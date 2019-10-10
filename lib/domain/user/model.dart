@@ -15,7 +15,7 @@ class User {
   }
 }
 
-class ChatState {
+class UserStore {
   final User user;
   final bool loading;
 
