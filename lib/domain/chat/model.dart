@@ -34,10 +34,10 @@ class Chat {
 }
 
 class ChatStore {
-  final Map chats;
+  final int counter;
   final bool initing;
   final bool loading;
-  final int counter;
+  final List<Chat> chats;
 
   const ChatStore({
     this.chats,

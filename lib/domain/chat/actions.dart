@@ -2,7 +2,19 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
 
-class SetChats {}
+import './model.dart';
+
+class SetChats {
+  final List<Chat> chats;
+
+  SetChats({this.chats});
+}
+
+class AddChat {
+  final Chat chat;
+
+  AddChat({this.chat});
+}
 
 class SetMessages {}
 
@@ -17,6 +29,7 @@ class SetCounter {
   SetCounter(this.counter);
 }
 
+void 
 void setCounterToDefault(Store<AppState> store) async {
   store.dispatch(SetCounter(5));
 }

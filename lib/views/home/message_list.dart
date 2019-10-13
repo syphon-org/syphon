@@ -4,15 +4,10 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
-
 import 'package:Tether/domain/chat/selectors.dart';
 
-import 'package:Tether/domain/chat/actions.dart';
-
-class Settings extends StatelessWidget {
-  Settings({Key key, this.title}) : super(key: key);
-
-  final String title;
+class MessageList extends StatelessWidget {
+  MessageList({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,22 +15,32 @@ class Settings extends StatelessWidget {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, false),
-          )),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               'You have pushed the button this many times:',
+            ),
+            ListView(
+              padding: const EdgeInsets.all(8),
+              children: <Widget>[
+                Container(
+                  height: 50,
+                  color: Colors.amber[600],
+                  child: const Center(child: Text('Entry A')),
+                ),
+                Container(
+                  height: 50,
+                  color: Colors.amber[500],
+                  child: const Center(child: Text('Entry B')),
+                ),
+                Container(
+                  height: 50,
+                  color: Colors.amber[100],
+                  child: const Center(child: Text('Entry C')),
+                ),
+              ],
             ),
             StoreConnector<AppState, int>(
               converter: (Store<AppState> store) => counter(store.state),
@@ -48,13 +53,6 @@ class Settings extends StatelessWidget {
             )
           ],
         ),
-      ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(incrementCounter()),
-        builder: (context, onPress) => FloatingActionButton(
-            child: Icon(Icons.add),
-            tooltip: 'Increment',
-            onPressed: () => onPress()),
       ),
     );
   }

@@ -21,8 +21,6 @@ class Home extends StatelessWidget {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(title,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
         leading: Builder(
@@ -30,16 +28,35 @@ class Home extends StatelessWidget {
             return IconButton(
               icon: CircleAvatar(
                 backgroundColor: Colors.grey,
-                child: Text('AH'),
+                child: Text('TE'),
               ),
               onPressed: () {
-                Scaffold.of(context).openDrawer();
+                Navigator.pushNamed(context, '/settings');
               },
               tooltip: 'Profile and Settings',
             );
           },
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              print('SEARCH STUB');
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              print('SEARCH STUB');
+            },
+            tooltip: 'Search Messages',
+          ),
           PopupMenuButton<Overflow>(
             onSelected: (Overflow result) {
               switch (result) {
@@ -97,7 +114,10 @@ class Home extends StatelessWidget {
       floatingActionButton: StoreConnector<AppState, dynamic>(
         converter: (store) => () => store.dispatch(incrementCounter()),
         builder: (context, onAction) => FloatingActionButton(
-            child: Icon(Icons.add),
+            child: Icon(
+              Icons.edit,
+              color: Colors.white,
+            ),
             tooltip: 'Increment',
             onPressed: () => onAction()),
       ),

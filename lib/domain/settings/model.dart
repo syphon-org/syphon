@@ -10,14 +10,16 @@ class Themes {
       primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
 
   static final ThemeData darkTheme = ThemeData(
-    primaryColor: Colors.grey,
-    brightness: Brightness.dark,
-  );
+      primaryColor: const Color(0xff34C7B5),
+      brightness: Brightness.dark,
+      fontFamily: 'Rubik',
+      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
 
   static final ThemeData darkerTheme = ThemeData(
-    primaryColor: Colors.black,
-    brightness: Brightness.dark,
-  );
+      primaryColor: const Color(0xff121212),
+      brightness: Brightness.dark,
+      fontFamily: 'Rubik',
+      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
 
   static ThemeData getThemeFromKey(ThemeType themeKey) {
     switch (themeKey) {
@@ -36,7 +38,7 @@ class Themes {
 class SettingsStore {
   final ThemeType theme;
 
-  const SettingsStore({this.theme = ThemeType.LIGHT});
+  const SettingsStore({this.theme = ThemeType.DARKER});
 
   @override
   int get hashCode => theme.hashCode;

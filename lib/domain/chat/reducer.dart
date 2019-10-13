@@ -6,9 +6,9 @@ ChatStore chatReducer([ChatStore state = const ChatStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetChats:
       return new ChatStore(
-        initing: false,
-        loading: false,
-        counter: 0,
+        initing: state.initing,
+        loading: state.loading,
+        counter: state.counter,
         chats: action.chats,
       );
     case SetMessages:
@@ -23,6 +23,13 @@ ChatStore chatReducer([ChatStore state = const ChatStore(), dynamic action]) {
         initing: false,
         loading: false,
         counter: 0,
+        chats: action.chats,
+      );
+    case CreateChat:
+      return new ChatStore(
+        initing: state.initing,
+        loading: state.loading,
+        counter: state.counter,
         chats: action.chats,
       );
     case SetCounter:

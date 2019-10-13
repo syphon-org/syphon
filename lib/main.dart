@@ -8,7 +8,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
 
 // Views
-import 'package:Tether/views/home.dart';
+import 'package:Tether/views/home/home.dart';
 import 'package:Tether/views/settings.dart';
 
 // Styling
