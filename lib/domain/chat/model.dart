@@ -35,13 +35,13 @@ class Chat {
 
 class ChatStore {
   final Map chats;
-  final bool counter;
+  final int counter;
   final bool initing;
   final bool loading;
 
   const ChatStore({
     this.chats,
-    this.counter,
+    this.counter = 0,
     this.initing,
     this.loading,
   });
