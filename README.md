@@ -11,4 +11,5 @@ A privacy centric messenger for the people
 
 
 ## Shoulders
+- (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]
 - (Redux Examples)[https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/lib/selectors/selectors.dart]

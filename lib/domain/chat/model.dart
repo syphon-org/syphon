@@ -35,14 +35,33 @@ class Chat {
 
 class ChatStore {
   final Map chats;
-  final int counter;
   final bool initing;
   final bool loading;
+  final int counter;
 
   const ChatStore({
     this.chats,
-    this.counter = 0,
     this.initing,
     this.loading,
+    this.counter = 0,
   });
+
+  @override
+  int get hashCode =>
+      chats.hashCode ^ initing.hashCode ^ counter.hashCode ^ loading.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatStore &&
+          runtimeType == other.runtimeType &&
+          chats == other.chats &&
+          initing == other.initing &&
+          loading == other.loading &&
+          counter == other.counter;
+
+  @override
+  String toString() {
+    return 'ChatStore{chats: $chats, initing: $initing, loading: $loading, counter: $counter}';
+  }
 }

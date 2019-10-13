@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -7,6 +5,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/chat/selectors.dart';
+import 'package:Tether/domain/chat/actions.dart';
+
+enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
 class Home extends StatelessWidget {
   Home({Key key, this.title}) : super(key: key);
@@ -22,30 +23,66 @@ class Home extends StatelessWidget {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(title),
+        title: Text(title,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Text('AH'),
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: 'Profile and Settings',
+            );
+          },
+        ),
+        actions: <Widget>[
+          PopupMenuButton<Overflow>(
+            onSelected: (Overflow result) {
+              switch (result) {
+                case Overflow.settings:
+                  Navigator.pushNamed(context, '/settings');
+                  break;
+                default:
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Overflow>>[
+              const PopupMenuItem<Overflow>(
+                value: Overflow.newGroup,
+                child: Text('New Group'),
+              ),
+              const PopupMenuItem<Overflow>(
+                value: Overflow.markAllRead,
+                child: Text('Mark All Read'),
+              ),
+              const PopupMenuItem<Overflow>(
+                value: Overflow.inviteFriends,
+                child: Text('Invite Friends'),
+              ),
+              const PopupMenuItem<Overflow>(
+                value: Overflow.settings,
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem<Overflow>(
+                value: Overflow.help,
+                child: Text('Help'),
+              ),
+            ],
+          )
+        ],
       ),
       body: Center(
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               'You have pushed the button this many times:',
             ),
-            new StoreConnector<AppState, int>(
+            StoreConnector<AppState, int>(
               converter: (Store<AppState> store) => counter(store.state),
               builder: (context, count) {
                 return new Text(
@@ -57,11 +94,13 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => print('STUB'),
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: StoreConnector<AppState, dynamic>(
+        converter: (store) => () => store.dispatch(incrementCounter()),
+        builder: (context, onAction) => FloatingActionButton(
+            child: Icon(Icons.add),
+            tooltip: 'Increment',
+            onPressed: () => onAction()),
+      ),
     );
   }
 }

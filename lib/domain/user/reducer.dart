@@ -1,29 +1,22 @@
 import './model.dart';
+import './actions.dart';
 
-enum Actions { login, logout, setLoading, reset }
-
-UserStore userReducer(UserStore state, action) {
-  switch (action.type) {
-    case Actions.login:
-      return new UserStore(
-          loading: false,
-          user: new User(
-            id: action.id,
-            name: action.name,
-          ));
-    case Actions.logout:
-      return new UserStore(
-          loading: false,
-          user: new User(
-            id: action.id,
-            name: action.name,
-          ));
-    case Actions.setLoading:
+UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
+  print('User Reducer $action');
+  switch (action.runtimeType) {
+    case SetLoading:
       return new UserStore(
           loading: action.loading,
           user: new User(
-            id: state.user.id,
-            name: state.user.name,
+            id: action.id,
+            name: action.name,
+          ));
+    case SetUser:
+      return new UserStore(
+          loading: state.loading,
+          user: new User(
+            id: action.id,
+            name: action.name,
           ));
     default:
       return state;
