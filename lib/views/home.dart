@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/chat/selectors.dart';
 
 class Home extends StatelessWidget {
   Home({Key key, this.title}) : super(key: key);
@@ -44,12 +45,11 @@ class Home extends StatelessWidget {
             Text(
               'You have pushed the button this many times:',
             ),
-            new StoreConnector<AppState, String>(
-              converter: (Store<AppState> store) =>
-                  store.state.chatStore.counter.toString(),
+            new StoreConnector<AppState, int>(
+              converter: (Store<AppState> store) => counter(store.state),
               builder: (context, count) {
                 return new Text(
-                  count,
+                  count.toString(),
                   style: Theme.of(context).textTheme.display1,
                 );
               },
