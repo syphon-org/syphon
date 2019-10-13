@@ -38,7 +38,7 @@ class Themes {
 class SettingsStore {
   final ThemeType theme;
 
-  const SettingsStore({this.theme = ThemeType.DARKER});
+  const SettingsStore({this.theme = ThemeType.LIGHT});
 
   @override
   int get hashCode => theme.hashCode;

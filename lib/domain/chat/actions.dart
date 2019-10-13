@@ -29,7 +29,6 @@ class SetCounter {
   SetCounter(this.counter);
 }
 
-void 
 void setCounterToDefault(Store<AppState> store) async {
   store.dispatch(SetCounter(5));
 }

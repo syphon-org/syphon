@@ -25,7 +25,7 @@ ChatStore chatReducer([ChatStore state = const ChatStore(), dynamic action]) {
         counter: 0,
         chats: action.chats,
       );
-    case CreateChat:
+    case AddChat:
       return new ChatStore(
         initing: state.initing,
         loading: state.loading,
