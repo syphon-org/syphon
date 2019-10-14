@@ -27,8 +27,8 @@ class Chat {
 
   const Chat({
     this.chatId,
-    this.title,
-    this.messages,
+    this.title = 'New Chat',
+    this.messages = const [],
     this.syncing = false,
   });
 }
@@ -40,9 +40,9 @@ class ChatStore {
   final List<Chat> chats;
 
   const ChatStore({
-    this.chats,
-    this.initing,
-    this.loading,
+    this.chats = const [],
+    this.initing = true,
+    this.loading = false,
     this.counter = 0,
   });
 

@@ -9,8 +9,8 @@ import 'package:Tether/domain/chat/selectors.dart';
 
 import 'package:Tether/domain/chat/actions.dart';
 
-class Settings extends StatelessWidget {
-  Settings({Key key, this.title}) : super(key: key);
+class SettingsScreen extends StatelessWidget {
+  SettingsScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -21,15 +21,13 @@ class Settings extends StatelessWidget {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, false),
-          )),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context, false),
+        ),
+        title: Text(title,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

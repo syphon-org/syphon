@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
@@ -22,7 +24,21 @@ class SetIniting {}
 
 class SetLoading {}
 
-// EXAMPLE
+ThunkAction<AppState> addChat() {
+  // return (dispatch, state) =>
+  return (Store<AppState> store) async {
+    var chatId = Random.secure().nextInt(10000000).toString();
+
+    store.dispatch(AddChat(
+        chat: Chat(
+            chatId: chatId,
+            title: 'chat-$chatId',
+            messages: [],
+            syncing: false)));
+  };
+}
+
+// *** EXAMPLES ***
 class SetCounter {
   final int counter;
 

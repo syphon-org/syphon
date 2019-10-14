@@ -8,7 +8,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
 
 // Views
-import 'package:Tether/views/home/home.dart';
+import 'package:Tether/views/home/index.dart';
+import 'package:Tether/views/chat/index.dart';
 import 'package:Tether/views/settings.dart';
 
 // Styling
@@ -36,8 +37,10 @@ class Tether extends StatelessWidget {
           theme: Themes.getThemeFromKey(store.state.settingsStore.theme),
           initialRoute: '/',
           routes: <String, WidgetBuilder>{
-            '/': (BuildContext context) => Home(title: 'Tether'),
-            '/settings': (BuildContext context) => Settings(title: 'Settings')
+            '/': (BuildContext context) => HomeScreen(title: 'Tether'),
+            '/chat': (BuildContext context) => ChatScreen(),
+            '/settings': (BuildContext context) =>
+                SettingsScreen(title: 'Settings')
           },
         ));
   }

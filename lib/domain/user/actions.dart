@@ -7,7 +7,7 @@ import './model.dart';
 class SetLoading {
   final bool loading;
 
-  SetLoading(this.loading);
+  SetLoading({this.loading});
 }
 
 class SetUser {
@@ -18,9 +18,9 @@ class SetUser {
 
 ThunkAction<AppState> initAuthenticationObserver() {
   return (Store<AppState> store) async {
-    store.dispatch(SetLoading(true));
+    store.dispatch(SetLoading(loading: true));
 
-    store.dispatch(SetLoading(false));
+    store.dispatch(SetLoading(loading: false));
   };
 }
 
@@ -28,7 +28,7 @@ ThunkAction<AppState> signupUser({username, domain, password}) {
   // return (dispatch, state) =>
   return (Store<AppState> store) async {
     // TODO: call out to matrix here
-    store.dispatch(SetLoading(false));
+    store.dispatch(SetLoading(loading: false));
   };
 }
 
@@ -36,6 +36,6 @@ ThunkAction<AppState> setLoading(bool loading) {
   print('User Set Loading');
   return (Store<AppState> store) async {
     print('Async Set Loading $loading');
-    store.dispatch(SetLoading(loading));
+    store.dispatch(SetLoading(loading: loading));
   };
 }
