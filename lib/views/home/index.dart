@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.topCenter,
         child: Column(
           children: <Widget>[
             StoreConnector<AppState, List<Chat>>(

@@ -16,3 +16,13 @@ ThunkAction<AppState> initSettings() {
     store.dispatch(SetTheme(ThemeType.LIGHT));
   };
 }
+
+ThunkAction<AppState> incrementTheme() {
+  return (Store<AppState> store) async {
+    ThemeType currentTheme = store.state.settingsStore.theme;
+    int themeIndex = ThemeType.values.indexOf(currentTheme);
+    print(themeIndex);
+    store.dispatch(
+        SetTheme(ThemeType.values[(themeIndex + 1) % ThemeType.values.length]));
+  };
+}

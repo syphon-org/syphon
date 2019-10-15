@@ -10,6 +10,9 @@ A privacy centric messenger for the people
 - (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
 
 
-## Shoulders
+## Getting Started
 - (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]
 - (Redux Examples)[https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/lib/selectors/selectors.dart]
+
+## Layouts and Styling
+- (Scrolling With Text Inputs)[https://github.com/flutter/flutter/issues/13339]

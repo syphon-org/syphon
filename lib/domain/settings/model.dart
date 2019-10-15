@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 enum ThemeType { LIGHT, DARK, DARKER }
 
+const colors = const {
+  'primary': 0xff34C7B5,
+};
+
 class Themes {
   static final ThemeData lightTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
@@ -11,19 +15,30 @@ class Themes {
       textTheme: TextTheme(
           headline: TextStyle(fontWeight: FontWeight.w100),
           title: TextStyle(fontWeight: FontWeight.w100),
+          caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
           button: TextStyle(fontWeight: FontWeight.w100)));
 
   static final ThemeData darkTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
       brightness: Brightness.dark,
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
+      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      textTheme: TextTheme(
+          headline: TextStyle(fontWeight: FontWeight.w100),
+          title: TextStyle(fontWeight: FontWeight.w100),
+          caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
+          button: TextStyle(fontWeight: FontWeight.w100)));
 
   static final ThemeData darkerTheme = ThemeData(
       primaryColor: const Color(0xff121212),
       brightness: Brightness.dark,
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
+      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      textTheme: TextTheme(
+          headline: TextStyle(fontWeight: FontWeight.w100),
+          title: TextStyle(fontWeight: FontWeight.w100),
+          caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
+          button: TextStyle(fontWeight: FontWeight.w100)));
 
   static ThemeData getThemeFromKey(ThemeType themeKey) {
     switch (themeKey) {

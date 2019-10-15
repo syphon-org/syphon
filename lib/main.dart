@@ -38,18 +38,25 @@ class Tether extends StatelessWidget {
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
         store: store,
-        child: MaterialApp(
-          title: 'Tether',
-          theme: Themes.getThemeFromKey(store.state.settingsStore.theme),
-          initialRoute: '/login',
-          routes: <String, WidgetBuilder>{
-            '/login': (BuildContext context) => LoginScreen(title: 'Login'),
-            '/signup': (BuildContext context) => SignupScreen(title: 'Signup'),
-            '/home': (BuildContext context) => HomeScreen(title: 'Tether'),
-            '/chat': (BuildContext context) => ChatScreen(),
-            '/settings': (BuildContext context) =>
-                SettingsScreen(title: 'Settings')
-          },
-        ));
+        child: StoreConnector<AppState, dynamic>(
+            converter: (store) => store.state.settingsStore.theme,
+            builder: (context, theme) {
+              return MaterialApp(
+                title: 'Tether',
+                theme: Themes.getThemeFromKey(theme),
+                initialRoute: '/login',
+                routes: <String, WidgetBuilder>{
+                  '/login': (BuildContext context) =>
+                      LoginScreen(title: 'Login'),
+                  '/signup': (BuildContext context) =>
+                      SignupScreen(title: 'Signup'),
+                  '/home': (BuildContext context) =>
+                      HomeScreen(title: 'Tether'),
+                  '/chat': (BuildContext context) => ChatScreen(),
+                  '/settings': (BuildContext context) =>
+                      SettingsScreen(title: 'Settings')
+                },
+              );
+            }));
   }
 }
