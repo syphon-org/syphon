@@ -7,10 +7,16 @@ import 'package:flutter_redux/flutter_redux.dart';
 // Redux - State Managment - "store"
 import 'package:Tether/domain/index.dart';
 
-// Views
+// Intro
+import 'package:Tether/views/intro/login.dart';
+import 'package:Tether/views/intro/signup.dart';
+
+// Home
 import 'package:Tether/views/home/index.dart';
+import 'package:Tether/views/home/settings.dart';
+
+// Chat
 import 'package:Tether/views/chat/index.dart';
-import 'package:Tether/views/settings.dart';
 
 // Styling
 import 'package:Tether/domain/settings/model.dart';
@@ -35,9 +41,11 @@ class Tether extends StatelessWidget {
         child: MaterialApp(
           title: 'Tether',
           theme: Themes.getThemeFromKey(store.state.settingsStore.theme),
-          initialRoute: '/',
+          initialRoute: '/login',
           routes: <String, WidgetBuilder>{
-            '/': (BuildContext context) => HomeScreen(title: 'Tether'),
+            '/login': (BuildContext context) => LoginScreen(title: 'Login'),
+            '/signup': (BuildContext context) => SignupScreen(title: 'Signup'),
+            '/home': (BuildContext context) => HomeScreen(title: 'Tether'),
             '/chat': (BuildContext context) => ChatScreen(),
             '/settings': (BuildContext context) =>
                 SettingsScreen(title: 'Settings')

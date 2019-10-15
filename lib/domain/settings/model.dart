@@ -7,7 +7,11 @@ class Themes {
       primaryColor: const Color(0xff34C7B5),
       brightness: Brightness.light,
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)));
+      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      textTheme: TextTheme(
+          headline: TextStyle(fontWeight: FontWeight.w100),
+          title: TextStyle(fontWeight: FontWeight.w100),
+          button: TextStyle(fontWeight: FontWeight.w100)));
 
   static final ThemeData darkTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
@@ -52,6 +56,6 @@ class SettingsStore {
 
   @override
   String toString() {
-    return 'SettingsStore{user: $theme}';
+    return 'SettingsStore{theme: $theme}';
   }
 }

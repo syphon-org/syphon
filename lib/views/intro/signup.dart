@@ -9,8 +9,8 @@ import 'package:Tether/domain/chat/selectors.dart';
 
 import 'package:Tether/domain/chat/actions.dart';
 
-class Home extends StatelessWidget {
-  Home({Key key, this.title}) : super(key: key);
+class SignupScreen extends StatelessWidget {
+  SignupScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
