@@ -63,7 +63,7 @@ class SignupScreen extends StatelessWidget {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30.0)),
-                                labelText: 'Alias',
+                                labelText: 'Username',
                               ),
                             ),
                           );

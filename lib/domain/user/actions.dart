@@ -4,6 +4,8 @@ import 'package:Tether/domain/index.dart';
 
 import './model.dart';
 
+import 'package:Tether/global/libs/hive.dart';
+
 class SetLoading {
   final bool loading;
 
@@ -24,10 +26,19 @@ ThunkAction<AppState> initAuthenticationObserver() {
   };
 }
 
-ThunkAction<AppState> signupUser({username, domain, password}) {
+ThunkAction<AppState> signupUser({username, homeserver, password}) {
   // return (dispatch, state) =>
   return (Store<AppState> store) async {
     // TODO: call out to matrix here
+    store.dispatch(SetLoading(loading: true));
+
+    var registrationUrl = homeserver + '_matrix/client/api/v1/register';
+    var registrationOptions = {
+      'user': username,
+      'password': password,
+      'type': "m.login.password"
+    };
+
     store.dispatch(SetLoading(loading: false));
   };
 }

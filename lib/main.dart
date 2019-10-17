@@ -4,12 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+// Library Implimentations
+import 'package:Tether/global/libs/hive.dart';
+
 // Redux - State Managment - "store"
 import 'package:Tether/domain/index.dart';
 
 // Intro
 import 'package:Tether/views/intro/login.dart';
 import 'package:Tether/views/intro/signup.dart';
+import 'package:Tether/views/intro/intro.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
@@ -27,13 +31,21 @@ void _enablePlatformOverrideForDesktop() {
   }
 }
 
-void main() {
+void main() async {
   _enablePlatformOverrideForDesktop();
-  runApp(Tether());
+  runApp(TetherState());
 }
 
-class Tether extends StatelessWidget {
+class TetherState extends StatefulWidget {
+  Tether createState() => Tether();
+}
+
+class Tether extends State<TetherState> {
   // This widget is the root of your application.
+  createState() async {
+    await initStorage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
@@ -44,8 +56,10 @@ class Tether extends StatelessWidget {
               return MaterialApp(
                 title: 'Tether',
                 theme: Themes.getThemeFromKey(theme),
-                initialRoute: '/login',
+                initialRoute: '/intro',
                 routes: <String, WidgetBuilder>{
+                  '/intro': (BuildContext context) =>
+                      IntroScreen(title: 'Intro'),
                   '/login': (BuildContext context) =>
                       LoginScreen(title: 'Login'),
                   '/signup': (BuildContext context) =>

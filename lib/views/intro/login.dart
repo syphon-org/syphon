@@ -1,5 +1,3 @@
-import 'package:Tether/domain/settings/actions.dart';
-import 'package:Tether/domain/settings/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +5,9 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
-
 import 'package:Tether/domain/chat/selectors.dart';
-
 import 'package:Tether/domain/user/model.dart';
+import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -94,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(30.0)),
-                                      labelText: 'Alias',
+                                      labelText: 'Username',
                                     ),
                                   ),
                                 );
@@ -135,12 +132,11 @@ class LoginScreen extends StatelessWidget {
                                     minWidth: 200,
                                     maxWidth: 400,
                                     minHeight: 45),
-                                child: MaterialButton(
+                                child: FlatButton(
                                   onPressed: () {
                                     Navigator.pushNamed(context, '/home');
                                   },
                                   color: Theme.of(context).primaryColor,
-                                  minWidth: width * 0.65,
                                   shape: RoundedRectangleBorder(
                                       borderRadius:
                                           new BorderRadius.circular(30.0)),

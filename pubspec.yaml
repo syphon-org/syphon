@@ -24,6 +24,10 @@ dependencies:
   flutter_redux: 0.5.3
   flutter_svg: 0.14.2
   touchable_opacity: 1.0.2
+  hive: 1.1.0
+  hive_flutter:  0.2.1
+  path_provider: 1.3.1
+  flutter_secure_storage: 3.3.1+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -31,7 +35,8 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
+    sdk: flutter 
+  hive_generator: 0.5.2
 
 
 # For information on the generic Dart part of this file, see the
@@ -57,7 +62,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    - assets/icons/noun_polygon_teal.svg
-   - assets/icons/noun_polygon_teal.png
+   - assets/icons/noun_polygon_teal.png 
+   - assets/graphics/undraw_mobile_user.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

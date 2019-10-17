@@ -9,6 +9,7 @@ import './user/reducer.dart';
 import './settings/reducer.dart';
 import './chat/reducer.dart';
 
+// https://matrix.org/docs/api/client-server/#!/User32data/register
 class AppState {
   final UserStore userStore;
   final SettingsStore settingsStore;
