@@ -12,17 +12,6 @@ import 'package:Tether/domain/settings/actions.dart';
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-// TODO: do you want these?
-// const Image(
-//   image: NetworkImage(
-//       'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-// ),
-
-// Text(
-//   'Welcome!',
-//   style: Theme.of(context).textTheme.display2,
-// ),
-
 class LoginScrollBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(

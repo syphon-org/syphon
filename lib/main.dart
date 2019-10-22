@@ -11,9 +11,9 @@ import 'package:Tether/global/libs/hive.dart';
 import 'package:Tether/domain/index.dart';
 
 // Intro
-import 'package:Tether/views/intro/login.dart';
-import 'package:Tether/views/intro/signup.dart';
-import 'package:Tether/views/intro/intro.dart';
+import 'package:Tether/views/onboarding/login.dart';
+import 'package:Tether/views/onboarding/signup.dart';
+import 'package:Tether/views/onboarding/intro/index.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';

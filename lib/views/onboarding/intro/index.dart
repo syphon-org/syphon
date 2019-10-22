@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -8,13 +7,27 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/model.dart';
 
-import 'package:touchable_opacity/touchable_opacity.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import './landing.dart';
 
 class IntroScreen extends StatelessWidget {
   IntroScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
+  /**
+   *  Swiper(
+                itemBuilder: (BuildContext context, int index) {
+                  return SvgPicture.asset(
+                      'assets/graphics/undraw_mobile_user.svg',
+                      semanticsLabel: 'Relaxed, Lounging User');
+                },
+                itemCount: 3,
+                pagination: new SwiperPagination(),
+              )
+   */
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -27,27 +40,16 @@ class IntroScreen extends StatelessWidget {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: height * 0.05),
           Container(
-            width: width * 0.7,
-            height: DEFAULT_INPUT_HEIGHT,
-            constraints:
-                BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-            child: SvgPicture.asset('assets/graphics/undraw_mobile_user.svg',
-                semanticsLabel: 'Relaxed, Lounging User'),
-          ),
-          SizedBox(height: height * 0.025),
-          Text(
-            'Welcome to Tether',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.display1,
-          ),
-          SizedBox(height: height * 0.025),
-          Text(
-            'Take back your privacy and freedom \nwithout the hassle.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle,
-          ),
+              width: width,
+              height: height * 0.6,
+              child: Swiper(
+                itemBuilder: (BuildContext context, int index) {
+                  return LandingSection();
+                },
+                itemCount: 3,
+              )),
+          // LandingSection(),
           SizedBox(height: height * 0.15),
           StoreConnector<AppState, UserStore>(
             converter: (Store<AppState> store) => store.state.userStore,
