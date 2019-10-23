@@ -7,8 +7,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/model.dart';
 
+// Styling Widgets
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
 
 import './landing.dart';
 import './understanding.dart';
@@ -25,10 +26,8 @@ class IntroScreen extends StatefulWidget {
 
 class IntroScreenState extends State<IntroScreen> {
   final String title;
-  SwiperController controller;
   final double DEFAULT_INPUT_HEIGHT = 52;
   final double DEFAULT_BUTTON_HEIGHT = 48;
-
   final sections = [
     LandingSection(),
     UnderstandingSection(),
@@ -37,11 +36,29 @@ class IntroScreenState extends State<IntroScreen> {
     ActionSection(),
   ];
 
+  int currentStep = 0;
+  bool onboarding = false;
+  SwiperController controller;
+
   IntroScreenState({Key key, this.title});
 
   @override
   void initState() {
     controller = new SwiperController();
+  }
+
+  Widget buildButtonText() {
+    switch (currentStep) {
+      case 0:
+        return const Text('Let\'s Go',
+            style: TextStyle(fontSize: 20, color: Colors.white));
+      case 4:
+        return const Text('Count Me In',
+            style: TextStyle(fontSize: 20, color: Colors.white));
+      default:
+        return const Text('Next',
+            style: TextStyle(fontSize: 20, color: Colors.white));
+    }
   }
 
   @override
@@ -63,6 +80,11 @@ class IntroScreenState extends State<IntroScreen> {
                 itemBuilder: (BuildContext context, int index) {
                   return sections[index];
                 },
+                onIndexChanged: (index) {
+                  setState(() {
+                    currentStep = index;
+                  });
+                },
                 loop: false,
                 itemCount: 5,
                 controller: controller,
@@ -78,18 +100,62 @@ class IntroScreenState extends State<IntroScreen> {
                 constraints:
                     BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 45),
                 child: FlatButton(
-                  onPressed: () {
-                    controller.next(animation: true);
-                  },
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  child: const Text('Let\'s Go',
-                      style: TextStyle(fontSize: 20, color: Colors.white)),
-                ),
+                    onPressed: () {
+                      if (currentStep != sections.length - 1) {
+                        setState(() {
+                          onboarding = true;
+                        });
+                        controller.next(animation: true);
+                      } else {
+                        Navigator.pushNamed(
+                          context,
+                          '/signup',
+                        );
+                      }
+                    },
+                    color: Theme.of(context).primaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    child: buildButtonText()),
               );
             },
           ),
+          Container(
+              height: DEFAULT_INPUT_HEIGHT,
+              margin: const EdgeInsets.all(10.0),
+              constraints: BoxConstraints(minWidth: 200, minHeight: 45),
+              child: Visibility(
+                  visible: !onboarding,
+                  child: TouchableOpacity(
+                      activeOpacity: 0.4,
+                      onTap: () => Navigator.pushNamed(
+                            context,
+                            '/login',
+                          ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Already have a username?',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w100,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Text('Login',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w100,
+                                  color: Theme.of(context).primaryColor,
+                                  decoration: TextDecoration.underline,
+                                )),
+                          ),
+                        ],
+                      )))),
         ],
       )),
     );

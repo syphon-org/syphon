@@ -28,11 +28,11 @@ class PossibilitiesSection extends StatelessWidget {
         ),
         SizedBox(height: height * 0.04),
         Text(
-          'Both Matrix and Tether are open source and \nrun by organizations and individuals, \bnot corporations.',
+          'Matrix and Tether are open source \nand run by organizations and individuals,\nnot corporations.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.025),
+        SizedBox(height: height * 0.015),
       ],
     ));
   }
