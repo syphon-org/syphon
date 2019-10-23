@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class LandingSection extends StatelessWidget {
-  LandingSection({Key key, this.title}) : super(key: key);
+class ActionSection extends StatelessWidget {
+  ActionSection({Key key, this.title}) : super(key: key);
 
   final String title;
   final double DEFAULT_INPUT_HEIGHT = 52;
@@ -23,22 +23,16 @@ class LandingSection extends StatelessWidget {
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset('assets/graphics/undraw_mobile_user.svg',
-              semanticsLabel: 'Relaxed, Lounging User'),
+          child: SvgPicture.asset('assets/graphics/undraw_people.svg',
+              semanticsLabel: 'User hidding behind a message'),
         ),
-        SizedBox(height: height * 0.025),
+        SizedBox(height: height * 0.04),
         Text(
-          'Welcome to Tether',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.display1,
-        ),
-        SizedBox(height: height * 0.025),
-        Text(
-          'Take back your privacy and freedom \nwithout the hassle.',
+          'By sharing Tether and other Matrix clients\nwe can make private communication \naccessible to everyone',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.025),
+        SizedBox(height: height * 0.01),
       ],
     ));
   }

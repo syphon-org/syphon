@@ -65,6 +65,12 @@ flutter:
    - assets/icons/noun_polygon_teal.svg
    - assets/icons/noun_polygon_teal.png 
    - assets/graphics/undraw_mobile_user.svg
+   - assets/graphics/undraw_messaging_fun.svg
+   - assets/graphics/undraw_connection.svg
+   - assets/graphics/undraw_group_chat.svg
+   - assets/graphics/undraw_people.svg
+   - assets/graphics/undraw_site_content.svg
+   - assets/graphics/undraw_escaping.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
