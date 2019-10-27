@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:Tether/global/assets.dart';
+
 class ActionSection extends StatelessWidget {
   ActionSection({Key key, this.title}) : super(key: key);
 
@@ -23,7 +25,7 @@ class ActionSection extends StatelessWidget {
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset('assets/graphics/undraw_people.svg',
+          child: SvgPicture.asset(PEOPLE_GRAPHIC,
               semanticsLabel: 'User hidding behind a message'),
         ),
         SizedBox(height: height * 0.04),

@@ -49,7 +49,7 @@ class ChatScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/settings');
             },
-            tooltip: 'Profile a',
+            tooltip: 'Profile and settings',
           ),
           Text(arguments.title,
               style:

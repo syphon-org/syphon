@@ -1,30 +1,61 @@
+import 'package:Tether/domain/index.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
-const TETHER_HIVE_ENCRYPTION_KEY = 'tether@hivekey';
-const TETHER_HIVE_KEY = 'tether';
+const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
+const HIVE_BOX_NAME = 'tether';
+const APPSTATE_HIVE_KEY = 'app_state';
 
-Future initStorage() async {
+/**
+ * Initializes encrypted storage that caches redux store 
+ * Testing:
+    print(box);
+    print(box.keys);
+    print(box.get('someone')); 
+ */
+void initStorage() async {
   var appStorageLocation = await getApplicationDocumentsDirectory();
   Hive.init(appStorageLocation.path);
 
   final storage = new FlutterSecureStorage();
-  final encryptionKey = Hive.generateSecureKey();
-  print(encryptionKey);
-  print(encryptionKey.toString());
 
-  await storage.write(
-      key: TETHER_HIVE_ENCRYPTION_KEY, value: jsonEncode(encryptionKey));
-  return await Hive.openBox(TETHER_HIVE_KEY, encryptionKey: encryptionKey);
+  // Check if storage has been created before
+  var encryptionKeySerialized = await storage.read(key: STORAGE_ENCRYPTION_KEY);
+  List<int> encryptionKey;
+
+  // Create a encryptionKey if a serialized one is not found
+  if (encryptionKeySerialized == null) {
+    encryptionKey = Hive.generateSecureKey();
+    await storage.write(
+        key: STORAGE_ENCRYPTION_KEY, value: jsonEncode(encryptionKey));
+  }
+
+  encryptionKey = jsonDecode(encryptionKeySerialized).cast<int>();
+
+  await Hive.openBox(HIVE_BOX_NAME, encryptionKey: encryptionKey);
 }
 
-Future getStorage() async {
-  final storage = new FlutterSecureStorage();
-  var encryptionKeySerialized =
-      await storage.read(key: TETHER_HIVE_ENCRYPTION_KEY);
+AppState rehydateStore() {
+  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+  AppState state = box.get(APPSTATE_HIVE_KEY);
+  return state;
+}
 
-  List<int> encryptionKey = jsonDecode(encryptionKeySerialized);
-  return await Hive.openBox('tether@hive', encryptionKey: encryptionKey);
+void cacheStore(AppState state) async {
+  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+  box.put(APPSTATE_HIVE_KEY, state);
+}
+
+void clearStorage() {
+  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+  box.put(APPSTATE_HIVE_KEY, null);
+}
+
+// Closes and saves storage
+void closeStorage() async {
+  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+  box.close();
+  // print();
 }

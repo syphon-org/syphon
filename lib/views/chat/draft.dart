@@ -33,7 +33,7 @@ class Home extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/settings');
               },
-              tooltip: 'Profile and Settings',
+              tooltip: 'Profile',
             );
           },
         ),

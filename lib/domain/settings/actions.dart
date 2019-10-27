@@ -1,8 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
-
-import './model.dart';
+import 'package:Tether/global/themes.dart';
 
 class SetTheme {
   final ThemeType theme;
@@ -21,7 +20,6 @@ ThunkAction<AppState> incrementTheme() {
   return (Store<AppState> store) async {
     ThemeType currentTheme = store.state.settingsStore.theme;
     int themeIndex = ThemeType.values.indexOf(currentTheme);
-    print(themeIndex);
     store.dispatch(
         SetTheme(ThemeType.values[(themeIndex + 1) % ThemeType.values.length]));
   };

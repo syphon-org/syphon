@@ -2,7 +2,6 @@ import './model.dart';
 import './actions.dart';
 
 ChatStore chatReducer([ChatStore state = const ChatStore(), dynamic action]) {
-  print('Chat Reducer $action');
   switch (action.runtimeType) {
     case SetChats:
       return ChatStore(

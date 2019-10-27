@@ -12,9 +12,9 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import './landing.dart';
-import './understanding.dart';
-import './possibilities.dart';
-import './explination.dart';
+import './first.dart';
+import './second.dart';
+import './third.dart';
 import './action.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -30,9 +30,9 @@ class IntroScreenState extends State<IntroScreen> {
   final double DEFAULT_BUTTON_HEIGHT = 48;
   final sections = [
     LandingSection(),
-    UnderstandingSection(),
-    ExplinationSection(),
-    PossibilitiesSection(),
+    FirstSection(),
+    SecondSection(),
+    ThirdSection(),
     ActionSection(),
   ];
 
@@ -71,11 +71,12 @@ class IntroScreenState extends State<IntroScreen> {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Spacer(flex: 8),
           Container(
               width: width,
-              height: height,
+              height: height * 0.6,
               constraints:
-                  BoxConstraints(minWidth: 125, minHeight: 200, maxHeight: 400),
+                  BoxConstraints(minWidth: 125, minHeight: 345, maxHeight: 400),
               child: Swiper(
                 itemBuilder: (BuildContext context, int index) {
                   return sections[index];
@@ -89,7 +90,7 @@ class IntroScreenState extends State<IntroScreen> {
                 itemCount: 5,
                 controller: controller,
               )),
-          SizedBox(height: height * 0.125),
+          Spacer(flex: 9),
           StoreConnector<AppState, UserStore>(
             converter: (Store<AppState> store) => store.state.userStore,
             builder: (context, userStore) {
@@ -97,8 +98,8 @@ class IntroScreenState extends State<IntroScreen> {
                 width: width * 0.7,
                 height: DEFAULT_BUTTON_HEIGHT,
                 margin: const EdgeInsets.all(10.0),
-                constraints:
-                    BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 45),
+                constraints: BoxConstraints(
+                    minWidth: 200, maxWidth: 400, minHeight: 45, maxHeight: 65),
                 child: FlatButton(
                     onPressed: () {
                       if (currentStep != sections.length - 1) {
@@ -120,6 +121,7 @@ class IntroScreenState extends State<IntroScreen> {
               );
             },
           ),
+          Spacer(flex: 1),
           Container(
               height: DEFAULT_INPUT_HEIGHT,
               margin: const EdgeInsets.all(10.0),
@@ -156,6 +158,7 @@ class IntroScreenState extends State<IntroScreen> {
                           ),
                         ],
                       )))),
+          Spacer(flex: 1),
         ],
       )),
     );

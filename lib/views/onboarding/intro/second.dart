@@ -2,8 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class ExplinationSection extends StatelessWidget {
-  ExplinationSection({Key key, this.title}) : super(key: key);
+// Assets
+import 'package:Tether/global/assets.dart';
+
+class SecondSection extends StatelessWidget {
+  SecondSection({Key key, this.title}) : super(key: key);
 
   final String title;
   final double DEFAULT_INPUT_HEIGHT = 52;
@@ -23,12 +26,12 @@ class ExplinationSection extends StatelessWidget {
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset('assets/graphics/undraw_connection.svg',
-              semanticsLabel: 'User hidding behind a message'),
+          child: SvgPicture.asset(CONNECTION_GRAPHIC,
+              semanticsLabel: 'Two people messaging privately but leisurely'),
         ),
         SizedBox(height: height * 0.04),
         Text(
-          'Matrix allows you to message others privately\nbut you control where your messages are stored',
+          'Matrix allows you to message others \nprivately but you control where \nyour messages are stored',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),

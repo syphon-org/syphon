@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class PossibilitiesSection extends StatelessWidget {
-  PossibilitiesSection({Key key, this.title}) : super(key: key);
+import 'package:Tether/global/assets.dart';
+
+class FirstSection extends StatelessWidget {
+  FirstSection({Key key, this.title}) : super(key: key);
 
   final String title;
   final double DEFAULT_INPUT_HEIGHT = 52;
@@ -17,22 +19,22 @@ class PossibilitiesSection extends StatelessWidget {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        SizedBox(height: height * 0.05),
+        SizedBox(height: height * 0.075),
         Container(
           width: width * 0.7,
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset('assets/graphics/undraw_group_chat.svg',
+          child: SvgPicture.asset(HIDDEN_MESSENGER_GRAPHIC,
               semanticsLabel: 'User hidding behind a message'),
         ),
-        SizedBox(height: height * 0.04),
+        SizedBox(height: height * 0.05),
         Text(
-          'Matrix and Tether are open source \nand run by organizations and individuals,\nnot corporations.',
+          'Tether works by using an encrypted \nand decentralized protocol called Matrix',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.015),
+        SizedBox(height: height * 0.025),
       ],
     ));
   }

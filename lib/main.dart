@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -13,6 +12,7 @@ import 'package:Tether/domain/index.dart';
 // Intro
 import 'package:Tether/views/onboarding/login.dart';
 import 'package:Tether/views/onboarding/signup.dart';
+import 'package:Tether/views/onboarding/search.dart';
 import 'package:Tether/views/onboarding/intro/index.dart';
 
 // Home
@@ -23,7 +23,7 @@ import 'package:Tether/views/home/settings.dart';
 import 'package:Tether/views/chat/index.dart';
 
 // Styling
-import 'package:Tether/domain/settings/model.dart';
+import 'package:Tether/global/themes.dart';
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -33,17 +33,32 @@ void _enablePlatformOverrideForDesktop() {
 
 void main() async {
   _enablePlatformOverrideForDesktop();
-  runApp(TetherState());
+  runApp(Tether());
 }
 
-class TetherState extends StatefulWidget {
-  Tether createState() => Tether();
+class Tether extends StatefulWidget {
+  @override
+  TetherState createState() => TetherState();
 }
 
-class Tether extends State<TetherState> {
-  // This widget is the root of your application.
-  createState() async {
-    await initStorage();
+class TetherState extends State<Tether> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    initStorage();
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('state = $state');
+  }
+
+  @override
+  void deactivate() {
+    closeStorage();
+    WidgetsBinding.instance.removeObserver(this);
+    super.deactivate();
   }
 
   @override
@@ -62,13 +77,15 @@ class Tether extends State<TetherState> {
                       IntroScreen(title: 'Intro'),
                   '/login': (BuildContext context) =>
                       LoginScreen(title: 'Login'),
+                  '/search_home': (BuildContext context) =>
+                      OnboardingSearchScreen(title: 'Find Your Homeserver'),
                   '/signup': (BuildContext context) =>
                       SignupScreen(title: 'Signup'),
                   '/home': (BuildContext context) =>
                       HomeScreen(title: 'Tether'),
                   '/chat': (BuildContext context) => ChatScreen(),
                   '/settings': (BuildContext context) =>
-                      SettingsScreen(title: 'Settings')
+                      SettingsScreen(title: 'Settings'),
                 },
               );
             }));

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+// Domain
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/chat/selectors.dart';
 import 'package:Tether/domain/user/model.dart';
@@ -11,6 +12,9 @@ import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
+
+// Assets
+import 'package:Tether/global/assets.dart';
 
 class LoginScrollBehavior extends ScrollBehavior {
   @override
@@ -32,41 +36,49 @@ class LoginScreen extends StatelessWidget {
     double DEFAULT_INPUT_HEIGHT = 52;
     double DEFAULT_BUTTON_HEIGHT = 48;
 
+    /* 
+     * TODO: find a more explicit way to style with flex
+     * Should be able to specify flex as a ratio of screen coverage without
+     * stretching elements, a mix of container and expanded
+    */
     return Scaffold(
       body: ScrollConfiguration(
         behavior: LoginScrollBehavior(),
         child: SingleChildScrollView(
-            child: Center(
+            // Use a container of the same height and width
+            // to flex dynamically but within a single child scroll
+            child: Container(
+                height: height,
+                width: width,
                 child: StoreConnector<AppState, dynamic>(
                     converter: (store) =>
                         () => store.dispatch(incrementTheme()),
                     builder: (context, onIncrementTheme) {
-                      return Column(
+                      return Flex(
+                        direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          SizedBox(height: height * 0.05),
+                          Spacer(flex: 8),
                           TouchableOpacity(
                             onTap: () {
                               onIncrementTheme();
                             },
                             child: const Image(
-                              width: 250,
-                              height: 250,
-                              image: AssetImage(
-                                  'assets/icons/noun_polygon_teal.png'),
+                              width: 150,
+                              height: 150,
+                              image: AssetImage(TETHER_ICON_PNG),
                             ),
                           ),
-                          SizedBox(height: height * 0.025),
+                          Spacer(flex: 4),
                           Text(
                             'Take back the chat',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.display1,
                           ),
-                          SizedBox(height: height * 0.1),
-                          StoreConnector<AppState, int>(
-                              converter: (Store<AppState> store) =>
-                                  counter(store.state),
-                              builder: (context, count) {
+                          Spacer(flex: 4),
+                          StoreConnector<AppState, AppState>(
+                              converter: (Store<AppState> store) => store.state,
+                              builder: (context, state) {
                                 return Container(
                                   width: width * 0.7,
                                   height: DEFAULT_INPUT_HEIGHT,
@@ -77,10 +89,21 @@ class LoginScreen extends StatelessWidget {
                                       minHeight: 45),
                                   child: TextField(
                                     decoration: InputDecoration(
+                                      suffixIcon: IconButton(
+                                          icon: Icon(Icons.search),
+                                          tooltip:
+                                              'Select your usernames homeserver',
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/search_home',
+                                            );
+                                          }),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(30.0)),
-                                      labelText: 'Username',
+                                      labelText: 'username@' +
+                                          state.userStore.homeserver,
                                     ),
                                   ),
                                 );
@@ -103,12 +126,12 @@ class LoginScreen extends StatelessWidget {
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(30.0)),
-                                      labelText: 'Password',
+                                      labelText: 'password',
                                     ),
                                   ),
                                 );
                               }),
-                          SizedBox(height: height * 0.05),
+                          Spacer(flex: 1),
                           StoreConnector<AppState, UserStore>(
                             converter: (Store<AppState> store) =>
                                 store.state.userStore,
@@ -136,6 +159,7 @@ class LoginScreen extends StatelessWidget {
                               );
                             },
                           ),
+                          Spacer(flex: 1),
                           Container(
                               height: DEFAULT_INPUT_HEIGHT,
                               margin: const EdgeInsets.all(10.0),
@@ -151,7 +175,7 @@ class LoginScreen extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Text(
-                                        'Don\'t have an alias yet?',
+                                        'Don\'t have an username?',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 18,
@@ -160,7 +184,7 @@ class LoginScreen extends StatelessWidget {
                                       ),
                                       Container(
                                         padding: const EdgeInsets.only(left: 4),
-                                        child: Text('Create an alias',
+                                        child: Text('Create one',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 18,
@@ -172,7 +196,8 @@ class LoginScreen extends StatelessWidget {
                                             )),
                                       ),
                                     ],
-                                  )))
+                                  ))),
+                          Spacer(flex: 1),
                         ],
                       );
                     }))),

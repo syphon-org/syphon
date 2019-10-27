@@ -6,7 +6,11 @@ class User {
   final String accessToken;
 
   const User(
-      {this.id, this.name, this.username, this.homeserver, this.accessToken});
+      {this.id,
+      this.name,
+      this.username,
+      this.homeserver = 'matrix.org',
+      this.accessToken});
 
   User preauthenticated({int id, String text, bool completed}) {
     return new User(
@@ -46,6 +50,7 @@ class UserStore {
   final String username;
   final String password;
   final String homeserver;
+  final List<dynamic> homeservers;
   final bool loading;
 
   const UserStore(
@@ -53,7 +58,8 @@ class UserStore {
       this.loading,
       this.password,
       this.username,
-      this.homeserver = 'https://matrix.org'});
+      this.homeservers,
+      this.homeserver = 'matrix.org'});
 
   @override
   int get hashCode =>
@@ -61,6 +67,7 @@ class UserStore {
       username.hashCode ^
       password.hashCode ^
       loading.hashCode ^
+      homeservers.hashCode ^
       homeserver.hashCode;
 
   @override
@@ -72,6 +79,7 @@ class UserStore {
           username == other.username &&
           password == other.password &&
           homeserver == other.homeserver &&
+          homeservers == other.homeservers &&
           loading == other.loading;
 
   @override

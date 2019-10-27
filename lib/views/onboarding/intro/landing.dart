@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:Tether/global/assets.dart';
+
 class LandingSection extends StatelessWidget {
   LandingSection({Key key, this.title}) : super(key: key);
 
@@ -23,7 +25,7 @@ class LandingSection extends StatelessWidget {
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset('assets/graphics/undraw_mobile_user.svg',
+          child: SvgPicture.asset(MOBILE_USER_GRAPHIC,
               semanticsLabel: 'Relaxed, Lounging User'),
         ),
         SizedBox(height: height * 0.025),
@@ -38,7 +40,6 @@ class LandingSection extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.025),
       ],
     ));
   }
