@@ -10,6 +10,9 @@ class Themes {
   static final ThemeData lightTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
       brightness: Brightness.light,
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.dark,
+      ),
       scaffoldBackgroundColor: const Color(0xFFFEFEFE),
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
@@ -24,6 +27,9 @@ class Themes {
   static final ThemeData primaryTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
       brightness: Brightness.dark,
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.dark,
+      ),
       scaffoldBackgroundColor: const Color(0xff34C7B5),
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
@@ -38,6 +44,9 @@ class Themes {
   static final ThemeData darkTheme = ThemeData(
       primaryColor: const Color(0xff34C7B5),
       brightness: Brightness.dark,
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.dark,
+      ),
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
       textTheme: TextTheme(
@@ -50,6 +59,9 @@ class Themes {
   static final ThemeData darkerTheme = ThemeData(
       primaryColor: const Color(0xff121212),
       brightness: Brightness.dark,
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.dark,
+      ),
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
       textTheme: TextTheme(

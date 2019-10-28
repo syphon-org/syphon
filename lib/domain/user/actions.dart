@@ -26,10 +26,22 @@ class SetUser {
   SetUser({this.user});
 }
 
+class SetHomeserver {
+  final dynamic homeserver;
+
+  SetHomeserver({this.homeserver});
+}
+
 class SetHomeservers {
   final List<dynamic> homeservers;
 
   SetHomeservers({this.homeservers});
+}
+
+class SetSearchResults {
+  final List<dynamic> searchResults;
+
+  SetSearchResults({this.searchResults});
 }
 
 ThunkAction<AppState> initAuthObserver() {
@@ -58,22 +70,29 @@ ThunkAction<AppState> setLoading(bool loading) {
   };
 }
 
+ThunkAction<AppState> setHomeserver({dynamic homeserver}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetHomeserver(homeserver: homeserver['hostname']));
+  };
+}
+
 ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
     var response = await http.get(HOMESERVER_SEARCH_SERVICE);
-
-    print(json.decode(response.body));
+    var homeservers = json.decode(response.body);
+    store.dispatch(SetHomeservers(homeservers: homeservers));
+    store.dispatch(SetLoading(loading: false));
   };
 }
 
 ThunkAction<AppState> searchHomeservers({String searchText}) {
   return (Store<AppState> store) async {
-    store.dispatch(SetLoading(loading: true));
-    List<dynamic> results = store.state.userStore.homeservers.where(
-        (homeserver) =>
-            homeserver.hostname.contains(searchText) ||
-            homeserver.description.contains(searchText));
-    store.dispatch(SetHomeservers(homeservers: results));
-    store.dispatch(SetLoading(loading: false));
+    List<dynamic> searchResults = store.state.userStore.homeservers
+        .where((homeserver) =>
+            homeserver['hostname'].contains(searchText) ||
+            homeserver['description'].contains(searchText))
+        .toList();
+    store.dispatch(SetSearchResults(searchResults: searchResults));
   };
 }

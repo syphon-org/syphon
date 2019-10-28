@@ -49,6 +49,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     super.initState();
   }
 
+  // TODO: REMOVE WHEN DEPLOYED
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print('state = $state');

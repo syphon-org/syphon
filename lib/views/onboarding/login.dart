@@ -89,16 +89,27 @@ class LoginScreen extends StatelessWidget {
                                       minHeight: 45),
                                   child: TextField(
                                     decoration: InputDecoration(
-                                      suffixIcon: IconButton(
-                                          icon: Icon(Icons.search),
-                                          tooltip:
-                                              'Select your usernames homeserver',
-                                          onPressed: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/search_home',
-                                            );
-                                          }),
+                                      suffixIcon:
+                                          //  Ink(
+                                          //     width: 5,
+                                          //     height: 5,
+                                          //     decoration: BoxDecoration(
+                                          //       border: Border.all(
+                                          //           color: Colors.cyan, width: 2.0),
+                                          //       shape: BoxShape.circle,
+                                          //     ),
+                                          //     child:
+                                          IconButton(
+                                              icon: Icon(Icons.help_outline),
+                                              tooltip:
+                                                  'Select your usernames homeserver',
+                                              onPressed: () {
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  '/search_home',
+                                                );
+                                              }),
+                                      // ),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(30.0)),

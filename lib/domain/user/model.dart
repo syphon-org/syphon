@@ -49,16 +49,20 @@ class UserStore {
   final User user;
   final String username;
   final String password;
-  final String homeserver;
-  final List<dynamic> homeservers;
   final bool loading;
 
+  // Extract to Matrix domain
+  final String homeserver;
+  final List<dynamic> homeservers;
+  final List<dynamic> searchResults;
+
   const UserStore(
-      {this.user,
-      this.loading,
-      this.password,
-      this.username,
-      this.homeservers,
+      {this.user = const User(),
+      this.loading = false,
+      this.password, // null
+      this.username, // null
+      this.homeservers = const [],
+      this.searchResults = const [],
       this.homeserver = 'matrix.org'});
 
   @override
@@ -67,6 +71,7 @@ class UserStore {
       username.hashCode ^
       password.hashCode ^
       loading.hashCode ^
+      searchResults.hashCode ^
       homeservers.hashCode ^
       homeserver.hashCode;
 
@@ -80,10 +85,11 @@ class UserStore {
           password == other.password &&
           homeserver == other.homeserver &&
           homeservers == other.homeservers &&
+          searchResults == other.searchResults &&
           loading == other.loading;
 
   @override
   String toString() {
-    return 'User{user: $user, username: $username, password: $password, loading: $loading}';
+    return 'User{user: $user, username: $username, password: $password, homeserver: $homeserver, homeservers: $homeservers, loading: $loading,}';
   }
 }

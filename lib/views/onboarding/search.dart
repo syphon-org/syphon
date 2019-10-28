@@ -1,11 +1,15 @@
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/domain/user/selectors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/domain/index.dart';
+import 'package:redux/redux.dart';
 
-import 'package:Tether/domain/chat/actions.dart';
+import 'package:Tether/domain/index.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
+
+import 'package:Tether/domain/user/model.dart';
 
 class SearchScrollBehavior extends ScrollBehavior {
   @override
@@ -26,12 +30,23 @@ class OnboardingSearchScreen extends StatefulWidget {
 
 class OnboardingSearchScreenState extends State<OnboardingSearchScreen> {
   final String title;
-
+  Widget appBarTitle = Text('Find a homeserver');
+  bool searching = false;
   OnboardingSearchScreenState({Key key, this.title});
 
   @override
   void initState() {
     store.dispatch(fetchHomeservers());
+    appBarTitle = TouchableOpacity(
+        activeOpacity: 0.4,
+        onTap: () {
+          setState(() {
+            searching = !searching;
+          });
+        },
+        child: Text(title,
+            style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.w100)));
     super.initState();
   }
 
@@ -41,48 +56,77 @@ class OnboardingSearchScreenState extends State<OnboardingSearchScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-          title: Text(title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+      appBar: AppBar(
+        brightness: Brightness.dark,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context, false),
         ),
-        body: Center(
-            child: ScrollConfiguration(
-          behavior: SearchScrollBehavior(),
-          child: SingleChildScrollView(
-            child: Container(
-                height: height,
-                width: width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      width: width * 0.9,
-                      height: 54,
-                      margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      constraints: BoxConstraints(
-                          minWidth: 200, maxWidth: 600, minHeight: 45),
-                      child: TextField(
-                          cursorRadius: Radius.circular(25),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0)),
-                            // hintStyle: TextStyle(decoration: ),
-                            labelText: 'Search Homeservers',
-                            hintText: 'matrix.org, potato.xyz, etc',
-                          )),
-                    ),
-                    Text(
-                      'Please Render',
-                      style: Theme.of(context).textTheme.display1,
-                    )
-                  ],
-                )),
+        title: searching
+            ? StoreConnector<AppState, UserStore>(
+                converter: (Store<AppState> store) => store.state.userStore,
+                builder: (context, userStore) {
+                  return TextField(
+                      onChanged: (text) {
+                        store.dispatch(searchHomeservers(searchText: text));
+                      },
+                      cursorColor: Colors.white,
+                      cursorRadius: Radius.circular(25),
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w100),
+                      decoration: InputDecoration.collapsed(
+                        hintStyle: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w100),
+                        hintText: 'Search by keywords',
+                      ));
+                })
+            : appBarTitle,
+        actions: <Widget>[
+          IconButton(
+            color: Colors.white,
+            icon: Icon(searching ? Icons.cancel : Icons.search),
+            onPressed: () {
+              setState(() {
+                searching = !searching;
+              });
+            },
+            tooltip: 'Search Homeservers',
           ),
-        )));
+        ],
+      ),
+      body: Center(
+          child: StoreConnector<AppState, List<dynamic>>(
+              converter: (Store<AppState> store) => searchResults(store.state),
+              builder: (context, homeservers) {
+                return ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: homeservers.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                        onTap: () {
+                          store.dispatch(
+                              setHomeserver(homeserver: homeservers[index]));
+                          Navigator.pop(context);
+                        },
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              homeservers[index]['hostname'],
+                              style: TextStyle(
+                                  fontSize: 22.0, color: Colors.black),
+                            ),
+                          ),
+                        ));
+                  },
+                );
+              })),
+    );
   }
 }
