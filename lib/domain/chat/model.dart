@@ -27,22 +27,41 @@ class Chat {
 
   const Chat({
     this.chatId,
-    this.title,
-    this.messages,
+    this.title = 'New Chat',
+    this.messages = const [],
     this.syncing = false,
   });
 }
 
 class ChatStore {
-  final Map chats;
-  final bool counter;
+  final int counter;
   final bool initing;
   final bool loading;
+  final List<Chat> chats;
 
   const ChatStore({
-    this.chats,
-    this.counter,
-    this.initing,
-    this.loading,
+    this.chats = const [],
+    this.initing = true,
+    this.loading = false,
+    this.counter = 0,
   });
+
+  @override
+  int get hashCode =>
+      chats.hashCode ^ initing.hashCode ^ counter.hashCode ^ loading.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatStore &&
+          runtimeType == other.runtimeType &&
+          chats == other.chats &&
+          initing == other.initing &&
+          loading == other.loading &&
+          counter == other.counter;
+
+  @override
+  String toString() {
+    return 'ChatStore{chats: $chats, initing: $initing, loading: $loading, counter: $counter}';
+  }
 }
