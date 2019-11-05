@@ -71,8 +71,6 @@ class UserStore {
       username.hashCode ^
       password.hashCode ^
       loading.hashCode ^
-      searchResults.hashCode ^
-      homeservers.hashCode ^
       homeserver.hashCode;
 
   @override
@@ -84,8 +82,6 @@ class UserStore {
           username == other.username &&
           password == other.password &&
           homeserver == other.homeserver &&
-          homeservers == other.homeservers &&
-          searchResults == other.searchResults &&
           loading == other.loading;
 
   @override

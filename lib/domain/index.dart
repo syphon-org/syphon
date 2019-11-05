@@ -4,7 +4,9 @@ import 'package:redux_thunk/redux_thunk.dart';
 import './user/model.dart';
 import './settings/model.dart';
 import './chat/model.dart';
+import './matrix/model.dart';
 
+import './matrix/reducer.dart';
 import './user/reducer.dart';
 import './settings/reducer.dart';
 import './chat/reducer.dart';
@@ -12,6 +14,7 @@ import './chat/reducer.dart';
 // https://matrix.org/docs/api/client-server/#!/User32data/register
 class AppState {
   final UserStore userStore;
+  final MatrixStore matrixStore;
   final SettingsStore settingsStore;
   final ChatStore chatStore;
   final bool loading;
@@ -19,6 +22,7 @@ class AppState {
   AppState(
       {this.loading = true,
       this.userStore = const UserStore(),
+      this.matrixStore = const MatrixStore(),
       this.settingsStore = const SettingsStore(),
       this.chatStore = const ChatStore()});
 
@@ -39,7 +43,11 @@ class AppState {
 
   @override
   String toString() {
-    return 'AppState{userStore: $userStore, settingsStore: $settingsStore, chatStore: $chatStore, loading: $loading}';
+    return 'AppState{userStore: $userStore,' +
+        'settingsStore: $settingsStore, ' +
+        'chatStore: $chatStore,' +
+        'matrixStore: $matrixStore,' +
+        'loading: $loading}';
   }
 }
 
@@ -49,6 +57,7 @@ AppState appReducer(AppState state, action) {
     chatStore: chatReducer(state.chatStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     userStore: userReducer(state.userStore, action),
+    matrixStore: matrixReducer(state.matrixStore, action),
   );
 }
 
