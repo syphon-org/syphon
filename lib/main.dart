@@ -12,7 +12,7 @@ import 'package:Tether/domain/index.dart';
 // Intro
 import 'package:Tether/views/onboarding/login.dart';
 import 'package:Tether/views/onboarding/signup.dart';
-import 'package:Tether/views/onboarding/search.dart';
+import 'package:Tether/views/onboarding/homesearch.dart';
 import 'package:Tether/views/onboarding/intro/index.dart';
 
 // Home
@@ -79,7 +79,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                   '/login': (BuildContext context) =>
                       LoginScreen(title: 'Login'),
                   '/search_home': (BuildContext context) =>
-                      OnboardingSearchScreen(title: 'Find Your Homeserver'),
+                      HomeSearchScreen(title: 'Find Your Homeserver'),
                   '/signup': (BuildContext context) =>
                       SignupScreen(title: 'Signup'),
                   '/home': (BuildContext context) =>

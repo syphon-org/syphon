@@ -39,29 +39,48 @@ class SetSearchResults {
 Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
   String icon = "";
   try {
-    var origin = homeserver['hostname'];
-    var response = await http.get('https://$origin');
+    final hostname = homeserver['hostname'];
 
-    var document = parse(response.body);
-    var favicons = document.querySelectorAll('link[rel="shortcut icon"]');
-    if (favicons.length != 0) {
-      icon = 'https://$origin/' +
-          favicons[0].attributes['href'].replaceAll('...', '');
-    }
+    // get the root domain
+    final origins = hostname.toString().split('.');
+    final rootorigin = origins.length > 1
+        ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
+        : origins[0];
+    final response = await http.get('https://$rootorigin');
+
+    final document = parse(response.body);
+    final favicon = document.querySelector('link[rel="shortcut icon"]');
+    icon = favicon.attributes['href'].toString().contains('http')
+        ? favicon.attributes['href']
+        : 'https://$rootorigin/' +
+            favicon.attributes['href']
+                .replaceAll('...', '')
+                .replaceAll('//', '/');
   } catch (error) {}
   return icon;
 }
 
 ThunkAction<AppState> fetchHomeserverIcons() {
   return (Store<AppState> store) async {
-    var homeservers = store.state.matrixStore.homeservers;
+    final homeservers = store.state.matrixStore.homeservers;
     print(homeservers.runtimeType);
 
     homeservers.forEach((homeserver) async {
-      var iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
-      homeserver['iconUrl'] = iconUrl;
+      final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
+      print(iconUrl);
 
-      print(homeserver['iconUrl']);
+      if (iconUrl.length <= 0) {
+        return;
+      }
+
+      final response = await http.get(iconUrl);
+
+      if (response.statusCode != 200) {
+        return;
+      }
+
+      homeserver['favicon'] = iconUrl;
+      store.dispatch(UpdateHomeservers(homeservers: List.from(homeservers)));
     });
   };
 }
@@ -69,8 +88,8 @@ ThunkAction<AppState> fetchHomeserverIcons() {
 ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
-    var response = await http.get(HOMESERVER_SEARCH_SERVICE);
-    var homeservers = json.decode(response.body);
+    final response = await http.get(HOMESERVER_SEARCH_SERVICE);
+    final homeservers = json.decode(response.body);
 
     store.dispatch(SetHomeservers(homeservers: homeservers));
     store.dispatch(SetLoading(loading: false));
@@ -80,11 +99,12 @@ ThunkAction<AppState> fetchHomeservers() {
 
 ThunkAction<AppState> searchHomeservers({String searchText}) {
   return (Store<AppState> store) async {
-    List<dynamic> searchResults = store.state.userStore.homeservers
+    List<dynamic> searchResults = store.state.matrixStore.homeservers
         .where((homeserver) =>
             homeserver['hostname'].contains(searchText) ||
             homeserver['description'].contains(searchText))
         .toList();
+    print(searchResults);
     store.dispatch(SetSearchResults(searchResults: searchResults));
   };
 }

@@ -12,6 +12,9 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:Tether/domain/user/model.dart';
 
+// Assets
+import 'package:Tether/global/assets.dart';
+
 class SearchScrollBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -20,24 +23,26 @@ class SearchScrollBehavior extends ScrollBehavior {
   }
 }
 
-class OnboardingSearchScreen extends StatefulWidget {
+class HomeSearchScreen extends StatefulWidget {
   final String title;
-  const OnboardingSearchScreen({Key key, this.title}) : super(key: key);
+  const HomeSearchScreen({Key key, this.title}) : super(key: key);
 
   @override
-  OnboardingSearchScreenState createState() =>
-      OnboardingSearchScreenState(title: this.title);
+  HomeSearchScreenState createState() =>
+      HomeSearchScreenState(title: this.title);
 }
 
-class OnboardingSearchScreenState extends State<OnboardingSearchScreen> {
+class HomeSearchScreenState extends State<HomeSearchScreen> {
   final String title;
   Widget appBarTitle = Text('Find a homeserver');
   bool searching = false;
-  OnboardingSearchScreenState({Key key, this.title});
+  HomeSearchScreenState({Key key, this.title});
 
   @override
   void initState() {
-    store.dispatch(fetchHomeservers());
+    if (store.state.matrixStore.homeservers.length <= 0) {
+      store.dispatch(fetchHomeservers());
+    }
     appBarTitle = TouchableOpacity(
         activeOpacity: 0.4,
         onTap: () {
@@ -106,25 +111,45 @@ class OnboardingSearchScreenState extends State<OnboardingSearchScreen> {
                 return ListView.builder(
                   padding: const EdgeInsets.all(8),
                   scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
                   itemCount: homeservers.length,
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
-                        onTap: () {
-                          store.dispatch(
-                              setHomeserver(homeserver: homeservers[index]));
-                          Navigator.pop(context);
-                        },
-                        child: Card(
+                      onTap: () {
+                        store.dispatch(
+                            setHomeserver(homeserver: homeservers[index]));
+                        Navigator.pop(context);
+                      },
+                      child: Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              homeservers[index]['hostname'],
-                              style: TextStyle(
-                                  fontSize: 22.0, color: Colors.black),
-                            ),
-                          ),
-                        ));
+                              padding: const EdgeInsets.only(top: 8, bottom: 8),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                    backgroundColor: Colors.grey[100],
+                                    child: homeservers[index]['favicon'] != null
+                                        ? Image(
+                                            width: 75,
+                                            height: 75,
+                                            image: NetworkImage(
+                                                homeservers[index]['favicon']),
+                                          )
+                                        : Text(
+                                            homeservers[index]['hostname']
+                                                .toString()
+                                                .substring(0, 2)
+                                                .toUpperCase(),
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          )),
+                                title: Text(
+                                  homeservers[index]['hostname'],
+                                  style: TextStyle(
+                                      fontSize: 22.0, color: Colors.black),
+                                ),
+                                subtitle:
+                                    Text(homeservers[index]['description']),
+                                trailing: Icon(Icons.expand_more),
+                              ))),
+                    );
                   },
                 );
               })),
