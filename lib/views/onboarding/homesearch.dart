@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:expandable/expandable.dart';
 
 import 'package:redux/redux.dart';
 import 'package:Tether/domain/user/actions.dart';
@@ -122,32 +123,104 @@ class HomeSearchScreenState extends State<HomeSearchScreen> {
                       child: Card(
                           child: Padding(
                               padding: const EdgeInsets.only(top: 8, bottom: 8),
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                    backgroundColor: Colors.grey[100],
-                                    child: homeservers[index]['favicon'] != null
-                                        ? Image(
-                                            width: 75,
-                                            height: 75,
-                                            image: NetworkImage(
-                                                homeservers[index]['favicon']),
-                                          )
-                                        : Text(
-                                            homeservers[index]['hostname']
-                                                .toString()
-                                                .substring(0, 2)
-                                                .toUpperCase(),
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          )),
-                                title: Text(
-                                  homeservers[index]['hostname'],
-                                  style: TextStyle(
-                                      fontSize: 22.0, color: Colors.black),
+                              child: ExpandablePanel(
+                                header: ListTile(
+                                  leading: CircleAvatar(
+                                      backgroundColor: Colors.grey[100],
+                                      child:
+                                          homeservers[index]['favicon'] != null
+                                              ? Image(
+                                                  width: 75,
+                                                  height: 75,
+                                                  image: NetworkImage(
+                                                      homeservers[index]
+                                                          ['favicon']),
+                                                )
+                                              : Text(
+                                                  homeservers[index]['hostname']
+                                                      .toString()
+                                                      .substring(0, 2)
+                                                      .toUpperCase(),
+                                                  style: TextStyle(
+                                                      color: Colors.black),
+                                                )),
+                                  title: Text(
+                                    homeservers[index]['hostname'],
+                                    style: TextStyle(
+                                        fontSize: 22.0, color: Colors.black),
+                                  ),
+                                  subtitle:
+                                      Text(homeservers[index]['description']),
                                 ),
-                                subtitle:
-                                    Text(homeservers[index]['description']),
-                                trailing: Icon(Icons.expand_more),
+                                expanded: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: Column(children: <Widget>[
+                                      Text(
+                                        'Location',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                        softWrap: true,
+                                      ),
+                                      Text(
+                                        homeservers[index]['location'],
+                                        softWrap: true,
+                                      )
+                                    ])),
+                                    Expanded(
+                                        child: Column(children: <Widget>[
+                                      Text(
+                                        'Users',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                        softWrap: true,
+                                      ),
+                                      homeservers[index]['users_active'] != null
+                                          ? Text(
+                                              homeservers[index]['users_active']
+                                                  .toString(),
+                                              softWrap: true,
+                                            )
+                                          : Text(
+                                              homeservers[index]
+                                                      ['public_room_count']
+                                                  .toString(),
+                                              softWrap: true,
+                                            ),
+                                    ])),
+                                    Expanded(
+                                        child: Column(children: <Widget>[
+                                      Text(
+                                        'Founded',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                        softWrap: true,
+                                      ),
+                                      Text(
+                                        homeservers[index]['online_since']
+                                            .toString(),
+                                        softWrap: true,
+                                      ),
+                                    ])),
+                                    Expanded(
+                                        child: Column(children: <Widget>[
+                                      Text(
+                                        'Avg Speed',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                        softWrap: true,
+                                      ),
+                                      Text(
+                                        homeservers[index]['last_response_time']
+                                                .toString() +
+                                            'ms',
+                                        softWrap: true,
+                                      ),
+                                    ])),
+                                  ],
+                                ),
+                                tapHeaderToExpand: false,
+                                hasIcon: true,
                               ))),
                     );
                   },
