@@ -10,10 +10,10 @@ import 'package:Tether/global/libs/hive.dart';
 import 'package:Tether/domain/index.dart';
 
 // Intro
-import 'package:Tether/views/onboarding/login.dart';
-import 'package:Tether/views/onboarding/signup.dart';
-import 'package:Tether/views/onboarding/homesearch.dart';
-import 'package:Tether/views/onboarding/intro/index.dart';
+import 'package:Tether/views/login.dart';
+import 'package:Tether/views/signup.dart';
+import 'package:Tether/views/homesearch.dart';
+import 'package:Tether/views/intro/index.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
