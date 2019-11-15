@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
+import './colors.dart';
 
 enum ThemeType { LIGHT, PRIMARY, DARK, DARKER }
-
-const PRIMARY_COLOR = 0xff34C7B5;
-const SECONDARY_COLOR = 0xff34C7B5;
-const PRIMARY_DARK = 0xff121212;
 
 class Themes {
   static final ThemeData lightTheme = ThemeData(

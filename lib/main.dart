@@ -11,7 +11,7 @@ import 'package:Tether/domain/index.dart';
 
 // Intro
 import 'package:Tether/views/login.dart';
-import 'package:Tether/views/signup.dart';
+import 'package:Tether/views/signup/index.dart';
 import 'package:Tether/views/homesearch.dart';
 import 'package:Tether/views/intro/index.dart';
 

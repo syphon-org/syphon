@@ -9,7 +9,7 @@ class User {
       {this.id,
       this.name,
       this.username,
-      this.homeserver = 'matrix.org',
+      this.homeserver = '192.168.2.20',
       this.accessToken});
 
   User preauthenticated({int id, String text, bool completed}) {

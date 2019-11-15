@@ -89,7 +89,7 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     final response = await http.get(HOMESERVER_SEARCH_SERVICE);
-    final homeservers = json.decode(response.body);
+    final List<dynamic> homeservers = json.decode(response.body);
 
     store.dispatch(SetHomeservers(homeservers: homeservers));
     store.dispatch(SetLoading(loading: false));
