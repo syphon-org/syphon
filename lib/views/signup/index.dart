@@ -11,34 +11,32 @@ import 'package:Tether/domain/user/model.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-import './homeserver.dart';
-import './username.dart';
-import './password.dart';
+import './step-username.dart';
+import './step-password.dart';
+import './step-homeserver.dart';
 
-class IntroScreen extends StatefulWidget {
+class Signup extends StatefulWidget {
   final String title;
-  const IntroScreen({Key key, this.title}) : super(key: key);
+  const Signup({Key key, this.title}) : super(key: key);
 
-  IntroScreenState createState() => IntroScreenState(title: this.title);
+  SignupState createState() => SignupState(title: this.title);
 }
 
-class IntroScreenState extends State<IntroScreen> {
+class SignupState extends State<Signup> {
   final String title;
   final double DEFAULT_INPUT_HEIGHT = 52;
   final double DEFAULT_BUTTON_HEIGHT = 48;
   final sections = [
-    LandingSection(),
-    FirstSection(),
-    SecondSection(),
-    ThirdSection(),
-    ActionSection(),
+    UsernameStep(),
+    PasswordStep(),
+    HomeserverStep(),
   ];
 
   int currentStep = 0;
   bool onboarding = false;
   SwiperController controller;
 
-  IntroScreenState({Key key, this.title});
+  SignupState({Key key, this.title});
 
   @override
   void initState() {

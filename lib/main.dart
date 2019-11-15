@@ -80,8 +80,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                       LoginScreen(title: 'Login'),
                   '/search_home': (BuildContext context) =>
                       HomeSearchScreen(title: 'Find Your Homeserver'),
-                  '/signup': (BuildContext context) =>
-                      SignupScreen(title: 'Signup'),
+                  '/signup': (BuildContext context) => Signup(title: 'Signup'),
                   '/home': (BuildContext context) =>
                       HomeScreen(title: 'Tether'),
                   '/chat': (BuildContext context) => ChatScreen(),
