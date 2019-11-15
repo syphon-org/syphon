@@ -25,6 +25,12 @@ class SetHomeserver {
   SetHomeserver({this.homeserver});
 }
 
+class SetUsername {
+  final String username;
+
+  SetUsername({this.username});
+}
+
 ThunkAction<AppState> initAuthObserver() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));

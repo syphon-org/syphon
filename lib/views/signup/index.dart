@@ -10,6 +10,7 @@ import 'package:Tether/domain/user/model.dart';
 // Styling Widgets
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
+import 'package:Tether/global/colors.dart';
 
 import './step-username.dart';
 import './step-password.dart';
@@ -45,14 +46,11 @@ class SignupState extends State<Signup> {
 
   Widget buildButtonText() {
     switch (currentStep) {
-      case 0:
-        return const Text('Let\'s Go',
-            style: TextStyle(fontSize: 20, color: Colors.white));
       case 4:
-        return const Text('Count Me In',
+        return const Text('Finish',
             style: TextStyle(fontSize: 20, color: Colors.white));
       default:
-        return const Text('Next',
+        return const Text('Continue',
             style: TextStyle(fontSize: 20, color: Colors.white));
     }
   }
@@ -97,19 +95,18 @@ class SignupState extends State<Signup> {
                 constraints: BoxConstraints(
                     minWidth: 200, maxWidth: 400, minHeight: 45, maxHeight: 65),
                 child: FlatButton(
-                    onPressed: () {
-                      if (currentStep != sections.length - 1) {
-                        setState(() {
-                          onboarding = true;
-                        });
-                        controller.next(animation: true);
-                      } else {
-                        Navigator.pushNamed(
-                          context,
-                          '/signup',
-                        );
-                      }
-                    },
+                    disabledColor: Colors.grey,
+                    disabledTextColor: Colors.grey[300],
+                    onPressed: !userStore.isUsernameValid
+                        ? null
+                        : () {
+                            if (currentStep != sections.length - 1) {
+                              setState(() {
+                                onboarding = true;
+                              });
+                              controller.next(animation: true);
+                            }
+                          },
                     color: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
@@ -117,44 +114,7 @@ class SignupState extends State<Signup> {
               );
             },
           ),
-          Spacer(flex: 1),
-          Container(
-              height: DEFAULT_INPUT_HEIGHT,
-              margin: const EdgeInsets.all(10.0),
-              constraints: BoxConstraints(minWidth: 200, minHeight: 45),
-              child: Visibility(
-                  visible: !onboarding,
-                  child: TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => Navigator.pushNamed(
-                            context,
-                            '/login',
-                          ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            'Already have a username?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w100,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Text('Login',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w100,
-                                  color: Theme.of(context).primaryColor,
-                                  decoration: TextDecoration.underline,
-                                )),
-                          ),
-                        ],
-                      )))),
-          Spacer(flex: 1),
+          Spacer(flex: 3),
         ],
       )),
     );

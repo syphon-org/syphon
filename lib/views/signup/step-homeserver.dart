@@ -16,22 +16,22 @@ class HomeserverStep extends StatelessWidget {
 
     return Center(
         child: Column(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        SizedBox(height: height * 0.075),
-        Container(
-          width: width * 0.7,
+        SizedBox(height: height * 0.1),
+        Center(
+            child: Container(
           height: DEFAULT_INPUT_HEIGHT,
           constraints:
-              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset(HIDDEN_MESSENGER_GRAPHIC,
+              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 220),
+          child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
               semanticsLabel: 'User hidding behind a message'),
-        ),
-        SizedBox(height: height * 0.05),
+        )),
+        SizedBox(height: 24),
         Text(
-          'Tether works by using an encrypted \nand decentralized protocol called Matrix',
+          'Find a homeserver',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle,
+          style: Theme.of(context).textTheme.headline,
         ),
         SizedBox(height: height * 0.025),
       ],

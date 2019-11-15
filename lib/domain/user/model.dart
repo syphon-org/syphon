@@ -1,29 +1,26 @@
 class User {
   final int id;
-  final String name;
   final String username;
   final String homeserver;
   final String accessToken;
 
   const User(
       {this.id,
-      this.name,
       this.username,
-      this.homeserver = '192.168.2.20',
+      this.homeserver = 'matrix.org',
       this.accessToken});
 
   User preauthenticated({int id, String text, bool completed}) {
     return new User(
         id: id ?? this.id,
-        name: text ?? this.name,
+        username: text ?? this.username,
+        homeserver: text ?? this.homeserver,
         accessToken: accessToken ?? this.accessToken);
   }
 
-  // TODO:
   @override
   int get hashCode =>
       id.hashCode ^
-      name.hashCode ^
       username.hashCode ^
       homeserver.hashCode ^
       accessToken.hashCode;
@@ -34,36 +31,34 @@ class User {
       other is User &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          name == other.name &&
           username == other.username &&
           homeserver == other.homeserver &&
           accessToken == other.accessToken;
 
   @override
   String toString() {
-    return 'User{id: $id, name: $name, username: $username, homeserver: $homeserver, accessToken: $accessToken}';
+    return 'User{id: $id,  username: $username, homeserver: $homeserver, accessToken: $accessToken}';
   }
 }
 
 class UserStore {
   final User user;
+
+  final bool loading;
   final String username;
   final String password;
-  final bool loading;
-
-  // Extract to Matrix domain
   final String homeserver;
-  final List<dynamic> homeservers;
-  final List<dynamic> searchResults;
+  final bool isUsernameValid;
+  final bool isPasswordValid;
 
   const UserStore(
       {this.user = const User(),
       this.loading = false,
       this.password, // null
       this.username, // null
-      this.homeservers = const [],
-      this.searchResults = const [],
-      this.homeserver = 'matrix.org'});
+      this.isUsernameValid = false,
+      this.isPasswordValid = false,
+      this.homeserver = '192.168.2.20'});
 
   @override
   int get hashCode =>
@@ -86,6 +81,6 @@ class UserStore {
 
   @override
   String toString() {
-    return 'User{user: $user, username: $username, password: $password, homeserver: $homeserver, homeservers: $homeservers, loading: $loading,}';
+    return 'User{user: $user, username: $username, password: $password, homeserver: $homeserver, loading: $loading,}';
   }
 }

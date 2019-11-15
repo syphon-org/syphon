@@ -17,6 +17,9 @@ import './second.dart';
 import './third.dart';
 import './action.dart';
 
+final double DEFAULT_INPUT_HEIGHT = 52;
+final double DEFAULT_BUTTON_HEIGHT = 48;
+
 class IntroScreen extends StatefulWidget {
   final String title;
   const IntroScreen({Key key, this.title}) : super(key: key);
@@ -26,8 +29,7 @@ class IntroScreen extends StatefulWidget {
 
 class IntroScreenState extends State<IntroScreen> {
   final String title;
-  final double DEFAULT_INPUT_HEIGHT = 52;
-  final double DEFAULT_BUTTON_HEIGHT = 48;
+
   final sections = [
     LandingSection(),
     FirstSection(),
@@ -38,6 +40,7 @@ class IntroScreenState extends State<IntroScreen> {
 
   int currentStep = 0;
   bool onboarding = false;
+  String loginText = 'Already have a username?';
   SwiperController controller;
 
   IntroScreenState({Key key, this.title});
@@ -102,17 +105,26 @@ class IntroScreenState extends State<IntroScreen> {
                     minWidth: 200, maxWidth: 400, minHeight: 45, maxHeight: 65),
                 child: FlatButton(
                     onPressed: () {
-                      if (currentStep != sections.length - 1) {
+                      if (currentStep == 0) {
                         setState(() {
                           onboarding = true;
                         });
-                        controller.next(animation: true);
-                      } else {
-                        Navigator.pushNamed(
+                      }
+                      if (currentStep == sections.length - 2) {
+                        setState(() {
+                          loginText = 'Already created a matrix user?';
+                          onboarding = false;
+                        });
+                      }
+
+                      if (currentStep == sections.length - 1) {
+                        return Navigator.pushNamed(
                           context,
                           '/signup',
                         );
                       }
+
+                      controller.next(animation: true);
                     },
                     color: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
@@ -138,7 +150,7 @@ class IntroScreenState extends State<IntroScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            'Already have a username?',
+                            loginText,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
