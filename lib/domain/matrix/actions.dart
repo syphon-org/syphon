@@ -10,7 +10,7 @@ import 'package:html/parser.dart';
 import 'package:html/dom.dart';
 
 const HOMESERVER_SEARCH_SERVICE =
-    'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=Switzerland+%28Hosttech%29';
+    'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=United+States+(Denver)';
 
 class SetLoading {
   final bool loading;

@@ -59,9 +59,6 @@ class HomeSearchScreenState extends State<HomeSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.dark,
@@ -117,7 +114,7 @@ class HomeSearchScreenState extends State<HomeSearchScreen> {
                     return GestureDetector(
                       onTap: () {
                         store.dispatch(
-                            setHomeserver(homeserver: homeservers[index]));
+                            selectHomeserver(homeserver: homeservers[index]));
                         Navigator.pop(context);
                       },
                       child: Card(

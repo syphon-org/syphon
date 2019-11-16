@@ -5,7 +5,8 @@ enum ThemeType { LIGHT, PRIMARY, DARK, DARKER }
 
 class Themes {
   static final ThemeData lightTheme = ThemeData(
-      primaryColor: const Color(PRIMARY),
+      primaryColor: PRIMARY_COLOR,
+      accentColor: SECONDARY_COLOR,
       brightness: Brightness.light,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,

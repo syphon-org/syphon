@@ -4,48 +4,35 @@ import './actions.dart';
 UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
-      return new UserStore(
-          loading: action.loading,
-          username: state.username,
-          password: state.password,
-          homeserver: state.homeserver,
-          user: new User(
-              id: state.user.id,
-              username: state.user.username,
-              homeserver: state.user.homeserver));
+      return state.copyWith(loading: action.loading);
+    case SetCreating:
+      return state.copyWith(creating: action.creating);
     case SetUser:
-      return new UserStore(
-          loading: state.loading,
-          username: state.username,
-          password: state.password,
-          homeserver: state.homeserver,
-          user: new User(
-            id: action.user.id,
-            username: action.user.username,
-            homeserver: action.user.homeserver,
-          ));
+      return state.copyWith(user: action.user);
     case SetHomeserver:
-      return new UserStore(
-          loading: state.loading,
-          username: state.username,
-          password: state.password,
-          homeserver: action.homeserver,
-          user: new User(
-            id: state.user.id,
-            username: state.user.username,
-            homeserver: action.user.homeserver,
-          ));
+      return state.copyWith(
+        homeserver: action.homeserver,
+      );
+    case SetHomeserverValid:
+      return state.copyWith(
+        isHomeserverValid: action.valid,
+      );
     case SetUsername:
-      return new UserStore(
-          loading: state.loading,
-          username: action.username,
-          password: state.password,
-          homeserver: state.homeserver,
-          user: new User(
-            id: state.user.id,
-            username: state.user.username,
-            homeserver: action.user.homeserver,
-          ));
+      return state.copyWith(
+        username: action.username,
+      );
+    case SetUsernameValid:
+      return state.copyWith(
+        isUsernameValid: action.valid,
+      );
+    case SetPassword:
+      return state.copyWith(
+        password: action.password,
+      );
+    case SetPasswordValid:
+      return state.copyWith(
+        isPasswordValid: action.valid,
+      );
     default:
       return state;
   }

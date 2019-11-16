@@ -12,11 +12,12 @@ import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
+import 'package:Tether/global/dimensions.dart';
 
 // Assets
 import 'package:Tether/global/assets.dart';
 
-class LoginScrollBehavior extends ScrollBehavior {
+class DefaultScrollBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
@@ -33,8 +34,6 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    double DEFAULT_INPUT_HEIGHT = 52;
-    double DEFAULT_BUTTON_HEIGHT = 48;
 
     /* 
      * TODO: find a more explicit way to style with flex
@@ -43,7 +42,7 @@ class LoginScreen extends StatelessWidget {
     */
     return Scaffold(
       body: ScrollConfiguration(
-        behavior: LoginScrollBehavior(),
+        behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
             // Use a container of the same height and width
             // to flex dynamically but within a single child scroll
@@ -89,27 +88,16 @@ class LoginScreen extends StatelessWidget {
                                       minHeight: 45),
                                   child: TextField(
                                     decoration: InputDecoration(
-                                      suffixIcon:
-                                          //  Ink(
-                                          //     width: 5,
-                                          //     height: 5,
-                                          //     decoration: BoxDecoration(
-                                          //       border: Border.all(
-                                          //           color: Colors.cyan, width: 2.0),
-                                          //       shape: BoxShape.circle,
-                                          //     ),
-                                          //     child:
-                                          IconButton(
-                                              icon: Icon(Icons.help_outline),
-                                              tooltip:
-                                                  'Select your usernames homeserver',
-                                              onPressed: () {
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  '/search_home',
-                                                );
-                                              }),
-                                      // ),
+                                      suffixIcon: IconButton(
+                                          icon: Icon(Icons.help_outline),
+                                          tooltip:
+                                              'Select your usernames homeserver',
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/search_home',
+                                            );
+                                          }),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(30.0)),

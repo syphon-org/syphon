@@ -10,15 +10,14 @@ import 'package:Tether/domain/user/model.dart';
 // Styling Widgets
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
+import 'package:Tether/global/dimensions.dart';
 
+// Local Components
 import './landing.dart';
 import './first.dart';
 import './second.dart';
 import './third.dart';
 import './action.dart';
-
-final double DEFAULT_INPUT_HEIGHT = 52;
-final double DEFAULT_BUTTON_HEIGHT = 48;
 
 class IntroScreen extends StatefulWidget {
   final String title;
@@ -112,7 +111,7 @@ class IntroScreenState extends State<IntroScreen> {
                       }
                       if (currentStep == sections.length - 2) {
                         setState(() {
-                          loginText = 'Already created a matrix user?';
+                          loginText = 'Already created a username?';
                           onboarding = false;
                         });
                       }

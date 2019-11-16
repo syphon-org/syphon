@@ -13,11 +13,11 @@ import './chat/reducer.dart';
 
 // https://matrix.org/docs/api/client-server/#!/User32data/register
 class AppState {
+  final bool loading;
   final UserStore userStore;
   final MatrixStore matrixStore;
   final SettingsStore settingsStore;
   final ChatStore chatStore;
-  final bool loading;
 
   AppState(
       {this.loading = true,

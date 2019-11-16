@@ -5,25 +5,15 @@ MatrixStore matrixReducer(
     [MatrixStore state = const MatrixStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
-      return MatrixStore(
-          loading: action.loading,
-          homeservers: state.homeservers,
-          searchResults: state.homeservers);
+      return state.copyWith(loading: action.loading);
     case SetHomeservers:
-      return MatrixStore(
-          loading: state.loading,
-          homeservers: action.homeservers,
-          searchResults: action.homeservers);
+      return state.copyWith(
+          homeservers: action.homeservers, searchResults: action.homeservers);
     case UpdateHomeservers:
-      return MatrixStore(
-          loading: state.loading,
-          homeservers: action.homeservers,
-          searchResults: action.homeservers);
+      return state.copyWith(
+          homeservers: action.homeservers, searchResults: action.homeservers);
     case SetSearchResults:
-      return MatrixStore(
-          loading: state.loading,
-          homeservers: state.homeservers,
-          searchResults: action.searchResults);
+      return state.copyWith(searchResults: action.homeservers);
     default:
       return state;
   }

@@ -5,6 +5,8 @@ description: A new Flutter project.
 # - flutter pub global run devtools
 # - emulator -list-avds
 # - emulator -avd Pixel_3a_API_29
+# - xcrun simctl list devices
+# - xcrun simctl boot B4F0652E-3AD2-41FE-8557-2A9369B0BA62
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
