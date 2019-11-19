@@ -48,6 +48,7 @@ class UserStore {
   final String username;
   final String password;
   final String homeserver;
+  final String loginType;
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
@@ -59,6 +60,7 @@ class UserStore {
       this.username = "", // null
       this.password, // null
       this.homeserver = '192.168.2.20',
+      this.loginType = 'm.login.password',
       this.isUsernameValid = false,
       this.isPasswordValid = false,
       this.isHomeserverValid = false,

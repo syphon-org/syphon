@@ -14,8 +14,8 @@ class ChatArguments {
   ChatArguments({this.title, this.photo});
 }
 
-class ChatScreen extends StatelessWidget {
-  ChatScreen({Key key, this.title}) : super(key: key);
+class Chats extends StatelessWidget {
+  Chats({Key key, this.title}) : super(key: key);
 
   final String title;
 

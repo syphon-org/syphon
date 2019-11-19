@@ -1,13 +1,19 @@
-import 'dart:async';
+import 'dart:convert';
+import 'package:Tether/global/libs/matrix/registration.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/domain/index.dart';
 
+// Domain
+import 'package:Tether/domain/index.dart';
 import './model.dart';
 
 const HOMESERVER_SEARCH_SERVICE =
     'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true';
+
+final PROTOCOL = DotEnv().env['PROTOCOL'];
 
 class SetLoading {
   final bool loading;
@@ -54,6 +60,8 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class ResetOnboarding {}
+
 ThunkAction<AppState> initAuthObserver() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
@@ -68,18 +76,41 @@ ThunkAction<AppState> createUser() {
     // TODO: call out to matrix here
     store.dispatch(SetLoading(loading: true));
     store.dispatch(SetCreating(creating: true));
-    print('Creating User...');
 
-    new Timer(new Duration(seconds: 3), () {
-      store.dispatch(SetUser(
-          user: User(
-              id: 123,
-              username: "Testing",
-              accessToken: 'Testing',
-              homeserver: "192.168.2.20")));
-      store.dispatch(SetCreating(creating: false));
-      store.dispatch(SetLoading(loading: false));
-    });
+    print('Creating User...');
+    final userStore = store.state.userStore;
+
+    final registerUserRequest = buildRegisterUserRequest(
+      homeserver: userStore.homeserver,
+      username: userStore.username,
+      password: userStore.password,
+      type: store.state.userStore.loginType,
+    );
+
+    final url = "$PROTOCOL${registerUserRequest['url']}";
+    final body = json.encode(registerUserRequest['body']);
+
+    print("$url, $body");
+    final response = await http.post(
+      url,
+      body: body,
+    );
+
+    final data = json.decode(response.body);
+    print(data);
+
+    // new Timer(new Duration(seconds: 3), () {
+    //   store.dispatch(SetUser(
+    //       user: User(
+    //           id: 123,
+    //           username: "Testing",
+    //           accessToken: 'Testing',
+    //           homeserver: "192.168.2.20")));
+    // });
+
+    store.dispatch(SetCreating(creating: false));
+    store.dispatch(SetLoading(loading: false));
+    store.dispatch(ResetOnboarding());
   };
 }
 

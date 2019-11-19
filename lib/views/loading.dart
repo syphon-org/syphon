@@ -1,18 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
 import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/dimensions.dart';
 
 // Assets
 import 'package:Tether/global/assets.dart';
@@ -25,8 +20,8 @@ class DefaultScrollBehavior extends ScrollBehavior {
   }
 }
 
-class Splash extends StatelessWidget {
-  Splash({Key key, this.title}) : super(key: key);
+class Loading extends StatelessWidget {
+  Loading({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -57,14 +52,13 @@ class Splash extends StatelessWidget {
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Spacer(flex: 8),
                           TouchableOpacity(
                             onTap: () {
                               onIncrementTheme();
                             },
                             child: const Image(
-                              width: 150,
-                              height: 150,
+                              width: 100,
+                              height: 100,
                               image: AssetImage(TETHER_ICON_PNG),
                             ),
                           ),

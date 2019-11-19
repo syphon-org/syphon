@@ -1,5 +1,5 @@
 name: Tether
-description: A new Flutter project.
+description: P.
 
 # commands:
 # - flutter pub global run devtools
@@ -39,6 +39,7 @@ dependencies:
   html: ^0.13.3+3
   expandable: 3.0.1
   flutter_secure_storage: 3.3.1+1 
+  flutter_dotenv: ^2.0.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -86,6 +87,7 @@ flutter:
    - assets/graphics/undraw_mention.svg
    - assets/icons/tether_icon_beta.svg
    - assets/icons/tether_icon_beta.png
+   - assets/icons/tether_icon_beta_v2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

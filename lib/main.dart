@@ -1,7 +1,7 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Library Implimentations
@@ -15,13 +15,14 @@ import 'package:Tether/views/login.dart';
 import 'package:Tether/views/signup/index.dart';
 import 'package:Tether/views/homesearch.dart';
 import 'package:Tether/views/intro/index.dart';
+import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
 import 'package:Tether/views/home/settings.dart';
 
 // Chat
-import 'package:Tether/views/chat/index.dart';
+import 'package:Tether/views/chats/index.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
@@ -34,6 +35,7 @@ void _enablePlatformOverrideForDesktop() {
 
 void main() async {
   _enablePlatformOverrideForDesktop();
+  await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
   runApp(Tether());
 }
 
@@ -77,16 +79,17 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                 routes: <String, WidgetBuilder>{
                   '/intro': (BuildContext context) =>
                       IntroScreen(title: 'Intro'),
-                  '/login': (BuildContext context) =>
-                      LoginScreen(title: 'Login'),
+                  '/login': (BuildContext context) => Login(title: 'Login'),
                   '/search_home': (BuildContext context) =>
                       HomeSearchScreen(title: 'Find Your Homeserver'),
                   '/signup': (BuildContext context) => Signup(title: 'Signup'),
                   '/home': (BuildContext context) =>
                       HomeScreen(title: 'Tether'),
-                  '/chat': (BuildContext context) => ChatScreen(),
+                  '/chats': (BuildContext context) => Chats(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
+                  '/loading': (BuildContext context) =>
+                      Loading(title: 'Loading'),
                 },
               );
             }));

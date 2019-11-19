@@ -44,6 +44,7 @@ class SignupState extends State<Signup> {
   int currentStep = 0;
   bool onboarding = false;
   bool validStep = false;
+  bool naving = false;
   SwiperController controller;
   StreamSubscription subscription;
 
@@ -55,8 +56,12 @@ class SignupState extends State<Signup> {
     subscription = store.onChange.listen((state) {
       if (state.userStore.user.accessToken != null) {
         final String currentRoute = ModalRoute.of(context).settings.name;
-        print('Subscription is working');
-        if (currentRoute != 'home') {
+        print('Subscription is working $currentRoute');
+        if (currentRoute != '/home' && !naving) {
+          print('Subscription REPLACEMENT');
+          setState(() {
+            naving = true;
+          });
           Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
         }
       }
@@ -71,6 +76,7 @@ class SignupState extends State<Signup> {
   }
 
   Function onCheckStepValidity(UserStore userStore) {
+    print('Running Step Validity');
     switch (this.currentStep) {
       case 0:
         return userStore.isHomeserverValid

@@ -25,8 +25,8 @@ class DefaultScrollBehavior extends ScrollBehavior {
   }
 }
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({Key key, this.title}) : super(key: key);
+class Login extends StatelessWidget {
+  Login({Key key, this.title}) : super(key: key);
 
   final String title;
 
