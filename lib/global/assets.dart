@@ -1,5 +1,5 @@
-const String TETHER_ICON = 'assets/icons/tether_icon_beta.svg';
-const String TETHER_ICON_PNG = 'assets/icons/tether_icon_beta_v2.png';
+const String TETHER_ICON = 'assets/icons/tether_icon.svg';
+const String TETHER_ICON_PNG = 'assets/icons/tether_icon.png';
 
 const String MOBILE_USER_GRAPHIC = 'assets/graphics/undraw_mobile_user.svg';
 const String HIDDEN_MESSENGER_GRAPHIC =

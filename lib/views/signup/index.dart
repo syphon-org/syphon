@@ -95,6 +95,8 @@ class SignupState extends State<Signup> {
             ? null
             : () {
                 store.dispatch(createUser());
+
+                // TODO: create a listener for if the call fails
                 setState(() {
                   currentStep = 3;
                 });

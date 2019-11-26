@@ -79,7 +79,9 @@ flutter:
           weight: 400
 
   # To add assets to your application, add an assets section, like this:
+  # On release, change .env.debug to .env
   assets: 
+   - .env.debug
    - assets/graphics/undraw_mobile_user.svg
    - assets/graphics/undraw_messaging_fun.svg
    - assets/graphics/undraw_connection.svg
@@ -91,9 +93,9 @@ flutter:
    - assets/graphics/undraw_in_thought.svg
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
-   - assets/icons/tether_icon_beta.svg
-   - assets/icons/tether_icon_beta.png
-   - assets/icons/tether_icon_beta_v2.png
+   - assets/icons/tether_icon.svg
+   - assets/icons/tether_icon.png
+   - assets/icons/tether_icon_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

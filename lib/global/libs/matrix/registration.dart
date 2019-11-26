@@ -1,7 +1,7 @@
 /** 
  * GET login
  * Used to check what types of logins are available on the server
- * curl -XGET "https://localhost:8008/_matrix/client/r0/login"
+ * curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login"
 {
     "flows": [ 
         {
@@ -15,19 +15,35 @@ dynamic buildLoginTypesRequest() {
   return {'url': url};
 }
 
-/**  
- * curl -XPOST 
- * -d '{"type":"m.login.password", "user":"example", "password":"wordpass"}' 
- * "https://localhost:8008/_matrix/client/r0/login"
+/** 
+ * GET login
+ * Used to check what types of logins are available on the server
+ * curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/register/available?username=testing"
 {
-    "access_token": "QGV4YW1wbGU6bG9jYWxob3N0.vRDLTgxefmKWQEtgGd", 
-    "home_server": "localhost", 
-    "user_id": "@example:localhost"
+    "flows": [ 
+        {
+            "type": "m.login.password"
+        }
+    ]
 }
  */
-dynamic buildLoginUserRequest(
-    {String homeserver, String username, String password, String type}) {
-  String url = '${homeserver}/_matrix/client/r0/login';
+dynamic buildCheckRegisterAvailableRequest({String username}) {
+  String url = '_matrix/client/r0/register/available?username=${username}';
+  return {'url': url};
+}
+
+/**   
+  curl -XPOST \
+  -d '{"type":"m.login.password", "user":"example", "password":"wordpass"}' \
+  "http://192.168.1.2:8008/_matrix/client/r0/login"
+{
+    "access_token": "QGV4YW1wbGU6bG9jYWxob3N0.vRDLTgxefmKWQEtgGd", 
+    "home_server": "192.168.1.2", 
+    "user_id": "@example:192.168.1.2"
+}
+ */
+dynamic buildLoginUserRequest({String username, String password, String type}) {
+  String url = '_matrix/client/r0/login';
 
   Map body = {'type': type, 'user': username, 'password': password};
 
@@ -35,21 +51,25 @@ dynamic buildLoginUserRequest(
 }
 
 /**  
- * curl -XPOST 
- * -d '{"username":"example", "password":"wordpass", "auth": {"type":"m.login.dummy"}}' 
- * "https://localhost:8008/_matrix/client/r0/register"
+  curl -XPOST \
+  -d '{ "auth": {"type":"m.login.dummy"}, "username":"testing", "password":"test1234!" }'  \
+  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
+
+  curl -XPOST \
+  -d '{  "auth": {"type":"m.login.password"}}'  \
+  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
 {
     "access_token": "QGV4YW1wbGU6bG9jYWxob3N0.AqdSzFmFYrLrTmteXc", 
-    "home_server": "localhost", 
-    "user_id": "@example:localhost"
+    "home_server": "192.168.1.2", 
+    "user_id": "@example:192.168.1.2"
 }
  */
 dynamic buildRegisterUserRequest(
-    {String homeserver, String username, String password, String type}) {
-  String url = '${homeserver}/_matrix/client/r0/register';
+    {String username, String password, String type}) {
+  String url = '_matrix/client/r0/register';
 
   Map body = {
-    'auth': {'type': type},
+    'auth': {'type': 'm.login.dummy'},
     'user': username,
     'password': password
   };

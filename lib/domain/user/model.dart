@@ -57,8 +57,8 @@ class UserStore {
   const UserStore(
       {this.user = const User(),
       this.loading = false,
-      this.username = "", // null
-      this.password, // null
+      this.username = "tester", // null
+      this.password = "tester", // null
       this.homeserver = '192.168.1.2',
       this.loginType = 'm.login.password',
       this.isUsernameValid = false,

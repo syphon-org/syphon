@@ -81,13 +81,13 @@ ThunkAction<AppState> createUser() {
     final userStore = store.state.userStore;
 
     final registerUserRequest = buildRegisterUserRequest(
-      homeserver: userStore.homeserver,
       username: userStore.username,
       password: userStore.password,
       type: store.state.userStore.loginType,
     );
 
-    final url = "$PROTOCOL${registerUserRequest['url']}";
+    final url =
+        "$PROTOCOL${userStore.homeserver}:8008/${registerUserRequest['url']}";
     final body = json.encode(registerUserRequest['body']);
 
     print("$url, $body");
