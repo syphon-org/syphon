@@ -2,6 +2,7 @@ import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 // Domain
 import 'package:redux/redux.dart';
@@ -27,13 +28,22 @@ class UsernameStepState extends State<UsernameStep> {
 
   @override
   void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      runInitTasks();
+    });
     usernameController.addListener(() {
       final text = usernameController.text.replaceAll(' ', '');
       usernameController.value = usernameController.value.copyWith(
         text: text,
       );
     });
-    super.initState();
+  }
+
+  @protected
+  void runInitTasks() {
+    final store = StoreProvider.of<AppState>(context);
+    usernameController.text = username(store.state);
   }
 
   @override

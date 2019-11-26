@@ -58,11 +58,22 @@ class SignupState extends State<Signup> {
   void initState() {
     controller = new SwiperController();
     subscription = store.onChange.listen((state) {
+      // toggle button to a creating user state
+      if (state.userStore.creating && this.currentStep != 3) {
+        setState(() {
+          currentStep = 3;
+        });
+        // otherwise let them retry
+      } else if (!state.userStore.creating && this.currentStep == 3) {
+        setState(() {
+          currentStep = 2;
+        });
+      }
+
       if (state.userStore.user.accessToken != null) {
         final String currentRoute = ModalRoute.of(context).settings.name;
         print('Subscription is working $currentRoute');
         if (currentRoute != '/home' && !naving) {
-          print('Subscription REPLACEMENT');
           setState(() {
             naving = true;
           });
@@ -99,11 +110,6 @@ class SignupState extends State<Signup> {
             ? null
             : () {
                 store.dispatch(createUser());
-
-                // TODO: create a listener for if the call fails
-                setState(() {
-                  currentStep = 3;
-                });
               };
       default:
         return null;
