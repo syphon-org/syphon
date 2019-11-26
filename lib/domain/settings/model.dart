@@ -17,6 +17,18 @@ class SettingsStore {
 
   @override
   String toString() {
-    return 'SettingsStore{theme: $theme}';
+    return '{theme: $theme}';
+  }
+
+  Map toJson() {
+    return {"theme": theme.index};
+  }
+
+  static SettingsStore fromJson(dynamic json) {
+    return json == null
+        ? SettingsStore()
+        : SettingsStore(
+            theme: ThemeType.values[json['theme']],
+          );
   }
 }

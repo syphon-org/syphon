@@ -1,30 +1,37 @@
 class User {
-  final int id;
-  final String name;
-  final String username;
+  final String userId;
+  final String deviceId;
   final String homeserver;
   final String accessToken;
+  final String displayName;
 
   const User(
-      {this.id,
-      this.name,
-      this.username,
-      this.homeserver = 'matrix.org',
+      {this.userId,
+      this.deviceId,
+      this.homeserver,
+      this.displayName,
       this.accessToken});
 
-  User preauthenticated({int id, String text, bool completed}) {
-    return new User(
-        id: id ?? this.id,
-        name: text ?? this.name,
-        accessToken: accessToken ?? this.accessToken);
+  User copyWith({
+    String userId,
+    String deviceId,
+    String homeserver,
+    String accessToken,
+    String displayName,
+  }) {
+    return User(
+      userId: userId ?? this.userId,
+      deviceId: deviceId ?? this.deviceId,
+      homeserver: homeserver ?? this.homeserver,
+      accessToken: accessToken ?? this.accessToken,
+      displayName: displayName ?? this.displayName,
+    );
   }
 
-  // TODO:
   @override
   int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      username.hashCode ^
+      userId.hashCode ^
+      deviceId.hashCode ^
       homeserver.hashCode ^
       accessToken.hashCode;
 
@@ -33,59 +40,131 @@ class User {
       identical(this, other) ||
       other is User &&
           runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          username == other.username &&
+          userId == other.userId &&
+          deviceId == other.deviceId &&
           homeserver == other.homeserver &&
           accessToken == other.accessToken;
 
   @override
   String toString() {
-    return 'User{id: $id, name: $name, username: $username, homeserver: $homeserver, accessToken: $accessToken}';
+    return '{id: $deviceId,  userId: $userId, homeserver: $homeserver, accessToken: $accessToken}';
   }
+
+  static User fromJson(dynamic json) {
+    return json == null
+        ? User()
+        : User(
+            userId: json['userId'],
+            deviceId: json['deviceId'],
+            homeserver: json['homeserver'],
+            accessToken: json['accessToken'],
+            displayName: json['displayName']);
+  }
+
+  Map toJson() => {
+        "userId": userId,
+        "deviceId": deviceId,
+        "homeserver": homeserver,
+        "accessToken": accessToken,
+        "displayName": displayName,
+      };
 }
 
 class UserStore {
   final User user;
+
+  final bool loading;
   final String username;
   final String password;
-  final bool loading;
-
-  // Extract to Matrix domain
   final String homeserver;
-  final List<dynamic> homeservers;
-  final List<dynamic> searchResults;
+  final String loginType;
+  final bool isUsernameValid;
+  final bool isPasswordValid;
+  final bool isHomeserverValid;
+  final bool creating;
 
   const UserStore(
       {this.user = const User(),
       this.loading = false,
-      this.password, // null
-      this.username, // null
-      this.homeservers = const [],
-      this.searchResults = const [],
-      this.homeserver = 'matrix.org'});
+      this.username = '', // null
+      this.password = '', // null
+      this.homeserver = '192.168.1.2',
+      this.loginType = 'm.login.dummy',
+      this.isUsernameValid = false,
+      this.isPasswordValid = false,
+      this.isHomeserverValid = false,
+      this.creating = false});
+
+  UserStore copyWith({
+    user,
+    loading,
+    username,
+    password,
+    homeserver,
+    isUsernameValid,
+    isPasswordValid,
+    isHomeserverValid,
+    creating,
+  }) {
+    return UserStore(
+        user: user ?? this.user,
+        loading: loading ?? this.loading,
+        username: username ?? this.username,
+        password: password ?? this.password,
+        homeserver: homeserver ?? this.homeserver,
+        isUsernameValid: isUsernameValid ?? this.isUsernameValid,
+        isPasswordValid: isPasswordValid ?? this.isPasswordValid,
+        isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
+        creating: creating ?? this.creating);
+  }
 
   @override
   int get hashCode =>
       user.hashCode ^
+      loading.hashCode ^
       username.hashCode ^
       password.hashCode ^
-      loading.hashCode ^
-      homeserver.hashCode;
+      homeserver.hashCode ^
+      isUsernameValid.hashCode ^
+      isPasswordValid.hashCode ^
+      isHomeserverValid.hashCode ^
+      creating.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UserStore &&
           runtimeType == other.runtimeType &&
+          loading == other.loading &&
           user == other.user &&
           username == other.username &&
           password == other.password &&
           homeserver == other.homeserver &&
-          loading == other.loading;
+          isUsernameValid == other.isUsernameValid &&
+          isPasswordValid == other.isPasswordValid &&
+          isHomeserverValid == other.isHomeserverValid &&
+          creating == other.creating;
 
   @override
   String toString() {
-    return 'User{user: $user, username: $username, password: $password, homeserver: $homeserver, homeservers: $homeservers, loading: $loading,}';
+    return '{user: $user, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
+
+  static UserStore fromJson(Map<String, dynamic> json) {
+    return json == null
+        ? UserStore()
+        : UserStore(
+            user: User.fromJson(json['user']),
+            loading: json['loading'],
+            username: json['username'],
+            password: json['password'],
+            homeserver: json['homeserver']);
+  }
+
+  Map toJson() => {
+        "user": user.toJson(),
+        "username": username,
+        "password": password,
+        "homeserver": homeserver,
+      };
 }

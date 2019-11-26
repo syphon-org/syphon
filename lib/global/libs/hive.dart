@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:Tether/domain/index.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+
+import 'package:redux_persist/redux_persist.dart';
 
 const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
 const HIVE_BOX_NAME = 'tether';
@@ -15,7 +19,7 @@ const APPSTATE_HIVE_KEY = 'app_state';
     print(box.keys);
     print(box.get('someone')); 
  */
-void initStorage() async {
+Future<void> initHiveStorage() async {
   var appStorageLocation = await getApplicationDocumentsDirectory();
   Hive.init(appStorageLocation.path);
 
@@ -59,3 +63,22 @@ void closeStorage() async {
   box.close();
   // print();
 }
+
+// TODO - finish this
+// class SecureHiveStorage extends StorageEngine {
+//   Box<dynamic> box;
+
+//   @override
+//   Future<Uint8List> load() async {
+//     if (await file.exists()) {
+//       return Uint8List.fromList(await file.readAsBytes());
+//     }
+
+//     return null;
+//   }
+
+//   @override
+//   Future<void> save(Uint8List data) async {
+//     await box.put(APPSTATE_HIVE_KEY, data);
+//   }
+// }

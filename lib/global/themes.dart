@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import './colors.dart';
 
 enum ThemeType { LIGHT, PRIMARY, DARK, DARKER }
 
-const PRIMARY_COLOR = 0xff34C7B5;
-const SECONDARY_COLOR = 0xff34C7B5;
-const PRIMARY_DARK = 0xff121212;
-
 class Themes {
   static final ThemeData lightTheme = ThemeData(
-      primaryColor: const Color(PRIMARY_COLOR),
+      primaryColor: PRIMARY_COLOR,
+      accentColor: SECONDARY_COLOR,
       brightness: Brightness.light,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,
@@ -25,7 +23,7 @@ class Themes {
           button: TextStyle(fontWeight: FontWeight.w100)));
 
   static final ThemeData primaryTheme = ThemeData(
-      primaryColor: const Color(PRIMARY_COLOR),
+      primaryColor: const Color(PRIMARY),
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,
@@ -42,7 +40,7 @@ class Themes {
           button: TextStyle(fontWeight: FontWeight.w100, color: Colors.white)));
 
   static final ThemeData darkTheme = ThemeData(
-      primaryColor: const Color(PRIMARY_COLOR),
+      primaryColor: const Color(PRIMARY),
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,

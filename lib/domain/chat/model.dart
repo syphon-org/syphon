@@ -62,6 +62,6 @@ class ChatStore {
 
   @override
   String toString() {
-    return 'ChatStore{chats: $chats, initing: $initing, loading: $loading, counter: $counter}';
+    return '{chats: $chats, initing: $initing, loading: $loading, counter: $counter}';
   }
 }

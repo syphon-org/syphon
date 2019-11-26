@@ -4,8 +4,14 @@ A privacy centric messenger for the people
 
 ## Why
 
-## Resources
 
+## Todo
+- SVG Icons
+- Finish .env selection
+- Loader screen with animations
+
+
+## Resources
 - (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
 - (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
 

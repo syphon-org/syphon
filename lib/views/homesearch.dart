@@ -24,20 +24,23 @@ class SearchScrollBehavior extends ScrollBehavior {
   }
 }
 
-class HomeSearchScreen extends StatefulWidget {
+class HomeSearch extends StatefulWidget {
   final String title;
-  const HomeSearchScreen({Key key, this.title}) : super(key: key);
+  final Store<AppState> store;
+  const HomeSearch({Key key, this.title, this.store}) : super(key: key);
 
   @override
-  HomeSearchScreenState createState() =>
-      HomeSearchScreenState(title: this.title);
+  HomeSearchState createState() =>
+      HomeSearchState(title: this.title, store: this.store);
 }
 
-class HomeSearchScreenState extends State<HomeSearchScreen> {
+class HomeSearchState extends State<HomeSearch> {
   final String title;
+  final Store<AppState> store;
+
   Widget appBarTitle = Text('Find a homeserver');
   bool searching = false;
-  HomeSearchScreenState({Key key, this.title});
+  HomeSearchState({Key key, this.title, this.store});
 
   @override
   void initState() {
@@ -59,9 +62,6 @@ class HomeSearchScreenState extends State<HomeSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.dark,
@@ -117,7 +117,7 @@ class HomeSearchScreenState extends State<HomeSearchScreen> {
                     return GestureDetector(
                       onTap: () {
                         store.dispatch(
-                            setHomeserver(homeserver: homeservers[index]));
+                            selectHomeserver(homeserver: homeservers[index]));
                         Navigator.pop(context);
                       },
                       child: Card(

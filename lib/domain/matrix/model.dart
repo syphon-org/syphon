@@ -8,6 +8,18 @@ class MatrixStore {
       this.homeservers = const [],
       this.searchResults = const []});
 
+  MatrixStore copyWith({
+    loading,
+    homeservers,
+    searchResults,
+  }) {
+    return MatrixStore(
+      loading: loading ?? this.loading,
+      homeservers: homeservers ?? this.homeservers,
+      searchResults: searchResults ?? this.searchResults,
+    );
+  }
+
   @override
   int get hashCode =>
       searchResults.hashCode ^ homeservers.hashCode ^ loading.hashCode;
@@ -19,11 +31,10 @@ class MatrixStore {
           runtimeType == other.runtimeType &&
           loading == other.loading &&
           homeservers == other.homeservers &&
-          searchResults == other.searchResults &&
-          loading == other.loading;
+          searchResults == other.searchResults;
 
   @override
   String toString() {
-    return 'MatrixStore {homeservers: $homeservers, searchResults: $searchResults loading: $loading,}';
+    return '{loading: $loading, homeservers: $homeservers, searchResults: $searchResults}';
   }
 }

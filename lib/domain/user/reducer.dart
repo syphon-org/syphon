@@ -4,35 +4,41 @@ import './actions.dart';
 UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
-      return new UserStore(
-          loading: action.loading,
-          homeserver: state.homeserver,
-          homeservers: state.homeservers,
-          searchResults: state.homeservers,
-          user: new User(
-            id: state.user.id,
-            name: state.user.name,
-          ));
+      return state.copyWith(loading: action.loading);
+    case SetCreating:
+      return state.copyWith(creating: action.creating);
     case SetUser:
-      return new UserStore(
-          loading: state.loading,
-          homeserver: state.homeserver,
-          homeservers: state.homeservers,
-          searchResults: state.searchResults,
-          user: new User(
-            id: action.user.id,
-            name: action.user.name,
-          ));
+      return state.copyWith(user: action.user);
     case SetHomeserver:
-      return new UserStore(
-          loading: state.loading,
-          homeserver: action.homeserver,
-          homeservers: state.homeservers,
-          searchResults: state.searchResults,
-          user: new User(
-            id: state.user.id,
-            name: state.user.name,
-          ));
+      return state.copyWith(
+        homeserver: action.homeserver,
+      );
+    case SetHomeserverValid:
+      return state.copyWith(
+        isHomeserverValid: action.valid,
+      );
+    case SetUsername:
+      return state.copyWith(
+        username: action.username,
+      );
+    case SetUsernameValid:
+      return state.copyWith(
+        isUsernameValid: action.valid,
+      );
+    case SetPassword:
+      return state.copyWith(
+        password: action.password,
+      );
+    case SetPasswordValid:
+      return state.copyWith(
+        isPasswordValid: action.valid,
+      );
+    case ResetOnboarding:
+      return state.copyWith(
+        username: '',
+        password: '',
+        homeserver: '',
+      );
     default:
       return state;
   }

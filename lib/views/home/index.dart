@@ -1,5 +1,5 @@
 import 'package:Tether/domain/chat/model.dart';
-import 'package:Tether/views/chat/index.dart';
+import 'package:Tether/views/chats/index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -11,8 +11,8 @@ import 'package:Tether/domain/chat/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+class Home extends StatelessWidget {
+  Home({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -107,7 +107,7 @@ class HomeScreen extends StatelessWidget {
                       return GestureDetector(
                           onTap: () => Navigator.pushNamed(
                                 context,
-                                '/chat',
+                                '/chats',
                                 arguments: ChatArguments(
                                   title: chats[index].title.toString(),
                                   photo: 'https://google.com/image',

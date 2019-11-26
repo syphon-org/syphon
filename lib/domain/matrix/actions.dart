@@ -1,16 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart';
-import 'package:html/dom.dart';
-
-const HOMESERVER_SEARCH_SERVICE =
-    'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=Switzerland+%28Hosttech%29';
+import 'package:Tether/global/libs/hello-matrix/index.dart';
 
 class SetLoading {
   final bool loading;
@@ -89,7 +86,7 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     final response = await http.get(HOMESERVER_SEARCH_SERVICE);
-    final homeservers = json.decode(response.body);
+    final List<dynamic> homeservers = json.decode(response.body);
 
     store.dispatch(SetHomeservers(homeservers: homeservers));
     store.dispatch(SetLoading(loading: false));
