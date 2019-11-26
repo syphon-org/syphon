@@ -28,13 +28,17 @@ class DefaultScrollBehavior extends ScrollBehavior {
 
 class Signup extends StatefulWidget {
   final String title;
-  const Signup({Key key, this.title}) : super(key: key);
+  final Store<AppState> store;
+  const Signup({Key key, this.title, this.store}) : super(key: key);
 
-  SignupState createState() => SignupState(title: this.title);
+  SignupState createState() =>
+      SignupState(title: this.title, store: this.store);
 }
 
 class SignupState extends State<Signup> {
   final String title;
+  final Store<AppState> store;
+
   final sections = [
     HomeserverStep(),
     UsernameStep(),
@@ -48,7 +52,7 @@ class SignupState extends State<Signup> {
   SwiperController controller;
   StreamSubscription subscription;
 
-  SignupState({Key key, this.title});
+  SignupState({Key key, this.title, this.store});
 
   @override
   void initState() {

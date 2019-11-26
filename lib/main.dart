@@ -7,7 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 // Library Implimentations
 import 'package:Tether/global/libs/hive.dart';
 
-// Redux - State Managment - "store"
+// Redux - State Managment - "store" - IMPORT ONLY ONCE
 import 'package:Tether/domain/index.dart';
 
 // Intro
@@ -26,6 +26,7 @@ import 'package:Tether/views/chats/index.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
+import 'package:redux/redux.dart';
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -34,20 +35,27 @@ void _enablePlatformOverrideForDesktop() {
 }
 
 void main() async {
-  _enablePlatformOverrideForDesktop();
   await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
-  runApp(Tether());
+  _enablePlatformOverrideForDesktop();
+  final store = await initStore();
+  runApp(Tether(store: store));
 }
 
 class Tether extends StatefulWidget {
+  final Store<AppState> store;
+  const Tether({Key key, this.store}) : super(key: key);
+
   @override
-  TetherState createState() => TetherState();
+  TetherState createState() => TetherState(store: store);
 }
 
 class TetherState extends State<Tether> with WidgetsBindingObserver {
+  final Store<AppState> store;
+
+  TetherState({this.store});
+
   @override
   void initState() {
-    initStorage();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -65,6 +73,8 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     super.deactivate();
   }
 
+  // Store should not need to be passed to a widget to affect
+  // lifecycle widget functions
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
@@ -81,10 +91,12 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                       IntroScreen(title: 'Intro'),
                   '/login': (BuildContext context) => Login(title: 'Login'),
                   '/search_home': (BuildContext context) =>
-                      HomeSearchScreen(title: 'Find Your Homeserver'),
-                  '/signup': (BuildContext context) => Signup(title: 'Signup'),
-                  '/home': (BuildContext context) =>
-                      HomeScreen(title: 'Tether'),
+                      HomeSearch(title: 'Find Your Homeserver', store: store),
+                  '/signup': (BuildContext context) =>
+                      Signup(title: 'Signup', store: store),
+                  '/home': (BuildContext context) => Home(
+                        title: 'Tether',
+                      ),
                   '/chats': (BuildContext context) => Chats(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),

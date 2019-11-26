@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:Tether/global/libs/hive.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 import './user/model.dart';
 import './settings/model.dart';
@@ -11,7 +15,11 @@ import './user/reducer.dart';
 import './settings/reducer.dart';
 import './chat/reducer.dart';
 
+import 'package:redux_persist/redux_persist.dart';
+import 'package:json_annotation/json_annotation.dart';
+
 // https://matrix.org/docs/api/client-server/#!/User32data/register
+@JsonSerializable(nullable: false)
 class AppState {
   final bool loading;
   final UserStore userStore;
@@ -26,34 +34,90 @@ class AppState {
       this.settingsStore = const SettingsStore(),
       this.chatStore = const ChatStore()});
 
-  // factory AppState.loading() => AppState(loading: true);
+  // Helper function to emulate { loading: action.loading, ...appState}
+  AppState copyWith({bool loading}) => AppState(
+        loading: loading ?? this.loading,
+        userStore: userStore ?? this.userStore,
+        matrixStore: matrixStore ?? this.matrixStore,
+        chatStore: chatStore ?? this.chatStore,
+        settingsStore: settingsStore ?? this.settingsStore,
+      );
 
   @override
   int get hashCode =>
-      userStore.hashCode ^ chatStore.hashCode ^ loading.hashCode;
+      loading.hashCode ^
+      userStore.hashCode ^
+      matrixStore.hashCode ^
+      chatStore.hashCode ^
+      settingsStore.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is AppState &&
           runtimeType == other.runtimeType &&
+          loading == other.loading &&
           userStore == other.userStore &&
+          matrixStore == other.matrixStore &&
           chatStore == other.chatStore &&
-          loading == other.loading;
+          settingsStore == other.settingsStore;
 
   @override
   String toString() {
-    return 'AppState{userStore: $userStore,' +
-        'settingsStore: $settingsStore, ' +
-        'chatStore: $chatStore,' +
-        'matrixStore: $matrixStore,' +
-        'loading: $loading}';
+    return '{' +
+        '\nuserStore: $userStore,' +
+        '\nmatrixStore: $matrixStore, ' +
+        '\nchatStore: $chatStore,' +
+        '\nsettingsStore: $settingsStore,' +
+        '\n}';
+  }
+
+  // dynamic toJson() {
+  //   print({
+  //     'loading': loading,
+  //     'userStore': userStore,
+  //     'matrixStore': matrixStore,
+  //     'chatStore': chatStore,
+  //     'settingsStore': settingsStore
+  //   });
+  //   return {
+  //     'loading': loading,
+  //     'userStore': userStore,
+  //     'matrixStore': matrixStore,
+  //     'chatStore': chatStore,
+  //     'settingsStore': settingsStore
+  //   };
+  // }
+
+  // // Allows conversion FROM json for redux_persist
+  static AppState fromJson(dynamic json) {
+    print('[Debug] From Json $json');
+    AppState initAppState = json == null
+        ? AppState()
+        : AppState(
+            loading: json['loading'],
+            userStore: UserStore.fromJson(json['userStore']),
+          );
+    return initAppState;
+  }
+
+  // Allows conversion TO json for redux_persist
+  dynamic toJson() {
+    print('[Debug] To Json\n');
+    print({
+      'loading': loading,
+      'userStore': userStore.toJson(),
+    });
+    return {
+      'loading': loading,
+      'userStore': userStore.toJson(),
+    };
   }
 }
 
 AppState appReducer(AppState state, action) {
-  return new AppState(
-    loading: false,
+  return AppState(
+    loading: state.loading,
     chatStore: chatReducer(state.chatStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     userStore: userReducer(state.userStore, action),
@@ -61,8 +125,26 @@ AppState appReducer(AppState state, action) {
   );
 }
 
-final Store<AppState> store = new Store<AppState>(
-  appReducer,
-  initialState: AppState(),
-  middleware: [thunkMiddleware],
-);
+Future<Store> initStore() async {
+// Create and Export Store
+  await initHiveStorage();
+
+  final persistor = Persistor<AppState>(
+    storage: FlutterStorage(), // Or use other engines
+    serializer:
+        JsonSerializer<AppState>(AppState.fromJson), // Or use other serializers
+  );
+
+  // dynamic initialState = null;
+
+  final initialState = await persistor.load();
+  print('INITIAL STATE $initialState');
+
+  final Store<AppState> store = new Store<AppState>(
+    appReducer,
+    initialState: initialState ?? AppState(),
+    middleware: [thunkMiddleware, persistor.createMiddleware()],
+  );
+
+  return Future.value(store);
+}

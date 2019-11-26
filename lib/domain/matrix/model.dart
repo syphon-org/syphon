@@ -35,6 +35,6 @@ class MatrixStore {
 
   @override
   String toString() {
-    return 'MatrixStore {homeservers: $homeservers, searchResults: $searchResults loading: $loading,}';
+    return '{loading: $loading, homeservers: $homeservers, searchResults: $searchResults}';
   }
 }

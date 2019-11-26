@@ -97,7 +97,7 @@ ThunkAction<AppState> createUser() {
     );
 
     final data = json.decode(response.body);
-    print(data);
+    print("${data} ${data.runtimeType}");
 
     // new Timer(new Duration(seconds: 3), () {
     //   store.dispatch(SetUser(
@@ -107,7 +107,13 @@ ThunkAction<AppState> createUser() {
     //           accessToken: 'Testing',
     //           homeserver: "192.168.1.2")));
     // });
-
+    store.dispatch(SetUser(
+        user: User(
+      userId: data['user_id'],
+      deviceId: data['device_id'],
+      accessToken: data['access_token'],
+      homeserver: data['home_server'],
+    )));
     store.dispatch(SetCreating(creating: false));
     store.dispatch(SetLoading(loading: false));
     store.dispatch(ResetOnboarding());

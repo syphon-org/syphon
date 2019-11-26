@@ -11,8 +11,8 @@ import 'package:Tether/domain/chat/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+class Home extends StatelessWidget {
+  Home({Key key, this.title}) : super(key: key);
 
   final String title;
 

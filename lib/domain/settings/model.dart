@@ -17,6 +17,6 @@ class SettingsStore {
 
   @override
   String toString() {
-    return 'SettingsStore{theme: $theme}';
+    return '{theme: $theme}';
   }
 }

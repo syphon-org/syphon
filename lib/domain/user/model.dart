@@ -1,27 +1,37 @@
 class User {
-  final int id;
-  final String username;
+  final String userId;
+  final String deviceId;
   final String homeserver;
   final String accessToken;
+  final String displayName;
 
   const User(
-      {this.id,
-      this.username,
-      this.homeserver = 'matrix.org',
+      {this.userId,
+      this.deviceId,
+      this.homeserver,
+      this.displayName,
       this.accessToken});
 
-  User preauthenticated({int id, String text, bool completed}) {
-    return new User(
-        id: id ?? this.id,
-        username: text ?? this.username,
-        homeserver: text ?? this.homeserver,
-        accessToken: accessToken ?? this.accessToken);
+  User copyWith({
+    String userId,
+    String deviceId,
+    String homeserver,
+    String accessToken,
+    String displayName,
+  }) {
+    return User(
+      userId: userId ?? this.userId,
+      deviceId: deviceId ?? this.deviceId,
+      homeserver: homeserver ?? this.homeserver,
+      accessToken: accessToken ?? this.accessToken,
+      displayName: displayName ?? this.displayName,
+    );
   }
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      username.hashCode ^
+      userId.hashCode ^
+      deviceId.hashCode ^
       homeserver.hashCode ^
       accessToken.hashCode;
 
@@ -30,15 +40,34 @@ class User {
       identical(this, other) ||
       other is User &&
           runtimeType == other.runtimeType &&
-          id == other.id &&
-          username == other.username &&
+          userId == other.userId &&
+          deviceId == other.deviceId &&
           homeserver == other.homeserver &&
           accessToken == other.accessToken;
 
   @override
   String toString() {
-    return 'User{id: $id,  username: $username, homeserver: $homeserver, accessToken: $accessToken}';
+    return '{id: $deviceId,  userId: $userId, homeserver: $homeserver, accessToken: $accessToken}';
   }
+
+  static User fromJson(dynamic json) {
+    return json == null
+        ? User()
+        : User(
+            userId: json['userId'],
+            deviceId: json['deviceId'],
+            homeserver: json['homeserver'],
+            accessToken: json['accessToken'],
+            displayName: json['displayName']);
+  }
+
+  Map toJson() => {
+        "userId": userId,
+        "deviceId": deviceId,
+        "homeserver": homeserver,
+        "accessToken": accessToken,
+        "displayName": displayName,
+      };
 }
 
 class UserStore {
@@ -118,6 +147,24 @@ class UserStore {
 
   @override
   String toString() {
-    return 'User{user: $user, username: $username, password: $password, homeserver: $homeserver, loading: $loading,}';
+    return '{user: $user, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
+
+  static UserStore fromJson(Map<String, dynamic> json) {
+    return json == null
+        ? UserStore()
+        : UserStore(
+            user: User.fromJson(json['user']),
+            loading: json['loading'],
+            username: json['username'],
+            password: json['password'],
+            homeserver: json['homeserver']);
+  }
+
+  Map toJson() => {
+        "user": user.toJson(),
+        "username": username,
+        "password": password,
+        "homeserver": homeserver,
+      };
 }

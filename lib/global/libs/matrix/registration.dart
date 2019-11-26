@@ -53,11 +53,7 @@ dynamic buildLoginUserRequest({String username, String password, String type}) {
 /**  
   curl -XPOST \
   -d '{ "auth": {"type":"m.login.dummy"}, "username":"testing", "password":"test1234!" }'  \
-  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
-
-  curl -XPOST \
-  -d '{  "auth": {"type":"m.login.password"}}'  \
-  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
+  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user"
 {
     "access_token": "QGV4YW1wbGU6bG9jYWxob3N0.AqdSzFmFYrLrTmteXc", 
     "home_server": "192.168.1.2", 
@@ -70,7 +66,7 @@ dynamic buildRegisterUserRequest(
 
   Map body = {
     'auth': {'type': 'm.login.dummy'},
-    'user': username,
+    'username': username,
     'password': password
   };
   return {'url': url, 'body': body};
