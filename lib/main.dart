@@ -19,10 +19,10 @@ import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
-import 'package:Tether/views/home/settings.dart';
+import 'package:Tether/views/home/settings/index.dart';
 
-// Chat
-import 'package:Tether/views/chats/index.dart';
+// Messages
+import 'package:Tether/views/home/messages/index.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
@@ -67,10 +67,10 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   }
 
   // TODO: REMOVE WHEN DEPLOYED
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   print('state = $state');
+  // }
 
   @override
   void deactivate() {
@@ -102,7 +102,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                   '/home': (BuildContext context) => Home(
                         title: 'Tether',
                       ),
-                  '/chats': (BuildContext context) => Chats(),
+                  '/home/messages': (BuildContext context) => Messages(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
                   '/loading': (BuildContext context) =>

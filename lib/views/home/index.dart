@@ -1,13 +1,19 @@
-import 'package:Tether/domain/chat/model.dart';
-import 'package:Tether/views/chats/index.dart';
+import 'package:Tether/global/assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+// Domain
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/chat/model.dart';
 import 'package:Tether/domain/chat/selectors.dart';
 import 'package:Tether/domain/chat/actions.dart';
+
+// View And Styling
+import 'package:Tether/views/home/messages/index.dart';
+import 'package:Tether/global/dimensions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
@@ -16,8 +22,48 @@ class Home extends StatelessWidget {
 
   final String title;
 
+  Widget buildConversationList(List<Chat> chats, double height) {
+    if (chats.length > 0) {
+      return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: chats.length,
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+              onTap: () => Navigator.pushNamed(
+                    context,
+                    '/home/messages',
+                    arguments: MessageArguments(
+                      title: chats[index].title.toString(),
+                      photo: 'https://google.com/image',
+                    ),
+                  ),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    chats[index].title.toString(),
+                    style: TextStyle(fontSize: 22.0),
+                  ),
+                ),
+              ));
+        },
+      );
+    }
+
+    return Center(
+        child: Container(
+      height: DEFAULT_BUTTON_HEIGHT,
+      constraints: BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 220),
+      child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
+          semanticsLabel: 'User hidding behind a message'),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
@@ -98,32 +144,7 @@ class Home extends StatelessWidget {
             StoreConnector<AppState, List<Chat>>(
                 converter: (Store<AppState> store) => chats(store.state),
                 builder: (context, chats) {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: chats.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                          onTap: () => Navigator.pushNamed(
-                                context,
-                                '/chats',
-                                arguments: ChatArguments(
-                                  title: chats[index].title.toString(),
-                                  photo: 'https://google.com/image',
-                                ),
-                              ),
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                chats[index].title.toString(),
-                                style: TextStyle(fontSize: 22.0),
-                              ),
-                            ),
-                          ));
-                    },
-                  );
+                  return buildConversationList(chats, height);
                 }),
           ],
         ),
@@ -136,7 +157,7 @@ class Home extends StatelessWidget {
               color: Colors.white,
             ),
             backgroundColor: Colors.grey,
-            tooltip: 'Increment',
+            tooltip: 'New Chat',
             onPressed: () => onAction()),
       ),
     );

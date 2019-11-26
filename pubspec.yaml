@@ -96,6 +96,7 @@ flutter:
    - assets/graphics/undraw_in_thought.svg
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
+   - assets/graphics/undraw_not_found.svg
    - assets/icons/tether_icon.svg
    - assets/icons/tether_icon.png
    - assets/icons/tether_icon_white.png

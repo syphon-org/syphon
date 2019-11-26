@@ -7,21 +7,22 @@ import 'package:Tether/domain/chat/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
-class ChatArguments {
+class MessageArguments {
   final String title;
   final String photo;
 
-  ChatArguments({this.title, this.photo});
+  MessageArguments({this.title, this.photo});
 }
 
-class Chats extends StatelessWidget {
-  Chats({Key key, this.title}) : super(key: key);
+class Messages extends StatelessWidget {
+  Messages({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
   Widget build(BuildContext context) {
-    final ChatArguments arguments = ModalRoute.of(context).settings.arguments;
+    final MessageArguments arguments =
+        ModalRoute.of(context).settings.arguments;
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
