@@ -51,6 +51,7 @@ class Tether extends StatefulWidget {
 
 class TetherState extends State<Tether> with WidgetsBindingObserver {
   final Store<AppState> store;
+  Widget defaultHome = Home(title: 'Tether');
 
   TetherState({this.store});
 
@@ -58,6 +59,11 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+
+    final authed = store.state.userStore.user.accessToken != null;
+    if (!authed) {
+      defaultHome = Intro();
+    }
   }
 
   // TODO: REMOVE WHEN DEPLOYED
@@ -85,10 +91,9 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
               return MaterialApp(
                 title: 'Tether',
                 theme: Themes.getThemeFromKey(theme),
-                initialRoute: '/intro',
+                home: defaultHome,
                 routes: <String, WidgetBuilder>{
-                  '/intro': (BuildContext context) =>
-                      IntroScreen(title: 'Intro'),
+                  '/intro': (BuildContext context) => Intro(),
                   '/login': (BuildContext context) => Login(title: 'Login'),
                   '/search_home': (BuildContext context) =>
                       HomeSearch(title: 'Find Your Homeserver', store: store),

@@ -16,10 +16,8 @@ import './settings/reducer.dart';
 import './chat/reducer.dart';
 
 import 'package:redux_persist/redux_persist.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 // https://matrix.org/docs/api/client-server/#!/User32data/register
-@JsonSerializable(nullable: false)
 class AppState {
   final bool loading;
   final UserStore userStore;
@@ -72,33 +70,15 @@ class AppState {
         '\n}';
   }
 
-  // dynamic toJson() {
-  //   print({
-  //     'loading': loading,
-  //     'userStore': userStore,
-  //     'matrixStore': matrixStore,
-  //     'chatStore': chatStore,
-  //     'settingsStore': settingsStore
-  //   });
-  //   return {
-  //     'loading': loading,
-  //     'userStore': userStore,
-  //     'matrixStore': matrixStore,
-  //     'chatStore': chatStore,
-  //     'settingsStore': settingsStore
-  //   };
-  // }
-
   // // Allows conversion FROM json for redux_persist
   static AppState fromJson(dynamic json) {
-    print('[Debug] From Json $json');
-    AppState initAppState = json == null
+    return json == null
         ? AppState()
         : AppState(
             loading: json['loading'],
             userStore: UserStore.fromJson(json['userStore']),
-          );
-    return initAppState;
+            settingsStore: SettingsStore.fromJson(json['settingsStore']));
+    ;
   }
 
   // Allows conversion TO json for redux_persist
@@ -107,10 +87,12 @@ class AppState {
     print({
       'loading': loading,
       'userStore': userStore.toJson(),
+      'settingsStore': settingsStore.toJson(),
     });
     return {
       'loading': loading,
       'userStore': userStore.toJson(),
+      'settingsStore': settingsStore.toJson(),
     };
   }
 }
@@ -134,8 +116,6 @@ Future<Store> initStore() async {
     serializer:
         JsonSerializer<AppState>(AppState.fromJson), // Or use other serializers
   );
-
-  // dynamic initialState = null;
 
   final initialState = await persistor.load();
   print('INITIAL STATE $initialState');

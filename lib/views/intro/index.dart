@@ -19,15 +19,14 @@ import './second.dart';
 import './third.dart';
 import './action.dart';
 
-class IntroScreen extends StatefulWidget {
-  final String title;
-  const IntroScreen({Key key, this.title}) : super(key: key);
+class Intro extends StatefulWidget {
+  const Intro({Key key}) : super(key: key);
 
-  IntroScreenState createState() => IntroScreenState(title: this.title);
+  IntroState createState() => IntroState();
 }
 
-class IntroScreenState extends State<IntroScreen> {
-  final String title;
+class IntroState extends State<Intro> {
+  final String title = 'Intro';
 
   final sections = [
     LandingSection(),
@@ -42,7 +41,7 @@ class IntroScreenState extends State<IntroScreen> {
   String loginText = 'Already have a username?';
   SwiperController controller;
 
-  IntroScreenState({Key key, this.title});
+  IntroState({Key key});
 
   @override
   void initState() {
