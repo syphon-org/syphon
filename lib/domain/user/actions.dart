@@ -105,7 +105,7 @@ ThunkAction<AppState> createUser() {
     //           id: 123,
     //           username: "Testing",
     //           accessToken: 'Testing',
-    //           homeserver: "192.168.2.20")));
+    //           homeserver: "192.168.1.2")));
     // });
 
     store.dispatch(SetCreating(creating: false));

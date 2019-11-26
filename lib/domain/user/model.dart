@@ -59,7 +59,7 @@ class UserStore {
       this.loading = false,
       this.username = "", // null
       this.password, // null
-      this.homeserver = '192.168.2.20',
+      this.homeserver = '192.168.1.2',
       this.loginType = 'm.login.password',
       this.isUsernameValid = false,
       this.isPasswordValid = false,

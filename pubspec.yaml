@@ -1,12 +1,18 @@
 name: Tether
-description: P.
+description: Privacy centric matrix client for everyone
 
 # commands:
 # - flutter pub global run devtools
 # - emulator -list-avds
 # - emulator -avd Pixel_3a_API_29
+# - xcrun simctl delete unavailable
 # - xcrun simctl list devices
-# - xcrun simctl boot B4F0652E-3AD2-41FE-8557-2A9369B0BA62
+# - xcrun simctl boot <device-id>
+# - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
+
+# env setup
+# - synctl start on 192.168.1.2 or respective local server
+# - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
