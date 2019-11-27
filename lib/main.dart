@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -19,10 +21,10 @@ import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
-import 'package:Tether/views/home/settings.dart';
+import 'package:Tether/views/home/settings/index.dart';
 
-// Chat
-import 'package:Tether/views/chats/index.dart';
+// Messages
+import 'package:Tether/views/home/messages/index.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
@@ -60,6 +62,9 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
 
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      runInitTasks();
+    });
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
       defaultHome = Intro();
@@ -67,16 +72,34 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   }
 
   // TODO: REMOVE WHEN DEPLOYED
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   print('state = $state');
+  // }
 
   @override
   void deactivate() {
     closeStorage();
     WidgetsBinding.instance.removeObserver(this);
     super.deactivate();
+  }
+
+  @protected
+  void runInitTasks() {
+    print('runInitTasks fired');
+    store.onChange.listen((state) {
+      if (state.userStore.user.accessToken == null &&
+          defaultHome.runtimeType == Home) {
+        print('ON CHANGE Listener Fired $state');
+        defaultHome = Intro();
+        NavigationService.clearTo('/intro', context);
+      } else if (state.userStore.user.accessToken != null &&
+          defaultHome.runtimeType == Intro) {
+        print('ON CHANGE  Listener Fired $state');
+        defaultHome = Home(title: 'Tether');
+        NavigationService.clearTo('/home', context);
+      }
+    });
   }
 
   // Store should not need to be passed to a widget to affect
@@ -91,6 +114,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
               return MaterialApp(
                 title: 'Tether',
                 theme: Themes.getThemeFromKey(theme),
+                navigatorKey: NavigationService.navigatorKey,
                 home: defaultHome,
                 routes: <String, WidgetBuilder>{
                   '/intro': (BuildContext context) => Intro(),
@@ -102,7 +126,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                   '/home': (BuildContext context) => Home(
                         title: 'Tether',
                       ),
-                  '/chats': (BuildContext context) => Chats(),
+                  '/home/messages': (BuildContext context) => Messages(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
                   '/loading': (BuildContext context) =>

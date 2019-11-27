@@ -33,11 +33,12 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
       return state.copyWith(
         isPasswordValid: action.valid,
       );
+    case ResetUser:
+      return state.copyWith(user: User());
     case ResetOnboarding:
       return state.copyWith(
         username: '',
         password: '',
-        homeserver: '',
       );
     default:
       return state;

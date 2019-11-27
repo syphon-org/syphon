@@ -83,12 +83,7 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    print('[Debug] To Json\n');
-    print({
-      'loading': loading,
-      'userStore': userStore.toJson(),
-      'settingsStore': settingsStore.toJson(),
-    });
+    print('SAVING USER STATE: ${userStore.toJson()}');
     return {
       'loading': loading,
       'userStore': userStore.toJson(),

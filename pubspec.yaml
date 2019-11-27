@@ -46,7 +46,6 @@ dependencies:
   http: 0.12.0+2
   html: ^0.13.3+3
   expandable: 3.0.1
-  json_serializable: 3.2.3
   flutter_secure_storage: 3.3.1+1 
   flutter_dotenv: ^2.0.3
 
@@ -96,6 +95,7 @@ flutter:
    - assets/graphics/undraw_in_thought.svg
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
+   - assets/graphics/undraw_not_found.svg
    - assets/icons/tether_icon.svg
    - assets/icons/tether_icon.png
    - assets/icons/tether_icon_white.png
