@@ -13,6 +13,7 @@ import 'package:Tether/domain/chat/actions.dart';
 
 // View And Styling
 import 'package:Tether/views/home/messages/index.dart';
+import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/dimensions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
@@ -22,12 +23,11 @@ class Home extends StatelessWidget {
 
   final String title;
 
-  Widget buildConversationList(List<Chat> chats, double height) {
+  Widget buildConversationList(List<Chat> chats, BuildContext context) {
     if (chats.length > 0) {
       return ListView.builder(
         padding: const EdgeInsets.all(8),
         scrollDirection: Axis.vertical,
-        shrinkWrap: true,
         itemCount: chats.length,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
@@ -53,11 +53,22 @@ class Home extends StatelessWidget {
     }
 
     return Center(
-        child: Container(
-      height: DEFAULT_BUTTON_HEIGHT,
-      constraints: BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 220),
-      child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
-          semanticsLabel: 'User hidding behind a message'),
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+            constraints:
+                BoxConstraints(minWidth: 200, maxWidth: 400, maxHeight: 200),
+            child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
+                semanticsLabel: 'Tiny cute monsters hidding behind foliage')),
+        Container(
+            margin: EdgeInsets.only(bottom: 48),
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              'Seems there\'s no messages yet',
+              style: Theme.of(context).textTheme.title,
+            ))
+      ],
     ));
   }
 
@@ -139,15 +150,11 @@ class Home extends StatelessWidget {
       ),
       body: Align(
         alignment: Alignment.topCenter,
-        child: Column(
-          children: <Widget>[
-            StoreConnector<AppState, List<Chat>>(
-                converter: (Store<AppState> store) => chats(store.state),
-                builder: (context, chats) {
-                  return buildConversationList(chats, height);
-                }),
-          ],
-        ),
+        child: StoreConnector<AppState, List<Chat>>(
+            converter: (Store<AppState> store) => chats(store.state),
+            builder: (context, chats) {
+              return buildConversationList(chats, context);
+            }),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
         converter: (store) => () => store.dispatch(addChat()),
@@ -156,7 +163,7 @@ class Home extends StatelessWidget {
               Icons.edit,
               color: Colors.white,
             ),
-            backgroundColor: Colors.grey,
+            backgroundColor: PRIMARY_COLOR,
             tooltip: 'New Chat',
             onPressed: () => onAction()),
       ),
