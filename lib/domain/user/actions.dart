@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:Tether/global/libs/matrix/registration.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,12 +7,13 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/global/libs/matrix/auth.dart';
 import './model.dart';
 
 const HOMESERVER_SEARCH_SERVICE =
     'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true';
 
-final PROTOCOL = DotEnv().env['PROTOCOL'];
+final protocol = DotEnv().env['PROTOCOL'];
 
 class SetLoading {
   final bool loading;
@@ -62,7 +62,10 @@ class SetPasswordValid {
 
 class ResetOnboarding {}
 
+class ResetUser {}
+
 ThunkAction<AppState> initAuthObserver() {
+  // return (dispatch, state) =>
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
@@ -70,50 +73,95 @@ ThunkAction<AppState> initAuthObserver() {
   };
 }
 
-ThunkAction<AppState> createUser() {
-  // return (dispatch, state) =>
+ThunkAction<AppState> loginUser() {
   return (Store<AppState> store) async {
-    // TODO: call out to matrix here
     store.dispatch(SetLoading(loading: true));
-    store.dispatch(SetCreating(creating: true));
 
-    print('Creating User...');
     final userStore = store.state.userStore;
+    final username = store.state.userStore.username;
+    final password = store.state.userStore.password;
+    final homeserver = store.state.userStore.homeserver;
 
-    final registerUserRequest = buildRegisterUserRequest(
-      username: userStore.username,
-      password: userStore.password,
-      type: store.state.userStore.loginType,
+    final loginUserRequest = buildLoginUserRequest(
+      type: "m.login.password",
+      username: username,
+      password: password,
     );
 
     final url =
-        "$PROTOCOL${userStore.homeserver}:8008/${registerUserRequest['url']}";
-    final body = json.encode(registerUserRequest['body']);
+        "$protocol${userStore.homeserver}:8008/${loginUserRequest['url']}";
+    final body = json.encode(loginUserRequest['body']);
 
-    print("$url, $body");
-    final response = await http.post(
-      url,
-      body: body,
-    );
+    final response = await http.post(url, body: body);
 
     final data = json.decode(response.body);
-    print("${data} ${data.runtimeType}");
 
-    // new Timer(new Duration(seconds: 3), () {
-    //   store.dispatch(SetUser(
-    //       user: User(
-    //           id: 123,
-    //           username: "Testing",
-    //           accessToken: 'Testing',
-    //           homeserver: "192.168.1.2")));
-    // });
+    print('Login User $data');
     store.dispatch(SetUser(
         user: User(
       userId: data['user_id'],
       deviceId: data['device_id'],
       accessToken: data['access_token'],
-      homeserver: data['home_server'],
+      homeserver: homeserver, // use homeserver from login call param instead
     )));
+
+    store.dispatch(SetLoading(loading: false));
+    store.dispatch(ResetOnboarding());
+  };
+}
+
+ThunkAction<AppState> logoutUser() {
+  return (Store<AppState> store) async {
+    final accessToken = store.state.userStore.user.accessToken;
+    final homeserver = "192.168.1.2" ?? store.state.userStore.user.homeserver;
+
+    store.dispatch(SetLoading(loading: true));
+    final logoutUserRequest = buildLogoutUserRequest(accessToken: accessToken);
+
+    final url = "$protocol$homeserver:8008/${logoutUserRequest['url']}";
+
+    final response = await http.post(
+      url,
+    );
+
+    final data = json.decode(response.body);
+    print("Logut Data $data");
+    store.dispatch(ResetUser());
+  };
+}
+
+ThunkAction<AppState> createUser() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+    store.dispatch(SetCreating(creating: true));
+    final username = store.state.userStore.username;
+    final password = store.state.userStore.password;
+    final loginType = store.state.userStore.loginType;
+    final homeserver = store.state.userStore.homeserver;
+
+    final registerUserRequest = buildRegisterUserRequest(
+      username: username,
+      password: password,
+      type: loginType,
+    );
+
+    final url = "$protocol$homeserver:8008/${registerUserRequest['url']}";
+    final body = json.encode(registerUserRequest['body']);
+
+    print("$url, $body");
+    final response = await http.post(url, body: body);
+
+    final data = json.decode(response.body);
+
+    store.dispatch(SetUser(
+        user: User(
+      userId: data['user_id'],
+      deviceId: data['device_id'],
+      accessToken: data['access_token'],
+      homeserver:
+          homeserver, // TODO: use homeserver from login call param instead in dev
+    )));
+
     store.dispatch(SetCreating(creating: false));
     store.dispatch(SetLoading(loading: false));
     store.dispatch(ResetOnboarding());

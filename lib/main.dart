@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -60,6 +62,9 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
 
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      runInitTasks();
+    });
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
       defaultHome = Intro();
@@ -79,6 +84,24 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     super.deactivate();
   }
 
+  @protected
+  void runInitTasks() {
+    print('runInitTasks fired');
+    store.onChange.listen((state) {
+      if (state.userStore.user.accessToken == null &&
+          defaultHome.runtimeType == Home) {
+        print('ON CHANGE Listener Fired $state');
+        defaultHome = Intro();
+        NavigationService.clearTo('/intro', context);
+      } else if (state.userStore.user.accessToken != null &&
+          defaultHome.runtimeType == Intro) {
+        print('ON CHANGE  Listener Fired $state');
+        defaultHome = Home(title: 'Tether');
+        NavigationService.clearTo('/home', context);
+      }
+    });
+  }
+
   // Store should not need to be passed to a widget to affect
   // lifecycle widget functions
   @override
@@ -91,6 +114,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
               return MaterialApp(
                 title: 'Tether',
                 theme: Themes.getThemeFromKey(theme),
+                navigatorKey: NavigationService.navigatorKey,
                 home: defaultHome,
                 routes: <String, WidgetBuilder>{
                   '/intro': (BuildContext context) => Intro(),

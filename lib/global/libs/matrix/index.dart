@@ -1,4 +1,4 @@
 // buildLoginTypesRequest
 // buildLoginUserRequest
 // buildRegisterUserRequest
-import "package:Tether/global/libs/matrix/registration.dart";
+import "package:Tether/global/libs/matrix/auth.dart";

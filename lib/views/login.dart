@@ -1,3 +1,4 @@
+import 'package:Tether/domain/user/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -75,9 +76,9 @@ class Login extends StatelessWidget {
                             style: Theme.of(context).textTheme.display1,
                           ),
                           Spacer(flex: 4),
-                          StoreConnector<AppState, AppState>(
-                              converter: (Store<AppState> store) => store.state,
-                              builder: (context, state) {
+                          StoreConnector<AppState, Store<AppState>>(
+                              converter: (Store<AppState> store) => store,
+                              builder: (context, store) {
                                 return Container(
                                   width: width * 0.7,
                                   height: DEFAULT_INPUT_HEIGHT,
@@ -87,30 +88,45 @@ class Login extends StatelessWidget {
                                       maxWidth: 400,
                                       minHeight: 45),
                                   child: TextField(
+                                    onChanged: (username) {
+                                      // If user enters full username, make sure to set homeserver
+                                      if (username.contains(':')) {
+                                        final alias = username.split(':');
+                                        store.dispatch(
+                                            setUsername(username: alias[0]));
+                                        store.dispatch(setHomeserver(
+                                            homeserver: alias[1]));
+                                      } else {
+                                        store.dispatch(
+                                            setUsername(username: username));
+                                      }
+                                    },
                                     decoration: InputDecoration(
-                                      suffixIcon: IconButton(
-                                          icon: Icon(Icons.help_outline),
-                                          tooltip:
-                                              'Select your usernames homeserver',
-                                          onPressed: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/search_home',
-                                            );
-                                          }),
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0)),
-                                      labelText: 'username@' +
-                                          state.userStore.homeserver,
-                                    ),
+                                        suffixIcon: IconButton(
+                                            icon: Icon(Icons.help_outline),
+                                            tooltip:
+                                                'Select your usernames homeserver',
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                context,
+                                                '/search_home',
+                                              );
+                                            }),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30.0)),
+                                        hintText: store.state.userStore
+                                                    .homeserver.length !=
+                                                0
+                                            ? '@username:${store.state.userStore.homeserver}'
+                                            : '@username:tether.org',
+                                        labelText: 'username'),
                                   ),
                                 );
                               }),
-                          StoreConnector<AppState, int>(
-                              converter: (Store<AppState> store) =>
-                                  counter(store.state),
-                              builder: (context, count) {
+                          StoreConnector<AppState, Store<AppState>>(
+                              converter: (Store<AppState> store) => store,
+                              builder: (context, store) {
                                 return Container(
                                   width: width * 0.7,
                                   height: DEFAULT_INPUT_HEIGHT,
@@ -120,6 +136,10 @@ class Login extends StatelessWidget {
                                       maxWidth: 400,
                                       minHeight: 45),
                                   child: TextField(
+                                    onChanged: (password) {
+                                      store.dispatch(
+                                          setPassword(password: password));
+                                    },
                                     obscureText: true,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
@@ -131,10 +151,9 @@ class Login extends StatelessWidget {
                                 );
                               }),
                           Spacer(flex: 1),
-                          StoreConnector<AppState, UserStore>(
-                            converter: (Store<AppState> store) =>
-                                store.state.userStore,
-                            builder: (context, userStore) {
+                          StoreConnector<AppState, Store<AppState>>(
+                            converter: (Store<AppState> store) => store,
+                            builder: (context, store) {
                               return Container(
                                 width: width * 0.7,
                                 height: DEFAULT_BUTTON_HEIGHT,
@@ -144,8 +163,10 @@ class Login extends StatelessWidget {
                                     maxWidth: 400,
                                     minHeight: 45),
                                 child: FlatButton(
+                                  disabledColor: Colors.grey,
+                                  disabledTextColor: Colors.grey[300],
                                   onPressed: () {
-                                    Navigator.pushNamed(context, '/home');
+                                    store.dispatch(loginUser());
                                   },
                                   color: Theme.of(context).primaryColor,
                                   shape: RoundedRectangleBorder(
