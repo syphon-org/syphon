@@ -8,6 +8,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 // Domain
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/global/libs/matrix/auth.dart';
+import 'package:Tether/global/libs/matrix/user.dart';
 import './model.dart';
 
 const HOMESERVER_SEARCH_SERVICE =
@@ -77,56 +78,90 @@ ThunkAction<AppState> loginUser() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
-    final userStore = store.state.userStore;
-    final username = store.state.userStore.username;
-    final password = store.state.userStore.password;
-    final homeserver = store.state.userStore.homeserver;
+    try {
+      final userStore = store.state.userStore;
+      final username = store.state.userStore.username;
+      final password = store.state.userStore.password;
+      final homeserver = store.state.userStore.homeserver;
 
-    final loginUserRequest = buildLoginUserRequest(
-      type: "m.login.password",
-      username: username,
-      password: password,
-    );
+      final request = buildLoginUserRequest(
+        type: "m.login.password",
+        username: username,
+        password: password,
+      );
 
-    final url =
-        "$protocol${userStore.homeserver}:8008/${loginUserRequest['url']}";
-    final body = json.encode(loginUserRequest['body']);
+      final url = "$protocol${userStore.homeserver}/${request['url']}";
+      final body = json.encode(request['body']);
 
-    final response = await http.post(url, body: body);
+      final response = await http.post(url, body: body);
+      final data = json.decode(response.body);
 
-    final data = json.decode(response.body);
+      store.dispatch(SetUser(
+          user: User(
+        userId: data['user_id'],
+        deviceId: data['device_id'],
+        accessToken: data['access_token'],
+        homeserver: homeserver, // use homeserver from login call param instead
+      )));
 
-    print('Login User $data');
-    store.dispatch(SetUser(
-        user: User(
-      userId: data['user_id'],
-      deviceId: data['device_id'],
-      accessToken: data['access_token'],
-      homeserver: homeserver, // use homeserver from login call param instead
-    )));
+      store.dispatch(ResetOnboarding());
+    } catch (error) {
+      print(error);
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
 
-    store.dispatch(SetLoading(loading: false));
-    store.dispatch(ResetOnboarding());
+ThunkAction<AppState> fetchUserProfile() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final user = store.state.userStore.user;
+      final homeserver = store.state.userStore.user.homeserver;
+      final request = buildUserProfileRequest(userId: user.userId);
+
+      final url = "$protocol$homeserver/${request['url']}";
+      final response = await http.post(url);
+      final data = json.decode(response.body);
+
+      print("Fetch User Profile ${data}");
+
+      store.dispatch(SetUser(
+        user: user.copyWith(
+          displayName: data['displayname'],
+          avatarUrl: data['avatar_url'],
+        ),
+      ));
+    } catch (error) {
+      print(error);
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
   };
 }
 
 ThunkAction<AppState> logoutUser() {
   return (Store<AppState> store) async {
-    final accessToken = store.state.userStore.user.accessToken;
-    final homeserver = "192.168.1.2" ?? store.state.userStore.user.homeserver;
+    try {
+      store.dispatch(SetLoading(loading: true));
 
-    store.dispatch(SetLoading(loading: true));
-    final logoutUserRequest = buildLogoutUserRequest(accessToken: accessToken);
+      final accessToken = store.state.userStore.user.accessToken;
+      final homeserver = store.state.userStore.user.homeserver;
 
-    final url = "$protocol$homeserver:8008/${logoutUserRequest['url']}";
+      final request = buildLogoutUserRequest(accessToken: accessToken);
 
-    final response = await http.post(
-      url,
-    );
+      final url = "$protocol$homeserver/${request['url']}";
+      final response = await http.post(url);
+      json.decode(response.body);
 
-    final data = json.decode(response.body);
-    print("Logut Data $data");
-    store.dispatch(ResetUser());
+      store.dispatch(ResetUser());
+    } catch (error) {
+      print(error);
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
   };
 }
 
@@ -153,13 +188,13 @@ ThunkAction<AppState> createUser() {
 
     final data = json.decode(response.body);
 
+    // TODO: use homeserver from login call param instead in dev
     store.dispatch(SetUser(
         user: User(
       userId: data['user_id'],
       deviceId: data['device_id'],
       accessToken: data['access_token'],
-      homeserver:
-          homeserver, // TODO: use homeserver from login call param instead in dev
+      homeserver: homeserver,
     )));
 
     store.dispatch(SetCreating(creating: false));

@@ -1,3 +1,4 @@
+import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -74,10 +75,6 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -86,15 +83,19 @@ class Home extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(left: 8, right: 8),
             child: IconButton(
-              icon: CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: Text(
-                  'TE',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+              icon: StoreConnector<AppState, String>(
+                  converter: (store) => displayInitials(store.state),
+                  builder: (context, initials) {
+                    return CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      child: Text(
+                        initials.toUpperCase(),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }),
               onPressed: () {
-                Navigator.pushNamed(context, '/settings');
+                Navigator.pushNamed(context, '/profile');
               },
               tooltip: 'Profile and Settings',
             ),

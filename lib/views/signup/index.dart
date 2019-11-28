@@ -13,18 +13,11 @@ import 'package:Tether/domain/user/model.dart';
 // Styling Widgets
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/behaviors.dart';
 
 import './step-username.dart';
 import './step-password.dart';
 import './step-homeserver.dart';
-
-class DefaultScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
 
 class Signup extends StatefulWidget {
   final String title;

@@ -1,5 +1,6 @@
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -56,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
     Icons.exit_to_app,
   ];
 
-  Function onTapOption(int index, Store<AppState> store) {
+  Function onPressOption(int index, Store<AppState> store) {
     return () {
       if (index == options.length - 1) {
         store.dispatch(logoutUser());
@@ -76,16 +77,11 @@ class SettingsScreen extends StatelessWidget {
             itemCount: options.length,
             itemBuilder: (BuildContext context, int index) {
               if (index == 0) {
-                return TouchableOpacity(
-                    activeOpacity: 0.2,
-                    onTap: () {
-                      print('navigate to profile');
-                    },
-                    child: ProfilePreview());
+                return ProfilePreview();
               }
 
               return ListTile(
-                onTap: onTapOption(index, store),
+                onTap: onPressOption(index, store),
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: Container(

@@ -4,12 +4,14 @@ class User {
   final String homeserver;
   final String accessToken;
   final String displayName;
+  final String avatarUrl;
 
   const User(
       {this.userId,
       this.deviceId,
       this.homeserver,
       this.displayName,
+      this.avatarUrl,
       this.accessToken});
 
   User copyWith({
@@ -18,6 +20,7 @@ class User {
     String homeserver,
     String accessToken,
     String displayName,
+    String avatarUrl,
   }) {
     return User(
       userId: userId ?? this.userId,
@@ -25,6 +28,7 @@ class User {
       homeserver: homeserver ?? this.homeserver,
       accessToken: accessToken ?? this.accessToken,
       displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
@@ -33,6 +37,8 @@ class User {
       userId.hashCode ^
       deviceId.hashCode ^
       homeserver.hashCode ^
+      displayName.hashCode ^
+      avatarUrl.hashCode ^
       accessToken.hashCode;
 
   @override
@@ -58,7 +64,9 @@ class User {
             deviceId: json['deviceId'],
             homeserver: json['homeserver'],
             accessToken: json['accessToken'],
-            displayName: json['displayName']);
+            displayName: json['displayName'],
+            avatarUrl: json['avatarUrl'],
+          );
   }
 
   Map toJson() => {
@@ -67,6 +75,7 @@ class User {
         "homeserver": homeserver,
         "accessToken": accessToken,
         "displayName": displayName,
+        "avatarUrl": avatarUrl
       };
 }
 
@@ -88,7 +97,7 @@ class UserStore {
       this.loading = false,
       this.username = '', // null
       this.password = '', // null
-      this.homeserver = '192.168.1.2',
+      this.homeserver = 'matrix.org',
       this.loginType = 'm.login.dummy',
       this.isUsernameValid = false,
       this.isPasswordValid = false,

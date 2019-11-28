@@ -8,17 +8,10 @@ import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
+import 'package:Tether/global/behaviors.dart';
 
 // Assets
 import 'package:Tether/global/assets.dart';
-
-class DefaultScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
 
 class Loading extends StatelessWidget {
   Loading({Key key, this.title}) : super(key: key);

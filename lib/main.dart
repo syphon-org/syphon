@@ -21,6 +21,7 @@ import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
+import 'package:Tether/views/home/profile/index.dart';
 import 'package:Tether/views/home/settings/index.dart';
 
 // Messages
@@ -62,13 +63,14 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      runInitTasks();
-    });
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
       defaultHome = Intro();
     }
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      runInitTasks();
+    });
   }
 
   // TODO: REMOVE WHEN DEPLOYED
@@ -90,12 +92,12 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     store.onChange.listen((state) {
       if (state.userStore.user.accessToken == null &&
           defaultHome.runtimeType == Home) {
-        print('ON CHANGE Listener Fired $state');
+        // print('ON CHANGE Listener Fired $state');
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
       } else if (state.userStore.user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
-        print('ON CHANGE  Listener Fired $state');
+        // print('ON CHANGE  Listener Fired $state');
         defaultHome = Home(title: 'Tether');
         NavigationService.clearTo('/home', context);
       }
@@ -127,6 +129,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                         title: 'Tether',
                       ),
                   '/home/messages': (BuildContext context) => Messages(),
+                  '/profile': (BuildContext context) => Profile(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
                   '/loading': (BuildContext context) =>

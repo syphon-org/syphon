@@ -1,29 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
 import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/behaviors.dart';
 
 // Assets
 import 'package:Tether/global/assets.dart';
-
-class DefaultScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
 
 class Splash extends StatelessWidget {
   Splash({Key key, this.title}) : super(key: key);

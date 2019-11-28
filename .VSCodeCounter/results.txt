@@ -1,0 +1,70 @@
+Date : 2019-11-28 15:23:48
+Directory : /Users/ereio/development/ere.io/src
+Total : 26 files,  784 codes, 22 comments, 126 blanks, all 932 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| CSS        |          7 |        464 |          6 |         85 |        555 |
+| JavaScript |          8 |        207 |         14 |         40 |        261 |
+| JSON       |          7 |         44 |          0 |          0 |         44 |
+| YAML       |          1 |         32 |          0 |          0 |         32 |
+| HTML       |          2 |         27 |          1 |          1 |         29 |
+| XML        |          1 |         10 |          1 |          0 |         11 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                   | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                      |         26 |        784 |         22 |        126 |        932 |
+| assets                                                                 |          1 |         10 |          1 |          0 |         11 |
+| assets/icons                                                           |          1 |         10 |          1 |          0 |         11 |
+| global                                                                 |          3 |         89 |          3 |         19 |        111 |
+| global/components                                                      |          2 |         88 |          3 |         19 |        110 |
+| global/components/header                                               |          2 |         88 |          3 |         19 |        110 |
+| static                                                                 |          8 |         66 |          1 |          0 |         67 |
+| static/admin                                                           |          2 |         43 |          1 |          0 |         44 |
+| static/posts                                                           |          1 |          6 |          0 |          0 |          6 |
+| static/things                                                          |          3 |         15 |          0 |          0 |         15 |
+| views                                                                  |         10 |        475 |         12 |         89 |        576 |
+| views/blog                                                             |          4 |         80 |          1 |         16 |         97 |
+| views/blog/post                                                        |          2 |         26 |          1 |          7 |         34 |
+| views/home                                                             |          4 |        274 |          5 |         54 |        333 |
+| views/home/intro-header                                                |          2 |        248 |          5 |         50 |        303 |
+| views/things                                                           |          2 |        121 |          6 |         19 |        146 |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                               | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/ereio/development/ere.io/src/assets/icons/ereio.svg             | XML        |         10 |          1 |          0 |         11 |
+| /Users/ereio/development/ere.io/src/global/assets.js                   | JavaScript |          1 |          0 |          0 |          1 |
+| /Users/ereio/development/ere.io/src/global/components/header/index.js  | JavaScript |         18 |          3 |          5 |         26 |
+| /Users/ereio/development/ere.io/src/global/components/header/style.css | CSS        |         70 |          0 |         14 |         84 |
+| /Users/ereio/development/ere.io/src/index.css                          | CSS        |         71 |          0 |         10 |         81 |
+| /Users/ereio/development/ere.io/src/index.js                           | JavaScript |         36 |          5 |          7 |         48 |
+| /Users/ereio/development/ere.io/src/manifest.json                      | JSON       |         21 |          0 |          0 |         21 |
+| /Users/ereio/development/ere.io/src/static/admin/config.yml            | YAML       |         32 |          0 |          0 |         32 |
+| /Users/ereio/development/ere.io/src/static/admin/index.html            | HTML       |         11 |          1 |          0 |         12 |
+| /Users/ereio/development/ere.io/src/static/all-posts.json              | JSON       |          1 |          0 |          0 |          1 |
+| /Users/ereio/development/ere.io/src/static/all-things.json             | JSON       |          1 |          0 |          0 |          1 |
+| /Users/ereio/development/ere.io/src/static/posts/welcome.json          | JSON       |          6 |          0 |          0 |          6 |
+| /Users/ereio/development/ere.io/src/static/things/dart.json            | JSON       |          5 |          0 |          0 |          5 |
+| /Users/ereio/development/ere.io/src/static/things/openwrt.json         | JSON       |          5 |          0 |          0 |          5 |
+| /Users/ereio/development/ere.io/src/static/things/punk.json            | JSON       |          5 |          0 |          0 |          5 |
+| /Users/ereio/development/ere.io/src/template.html                      | HTML       |         16 |          0 |          1 |         17 |
+| /Users/ereio/development/ere.io/src/views/blog/index.js                | JavaScript |         33 |          0 |          5 |         38 |
+| /Users/ereio/development/ere.io/src/views/blog/post/index.js           | JavaScript |         21 |          1 |          7 |         29 |
+| /Users/ereio/development/ere.io/src/views/blog/post/style.css          | CSS        |          5 |          0 |          0 |          5 |
+| /Users/ereio/development/ere.io/src/views/blog/style.css               | CSS        |         21 |          0 |          4 |         25 |
+| /Users/ereio/development/ere.io/src/views/home/index.js                | JavaScript |         18 |          0 |          4 |         22 |
+| /Users/ereio/development/ere.io/src/views/home/intro-header/index.js   | JavaScript |         28 |          3 |          5 |         36 |
+| /Users/ereio/development/ere.io/src/views/home/intro-header/style.css  | CSS        |        220 |          2 |         45 |        267 |
+| /Users/ereio/development/ere.io/src/views/home/style.css               | CSS        |          8 |          0 |          0 |          8 |
+| /Users/ereio/development/ere.io/src/views/things/index.js              | JavaScript |         52 |          2 |          7 |         61 |
+| /Users/ereio/development/ere.io/src/views/things/style.css             | CSS        |         69 |          4 |         12 |         85 |
+| Total                                                                  |            |        784 |         22 |        126 |        932 |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
