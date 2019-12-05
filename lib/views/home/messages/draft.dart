@@ -100,9 +100,9 @@ class Draft extends StatelessWidget {
               'You have pushed the button this many times:',
             ),
             StoreConnector<AppState, int>(
-              converter: (Store<AppState> store) => counter(store.state),
+              converter: (Store<AppState> store) => 0,
               builder: (context, count) {
-                return new Text(
+                return Text(
                   count.toString(),
                   style: Theme.of(context).textTheme.display1,
                 );

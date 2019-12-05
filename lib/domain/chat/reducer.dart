@@ -3,44 +3,18 @@ import './actions.dart';
 
 ChatStore chatReducer([ChatStore state = const ChatStore(), dynamic action]) {
   switch (action.runtimeType) {
+    case SetLoading:
+      return state.copyWith(loading: action.loading);
+    case SetSyncing:
+      return state.copyWith(syncing: action.syncing);
+    case SetChatObserver:
+      return state.copyWith(chatObserver: action.chatObserver);
     case SetChats:
-      return ChatStore(
-        initing: state.initing,
-        loading: state.loading,
-        counter: state.counter,
-        chats: action.chats,
-      );
-    case SetMessages:
-      return ChatStore(
-        initing: false,
-        loading: false,
-        counter: 0,
-        chats: action.chats,
-      );
-    case SetIniting:
-      return ChatStore(
-        initing: false,
-        loading: false,
-        counter: 0,
-        chats: action.chats,
-      );
+      return state.copyWith(chats: action.chats);
     case AddChat:
       List<Chat> chats = List<Chat>.from(state.chats);
       chats.add(action.chat);
-
-      return ChatStore(
-          initing: state.initing,
-          loading: state.loading,
-          counter: state.counter,
-          chats: chats);
-
-    case SetCounter:
-      return ChatStore(
-        initing: state.initing,
-        loading: state.loading,
-        counter: action.counter,
-        chats: state.chats,
-      );
+      return state.copyWith(chats: chats);
     default:
       return state;
   }

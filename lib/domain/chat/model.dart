@@ -1,3 +1,5 @@
+import 'dart:async';
+
 class Message {
   final int senderId;
   final int receiverId;
@@ -34,34 +36,51 @@ class Chat {
 }
 
 class ChatStore {
-  final int counter;
-  final bool initing;
   final bool loading;
+  final bool syncing;
+  final Timer chatObserver;
   final List<Chat> chats;
 
   const ChatStore({
-    this.chats = const [],
-    this.initing = true,
+    this.syncing = false,
     this.loading = false,
-    this.counter = 0,
+    this.chatObserver,
+    this.chats = const [],
   });
+
+  ChatStore copyWith({
+    loading,
+    syncing,
+    chats,
+    chatObserver,
+  }) {
+    return ChatStore(
+      loading: loading ?? this.loading,
+      syncing: syncing ?? this.syncing,
+      chatObserver: chatObserver ?? this.chatObserver,
+      chats: chats ?? this.chats,
+    );
+  }
 
   @override
   int get hashCode =>
-      chats.hashCode ^ initing.hashCode ^ counter.hashCode ^ loading.hashCode;
+      loading.hashCode ^
+      syncing.hashCode ^
+      chatObserver.hashCode ^
+      chats.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ChatStore &&
           runtimeType == other.runtimeType &&
-          chats == other.chats &&
-          initing == other.initing &&
           loading == other.loading &&
-          counter == other.counter;
+          syncing == other.syncing &&
+          chatObserver == other.chatObserver &&
+          chats == other.chats;
 
   @override
   String toString() {
-    return '{chats: $chats, initing: $initing, loading: $loading, counter: $counter}';
+    return '{loading: $loading, syncing: $syncing, chatObserver: $chatObserver, chats: $chats}';
   }
 }

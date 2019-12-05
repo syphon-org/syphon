@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:Tether/domain/chat/actions.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -61,16 +64,47 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class SetAuthObserver {
+  final StreamController authObserver;
+  SetAuthObserver({this.authObserver});
+}
+
 class ResetOnboarding {}
 
 class ResetUser {}
 
-ThunkAction<AppState> initAuthObserver() {
-  // return (dispatch, state) =>
+ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
-    store.dispatch(SetLoading(loading: true));
+    if (store.state.userStore.authObserver != null) {
+      throw 'Cannot call startAuthObserver twice!';
+    }
 
-    store.dispatch(SetLoading(loading: false));
+    store.dispatch(
+      SetAuthObserver(authObserver: StreamController<User>.broadcast()),
+    );
+
+    final user = store.state.userStore.user;
+
+    if (user != null && user.accessToken != null) {
+      store.dispatch(startChatObserver());
+    } else {
+      store.dispatch(stopChatObserver());
+    }
+
+    store.state.userStore.onAuthStateChanged.listen((user) {
+      print('auth state change?');
+      if (user != null && user.accessToken != null) {
+        store.dispatch(startChatObserver());
+      } else {
+        store.dispatch(stopChatObserver());
+      }
+    });
+  };
+}
+
+ThunkAction<AppState> stopAuthObserver() {
+  return (Store<AppState> store) async {
+    store.state.userStore.authObserver.close();
   };
 }
 
@@ -79,10 +113,10 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      final userStore = store.state.userStore;
       final username = store.state.userStore.username;
       final password = store.state.userStore.password;
       final homeserver = store.state.userStore.homeserver;
+      final authObserver = store.state.userStore.authObserver;
 
       final request = buildLoginUserRequest(
         type: "m.login.password",
@@ -90,11 +124,13 @@ ThunkAction<AppState> loginUser() {
         password: password,
       );
 
-      final url = "$protocol${userStore.homeserver}/${request['url']}";
+      final url = "$protocol$homeserver/${request['url']}";
       final body = json.encode(request['body']);
 
       final response = await http.post(url, body: body);
       final data = json.decode(response.body);
+
+      // TODO: UNHAPPY PATH NEEDS TO BE ACCOUNT FOR
 
       store.dispatch(SetUser(
           user: User(
@@ -103,6 +139,8 @@ ThunkAction<AppState> loginUser() {
         accessToken: data['access_token'],
         homeserver: homeserver, // use homeserver from login call param instead
       )));
+
+      authObserver.add(store.state.userStore.user);
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
@@ -120,6 +158,7 @@ ThunkAction<AppState> fetchUserProfile() {
 
       final user = store.state.userStore.user;
       final homeserver = store.state.userStore.user.homeserver;
+
       final request = buildUserProfileRequest(userId: user.userId);
 
       final url = "$protocol$homeserver/${request['url']}";
@@ -149,6 +188,7 @@ ThunkAction<AppState> logoutUser() {
 
       final accessToken = store.state.userStore.user.accessToken;
       final homeserver = store.state.userStore.user.homeserver;
+      final authObserver = store.state.userStore.authObserver;
 
       final request = buildLogoutUserRequest(accessToken: accessToken);
 
@@ -156,6 +196,7 @@ ThunkAction<AppState> logoutUser() {
       final response = await http.post(url);
       json.decode(response.body);
 
+      authObserver.add(null);
       store.dispatch(ResetUser());
     } catch (error) {
       print(error);

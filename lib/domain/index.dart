@@ -78,12 +78,11 @@ class AppState {
             loading: json['loading'],
             userStore: UserStore.fromJson(json['userStore']),
             settingsStore: SettingsStore.fromJson(json['settingsStore']));
-    ;
   }
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    print('SAVING USER STATE: ${userStore.toJson()}');
+    print('REDUX PERSISTING: ${userStore.toJson()}');
     return {
       'loading': loading,
       'userStore': userStore.toJson(),

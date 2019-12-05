@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -55,13 +56,13 @@ class Tether extends StatefulWidget {
 class TetherState extends State<Tether> with WidgetsBindingObserver {
   final Store<AppState> store;
   Widget defaultHome = Home(title: 'Tether');
-
   TetherState({this.store});
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+    store.dispatch(startAuthObserver());
 
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
@@ -83,21 +84,21 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   void deactivate() {
     closeStorage();
     WidgetsBinding.instance.removeObserver(this);
+    store.dispatch(stopAuthObserver());
     super.deactivate();
   }
 
   @protected
   void runInitTasks() {
     print('runInitTasks fired');
-    store.onChange.listen((state) {
-      if (state.userStore.user.accessToken == null &&
-          defaultHome.runtimeType == Home) {
-        // print('ON CHANGE Listener Fired $state');
+
+    store.state.userStore.onAuthStateChanged.listen((user) {
+      if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
-      } else if (state.userStore.user.accessToken != null &&
+      } else if (user != null &&
+          user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
-        // print('ON CHANGE  Listener Fired $state');
         defaultHome = Home(title: 'Tether');
         NavigationService.clearTo('/home', context);
       }
