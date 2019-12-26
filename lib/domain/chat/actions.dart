@@ -42,12 +42,13 @@ class AddChat {
 
 ThunkAction<AppState> startChatObserver() {
   return (Store<AppState> store) async {
-    store.dispatch(syncChat());
+    store.dispatch(fetchChats());
 
     // Timer chatObserver = Timer.periodic(Duration(seconds: 30), (timer) async {
     //   debugPrint('${timer.tick}');
     //   store.dispatch(syncChat());
     // });
+
     // store.dispatch(SetChatObserver(chatObserver: chatObserver));
   };
 }
@@ -60,13 +61,40 @@ ThunkAction<AppState> stopChatObserver() {
   };
 }
 
+ThunkAction<AppState> fetchChats() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final accessToken = store.state.userStore.user.accessToken;
+      final homeserver = store.state.userStore.homeserver;
+
+      final request = buildJoinedRoomsRequest(
+        accessToken: accessToken,
+      );
+
+      final url = "$protocol$homeserver/${request['url']}";
+      final response = await http.get(url);
+      final data = json.decode(response.body);
+
+      print(data);
+      print('Fetch Chats Completed');
+    } catch (error) {
+      print('Fetch Chats Error');
+      debugPrint(error);
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+// TODO: Fetch whole state if last updated time is null
 ThunkAction<AppState> syncChat() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
       print('Syncing Started');
 
-      // TODO: Fetch whole state if last updated time is null
       final isFullState = store.state.chatStore.chats.length == 0;
       final accessToken = store.state.userStore.user.accessToken;
       final homeserver = store.state.userStore.homeserver;

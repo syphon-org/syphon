@@ -13,3 +13,14 @@ dynamic buildSyncRequest({
 
   return {'url': url};
 }
+
+dynamic buildJoinedRoomsRequest({
+  String accessToken,
+}) {
+  String url = '/_matrix/client/r0/joined_rooms';
+
+  // Params
+  url += '?access_token=${accessToken}';
+
+  return {'url': url};
+}

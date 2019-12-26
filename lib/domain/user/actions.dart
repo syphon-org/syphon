@@ -10,6 +10,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import './model.dart';
@@ -76,7 +77,7 @@ class ResetUser {}
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
     if (store.state.userStore.authObserver != null) {
-      throw 'Cannot call startAuthObserver twice!';
+      throw 'Cannot call startAuthObserver with an existing instance!';
     }
 
     store.dispatch(
@@ -84,27 +85,26 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.userStore.user;
-
-    if (user != null && user.accessToken != null) {
-      store.dispatch(startChatObserver());
-    } else {
-      store.dispatch(stopChatObserver());
-    }
-
-    store.state.userStore.onAuthStateChanged.listen((user) {
-      print('auth state change?');
+    final Function changeAuthState = (user) {
       if (user != null && user.accessToken != null) {
         store.dispatch(startChatObserver());
       } else {
         store.dispatch(stopChatObserver());
       }
-    });
+    };
+
+    // init current auth state and set auth state listener
+    changeAuthState(user);
+    store.state.userStore.onAuthStateChanged.listen(changeAuthState);
   };
 }
 
 ThunkAction<AppState> stopAuthObserver() {
   return (Store<AppState> store) async {
-    store.state.userStore.authObserver.close();
+    if (store.state.userStore.authObserver != null) {
+      store.state.userStore.authObserver.close();
+      store.dispatch(SetAuthObserver(authObserver: null));
+    }
   };
 }
 
@@ -132,6 +132,10 @@ ThunkAction<AppState> loginUser() {
 
       // TODO: UNHAPPY PATH NEEDS TO BE ACCOUNT FOR
 
+      if (data['errcode'] != null) {
+        throw Exception(data['error']);
+      }
+
       store.dispatch(SetUser(
           user: User(
         userId: data['user_id'],
@@ -144,7 +148,8 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      print(error);
+      print('loginUser failure : $error');
+      store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -261,7 +266,7 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
   return (Store<AppState> store) async {
     store.dispatch(
         SetHomeserverValid(valid: homeserver != null && homeserver.length > 0));
-    store.dispatch(SetHomeserver(homeserver: homeserver));
+    store.dispatch(SetHomeserver(homeserver: homeserver.trim()));
   };
 }
 
@@ -269,7 +274,7 @@ ThunkAction<AppState> setUsername({String username}) {
   return (Store<AppState> store) async {
     store.dispatch(
         SetUsernameValid(valid: username != null && username.length > 0));
-    store.dispatch(SetUsername(username: username));
+    store.dispatch(SetUsername(username: username.trim()));
   };
 }
 
@@ -277,6 +282,6 @@ ThunkAction<AppState> setPassword({String password}) {
   return (Store<AppState> store) async {
     store.dispatch(
         SetPasswordValid(valid: password != null && password.length > 0));
-    store.dispatch(SetPassword(password: password));
+    store.dispatch(SetPassword(password: password.trim()));
   };
 }

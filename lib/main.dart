@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
@@ -63,6 +64,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
     store.dispatch(startAuthObserver());
+    store.dispatch(startAlertsObserver());
 
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
@@ -70,7 +72,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     }
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      runInitTasks();
+      onMounted();
     });
   }
 
@@ -85,13 +87,13 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     closeStorage();
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());
+    store.dispatch(stopAlertsObserver());
     super.deactivate();
   }
 
   @protected
-  void runInitTasks() {
-    print('runInitTasks fired');
-
+  void onMounted() {
+    // init authenticated navigation
     store.state.userStore.onAuthStateChanged.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
@@ -121,7 +123,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                 home: defaultHome,
                 routes: <String, WidgetBuilder>{
                   '/intro': (BuildContext context) => Intro(),
-                  '/login': (BuildContext context) => Login(title: 'Login'),
+                  '/login': (BuildContext context) => Login(store: store),
                   '/search_home': (BuildContext context) =>
                       HomeSearch(title: 'Find Your Homeserver', store: store),
                   '/signup': (BuildContext context) =>
