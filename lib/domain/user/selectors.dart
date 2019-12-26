@@ -17,6 +17,10 @@ bool creating(AppState state) {
   return state.userStore.creating;
 }
 
+bool isLoginAttemptable(AppState state) {
+  return state.userStore.isPasswordValid && state.userStore.isUsernameValid;
+}
+
 // Auth
 String shortname(AppState state) {
   // If user has yet to save a username, format the userId to show the shortname

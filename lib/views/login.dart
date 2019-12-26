@@ -1,5 +1,6 @@
 import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/domain/user/selectors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -60,9 +61,31 @@ class LoginState extends State<Login> {
   void onMounted() {
     // Init alerts listener
     store.state.alertsStore.onAlertsChanged.listen((alert) {
+      var color;
+
+      switch (alert.type) {
+        case 'warning':
+          color = Colors.red;
+          break;
+        case 'error':
+          color = Colors.red;
+          break;
+        case 'info':
+        default:
+          color = Colors.grey;
+      }
+
       loginScaffold.currentState.showSnackBar(SnackBar(
+        backgroundColor: color,
         content: Text(alert.message),
         duration: alert.duration,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            loginScaffold.currentState.removeCurrentSnackBar();
+          },
+        ),
       ));
     });
   }
@@ -209,6 +232,12 @@ class LoginState extends State<Login> {
                           StoreConnector<AppState, Store<AppState>>(
                             converter: (Store<AppState> store) => store,
                             builder: (context, store) {
+                              Function onPressLogin = null;
+                              if (isLoginAttemptable(store.state)) {
+                                onPressLogin = () {
+                                  store.dispatch(loginUser());
+                                };
+                              }
                               return Container(
                                 width: width * 0.7,
                                 height: DEFAULT_BUTTON_HEIGHT,
@@ -220,9 +249,7 @@ class LoginState extends State<Login> {
                                 child: FlatButton(
                                   disabledColor: Colors.grey,
                                   disabledTextColor: Colors.grey[300],
-                                  onPressed: () {
-                                    store.dispatch(testAlerts());
-                                  },
+                                  onPressed: onPressLogin,
                                   color: Theme.of(context).primaryColor,
                                   shape: RoundedRectangleBorder(
                                       borderRadius:

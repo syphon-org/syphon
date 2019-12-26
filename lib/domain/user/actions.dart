@@ -130,7 +130,9 @@ ThunkAction<AppState> loginUser() {
       final response = await http.post(url, body: body);
       final data = json.decode(response.body);
 
-      // TODO: UNHAPPY PATH NEEDS TO BE ACCOUNT FOR
+      if (data['errcode'] == 'M_FORBIDDEN') {
+        throw Exception('Invalid credentials, confirm and try again');
+      }
 
       if (data['errcode'] != null) {
         throw Exception(data['error']);
