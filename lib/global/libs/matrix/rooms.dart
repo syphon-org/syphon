@@ -14,13 +14,39 @@ dynamic buildSyncRequest({
   return {'url': url};
 }
 
-dynamic buildJoinedRoomsRequest({
-  String accessToken,
-}) {
+dynamic buildJoinedRoomsRequest({String accessToken}) {
   String url = '_matrix/client/r0/joined_rooms';
 
   // Params
   url += '?access_token=${accessToken}';
 
+  return {'url': url};
+}
+
+dynamic buildRoomMembersRequest({String accessToken, String roomId}) {
+  String url = '_matrix/client/r0/rooms/$roomId/joined_members';
+
+  // Params
+  url += '?access_token=${accessToken}';
+
+  return {'url': url};
+}
+
+dynamic buildRoomStateRequest({String accessToken, String roomId}) {
+  String url = '_matrix/client/r0/rooms/$roomId/state';
+
+  // Params
+  url += '?access_token=${accessToken}';
+
+  return {'url': url};
+}
+
+dynamic buildRoomSyncRequest({String accessToken, String roomId}) {
+  String url = '_matrix/client/r0/sync';
+  // Params
+  url += '?access_token=${accessToken}';
+  url += '&filter={\"room\":{\"rooms\":["$roomId"]}}';
+
+  print(url);
   return {'url': url};
 }

@@ -64,7 +64,6 @@ ThunkAction<AppState> fetchHomeserverIcons() {
 
     homeservers.forEach((homeserver) async {
       final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
-      print(iconUrl);
 
       if (iconUrl.length <= 0) {
         return;
@@ -101,7 +100,6 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
             homeserver['hostname'].contains(searchText) ||
             homeserver['description'].contains(searchText))
         .toList();
-    print(searchResults);
     store.dispatch(SetSearchResults(searchResults: searchResults));
   };
 }

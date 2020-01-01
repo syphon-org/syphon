@@ -37,7 +37,6 @@ String displayInitials(AppState state) {
   if (user.userId == null) return 'NA';
 
   final displayName = user.displayName ?? user.userId.replaceFirst('@', '');
-  print(displayName);
   final initials = displayName.contains(' ')
       ? displayName.split(' ')[0].substring(0, 1) +
           displayName.split(' ')[1].substring(0, 1)
