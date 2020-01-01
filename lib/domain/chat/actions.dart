@@ -74,14 +74,16 @@ ThunkAction<AppState> fetchChats() {
       );
 
       final url = "$protocol$homeserver/${request['url']}";
+      print('what $url');
       final response = await http.get(url);
       final data = json.decode(response.body);
+      final List<dynamic> joinedRooms = data['joined_rooms'];
 
-      print(data);
-      print('Fetch Chats Completed');
+      // Convert rooms to chats
+      final joinedChats = joinedRooms.map((id) => Chat(id: id)).toList();
+      store.dispatch(SetChats(chats: joinedChats));
     } catch (error) {
-      print('Fetch Chats Error');
-      debugPrint(error);
+      print(error);
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -108,7 +110,6 @@ ThunkAction<AppState> syncChat() {
       final response = await http.get(url);
       final data = json.decode(response.body);
 
-      // TODO: do more here
       print(data);
       print('Syncing Completed');
     } catch (error) {
@@ -124,13 +125,9 @@ ThunkAction<AppState> syncChat() {
 ThunkAction<AppState> addChat() {
   // return (dispatch, state) =>
   return (Store<AppState> store) async {
-    var chatId = Random.secure().nextInt(10000000).toString();
+    var id = Random.secure().nextInt(10000000).toString();
 
     store.dispatch(AddChat(
-        chat: Chat(
-            chatId: chatId,
-            title: 'chat-$chatId',
-            messages: [],
-            syncing: false)));
+        chat: Chat(id: id, title: 'chat-$id', messages: [], syncing: false)));
   };
 }

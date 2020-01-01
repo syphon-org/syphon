@@ -28,6 +28,7 @@ import 'package:Tether/views/home/settings/index.dart';
 
 // Messages
 import 'package:Tether/views/home/messages/index.dart';
+import 'package:Tether/views/home/messages/draft.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
@@ -132,6 +133,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                         title: 'Tether',
                       ),
                   '/home/messages': (BuildContext context) => Messages(),
+                  '/draft': (BuildContext context) => Draft(),
                   '/profile': (BuildContext context) => Profile(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),

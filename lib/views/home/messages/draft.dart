@@ -111,16 +111,6 @@ class Draft extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(incrementCounter()),
-        builder: (context, onAction) => FloatingActionButton(
-            child: Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-            tooltip: 'Increment',
-            onPressed: () => onAction()),
-      ),
     );
   }
 }

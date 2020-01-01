@@ -130,6 +130,8 @@ ThunkAction<AppState> loginUser() {
       final response = await http.post(url, body: body);
       final data = json.decode(response.body);
 
+      print('$url $password');
+
       if (data['errcode'] == 'M_FORBIDDEN') {
         throw Exception('Invalid credentials, confirm and try again');
       }

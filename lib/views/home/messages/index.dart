@@ -103,17 +103,6 @@ class Messages extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(addChat()),
-        builder: (context, onAction) => FloatingActionButton(
-            child: Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.grey,
-            tooltip: 'Increment',
-            onPressed: () => onAction()),
-      ),
     );
   }
 }

@@ -21,14 +21,15 @@ class Message {
       timestamp.hashCode;
 }
 
+// Corresponds to rooms in the matrix protocol
 class Chat {
-  final String chatId;
+  final String id;
   final String title;
   final List<Message> messages;
   final bool syncing;
 
   const Chat({
-    this.chatId,
+    this.id,
     this.title = 'New Chat',
     this.messages = const [],
     this.syncing = false,

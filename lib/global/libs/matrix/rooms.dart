@@ -17,7 +17,7 @@ dynamic buildSyncRequest({
 dynamic buildJoinedRoomsRequest({
   String accessToken,
 }) {
-  String url = '/_matrix/client/r0/joined_rooms';
+  String url = '_matrix/client/r0/joined_rooms';
 
   // Params
   url += '?access_token=${accessToken}';

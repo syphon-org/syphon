@@ -24,14 +24,19 @@ class Home extends StatelessWidget {
 
   final String title;
 
+  @protected
+  onNavigateToDraft(context) {
+    Navigator.pushNamed(context, '/draft');
+  }
+
   Widget buildConversationList(List<Chat> chats, BuildContext context) {
     if (chats.length > 0) {
       return ListView.builder(
-        padding: const EdgeInsets.all(8),
         scrollDirection: Axis.vertical,
         itemCount: chats.length,
         itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
+          // GestureDetector w/ animation
+          return InkWell(
               onTap: () => Navigator.pushNamed(
                     context,
                     '/home/messages',
@@ -40,14 +45,33 @@ class Home extends StatelessWidget {
                       photo: 'https://google.com/image',
                     ),
                   ),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    chats[index].title.toString(),
-                    style: TextStyle(fontSize: 22.0),
-                  ),
-                ),
+              child: Container(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            child: CircleAvatar(
+                              radius: 24,
+                              backgroundColor: Colors.grey,
+                              child: Text(
+                                chats[index]
+                                    .title
+                                    .substring(0, 2)
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          Text(
+                            chats[index].title.toString(),
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        ])),
               ));
         },
       );
@@ -78,10 +102,10 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        titleSpacing: 0.0,
+        titleSpacing: 24.0,
         title: Row(children: <Widget>[
           Container(
-            margin: EdgeInsets.only(left: 8, right: 8),
+            margin: EdgeInsets.only(right: 8),
             child: IconButton(
               icon: StoreConnector<AppState, String>(
                   converter: (store) => displayInitials(store.state),
@@ -90,7 +114,7 @@ class Home extends StatelessWidget {
                       backgroundColor: Colors.grey,
                       child: Text(
                         initials.toUpperCase(),
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     );
                   }),
@@ -151,10 +175,27 @@ class Home extends StatelessWidget {
       ),
       body: Align(
         alignment: Alignment.topCenter,
-        child: StoreConnector<AppState, List<Chat>>(
-            converter: (Store<AppState> store) => chats(store.state),
-            builder: (context, chats) {
-              return buildConversationList(chats, context);
+        child: StoreConnector<AppState, AppState>(
+            converter: (Store<AppState> store) => store.state,
+            builder: (context, state) {
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Visibility(
+                        visible: state.chatStore.loading,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4.0,
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                                PRIMARY_COLOR),
+                            value: null,
+                          ),
+                        )),
+                    Expanded(
+                      child: buildConversationList(chats(state), context),
+                    )
+                  ]);
             }),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
@@ -166,7 +207,7 @@ class Home extends StatelessWidget {
             ),
             backgroundColor: PRIMARY_COLOR,
             tooltip: 'New Chat',
-            onPressed: () => onAction()),
+            onPressed: () => onNavigateToDraft(context)),
       ),
     );
   }
