@@ -9,11 +9,11 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import './alerts/model.dart';
 import './user/model.dart';
 import './settings/model.dart';
-import './chat/model.dart';
+import './rooms/model.dart';
 import './matrix/model.dart';
 
 import './alerts/reducer.dart';
-import './chat/reducer.dart';
+import './rooms/reducer.dart';
 import './matrix/reducer.dart';
 import './user/reducer.dart';
 import './settings/reducer.dart';
@@ -27,7 +27,7 @@ class AppState {
   final UserStore userStore;
   final MatrixStore matrixStore;
   final SettingsStore settingsStore;
-  final ChatStore chatStore;
+  final RoomStore roomStore;
 
   AppState(
       {this.loading = true,
@@ -35,7 +35,7 @@ class AppState {
       this.userStore = const UserStore(),
       this.matrixStore = const MatrixStore(),
       this.settingsStore = const SettingsStore(),
-      this.chatStore = const ChatStore()});
+      this.roomStore = const RoomStore()});
 
   // Helper function to emulate { loading: action.loading, ...appState}
   AppState copyWith({bool loading}) => AppState(
@@ -43,7 +43,7 @@ class AppState {
         alertsStore: alertsStore ?? this.alertsStore,
         userStore: userStore ?? this.userStore,
         matrixStore: matrixStore ?? this.matrixStore,
-        chatStore: chatStore ?? this.chatStore,
+        roomStore: roomStore ?? this.roomStore,
         settingsStore: settingsStore ?? this.settingsStore,
       );
 
@@ -53,7 +53,7 @@ class AppState {
       alertsStore.hashCode ^
       userStore.hashCode ^
       matrixStore.hashCode ^
-      chatStore.hashCode ^
+      roomStore.hashCode ^
       settingsStore.hashCode;
 
   @override
@@ -65,7 +65,7 @@ class AppState {
           alertsStore == other.alertsStore &&
           userStore == other.userStore &&
           matrixStore == other.matrixStore &&
-          chatStore == other.chatStore &&
+          roomStore == other.roomStore &&
           settingsStore == other.settingsStore;
 
   @override
@@ -74,7 +74,7 @@ class AppState {
         '\alertsStore: $alertsStore,' +
         '\nuserStore: $userStore,' +
         '\nmatrixStore: $matrixStore, ' +
-        '\nchatStore: $chatStore,' +
+        '\nroomStore: $roomStore,' +
         '\nsettingsStore: $settingsStore,' +
         '\n}';
   }
@@ -104,7 +104,7 @@ AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
     alertsStore: alertsReducer(state.alertsStore, action),
-    chatStore: chatReducer(state.chatStore, action),
+    roomStore: chatReducer(state.roomStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     userStore: userReducer(state.userStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),

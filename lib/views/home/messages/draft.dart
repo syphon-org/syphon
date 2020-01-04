@@ -4,8 +4,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/chat/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 

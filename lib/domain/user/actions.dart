@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Tether/domain/chat/actions.dart';
+import 'package:Tether/domain/rooms/actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -87,9 +87,9 @@ ThunkAction<AppState> startAuthObserver() {
     final user = store.state.userStore.user;
     final Function changeAuthState = (user) {
       if (user != null && user.accessToken != null) {
-        store.dispatch(startChatObserver());
+        store.dispatch(startRoomsObserver());
       } else {
-        store.dispatch(stopChatObserver());
+        store.dispatch(stopRoomsObserver());
       }
     };
 

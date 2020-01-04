@@ -8,9 +8,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/model.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/chat/actions.dart';
+import 'package:Tether/domain/rooms/model.dart';
+import 'package:Tether/domain/rooms/selectors.dart';
+import 'package:Tether/domain/rooms/actions.dart';
 
 // View And Styling
 import 'package:Tether/views/home/messages/index.dart';
@@ -29,11 +29,11 @@ class Home extends StatelessWidget {
     Navigator.pushNamed(context, '/draft');
   }
 
-  Widget buildConversationList(List<Chat> chats, BuildContext context) {
-    if (chats.length > 0) {
+  Widget buildConversationList(List<Room> rooms, BuildContext context) {
+    if (rooms.length > 0) {
       return ListView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: chats.length,
+        itemCount: rooms.length,
         itemBuilder: (BuildContext context, int index) {
           // GestureDetector w/ animation
           return InkWell(
@@ -41,7 +41,7 @@ class Home extends StatelessWidget {
                     context,
                     '/home/messages',
                     arguments: MessageArguments(
-                      title: chats[index].title.toString(),
+                      title: rooms[index].name.toString(),
                       photo: 'https://google.com/image',
                     ),
                   ),
@@ -58,17 +58,14 @@ class Home extends StatelessWidget {
                               radius: 24,
                               backgroundColor: Colors.grey,
                               child: Text(
-                                chats[index]
-                                    .title
-                                    .substring(0, 2)
-                                    .toUpperCase(),
+                                rooms[index].name.substring(0, 2).toUpperCase(),
                                 style: TextStyle(
                                     fontSize: 18, color: Colors.white),
                               ),
                             ),
                           ),
                           Text(
-                            chats[index].title.toString(),
+                            rooms[index].name.toString(),
                             style: TextStyle(fontSize: 22),
                           ),
                         ])),
@@ -182,7 +179,7 @@ class Home extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Visibility(
-                        visible: state.chatStore.loading,
+                        visible: state.roomStore.loading,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 16),
                           child: CircularProgressIndicator(
@@ -193,13 +190,13 @@ class Home extends StatelessWidget {
                           ),
                         )),
                     Expanded(
-                      child: buildConversationList(chats(state), context),
+                      child: buildConversationList(rooms(state), context),
                     )
                   ]);
             }),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(addChat()),
+        converter: (store) => () => store.dispatch(addRoom()),
         builder: (context, onAction) => FloatingActionButton(
             child: Icon(
               Icons.edit,

@@ -1,4 +1,3 @@
-import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:flutter/foundation.dart';
@@ -10,8 +9,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
 import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
@@ -195,8 +192,8 @@ class LoginState extends State<Login> {
                                         hintText: store.state.userStore
                                                     .homeserver.length !=
                                                 0
-                                            ? '@username:${store.state.userStore.homeserver}'
-                                            : '@username:tether.org',
+                                            ? 'username:${store.state.userStore.homeserver}'
+                                            : 'username:tether.org',
                                         labelText: 'username'),
                                   ),
                                 );

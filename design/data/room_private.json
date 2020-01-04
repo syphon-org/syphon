@@ -1,0 +1,291 @@
+{
+    "timeline": {
+        "events": [
+            {
+                "origin_server_ts": 1527264374992,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726437437762niLSR:matrix.org",
+                "state_key": "",
+                "content": {
+                    "guest_access": "can_join"
+                },
+                "type": "m.room.guest_access",
+                "unsigned": {
+                    "age": 50644063857
+                }
+            },
+            {
+                "origin_server_ts": 1527264386130,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726438637774fuLSw:matrix.org",
+                "membership": "invite",
+                "state_key": "@riot-bot:matrix.org",
+                "content": {
+                    "membership": "invite",
+                    "avatar_url": "mxc://matrix.org/GQARBLLbPNAsbDPVvKOzncQu",
+                    "displayname": "Riot-bot",
+                    "is_direct": true
+                },
+                "type": "m.room.member",
+                "unsigned": {
+                    "age": 50644052719
+                }
+            },
+            {
+                "origin_server_ts": 1527271541682,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271541413618djQpH:matrix.org",
+                "membership": "join",
+                "state_key": "@riot-bot:matrix.org",
+                "content": {
+                    "inviter": "@ereio:matrix.org",
+                    "membership": "join",
+                    "avatar_url": "mxc://matrix.org/GQARBLLbPNAsbDPVvKOzncQu",
+                    "displayname": "Riot-bot"
+                },
+                "type": "m.room.member",
+                "unsigned": {
+                    "replaces_state": "$152726438637774fuLSw:matrix.org",
+                    "prev_content": {
+                        "membership": "invite",
+                        "avatar_url": "mxc://matrix.org/GQARBLLbPNAsbDPVvKOzncQu",
+                        "displayname": "Riot-bot",
+                        "is_direct": true
+                    },
+                    "prev_sender": "@ereio:matrix.org",
+                    "age": 50636897167
+                }
+            },
+            {
+                "origin_server_ts": 1527271544937,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271544413674eOAxB:matrix.org",
+                "content": {
+                    "body": "Hi there and welcome to Riot!",
+                    "info": {
+                        "mimetype": "image/png",
+                        "size": 8536
+                    },
+                    "msgtype": "m.image",
+                    "url": "mxc://matrix.org/ljxwjBuEVUZlUoXrTvweVwjR"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636893912
+                }
+            },
+            {
+                "origin_server_ts": 1527271552048,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271552413750cVlpI:matrix.org",
+                "content": {
+                    "body": "Hi there and welcome to Riot!",
+                    "msgtype": "m.text"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636886801
+                }
+            },
+            {
+                "origin_server_ts": 1527271566766,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271566414028TCTTu:matrix.org",
+                "content": {
+                    "body": "My name is Riot-bot and I am here to help you get started using Riot!",
+                    "msgtype": "m.text"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636872083
+                }
+            },
+            {
+                "origin_server_ts": 1527271584123,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271584414310GZWRs:matrix.org",
+                "content": {
+                    "body": "Right, let's begin...",
+                    "msgtype": "m.text"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636854726
+                }
+            },
+            {
+                "origin_server_ts": 1527271594882,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271594414489glEcU:matrix.org",
+                "content": {
+                    "body": "Let's start with a quick video that shows you how to start a 1:1 chat",
+                    "msgtype": "m.text"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636843967
+                }
+            },
+            {
+                "origin_server_ts": 1527271596298,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271596414510fhkWN:matrix.org",
+                "content": {
+                    "body": "Starting a 1:1 chat",
+                    "info": {
+                        "mimetype": "video/mp4",
+                        "h": 480,
+                        "thumbnail_url": "mxc://matrix.org/EGvDShFxkRfPmhrYcTjCZKjj",
+                        "thumbnail_info": {
+                            "mimetype": "image/png",
+                            "h": 600,
+                            "w": 800
+                        },
+                        "w": 853
+                    },
+                    "msgtype": "m.video",
+                    "url": "mxc://matrix.org/IYfzAwoWvuyEnVTBvKZMcOCh"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636842551
+                }
+            },
+            {
+                "origin_server_ts": 1527271607610,
+                "sender": "@riot-bot:matrix.org",
+                "event_id": "$1527271607414693rsNti:matrix.org",
+                "content": {
+                    "body": "Would you like another tip?",
+                    "msgtype": "m.text"
+                },
+                "type": "m.room.message",
+                "unsigned": {
+                    "age": 50636831239
+                }
+            }
+        ],
+        "prev_batch": "t6-549310054_757269739_922552_407215420_251318976_1028876_38739171_19954171_68363",
+        "limited": true
+    },
+    "state": {
+        "events": [
+            {
+                "origin_server_ts": 1527264367721,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726436737747ceOyo:matrix.org",
+                "state_key": "",
+                "content": {
+                    "join_rule": "invite"
+                },
+                "type": "m.room.join_rules",
+                "unsigned": {
+                    "age": 50644071128
+                }
+            },
+            {
+                "origin_server_ts": 1527264372985,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726437237755RDQQp:matrix.org",
+                "state_key": "",
+                "content": {
+                    "history_visibility": "shared"
+                },
+                "type": "m.room.history_visibility",
+                "unsigned": {
+                    "age": 50644065864
+                }
+            },
+            {
+                "origin_server_ts": 1527264354115,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726435437723IzjIU:matrix.org",
+                "membership": "join",
+                "state_key": "@ereio:matrix.org",
+                "content": {
+                    "membership": "join",
+                    "avatar_url": null,
+                    "displayname": "ereio"
+                },
+                "type": "m.room.member",
+                "unsigned": {
+                    "age": 50644084734
+                }
+            },
+            {
+                "origin_server_ts": 1527264363850,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726436337738FVCEP:matrix.org",
+                "state_key": "",
+                "content": {
+                    "redact": 50,
+                    "events_default": 0,
+                    "users": {
+                        "@ereio:matrix.org": 100,
+                        "@riot-bot:matrix.org": 100
+                    },
+                    "invite": 0,
+                    "ban": 50,
+                    "state_default": 50,
+                    "events": {
+                        "m.room.avatar": 50,
+                        "m.room.history_visibility": 100,
+                        "m.room.canonical_alias": 50,
+                        "m.room.name": 50,
+                        "m.room.power_levels": 100
+                    },
+                    "kick": 50,
+                    "users_default": 0
+                },
+                "type": "m.room.power_levels",
+                "unsigned": {
+                    "age": 50644074999
+                }
+            },
+            {
+                "origin_server_ts": 1527264347097,
+                "sender": "@ereio:matrix.org",
+                "event_id": "$152726434737712IQYZH:matrix.org",
+                "state_key": "",
+                "content": {
+                    "creator": "@ereio:matrix.org"
+                },
+                "type": "m.room.create",
+                "unsigned": {
+                    "age": 50644091752
+                }
+            }
+        ]
+    },
+    "account_data": {
+        "events": [
+            {
+                "type": "m.fully_read",
+                "content": {
+                    "event_id": "$1527271541413618djQpH:matrix.org"
+                }
+            }
+        ]
+    },
+    "ephemeral": {
+        "events": [
+            {
+                "type": "m.receipt",
+                "content": {
+                    "$1527271607414693rsNti:matrix.org": {
+                        "m.read": {
+                            "@ereio:matrix.org": {
+                                "ts": 1528212844293
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "unread_notifications": {
+        "notification_count": 0,
+        "highlight_count": 0
+    },
+    "summary": {}
+}

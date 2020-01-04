@@ -6,7 +6,7 @@ dynamic homeserver(AppState state) {
 }
 
 String username(AppState state) {
-  return state.userStore.username;
+  return state.userStore.username.replaceAll('@', '');
 }
 
 String alias(AppState state) {
