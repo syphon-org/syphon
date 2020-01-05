@@ -1,3 +1,4 @@
+import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/model.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/chat/actions.dart';
+import 'package:Tether/domain/rooms/model.dart';
+import 'package:Tether/domain/rooms/selectors.dart';
+import 'package:Tether/domain/rooms/actions.dart';
 
 // View And Styling
 import 'package:Tether/views/home/messages/index.dart';
@@ -23,30 +24,64 @@ class Home extends StatelessWidget {
 
   final String title;
 
-  Widget buildConversationList(List<Chat> chats, BuildContext context) {
-    if (chats.length > 0) {
+  @protected
+  onNavigateToDraft(context) {
+    Navigator.pushNamed(context, '/draft');
+  }
+
+  Widget buildConversationList(List<Room> rooms, BuildContext context) {
+    if (rooms.length > 0) {
       return ListView.builder(
-        padding: const EdgeInsets.all(8),
         scrollDirection: Axis.vertical,
-        itemCount: chats.length,
+        itemCount: rooms.length,
         itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
+          // GestureDetector w/ animation
+          return InkWell(
               onTap: () => Navigator.pushNamed(
                     context,
                     '/home/messages',
                     arguments: MessageArguments(
-                      title: chats[index].title.toString(),
+                      title: rooms[index].name.toString(),
                       photo: 'https://google.com/image',
                     ),
                   ),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    chats[index].title.toString(),
-                    style: TextStyle(fontSize: 22.0),
-                  ),
-                ),
+              child: Container(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor: Colors.grey,
+                              child: rooms[index].syncing
+                                  ? Container(
+                                      margin: EdgeInsets.all(8),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        valueColor:
+                                            new AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                        value: null,
+                                      ))
+                                  : Text(
+                                      rooms[index]
+                                          .name
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.white),
+                                    ),
+                            ),
+                          ),
+                          Text(
+                            rooms[index].name.toString(),
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ])),
               ));
         },
       );
@@ -74,27 +109,27 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        titleSpacing: 0.0,
+        titleSpacing: 24.0,
         title: Row(children: <Widget>[
           Container(
-            margin: EdgeInsets.only(left: 8, right: 8),
+            margin: EdgeInsets.only(right: 8),
             child: IconButton(
-              icon: CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: Text(
-                  'TE',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+              icon: StoreConnector<AppState, String>(
+                  converter: (store) => displayInitials(store.state),
+                  builder: (context, initials) {
+                    return CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      child: Text(
+                        initials.toUpperCase(),
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    );
+                  }),
               onPressed: () {
-                Navigator.pushNamed(context, '/settings');
+                Navigator.pushNamed(context, '/profile');
               },
               tooltip: 'Profile and Settings',
             ),
@@ -150,14 +185,31 @@ class Home extends StatelessWidget {
       ),
       body: Align(
         alignment: Alignment.topCenter,
-        child: StoreConnector<AppState, List<Chat>>(
-            converter: (Store<AppState> store) => chats(store.state),
-            builder: (context, chats) {
-              return buildConversationList(chats, context);
+        child: StoreConnector<AppState, AppState>(
+            converter: (Store<AppState> store) => store.state,
+            builder: (context, state) {
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Visibility(
+                        visible: state.roomStore.loading,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4.0,
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                                PRIMARY_COLOR),
+                            value: null,
+                          ),
+                        )),
+                    Expanded(
+                      child: buildConversationList(rooms(state), context),
+                    )
+                  ]);
             }),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(addChat()),
+        converter: (store) => () => store.dispatch(addRoom()),
         builder: (context, onAction) => FloatingActionButton(
             child: Icon(
               Icons.edit,
@@ -165,7 +217,7 @@ class Home extends StatelessWidget {
             ),
             backgroundColor: PRIMARY_COLOR,
             tooltip: 'New Chat',
-            onPressed: () => onAction()),
+            onPressed: () => onNavigateToDraft(context)),
       ),
     );
   }

@@ -124,7 +124,7 @@ packages:
       name: flutter_redux
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.3"
+    version: "0.6.0"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -346,14 +346,14 @@ packages:
       name: redux
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.0"
   redux_persist:
     dependency: "direct main"
     description:
       name: redux_persist
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.2"
+    version: "0.8.3"
   redux_persist_flutter:
     dependency: "direct main"
     description:
@@ -367,7 +367,7 @@ packages:
       name: redux_thunk
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.1"
+    version: "0.3.0"
   shared_preferences:
     dependency: transitive
     description:
@@ -380,6 +380,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  smooth_page_indicator:
+    dependency: "direct main"
+    description:
+      name: smooth_page_indicator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   source_gen:
     dependency: transitive
     description:

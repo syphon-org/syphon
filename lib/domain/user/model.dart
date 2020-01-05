@@ -1,15 +1,19 @@
+import 'dart:async';
+
 class User {
   final String userId;
   final String deviceId;
   final String homeserver;
   final String accessToken;
   final String displayName;
+  final String avatarUrl;
 
   const User(
       {this.userId,
       this.deviceId,
       this.homeserver,
       this.displayName,
+      this.avatarUrl,
       this.accessToken});
 
   User copyWith({
@@ -18,6 +22,7 @@ class User {
     String homeserver,
     String accessToken,
     String displayName,
+    String avatarUrl,
   }) {
     return User(
       userId: userId ?? this.userId,
@@ -25,6 +30,7 @@ class User {
       homeserver: homeserver ?? this.homeserver,
       accessToken: accessToken ?? this.accessToken,
       displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
@@ -33,6 +39,8 @@ class User {
       userId.hashCode ^
       deviceId.hashCode ^
       homeserver.hashCode ^
+      displayName.hashCode ^
+      avatarUrl.hashCode ^
       accessToken.hashCode;
 
   @override
@@ -58,7 +66,9 @@ class User {
             deviceId: json['deviceId'],
             homeserver: json['homeserver'],
             accessToken: json['accessToken'],
-            displayName: json['displayName']);
+            displayName: json['displayName'],
+            avatarUrl: json['avatarUrl'],
+          );
   }
 
   Map toJson() => {
@@ -67,11 +77,13 @@ class User {
         "homeserver": homeserver,
         "accessToken": accessToken,
         "displayName": displayName,
+        "avatarUrl": avatarUrl
       };
 }
 
 class UserStore {
   final User user;
+  final StreamController<User> authObserver;
 
   final bool loading;
   final String username;
@@ -86,9 +98,10 @@ class UserStore {
   const UserStore(
       {this.user = const User(),
       this.loading = false,
+      this.authObserver,
       this.username = '', // null
       this.password = '', // null
-      this.homeserver = '192.168.1.2',
+      this.homeserver = 'matrix.org',
       this.loginType = 'm.login.dummy',
       this.isUsernameValid = false,
       this.isPasswordValid = false,
@@ -98,6 +111,7 @@ class UserStore {
   UserStore copyWith({
     user,
     loading,
+    authObserver,
     username,
     password,
     homeserver,
@@ -109,6 +123,7 @@ class UserStore {
     return UserStore(
         user: user ?? this.user,
         loading: loading ?? this.loading,
+        authObserver: authObserver ?? this.authObserver,
         username: username ?? this.username,
         password: password ?? this.password,
         homeserver: homeserver ?? this.homeserver,
@@ -118,10 +133,13 @@ class UserStore {
         creating: creating ?? this.creating);
   }
 
+  Stream<User> get onAuthStateChanged => authObserver.stream;
+
   @override
   int get hashCode =>
       user.hashCode ^
       loading.hashCode ^
+      authObserver.hashCode ^
       username.hashCode ^
       password.hashCode ^
       homeserver.hashCode ^
@@ -137,6 +155,7 @@ class UserStore {
           runtimeType == other.runtimeType &&
           loading == other.loading &&
           user == other.user &&
+          authObserver == other.authObserver &&
           username == other.username &&
           password == other.password &&
           homeserver == other.homeserver &&
@@ -147,7 +166,7 @@ class UserStore {
 
   @override
   String toString() {
-    return '{user: $user, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
+    return '{user: $user, authObserver: $authObserver, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
 
   static UserStore fromJson(Map<String, dynamic> json) {

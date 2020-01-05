@@ -4,8 +4,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/chat/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
@@ -100,9 +98,9 @@ class Draft extends StatelessWidget {
               'You have pushed the button this many times:',
             ),
             StoreConnector<AppState, int>(
-              converter: (Store<AppState> store) => counter(store.state),
+              converter: (Store<AppState> store) => 0,
               builder: (context, count) {
-                return new Text(
+                return Text(
                   count.toString(),
                   style: Theme.of(context).textTheme.display1,
                 );
@@ -110,16 +108,6 @@ class Draft extends StatelessWidget {
             )
           ],
         ),
-      ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(incrementCounter()),
-        builder: (context, onAction) => FloatingActionButton(
-            child: Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-            tooltip: 'Increment',
-            onPressed: () => onAction()),
       ),
     );
   }

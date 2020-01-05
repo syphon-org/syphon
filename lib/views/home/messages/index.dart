@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/actions.dart';
+import 'package:Tether/domain/rooms/actions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
@@ -102,17 +102,6 @@ class Messages extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(addChat()),
-        builder: (context, onAction) => FloatingActionButton(
-            child: Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.grey,
-            tooltip: 'Increment',
-            onPressed: () => onAction()),
       ),
     );
   }

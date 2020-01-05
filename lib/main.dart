@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:Tether/domain/alerts/actions.dart';
+import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +23,12 @@ import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
+import 'package:Tether/views/home/profile/index.dart';
 import 'package:Tether/views/home/settings/index.dart';
 
 // Messages
 import 'package:Tether/views/home/messages/index.dart';
+import 'package:Tether/views/home/messages/draft.dart';
 
 // Styling
 import 'package:Tether/global/themes.dart';
@@ -54,21 +58,23 @@ class Tether extends StatefulWidget {
 class TetherState extends State<Tether> with WidgetsBindingObserver {
   final Store<AppState> store;
   Widget defaultHome = Home(title: 'Tether');
-
   TetherState({this.store});
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+    store.dispatch(startAuthObserver());
+    store.dispatch(startAlertsObserver());
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      runInitTasks();
-    });
     final authed = store.state.userStore.user.accessToken != null;
     if (!authed) {
       defaultHome = Intro();
     }
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
   // TODO: REMOVE WHEN DEPLOYED
@@ -81,21 +87,21 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   void deactivate() {
     closeStorage();
     WidgetsBinding.instance.removeObserver(this);
+    store.dispatch(stopAuthObserver());
+    store.dispatch(stopAlertsObserver());
     super.deactivate();
   }
 
   @protected
-  void runInitTasks() {
-    print('runInitTasks fired');
-    store.onChange.listen((state) {
-      if (state.userStore.user.accessToken == null &&
-          defaultHome.runtimeType == Home) {
-        print('ON CHANGE Listener Fired $state');
+  void onMounted() {
+    // init authenticated navigation
+    store.state.userStore.onAuthStateChanged.listen((user) {
+      if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
-      } else if (state.userStore.user.accessToken != null &&
+      } else if (user != null &&
+          user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
-        print('ON CHANGE  Listener Fired $state');
         defaultHome = Home(title: 'Tether');
         NavigationService.clearTo('/home', context);
       }
@@ -118,7 +124,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                 home: defaultHome,
                 routes: <String, WidgetBuilder>{
                   '/intro': (BuildContext context) => Intro(),
-                  '/login': (BuildContext context) => Login(title: 'Login'),
+                  '/login': (BuildContext context) => Login(store: store),
                   '/search_home': (BuildContext context) =>
                       HomeSearch(title: 'Find Your Homeserver', store: store),
                   '/signup': (BuildContext context) =>
@@ -127,6 +133,8 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                         title: 'Tether',
                       ),
                   '/home/messages': (BuildContext context) => Messages(),
+                  '/draft': (BuildContext context) => Draft(),
+                  '/profile': (BuildContext context) => Profile(),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
                   '/loading': (BuildContext context) =>

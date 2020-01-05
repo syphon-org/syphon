@@ -32,12 +32,6 @@ class UsernameStepState extends State<UsernameStep> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       runInitTasks();
     });
-    usernameController.addListener(() {
-      final text = usernameController.text.replaceAll(' ', '');
-      usernameController.value = usernameController.value.copyWith(
-        text: text,
-      );
-    });
   }
 
   @protected
@@ -81,8 +75,17 @@ class UsernameStepState extends State<UsernameStep> {
                     minWidth: 200, maxWidth: 400, minHeight: 45, maxHeight: 45),
                 child: TextField(
                   controller: usernameController,
-                  onChanged: (text) {
-                    store.dispatch(setUsername(username: text));
+                  onChanged: (username) {
+                    // Trim new username
+                    usernameController.value = TextEditingValue(
+                      text: username.trim(),
+                      selection: TextSelection.fromPosition(
+                        TextPosition(offset: username.trim().length),
+                      ),
+                    );
+
+                    // Set new username
+                    store.dispatch(setUsername(username: username));
                   },
                   onEditingComplete: () {
                     store.dispatch(

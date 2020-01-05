@@ -1,52 +1,59 @@
 import 'dart:io';
 
+import 'package:Tether/domain/alerts/model.dart';
 import 'package:Tether/global/libs/hive.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
+import './alerts/model.dart';
 import './user/model.dart';
 import './settings/model.dart';
-import './chat/model.dart';
+import './rooms/model.dart';
 import './matrix/model.dart';
 
+import './alerts/reducer.dart';
+import './rooms/reducer.dart';
 import './matrix/reducer.dart';
 import './user/reducer.dart';
 import './settings/reducer.dart';
-import './chat/reducer.dart';
 
 import 'package:redux_persist/redux_persist.dart';
 
 // https://matrix.org/docs/api/client-server/#!/User32data/register
 class AppState {
   final bool loading;
+  final AlertsStore alertsStore;
   final UserStore userStore;
   final MatrixStore matrixStore;
   final SettingsStore settingsStore;
-  final ChatStore chatStore;
+  final RoomStore roomStore;
 
   AppState(
       {this.loading = true,
+      this.alertsStore = const AlertsStore(),
       this.userStore = const UserStore(),
       this.matrixStore = const MatrixStore(),
       this.settingsStore = const SettingsStore(),
-      this.chatStore = const ChatStore()});
+      this.roomStore = const RoomStore()});
 
   // Helper function to emulate { loading: action.loading, ...appState}
   AppState copyWith({bool loading}) => AppState(
         loading: loading ?? this.loading,
+        alertsStore: alertsStore ?? this.alertsStore,
         userStore: userStore ?? this.userStore,
         matrixStore: matrixStore ?? this.matrixStore,
-        chatStore: chatStore ?? this.chatStore,
+        roomStore: roomStore ?? this.roomStore,
         settingsStore: settingsStore ?? this.settingsStore,
       );
 
   @override
   int get hashCode =>
       loading.hashCode ^
+      alertsStore.hashCode ^
       userStore.hashCode ^
       matrixStore.hashCode ^
-      chatStore.hashCode ^
+      roomStore.hashCode ^
       settingsStore.hashCode;
 
   @override
@@ -55,17 +62,19 @@ class AppState {
       other is AppState &&
           runtimeType == other.runtimeType &&
           loading == other.loading &&
+          alertsStore == other.alertsStore &&
           userStore == other.userStore &&
           matrixStore == other.matrixStore &&
-          chatStore == other.chatStore &&
+          roomStore == other.roomStore &&
           settingsStore == other.settingsStore;
 
   @override
   String toString() {
     return '{' +
+        '\alertsStore: $alertsStore,' +
         '\nuserStore: $userStore,' +
         '\nmatrixStore: $matrixStore, ' +
-        '\nchatStore: $chatStore,' +
+        '\nroomStore: $roomStore,' +
         '\nsettingsStore: $settingsStore,' +
         '\n}';
   }
@@ -78,12 +87,11 @@ class AppState {
             loading: json['loading'],
             userStore: UserStore.fromJson(json['userStore']),
             settingsStore: SettingsStore.fromJson(json['settingsStore']));
-    ;
   }
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    print('SAVING USER STATE: ${userStore.toJson()}');
+    print('redux persisting ${userStore.toJson()}');
     return {
       'loading': loading,
       'userStore': userStore.toJson(),
@@ -95,7 +103,8 @@ class AppState {
 AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
-    chatStore: chatReducer(state.chatStore, action),
+    alertsStore: alertsReducer(state.alertsStore, action),
+    roomStore: chatReducer(state.roomStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     userStore: userReducer(state.userStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),

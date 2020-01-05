@@ -1,35 +1,95 @@
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/domain/user/selectors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/chat/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
 import 'package:Tether/domain/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/behaviors.dart';
 
 // Assets
 import 'package:Tether/global/assets.dart';
 
-class DefaultScrollBehavior extends ScrollBehavior {
+class Login extends StatefulWidget {
+  final Store<AppState> store;
+  const Login({Key key, this.store}) : super(key: key);
+
   @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
+  LoginState createState() => LoginState(store: this.store);
 }
 
-class Login extends StatelessWidget {
-  Login({Key key, this.title}) : super(key: key);
+class LoginState extends State<Login> {
+  final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passwordFocus = FocusNode();
 
-  final String title;
+  final Store<AppState> store;
+
+  LoginState({Key key, this.store});
+
+  @override
+  void initState() {
+    super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    passwordFocus.dispose();
+    super.dispose();
+  }
+
+  @protected
+  void onMounted() {
+    // Init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen((alert) {
+      var color;
+
+      switch (alert.type) {
+        case 'warning':
+          color = Colors.red;
+          break;
+        case 'error':
+          color = Colors.red;
+          break;
+        case 'info':
+        default:
+          color = Colors.grey;
+      }
+
+      loginScaffold.currentState.showSnackBar(SnackBar(
+        backgroundColor: color,
+        content: Text(alert.message),
+        duration: alert.duration,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            loginScaffold.currentState.removeCurrentSnackBar();
+          },
+        ),
+      ));
+    });
+  }
+
+  void handleSubmitted(String value) {
+    FocusScope.of(context).requestFocus(passwordFocus);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +102,7 @@ class Login extends StatelessWidget {
      * stretching elements, a mix of container and expanded
     */
     return Scaffold(
+      key: loginScaffold,
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
@@ -88,17 +149,30 @@ class Login extends StatelessWidget {
                                       maxWidth: 400,
                                       minHeight: 45),
                                   child: TextField(
+                                    controller: usernameController,
+                                    onSubmitted: handleSubmitted,
                                     onChanged: (username) {
+                                      // Trim value for UI
+                                      usernameController.value =
+                                          TextEditingValue(
+                                        text: username.trim(),
+                                        selection: TextSelection.fromPosition(
+                                          TextPosition(
+                                              offset: username.trim().length),
+                                        ),
+                                      );
+
                                       // If user enters full username, make sure to set homeserver
                                       if (username.contains(':')) {
-                                        final alias = username.split(':');
+                                        final alias =
+                                            username.trim().split(':');
                                         store.dispatch(
                                             setUsername(username: alias[0]));
                                         store.dispatch(setHomeserver(
                                             homeserver: alias[1]));
                                       } else {
-                                        store.dispatch(
-                                            setUsername(username: username));
+                                        store.dispatch(setUsername(
+                                            username: username.trim()));
                                       }
                                     },
                                     decoration: InputDecoration(
@@ -118,8 +192,8 @@ class Login extends StatelessWidget {
                                         hintText: store.state.userStore
                                                     .homeserver.length !=
                                                 0
-                                            ? '@username:${store.state.userStore.homeserver}'
-                                            : '@username:tether.org',
+                                            ? 'username:${store.state.userStore.homeserver}'
+                                            : 'username:tether.org',
                                         labelText: 'username'),
                                   ),
                                 );
@@ -136,6 +210,7 @@ class Login extends StatelessWidget {
                                       maxWidth: 400,
                                       minHeight: 45),
                                   child: TextField(
+                                    focusNode: passwordFocus,
                                     onChanged: (password) {
                                       store.dispatch(
                                           setPassword(password: password));
@@ -154,6 +229,12 @@ class Login extends StatelessWidget {
                           StoreConnector<AppState, Store<AppState>>(
                             converter: (Store<AppState> store) => store,
                             builder: (context, store) {
+                              Function onPressLogin = null;
+                              if (isLoginAttemptable(store.state)) {
+                                onPressLogin = () {
+                                  store.dispatch(loginUser());
+                                };
+                              }
                               return Container(
                                 width: width * 0.7,
                                 height: DEFAULT_BUTTON_HEIGHT,
@@ -165,9 +246,7 @@ class Login extends StatelessWidget {
                                 child: FlatButton(
                                   disabledColor: Colors.grey,
                                   disabledTextColor: Colors.grey[300],
-                                  onPressed: () {
-                                    store.dispatch(loginUser());
-                                  },
+                                  onPressed: onPressLogin,
                                   color: Theme.of(context).primaryColor,
                                   shape: RoundedRectangleBorder(
                                       borderRadius:
