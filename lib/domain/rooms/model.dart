@@ -6,6 +6,7 @@ import './events/model.dart';
 class Room {
   final String id;
   final String name;
+  final List<Event> state;
   final List<Event> events;
   final bool syncing;
 
@@ -13,10 +14,27 @@ class Room {
     this.id,
     this.name = 'New Room',
     this.events = const [],
+    this.state = const [],
     this.syncing = false,
   });
 
-  factory Room.fromJson(Map<String, dynamic> json) {
+  Room copyWith({
+    id,
+    name,
+    state,
+    events,
+    syncing,
+  }) {
+    return Room(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      state: state ?? this.state,
+      events: events ?? this.events,
+      syncing: syncing ?? this.syncing,
+    );
+  }
+
+  factory Room.fromJsonSync(Map<String, dynamic> json) {
     if (json == null) {
       return Room();
     }
@@ -40,7 +58,7 @@ class Room {
 
   @override
   String toString() {
-    return '{id: $id, name: $name, events: $events, syncing: $syncing}';
+    return '{id: $id, name: $name, state: ${state.length}, events: ${events.length}, syncing: $syncing}';
   }
 }
 
@@ -102,7 +120,7 @@ class RoomStore {
         ? RoomStore()
         : RoomStore(
             rooms: json['rooms']['join']
-                .map((rawRoom) => Room.fromJson(rawRoom))
+                .map((rawRoom) => Room.fromJsonSync(rawRoom))
                 .toList(),
           );
   }

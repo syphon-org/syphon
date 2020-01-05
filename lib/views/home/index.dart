@@ -55,7 +55,7 @@ class Home extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.only(right: 12),
                             child: CircleAvatar(
-                              radius: 24,
+                              radius: 22,
                               backgroundColor: Colors.grey,
                               child: Text(
                                 rooms[index].name.substring(0, 2).toUpperCase(),
@@ -66,7 +66,7 @@ class Home extends StatelessWidget {
                           ),
                           Text(
                             rooms[index].name.toString(),
-                            style: TextStyle(fontSize: 22),
+                            style: TextStyle(fontSize: 20),
                           ),
                         ])),
               ));

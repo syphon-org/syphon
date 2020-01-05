@@ -16,8 +16,12 @@ dynamic buildSyncRequest({
   return {'url': url};
 }
 
-dynamic buildJoinedRoomsRequest({String accessToken}) {
-  String url = '_matrix/client/r0/joined_rooms';
+dynamic buildJoinedRoomsRequest({
+  String protocol = 'https://', // http or https ( or libp2p :D )
+  String homeserver = 'matrix.org',
+  String accessToken,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
 
   // Params
   url += '?access_token=${accessToken}';
@@ -25,8 +29,14 @@ dynamic buildJoinedRoomsRequest({String accessToken}) {
   return {'url': url};
 }
 
-dynamic buildRoomMembersRequest({String accessToken, String roomId}) {
-  String url = '_matrix/client/r0/rooms/$roomId/joined_members';
+dynamic buildRoomMembersRequest({
+  String protocol = 'https://', // http or https ( or libp2p :D )
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String roomId,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/joined_members';
 
   // Params
   url += '?access_token=${accessToken}';
@@ -35,10 +45,12 @@ dynamic buildRoomMembersRequest({String accessToken, String roomId}) {
 }
 
 dynamic buildRoomStateRequest({
+  String protocol = 'https://', // http or https ( or libp2p :D )
+  String homeserver = 'matrix.org',
   String accessToken,
   String roomId,
 }) {
-  String url = '_matrix/client/r0/rooms/$roomId/state';
+  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
   // Params
   url += '?access_token=${accessToken}';
@@ -46,8 +58,13 @@ dynamic buildRoomStateRequest({
   return {'url': url};
 }
 
-dynamic buildRoomSyncRequest({String accessToken, String roomId}) {
-  String url = '_matrix/client/r0/sync';
+dynamic buildRoomSyncRequest({
+  String protocol = 'https://', // http or https ( or libp2p :D )
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String roomId,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/sync';
   // Params
   url += '?access_token=${accessToken}';
   url += '&filter={\"room\":{\"rooms\":["$roomId"]}}';

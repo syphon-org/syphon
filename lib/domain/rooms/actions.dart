@@ -38,6 +38,11 @@ class SetRooms {
   SetRooms({this.rooms});
 }
 
+class UpdateRoom {
+  final Room room;
+  UpdateRoom({this.room});
+}
+
 class AddRoom {
   final Room room;
   AddRoom({this.room});
@@ -70,9 +75,8 @@ Future<dynamic> readFullSyncJson() async {
 
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
-    final location = await _localPath;
-    print(location);
-    store.dispatch(fullSync());
+    store.dispatch(fetchRooms());
+    // store.dispatch(fullSync());
 
     // Timer roomObserver = Timer.periodic(Duration(seconds: 30), (timer) async {
     //   debugPrint('${timer.tick}');
@@ -101,13 +105,11 @@ ThunkAction<AppState> fullSync() {
       print('** Read State From Disk Successfully **');
 
       final Map<String, dynamic> rawJoinedRooms = syncState['rooms']['join'];
-      print(rawJoinedRooms.keys);
-
       List<Room> rooms = [];
 
       rawJoinedRooms.forEach((id, json) {
         json['id'] = id;
-        rooms.add(Room.fromJson(json));
+        rooms.add(Room.fromJsonSync(json));
       });
 
       store.dispatch(SetRooms(rooms: rooms));
@@ -151,32 +153,82 @@ ThunkAction<AppState> fetchRooms() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.homeserver;
-
       final request = buildJoinedRoomsRequest(
-        accessToken: accessToken,
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
       );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.get(url);
+      final response = await http.get(request['url']);
       final data = json.decode(response.body);
       final List<dynamic> rawJoinedRooms = data['joined_rooms'];
 
       // Convert joined_rooms to Room objects
-      final joinedRooms = rawJoinedRooms.map((id) {
-        return Room(id: id);
-      }).toList();
-      store.dispatch(SetRooms(rooms: joinedRooms));
+      final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
+      await store.dispatch(SetRooms(rooms: joinedRooms));
 
-      // HACK: remove but for testing fetch messages
-      // joinedRooms.forEach((room) {
-      //   store.dispatch(fetchRoomMessages(roomId: room.id));
-      // });
+      // Fetch all room states async
+      await Future.wait(joinedRooms.map((room) async {
+        return store.dispatch(fetchRoomState(room: room));
+      }).toList());
+
+      print('*** *** Finished Fetching Room States');
     } catch (error) {
       print(error);
+      print('*** *** Failed Fetching Room States');
     } finally {
       store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchRoomState({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      print('Running Fetch Room State ${room.id}');
+
+      final request = buildRoomStateRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(request['url']);
+      final List<dynamic> rawStateEvents = json.decode(response.body);
+
+      // Convert all of the events and save
+      final List<Event> stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+
+      int priority = 4;
+      final String name = stateEvents.fold('Room', (name, event) {
+        if (event.type == 'm.room.name') {
+          priority = 1;
+          return event.content['name'];
+        } else if (event.type == 'm.room.canonical_alias' && priority > 2) {
+          priority = 2;
+          return event.content['alias'];
+        } else if (event.type == 'm.room.aliases' && priority > 3) {
+          priority = 3;
+          return event.content['aliases'][0];
+        }
+
+        return name;
+      });
+
+      final updatedRoom = room.copyWith(
+        name: name,
+        state: stateEvents,
+      );
+
+      store.dispatch(UpdateRoom(room: updatedRoom));
+    } catch (error) {
+      print('** Failed Fetch Room State ${room.id}');
+    } finally {
+      print('** Completed Fetch Room State ${room.id}');
     }
   };
 }
@@ -184,41 +236,35 @@ ThunkAction<AppState> fetchRooms() {
 ThunkAction<AppState> fetchRoomMembers({String roomId}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
-
       final accessToken = store.state.userStore.user.accessToken;
       final homeserver = store.state.userStore.homeserver;
 
-      final request =
-          buildRoomMembersRequest(accessToken: accessToken, roomId: roomId);
+      final request = buildRoomMembersRequest(
+        protocol: protocol,
+        homeserver: homeserver,
+        accessToken: accessToken,
+        roomId: roomId,
+      );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.get(url);
+      final response = await http.get(request['url']);
       final data = json.decode(response.body);
 
       // Convert rooms to rooms
       print(data);
     } catch (error) {
       print(error);
-    } finally {
-      store.dispatch(SetLoading(loading: false));
     }
   };
 }
 
-ThunkAction<AppState> fetchRoomMessages({String roomId}) {
+ThunkAction<AppState> fetchRoomMessages({Room room}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
-
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.homeserver;
-
       final startRequest = buildRoomMessagesRequest(
-        accessToken: accessToken,
-        homeserver: homeserver,
         protocol: protocol,
-        roomId: roomId,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
       );
 
       final response = await http.get(startRequest['url']);
@@ -227,33 +273,6 @@ ThunkAction<AppState> fetchRoomMessages({String roomId}) {
       print('START DATA ${data['start']}');
     } catch (error) {
       print(error);
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchRoomState({String roomId}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.homeserver;
-
-      final request =
-          buildRoomStateRequest(accessToken: accessToken, roomId: roomId);
-
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.get(url);
-      final data = json.decode(response.body);
-
-      // Convert rooms to rooms
-      print(data);
-    } catch (error) {
-      print(error);
-    } finally {
-      store.dispatch(SetLoading(loading: false));
     }
   };
 }

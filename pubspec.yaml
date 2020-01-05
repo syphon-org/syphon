@@ -32,11 +32,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  redux: 3.0.0
-  redux_thunk: 0.2.1
-  redux_persist: 0.8.2
+  redux: 4.0.0
+  redux_thunk: 0.3.0
+  redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
-  flutter_redux: 0.5.3
+  flutter_redux: 0.6.0
   flutter_svg: 0.14.2
   touchable_opacity: 1.0.2
   hive: 1.1.0
