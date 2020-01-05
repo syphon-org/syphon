@@ -2,7 +2,7 @@
   curl -XGET "http://matrix.org/_matrix/client/r0/sync?access_token=MDAxOGxvY2F0aW9uIG1hdHJpeC5vcmcKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI0Y2lkIHVzZXJfaWQgPSBAZXJlaW86bWF0cml4Lm9yZwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IGJ0cmtjdC5XJkdVfkxweVAKMDAyZnNpZ25hdHVyZSDGd2cVbTYZMwapTV-smtSNHg-jwfi5iq9UFc5Kb-9Z2go" 
  */
 dynamic buildSyncRequest({
-  String protocol = 'https://',
+  String protocol = 'https://', // http or https ( or libp2p :D )
   String homeserver = 'matrix.org',
   String accessToken,
   bool fullState = false,
@@ -17,7 +17,7 @@ dynamic buildSyncRequest({
 }
 
 dynamic buildJoinedRoomsRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
+  String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
 }) {
@@ -29,8 +29,23 @@ dynamic buildJoinedRoomsRequest({
   return {'url': url};
 }
 
+dynamic buildDirectRoomsRequest({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String userId,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
+
+  // Params
+  url += '?access_token=${accessToken}';
+
+  return {'url': url};
+}
+
 dynamic buildRoomMembersRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
+  String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String roomId,
@@ -45,7 +60,7 @@ dynamic buildRoomMembersRequest({
 }
 
 dynamic buildRoomStateRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
+  String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String roomId,
@@ -59,7 +74,7 @@ dynamic buildRoomStateRequest({
 }
 
 dynamic buildRoomSyncRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
+  String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String roomId,
@@ -73,7 +88,7 @@ dynamic buildRoomSyncRequest({
 }
 
 dynamic buildRoomMessagesRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
+  String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String roomId,

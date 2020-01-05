@@ -57,11 +57,24 @@ class Home extends StatelessWidget {
                             child: CircleAvatar(
                               radius: 22,
                               backgroundColor: Colors.grey,
-                              child: Text(
-                                rooms[index].name.substring(0, 2).toUpperCase(),
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.white),
-                              ),
+                              child: rooms[index].syncing
+                                  ? Container(
+                                      margin: EdgeInsets.all(8),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        valueColor:
+                                            new AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                        value: null,
+                                      ))
+                                  : Text(
+                                      rooms[index]
+                                          .name
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.white),
+                                    ),
                             ),
                           ),
                           Text(

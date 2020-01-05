@@ -9,6 +9,7 @@ class Room {
   final List<Event> state;
   final List<Event> events;
   final bool syncing;
+  final bool direct;
 
   const Room({
     this.id,
@@ -16,6 +17,7 @@ class Room {
     this.events = const [],
     this.state = const [],
     this.syncing = false,
+    this.direct = false,
   });
 
   Room copyWith({
@@ -31,6 +33,30 @@ class Room {
       state: state ?? this.state,
       events: events ?? this.events,
       syncing: syncing ?? this.syncing,
+    );
+  }
+
+  // Find name of room based on spec naming priority
+  Room fromStateEvents(List<Event> stateEvents) {
+    int priority = 4;
+    final String name = stateEvents.fold(this.name ?? 'Room', (name, event) {
+      if (event.type == 'm.room.name') {
+        priority = 1;
+        return event.content['name'];
+      } else if (event.type == 'm.room.canonical_alias' && priority > 2) {
+        priority = 2;
+        return event.content['alias'];
+      } else if (event.type == 'm.room.aliases' && priority > 3) {
+        priority = 3;
+        return event.content['aliases'][0];
+      }
+
+      return name;
+    });
+
+    return this.copyWith(
+      name: name,
+      state: stateEvents,
     );
   }
 

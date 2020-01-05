@@ -75,7 +75,17 @@ Future<dynamic> readFullSyncJson() async {
 
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
-    store.dispatch(fetchRooms());
+    // Fetch All Room Ids
+    await store.dispatch(fetchRooms());
+    await store.dispatch(fetchDirectRooms());
+
+    // Fetch All Room State
+    final joinedRooms = store.state.roomStore.rooms;
+    await Future.wait(joinedRooms.map((room) async {
+      return store.dispatch(fetchRoomState(room: room));
+    }).toList());
+
+    // Dispatch Background Sync
     // store.dispatch(fullSync());
 
     // Timer roomObserver = Timer.periodic(Duration(seconds: 30), (timer) async {
@@ -91,6 +101,92 @@ ThunkAction<AppState> stopRoomsObserver() {
   return (Store<AppState> store) async {
     if (store.state.roomStore.roomObserver != null) {
       store.state.roomStore.roomObserver.cancel();
+    }
+  };
+}
+
+ThunkAction<AppState> fetchRooms() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final request = buildJoinedRoomsRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+      );
+
+      final response = await http.get(request['url']);
+      final data = json.decode(response.body);
+      final List<dynamic> rawJoinedRooms = data['joined_rooms'];
+
+      // Convert joined_rooms to Room objects
+      final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
+      store.dispatch(SetRooms(rooms: joinedRooms));
+    } catch (error) {
+      print('****** Error Fetching Rooms: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchDirectRooms() {
+  return (Store<AppState> store) async {
+    try {
+      final request = buildDirectRoomsRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        userId: store.state.userStore.user.userId,
+      );
+
+      final response = await http.get(request['url']);
+      final Map<String, dynamic> rawDirectRooms = json.decode(response.body);
+
+      // Mark specified rooms as direct chats
+      rawDirectRooms.forEach((name, roomIds) {
+        store.dispatch(UpdateRoom(
+            room: Room(
+          id: roomIds[0],
+          name: name,
+          direct: true,
+        )));
+      });
+    } catch (error) {
+      print('****** Error Fetching Direct Rooms: $error');
+    }
+  };
+}
+
+ThunkAction<AppState> fetchRoomState({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    var updatedRoom = room;
+    try {
+      store.dispatch(UpdateRoom(room: room.copyWith(syncing: true)));
+
+      final request = buildRoomStateRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(request['url']);
+      final List<dynamic> rawStateEvents = json.decode(response.body);
+
+      // Convert all of the events and save
+      final List<Event> stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+
+      // Add State events to room and toggle syncing
+      updatedRoom = room.fromStateEvents(stateEvents);
+    } catch (error) {
+      print('** Failed Fetch Room State ${room.id} $error');
+    } finally {
+      store.dispatch(UpdateRoom(room: updatedRoom.copyWith(syncing: false)));
     }
   };
 }
@@ -123,14 +219,11 @@ ThunkAction<AppState> fullSync() {
       store.dispatch(SetSyncing(syncing: true));
       print('Syncing Started');
 
-      final isFullState = store.state.roomStore.rooms.length == 0;
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.homeserver;
-
       final request = buildSyncRequest(
-        homeserver: homeserver,
-        accessToken: accessToken,
-        fullState: isFullState,
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        fullState: store.state.roomStore.rooms.length == 0,
       );
 
       final response = await http.get(request['url']);
@@ -148,101 +241,13 @@ ThunkAction<AppState> fullSync() {
   };
 }
 
-ThunkAction<AppState> fetchRooms() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final request = buildJoinedRoomsRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-      );
-
-      final response = await http.get(request['url']);
-      final data = json.decode(response.body);
-      final List<dynamic> rawJoinedRooms = data['joined_rooms'];
-
-      // Convert joined_rooms to Room objects
-      final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
-      await store.dispatch(SetRooms(rooms: joinedRooms));
-
-      // Fetch all room states async
-      await Future.wait(joinedRooms.map((room) async {
-        return store.dispatch(fetchRoomState(room: room));
-      }).toList());
-
-      print('*** *** Finished Fetching Room States');
-    } catch (error) {
-      print(error);
-      print('*** *** Failed Fetching Room States');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchRoomState({
-  Room room,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      print('Running Fetch Room State ${room.id}');
-
-      final request = buildRoomStateRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(request['url']);
-      final List<dynamic> rawStateEvents = json.decode(response.body);
-
-      // Convert all of the events and save
-      final List<Event> stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
-
-      int priority = 4;
-      final String name = stateEvents.fold('Room', (name, event) {
-        if (event.type == 'm.room.name') {
-          priority = 1;
-          return event.content['name'];
-        } else if (event.type == 'm.room.canonical_alias' && priority > 2) {
-          priority = 2;
-          return event.content['alias'];
-        } else if (event.type == 'm.room.aliases' && priority > 3) {
-          priority = 3;
-          return event.content['aliases'][0];
-        }
-
-        return name;
-      });
-
-      final updatedRoom = room.copyWith(
-        name: name,
-        state: stateEvents,
-      );
-
-      store.dispatch(UpdateRoom(room: updatedRoom));
-    } catch (error) {
-      print('** Failed Fetch Room State ${room.id}');
-    } finally {
-      print('** Completed Fetch Room State ${room.id}');
-    }
-  };
-}
-
 ThunkAction<AppState> fetchRoomMembers({String roomId}) {
   return (Store<AppState> store) async {
     try {
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.homeserver;
-
       final request = buildRoomMembersRequest(
         protocol: protocol,
-        homeserver: homeserver,
-        accessToken: accessToken,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
         roomId: roomId,
       );
 
@@ -250,7 +255,7 @@ ThunkAction<AppState> fetchRoomMembers({String roomId}) {
       final data = json.decode(response.body);
 
       // Convert rooms to rooms
-      print(data);
+      print('$data');
     } catch (error) {
       print(error);
     }
