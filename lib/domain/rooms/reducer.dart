@@ -20,7 +20,8 @@ RoomStore chatReducer([RoomStore state = const RoomStore(), dynamic action]) {
       final roomIndex =
           newRooms.indexWhere((room) => room.id == action.room.id);
       newRooms.replaceRange(roomIndex, roomIndex + 1, [action.room]);
-      print('${action.runtimeType}, $roomIndex, ${action.room}');
+      // Testing room updates
+      // print('${action.runtimeType}, $roomIndex, ${action.room}');
       return state.copyWith(rooms: newRooms);
     default:
       return state;

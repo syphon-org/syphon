@@ -91,7 +91,7 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    print('redux persisting ${userStore.toJson()}');
+    // print('redux persisting ${userStore.toJson()}');
     return {
       'loading': loading,
       'userStore': userStore.toJson(),
@@ -122,7 +122,8 @@ Future<Store> initStore() async {
   );
 
   final initialState = await persistor.load();
-  print('INITIAL STATE $initialState');
+
+  print('[initStore] $initialState');
 
   final Store<AppState> store = new Store<AppState>(
     appReducer,

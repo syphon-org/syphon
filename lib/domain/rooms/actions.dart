@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
+import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,6 +13,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
+import 'package:Tether/global/libs/matrix/messages.dart';
 
 import './model.dart';
 import 'events/model.dart';
@@ -78,6 +80,11 @@ ThunkAction<AppState> startRoomsObserver() {
     // Fetch All Room Ids
     await store.dispatch(fetchRooms());
     await store.dispatch(fetchDirectRooms());
+    final sortedDirectRooms = store.state.roomStore.rooms;
+
+    // TODO: Refactor this to be logical based on direct but also update timestamps
+    sortedDirectRooms.sort((a, b) => a.direct && !b.direct ? -1 : 1);
+    store.dispatch(SetRooms(rooms: sortedDirectRooms));
 
     // Fetch All Room State
     final joinedRooms = store.state.roomStore.rooms;
@@ -124,13 +131,21 @@ ThunkAction<AppState> fetchRooms() {
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
       store.dispatch(SetRooms(rooms: joinedRooms));
     } catch (error) {
-      print('****** Error Fetching Rooms: $error');
+      print('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };
 }
 
+/*
+ Fetch Direct Room Ids
+ - fetches id's of direct rooms
+{
+ @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org],
+ alekseyparfyonov@gmail.com: [!muTrhMUMwdJSrYlqic:matrix.org]
+}
+*/
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
@@ -154,24 +169,22 @@ ThunkAction<AppState> fetchDirectRooms() {
         )));
       });
     } catch (error) {
-      print('****** Error Fetching Direct Rooms: $error');
+      print('[fetchDirectRooms] error: $error');
     }
   };
 }
 
-ThunkAction<AppState> fetchRoomState({
-  Room room,
-}) {
+ThunkAction<AppState> fetchRoomState({Room room}) {
   return (Store<AppState> store) async {
     var updatedRoom = room;
     try {
-      store.dispatch(UpdateRoom(room: room.copyWith(syncing: true)));
+      store.dispatch(UpdateRoom(room: updatedRoom.copyWith(syncing: true)));
 
       final request = buildRoomStateRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
+        roomId: updatedRoom.id,
       );
 
       final response = await http.get(request['url']);
@@ -182,11 +195,53 @@ ThunkAction<AppState> fetchRoomState({
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
 
       // Add State events to room and toggle syncing
-      updatedRoom = room.fromStateEvents(stateEvents);
+      final user = store.state.userStore.user;
+      updatedRoom = updatedRoom.fromStateEvents(stateEvents,
+          currentUsername: user.displayName);
+
+      if (updatedRoom.avatar != null) {
+        updatedRoom = await store.dispatch(fetchRoomAvatar(updatedRoom));
+      }
     } catch (error) {
-      print('** Failed Fetch Room State ${room.id} $error');
+      print('[fetchRoomState] error: ${room.id} $error');
     } finally {
       store.dispatch(UpdateRoom(room: updatedRoom.copyWith(syncing: false)));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchRoomAvatar(
+  Room room,
+) {
+  return (Store<AppState> store) async {
+    try {
+      if (room.avatar == null || room.avatar.uri == null) {
+        throw 'avatar is null';
+      }
+
+      final request = buildThumbnailRequest(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        mediaUri: room.avatar.uri,
+      );
+
+      final response = await http.get(request['url']);
+
+      if (response.headers['content-type'] == 'application/json') {
+        final errorData = json.decode(response.body);
+        throw errorData['errcode'];
+      }
+
+      return room.copyWith(
+          syncing: false,
+          avatar: room.avatar.copyWith(
+              url: request['url'].toString(),
+              type: response.headers['content-type'],
+              data: response.bodyBytes));
+    } catch (error) {
+      print('[fetchRoomAvatar] error: ${room.id} $error');
+      return room;
     }
   };
 }
@@ -275,7 +330,7 @@ ThunkAction<AppState> fetchRoomMessages({Room room}) {
       final response = await http.get(startRequest['url']);
       final data = json.decode(response.body);
 
-      print('START DATA ${data['start']}');
+      print('Room Messages ${data['start']}');
     } catch (error) {
       print(error);
     }

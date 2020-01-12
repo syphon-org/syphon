@@ -67,7 +67,9 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
 
-    final authed = store.state.userStore.user.accessToken != null;
+    final currentUser = store.state.userStore.user;
+    final authed = currentUser.accessToken != null;
+
     if (!authed) {
       defaultHome = Intro();
     }

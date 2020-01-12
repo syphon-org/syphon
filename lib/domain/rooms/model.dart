@@ -1,45 +1,90 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import './events/model.dart';
+
+class Avatar {
+  final String uri;
+  final String url;
+  final String type;
+  final Uint8List data;
+
+  const Avatar({
+    this.uri,
+    this.url,
+    this.type,
+    this.data,
+  });
+  Avatar copyWith({
+    uri,
+    url,
+    type,
+    data,
+  }) {
+    return Avatar(
+      uri: uri ?? this.uri,
+      url: url ?? this.url,
+      type: type ?? this.type,
+      data: data ?? this.data,
+    );
+  }
+}
 
 // Corresponds to rooms in the matrix protocol
 class Room {
   final String id;
   final String name;
+  final String homeserver;
+  final Avatar avatar;
+  final bool direct;
+  final bool syncing;
   final List<Event> state;
   final List<Event> events;
-  final bool syncing;
-  final bool direct;
 
   const Room({
     this.id,
     this.name = 'New Room',
+    this.homeserver,
+    this.avatar,
+    this.direct = false,
+    this.syncing = false,
     this.events = const [],
     this.state = const [],
-    this.syncing = false,
-    this.direct = false,
   });
 
   Room copyWith({
     id,
     name,
+    avatar,
+    direct,
+    syncing,
     state,
     events,
-    syncing,
   }) {
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
+      avatar: avatar ?? this.avatar,
+      direct: direct ?? this.direct,
+      syncing: syncing ?? this.syncing,
       state: state ?? this.state,
       events: events ?? this.events,
-      syncing: syncing ?? this.syncing,
     );
   }
 
   // Find name of room based on spec naming priority
-  Room fromStateEvents(List<Event> stateEvents) {
+  Room fromStateEvents(List<Event> stateEvents, {String currentUsername}) {
     int priority = 4;
-    final String name = stateEvents.fold(this.name ?? 'Room', (name, event) {
+    Avatar avatar;
+
+    final String name = stateEvents.fold(this.name, (name, event) {
+      if (this.direct &&
+          event.type == 'm.room.member' &&
+          event.content['displayname'] != currentUsername) {
+        return event.content['displayname'];
+      }
+
       if (event.type == 'm.room.name') {
         priority = 1;
         return event.content['name'];
@@ -49,13 +94,20 @@ class Room {
       } else if (event.type == 'm.room.aliases' && priority > 3) {
         priority = 3;
         return event.content['aliases'][0];
+      } else if (event.type == 'm.room.avatar') {
+        // Save mxc uri for thumbnail file
+        final avatarFile = event.content['thumbnail_file'];
+        if (avatarFile == null) {
+          avatar = Avatar(uri: event.content['url']);
+        }
       }
 
       return name;
     });
 
     return this.copyWith(
-      name: name,
+      name: name ?? 'New Room',
+      avatar: avatar,
       state: stateEvents,
     );
   }

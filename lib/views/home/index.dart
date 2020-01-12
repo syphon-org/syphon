@@ -29,6 +29,33 @@ class Home extends StatelessWidget {
     Navigator.pushNamed(context, '/draft');
   }
 
+  Widget buildChatAvatar({Room room}) {
+    if (room.syncing) {
+      return Container(
+          margin: EdgeInsets.all(8),
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+            value: null,
+          ));
+    }
+
+    if (room.avatar != null && room.avatar.data != null) {
+      return ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Image(
+            width: 52,
+            height: 52,
+            image: MemoryImage(room.avatar.data),
+          ));
+    }
+
+    return Text(
+      room.name.substring(0, 2).toUpperCase(),
+      style: TextStyle(fontSize: 18, color: Colors.white),
+    );
+  }
+
   Widget buildConversationList(List<Room> rooms, BuildContext context) {
     if (rooms.length > 0) {
       return ListView.builder(
@@ -53,29 +80,13 @@ class Home extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Container(
-                            margin: const EdgeInsets.only(right: 12),
                             child: CircleAvatar(
-                              radius: 22,
-                              backgroundColor: Colors.grey,
-                              child: rooms[index].syncing
-                                  ? Container(
-                                      margin: EdgeInsets.all(8),
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                        valueColor:
-                                            new AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                        value: null,
-                                      ))
-                                  : Text(
-                                      rooms[index]
-                                          .name
-                                          .substring(0, 2)
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.white),
-                                    ),
-                            ),
+                                radius: 24,
+                                backgroundColor: rooms[index].avatar != null
+                                    ? Colors.white70
+                                    : Colors.grey,
+                                child: buildChatAvatar(room: rooms[index])),
+                            margin: const EdgeInsets.only(right: 12),
                           ),
                           Text(
                             rooms[index].name.toString(),

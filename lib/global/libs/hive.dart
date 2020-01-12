@@ -34,6 +34,7 @@ Future<void> initHiveStorage() async {
     encryptionKey = Hive.generateSecureKey();
     await storage.write(
         key: STORAGE_ENCRYPTION_KEY, value: jsonEncode(encryptionKey));
+    encryptionKeySerialized = await storage.read(key: STORAGE_ENCRYPTION_KEY);
   }
 
   encryptionKey = jsonDecode(encryptionKeySerialized).cast<int>();

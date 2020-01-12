@@ -86,22 +86,3 @@ dynamic buildRoomSyncRequest({
 
   return {'url': url};
 }
-
-dynamic buildRoomMessagesRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-  String start,
-  String end,
-  bool forwards = false, // Direction of events
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
-  // Params
-  url += '?access_token=${accessToken}';
-  url += start != null ? '&from=${start}' : '';
-  url += end != null ? '&to=${end}' : '';
-  url += forwards ? '&dir=f' : '';
-
-  return {'url': url};
-}

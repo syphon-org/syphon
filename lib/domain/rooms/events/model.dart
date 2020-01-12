@@ -16,9 +16,10 @@ enum EventType {
 }
 
 class Event {
-  final String id;
-  final String type;
+  final String id; // event_id
+  final String type; //
   final String sender;
+  final String roomId;
   final String stateKey;
   final int timestamp;
   final dynamic content;
@@ -27,6 +28,7 @@ class Event {
     this.id,
     this.type,
     this.sender,
+    this.roomId,
     this.stateKey,
     this.content,
     this.timestamp,

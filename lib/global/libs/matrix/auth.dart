@@ -39,10 +39,12 @@ dynamic buildCheckRegisterAvailableRequest({String username}) {
  */
 dynamic buildLoginUserRequest({
   String type,
+  String protocol,
+  String homeserver,
   String username,
   String password,
 }) {
-  String url = '_matrix/client/r0/login';
+  String url = '$protocol$homeserver/_matrix/client/r0/login';
 
   Map body = {
     "identifier": {"type": "m.id.user", "user": username},
