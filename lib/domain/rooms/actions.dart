@@ -35,19 +35,41 @@ class SetRoomObserver {
   SetRoomObserver({this.roomObserver});
 }
 
+class SetRoom {
+  final Room room;
+  SetRoom({this.room});
+}
+
 class SetRooms {
   final List<Room> rooms;
   SetRooms({this.rooms});
 }
 
-class UpdateRoom {
-  final Room room;
-  UpdateRoom({this.room});
+class SetRoomState {
+  final String id; // room id
+  final List<Event> state; // room states
+  final String username;
+
+  SetRoomState({this.id, this.state, this.username});
 }
 
-class AddRoom {
-  final Room room;
-  AddRoom({this.room});
+class SetRoomMessages {
+  final String id;
+  final Map<String, dynamic> messagesJson;
+  SetRoomMessages({this.id, this.messagesJson});
+}
+
+// Atomically Update specific room attributes
+class UpdateRoom {
+  final String id;
+  final Avatar avatar;
+  final bool syncing;
+
+  UpdateRoom({
+    this.id,
+    this.avatar,
+    this.syncing,
+  });
 }
 
 // TODO: REMOVE - ONLY FOR TESTING OUTPUT
@@ -88,9 +110,16 @@ ThunkAction<AppState> startRoomsObserver() {
 
     // Fetch All Room State
     final joinedRooms = store.state.roomStore.rooms;
-    await Future.wait(joinedRooms.map((room) async {
+
+    final allFetchStates = joinedRooms.map((room) async {
       return store.dispatch(fetchRoomState(room: room));
-    }).toList());
+    }).toList();
+
+    final allFetchMessages = joinedRooms.map((room) async {
+      return store.dispatch(fetchRoomMessages(room: room));
+    }).toList();
+
+    await Future.wait(allFetchStates + allFetchMessages);
 
     // Dispatch Background Sync
     // store.dispatch(fullSync());
@@ -160,11 +189,10 @@ ThunkAction<AppState> fetchDirectRooms() {
       final Map<String, dynamic> rawDirectRooms = json.decode(response.body);
 
       // Mark specified rooms as direct chats
-      rawDirectRooms.forEach((name, roomIds) {
-        store.dispatch(UpdateRoom(
+      rawDirectRooms.forEach((name, ids) {
+        store.dispatch(SetRoom(
             room: Room(
-          id: roomIds[0],
-          name: name,
+          id: ids[0],
           direct: true,
         )));
       });
@@ -176,15 +204,14 @@ ThunkAction<AppState> fetchDirectRooms() {
 
 ThunkAction<AppState> fetchRoomState({Room room}) {
   return (Store<AppState> store) async {
-    var updatedRoom = room;
     try {
-      store.dispatch(UpdateRoom(room: updatedRoom.copyWith(syncing: true)));
-
+      // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
       final request = buildRoomStateRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
-        roomId: updatedRoom.id,
+        roomId: room.id,
       );
 
       final response = await http.get(request['url']);
@@ -196,16 +223,46 @@ ThunkAction<AppState> fetchRoomState({Room room}) {
 
       // Add State events to room and toggle syncing
       final user = store.state.userStore.user;
-      updatedRoom = updatedRoom.fromStateEvents(stateEvents,
-          currentUsername: user.displayName);
 
+      store.dispatch(SetRoomState(
+        id: room.id,
+        state: stateEvents,
+        username: user.displayName,
+      ));
+
+      final updatedRooms = store.state.roomStore.rooms;
+      final updatedRoom = updatedRooms.firstWhere((r) => r.id == room.id);
       if (updatedRoom.avatar != null) {
-        updatedRoom = await store.dispatch(fetchRoomAvatar(updatedRoom));
+        store.dispatch(fetchRoomAvatar(updatedRoom));
       }
     } catch (error) {
       print('[fetchRoomState] error: ${room.id} $error');
     } finally {
-      store.dispatch(UpdateRoom(room: updatedRoom.copyWith(syncing: false)));
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchRoomMessages({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      final startRequest = buildRoomMessagesRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(startRequest['url']);
+      final Map<String, dynamic> messagesJson = json.decode(response.body);
+
+      store.dispatch(SetRoomMessages(id: room.id, messagesJson: messagesJson));
+      store.dispatch(UpdateRoom(
+        id: room.id,
+        syncing: false,
+      ));
+    } catch (error) {
+      print(error);
     }
   };
 }
@@ -233,15 +290,17 @@ ThunkAction<AppState> fetchRoomAvatar(
         throw errorData['errcode'];
       }
 
-      return room.copyWith(
-          syncing: false,
+      store.dispatch(UpdateRoom(
+          id: room.id,
           avatar: room.avatar.copyWith(
               url: request['url'].toString(),
               type: response.headers['content-type'],
-              data: response.bodyBytes));
+              data: response.bodyBytes),
+          syncing: false));
     } catch (error) {
       print('[fetchRoomAvatar] error: ${room.id} $error');
-      return room;
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
   };
 }
@@ -314,36 +373,5 @@ ThunkAction<AppState> fetchRoomMembers({String roomId}) {
     } catch (error) {
       print(error);
     }
-  };
-}
-
-ThunkAction<AppState> fetchRoomMessages({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      final startRequest = buildRoomMessagesRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(startRequest['url']);
-      final data = json.decode(response.body);
-
-      print('Room Messages ${data['start']}');
-    } catch (error) {
-      print(error);
-    }
-  };
-}
-
-// TODO: LEGACY TESTING UI
-ThunkAction<AppState> addRoom() {
-  // return (dispatch, state) =>
-  return (Store<AppState> store) async {
-    var id = Random.secure().nextInt(10000000).toString();
-
-    store.dispatch(AddRoom(
-        room: Room(id: id, name: 'room-$id', events: [], syncing: false)));
   };
 }

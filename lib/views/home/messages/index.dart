@@ -1,23 +1,54 @@
+import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:Tether/domain/rooms/model.dart';
+import 'package:Tether/domain/rooms/selectors.dart';
+import 'package:Tether/global/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/actions.dart';
+import 'package:redux/redux.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 
 class MessageArguments {
+  final String roomId;
   final String title;
   final String photo;
 
-  MessageArguments({this.title, this.photo});
+  // Improve loading times
+  MessageArguments({
+    this.roomId,
+    this.title,
+    this.photo,
+  });
 }
 
 class Messages extends StatelessWidget {
   Messages({Key key, this.title}) : super(key: key);
 
   final String title;
+
+  Widget buildMessageList(List<Event> messages, BuildContext context) {
+    if (messages.length > 0) {
+      return ListView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: messages.length,
+          itemBuilder: (BuildContext context, int index) {
+            final message = messages[index];
+            return Container(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
+                    child: Text(
+                      message.body,
+                    )));
+          });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +73,7 @@ class Messages extends StatelessWidget {
             icon: CircleAvatar(
               backgroundColor: Colors.grey,
               child: Text(
-                arguments.title.substring(
-                    arguments.title.length - 2, arguments.title.length),
+                arguments.title.substring(0, 2).toUpperCase(),
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -95,13 +125,35 @@ class Messages extends StatelessWidget {
       ),
       body: Align(
         alignment: Alignment.topRight,
-        child: Column(
-          children: <Widget>[
-            Text(
-              arguments.title,
-            ),
-          ],
-        ),
+        child: StoreConnector<AppState, AppState>(
+            rebuildOnChange: false,
+            converter: (Store<AppState> store) => store.state,
+            builder: (context, state) {
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Visibility(
+                        visible: state.roomStore.loading,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4.0,
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                                PRIMARY_COLOR),
+                            value: null,
+                          ),
+                        )),
+                    Expanded(
+                      child: buildMessageList(
+                          // Selector for room TODO: convert to map
+                          room(
+                            appState: state,
+                            id: arguments.roomId,
+                          ).messages,
+                          context),
+                    )
+                  ]);
+            }),
       ),
     );
   }

@@ -37,81 +37,143 @@ class Room {
   final String name;
   final String homeserver;
   final Avatar avatar;
+  final String topic;
+  final int lastUpdate;
   final bool direct;
   final bool syncing;
   final List<Event> state;
   final List<Event> events;
+  final List<Event> messages;
+  final String startTime;
+  final String endTime;
 
   const Room({
     this.id,
     this.name = 'New Room',
     this.homeserver,
     this.avatar,
+    this.topic = '',
+    this.lastUpdate,
     this.direct = false,
     this.syncing = false,
     this.events = const [],
+    this.messages = const [],
     this.state = const [],
+    this.startTime,
+    this.endTime,
   });
 
   Room copyWith({
     id,
     name,
+    homeserver,
     avatar,
+    topic,
+    lastUpdate,
     direct,
     syncing,
     state,
     events,
+    messages,
+    startTime,
+    endTime,
   }) {
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
+      homeserver: homeserver ?? this.homeserver,
       avatar: avatar ?? this.avatar,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
       direct: direct ?? this.direct,
       syncing: syncing ?? this.syncing,
       state: state ?? this.state,
       events: events ?? this.events,
+      messages: messages ?? this.messages,
     );
   }
 
-  // Find name of room based on spec naming priority
+  Room fromMessageEvents(
+    Map<String, dynamic> messagesJson,
+  ) {
+    messagesJson.keys.map((key) => print('$key\n'));
+    final String startTime = messagesJson['start'];
+    final String endTime = messagesJson['end'];
+    final List<dynamic> messagesChunk = messagesJson['chunk'];
+
+    // Retain where mutates
+    messagesChunk
+        .retainWhere((eventJson) => eventJson['type'] == 'm.room.message');
+
+    // Converting only message events
+    final List<Event> messageEvents = messagesChunk.map((eventJson) {
+      return Event.fromJson(eventJson);
+    }).toList();
+
+    return this.copyWith(
+      messages: messageEvents,
+      startTime: startTime,
+      endTime: endTime,
+    );
+  }
+
+  // Find details of room based on state events
+  // follows spec naming priority and thumbnail downloading
   Room fromStateEvents(List<Event> stateEvents, {String currentUsername}) {
-    int priority = 4;
+    String name;
     Avatar avatar;
+    String topic;
+    int lastUpdate = 0;
+    int namePriority = 4;
 
-    final String name = stateEvents.fold(this.name, (name, event) {
-      if (this.direct &&
-          event.type == 'm.room.member' &&
-          event.content['displayname'] != currentUsername) {
-        return event.content['displayname'];
+    stateEvents.forEach((event) {
+      lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+
+      switch (event.type) {
+        case 'm.room.name':
+          namePriority = 1;
+          name = event.content['name'];
+          break;
+        case 'm.room.topic':
+          topic = event.content['topic'];
+          break;
+        case 'm.room.canonical_alias':
+          if (namePriority > 2) {
+            namePriority = 2;
+            name = event.content['alias'];
+          }
+          break;
+        case 'm.room.aliases':
+          if (namePriority > 3) {
+            namePriority = 3;
+            name = event.content['aliases'][0];
+          }
+          break;
+        case 'm.room.avatar':
+          final avatarFile = event.content['thumbnail_file'];
+          if (avatarFile == null) {
+            avatar = Avatar(uri: event.content['url']);
+          }
+          break;
+        case 'm.room.member':
+          if (this.direct && event.content['displayname'] != currentUsername) {
+            name = event.content['displayname'];
+          }
+          break;
+        default:
+          break;
       }
-
-      if (event.type == 'm.room.name') {
-        priority = 1;
-        return event.content['name'];
-      } else if (event.type == 'm.room.canonical_alias' && priority > 2) {
-        priority = 2;
-        return event.content['alias'];
-      } else if (event.type == 'm.room.aliases' && priority > 3) {
-        priority = 3;
-        return event.content['aliases'][0];
-      } else if (event.type == 'm.room.avatar') {
-        // Save mxc uri for thumbnail file
-        final avatarFile = event.content['thumbnail_file'];
-        if (avatarFile == null) {
-          avatar = Avatar(uri: event.content['url']);
-        }
-      }
-
-      return name;
     });
 
     return this.copyWith(
       name: name ?? 'New Room',
       avatar: avatar,
+      topic: topic,
       state: stateEvents,
+      lastUpdate: lastUpdate,
     );
   }
 
+  // TODO: use fromStateEvents above
   factory Room.fromJsonSync(Map<String, dynamic> json) {
     if (json == null) {
       return Room();

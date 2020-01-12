@@ -2,6 +2,7 @@ import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,6 +28,46 @@ class Home extends StatelessWidget {
   @protected
   onNavigateToDraft(context) {
     Navigator.pushNamed(context, '/draft');
+  }
+
+  String formatPreview({Room room}) {
+    if (room.messages.length > 0) {
+      final lastMessage = room.messages[0].body;
+      final shortened = lastMessage.length > 42;
+      final preview = shortened
+          ? lastMessage.substring(0, 42).replaceAll('\n', '')
+          : lastMessage;
+
+      return shortened ? '$preview...' : preview;
+    }
+
+    return room.topic;
+  }
+
+  String formatSinceLastUpdate({int lastUpdateMillis}) {
+    if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
+
+    final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
+    final sinceLastUpdate = DateTime.now().difference(timestamp);
+
+    if (sinceLastUpdate.inDays > 6) {
+      // Abbreviated month and day number - Jan 1
+      return DateFormat.MMMd().format(timestamp);
+    } else if (sinceLastUpdate.inDays > 0) {
+      // Abbreviated weekday - Fri
+      return DateFormat.E().format(timestamp);
+    } else if (sinceLastUpdate.inHours > 0) {
+      // Abbreviated hours since - 1h
+      return '${sinceLastUpdate.inHours}h';
+    } else if (sinceLastUpdate.inMinutes > 0) {
+      // Abbreviated minutes since - 1m
+      return '${sinceLastUpdate.inMinutes}m';
+    } else if (sinceLastUpdate.inSeconds > 1) {
+      // Just say now if it's been within the minute
+      return 'Now';
+    } else {
+      return '';
+    }
   }
 
   Widget buildChatAvatar({Room room}) {
@@ -62,36 +103,69 @@ class Home extends StatelessWidget {
         scrollDirection: Axis.vertical,
         itemCount: rooms.length,
         itemBuilder: (BuildContext context, int index) {
+          final room = rooms[index];
+
           // GestureDetector w/ animation
           return InkWell(
               onTap: () => Navigator.pushNamed(
                     context,
                     '/home/messages',
                     arguments: MessageArguments(
-                      title: rooms[index].name.toString(),
-                      photo: 'https://google.com/image',
+                      roomId: room.id,
+                      title: room.name,
                     ),
                   ),
               child: Container(
                 child: Container(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 24),
-                    child: Row(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
+                    child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Container(
                             child: CircleAvatar(
                                 radius: 24,
-                                backgroundColor: rooms[index].avatar != null
+                                backgroundColor: room.avatar != null
                                     ? Colors.white70
                                     : Colors.grey,
-                                child: buildChatAvatar(room: rooms[index])),
+                                child: buildChatAvatar(room: room)),
                             margin: const EdgeInsets.only(right: 12),
                           ),
-                          Text(
-                            rooms[index].name.toString(),
-                            style: TextStyle(fontSize: 20),
-                          ),
+                          Flexible(
+                              flex: 1,
+                              fit: FlexFit.tight,
+                              child: Flex(
+                                  direction: Axis.horizontal,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          room.name,
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                        Text(
+                                          formatPreview(room: room),
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      formatSinceLastUpdate(
+                                          lastUpdateMillis: room.lastUpdate),
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ])),
                         ])),
               ));
         },
@@ -123,7 +197,7 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        titleSpacing: 24.0,
+        titleSpacing: 22.00,
         title: Row(children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 8),
@@ -220,7 +294,7 @@ class Home extends StatelessWidget {
             }),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => store.dispatch(addRoom()),
+        converter: (store) => () => print('Add Room Stub'),
         builder: (context, onAction) => FloatingActionButton(
             child: Icon(
               Icons.edit,

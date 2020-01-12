@@ -104,10 +104,10 @@ AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
     alertsStore: alertsReducer(state.alertsStore, action),
-    roomStore: chatReducer(state.roomStore, action),
-    settingsStore: settingsReducer(state.settingsStore, action),
+    roomStore: roomReducer(state.roomStore, action),
     userStore: userReducer(state.userStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
+    settingsStore: settingsReducer(state.settingsStore, action),
   );
 }
 
