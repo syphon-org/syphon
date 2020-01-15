@@ -30,6 +30,11 @@ class Home extends StatelessWidget {
     Navigator.pushNamed(context, '/draft');
   }
 
+  String formatRoomName({Room room}) {
+    final name = room.name;
+    return name.length > 22 ? '${name.substring(0, 22)}...' : name;
+  }
+
   String formatPreview({Room room}) {
     if (room.messages.length > 0) {
       final lastMessage = room.messages[0].body;
@@ -119,7 +124,7 @@ class Home extends StatelessWidget {
                 child: Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 16,
-                      horizontal: 24,
+                      horizontal: 18,
                     ),
                     child: Flex(
                         direction: Axis.horizontal,
@@ -139,31 +144,35 @@ class Home extends StatelessWidget {
                               flex: 1,
                               fit: FlexFit.tight,
                               child: Flex(
-                                  direction: Axis.horizontal,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  direction: Axis.vertical,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Column(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
                                       children: <Widget>[
                                         Text(
-                                          room.name,
-                                          style: TextStyle(fontSize: 20),
+                                          formatRoomName(room: room),
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400),
                                         ),
                                         Text(
-                                          formatPreview(room: room),
-                                          style: TextStyle(fontSize: 12),
+                                          formatSinceLastUpdate(
+                                              lastUpdateMillis:
+                                                  room.lastUpdate),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w100),
                                         ),
                                       ],
                                     ),
                                     Text(
-                                      formatSinceLastUpdate(
-                                          lastUpdateMillis: room.lastUpdate),
-                                      style: TextStyle(fontSize: 14),
+                                      formatPreview(room: room),
+                                      style: TextStyle(fontSize: 12),
                                     ),
                                   ])),
                         ])),

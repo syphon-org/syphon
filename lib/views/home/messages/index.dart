@@ -10,7 +10,13 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/actions.dart';
 import 'package:redux/redux.dart';
 
-enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
+enum Overflow {
+  search,
+  allMedia,
+  chatSettings,
+  inviteFriends,
+  muteNotifications
+}
 
 class MessageArguments {
   final String roomId;
@@ -31,23 +37,21 @@ class Messages extends StatelessWidget {
   final String title;
 
   Widget buildMessageList(List<Event> messages, BuildContext context) {
-    if (messages.length > 0) {
-      return ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: messages.length,
-          itemBuilder: (BuildContext context, int index) {
-            final message = messages[index];
-            return Container(
-                child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 24,
-                    ),
-                    child: Text(
-                      message.body,
-                    )));
-          });
-    }
+    return ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: messages.length,
+        itemBuilder: (BuildContext context, int index) {
+          final message = messages[index];
+          return Container(
+              child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 24,
+                  ),
+                  child: Text(
+                    message.body,
+                  )));
+        });
   }
 
   @override
@@ -91,33 +95,30 @@ class Messages extends StatelessWidget {
             icon: Icon(Icons.more_vert, color: Colors.white),
             onSelected: (Overflow result) {
               switch (result) {
-                case Overflow.settings:
-                  Navigator.pushNamed(context, '/settings');
-                  break;
                 default:
                   break;
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<Overflow>>[
               const PopupMenuItem<Overflow>(
-                value: Overflow.newGroup,
-                child: Text('New Group'),
+                value: Overflow.search,
+                child: Text('Search'),
               ),
               const PopupMenuItem<Overflow>(
-                value: Overflow.markAllRead,
-                child: Text('Mark All Read'),
+                value: Overflow.allMedia,
+                child: Text('All Media'),
+              ),
+              const PopupMenuItem<Overflow>(
+                value: Overflow.chatSettings,
+                child: Text('Chat Settings'),
               ),
               const PopupMenuItem<Overflow>(
                 value: Overflow.inviteFriends,
                 child: Text('Invite Friends'),
               ),
               const PopupMenuItem<Overflow>(
-                value: Overflow.settings,
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.help,
-                child: Text('Help'),
+                value: Overflow.muteNotifications,
+                child: Text('Mute Notifications'),
               ),
             ],
           )

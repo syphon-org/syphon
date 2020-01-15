@@ -12,6 +12,7 @@ Room room({AppState state, String id}) {
 
 List<Room> sortRoomsByPriority(AppState state) {
   final sortedList = List<Room>.from(state.roomStore.rooms);
+
   sortedList.sort((a, b) {
     // Prioritze if a direct chat
     if (a.direct && !b.direct) {
