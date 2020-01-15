@@ -47,21 +47,21 @@ class SetRooms {
 
 class SetRoomState {
   final String id; // room id
-  final List<Event> state; // room states
+  final List<Event> state;
   final String username;
 
   SetRoomState({this.id, this.state, this.username});
 }
 
 class SetRoomMessages {
-  final String id;
+  final String id; // room id
   final Map<String, dynamic> messagesJson;
   SetRoomMessages({this.id, this.messagesJson});
 }
 
 // Atomically Update specific room attributes
 class UpdateRoom {
-  final String id;
+  final String id; // room id
   final Avatar avatar;
   final bool syncing;
 
@@ -152,9 +152,16 @@ ThunkAction<AppState> fetchRooms() {
         accessToken: store.state.userStore.user.accessToken,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      print('${response.statusCode} ${response.body}');
       final data = json.decode(response.body);
       final List<dynamic> rawJoinedRooms = data['joined_rooms'];
+
+      print(rawJoinedRooms);
 
       // Convert joined_rooms to Room objects
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
@@ -185,7 +192,11 @@ ThunkAction<AppState> fetchDirectRooms() {
         userId: store.state.userStore.user.userId,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final Map<String, dynamic> rawDirectRooms = json.decode(response.body);
 
       // Mark specified rooms as direct chats
@@ -214,7 +225,11 @@ ThunkAction<AppState> fetchRoomState({Room room}) {
         roomId: room.id,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final List<dynamic> rawStateEvents = json.decode(response.body);
 
       // Convert all of the events and save
@@ -246,23 +261,27 @@ ThunkAction<AppState> fetchRoomState({Room room}) {
 ThunkAction<AppState> fetchRoomMessages({Room room}) {
   return (Store<AppState> store) async {
     try {
-      final startRequest = buildRoomMessagesRequest(
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
+      final request = buildRoomMessagesRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
         roomId: room.id,
       );
 
-      final response = await http.get(startRequest['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final Map<String, dynamic> messagesJson = json.decode(response.body);
 
       store.dispatch(SetRoomMessages(id: room.id, messagesJson: messagesJson));
-      store.dispatch(UpdateRoom(
-        id: room.id,
-        syncing: false,
-      ));
     } catch (error) {
       print(error);
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
   };
 }
@@ -283,7 +302,10 @@ ThunkAction<AppState> fetchRoomAvatar(
         mediaUri: room.avatar.uri,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
 
       if (response.headers['content-type'] == 'application/json') {
         final errorData = json.decode(response.body);
@@ -340,7 +362,10 @@ ThunkAction<AppState> fullSync() {
         fullState: store.state.roomStore.rooms.length == 0,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
       final data = json.decode(response.body);
 
       print('Syncing Completed');
@@ -365,7 +390,11 @@ ThunkAction<AppState> fetchRoomMembers({String roomId}) {
         roomId: roomId,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final data = json.decode(response.body);
 
       // Convert rooms to rooms

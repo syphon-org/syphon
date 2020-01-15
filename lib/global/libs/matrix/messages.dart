@@ -9,11 +9,14 @@ dynamic buildRoomMessagesRequest({
   bool desc = true, // Direction of events
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
+
   // Params
-  url += '?access_token=${accessToken}&limit=$limit';
+  url += '?limit=$limit';
   url += start != null ? '&from=${start}' : '';
   url += end != null ? '&to=${end}' : '';
   url += desc ? '&dir=b' : '&dir=f';
 
-  return {'url': url};
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
 }

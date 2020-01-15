@@ -147,7 +147,7 @@ class Messages extends StatelessWidget {
                       child: buildMessageList(
                           // Selector for room TODO: convert to map
                           room(
-                            appState: state,
+                            state: state,
                             id: arguments.roomId,
                           ).messages,
                           context),

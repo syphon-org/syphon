@@ -10,10 +10,11 @@ dynamic buildSyncRequest({
   String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
   // Params
-  url += '?access_token=${accessToken}';
   url += '&full_state=${fullState}';
 
-  return {'url': url};
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildJoinedRoomsRequest({
@@ -23,10 +24,9 @@ dynamic buildJoinedRoomsRequest({
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildDirectRoomsRequest({
@@ -38,10 +38,9 @@ dynamic buildDirectRoomsRequest({
   String url =
       '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomMembersRequest({
@@ -53,10 +52,9 @@ dynamic buildRoomMembersRequest({
   String url =
       '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/joined_members';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomStateRequest({
@@ -67,10 +65,9 @@ dynamic buildRoomStateRequest({
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomSyncRequest({
@@ -80,9 +77,10 @@ dynamic buildRoomSyncRequest({
   String roomId,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/sync';
-  // Params
-  url += '?access_token=${accessToken}';
-  url += '&filter={\"room\":{\"rooms\":["$roomId"]}}';
 
-  return {'url': url};
+  url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
+
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
 }

@@ -288,7 +288,10 @@ class Home extends StatelessWidget {
                           ),
                         )),
                     Expanded(
-                      child: buildConversationList(rooms(state), context),
+                      child: buildConversationList(
+                        sortRoomsByPriority(state),
+                        context,
+                      ),
                     )
                   ]);
             }),

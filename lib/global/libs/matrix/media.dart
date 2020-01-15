@@ -18,9 +18,10 @@ dynamic buildThumbnailRequest({
 
   // Params
   url += '?height=${size}&width=${size}&method=${method}';
-  url += accessToken != null ? '?access_token=${accessToken}' : '';
 
-  return {'url': url};
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildMediaDownloadRequest({
@@ -35,10 +36,9 @@ dynamic buildMediaDownloadRequest({
   String url =
       '$protocol$homeserver/_matrix/media/r0/download/${serverName ?? homeserver}/$mediaId';
 
-  // Params
-  url += accessToken != null ? '?access_token=${accessToken}' : '';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildMediaUploadRequest({
@@ -46,17 +46,17 @@ dynamic buildMediaUploadRequest({
   String homeserver = 'matrix.org',
   String accessToken,
   String fileName,
-  String fileType, // Content-Type: application/pdf
+  String fileType = 'application/jpeg', // Content-Type: application/pdf
 }) {
   String url = '$protocol$homeserver/_matrix/media/r0/upload';
-  String headers;
 
   // Params
-  url += '?access_token=${accessToken}';
-  url += fileName != null ? '&filename=${fileName}' : '';
+  url += fileName != null ? '?filename=${fileName}' : '';
 
-  // Headers
-  headers = fileType != null ? 'Content-Type: ${fileType}' : null;
+  Map<String, String> headers = {
+    'Content-Type': '$fileType',
+    'Authorization': 'Bearer $accessToken',
+  };
 
   return {'url': url, 'headers': headers};
 }

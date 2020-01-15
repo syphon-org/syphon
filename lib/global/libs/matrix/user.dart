@@ -13,8 +13,7 @@ dynamic buildUserProfileRequest({
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/profile/${userId}';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }

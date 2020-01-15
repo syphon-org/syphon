@@ -84,7 +84,7 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.userStore.user;
-    final Function changeAuthState = (user) {
+    final Function onAuthStateChanged = (user) {
       if (user != null && user.accessToken != null) {
         store.dispatch(fetchUserProfile());
         store.dispatch(startRoomsObserver());
@@ -94,8 +94,8 @@ ThunkAction<AppState> startAuthObserver() {
     };
 
     // init current auth state and set auth state listener
-    changeAuthState(user);
-    store.state.userStore.onAuthStateChanged.listen(changeAuthState);
+    onAuthStateChanged(user);
+    store.state.userStore.onAuthStateChanged.listen(onAuthStateChanged);
   };
 }
 
@@ -175,7 +175,11 @@ ThunkAction<AppState> fetchUserProfile() {
         userId: user.userId,
       );
 
-      final response = await http.get(request['url']);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final data = json.decode(response.body);
 
       store.dispatch(SetUser(

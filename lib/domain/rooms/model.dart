@@ -53,7 +53,7 @@ class Room {
     this.homeserver,
     this.avatar,
     this.topic = '',
-    this.lastUpdate,
+    this.lastUpdate = 0,
     this.direct = false,
     this.syncing = false,
     this.events = const [],
