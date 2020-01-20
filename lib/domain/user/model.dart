@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:dart_json_mapper/dart_json_mapper.dart';
+
+@jsonSerializable
 class User {
   final String userId;
   final String deviceId;
@@ -57,35 +60,10 @@ class User {
   String toString() {
     return '{id: $deviceId,  userId: $userId, homeserver: $homeserver, accessToken: $accessToken}';
   }
-
-  static User fromJson(dynamic json) {
-    return json == null
-        ? User()
-        : User(
-            userId: json['userId'],
-            deviceId: json['deviceId'],
-            homeserver: json['homeserver'],
-            accessToken: json['accessToken'],
-            displayName: json['displayName'],
-            avatarUrl: json['avatarUrl'],
-          );
-  }
-
-  Map toJson() => {
-        "userId": userId,
-        "deviceId": deviceId,
-        "homeserver": homeserver,
-        "accessToken": accessToken,
-        "displayName": displayName,
-        "avatarUrl": avatarUrl
-      };
 }
 
 class UserStore {
   final User user;
-  final StreamController<User> authObserver;
-
-  final bool loading;
   final String username;
   final String password;
   final String homeserver;
@@ -94,24 +72,27 @@ class UserStore {
   final bool isPasswordValid;
   final bool isHomeserverValid;
   final bool creating;
+  final bool loading;
 
-  const UserStore(
-      {this.user = const User(),
-      this.loading = false,
-      this.authObserver,
-      this.username = '', // null
-      this.password = '', // null
-      this.homeserver = 'matrix.org',
-      this.loginType = 'm.login.dummy',
-      this.isUsernameValid = false,
-      this.isPasswordValid = false,
-      this.isHomeserverValid = false,
-      this.creating = false});
+  final StreamController<User> authObserver;
+
+  const UserStore({
+    this.user = const User(),
+    this.authObserver,
+    this.username = '', // null
+    this.password = '', // null
+    this.homeserver = 'matrix.org',
+    this.loginType = 'm.login.dummy',
+    this.isUsernameValid = false,
+    this.isPasswordValid = false,
+    this.isHomeserverValid = false,
+    this.creating = false,
+    this.loading = false,
+  });
 
   UserStore copyWith({
     user,
     loading,
-    authObserver,
     username,
     password,
     homeserver,
@@ -119,6 +100,7 @@ class UserStore {
     isPasswordValid,
     isHomeserverValid,
     creating,
+    authObserver,
   }) {
     return UserStore(
         user: user ?? this.user,
@@ -133,12 +115,12 @@ class UserStore {
         creating: creating ?? this.creating);
   }
 
-  Stream<User> get onAuthStateChanged => authObserver.stream;
+  Stream<User> get onAuthStateChanged =>
+      authObserver != null ? authObserver.stream : null;
 
   @override
   int get hashCode =>
       user.hashCode ^
-      loading.hashCode ^
       authObserver.hashCode ^
       username.hashCode ^
       password.hashCode ^
@@ -146,6 +128,7 @@ class UserStore {
       isUsernameValid.hashCode ^
       isPasswordValid.hashCode ^
       isHomeserverValid.hashCode ^
+      loading.hashCode ^
       creating.hashCode;
 
   @override
@@ -153,7 +136,6 @@ class UserStore {
       identical(this, other) ||
       other is UserStore &&
           runtimeType == other.runtimeType &&
-          loading == other.loading &&
           user == other.user &&
           authObserver == other.authObserver &&
           username == other.username &&
@@ -162,6 +144,7 @@ class UserStore {
           isUsernameValid == other.isUsernameValid &&
           isPasswordValid == other.isPasswordValid &&
           isHomeserverValid == other.isHomeserverValid &&
+          loading == other.loading &&
           creating == other.creating;
 
   @override
@@ -169,23 +152,27 @@ class UserStore {
     return '{user: $user, authObserver: $authObserver, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
 
+  dynamic toJson() {
+    return {
+      "user": JsonMapper.toJson(user),
+      "username": username,
+      "password": password,
+      "loading": loading,
+      "homeserver": homeserver,
+    };
+  }
+
   static UserStore fromJson(Map<String, dynamic> json) {
     if (json == null) {
       return UserStore();
     }
+
     return UserStore(
-      user: User.fromJson(json['user']),
-      loading: json['loading'],
+      user: JsonMapper.fromJson<User>(json['user']),
+      loading: json['loading'] != null ? json['loading'] : false,
       username: json['username'],
       password: json['password'],
       homeserver: json['homeserver'],
     );
   }
-
-  Map toJson() => {
-        "user": user.toJson(),
-        "username": username,
-        "password": password,
-        "homeserver": homeserver,
-      };
 }

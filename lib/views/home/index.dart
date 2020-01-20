@@ -9,14 +9,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Domain
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/model.dart';
+import 'package:Tether/domain/rooms/room/model.dart';
 import 'package:Tether/domain/rooms/selectors.dart';
-import 'package:Tether/domain/rooms/actions.dart';
 
 // View And Styling
 import 'package:Tether/views/home/messages/index.dart';
 import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/dimensions.dart';
 
 enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
 

@@ -15,7 +15,7 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 
-import './model.dart';
+import 'room/model.dart';
 import 'events/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -100,18 +100,16 @@ Future<dynamic> readFullSyncJson() async {
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Fetch All Room Ids
-    await store.dispatch(fetchRooms());
-    await store.dispatch(fetchDirectRooms());
-    final sortedDirectRooms = store.state.roomStore.rooms;
-
-    // TODO: Refactor this to be logical based on direct but also update timestamps
-    sortedDirectRooms.sort((a, b) => a.direct && !b.direct ? -1 : 1);
-    store.dispatch(SetRooms(rooms: sortedDirectRooms));
+    if (store.state.roomStore.rooms.length < 1) {
+      await store.dispatch(fetchRooms());
+      await store.dispatch(fetchDirectRooms());
+    }
 
     // Fetch All Room State
     final joinedRooms = store.state.roomStore.rooms;
 
     final allFetchStates = joinedRooms.map((room) async {
+      if (room.state.length > 0) return;
       return store.dispatch(fetchRoomState(room: room));
     }).toList();
 
@@ -157,11 +155,8 @@ ThunkAction<AppState> fetchRooms() {
         headers: request['headers'],
       );
 
-      print('${response.statusCode} ${response.body}');
       final data = json.decode(response.body);
       final List<dynamic> rawJoinedRooms = data['joined_rooms'];
-
-      print(rawJoinedRooms);
 
       // Convert joined_rooms to Room objects
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();

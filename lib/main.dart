@@ -8,6 +8,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+// Generated Json Serializables
+import 'main.reflectable.dart'; // Import generated code.
+
 // Library Implimentations
 import 'package:Tether/global/libs/hive.dart';
 
@@ -41,6 +44,7 @@ void _enablePlatformOverrideForDesktop() {
 }
 
 void main() async {
+  initializeReflectable();
   await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
   _enablePlatformOverrideForDesktop();
   final store = await initStore();

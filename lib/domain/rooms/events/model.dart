@@ -1,3 +1,5 @@
+import 'package:dart_json_mapper/dart_json_mapper.dart';
+
 enum EventType {
   // Actual Messages
   MESSAGE, // m.room.message
@@ -15,6 +17,7 @@ enum EventType {
   POWER_LEVELS, // m.room.power_levels
 }
 
+@jsonSerializable
 class Event {
   final String id; // event_id
   final String userId;
@@ -23,11 +26,13 @@ class Event {
   final String sender;
   final String stateKey;
   final int timestamp;
+
+  @JsonProperty(ignore: true)
   final dynamic content;
 
   // For m.room.message only
-  final String contentType;
-  final String body;
+  String get body => content != null ? content['body'] : null;
+  String get contentType => content != null ? content['msgtype'] : null;
 
   const Event({
     this.id,
@@ -38,8 +43,6 @@ class Event {
     this.stateKey,
     this.content,
     this.timestamp,
-    this.contentType,
-    this.body,
   });
 
   Event copyWith({
@@ -50,30 +53,19 @@ class Event {
     stateKey,
     content,
     timestamp,
-    contentType,
-    body,
   }) {
     return Event(
-        id: id ?? this.id,
-        type: type ?? this.type,
-        sender: sender ?? this.sender,
-        roomId: roomId ?? this.roomId,
-        stateKey: stateKey ?? this.stateKey,
-        content: content ?? this.content,
-        timestamp: timestamp ?? this.timestamp,
-        contentType: contentType ?? this.contentType,
-        body: body ?? this.body);
+      id: id ?? this.id,
+      type: type ?? this.type,
+      sender: sender ?? this.sender,
+      roomId: roomId ?? this.roomId,
+      stateKey: stateKey ?? this.stateKey,
+      timestamp: timestamp ?? this.timestamp,
+      content: content ?? this.content,
+    );
   }
 
   factory Event.fromJson(Map<String, dynamic> json) {
-    var body;
-    var contentType;
-
-    if (json['type'] == 'm.room.message') {
-      body = json['content']['body'] as String;
-      contentType = json['content']['msgtype'] as String;
-    }
-
     return Event(
       id: json['event_id'] as String,
       userId: json['user_id'] as String,
@@ -83,8 +75,6 @@ class Event {
       stateKey: json['state_key'] as String,
       timestamp: json['origin_server_ts'] as int,
       content: json['content'] as dynamic,
-      body: body,
-      contentType: contentType,
     );
   }
 }
