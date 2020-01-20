@@ -10,6 +10,9 @@ description: Privacy centric matrix client for everyone
 # - xcrun simctl boot <device-id>
 # - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
 
+# building generated files
+# - flutter pub run build_runner build
+
 # env setup
 # - synctl start on 192.168.1.2 or respective local server
 # - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
@@ -32,18 +35,22 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # Domain / Store
   redux: 4.0.0
   redux_thunk: 0.3.0
   redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
   flutter_redux: 0.6.0
-  hive: 1.1.0
-  hive_flutter:  0.2.1
-  path_provider: 1.3.1
+  hive: ^1.3.0
+  hive_flutter:  ^0.3.0
+  flutter_secure_storage: 3.3.1+1 
+  path_provider: 1.3.1 
+
+  # Services
   http: 0.12.0+2
   html: ^0.13.3+3
   intl: ^0.16.1
-  flutter_secure_storage: 3.3.1+1 
   flutter_dotenv: ^2.0.3
 
   # UI Only
@@ -53,6 +60,9 @@ dependencies:
   touchable_opacity: 1.0.2
   smooth_page_indicator: 0.1.1
 
+  # Converters
+  # dart_json_mapper: 1.3.3
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -60,7 +70,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter 
-  hive_generator: 0.5.2
+  hive_generator: ^0.7.0
+  build_runner: ^1.0.0
+  # json_serializable: ^3.2.0
 
 
 # For information on the generic Dart part of this file, see the

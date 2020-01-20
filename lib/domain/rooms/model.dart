@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
+
+// import 'package:dart_json_mapper/dart_json_mapper.dart';
 
 import './events/model.dart';
 
+// @jsonSerializable
 class Avatar {
   final String uri;
   final String url;
@@ -31,19 +33,18 @@ class Avatar {
   }
 }
 
-// Corresponds to rooms in the matrix protocol
 class Room {
   final String id;
   final String name;
   final String homeserver;
   final Avatar avatar;
   final String topic;
-  final int lastUpdate;
   final bool direct;
   final bool syncing;
   final List<Event> state;
   final List<Event> events;
   final List<Event> messages;
+  final int lastUpdate;
   final String startTime;
   final String endTime;
 
@@ -53,12 +54,12 @@ class Room {
     this.homeserver,
     this.avatar,
     this.topic = '',
-    this.lastUpdate = 0,
     this.direct = false,
     this.syncing = false,
     this.events = const [],
     this.messages = const [],
     this.state = const [],
+    this.lastUpdate = 0,
     this.startTime,
     this.endTime,
   });
@@ -95,7 +96,6 @@ class Room {
   Room fromMessageEvents(
     Map<String, dynamic> messagesJson,
   ) {
-    messagesJson.keys.map((key) => print('$key\n'));
     final String startTime = messagesJson['start'];
     final String endTime = messagesJson['end'];
     final List<dynamic> messagesChunk = messagesJson['chunk'];
@@ -173,28 +173,40 @@ class Room {
     );
   }
 
-  // TODO: use fromStateEvents above
-  factory Room.fromJsonSync(Map<String, dynamic> json) {
-    if (json == null) {
-      return Room();
-    }
-    // Dart needs this or it won't be able to dynamicly cast
+  factory Room.fromSync({
+    String id,
+    String startTime,
+    Map<String, dynamic> json,
+  }) {
     final List<dynamic> rawEvents = json['timeline']['events'];
+    final List<dynamic> rawStateEvents = json['state']['events'];
+    final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
+    final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
 
-    // Convert all of the events and save
     final List<Event> events =
         rawEvents.map((event) => Event.fromJson(event)).toList();
 
-    // HACK: to find room name
-    final Event nameEvent = events
-        .firstWhere((event) => event.type == "m.room.name", orElse: () => null);
+    final List<Event> stateEvents =
+        rawStateEvents.map((event) => Event.fromJson(event)).toList();
 
-    return Room(
-      id: json['id'] as String,
-      name: nameEvent != null ? nameEvent.content['name'] : 'Loading...',
+    // Convert basic room features
+    var newRoom = Room(
+      id: id,
       events: events,
+      startTime: startTime,
     );
+
+    newRoom = newRoom.fromStateEvents(stateEvents);
+
+    return newRoom;
   }
+
+  dynamic toJson() => {
+        "id": id,
+        "name": name,
+        "homeserver": homeserver,
+        "avatar": avatar,
+      };
 
   @override
   String toString() {
@@ -205,12 +217,14 @@ class Room {
 class RoomStore {
   final bool loading;
   final bool syncing;
+  final int lastUpdate;
   final Timer roomObserver;
   final List<Room> rooms;
 
   const RoomStore({
     this.syncing = false,
     this.loading = false,
+    this.lastUpdate = 0,
     this.roomObserver,
     this.rooms = const [],
   });
@@ -218,12 +232,14 @@ class RoomStore {
   RoomStore copyWith({
     loading,
     syncing,
+    lastUpdate,
     rooms,
     roomObserver,
   }) {
     return RoomStore(
       loading: loading ?? this.loading,
       syncing: syncing ?? this.syncing,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
       roomObserver: roomObserver ?? this.roomObserver,
       rooms: rooms ?? this.rooms,
     );
@@ -252,16 +268,17 @@ class RoomStore {
   }
 
   Map<String, dynamic> toJson() => {
-        "rooms": rooms.toString(),
+        "lastUpdate": lastUpdate,
+        "rooms": rooms,
       };
 
   static RoomStore fromJson(Map<String, dynamic> json) {
-    return json == null
-        ? RoomStore()
-        : RoomStore(
-            rooms: json['rooms']['join']
-                .map((rawRoom) => Room.fromJsonSync(rawRoom))
-                .toList(),
-          );
+    if (json == null) {
+      return RoomStore();
+    }
+
+    return RoomStore(
+      rooms: List<Room>.from(json['rooms']),
+    );
   }
 }

@@ -336,16 +336,17 @@ ThunkAction<AppState> fullSync() {
 
       print('** Read State From Disk Successfully **');
 
-      final Map<String, dynamic> rawJoinedRooms = syncState['rooms']['join'];
-      List<Room> rooms = [];
+      final List<Room> rooms = [];
+      final Map<String, dynamic> rawRooms = syncState['rooms']['join'];
 
-      rawJoinedRooms.forEach((id, json) {
-        json['id'] = id;
-        rooms.add(Room.fromJsonSync(json));
-      });
+      rawRooms.forEach((id, json) => rooms.add(Room.fromSync(
+            id: id,
+            json: json,
+          )));
+
+      print(rooms);
 
       store.dispatch(SetRooms(rooms: rooms));
-      print(rooms);
       return true;
     } catch (error) {
       debugPrint(error);

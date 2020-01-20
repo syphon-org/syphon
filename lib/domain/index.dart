@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:Tether/domain/alerts/model.dart';
 import 'package:Tether/global/libs/hive.dart';
@@ -91,7 +92,8 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    // print('redux persisting ${userStore.toJson()}');
+    final testing = json.encode(roomStore);
+    print('redux persisting ${testing}');
     return {
       'loading': loading,
       'userStore': userStore.toJson(),

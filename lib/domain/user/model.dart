@@ -170,14 +170,16 @@ class UserStore {
   }
 
   static UserStore fromJson(Map<String, dynamic> json) {
-    return json == null
-        ? UserStore()
-        : UserStore(
-            user: User.fromJson(json['user']),
-            loading: json['loading'],
-            username: json['username'],
-            password: json['password'],
-            homeserver: json['homeserver']);
+    if (json == null) {
+      return UserStore();
+    }
+    return UserStore(
+      user: User.fromJson(json['user']),
+      loading: json['loading'],
+      username: json['username'],
+      password: json['password'],
+      homeserver: json['homeserver'],
+    );
   }
 
   Map toJson() => {
