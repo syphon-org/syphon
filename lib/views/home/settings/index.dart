@@ -59,10 +59,12 @@ class SettingsScreen extends StatelessWidget {
 
   Function onPressOption(int index, Store<AppState> store) {
     return () {
-      if (index == options.length - 1) {
-        store.dispatch(logoutUser());
-      } else {
-        print('STUB ${options[index]['title']}');
+      switch (index) {
+        case 6:
+          store.dispatch(logoutUser());
+          break;
+        default:
+          break;
       }
     };
   }

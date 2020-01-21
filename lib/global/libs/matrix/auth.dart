@@ -61,8 +61,12 @@ dynamic buildLoginUserRequest({
   curl -XPOST \
   "http://192.168.1.2:8008/_matrix/client/r0/logout?access_token=MDAxOGxvY2F0aW9uIG1hdHJpeC5vcmcKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI0Y2lkIHVzZXJfaWQgPSBAZXJlaW86bWF0cml4Lm9yZwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IFJwWkgxalF1a2YuTzhsO2gKMDAyZnNpZ25hdHVyZSDMDyFzbJvI8lwbYjPQb-s128dmt6C5ihFI2PwSJj0IEgo" 
  */
-dynamic buildLogoutUserRequest({String accessToken}) {
-  String url = '_matrix/client/r0/logout';
+dynamic buildLogoutUserRequest({
+  String protocol,
+  String homeserver,
+  String accessToken,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/logout';
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
   return {'url': url, 'headers': headers};
@@ -85,9 +89,14 @@ dynamic buildLogoutUserAllRequest({String accessToken}) {
   -d '{ "access_token": "" }'  \
   "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
  */
-dynamic buildRegisterUserRequest(
-    {String username, String password, String type}) {
-  String url = '_matrix/client/r0/register';
+dynamic buildRegisterUserRequest({
+  String protocol,
+  String homeserver,
+  String username,
+  String password,
+  String type,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/register';
 
   Map body = {
     'auth': {'type': 'm.login.dummy'},

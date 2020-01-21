@@ -201,14 +201,19 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.user.homeserver;
       final authObserver = store.state.userStore.authObserver;
 
-      final request = buildLogoutUserRequest(accessToken: accessToken);
+      final request = buildLogoutUserRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.user.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+      );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.post(url);
+      final response = await http.post(
+        request['url'],
+        headers: request['headers'],
+      );
+
       json.decode(response.body);
 
       authObserver.add(null);
@@ -225,21 +230,21 @@ ThunkAction<AppState> createUser() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     store.dispatch(SetCreating(creating: true));
-    final username = store.state.userStore.username;
-    final password = store.state.userStore.password;
-    final loginType = store.state.userStore.loginType;
-    final homeserver = store.state.userStore.homeserver;
 
-    final registerUserRequest = buildRegisterUserRequest(
-      username: username,
-      password: password,
+    final loginType = store.state.userStore.loginType;
+
+    final request = buildRegisterUserRequest(
+      protocol: protocol,
+      homeserver: store.state.userStore.homeserver,
+      username: store.state.userStore.username,
+      password: store.state.userStore.password,
       type: loginType,
     );
 
-    final url = "$protocol$homeserver:8008/${registerUserRequest['url']}";
-    final body = json.encode(registerUserRequest['body']);
-
-    final response = await http.post(url, body: body);
+    final response = await http.post(
+      request['url'],
+      body: request['body'],
+    );
 
     final data = json.decode(response.body);
 
@@ -249,7 +254,7 @@ ThunkAction<AppState> createUser() {
       userId: data['user_id'],
       deviceId: data['device_id'],
       accessToken: data['access_token'],
-      homeserver: homeserver,
+      homeserver: store.state.userStore.homeserver,
     )));
 
     store.dispatch(SetCreating(creating: false));

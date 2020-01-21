@@ -115,7 +115,6 @@ ThunkAction<AppState> startRoomsObserver() {
     }).toList();
 
     final allFetchMessages = joinedRooms.map((room) async {
-      if (room.messages.length > 0) return;
       return store.dispatch(fetchRoomMessages(room: room));
     }).toList();
 
