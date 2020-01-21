@@ -31,7 +31,7 @@ class Event {
   final dynamic content;
 
   // For m.room.message only
-  String get body => content != null ? content['body'] : null;
+  String get body => content != null ? content['body'] : '';
   String get contentType => content != null ? content['msgtype'] : null;
 
   const Event({

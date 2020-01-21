@@ -3,15 +3,16 @@ import 'package:Tether/domain/index.dart';
 import './room/model.dart';
 
 List<Room> rooms(AppState state) {
-  return state.roomStore.rooms;
+  return state.roomStore.roomList;
 }
 
 Room room({AppState state, String id}) {
-  return state.roomStore.rooms.firstWhere((room) => room.id == id);
+  if (state.roomStore.rooms == null) return Room();
+  return state.roomStore.rooms[id];
 }
 
 List<Room> sortRoomsByPriority(AppState state) {
-  final sortedList = List<Room>.from(state.roomStore.rooms);
+  final sortedList = List<Room>.from(state.roomStore.roomList);
 
   sortedList.sort((a, b) {
     // Prioritze if a direct chat

@@ -3,31 +3,30 @@ import 'dart:async';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 
 import './room/model.dart';
-import './events/model.dart';
 
 class RoomStore {
   final bool loading;
   final bool syncing;
   final int lastUpdate;
   final Timer roomObserver;
-  final List<Room> rooms;
-  final Map<String, Room> roomMap;
+  final Map<String, Room> rooms;
 
   const RoomStore({
     this.syncing = false,
     this.loading = false,
     this.lastUpdate = 0,
     this.roomObserver,
-    this.rooms = const [],
-    this.roomMap,
+    this.rooms,
   });
+
+  List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
 
   RoomStore copyWith({
     loading,
     syncing,
     lastUpdate,
-    rooms,
     roomObserver,
+    rooms,
   }) {
     return RoomStore(
       loading: loading ?? this.loading,
@@ -35,7 +34,6 @@ class RoomStore {
       lastUpdate: lastUpdate ?? this.lastUpdate,
       roomObserver: roomObserver ?? this.roomObserver,
       rooms: rooms ?? this.rooms,
-      roomMap: roomMap ?? this.roomMap,
     );
   }
 
@@ -44,7 +42,6 @@ class RoomStore {
       loading.hashCode ^
       syncing.hashCode ^
       roomObserver.hashCode ^
-      roomMap.hashCode ^
       rooms.hashCode;
 
   @override
@@ -55,7 +52,6 @@ class RoomStore {
           loading == other.loading &&
           syncing == other.syncing &&
           roomObserver == other.roomObserver &&
-          roomMap == other.roomMap &&
           rooms == other.rooms;
 
   @override
@@ -64,21 +60,17 @@ class RoomStore {
   }
 
   dynamic toJson() {
-    try {
-      final iterableEventDecorator = (value) => value.cast<Event>();
-      JsonMapper.registerValueDecorator<List<Event>>(iterableEventDecorator);
-
+    if (rooms == null || rooms.isEmpty) {
       return {
         "lastUpdate": lastUpdate,
-        "rooms": rooms.map((room) => JsonMapper.toJson(room)).toList(),
-      };
-    } catch (error) {
-      print('FAILED TO JSON IN ROOM STORE $error');
-      return {
-        "lastUpdate": lastUpdate,
-        "rooms": [],
+        "rooms": JsonMapper.toJson([]),
       };
     }
+
+    return {
+      "lastUpdate": lastUpdate,
+      "rooms": JsonMapper.toJson(List<Room>.from(rooms.values)),
+    };
   }
 
   static RoomStore fromJson(Map<String, dynamic> json) {
@@ -88,13 +80,16 @@ class RoomStore {
     }
 
     if (json['rooms'] != null) {
-      print('we trying ${json['rooms']}');
       rooms = JsonMapper.fromJson<List<Room>>(json['rooms']);
     }
 
     return RoomStore(
       lastUpdate: json['lastUpdate'],
-      rooms: rooms,
+      rooms: Map.fromIterable(
+        rooms,
+        key: (room) => room.id,
+        value: (room) => room,
+      ),
     );
   }
 }

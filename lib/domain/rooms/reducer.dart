@@ -10,42 +10,41 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(syncing: action.syncing);
     case SetRoomObserver:
       return state.copyWith(roomObserver: action.chatObserver);
-    case SetRooms:
-      return state.copyWith(rooms: action.rooms);
 
     case SetRoom:
-      final rooms = List<Room>.from(state.rooms);
-      final index = rooms.indexWhere((room) => room.id == action.room.id);
-
-      rooms.replaceRange(index, index + 1, [action.room]);
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.room.id] = action.room;
       return state.copyWith(rooms: rooms);
 
-    case SetRoomState: // TODO: refactor to map
-      final rooms = List<Room>.from(state.rooms);
-      final index = rooms.indexWhere((room) => room.id == action.id);
-      var updated = rooms[index]
-          .fromStateEvents(action.state, currentUsername: action.username);
-
-      rooms.replaceRange(index, index + 1, [updated]);
+    case SetRooms:
+      final Map<String, Room> rooms = Map.fromIterable(
+        action.rooms,
+        key: (room) => room.id,
+        value: (room) => room,
+      );
       return state.copyWith(rooms: rooms);
 
-    case SetRoomMessages: // TODO: refactor to map
-      final rooms = List<Room>.from(state.rooms);
-      final index = rooms.indexWhere((room) => room.id == action.id);
-      var updated = rooms[index].fromMessageEvents(action.messagesJson);
-
-      rooms.replaceRange(index, index + 1, [updated]);
+    case SetRoomState:
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.id] = rooms[action.id].fromStateEvents(
+        action.state,
+        currentUsername: action.username,
+      );
       return state.copyWith(rooms: rooms);
 
-    case UpdateRoom: // TODO: refactor to map
-      final rooms = List<Room>.from(state.rooms);
-      final index = rooms.indexWhere((room) => room.id == action.id);
-      final updatedRoom = state.rooms[index].copyWith(
+    case SetRoomMessages:
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.id] = rooms[action.id].fromMessageEvents(
+        action.messagesJson,
+      );
+      return state.copyWith(rooms: rooms);
+
+    case UpdateRoom:
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.id] = rooms[action.id].copyWith(
         avatar: action.avatar,
         syncing: action.syncing,
       );
-
-      rooms.replaceRange(index, index + 1, [updatedRoom]);
       return state.copyWith(rooms: rooms);
     default:
       return state;

@@ -49,12 +49,14 @@ class Room {
   final String topic;
   final bool direct;
   final bool syncing;
+  final String startTime;
+  final String endTime;
+  final int lastUpdate;
+
+  // Event lists
   final List<Event> state;
   final List<Event> events;
   final List<Event> messages;
-  final int lastUpdate;
-  final String startTime;
-  final String endTime;
 
   const Room({
     this.id,
@@ -172,11 +174,17 @@ class Room {
       }
     });
 
+    print('from state event ${this.id} ${stateEvents.length}');
     return this.copyWith(
       name: name ?? 'New Room',
       avatar: avatar,
       topic: topic,
-      state: stateEvents,
+      // only save the last 50 events to prevent massive caches
+      // TODO: make this not an issue
+      state: stateEvents.sublist(
+        0,
+        stateEvents.length > 50 ? 50 : stateEvents.length,
+      ),
       lastUpdate: lastUpdate,
     );
   }

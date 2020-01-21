@@ -54,7 +54,7 @@ Future<Store> initStore() async {
   // Finally load persisted store
   final initialState = await persistor.load();
 
-  print('[initStore] $initialState');
+  // print('[initStore] $initialState');
 
   final Store<AppState> store = new Store<AppState>(
     appReducer,

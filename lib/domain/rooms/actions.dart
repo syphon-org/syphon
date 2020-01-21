@@ -100,13 +100,14 @@ Future<dynamic> readFullSyncJson() async {
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Fetch All Room Ids
-    if (store.state.roomStore.rooms.length < 1) {
+    if (store.state.roomStore.rooms == null ||
+        store.state.roomStore.rooms.isEmpty) {
       await store.dispatch(fetchRooms());
       await store.dispatch(fetchDirectRooms());
     }
 
     // Fetch All Room State
-    final joinedRooms = store.state.roomStore.rooms;
+    final joinedRooms = store.state.roomStore.roomList;
 
     final allFetchStates = joinedRooms.map((room) async {
       if (room.state.length > 0) return;
@@ -114,10 +115,11 @@ ThunkAction<AppState> startRoomsObserver() {
     }).toList();
 
     final allFetchMessages = joinedRooms.map((room) async {
+      if (room.messages.length > 0) return;
       return store.dispatch(fetchRoomMessages(room: room));
     }).toList();
 
-    await Future.wait(allFetchStates + allFetchMessages);
+    await Future.wait(allFetchMessages + allFetchStates);
 
     // Dispatch Background Sync
     // store.dispatch(fullSync());
@@ -240,8 +242,7 @@ ThunkAction<AppState> fetchRoomState({Room room}) {
         username: user.displayName,
       ));
 
-      final updatedRooms = store.state.roomStore.rooms;
-      final updatedRoom = updatedRooms.firstWhere((r) => r.id == room.id);
+      final updatedRoom = store.state.roomStore.rooms[room.id];
       if (updatedRoom.avatar != null) {
         store.dispatch(fetchRoomAvatar(updatedRoom));
       }

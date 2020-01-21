@@ -34,17 +34,17 @@ class Home extends StatelessWidget {
   }
 
   String formatPreview({Room room}) {
-    if (room.messages.length > 0) {
-      final lastMessage = room.messages[0].body;
-      final shortened = lastMessage.length > 42;
-      final preview = shortened
-          ? lastMessage.substring(0, 42).replaceAll('\n', '')
-          : lastMessage;
-
-      return shortened ? '$preview...' : preview;
+    if (room.messages.length < 1) {
+      return room.topic;
     }
 
-    return room.topic;
+    final lastMessage = room.messages[0].body;
+    final shortened = lastMessage.length > 42;
+    final preview = shortened
+        ? lastMessage.substring(0, 42).replaceAll('\n', '')
+        : lastMessage;
+
+    return shortened ? '$preview...' : preview;
   }
 
   String formatSinceLastUpdate({int lastUpdateMillis}) {
