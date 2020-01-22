@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/views/home/settings/appearance.dart';
 import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -141,6 +142,8 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
                   '/home/messages': (BuildContext context) => Messages(),
                   '/draft': (BuildContext context) => Draft(),
                   '/profile': (BuildContext context) => Profile(),
+                  '/appearance': (BuildContext context) =>
+                      ApperanceScreen(title: 'Appearance'),
                   '/settings': (BuildContext context) =>
                       SettingsScreen(title: 'Settings'),
                   '/loading': (BuildContext context) =>

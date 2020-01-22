@@ -14,112 +14,189 @@ class SettingsScreen extends StatelessWidget {
 
   final String title;
 
-  final List<Map> options = [
-    {"title": 'Profile'},
-    {
-      "title": 'Notifications',
-      "subtitle": "On",
-    },
-    {
-      "title": 'Privacy',
-      "subtitle": "Configuration and Checklist",
-    },
-    {
-      "title": 'Chats and Data',
-      "subtitle": "Manage your matrix data",
-    },
-    {
-      "title": 'Appearance',
-      "subtitle": "",
-    },
-    {
-      "title": 'Devices',
-      "subtitle": "",
-    },
-    {
-      "title": 'Advanced',
-      "subtitle": "",
-    },
-    {
-      "title": 'Logout',
-      "subtitle": "",
-    },
-  ];
-
-  final List<IconData> optionIcons = [
-    null,
-    Icons.notifications,
-    Icons.security,
-    Icons.chat_bubble,
-    Icons.brightness_medium,
-    Icons.phone_android,
-    Icons.code,
-    Icons.exit_to_app,
-  ];
-
-  Function onPressOption(int index, Store<AppState> store) {
-    return () {
-      switch (index) {
-        case 6:
-          store.dispatch(logoutUser());
-          break;
-        default:
-          break;
-      }
-    };
-  }
-
-  Widget buildOptions({List<Map> options, BuildContext context}) {
-    return StoreConnector<AppState, Store<AppState>>(
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) {
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            scrollDirection: Axis.vertical,
-            itemCount: options.length,
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
-                return ProfilePreview();
-              }
-
-              return ListTile(
-                onTap: onPressOption(index, store),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: Container(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(optionIcons[index], size: 28)),
-                title: Text(
-                  options[index]['title'].toString(),
-                  style: TextStyle(fontSize: 18.0),
-                ),
-                subtitle: options[index]['subtitle'].length != 0
-                    ? Text(
-                        options[index]['subtitle'].toString(),
-                        style: TextStyle(fontSize: 14.0),
-                      )
-                    : null,
-              );
-            },
-          );
-        });
+  Widget buildToggledSubtitle({String option}) {
+    return Text(
+      option == null ? 'Off' : 'On',
+      style: TextStyle(fontSize: 14.0),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context, false),
-        ),
-        title: Text(title,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
-      ),
-      body: Align(child: buildOptions(options: options, context: context)),
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              title: Text(title,
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w100)),
+            ),
+            body: Container(
+                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                child: Column(
+                  children: <Widget>[
+                    ProfilePreview(),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        children: <Widget>[
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.chat,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'SMS and MMS',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            subtitle: buildToggledSubtitle(),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.notifications,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Notifications',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            subtitle: buildToggledSubtitle(),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Privacy',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/appearance');
+                            },
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.brightness_medium,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Appearance',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.data_usage,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Storage',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.phone_android,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Devices',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.code,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Advanced',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              store.dispatch(logoutUser());
+                            },
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.exit_to_app,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Logout',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+          );
+        },
+      );
 }

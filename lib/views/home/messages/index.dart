@@ -140,7 +140,8 @@ class Messages extends StatelessWidget {
                           child: CircularProgressIndicator(
                             strokeWidth: 4.0,
                             valueColor: new AlwaysStoppedAnimation<Color>(
-                                PRIMARY_COLOR),
+                              PRIMARY_COLOR,
+                            ),
                             value: null,
                           ),
                         )),

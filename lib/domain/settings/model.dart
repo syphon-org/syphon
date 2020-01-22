@@ -1,9 +1,24 @@
+import 'package:Tether/global/colors.dart';
 import "package:Tether/global/themes.dart";
 
 class SettingsStore {
+  final int primaryColor;
+  final int accentColor;
+  final int brightness;
   final ThemeType theme;
+  final String language;
+  final bool smsEnabled;
+  final bool notificationsEnabled;
 
-  const SettingsStore({this.theme = ThemeType.LIGHT});
+  const SettingsStore({
+    this.primaryColor = PRIMARY,
+    this.accentColor = ACCENT,
+    this.brightness = 0,
+    this.theme = ThemeType.LIGHT,
+    this.language = 'English',
+    this.smsEnabled = false,
+    this.notificationsEnabled = false,
+  });
 
   @override
   int get hashCode => theme.hashCode;
@@ -15,20 +30,26 @@ class SettingsStore {
           runtimeType == other.runtimeType &&
           theme == other.theme;
 
-  @override
-  String toString() {
-    return '{theme: $theme}';
-  }
-
   Map toJson() {
-    return {"theme": theme.index};
+    return {
+      "theme": theme.index,
+      "primary": primaryColor,
+      "accent": accentColor,
+      "brightness": brightness
+    };
   }
 
   static SettingsStore fromJson(dynamic json) {
-    return json == null
-        ? SettingsStore()
-        : SettingsStore(
-            theme: ThemeType.values[json['theme']],
-          );
+    if (json == null) {
+      return SettingsStore();
+    }
+    return SettingsStore(
+      theme: ThemeType.values[json['theme']],
+    );
+  }
+
+  @override
+  String toString() {
+    return '{theme: $theme}';
   }
 }
