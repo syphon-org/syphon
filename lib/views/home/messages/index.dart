@@ -1,5 +1,6 @@
 import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:Tether/domain/rooms/model.dart';
+import 'package:Tether/domain/rooms/room/model.dart';
 import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:flutter/foundation.dart';
@@ -36,31 +37,63 @@ class Messages extends StatelessWidget {
 
   final String title;
 
-  Widget buildMessageList(List<Event> messages, BuildContext context) {
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: messages.length,
-        itemBuilder: (BuildContext context, int index) {
-          final message = messages[index];
-          return Container(
-              child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 24,
+  Widget buildMessageList(String roomId, BuildContext context) {
+    return StoreConnector<AppState, AppState>(
+      converter: (Store<AppState> store) => store.state,
+      builder: (context, state) {
+        final messages = room(id: roomId, state: state).messages;
+        final userId = state.userStore.user.userId;
+        return ListView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: messages.length,
+          itemBuilder: (BuildContext context, int index) {
+            final message = messages[index];
+            // if (message.userId != userId) {
+            //   return Container(
+            // child: Container(
+            //   padding: const EdgeInsets.symmetric(
+            //     vertical: 16,
+            //     horizontal: 24,
+            //   ),
+            //   child: Text(
+            //     message.body,
+            //     style: TextStyle(),
+            //   ),
+            // ),
+            //   );
+            // }
+
+            return Flexible(
+              flex: 1,
+              fit: FlexFit.loose,
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
+                    child: Text(
+                      message.body,
+                      style: TextStyle(),
+                    ),
                   ),
-                  child: Text(
-                    message.body,
-                  )));
-        });
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final MessageArguments arguments =
         ModalRoute.of(context).settings.arguments;
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -126,15 +159,15 @@ class Messages extends StatelessWidget {
       ),
       body: Align(
         alignment: Alignment.topRight,
-        child: StoreConnector<AppState, AppState>(
+        child: StoreConnector<AppState, bool>(
             rebuildOnChange: false,
-            converter: (Store<AppState> store) => store.state,
-            builder: (context, state) {
+            converter: (Store<AppState> store) => store.state.roomStore.loading,
+            builder: (context, loading) {
               return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Visibility(
-                        visible: state.roomStore.loading,
+                        visible: loading,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 16),
                           child: CircularProgressIndicator(
@@ -147,11 +180,9 @@ class Messages extends StatelessWidget {
                         )),
                     Expanded(
                       child: buildMessageList(
-                          room(
-                            state: state,
-                            id: arguments.roomId,
-                          ).messages,
-                          context),
+                        arguments.roomId,
+                        context,
+                      ),
                     )
                   ]);
             }),

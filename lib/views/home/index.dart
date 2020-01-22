@@ -131,48 +131,49 @@ class Home extends StatelessWidget {
                         children: <Widget>[
                           Container(
                             child: CircleAvatar(
-                                radius: 24,
-                                backgroundColor: room.avatar != null
-                                    ? Colors.white70
-                                    : Colors.grey,
-                                child: buildChatAvatar(room: room)),
+                              radius: 24,
+                              backgroundColor: room.avatar != null
+                                  ? Colors.white70
+                                  : Colors.grey,
+                              child: buildChatAvatar(room: room),
+                            ),
                             margin: const EdgeInsets.only(right: 12),
                           ),
                           Flexible(
-                              flex: 1,
-                              fit: FlexFit.tight,
-                              child: Flex(
-                                  direction: Axis.vertical,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          formatRoomName(room: room),
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                        Text(
-                                          formatSinceLastUpdate(
-                                              lastUpdateMillis:
-                                                  room.lastUpdate),
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w100),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      formatPreview(room: room),
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ])),
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Flex(
+                                direction: Axis.vertical,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        formatRoomName(room: room),
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      Text(
+                                        formatSinceLastUpdate(
+                                            lastUpdateMillis: room.lastUpdate),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w100),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    formatPreview(room: room),
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ]),
+                          ),
                         ])),
               ));
         },
