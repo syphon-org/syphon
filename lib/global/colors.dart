@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const PRIMARY = 0xff34C7B5;
 const ACCENT = 0xff4476CC;
 const PRIMARY_DARK = 0xff121212;
+const ENABLED_GREY = 0xffF0F0F0;
 const DISABLED_GREY = 0xffD8D8D8;
 
 const PRIMARY_COLOR = const Color(PRIMARY);

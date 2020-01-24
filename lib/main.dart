@@ -9,9 +9,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-// Generated Json Serializables
-import 'main.reflectable.dart'; // Import generated code.
-
 // Library Implimentations
 import 'package:Tether/global/libs/hive.dart';
 
@@ -37,6 +34,9 @@ import 'package:Tether/views/home/messages/draft.dart';
 // Styling
 import 'package:Tether/global/themes.dart';
 import 'package:redux/redux.dart';
+
+// Generated Json Serializables
+import 'main.reflectable.dart'; // Import generated code.
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {

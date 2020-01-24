@@ -159,7 +159,8 @@ class HomeSearchState extends State<HomeSearch> {
                                       Text(
                                         'Location',
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w400),
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                         softWrap: true,
                                       ),
                                       Text(
