@@ -229,7 +229,7 @@ class LoginState extends State<Login> {
                           StoreConnector<AppState, Store<AppState>>(
                             converter: (Store<AppState> store) => store,
                             builder: (context, store) {
-                              Function onPressLogin = null;
+                              Function onPressLogin;
                               if (isLoginAttemptable(store.state)) {
                                 onPressLogin = () {
                                   store.dispatch(loginUser());

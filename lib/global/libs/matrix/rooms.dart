@@ -5,15 +5,18 @@ dynamic buildSyncRequest({
   String protocol = 'https://', // http or https ( or libp2p :D )
   String homeserver = 'matrix.org',
   String accessToken,
+  String since,
   bool fullState = false,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
   // Params
-  url += '?access_token=${accessToken}';
-  url += '&full_state=${fullState}';
+  url += '?full_state=${fullState}';
+  url += since != null ? '&since=$since' : '';
 
-  return {'url': url};
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildJoinedRoomsRequest({
@@ -23,10 +26,9 @@ dynamic buildJoinedRoomsRequest({
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildDirectRoomsRequest({
@@ -38,10 +40,9 @@ dynamic buildDirectRoomsRequest({
   String url =
       '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomMembersRequest({
@@ -53,10 +54,9 @@ dynamic buildRoomMembersRequest({
   String url =
       '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/joined_members';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomStateRequest({
@@ -67,10 +67,9 @@ dynamic buildRoomStateRequest({
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
-  // Params
-  url += '?access_token=${accessToken}';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }
 
 dynamic buildRoomSyncRequest({
@@ -80,28 +79,10 @@ dynamic buildRoomSyncRequest({
   String roomId,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/sync';
-  // Params
-  url += '?access_token=${accessToken}';
-  url += '&filter={\"room\":{\"rooms\":["$roomId"]}}';
 
-  return {'url': url};
-}
+  url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
 
-dynamic buildRoomMessagesRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-  String start,
-  String end,
-  bool forwards = false, // Direction of events
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
-  // Params
-  url += '?access_token=${accessToken}';
-  url += start != null ? '&from=${start}' : '';
-  url += end != null ? '&to=${end}' : '';
-  url += forwards ? '&dir=f' : '';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url};
+  return {'url': url, 'headers': headers};
 }

@@ -17,6 +17,8 @@ class ProfilePreview extends StatelessWidget {
         rebuildOnChange: false,
         converter: (Store<AppState> store) => store,
         builder: (context, store) {
+          final user = store.state.userStore.user;
+          final userId = user != null ? user.userId : '';
           return Container(
               child: TouchableOpacity(
                   activeOpacity: 0.2,
@@ -50,7 +52,7 @@ class ProfilePreview extends StatelessWidget {
                                 style: TextStyle(fontSize: 20.0),
                               ),
                               Text(
-                                store.state.userStore.user.userId,
+                                userId,
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ],

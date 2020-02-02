@@ -2,7 +2,8 @@ name: Tether
 description: Privacy centric matrix client for everyone
 
 # commands:
-# - flutter pub global run devtools
+# - flutter run --no-fast-start #
+# - flutter pub global run devtools 
 # - emulator -list-avds
 # - emulator -avd Pixel_3a_API_29
 # - xcrun simctl delete unavailable
@@ -10,21 +11,23 @@ description: Privacy centric matrix client for everyone
 # - xcrun simctl boot <device-id>
 # - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
 
+# serializable generation
+# - flutter pub run build_runner build
+# - flutter pub run build_runner watch - if making schema changes
+
+# asset generation
+# iOS icons - https://github.com/smallmuou/ios-icon-generator
+#           - run generation script for ios and macos (desktop and mobile)
+# android icons - use Android Studio with generic png
+
 # env setup
 # - synctl start on 192.168.1.2 or respective local server
 # - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+# followed by an optional build number separated by a +. 
+version: 0.0.1+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -32,17 +35,22 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # Domain / Store
   redux: 4.0.0
   redux_thunk: 0.3.0
   redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
   flutter_redux: 0.6.0
-  hive: 1.1.0
-  hive_flutter:  0.2.1
-  path_provider: 1.3.1
+  hive: ^1.3.0
+  hive_flutter:  ^0.3.0
+  flutter_secure_storage: 3.3.1+1 
+  path_provider: 1.3.1 
+
+  # Services
   http: 0.12.0+2
   html: ^0.13.3+3
-  flutter_secure_storage: 3.3.1+1 
+  intl: ^0.16.1
   flutter_dotenv: ^2.0.3
 
   # UI Only
@@ -52,6 +60,9 @@ dependencies:
   touchable_opacity: 1.0.2
   smooth_page_indicator: 0.1.1
 
+  # Converters
+  dart_json_mapper: 1.3.3
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -59,7 +70,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter 
-  hive_generator: 0.5.2
+  hive_generator: ^0.7.0
+  build_runner: ^1.0.0
+  # json_serializable: ^3.2.0
 
 
 # For information on the generic Dart part of this file, see the

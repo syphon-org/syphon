@@ -18,7 +18,13 @@ bool creating(AppState state) {
 }
 
 bool isLoginAttemptable(AppState state) {
-  return state.userStore.isPasswordValid && state.userStore.isUsernameValid;
+  return state.userStore.isPasswordValid &&
+      state.userStore.isUsernameValid &&
+      !state.userStore.loading;
+}
+
+bool isAuthLoading(AppState state) {
+  return state.userStore.loading;
 }
 
 // Auth

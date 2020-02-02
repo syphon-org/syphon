@@ -60,7 +60,6 @@ Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
 ThunkAction<AppState> fetchHomeserverIcons() {
   return (Store<AppState> store) async {
     final homeservers = store.state.matrixStore.homeservers;
-    print(homeservers.runtimeType);
 
     homeservers.forEach((homeserver) async {
       final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);

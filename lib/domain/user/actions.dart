@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:Tether/domain/rooms/actions.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -85,8 +84,13 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.userStore.user;
-    final Function changeAuthState = (user) {
+    final Function onAuthStateChanged = (user) async {
       if (user != null && user.accessToken != null) {
+        // Run for new authed user without a proper sync
+        if (store.state.roomStore.lastSince == null || true) {
+          await store.dispatch(initialRoomSync());
+        }
+        store.dispatch(fetchUserProfile());
         store.dispatch(startRoomsObserver());
       } else {
         store.dispatch(stopRoomsObserver());
@@ -94,8 +98,8 @@ ThunkAction<AppState> startAuthObserver() {
     };
 
     // init current auth state and set auth state listener
-    changeAuthState(user);
-    store.state.userStore.onAuthStateChanged.listen(changeAuthState);
+    onAuthStateChanged(user);
+    store.state.userStore.onAuthStateChanged.listen(onAuthStateChanged);
   };
 }
 
@@ -113,21 +117,23 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      final username = store.state.userStore.username;
-      final password = store.state.userStore.password;
-      final homeserver = store.state.userStore.homeserver;
       final authObserver = store.state.userStore.authObserver;
 
       final request = buildLoginUserRequest(
         type: "m.login.password",
-        username: username,
-        password: password,
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        username: store.state.userStore.username,
+        password: store.state.userStore.password,
       );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final body = json.encode(request['body']);
+      final response = await http.post(
+        request['url'],
+        body: json.encode(
+          request['body'],
+        ),
+      );
 
-      final response = await http.post(url, body: body);
       final data = json.decode(response.body);
 
       if (data['errcode'] == 'M_FORBIDDEN') {
@@ -143,7 +149,8 @@ ThunkAction<AppState> loginUser() {
         userId: data['user_id'],
         deviceId: data['device_id'],
         accessToken: data['access_token'],
-        homeserver: homeserver, // use homeserver from login call param instead
+        homeserver: store.state.userStore
+            .homeserver, // use homeserver from login call param instead
       )));
 
       authObserver.add(store.state.userStore.user);
@@ -164,15 +171,20 @@ ThunkAction<AppState> fetchUserProfile() {
       store.dispatch(SetLoading(loading: true));
 
       final user = store.state.userStore.user;
-      final homeserver = store.state.userStore.user.homeserver;
 
-      final request = buildUserProfileRequest(userId: user.userId);
+      final request = buildUserProfileRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        userId: user.userId,
+      );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.post(url);
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
       final data = json.decode(response.body);
-
-      print("Fetch User Profile ${data}");
 
       store.dispatch(SetUser(
         user: user.copyWith(
@@ -193,14 +205,19 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final accessToken = store.state.userStore.user.accessToken;
-      final homeserver = store.state.userStore.user.homeserver;
       final authObserver = store.state.userStore.authObserver;
 
-      final request = buildLogoutUserRequest(accessToken: accessToken);
+      final request = buildLogoutUserRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.user.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+      );
 
-      final url = "$protocol$homeserver/${request['url']}";
-      final response = await http.post(url);
+      final response = await http.post(
+        request['url'],
+        headers: request['headers'],
+      );
+
       json.decode(response.body);
 
       authObserver.add(null);
@@ -217,21 +234,21 @@ ThunkAction<AppState> createUser() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     store.dispatch(SetCreating(creating: true));
-    final username = store.state.userStore.username;
-    final password = store.state.userStore.password;
-    final loginType = store.state.userStore.loginType;
-    final homeserver = store.state.userStore.homeserver;
 
-    final registerUserRequest = buildRegisterUserRequest(
-      username: username,
-      password: password,
+    final loginType = store.state.userStore.loginType;
+
+    final request = buildRegisterUserRequest(
+      protocol: protocol,
+      homeserver: store.state.userStore.homeserver,
+      username: store.state.userStore.username,
+      password: store.state.userStore.password,
       type: loginType,
     );
 
-    final url = "$protocol$homeserver:8008/${registerUserRequest['url']}";
-    final body = json.encode(registerUserRequest['body']);
-
-    final response = await http.post(url, body: body);
+    final response = await http.post(
+      request['url'],
+      body: request['body'],
+    );
 
     final data = json.decode(response.body);
 
@@ -241,7 +258,7 @@ ThunkAction<AppState> createUser() {
       userId: data['user_id'],
       deviceId: data['device_id'],
       accessToken: data['access_token'],
-      homeserver: homeserver,
+      homeserver: store.state.userStore.homeserver,
     )));
 
     store.dispatch(SetCreating(creating: false));

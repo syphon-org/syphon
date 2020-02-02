@@ -1,3 +1,5 @@
+import 'package:dart_json_mapper/dart_json_mapper.dart';
+
 enum EventType {
   // Actual Messages
   MESSAGE, // m.room.message
@@ -15,16 +17,27 @@ enum EventType {
   POWER_LEVELS, // m.room.power_levels
 }
 
+@jsonSerializable
 class Event {
-  final String id;
+  final String id; // event_id
+  final String userId;
+  final String roomId;
   final String type;
   final String sender;
   final String stateKey;
   final int timestamp;
+
+  @JsonProperty(ignore: true)
   final dynamic content;
+
+  // For m.room.message only
+  String get body => content != null ? content['body'] : '';
+  String get contentType => content != null ? content['msgtype'] : null;
 
   const Event({
     this.id,
+    this.userId,
+    this.roomId,
     this.type,
     this.sender,
     this.stateKey,
@@ -36,6 +49,7 @@ class Event {
     id,
     type,
     sender,
+    roomId,
     stateKey,
     content,
     timestamp,
@@ -44,15 +58,18 @@ class Event {
       id: id ?? this.id,
       type: type ?? this.type,
       sender: sender ?? this.sender,
+      roomId: roomId ?? this.roomId,
       stateKey: stateKey ?? this.stateKey,
-      content: content ?? this.content,
       timestamp: timestamp ?? this.timestamp,
+      content: content ?? this.content,
     );
   }
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['event_id'] as String,
+      userId: json['user_id'] as String,
+      roomId: json['room_id'] as String,
       type: json['type'] as String,
       sender: json['sender'] as String,
       stateKey: json['state_key'] as String,
