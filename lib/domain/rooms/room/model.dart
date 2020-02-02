@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:flutter/material.dart';
 
 @jsonSerializable
 class Avatar {
@@ -55,7 +56,7 @@ class Room {
 
   // Event lists
   final List<Event> state;
-  final List<Event> events;
+  final List<Event> events; // DEPRECATE - every event should never be in store
   final List<Event> messages;
 
   const Room({
@@ -128,93 +129,101 @@ class Room {
 
   // Find details of room based on state events
   // follows spec naming priority and thumbnail downloading
-  Room fromStateEvents(List<Event> stateEvents, {String currentUsername}) {
+  Room fromStateEvents(
+    List<Event> stateEvents, {
+    String currentUsername,
+    int limit,
+  }) {
     String name;
     Avatar avatar;
     String topic;
-    int lastUpdate = 0;
+    int lastUpdate = this.lastUpdate;
     int namePriority = 4;
+    List<Event> cachedStateEvents = List<Event>();
 
-    stateEvents.forEach((event) {
-      lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+    Error wizards;
+    try {
+      stateEvents.forEach((event) {
+        lastUpdate =
+            event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
-      switch (event.type) {
-        case 'm.room.name':
-          namePriority = 1;
-          name = event.content['name'];
-          break;
-        case 'm.room.topic':
-          topic = event.content['topic'];
-          break;
-        case 'm.room.canonical_alias':
-          if (namePriority > 2) {
-            namePriority = 2;
-            name = event.content['alias'];
-          }
-          break;
-        case 'm.room.aliases':
-          if (namePriority > 3) {
-            namePriority = 3;
-            name = event.content['aliases'][0];
-          }
-          break;
-        case 'm.room.avatar':
-          final avatarFile = event.content['thumbnail_file'];
-          if (avatarFile == null) {
-            avatar = Avatar(uri: event.content['url']);
-          }
-          break;
-        case 'm.room.member':
-          if (this.direct && event.content['displayname'] != currentUsername) {
-            name = event.content['displayname'];
-          }
-          break;
-        default:
-          break;
-      }
-    });
+        switch (event.type) {
+          case 'm.room.message':
+            break;
+          case 'm.room.name':
+            namePriority = 1;
+            name = event.content['name'];
+            break;
+          case 'm.room.topic':
+            topic = event.content['topic'];
+            break;
+          case 'm.room.canonical_alias':
+            if (namePriority > 2) {
+              namePriority = 2;
+              name = event.content['alias'];
+            }
+            break;
+          case 'm.room.aliases':
+            if (namePriority > 3) {
+              namePriority = 3;
+              name = event.content['aliases'][0];
+            }
+            break;
+          case 'm.room.avatar':
+            final avatarFile = event.content['thumbnail_file'];
+            if (avatarFile == null) {
+              avatar = Avatar(uri: event.content['url']);
+            }
+            break;
+          case 'm.room.member':
+            if (this.direct &&
+                event.content['displayname'] != currentUsername) {
+              name = event.content['displayname'];
+            }
+            break;
+          default:
+            break;
+        }
+      });
+    } catch (error) {
+      wizards = error;
+      print(error);
+    } finally {
+      print('[From State Events] ${this.id} ${stateEvents.length} ${wizards}');
+    }
 
-    print('from state event ${this.id} ${stateEvents.length}');
     return this.copyWith(
-      name: name ?? 'New Room',
-      avatar: avatar,
-      topic: topic,
-      // only save the last 50 events to prevent massive caches
-      // TODO: make this not an issue
-      state: stateEvents.sublist(
-        0,
-        stateEvents.length > 50 ? 50 : stateEvents.length,
-      ),
-      lastUpdate: lastUpdate,
+      name: name ?? this.name ?? 'New Room',
+      avatar: avatar ?? this.avatar,
+      topic: topic ?? this.topic,
+      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      state: cachedStateEvents,
     );
   }
 
-  factory Room.fromSync({
+  Room fromSync({
     String id,
     String startTime,
     Map<String, dynamic> json,
   }) {
+    // contains message events
     final List<dynamic> rawEvents = json['timeline']['events'];
     final List<dynamic> rawStateEvents = json['state']['events'];
-    final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
-    final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
 
-    final List<Event> events =
-        rawEvents.map((event) => Event.fromJson(event)).toList();
+    print(json['summary']);
+    print(json['ephemeral']);
+    // Check for message events
+    print('TIMELINE OUTPUT ${json['timeline']}');
+    // TODO: final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
+    // TODO: final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
 
-    final List<Event> stateEvents =
-        rawStateEvents.map((event) => Event.fromJson(event)).toList();
+    final List<Event> stateEvents = rawStateEvents
+        .map((event) => Event.fromJson(event))
+        .toList(growable: false);
 
-    // Convert basic room features
-    var newRoom = Room(
-      id: id,
-      events: events,
-      startTime: startTime,
+    return this.fromStateEvents(
+      stateEvents,
     );
-
-    newRoom = newRoom.fromStateEvents(stateEvents);
-
-    return newRoom;
   }
 
   @override

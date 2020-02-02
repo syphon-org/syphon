@@ -2,6 +2,7 @@ name: Tether
 description: Privacy centric matrix client for everyone
 
 # commands:
+# - flutter run --no-fast-start #
 # - flutter pub global run devtools 
 # - emulator -list-avds
 # - emulator -avd Pixel_3a_API_29

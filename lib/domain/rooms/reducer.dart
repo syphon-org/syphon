@@ -8,8 +8,13 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(loading: action.loading);
     case SetSyncing:
       return state.copyWith(syncing: action.syncing);
+    case SetSynced:
+      return state.copyWith(
+        synced: action.synced,
+        lastSince: action.lastSince,
+      );
     case SetRoomObserver:
-      return state.copyWith(roomObserver: action.chatObserver);
+      return state.copyWith(roomObserver: action.roomObserver);
 
     case SetRoom:
       final rooms = Map<String, Room>.from(state.rooms);

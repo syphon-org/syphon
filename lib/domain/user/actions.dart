@@ -84,8 +84,12 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.userStore.user;
-    final Function onAuthStateChanged = (user) {
+    final Function onAuthStateChanged = (user) async {
       if (user != null && user.accessToken != null) {
+        // Run for new authed user without a proper sync
+        if (store.state.roomStore.lastSince == null || true) {
+          await store.dispatch(initialRoomSync());
+        }
         store.dispatch(fetchUserProfile());
         store.dispatch(startRoomsObserver());
       } else {

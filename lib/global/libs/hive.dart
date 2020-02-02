@@ -12,14 +12,19 @@ const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
 const HIVE_BOX_NAME = 'tether';
 const APPSTATE_HIVE_KEY = 'app_state';
 
+// Global cache
+class Cache {
+  static Box hive;
+}
+
 /**
- * Initializes encrypted storage that caches redux store 
+ * Initializes encrypted storage for caching 
  * Testing:
     print(box);
     print(box.keys);
     print(box.get('someone')); 
  */
-Future<void> initHiveStorage() async {
+Future<dynamic> initHiveStorage() async {
   var appStorageLocation = await getApplicationDocumentsDirectory();
   Hive.init(appStorageLocation.path);
 
@@ -39,47 +44,28 @@ Future<void> initHiveStorage() async {
 
   encryptionKey = jsonDecode(encryptionKeySerialized).cast<int>();
 
-  await Hive.openBox(HIVE_BOX_NAME, encryptionKey: encryptionKey);
+  return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: encryptionKey);
 }
 
-AppState rehydateStore() {
-  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-  AppState state = box.get(APPSTATE_HIVE_KEY);
-  return state;
-}
+// AppState rehydateStore() {
+//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+//   AppState state = box.get(APPSTATE_HIVE_KEY);
+//   return state;
+// }
 
-void cacheStore(AppState state) async {
-  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-  box.put(APPSTATE_HIVE_KEY, state);
-}
+// void cacheStore(AppState state) async {
+//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+//   box.put(APPSTATE_HIVE_KEY, state);
+// }
 
-void clearStorage() {
-  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-  box.put(APPSTATE_HIVE_KEY, null);
-}
+// void clearStorage() {
+//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+//   box.put(APPSTATE_HIVE_KEY, null);
+// }
 
-// Closes and saves storage
+// // Closes and saves storage
 void closeStorage() async {
   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
   box.close();
   // print();
 }
-
-// TODO - finish this
-// class SecureHiveStorage extends StorageEngine {
-//   Box<dynamic> box;
-
-//   @override
-//   Future<Uint8List> load() async {
-//     if (await file.exists()) {
-//       return Uint8List.fromList(await file.readAsBytes());
-//     }
-
-//     return null;
-//   }
-
-//   @override
-//   Future<void> save(Uint8List data) async {
-//     await box.put(APPSTATE_HIVE_KEY, data);
-//   }
-// }

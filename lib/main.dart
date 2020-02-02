@@ -48,7 +48,12 @@ void main() async {
   initializeReflectable();
   await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
   _enablePlatformOverrideForDesktop();
+
+  // Init caching and state store
+  Cache.hive = await initHiveStorage();
   final store = await initStore();
+
+  // Run the app
   runApp(Tether(store: store));
 }
 

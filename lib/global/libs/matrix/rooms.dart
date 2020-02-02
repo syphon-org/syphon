@@ -5,12 +5,14 @@ dynamic buildSyncRequest({
   String protocol = 'https://', // http or https ( or libp2p :D )
   String homeserver = 'matrix.org',
   String accessToken,
+  String since,
   bool fullState = false,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
   // Params
-  url += '&full_state=${fullState}';
+  url += '?full_state=${fullState}';
+  url += since != null ? '&since=$since' : '';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

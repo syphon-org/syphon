@@ -35,17 +35,21 @@ AppState appReducer(AppState state, action) {
   );
 }
 
-Future<Store> initStore() async {
 // Create and Export Store
-  await initHiveStorage();
+Future<Store> initStore() async {
+  // TODO: add hive back here if you'd like to use it as a storage engine
+  // for redux persist
 
+  // Hot redux state cache for top level data
+  // Consider still using hive here
   final persistor = Persistor<AppState>(
-    storage: FlutterStorage(), // Or use other engines
-    serializer:
-        JsonSerializer<AppState>(AppState.fromJson), // Or use other serializers
+    storage: FlutterStorage(),
+    serializer: JsonSerializer<AppState>(
+      AppState.fromJson,
+    ),
   );
 
-  // All available json list decorators
+  // Load available json list decorators
   final iterableEventDecorator = (value) => value.cast<Event>();
   JsonMapper.registerValueDecorator<List<Event>>(iterableEventDecorator);
   final iterableDecorator = (value) => value.cast<Room>();
@@ -53,8 +57,7 @@ Future<Store> initStore() async {
 
   // Finally load persisted store
   final initialState = await persistor.load();
-
-  // print('[initStore] $initialState');
+  print('[initStore] $initialState');
 
   final Store<AppState> store = new Store<AppState>(
     appReducer,

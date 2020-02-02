@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
  * https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter
  * https://stackoverflow.com/questions/50400529/how-to-update-flutter-textfields-height-and-width
  * https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter
+ * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
  * 
  */
 enum Overflow {
@@ -220,9 +221,14 @@ class MessagesState extends State<Messages> {
                         ),
                       )),
                   Expanded(
-                    child: buildMessageList(
-                      arguments.roomId,
-                      context,
+                    child: RefreshIndicator(
+                      onRefresh: () {
+                        print('STUB REFRESH');
+                      },
+                      child: buildMessageList(
+                        arguments.roomId,
+                        context,
+                      ),
                     ),
                   ),
                   Container(

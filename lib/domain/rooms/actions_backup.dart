@@ -57,8 +57,10 @@ class SetRoomState {
 
 class SetRoomMessages {
   final String id; // room id
-  final Map<String, dynamic> messagesJson;
-  SetRoomMessages({this.id, this.messagesJson});
+  final String endTime;
+  final String startTime;
+  final List<Event> messageEvents;
+  SetRoomMessages({this.id, this.startTime, this.endTime, this.messageEvents});
 }
 
 // Atomically Update specific room attributes
@@ -128,7 +130,7 @@ ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Dispatch Background Sync
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
-      // debugPrint('${timer.tick}');
+      // print('${timer.tick}');
 
       if (store.state.roomStore.lastSince != null) {
         store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
@@ -194,7 +196,7 @@ ThunkAction<AppState> fetchSync({String since}) {
     } catch (error) {
       print('[fetchSync] error $error');
     } finally {
-      print('[fetchSync] completed successfully');
+      print('[fetchSync] completed');
       store.dispatch(SetSyncing(syncing: false));
     }
   };
@@ -267,6 +269,45 @@ ThunkAction<AppState> fetchDirectRooms() {
   };
 }
 
+ThunkAction<AppState> fetchMessageEvents({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
+      final request = buildRoomMessagesRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final Map<String, dynamic> messagesJson = json.decode(response.body);
+      final String startTime = messagesJson['start'];
+      final String endTime = messagesJson['end'];
+      final List<dynamic> messagesChunk = messagesJson['chunk'];
+
+      final List<Event> messageEvents =
+          messagesChunk.map((event) => Event.fromJson(event)).toList();
+
+      store.dispatch(SetRoomMessages(
+        id: room.id,
+        endTime: endTime,
+        startTime: startTime,
+        messageEvents: messageEvents,
+      ));
+    } catch (error) {
+      print(error);
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
 ThunkAction<AppState> fetchStateEvents({Room room}) {
   return (Store<AppState> store) async {
     try {
@@ -305,34 +346,6 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
       }
     } catch (error) {
       print('[fetchRoomState] error: ${room.id} $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchMessageEvents({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
-
-      final request = buildRoomMessagesRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final Map<String, dynamic> messagesJson = json.decode(response.body);
-
-      store.dispatch(SetRoomMessages(id: room.id, messagesJson: messagesJson));
-    } catch (error) {
-      print(error);
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -419,7 +432,7 @@ ThunkAction<AppState> loadSync() {
       store.dispatch(SetRooms(rooms: rooms));
       return true;
     } catch (error) {
-      debugPrint(error);
+      print(error);
     }
   };
 }
