@@ -125,36 +125,37 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
-        store: store,
-        child: StoreConnector<AppState, dynamic>(
-            converter: (store) => store.state.settingsStore.theme,
-            builder: (context, theme) {
-              return MaterialApp(
-                title: 'Tether',
-                theme: Themes.getThemeFromKey(theme),
-                navigatorKey: NavigationService.navigatorKey,
-                home: defaultHome,
-                routes: <String, WidgetBuilder>{
-                  '/intro': (BuildContext context) => Intro(),
-                  '/login': (BuildContext context) => Login(store: store),
-                  '/search_home': (BuildContext context) =>
-                      HomeSearch(title: 'Find Your Homeserver', store: store),
-                  '/signup': (BuildContext context) =>
-                      Signup(title: 'Signup', store: store),
-                  '/home': (BuildContext context) => Home(
-                        title: 'Tether',
-                      ),
-                  '/home/messages': (BuildContext context) => Messages(),
-                  '/draft': (BuildContext context) => Draft(),
-                  '/profile': (BuildContext context) => Profile(),
-                  '/appearance': (BuildContext context) =>
-                      ApperanceScreen(title: 'Appearance'),
-                  '/settings': (BuildContext context) =>
-                      SettingsScreen(title: 'Settings'),
-                  '/loading': (BuildContext context) =>
-                      Loading(title: 'Loading'),
-                },
-              );
-            }));
+      store: store,
+      child: StoreConnector<AppState, dynamic>(
+        converter: (store) => store.state.settingsStore.theme,
+        builder: (context, theme) {
+          return MaterialApp(
+            title: 'Tether',
+            theme: Themes.getThemeFromKey(theme),
+            navigatorKey: NavigationService.navigatorKey,
+            home: defaultHome,
+            routes: <String, WidgetBuilder>{
+              '/intro': (BuildContext context) => Intro(),
+              '/login': (BuildContext context) => Login(store: store),
+              '/search_home': (BuildContext context) =>
+                  HomeSearch(title: 'Find Your Homeserver', store: store),
+              '/signup': (BuildContext context) =>
+                  Signup(title: 'Signup', store: store),
+              '/home': (BuildContext context) => Home(
+                    title: 'Tether',
+                  ),
+              '/home/messages': (BuildContext context) => Messages(),
+              '/draft': (BuildContext context) => Draft(),
+              '/profile': (BuildContext context) => Profile(),
+              '/appearance': (BuildContext context) =>
+                  ApperanceScreen(title: 'Appearance'),
+              '/settings': (BuildContext context) =>
+                  SettingsScreen(title: 'Settings'),
+              '/loading': (BuildContext context) => Loading(title: 'Loading'),
+            },
+          );
+        },
+      ),
+    );
   }
 }

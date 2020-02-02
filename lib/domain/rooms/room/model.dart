@@ -105,25 +105,32 @@ class Room {
   }
 
   Room fromMessageEvents(
-    Map<String, dynamic> messagesJson,
-  ) {
-    final String startTime = messagesJson['start'];
-    final String endTime = messagesJson['end'];
-    final List<dynamic> messagesChunk = messagesJson['chunk'];
-
-    // Retain where mutates
-    messagesChunk
-        .retainWhere((eventJson) => eventJson['type'] == 'm.room.message');
+    List<Event> messageEvents, {
+    String startTime,
+    String endTime,
+  }) {
+    int lastUpdate = this.lastUpdate;
 
     // Converting only message events
-    final List<Event> messageEvents = messagesChunk.map((eventJson) {
-      return Event.fromJson(eventJson);
-    }).toList();
+    messageEvents.retainWhere((event) => event.type == 'm.room.message');
+    var updatedMessages = messageEvents;
 
+    updatedMessages.forEach((event) {
+      lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+    });
+
+    // Combine current and new
+    if (this.messages.length > 0) {
+      updatedMessages =
+          [messageEvents, this.messages].expand((x) => x).toList();
+    }
+
+    // Add to room
     return this.copyWith(
-      messages: messageEvents,
-      startTime: startTime,
-      endTime: endTime,
+      messages: updatedMessages,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
     );
   }
 
@@ -207,7 +214,7 @@ class Room {
     Map<String, dynamic> json,
   }) {
     // contains message events
-    final List<dynamic> rawEvents = json['timeline']['events'];
+    final List<dynamic> rawTimelineEvents = json['timeline']['events'];
     final List<dynamic> rawStateEvents = json['state']['events'];
 
     print(json['summary']);
@@ -217,13 +224,19 @@ class Room {
     // TODO: final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
     // TODO: final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
 
-    final List<Event> stateEvents = rawStateEvents
-        .map((event) => Event.fromJson(event))
-        .toList(growable: false);
+    final List<Event> stateEvents =
+        rawStateEvents.map((event) => Event.fromJson(event)).toList();
 
-    return this.fromStateEvents(
-      stateEvents,
-    );
+    final List<Event> messageEvents =
+        rawTimelineEvents.map((event) => Event.fromJson(event)).toList();
+
+    return this
+        .fromStateEvents(
+          stateEvents,
+        )
+        .fromMessageEvents(
+          messageEvents,
+        );
   }
 
   @override

@@ -40,7 +40,9 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
     case SetRoomMessages:
       final rooms = Map<String, Room>.from(state.rooms);
       rooms[action.id] = rooms[action.id].fromMessageEvents(
-        action.messagesJson,
+        action.messageEvents,
+        startTime: action.startTime,
+        endTime: action.endTime,
       );
       return state.copyWith(rooms: rooms);
 
