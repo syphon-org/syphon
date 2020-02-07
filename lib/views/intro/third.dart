@@ -19,7 +19,6 @@ class ThirdSection extends StatelessWidget {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        SizedBox(height: height * 0.05),
         Container(
           width: width * 0.7,
           height: DEFAULT_INPUT_HEIGHT,
@@ -34,7 +33,6 @@ class ThirdSection extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.015),
       ],
     ));
   }

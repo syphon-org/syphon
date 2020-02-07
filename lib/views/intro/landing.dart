@@ -36,7 +36,7 @@ class LandingSection extends StatelessWidget {
         ),
         SizedBox(height: height * 0.025),
         Text(
-          'Take back your privacy and freedom \nwithout the hassle.',
+          'Take back your privacy and freedom \nwithout the hassle',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),

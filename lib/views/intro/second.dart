@@ -35,7 +35,6 @@ class SecondSection extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.subtitle,
         ),
-        SizedBox(height: height * 0.025),
       ],
     ));
   }
