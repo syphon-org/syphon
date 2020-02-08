@@ -26,7 +26,7 @@ class HomeserverStep extends StatelessWidget {
             direction: Axis.vertical,
             children: <Widget>[
               Flexible(
-                flex: 2,
+                flex: 3,
                 child: Container(
                   constraints: BoxConstraints(
                     minHeight: 220,
@@ -54,7 +54,7 @@ class HomeserverStep extends StatelessWidget {
               Container(
                 height: DEFAULT_INPUT_HEIGHT,
                 margin: EdgeInsets.only(
-                  top: 24,
+                  top: 58,
                 ),
                 constraints: BoxConstraints(
                   minWidth: 200,
@@ -65,9 +65,9 @@ class HomeserverStep extends StatelessWidget {
                     TextEditingValue(
                       text: homeserver(store.state),
                       selection: TextSelection(
-                          baseOffset: store.state.userStore.homeserver.length,
-                          extentOffset:
-                              store.state.userStore.homeserver.length),
+                        baseOffset: store.state.userStore.homeserver.length,
+                        extentOffset: store.state.userStore.homeserver.length,
+                      ),
                     ),
                   ),
                   onChanged: (text) {

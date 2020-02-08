@@ -280,8 +280,27 @@ class LoginState extends State<Login> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28.0),
                       ),
-                      child: const Text('Login',
-                          style: TextStyle(fontSize: 20, color: Colors.white)),
+                      child: isAuthLoading(store.state)
+                          ? Container(
+                              constraints: BoxConstraints(
+                                maxHeight: 28,
+                                maxWidth: 28,
+                              ),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                backgroundColor: Colors.white,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.grey,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
                   Container(

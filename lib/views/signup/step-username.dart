@@ -8,7 +8,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -49,7 +48,7 @@ class UsernameStepState extends State<UsernameStep> {
             direction: Axis.vertical,
             children: <Widget>[
               Flexible(
-                flex: 2,
+                flex: 3,
                 child: Container(
                   constraints: BoxConstraints(
                     minHeight: 220,
@@ -77,7 +76,7 @@ class UsernameStepState extends State<UsernameStep> {
               Container(
                 height: DEFAULT_INPUT_HEIGHT,
                 margin: EdgeInsets.only(
-                  top: 24,
+                  top: 58,
                 ),
                 constraints: BoxConstraints(
                   minWidth: 200,
@@ -90,7 +89,9 @@ class UsernameStepState extends State<UsernameStep> {
                     usernameController.value = TextEditingValue(
                       text: username.trim(),
                       selection: TextSelection.fromPosition(
-                        TextPosition(offset: username.trim().length),
+                        TextPosition(
+                          offset: username.trim().length,
+                        ),
                       ),
                     );
 
@@ -99,7 +100,8 @@ class UsernameStepState extends State<UsernameStep> {
                   },
                   onEditingComplete: () {
                     store.dispatch(
-                        setUsername(username: store.state.userStore.username));
+                      setUsername(username: store.state.userStore.username),
+                    );
                     FocusScope.of(context).unfocus();
                   },
                   decoration: InputDecoration(

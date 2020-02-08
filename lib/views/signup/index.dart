@@ -144,11 +144,13 @@ class SignupState extends State<Signup> {
 
     // TODO: document
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height -
-        MediaQuery.of(context).viewPadding.top -
-        appBar.preferredSize.height;
+    double height = MediaQuery.of(context).size.height;
+    // -
+    //     MediaQuery.of(context).viewPadding.top -
+    //     appBar.preferredSize.height;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: appBar,
       body: ScrollConfiguration(
           behavior: DefaultScrollBehavior(),
@@ -161,19 +163,22 @@ class SignupState extends State<Signup> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Flexible(
-                        flex: 8,
+                        flex: 12,
+                        fit: FlexFit.tight,
                         child: Flex(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
                               width: width,
+                              margin: EdgeInsets.only(top: 64, bottom: 32),
                               constraints: BoxConstraints(
-                                minWidth: 125,
-                                minHeight: 345,
+                                minHeight: 326,
                                 maxHeight: 400,
+                                minWidth: 200,
                               ),
                               child: PageView(
+                                physics: ScrollPhysics(),
                                 pageSnapping: true,
                                 allowImplicitScrolling: false,
                                 controller: pageController,
@@ -200,10 +205,10 @@ class SignupState extends State<Signup> {
                               converter: (Store<AppState> store) =>
                                   store.state.userStore,
                               builder: (context, userStore) => Container(
-                                width: width * 0.7,
+                                width: width * 0.725,
                                 height: DEFAULT_BUTTON_HEIGHT,
                                 constraints: BoxConstraints(
-                                  minWidth: 200,
+                                  minWidth: 256,
                                   maxWidth: 400,
                                   minHeight: 45,
                                   maxHeight: 65,
@@ -238,7 +243,7 @@ class SignupState extends State<Signup> {
                           vertical: 16,
                         ),
                         constraints: BoxConstraints(
-                          minWidth: 200,
+                          minWidth: 256,
                           minHeight: 45,
                         ),
                         child: Flex(

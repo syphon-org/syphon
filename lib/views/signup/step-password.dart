@@ -40,7 +40,7 @@ class PasswordStepState extends State<PasswordStep> {
             direction: Axis.vertical,
             children: <Widget>[
               Flexible(
-                flex: 2,
+                flex: 3,
                 child: Container(
                   constraints: BoxConstraints(
                     minHeight: 220,
@@ -72,43 +72,42 @@ class PasswordStepState extends State<PasswordStep> {
                   ],
                 ),
               ),
-              StoreConnector<AppState, Store<AppState>>(
-                converter: (Store<AppState> store) => store,
-                builder: (context, store) => Container(
-                  height: DEFAULT_INPUT_HEIGHT,
-                  constraints: BoxConstraints(
-                    minWidth: 200,
-                    maxWidth: 320,
-                  ),
-                  child: TextField(
-                    controller: passwordController,
-                    obscureText: !visibility,
-                    onChanged: (text) {
-                      store.dispatch(
-                          setPassword(password: text.replaceAll(' ', '')));
-                    },
-                    onEditingComplete: () {
-                      store.dispatch(setPassword(
-                          password: store.state.userStore.password));
-                      FocusScope.of(context).unfocus();
-                    },
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                          icon: Icon(
-                            visibility
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          tooltip: 'Show password in plaintext',
-                          onPressed: () {
-                            this.setState(() {
-                              visibility = !visibility;
-                            });
-                          }),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(34.0)),
-                      labelText: 'Password',
-                    ),
+              Container(
+                height: DEFAULT_INPUT_HEIGHT,
+                margin: EdgeInsets.only(
+                  top: 58,
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 200,
+                  maxWidth: 320,
+                ),
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: !visibility,
+                  onChanged: (text) {
+                    store.dispatch(
+                        setPassword(password: text.replaceAll(' ', '')));
+                  },
+                  onEditingComplete: () {
+                    store.dispatch(
+                      setPassword(password: store.state.userStore.password),
+                    );
+                    FocusScope.of(context).unfocus();
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        icon: Icon(
+                          visibility ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        tooltip: 'Show password in plaintext',
+                        onPressed: () {
+                          this.setState(() {
+                            visibility = !visibility;
+                          });
+                        }),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(34.0)),
+                    labelText: 'Password',
                   ),
                 ),
               ),
