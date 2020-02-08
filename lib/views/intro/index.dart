@@ -32,7 +32,7 @@ class IntroState extends State<Intro> {
   int currentStep = 0;
   bool onboarding = false;
   String loginText = 'Already have a username?';
-  SwiperController swipeController;
+  // TODO: document SwiperController swipeController; // RIP
   PageController pageController;
 
   final List<Widget> sections = [
@@ -47,7 +47,7 @@ class IntroState extends State<Intro> {
 
   @override
   void initState() {
-    swipeController = SwiperController();
+    // TODO: document swipeController = SwiperController(); RIP
     pageController = PageController(
       initialPage: 0,
       keepPage: false,
@@ -58,13 +58,13 @@ class IntroState extends State<Intro> {
   Widget buildButtonText() {
     switch (currentStep) {
       case 0:
-        return const Text('Let\'s Go',
+        return const Text('let\'s go',
             style: TextStyle(fontSize: 20, color: Colors.white));
       case 4:
-        return const Text('Count Me In',
+        return const Text('count me in',
             style: TextStyle(fontSize: 20, color: Colors.white));
       default:
-        return const Text('Next',
+        return const Text('next',
             style: TextStyle(fontSize: 20, color: Colors.white));
     }
   }
@@ -74,7 +74,7 @@ class IntroState extends State<Intro> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    // Swiper(
+    // TODO: document Swiper(
     //   loop: false,
     //   itemCount: 5,
     //   controller: swipeController,
@@ -88,10 +88,10 @@ class IntroState extends State<Intro> {
     //   },
     // ),
 
-    return StoreConnector<AppState, AppState>(
-      converter: (Store<AppState> store) => store.state,
-      builder: (context, state) => Scaffold(
-        body: Column(
+    return Scaffold(
+      body: StoreConnector<AppState, AppState>(
+        converter: (Store<AppState> store) => store.state,
+        builder: (context, state) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Flexible(
@@ -156,7 +156,7 @@ class IntroState extends State<Intro> {
                               '/signup',
                             );
                           }
-                          // swipeController.next(animation: true);
+                          // TODO: document swipeController.next(animation: true);
                           pageController.nextPage(
                             duration: Duration(milliseconds: 350),
                             curve: Curves.ease,
@@ -176,7 +176,7 @@ class IntroState extends State<Intro> {
               height: DEFAULT_INPUT_HEIGHT,
               margin: const EdgeInsets.symmetric(
                 horizontal: 8,
-                vertical: 24,
+                vertical: 16,
               ),
               constraints: BoxConstraints(
                 minWidth: 200,
@@ -191,6 +191,9 @@ class IntroState extends State<Intro> {
                           controller: pageController, // PageController
                           count: sections.length,
                           effect: WormEffect(
+                            spacing: 16,
+                            dotHeight: 12,
+                            dotWidth: 12,
                             activeDotColor: Color(
                               state.settingsStore.primaryColor,
                             ),

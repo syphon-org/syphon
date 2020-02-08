@@ -32,60 +32,73 @@ class PasswordStepState extends State<PasswordStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        SizedBox(height: height * 0.1),
-        Container(
-          width: width * 0.7,
-          height: DEFAULT_INPUT_HEIGHT,
-          constraints:
-              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 240),
-          child: SvgPicture.asset(SIGNUP_PASSWORD_GRAPHIC,
-              semanticsLabel: 'User hidding behind a message'),
-        ),
-        SizedBox(height: 24),
-        Text(
-          'Create a password',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline,
-        ),
-        SizedBox(height: 24),
-        Text('Try thinking up 4 random words you\'ll\nremember easily',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subhead),
-        SizedBox(height: height * 0.025),
-        StoreConnector<AppState, Store<AppState>>(
-            converter: (Store<AppState> store) => store,
-            builder: (context, store) {
-              return Container(
-                width: width * 0.7,
-                height: DEFAULT_INPUT_HEIGHT,
-                margin: const EdgeInsets.all(10.0),
-                constraints:
-                    BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 45),
-                child: TextField(
-                  controller: passwordController,
-                  obscureText: !visibility,
-                  onChanged: (text) {
-                    store.dispatch(
-                        setPassword(password: text.replaceAll(' ', '')));
-                  },
-                  onEditingComplete: () {
-                    store.dispatch(
-                        setPassword(password: store.state.userStore.password));
-                    FocusScope.of(context).unfocus();
-                  },
-                  decoration: InputDecoration(
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) => Container(
+          child: Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              Flexible(
+                flex: 2,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: 220,
+                    minWidth: 200,
+                    maxWidth: 400,
+                  ),
+                  child: SvgPicture.asset(SIGNUP_PASSWORD_GRAPHIC,
+                      semanticsLabel: 'User holding on to credentials'),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Create a password',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline,
+                      ),
+                    ),
+                    Text(
+                        'Try thinking up 4 random words you\'ll\nremember easily',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.subtitle1),
+                  ],
+                ),
+              ),
+              StoreConnector<AppState, Store<AppState>>(
+                converter: (Store<AppState> store) => store,
+                builder: (context, store) => Container(
+                  height: DEFAULT_INPUT_HEIGHT,
+                  constraints: BoxConstraints(
+                    minWidth: 200,
+                    maxWidth: 320,
+                  ),
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: !visibility,
+                    onChanged: (text) {
+                      store.dispatch(
+                          setPassword(password: text.replaceAll(' ', '')));
+                    },
+                    onEditingComplete: () {
+                      store.dispatch(setPassword(
+                          password: store.state.userStore.password));
+                      FocusScope.of(context).unfocus();
+                    },
+                    decoration: InputDecoration(
                       suffixIcon: IconButton(
-                          icon: Icon(visibility
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            visibility
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                           tooltip: 'Show password in plaintext',
                           onPressed: () {
                             this.setState(() {
@@ -93,12 +106,14 @@ class PasswordStepState extends State<PasswordStep> {
                             });
                           }),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
-                      labelText: 'Password'),
+                          borderRadius: BorderRadius.circular(34.0)),
+                      labelText: 'Password',
+                    ),
+                  ),
                 ),
-              );
-            }),
-      ],
-    ));
-  }
+              ),
+            ],
+          ),
+        ),
+      );
 }

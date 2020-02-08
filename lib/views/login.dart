@@ -122,7 +122,7 @@ class LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Flexible(
-                    flex: 12,
+                    flex: 3,
                     child: Flex(
                       direction: Axis.vertical,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -143,7 +143,7 @@ class LoginState extends State<Login> {
                     ),
                   ),
                   Flexible(
-                    flex: 6,
+                    flex: 2,
                     child: Flex(
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -156,18 +156,22 @@ class LoginState extends State<Login> {
                         ]),
                   ),
                   Flexible(
-                    flex: 4,
+                    flex: 2,
                     fit: FlexFit.loose,
                     child: Flex(
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            width: width * 0.7,
+                            width: width * 0.725,
                             height: DEFAULT_INPUT_HEIGHT,
-                            margin: const EdgeInsets.all(10.0),
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
                             constraints: BoxConstraints(
-                                minWidth: 200, maxWidth: 400, minHeight: 45),
+                              minWidth: 200,
+                              maxWidth: 400,
+                            ),
                             child: TextField(
                               controller: usernameController,
                               onSubmitted: handleSubmitted,
@@ -177,10 +181,10 @@ class LoginState extends State<Login> {
                                   text: username.trim(),
                                   selection: TextSelection.fromPosition(
                                     TextPosition(
-                                        offset: username.trim().length),
+                                      offset: username.trim().length,
+                                    ),
                                   ),
                                 );
-
                                 // If user enters full username, make sure to set homeserver
                                 if (username.contains(':')) {
                                   final alias = username.trim().split(':');
@@ -197,6 +201,10 @@ class LoginState extends State<Login> {
                                 }
                               },
                               decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(
+                                  left: 20,
+                                  top: 32,
+                                ),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.help_outline),
                                   tooltip: 'Select your usernames homeserver',
@@ -208,7 +216,7 @@ class LoginState extends State<Login> {
                                   },
                                 ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderRadius: BorderRadius.circular(28.0),
                                 ),
                                 hintText: store.state.userStore.homeserver
                                             .length !=
@@ -219,36 +227,47 @@ class LoginState extends State<Login> {
                               ),
                             ),
                           ),
+                          Container(
+                            width: width * 0.725,
+                            height: DEFAULT_INPUT_HEIGHT,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 200,
+                              maxWidth: 400,
+                            ),
+                            child: TextField(
+                              focusNode: passwordFocus,
+                              onChanged: (password) {
+                                store.dispatch(setPassword(password: password));
+                              },
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(
+                                  left: 20,
+                                  top: 32,
+                                  bottom: 32,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                                labelText: 'password',
+                              ),
+                            ),
+                          ),
                         ]),
                   ),
                   Container(
-                    width: width * 0.7,
-                    height: DEFAULT_INPUT_HEIGHT,
-                    margin: const EdgeInsets.all(10.0),
+                    width: width * 0.725,
+                    height: DEFAULT_BUTTON_HEIGHT,
+                    margin: const EdgeInsets.only(
+                      top: 24,
+                    ),
                     constraints: BoxConstraints(
                       minWidth: 200,
                       maxWidth: 400,
-                      minHeight: 45,
                     ),
-                    child: TextField(
-                      focusNode: passwordFocus,
-                      onChanged: (password) {
-                        store.dispatch(setPassword(password: password));
-                      },
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0)),
-                        labelText: 'password',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: width * 0.7,
-                    height: DEFAULT_BUTTON_HEIGHT,
-                    margin: const EdgeInsets.all(10.0),
-                    constraints: BoxConstraints(
-                        minWidth: 200, maxWidth: 400, minHeight: 45),
                     child: FlatButton(
                       disabledColor: Colors.grey,
                       disabledTextColor: Colors.grey[300],
@@ -259,7 +278,8 @@ class LoginState extends State<Login> {
                           : null,
                       color: Theme.of(context).primaryColor,
                       shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
+                        borderRadius: BorderRadius.circular(28.0),
+                      ),
                       child: const Text('Login',
                           style: TextStyle(fontSize: 20, color: Colors.white)),
                     ),
@@ -293,14 +313,16 @@ class LoginState extends State<Login> {
                           ),
                           Container(
                             padding: const EdgeInsets.only(left: 4),
-                            child: Text('Create one',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w100,
-                                  color: Theme.of(context).primaryColor,
-                                  decoration: TextDecoration.underline,
-                                )),
+                            child: Text(
+                              'Create one',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w100,
+                                color: Theme.of(context).primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                           ),
                         ],
                       ),
