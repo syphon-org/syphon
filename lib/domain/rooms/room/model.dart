@@ -179,7 +179,9 @@ class Room {
           case 'm.room.avatar':
             final avatarFile = event.content['thumbnail_file'];
             if (avatarFile == null) {
-              avatar = Avatar(uri: event.content['url']);
+              avatar = Avatar(
+                uri: event.content['url'],
+              );
             }
             break;
           case 'm.room.member':
@@ -231,12 +233,13 @@ class Room {
         rawTimelineEvents.map((event) => Event.fromJson(event)).toList();
 
     return this
-        .fromStateEvents(
-          stateEvents,
-        )
+        // TODO: overriding avatar
+        // .fromStateEvents(
+        //   stateEvents,
+        // )
         .fromMessageEvents(
-          messageEvents,
-        );
+      messageEvents,
+    );
   }
 
   @override

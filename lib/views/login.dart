@@ -106,200 +106,211 @@ class LoginState extends State<Login> {
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
-            // Use a container of the same height and width
-            // to flex dynamically but within a single child scroll
-            child: Container(
-                height: height,
-                width: width,
-                child: StoreConnector<AppState, dynamic>(
-                    converter: (store) =>
-                        () => store.dispatch(incrementTheme()),
-                    builder: (context, onIncrementTheme) {
-                      return Flex(
+          // Use a container of the same height and width
+          // to flex dynamically but within a single child scroll
+          child: Container(
+            height: height,
+            width: width,
+            constraints: BoxConstraints(
+              maxHeight: 1024,
+              maxWidth: 512,
+            ),
+            child: StoreConnector<AppState, Store<AppState>>(
+              converter: (store) => store,
+              builder: (context, store) => Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    flex: 12,
+                    child: Flex(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TouchableOpacity(
+                          onTap: () {
+                            store.dispatch(
+                              incrementTheme(),
+                            );
+                          },
+                          child: const Image(
+                            width: 150,
+                            height: 150,
+                            image: AssetImage(TETHER_ICON_PNG),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 6,
+                    child: Flex(
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Spacer(flex: 8),
-                          TouchableOpacity(
-                            onTap: () {
-                              onIncrementTheme();
-                            },
-                            child: const Image(
-                              width: 150,
-                              height: 150,
-                              image: AssetImage(TETHER_ICON_PNG),
-                            ),
-                          ),
-                          Spacer(flex: 4),
+                        children: [
                           Text(
                             'Take back the chat',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.display1,
+                            style: Theme.of(context).textTheme.headline4,
                           ),
-                          Spacer(flex: 4),
-                          StoreConnector<AppState, Store<AppState>>(
-                              converter: (Store<AppState> store) => store,
-                              builder: (context, store) {
-                                return Container(
-                                  width: width * 0.7,
-                                  height: DEFAULT_INPUT_HEIGHT,
-                                  margin: const EdgeInsets.all(10.0),
-                                  constraints: BoxConstraints(
-                                      minWidth: 200,
-                                      maxWidth: 400,
-                                      minHeight: 45),
-                                  child: TextField(
-                                    controller: usernameController,
-                                    onSubmitted: handleSubmitted,
-                                    onChanged: (username) {
-                                      // Trim value for UI
-                                      usernameController.value =
-                                          TextEditingValue(
-                                        text: username.trim(),
-                                        selection: TextSelection.fromPosition(
-                                          TextPosition(
-                                              offset: username.trim().length),
-                                        ),
-                                      );
-
-                                      // If user enters full username, make sure to set homeserver
-                                      if (username.contains(':')) {
-                                        final alias =
-                                            username.trim().split(':');
-                                        store.dispatch(
-                                            setUsername(username: alias[0]));
-                                        store.dispatch(setHomeserver(
-                                            homeserver: alias[1]));
-                                      } else {
-                                        store.dispatch(setUsername(
-                                            username: username.trim()));
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                        suffixIcon: IconButton(
-                                            icon: Icon(Icons.help_outline),
-                                            tooltip:
-                                                'Select your usernames homeserver',
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                context,
-                                                '/search_home',
-                                              );
-                                            }),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30.0)),
-                                        hintText: store.state.userStore
-                                                    .homeserver.length !=
-                                                0
-                                            ? 'username:${store.state.userStore.homeserver}'
-                                            : 'username:tether.org',
-                                        labelText: 'username'),
-                                  ),
-                                );
-                              }),
-                          StoreConnector<AppState, Store<AppState>>(
-                              converter: (Store<AppState> store) => store,
-                              builder: (context, store) {
-                                return Container(
-                                  width: width * 0.7,
-                                  height: DEFAULT_INPUT_HEIGHT,
-                                  margin: const EdgeInsets.all(10.0),
-                                  constraints: BoxConstraints(
-                                      minWidth: 200,
-                                      maxWidth: 400,
-                                      minHeight: 45),
-                                  child: TextField(
-                                    focusNode: passwordFocus,
-                                    onChanged: (password) {
-                                      store.dispatch(
-                                          setPassword(password: password));
-                                    },
-                                    obscureText: true,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0)),
-                                      labelText: 'password',
-                                    ),
-                                  ),
-                                );
-                              }),
-                          Spacer(flex: 1),
-                          StoreConnector<AppState, Store<AppState>>(
-                            converter: (Store<AppState> store) => store,
-                            builder: (context, store) {
-                              Function onPressLogin;
-                              if (isLoginAttemptable(store.state)) {
-                                onPressLogin = () {
-                                  store.dispatch(loginUser());
-                                };
-                              }
-                              return Container(
-                                width: width * 0.7,
-                                height: DEFAULT_BUTTON_HEIGHT,
-                                margin: const EdgeInsets.all(10.0),
-                                constraints: BoxConstraints(
-                                    minWidth: 200,
-                                    maxWidth: 400,
-                                    minHeight: 45),
-                                child: FlatButton(
-                                  disabledColor: Colors.grey,
-                                  disabledTextColor: Colors.grey[300],
-                                  onPressed: onPressLogin,
-                                  color: Theme.of(context).primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(30.0)),
-                                  child: const Text('Login',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.white)),
-                                ),
-                              );
-                            },
-                          ),
-                          Spacer(flex: 1),
+                        ]),
+                  ),
+                  Flexible(
+                    flex: 4,
+                    fit: FlexFit.loose,
+                    child: Flex(
+                        direction: Axis.vertical,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                           Container(
-                              height: DEFAULT_INPUT_HEIGHT,
-                              margin: const EdgeInsets.all(10.0),
-                              constraints:
-                                  BoxConstraints(minWidth: 200, minHeight: 45),
-                              child: TouchableOpacity(
-                                  activeOpacity: 0.4,
-                                  onTap: () => Navigator.pushNamed(
-                                        context,
-                                        '/signup',
-                                      ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        'Don\'t have an username?',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w100,
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.only(left: 4),
-                                        child: Text('Create one',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w100,
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                            )),
-                                      ),
-                                    ],
-                                  ))),
-                          Spacer(flex: 1),
+                            width: width * 0.7,
+                            height: DEFAULT_INPUT_HEIGHT,
+                            margin: const EdgeInsets.all(10.0),
+                            constraints: BoxConstraints(
+                                minWidth: 200, maxWidth: 400, minHeight: 45),
+                            child: TextField(
+                              controller: usernameController,
+                              onSubmitted: handleSubmitted,
+                              onChanged: (username) {
+                                // Trim value for UI
+                                usernameController.value = TextEditingValue(
+                                  text: username.trim(),
+                                  selection: TextSelection.fromPosition(
+                                    TextPosition(
+                                        offset: username.trim().length),
+                                  ),
+                                );
+
+                                // If user enters full username, make sure to set homeserver
+                                if (username.contains(':')) {
+                                  final alias = username.trim().split(':');
+                                  store.dispatch(setUsername(
+                                    username: alias[0],
+                                  ));
+                                  store.dispatch(setHomeserver(
+                                    homeserver: alias[1],
+                                  ));
+                                } else {
+                                  store.dispatch(setUsername(
+                                    username: username.trim(),
+                                  ));
+                                }
+                              },
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.help_outline),
+                                  tooltip: 'Select your usernames homeserver',
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/search_home',
+                                    );
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                                hintText: store.state.userStore.homeserver
+                                            .length !=
+                                        0
+                                    ? 'username:${store.state.userStore.homeserver}'
+                                    : 'username:tether.org',
+                                labelText: 'username',
+                              ),
+                            ),
+                          ),
+                        ]),
+                  ),
+                  Container(
+                    width: width * 0.7,
+                    height: DEFAULT_INPUT_HEIGHT,
+                    margin: const EdgeInsets.all(10.0),
+                    constraints: BoxConstraints(
+                      minWidth: 200,
+                      maxWidth: 400,
+                      minHeight: 45,
+                    ),
+                    child: TextField(
+                      focusNode: passwordFocus,
+                      onChanged: (password) {
+                        store.dispatch(setPassword(password: password));
+                      },
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0)),
+                        labelText: 'password',
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: width * 0.7,
+                    height: DEFAULT_BUTTON_HEIGHT,
+                    margin: const EdgeInsets.all(10.0),
+                    constraints: BoxConstraints(
+                        minWidth: 200, maxWidth: 400, minHeight: 45),
+                    child: FlatButton(
+                      disabledColor: Colors.grey,
+                      disabledTextColor: Colors.grey[300],
+                      onPressed: isLoginAttemptable(store.state)
+                          ? () {
+                              store.dispatch(loginUser());
+                            }
+                          : null,
+                      color: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      child: const Text('Login',
+                          style: TextStyle(fontSize: 20, color: Colors.white)),
+                    ),
+                  ),
+                  Container(
+                    height: DEFAULT_INPUT_HEIGHT,
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 24,
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 200,
+                      minHeight: 45,
+                    ),
+                    child: TouchableOpacity(
+                      activeOpacity: 0.4,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/signup',
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Don\'t have an username?',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w100,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Text('Create one',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w100,
+                                  color: Theme.of(context).primaryColor,
+                                  decoration: TextDecoration.underline,
+                                )),
+                          ),
                         ],
-                      );
-                    }))),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -75,6 +75,9 @@ class IntroState extends State<Intro> {
     double height = MediaQuery.of(context).size.height;
 
     // Swiper(
+    //   loop: false,
+    //   itemCount: 5,
+    //   controller: swipeController,
     //   itemBuilder: (BuildContext context, int index) {
     //     return sections[index];
     //   },
@@ -83,9 +86,6 @@ class IntroState extends State<Intro> {
     //       currentStep = index;
     //     });
     //   },
-    //   loop: false,
-    //   itemCount: 5,
-    //   controller: swipeController,
     // ),
 
     return StoreConnector<AppState, AppState>(
@@ -112,22 +112,10 @@ class IntroState extends State<Intro> {
                   onPageChanged: (index) {
                     setState(() {
                       currentStep = index;
+                      onboarding = index != 0 && index != sections.length - 1;
                     });
                   },
                 ),
-                //     Swiper(
-                //   itemBuilder: (BuildContext context, int index) {
-                //     return sections[index];
-                //   },
-                //   onIndexChanged: (index) {
-                //     setState(() {
-                //       currentStep = index;
-                //     });
-                //   },
-                //   loop: false,
-                //   itemCount: 5,
-                //   controller: swipeController,
-                // ),
               ),
             ),
             Flexible(
@@ -154,6 +142,7 @@ class IntroState extends State<Intro> {
                               onboarding = true;
                             });
                           }
+
                           if (currentStep == sections.length - 2) {
                             setState(() {
                               loginText = 'Already created a username?';
