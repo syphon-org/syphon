@@ -34,7 +34,11 @@ import 'package:Tether/views/home/messages/draft.dart';
 // Styling
 import 'package:Tether/global/themes.dart';
 import 'package:redux/redux.dart';
+
+/**
+ * DESKTOP ONLY
 import 'package:window_utils/window_utils.dart';
+ */
 
 // Generated Json Serializables
 import 'main.reflectable.dart'; // Import generated code.
@@ -55,10 +59,13 @@ void main() async {
     Cache.hive = await initHiveStorage();
   }
 
+  /**
+   * DESKTOP ONLY
   if (Platform.isMacOS) {
     print(await WindowUtils.getWindowSize());
     await WindowUtils.setSize(Size(720, 720));
   }
+   */
 
   // init state cache (hot)
   final store = await initStore();
