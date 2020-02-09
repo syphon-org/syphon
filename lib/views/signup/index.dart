@@ -89,7 +89,6 @@ class SignupState extends State<Signup> {
   }
 
   Function onCheckStepValidity(UserStore userStore) {
-    print('Running Step Validity');
     switch (this.currentStep) {
       case 0:
         return userStore.isHomeserverValid
@@ -174,11 +173,11 @@ class SignupState extends State<Signup> {
                               margin: EdgeInsets.only(top: 64, bottom: 32),
                               constraints: BoxConstraints(
                                 minHeight: 326,
-                                maxHeight: 400,
+                                maxHeight: 512,
                                 minWidth: 200,
                               ),
                               child: PageView(
-                                physics: ScrollPhysics(),
+                                physics: NeverScrollableScrollPhysics(),
                                 pageSnapping: true,
                                 allowImplicitScrolling: false,
                                 controller: pageController,

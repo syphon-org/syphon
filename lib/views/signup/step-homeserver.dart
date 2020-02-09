@@ -29,9 +29,10 @@ class HomeserverStep extends StatelessWidget {
                 flex: 3,
                 child: Container(
                   constraints: BoxConstraints(
-                    minHeight: 220,
-                    minWidth: 200,
-                    maxWidth: 400,
+                    minHeight: 256,
+                    minWidth: 256,
+                    maxHeight: 320,
+                    maxWidth: 320,
                   ),
                   child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
                       semanticsLabel: 'User hidding behind a message'),

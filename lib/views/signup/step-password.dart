@@ -43,9 +43,10 @@ class PasswordStepState extends State<PasswordStep> {
                 flex: 3,
                 child: Container(
                   constraints: BoxConstraints(
-                    minHeight: 220,
-                    minWidth: 200,
-                    maxWidth: 400,
+                    minHeight: 256,
+                    minWidth: 256,
+                    maxHeight: 320,
+                    maxWidth: 320,
                   ),
                   child: SvgPicture.asset(SIGNUP_PASSWORD_GRAPHIC,
                       semanticsLabel: 'User holding on to credentials'),
@@ -65,10 +66,13 @@ class PasswordStepState extends State<PasswordStep> {
                         style: Theme.of(context).textTheme.headline,
                       ),
                     ),
-                    Text(
-                        'Try thinking up 4 random words you\'ll\nremember easily',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.subtitle1),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                          'Try thinking up 4 random words you\'ll\nremember easily',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.subtitle1),
+                    ),
                   ],
                 ),
               ),
