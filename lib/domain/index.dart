@@ -42,8 +42,24 @@ Future<Store> initStore() async {
 
   // Hot redux state cache for top level data
   // Consider still using hive here
+  var storageEngine;
+
+  if (Platform.isIOS || Platform.isAndroid) {
+    storageEngine = FlutterStorage();
+  }
+
+  if (Platform.isMacOS) {
+    final storageLocation = await File('cache').create().then(
+          (value) => value.writeAsString(
+            '{}',
+            flush: true,
+          ),
+        );
+    storageEngine = FileStorage(storageLocation);
+  }
+
   final persistor = Persistor<AppState>(
-    storage: FlutterStorage(),
+    storage: storageEngine,
     serializer: JsonSerializer<AppState>(
       AppState.fromJson,
     ),

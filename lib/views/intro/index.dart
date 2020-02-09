@@ -8,7 +8,6 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/model.dart';
 
 // Styling Widgets
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:Tether/global/dimensions.dart';
@@ -74,6 +73,8 @@ class IntroState extends State<Intro> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
+    final double widgetWidthScaling = width * 0.725;
+
     // TODO: document Swiper(
     //   loop: false,
     //   itemCount: 5,
@@ -98,7 +99,7 @@ class IntroState extends State<Intro> {
               flex: 6,
               fit: FlexFit.tight,
               child: Container(
-                height: height * 0.6,
+                height: widgetWidthScaling,
                 constraints: BoxConstraints(
                   minWidth: 125,
                   minHeight: 345,
@@ -124,63 +125,57 @@ class IntroState extends State<Intro> {
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  StoreConnector<AppState, UserStore>(
-                    converter: (Store<AppState> store) => store.state.userStore,
-                    builder: (context, userStore) => Container(
-                      width: width * 0.7,
-                      height: DEFAULT_BUTTON_HEIGHT,
-                      constraints: BoxConstraints(
-                        minHeight: 45,
-                        maxHeight: 65,
-                        minWidth: 200,
-                        maxWidth: 400,
-                      ),
-                      child: FlatButton(
-                        onPressed: () {
-                          if (currentStep == 0) {
-                            setState(() {
-                              onboarding = true;
-                            });
-                          }
+                  Container(
+                    width: widgetWidthScaling,
+                    height: DEFAULT_BUTTON_HEIGHT,
+                    constraints: BoxConstraints(
+                      minWidth: MIN_BUTTON_WIDTH,
+                      maxWidth: MAX_BUTTON_WIDTH,
+                    ),
+                    child: FlatButton(
+                      onPressed: () {
+                        if (currentStep == 0) {
+                          setState(() {
+                            onboarding = true;
+                          });
+                        }
 
-                          if (currentStep == sections.length - 2) {
-                            setState(() {
-                              loginText = 'Already created a username?';
-                              onboarding = false;
-                            });
-                          }
+                        if (currentStep == sections.length - 2) {
+                          setState(() {
+                            loginText = 'Already created a username?';
+                            onboarding = false;
+                          });
+                        }
 
-                          if (currentStep == sections.length - 1) {
-                            return Navigator.pushNamed(
-                              context,
-                              '/signup',
-                            );
-                          }
-                          // TODO: document swipeController.next(animation: true);
-                          pageController.nextPage(
-                            duration: Duration(milliseconds: 350),
-                            curve: Curves.ease,
+                        if (currentStep == sections.length - 1) {
+                          return Navigator.pushNamed(
+                            context,
+                            '/signup',
                           );
-                        },
-                        color: Theme.of(context).primaryColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        child: buildButtonText(),
-                      ),
+                        }
+                        // TODO: document swipeController.next(animation: true);
+                        pageController.nextPage(
+                          duration: Duration(milliseconds: 350),
+                          curve: Curves.ease,
+                        );
+                      },
+                      color: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      child: buildButtonText(),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              height: DEFAULT_INPUT_HEIGHT,
               margin: const EdgeInsets.symmetric(
                 horizontal: 8,
                 vertical: 16,
               ),
               constraints: BoxConstraints(
                 minWidth: 200,
-                minHeight: 45,
+                minHeight: DEFAULT_BUTTON_HEIGHT,
               ),
               child: onboarding
                   ? Flex(

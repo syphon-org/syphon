@@ -152,120 +152,121 @@ class SignupState extends State<Signup> {
       extendBodyBehindAppBar: true,
       appBar: appBar,
       body: ScrollConfiguration(
-          behavior: DefaultScrollBehavior(),
-          child: SingleChildScrollView(
-              child: Container(
-                  height: height,
-                  width: width,
+        behavior: DefaultScrollBehavior(),
+        child: SingleChildScrollView(
+          child: Container(
+            height: height,
+            width: width,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 12,
+                  fit: FlexFit.tight,
                   child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     direction: Axis.vertical,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Flexible(
-                        flex: 12,
-                        fit: FlexFit.tight,
-                        child: Flex(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          direction: Axis.vertical,
-                          children: <Widget>[
-                            Container(
-                              width: width,
-                              margin: EdgeInsets.only(top: 64, bottom: 32),
-                              constraints: BoxConstraints(
-                                minHeight: 326,
-                                maxHeight: 512,
-                                minWidth: 200,
-                              ),
-                              child: PageView(
-                                physics: NeverScrollableScrollPhysics(),
-                                pageSnapping: true,
-                                allowImplicitScrolling: false,
-                                controller: pageController,
-                                children: sections,
-                                onPageChanged: (index) {
-                                  setState(() {
-                                    currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Flex(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          direction: Axis.vertical,
-                          children: <Widget>[
-                            StoreConnector<AppState, UserStore>(
-                              converter: (Store<AppState> store) =>
-                                  store.state.userStore,
-                              builder: (context, userStore) => Container(
-                                width: width * 0.725,
-                                height: DEFAULT_BUTTON_HEIGHT,
-                                constraints: BoxConstraints(
-                                  minWidth: 256,
-                                  maxWidth: 400,
-                                  minHeight: 45,
-                                  maxHeight: 65,
-                                ),
-                                child: FlatButton(
-                                  disabledColor: Colors.grey,
-                                  disabledTextColor: Colors.grey[300],
-                                  onPressed: onCheckStepValidity(userStore),
-                                  color: Theme.of(context).primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                  child: !userStore.creating
-                                      ? buildButtonText()
-                                      : CircularProgressIndicator(
-                                          backgroundColor: Colors.white,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            Colors.grey,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                       Container(
-                        height: DEFAULT_INPUT_HEIGHT,
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 16,
-                        ),
+                        width: width,
+                        margin: EdgeInsets.only(top: 64, bottom: 32),
                         constraints: BoxConstraints(
-                          minWidth: 256,
-                          minHeight: 45,
+                          minHeight: 326,
+                          maxHeight: 400,
+                          minWidth: 200,
                         ),
-                        child: Flex(
-                          direction: Axis.horizontal,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SmoothPageIndicator(
-                              controller: pageController, // PageController
-                              count: sections.length,
-                              effect: WormEffect(
-                                spacing: 16,
-                                dotHeight: 12,
-                                dotWidth: 12,
-                                activeDotColor: Color(
-                                  store.state.settingsStore.primaryColor,
-                                ),
-                              ), // your preferred effect
-                            ),
-                          ],
+                        child: PageView(
+                          physics: NeverScrollableScrollPhysics(),
+                          pageSnapping: true,
+                          allowImplicitScrolling: false,
+                          controller: pageController,
+                          children: sections,
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentStep = index;
+                              onboarding =
+                                  index != 0 && index != sections.length - 1;
+                            });
+                          },
                         ),
                       ),
                     ],
-                  )))),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    direction: Axis.vertical,
+                    children: <Widget>[
+                      StoreConnector<AppState, UserStore>(
+                        converter: (Store<AppState> store) =>
+                            store.state.userStore,
+                        builder: (context, userStore) => Container(
+                          width: width * 0.725,
+                          height: DEFAULT_BUTTON_HEIGHT,
+                          constraints: BoxConstraints(
+                            minWidth: 256,
+                            maxWidth: 400,
+                            minHeight: 45,
+                            maxHeight: 65,
+                          ),
+                          child: FlatButton(
+                            disabledColor: Colors.grey,
+                            disabledTextColor: Colors.grey[300],
+                            onPressed: onCheckStepValidity(userStore),
+                            color: Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            child: !userStore.creating
+                                ? buildButtonText()
+                                : CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.grey,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: DEFAULT_INPUT_HEIGHT,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 16,
+                  ),
+                  constraints: BoxConstraints(
+                    minHeight: 45,
+                  ),
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SmoothPageIndicator(
+                        controller: pageController, // PageController
+                        count: sections.length,
+                        effect: WormEffect(
+                          spacing: 16,
+                          dotHeight: 12,
+                          dotWidth: 12,
+                          activeDotColor: Color(
+                            store.state.settingsStore.primaryColor,
+                          ),
+                        ), // your preferred effect
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

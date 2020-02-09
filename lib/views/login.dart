@@ -95,12 +95,8 @@ class LoginState extends State<Login> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    final double defaultWidgetScaling = width * 0.725;
 
-    /* 
-     * TODO: find a more explicit way to style with flex
-     * Should be able to specify flex as a ratio of screen coverage without
-     * stretching elements, a mix of container and expanded
-    */
     return Scaffold(
       key: loginScaffold,
       body: ScrollConfiguration(
@@ -108,16 +104,14 @@ class LoginState extends State<Login> {
         child: SingleChildScrollView(
           // Use a container of the same height and width
           // to flex dynamically but within a single child scroll
-          child: Container(
-            height: height,
-            width: width,
-            constraints: BoxConstraints(
-              maxHeight: 1024,
-              maxWidth: 512,
-            ),
-            child: StoreConnector<AppState, Store<AppState>>(
-              converter: (store) => store,
-              builder: (context, store) => Flex(
+          child: StoreConnector<AppState, Store<AppState>>(
+            converter: (store) => store,
+            builder: (context, store) => Container(
+              height: height,
+              constraints: BoxConstraints(
+                maxHeight: MAX_WIDGET_HEIGHT,
+              ),
+              child: Flex(
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -134,8 +128,8 @@ class LoginState extends State<Login> {
                             );
                           },
                           child: const Image(
-                            width: 150,
-                            height: 150,
+                            width: 164,
+                            height: 164,
                             image: AssetImage(TETHER_ICON_PNG),
                           ),
                         ),
@@ -163,14 +157,14 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            width: width * 0.725,
+                            width: defaultWidgetScaling,
                             height: DEFAULT_INPUT_HEIGHT,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
                             ),
                             constraints: BoxConstraints(
-                              minWidth: 200,
-                              maxWidth: 400,
+                              minWidth: MIN_INPUT_WIDTH,
+                              maxWidth: MAX_INPUT_WIDTH,
                             ),
                             child: TextField(
                               controller: usernameController,
@@ -228,14 +222,14 @@ class LoginState extends State<Login> {
                             ),
                           ),
                           Container(
-                            width: width * 0.725,
+                            width: defaultWidgetScaling,
                             height: DEFAULT_INPUT_HEIGHT,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
                             ),
                             constraints: BoxConstraints(
-                              minWidth: 200,
-                              maxWidth: 400,
+                              minWidth: MIN_INPUT_WIDTH,
+                              maxWidth: MAX_INPUT_WIDTH,
                             ),
                             child: TextField(
                               focusNode: passwordFocus,
@@ -259,14 +253,14 @@ class LoginState extends State<Login> {
                         ]),
                   ),
                   Container(
-                    width: width * 0.725,
+                    width: defaultWidgetScaling,
                     height: DEFAULT_BUTTON_HEIGHT,
                     margin: const EdgeInsets.only(
                       top: 24,
                     ),
                     constraints: BoxConstraints(
-                      minWidth: 200,
-                      maxWidth: 400,
+                      minWidth: 256,
+                      maxWidth: 336,
                     ),
                     child: FlatButton(
                       disabledColor: Colors.grey,
@@ -323,7 +317,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            'Don\'t have an username?',
+                            'Don\'t have a username?',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
