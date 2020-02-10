@@ -59,13 +59,13 @@ void main() async {
     Cache.hive = await initHiveStorage();
   }
 
-  /**
-   * DESKTOP ONLY
-  if (Platform.isMacOS) {
-    print(await WindowUtils.getWindowSize());
-    await WindowUtils.setSize(Size(720, 720));
-  }
-   */
+  // /**
+  //  * DESKTOP ONLY
+  // if (Platform.isMacOS) {
+  //   print(await WindowUtils.getWindowSize());
+  //   await WindowUtils.setSize(Size(720, 720));
+  // }
+  //  */
 
   // init state cache (hot)
   final store = await initStore();

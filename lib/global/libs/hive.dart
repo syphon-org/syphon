@@ -29,9 +29,7 @@ Future<dynamic> initHiveStorage() async {
   var storageLocation;
   var storageEngine;
   var storageEncryptionKeyRaw;
-  var storageEncryptionKey = List<int>(
-    0xAFBC9393, // TODO: ONLY FOR TESTING
-  );
+  var storageEncryptionKey;
 
   // Init storage location
   try {
@@ -70,6 +68,9 @@ Future<dynamic> initHiveStorage() async {
     storageEncryptionKey = jsonDecode(storageEncryptionKeyRaw).cast<int>();
   } catch (error) {
     print('[initHiveStorage] storage engine failure - $error');
+    storageEncryptionKey = List<int>(
+      0xAFBC9393, // TODO: ONLY FOR TESTING
+    );
   }
 
   return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: storageEncryptionKey);
