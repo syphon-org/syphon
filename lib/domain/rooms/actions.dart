@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:convert';
-import 'package:Tether/domain/user/actions.dart';
-import 'package:Tether/global/libs/hive.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:http/http.dart' as http;
 
@@ -430,15 +427,11 @@ ThunkAction<AppState> loadSync() {
   return (Store<AppState> store) async {
     try {
       // final json = await readFullSyncJson();
-      final json = Cache.hive.get('sync');
-
-      final List<Room> rooms = [];
-      final Map<String, dynamic> rawRooms = json['rooms']['join'];
-
-      store.dispatch(SetRooms(rooms: rooms));
+      // final json = Cache.hive.get('sync');
       return true;
     } catch (error) {
       debugPrint(error);
+      return false;
     }
   };
 }

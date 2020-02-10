@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,7 +10,6 @@ class SecondSection extends StatelessWidget {
   SecondSection({Key key, this.title}) : super(key: key);
 
   final String title;
-  final double DEFAULT_INPUT_HEIGHT = 52;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class SecondSection extends StatelessWidget {
         Text(
           'Matrix allows you to message others \nprivately but you control where \nyour messages are stored',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle,
+          style: Theme.of(context).textTheme.subtitle2,
         ),
       ],
     ));

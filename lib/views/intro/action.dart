@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,7 +9,6 @@ class ActionSection extends StatelessWidget {
   ActionSection({Key key, this.title}) : super(key: key);
 
   final String title;
-  final double DEFAULT_INPUT_HEIGHT = 52;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class ActionSection extends StatelessWidget {
         Text(
           'By using Tether and other Matrix clients\nwe can make private messaging \naccessible to everyone',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle,
+          style: Theme.of(context).textTheme.subtitle2,
         ),
         SizedBox(height: height * 0.01),
       ],

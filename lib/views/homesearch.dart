@@ -14,7 +14,6 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:Tether/domain/user/model.dart';
 
 // Assets
-import 'package:Tether/global/assets.dart';
 
 class SearchScrollBehavior extends ScrollBehavior {
   @override
@@ -44,20 +43,24 @@ class HomeSearchState extends State<HomeSearch> {
 
   @override
   void initState() {
+    super.initState();
+
     if (store.state.matrixStore.homeservers.length <= 0) {
       store.dispatch(fetchHomeservers());
     }
+
     appBarTitle = TouchableOpacity(
-        activeOpacity: 0.4,
-        onTap: () {
-          setState(() {
-            searching = !searching;
-          });
-        },
-        child: Text(title,
-            style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.w100)));
-    super.initState();
+      activeOpacity: 0.4,
+      onTap: () {
+        setState(() {
+          searching = !searching;
+        });
+      },
+      child: Text(
+        title,
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
+      ),
+    );
   }
 
   @override

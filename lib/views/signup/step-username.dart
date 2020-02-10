@@ -69,7 +69,7 @@ class UsernameStepState extends State<UsernameStep> {
                     Text(
                       'Create a username',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline,
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                   ],
                 ),

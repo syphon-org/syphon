@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,13 +9,13 @@ class LandingSection extends StatelessWidget {
   LandingSection({Key key, this.title}) : super(key: key);
 
   final String title;
-  final double DEFAULT_INPUT_HEIGHT = 52;
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
+    // TODO: convert to flex
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -32,13 +33,13 @@ class LandingSection extends StatelessWidget {
         Text(
           'Welcome to Tether',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.display1,
+          style: Theme.of(context).textTheme.headline4,
         ),
         SizedBox(height: height * 0.025),
         Text(
           'Take back your privacy and freedom \nwithout the hassle',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle,
+          style: Theme.of(context).textTheme.subtitle2,
         ),
       ],
     ));

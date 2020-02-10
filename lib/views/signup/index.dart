@@ -11,7 +11,6 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/model.dart';
 
 // Styling Widgets
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/behaviors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -50,6 +49,7 @@ class SignupState extends State<Signup> {
 
   @override
   void initState() {
+    super.initState();
     pageController = PageController(
       initialPage: 0,
       keepPage: false,
@@ -79,7 +79,6 @@ class SignupState extends State<Signup> {
         }
       }
     });
-    super.initState();
   }
 
   @override

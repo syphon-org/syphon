@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -63,7 +62,7 @@ class PasswordStepState extends State<PasswordStep> {
                       child: Text(
                         'Create a password',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline,
+                        style: Theme.of(context).textTheme.headline5,
                       ),
                     ),
                     Container(

@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,7 +9,6 @@ class FirstSection extends StatelessWidget {
   FirstSection({Key key, this.title}) : super(key: key);
 
   final String title;
-  static const double DEFAULT_INPUT_HEIGHT = 52;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class FirstSection extends StatelessWidget {
           Text(
             'Tether works by using an encrypted \nand decentralized protocol called Matrix',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
       ),

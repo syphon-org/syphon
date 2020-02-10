@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:flutter/material.dart';
 
 @jsonSerializable
 class Avatar {

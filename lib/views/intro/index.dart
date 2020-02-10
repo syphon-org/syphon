@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+// Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling Widgets
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -31,7 +30,6 @@ class IntroState extends State<Intro> {
   int currentStep = 0;
   bool onboarding = false;
   String loginText = 'Already have a username?';
-  // TODO: document SwiperController swipeController; // RIP
   PageController pageController;
 
   final List<Widget> sections = [
@@ -46,7 +44,6 @@ class IntroState extends State<Intro> {
 
   @override
   void initState() {
-    // TODO: document swipeController = SwiperController(); RIP
     pageController = PageController(
       initialPage: 0,
       keepPage: false,
@@ -71,23 +68,8 @@ class IntroState extends State<Intro> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     final double widgetWidthScaling = width * 0.725;
-
-    // TODO: document Swiper(
-    //   loop: false,
-    //   itemCount: 5,
-    //   controller: swipeController,
-    //   itemBuilder: (BuildContext context, int index) {
-    //     return sections[index];
-    //   },
-    //   onIndexChanged: (index) {
-    //     setState(() {
-    //       currentStep = index;
-    //     });
-    //   },
-    // ),
 
     return Scaffold(
       body: StoreConnector<AppState, AppState>(
@@ -153,7 +135,7 @@ class IntroState extends State<Intro> {
                             '/signup',
                           );
                         }
-                        // TODO: document swipeController.next(animation: true);
+
                         pageController.nextPage(
                           duration: Duration(milliseconds: 350),
                           curve: Curves.ease,
