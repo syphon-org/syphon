@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:convert';
 
 import 'package:Tether/domain/alerts/model.dart';
-import 'package:Tether/global/libs/hive.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -35,13 +33,12 @@ AppState appReducer(AppState state, action) {
   );
 }
 
-// Create and Export Store
+/**
+ * Initialize Store
+ * - Hot redux state cache for top level data
+ * * Consider still using hive here
+ */
 Future<Store> initStore() async {
-  // TODO: add hive back here if you'd like to use it as a storage engine
-  // for redux persist
-
-  // Hot redux state cache for top level data
-  // Consider still using hive here
   var storageEngine;
 
   if (Platform.isIOS || Platform.isAndroid) {
