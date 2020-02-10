@@ -26,6 +26,7 @@ description: Privacy centric matrix client for everyone
 # android icons - use Android Studio with generic png
 
 # env setup
+# - defaults delete com.apple.dt.Xcode # Reset XCode settings
 # - synctl start on 192.168.1.2 or respective local server
 # - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
 

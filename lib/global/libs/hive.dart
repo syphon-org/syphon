@@ -1,13 +1,7 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:Tether/domain/index.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
-
-import 'package:redux_persist/redux_persist.dart';
 
 const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
 const HIVE_BOX_NAME = 'tether';
@@ -29,7 +23,7 @@ Future<dynamic> initHiveStorage() async {
   var storageLocation;
   var storageEngine;
   var storageEncryptionKeyRaw;
-  var storageEncryptionKey;
+  var storageEncryptionKey = Hive.generateSecureKey();
 
   // Init storage location
   try {
@@ -68,9 +62,6 @@ Future<dynamic> initHiveStorage() async {
     storageEncryptionKey = jsonDecode(storageEncryptionKeyRaw).cast<int>();
   } catch (error) {
     print('[initHiveStorage] storage engine failure - $error');
-    storageEncryptionKey = List<int>(
-      0xAFBC9393, // TODO: ONLY FOR TESTING
-    );
   }
 
   return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: storageEncryptionKey);

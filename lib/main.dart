@@ -51,6 +51,7 @@ void _enablePlatformOverrideForDesktop() {
 
 void main() async {
   initializeReflectable();
+
   await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
   _enablePlatformOverrideForDesktop();
 
@@ -59,6 +60,9 @@ void main() async {
     Cache.hive = await initHiveStorage();
   }
 
+  // init state cache (hot)
+  final store = await initStore();
+
   // /**
   //  * DESKTOP ONLY
   // if (Platform.isMacOS) {
@@ -66,9 +70,6 @@ void main() async {
   //   await WindowUtils.setSize(Size(720, 720));
   // }
   //  */
-
-  // init state cache (hot)
-  final store = await initStore();
 
   // the main thing
   runApp(Tether(store: store));
