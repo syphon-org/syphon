@@ -44,6 +44,7 @@ class IntroState extends State<Intro> {
 
   @override
   void initState() {
+    super.initState();
     pageController = PageController(
       initialPage: 0,
       keepPage: false,

@@ -1,4 +1,3 @@
-import 'package:Tether/global/dimensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,27 +13,57 @@ class SecondSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final widthScale = width * 0.825;
 
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        SizedBox(height: height * 0.05),
         Container(
-          width: width * 0.7,
-          height: DEFAULT_INPUT_HEIGHT,
-          constraints:
-              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 200),
-          child: SvgPicture.asset(CONNECTION_GRAPHIC,
-              semanticsLabel: 'Two people messaging privately but leisurely'),
+          width: widthScale,
+          constraints: BoxConstraints(
+            maxHeight: 256,
+            maxWidth: 320,
+          ),
+          child: SvgPicture.asset(
+            CONNECTION_GRAPHIC,
+            semanticsLabel: 'Two people messaging privately but leisurely',
+          ),
         ),
-        SizedBox(height: height * 0.04),
-        Text(
-          'Matrix allows you to message others \nprivately but you control where \nyour messages are stored',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle2,
-        ),
+        Container(
+          height: 88,
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: 'Matrix enables you to message others',
+                  style: Theme.of(context).textTheme.subtitle2,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '\nprivately ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'and control where the\nmessages are ',
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    TextSpan(
+                      text: 'stored',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
       ],
     ));
   }
