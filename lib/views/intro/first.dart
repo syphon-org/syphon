@@ -14,30 +14,38 @@ class FirstSection extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
+    final widthScale = width * 0.825;
+    print(height * 0.05);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Container(
-            width: width * 0.7,
-            height: DEFAULT_INPUT_HEIGHT,
+            width: widthScale,
             constraints: BoxConstraints(
-              minWidth: 200,
-              maxWidth: 400,
-              minHeight: 200,
+              maxHeight: 256,
+              maxWidth: 320,
             ),
             child: SvgPicture.asset(
               HIDDEN_MESSENGER_GRAPHIC,
               semanticsLabel: 'User hidding behind a message',
+              allowDrawingOutsideViewBox: false,
             ),
           ),
-          SizedBox(height: height * 0.05),
-          Text(
-            'Tether works by using an encrypted \nand decentralized protocol called Matrix',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle2,
-          ),
+          Container(
+            height: 88,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Tether works by using an encrypted \nand decentralized protocol called Matrix',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

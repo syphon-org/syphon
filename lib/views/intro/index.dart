@@ -130,7 +130,7 @@ class IntroState extends State<Intro> {
                         }
 
                         if (currentStep == sections.length - 1) {
-                          return Navigator.pushNamed(
+                          Navigator.pushNamed(
                             context,
                             '/signup',
                           );
@@ -151,13 +151,13 @@ class IntroState extends State<Intro> {
               ),
             ),
             Container(
+              height: DEFAULT_INPUT_HEIGHT,
+              constraints: BoxConstraints(
+                minHeight: DEFAULT_BUTTON_HEIGHT,
+              ),
               margin: const EdgeInsets.symmetric(
                 horizontal: 8,
                 vertical: 16,
-              ),
-              constraints: BoxConstraints(
-                minWidth: 200,
-                minHeight: DEFAULT_BUTTON_HEIGHT,
               ),
               child: onboarding
                   ? Flex(

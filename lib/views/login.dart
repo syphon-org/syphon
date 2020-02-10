@@ -299,13 +299,12 @@ class LoginState extends State<Login> {
                   ),
                   Container(
                     height: DEFAULT_INPUT_HEIGHT,
+                    constraints: BoxConstraints(
+                      minHeight: DEFAULT_BUTTON_HEIGHT,
+                    ),
                     margin: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 24,
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 200,
-                      minHeight: 45,
+                      vertical: 16,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
