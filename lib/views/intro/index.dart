@@ -172,6 +172,8 @@ class IntroState extends State<Intro> {
                             spacing: 16,
                             dotHeight: 12,
                             dotWidth: 12,
+                            paintStyle: PaintingStyle.fill,
+                            strokeWidth: 12,
                             activeDotColor: Color(
                               state.settingsStore.primaryColor,
                             ),
