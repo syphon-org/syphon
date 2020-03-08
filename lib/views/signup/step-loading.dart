@@ -39,7 +39,7 @@ class HomeserverStep extends StatelessWidget {
         Text(
           'Find a homeserver',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline,
+          style: Theme.of(context).textTheme.headline5,
         ),
         SizedBox(height: height * 0.025),
         StoreConnector<AppState, Store<AppState>>(

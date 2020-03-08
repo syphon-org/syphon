@@ -1,14 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+// Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling Widgets
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:Tether/global/dimensions.dart';
@@ -32,7 +30,6 @@ class IntroState extends State<Intro> {
   int currentStep = 0;
   bool onboarding = false;
   String loginText = 'Already have a username?';
-  SwiperController swipeController;
   PageController pageController;
 
   final List<Widget> sections = [
@@ -47,7 +44,7 @@ class IntroState extends State<Intro> {
 
   @override
   void initState() {
-    swipeController = SwiperController();
+    super.initState();
     pageController = PageController(
       initialPage: 0,
       keepPage: false,
@@ -58,13 +55,13 @@ class IntroState extends State<Intro> {
   Widget buildButtonText() {
     switch (currentStep) {
       case 0:
-        return const Text('Let\'s Go',
+        return const Text('let\'s go',
             style: TextStyle(fontSize: 20, color: Colors.white));
       case 4:
-        return const Text('Count Me In',
+        return const Text('count me in',
             style: TextStyle(fontSize: 20, color: Colors.white));
       default:
-        return const Text('Next',
+        return const Text('next',
             style: TextStyle(fontSize: 20, color: Colors.white));
     }
   }
@@ -72,33 +69,20 @@ class IntroState extends State<Intro> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
-    // Swiper(
-    //   itemBuilder: (BuildContext context, int index) {
-    //     return sections[index];
-    //   },
-    //   onIndexChanged: (index) {
-    //     setState(() {
-    //       currentStep = index;
-    //     });
-    //   },
-    //   loop: false,
-    //   itemCount: 5,
-    //   controller: swipeController,
-    // ),
+    final double widgetWidthScaling = width * 0.725;
 
-    return StoreConnector<AppState, AppState>(
-      converter: (Store<AppState> store) => store.state,
-      builder: (context, state) => Scaffold(
-        body: Column(
+    return Scaffold(
+      body: StoreConnector<AppState, AppState>(
+        converter: (Store<AppState> store) => store.state,
+        builder: (context, state) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Flexible(
               flex: 6,
               fit: FlexFit.tight,
               child: Container(
-                height: height * 0.6,
+                height: widgetWidthScaling,
                 constraints: BoxConstraints(
                   minWidth: 125,
                   minHeight: 345,
@@ -112,22 +96,10 @@ class IntroState extends State<Intro> {
                   onPageChanged: (index) {
                     setState(() {
                       currentStep = index;
+                      onboarding = index != 0 && index != sections.length - 1;
                     });
                   },
                 ),
-                //     Swiper(
-                //   itemBuilder: (BuildContext context, int index) {
-                //     return sections[index];
-                //   },
-                //   onIndexChanged: (index) {
-                //     setState(() {
-                //       currentStep = index;
-                //     });
-                //   },
-                //   loop: false,
-                //   itemCount: 5,
-                //   controller: swipeController,
-                // ),
               ),
             ),
             Flexible(
@@ -136,48 +108,44 @@ class IntroState extends State<Intro> {
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  StoreConnector<AppState, UserStore>(
-                    converter: (Store<AppState> store) => store.state.userStore,
-                    builder: (context, userStore) => Container(
-                      width: width * 0.7,
-                      height: DEFAULT_BUTTON_HEIGHT,
-                      constraints: BoxConstraints(
-                        minHeight: 45,
-                        maxHeight: 65,
-                        minWidth: 200,
-                        maxWidth: 400,
-                      ),
-                      child: FlatButton(
-                        onPressed: () {
-                          if (currentStep == 0) {
-                            setState(() {
-                              onboarding = true;
-                            });
-                          }
-                          if (currentStep == sections.length - 2) {
-                            setState(() {
-                              loginText = 'Already created a username?';
-                              onboarding = false;
-                            });
-                          }
+                  Container(
+                    width: widgetWidthScaling,
+                    height: DEFAULT_BUTTON_HEIGHT,
+                    constraints: BoxConstraints(
+                      minWidth: MIN_BUTTON_WIDTH,
+                      maxWidth: MAX_BUTTON_WIDTH,
+                    ),
+                    child: FlatButton(
+                      onPressed: () {
+                        if (currentStep == 0) {
+                          setState(() {
+                            onboarding = true;
+                          });
+                        }
 
-                          if (currentStep == sections.length - 1) {
-                            return Navigator.pushNamed(
-                              context,
-                              '/signup',
-                            );
-                          }
-                          // swipeController.next(animation: true);
-                          pageController.nextPage(
-                            duration: Duration(milliseconds: 350),
-                            curve: Curves.ease,
+                        if (currentStep == sections.length - 2) {
+                          setState(() {
+                            loginText = 'Already created a username?';
+                            onboarding = false;
+                          });
+                        }
+
+                        if (currentStep == sections.length - 1) {
+                          Navigator.pushNamed(
+                            context,
+                            '/signup',
                           );
-                        },
-                        color: Theme.of(context).primaryColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        child: buildButtonText(),
-                      ),
+                        }
+
+                        pageController.nextPage(
+                          duration: Duration(milliseconds: 350),
+                          curve: Curves.ease,
+                        );
+                      },
+                      color: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      child: buildButtonText(),
                     ),
                   ),
                 ],
@@ -185,13 +153,12 @@ class IntroState extends State<Intro> {
             ),
             Container(
               height: DEFAULT_INPUT_HEIGHT,
+              constraints: BoxConstraints(
+                minHeight: DEFAULT_BUTTON_HEIGHT,
+              ),
               margin: const EdgeInsets.symmetric(
                 horizontal: 8,
-                vertical: 24,
-              ),
-              constraints: BoxConstraints(
-                minWidth: 200,
-                minHeight: 45,
+                vertical: 16,
               ),
               child: onboarding
                   ? Flex(
@@ -202,6 +169,11 @@ class IntroState extends State<Intro> {
                           controller: pageController, // PageController
                           count: sections.length,
                           effect: WormEffect(
+                            spacing: 16,
+                            dotHeight: 12,
+                            dotWidth: 12,
+                            paintStyle: PaintingStyle.fill,
+                            strokeWidth: 12,
                             activeDotColor: Color(
                               state.settingsStore.primaryColor,
                             ),

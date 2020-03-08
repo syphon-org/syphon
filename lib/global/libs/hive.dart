@@ -1,12 +1,7 @@
-import 'dart:typed_data';
-
-import 'package:Tether/domain/index.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
-
-import 'package:redux_persist/redux_persist.dart';
 
 const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
 const HIVE_BOX_NAME = 'tether';
@@ -25,26 +20,51 @@ class Cache {
     print(box.get('someone')); 
  */
 Future<dynamic> initHiveStorage() async {
-  var appStorageLocation = await getApplicationDocumentsDirectory();
-  Hive.init(appStorageLocation.path);
+  var storageLocation;
+  var storageEngine;
+  var storageEncryptionKeyRaw;
+  var storageEncryptionKey = Hive.generateSecureKey();
 
-  final storage = new FlutterSecureStorage();
-
-  // Check if storage has been created before
-  var encryptionKeySerialized = await storage.read(key: STORAGE_ENCRYPTION_KEY);
-  List<int> encryptionKey;
-
-  // Create a encryptionKey if a serialized one is not found
-  if (encryptionKeySerialized == null) {
-    encryptionKey = Hive.generateSecureKey();
-    await storage.write(
-        key: STORAGE_ENCRYPTION_KEY, value: jsonEncode(encryptionKey));
-    encryptionKeySerialized = await storage.read(key: STORAGE_ENCRYPTION_KEY);
+  // Init storage location
+  try {
+    storageLocation = await getApplicationDocumentsDirectory();
+  } catch (error) {
+    print('[initHiveStorage] storage location failure - $error');
   }
 
-  encryptionKey = jsonDecode(encryptionKeySerialized).cast<int>();
+  // Init hive cache
+  Hive.init(storageLocation.path);
 
-  return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: encryptionKey);
+  // Init storage engine for hive key
+  try {
+    storageEngine = FlutterSecureStorage();
+
+    // Check if storage has been created before
+    storageEncryptionKeyRaw = await storageEngine.read(
+      key: STORAGE_ENCRYPTION_KEY,
+    );
+
+    // Create a encryptionKey if a serialized one is not found
+    if (storageEncryptionKeyRaw == null) {
+      storageEncryptionKey = Hive.generateSecureKey();
+
+      await storageEngine.write(
+        key: STORAGE_ENCRYPTION_KEY,
+        value: jsonEncode(storageEncryptionKey),
+      );
+
+      storageEncryptionKeyRaw = await storageEngine.read(
+        key: STORAGE_ENCRYPTION_KEY,
+      );
+    }
+
+    // Decode raw encryption key
+    storageEncryptionKey = jsonDecode(storageEncryptionKeyRaw).cast<int>();
+  } catch (error) {
+    print('[initHiveStorage] storage engine failure - $error');
+  }
+
+  return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: storageEncryptionKey);
 }
 
 // AppState rehydateStore() {

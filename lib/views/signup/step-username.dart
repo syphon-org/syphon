@@ -8,7 +8,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -41,38 +40,49 @@ class UsernameStepState extends State<UsernameStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: height * 0.1),
-        Container(
-          height: DEFAULT_INPUT_HEIGHT,
-          constraints:
-              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 240),
-          child: SvgPicture.asset(SIGNUP_USERNAME_GRAPHIC,
-              semanticsLabel: 'User hidding behind a message'),
-        ),
-        SizedBox(height: 24),
-        Text(
-          'Create a username',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline,
-        ),
-        SizedBox(height: height * 0.025),
-        StoreConnector<AppState, Store<AppState>>(
-            converter: (Store<AppState> store) => store,
-            builder: (context, store) {
-              return Container(
-                width: width * 0.7,
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) => Container(
+          child: Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              Flexible(
+                flex: 3,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: 256,
+                    minWidth: 256,
+                    maxHeight: 320,
+                    maxWidth: 320,
+                  ),
+                  child: SvgPicture.asset(SIGNUP_USERNAME_GRAPHIC,
+                      semanticsLabel: 'Person resting on I.D. card'),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Create a username',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
                 height: DEFAULT_INPUT_HEIGHT,
-                margin: const EdgeInsets.all(10.0),
+                margin: EdgeInsets.only(
+                  top: 58,
+                ),
                 constraints: BoxConstraints(
-                    minWidth: 200, maxWidth: 400, minHeight: 45, maxHeight: 45),
+                  minWidth: 200,
+                  maxWidth: 320,
+                ),
                 child: TextField(
                   controller: usernameController,
                   onChanged: (username) {
@@ -80,7 +90,9 @@ class UsernameStepState extends State<UsernameStep> {
                     usernameController.value = TextEditingValue(
                       text: username.trim(),
                       selection: TextSelection.fromPosition(
-                        TextPosition(offset: username.trim().length),
+                        TextPosition(
+                          offset: username.trim().length,
+                        ),
                       ),
                     );
 
@@ -89,7 +101,8 @@ class UsernameStepState extends State<UsernameStep> {
                   },
                   onEditingComplete: () {
                     store.dispatch(
-                        setUsername(username: store.state.userStore.username));
+                      setUsername(username: store.state.userStore.username),
+                    );
                     FocusScope.of(context).unfocus();
                   },
                   decoration: InputDecoration(
@@ -100,9 +113,9 @@ class UsernameStepState extends State<UsernameStep> {
                           ? alias(store.state)
                           : "Username"),
                 ),
-              );
-            }),
-      ],
-    ));
-  }
+              ),
+            ],
+          ),
+        ),
+      );
 }

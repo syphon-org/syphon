@@ -1,13 +1,8 @@
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/actions.dart';
-import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
-import './profile-preview.dart';
 
 class ApperanceScreen extends StatelessWidget {
   ApperanceScreen({Key key, this.title}) : super(key: key);

@@ -35,6 +35,11 @@ import 'package:Tether/views/home/messages/draft.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:redux/redux.dart';
 
+/**
+ * DESKTOP ONLY
+import 'package:window_utils/window_utils.dart';
+ */
+
 // Generated Json Serializables
 import 'main.reflectable.dart'; // Import generated code.
 
@@ -46,14 +51,27 @@ void _enablePlatformOverrideForDesktop() {
 
 void main() async {
   initializeReflectable();
+
   await DotEnv().load(kReleaseMode ? '.env' : '.env.debug');
   _enablePlatformOverrideForDesktop();
 
-  // Init caching and state store
-  Cache.hive = await initHiveStorage();
+  // init cold cache (mobile only)
+  if (Platform.isIOS || Platform.isAndroid) {
+    Cache.hive = await initHiveStorage();
+  }
+
+  // init state cache (hot)
   final store = await initStore();
 
-  // Run the app
+  // /**
+  //  * DESKTOP ONLY
+  // if (Platform.isMacOS) {
+  //   print(await WindowUtils.getWindowSize());
+  //   await WindowUtils.setSize(Size(720, 720));
+  // }
+  //  */
+
+  // the main thing
   runApp(Tether(store: store));
 }
 

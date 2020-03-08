@@ -13,12 +13,12 @@ class Themes {
     ),
     scaffoldBackgroundColor: const Color(0xFFFEFEFE),
     fontFamily: 'Rubik',
-    primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+    primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
     cursorColor: const Color(0xff34C7B5),
     textTheme: TextTheme(
-      headline: TextStyle(fontWeight: FontWeight.w100),
-      title: TextStyle(fontWeight: FontWeight.w100),
-      subtitle: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+      headline5: TextStyle(fontWeight: FontWeight.w100),
+      headline6: TextStyle(fontWeight: FontWeight.w100),
+      subtitle2: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
       caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
       button: TextStyle(fontWeight: FontWeight.w100),
     ),
@@ -32,11 +32,13 @@ class Themes {
       ),
       scaffoldBackgroundColor: const Color(0xff34C7B5),
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       textTheme: TextTheme(
-          headline: TextStyle(fontWeight: FontWeight.w100, color: Colors.white),
-          title: TextStyle(fontWeight: FontWeight.w100, color: Colors.white),
-          subtitle: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
+          headline5:
+              TextStyle(fontWeight: FontWeight.w100, color: Colors.white),
+          headline6:
+              TextStyle(fontWeight: FontWeight.w100, color: Colors.white),
+          subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
           caption: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w100, color: Colors.white),
           button: TextStyle(fontWeight: FontWeight.w100, color: Colors.white)));
@@ -48,11 +50,11 @@ class Themes {
         brightness: Brightness.dark,
       ),
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       textTheme: TextTheme(
-          headline: TextStyle(fontWeight: FontWeight.w100),
-          title: TextStyle(fontWeight: FontWeight.w100),
-          subtitle: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
+          headline5: TextStyle(fontWeight: FontWeight.w100),
+          headline6: TextStyle(fontWeight: FontWeight.w100),
+          subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
           caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
           button: TextStyle(fontWeight: FontWeight.w100)));
 
@@ -63,11 +65,11 @@ class Themes {
         brightness: Brightness.dark,
       ),
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       textTheme: TextTheme(
-          headline: TextStyle(fontWeight: FontWeight.w100),
-          title: TextStyle(fontWeight: FontWeight.w100),
-          subtitle: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
+          headline5: TextStyle(fontWeight: FontWeight.w100),
+          headline6: TextStyle(fontWeight: FontWeight.w100),
+          subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
           caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
           button: TextStyle(fontWeight: FontWeight.w100)));
 
@@ -94,12 +96,12 @@ class Themes {
       ),
       scaffoldBackgroundColor: const Color(0xFFFEFEFE),
       fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(title: TextStyle(color: Colors.white)),
+      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       cursorColor: const Color(0xff34C7B5),
       textTheme: TextTheme(
-        headline: TextStyle(fontWeight: FontWeight.w100),
-        title: TextStyle(fontWeight: FontWeight.w100),
-        subtitle: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+        headline5: TextStyle(fontWeight: FontWeight.w100),
+        headline6: TextStyle(fontWeight: FontWeight.w100),
+        subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
         caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
         button: TextStyle(fontWeight: FontWeight.w100),
       ),

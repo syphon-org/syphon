@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -32,43 +31,59 @@ class PasswordStepState extends State<PasswordStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        SizedBox(height: height * 0.1),
-        Container(
-          width: width * 0.7,
-          height: DEFAULT_INPUT_HEIGHT,
-          constraints:
-              BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 240),
-          child: SvgPicture.asset(SIGNUP_PASSWORD_GRAPHIC,
-              semanticsLabel: 'User hidding behind a message'),
-        ),
-        SizedBox(height: 24),
-        Text(
-          'Create a password',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline,
-        ),
-        SizedBox(height: 24),
-        Text('Try thinking up 4 random words you\'ll\nremember easily',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subhead),
-        SizedBox(height: height * 0.025),
-        StoreConnector<AppState, Store<AppState>>(
-            converter: (Store<AppState> store) => store,
-            builder: (context, store) {
-              return Container(
-                width: width * 0.7,
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) => Container(
+          child: Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              Flexible(
+                flex: 3,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: 256,
+                    minWidth: 256,
+                    maxHeight: 320,
+                    maxWidth: 320,
+                  ),
+                  child: SvgPicture.asset(SIGNUP_PASSWORD_GRAPHIC,
+                      semanticsLabel: 'User holding on to credentials'),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Create a password',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                          'Try thinking up 4 random words you\'ll\nremember easily',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.subtitle1),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
                 height: DEFAULT_INPUT_HEIGHT,
-                margin: const EdgeInsets.all(10.0),
-                constraints:
-                    BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 45),
+                margin: EdgeInsets.only(
+                  top: 58,
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 200,
+                  maxWidth: 320,
+                ),
                 child: TextField(
                   controller: passwordController,
                   obscureText: !visibility,
@@ -78,27 +93,29 @@ class PasswordStepState extends State<PasswordStep> {
                   },
                   onEditingComplete: () {
                     store.dispatch(
-                        setPassword(password: store.state.userStore.password));
+                      setPassword(password: store.state.userStore.password),
+                    );
                     FocusScope.of(context).unfocus();
                   },
                   decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                          icon: Icon(visibility
-                              ? Icons.visibility
-                              : Icons.visibility_off),
-                          tooltip: 'Show password in plaintext',
-                          onPressed: () {
-                            this.setState(() {
-                              visibility = !visibility;
-                            });
-                          }),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
-                      labelText: 'Password'),
+                    suffixIcon: IconButton(
+                        icon: Icon(
+                          visibility ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        tooltip: 'Show password in plaintext',
+                        onPressed: () {
+                          this.setState(() {
+                            visibility = !visibility;
+                          });
+                        }),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(34.0)),
+                    labelText: 'Password',
+                  ),
                 ),
-              );
-            }),
-      ],
-    ));
-  }
+              ),
+            ],
+          ),
+        ),
+      );
 }

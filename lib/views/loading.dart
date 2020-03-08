@@ -24,40 +24,38 @@ class Loading extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
 
     /* 
-     * TODO: find a more explicit way to style with flex
-     * Should be able to specify flex as a ratio of screen coverage without
-     * stretching elements, a mix of container and expanded
+     * TODO: convert to flexibles
     */
     return Scaffold(
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
-            // Use a container of the same height and width
-            // to flex dynamically but within a single child scroll
-            child: Container(
-                height: height,
-                width: width,
-                child: StoreConnector<AppState, dynamic>(
-                    converter: (store) =>
-                        () => store.dispatch(incrementTheme()),
-                    builder: (context, onIncrementTheme) {
-                      return Flex(
-                        direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TouchableOpacity(
-                            onTap: () {
-                              onIncrementTheme();
-                            },
-                            child: const Image(
-                              width: 100,
-                              height: 100,
-                              image: AssetImage(TETHER_ICON_PNG),
-                            ),
-                          ),
-                        ],
-                      );
-                    }))),
+          // Use a container of the same height and width
+          // to flex dynamically but within a single child scroll
+          child: Container(
+            height: height,
+            width: width,
+            child: StoreConnector<AppState, dynamic>(
+              converter: (store) => () => store.dispatch(incrementTheme()),
+              builder: (context, onIncrementTheme) => Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TouchableOpacity(
+                    onTap: () {
+                      onIncrementTheme();
+                    },
+                    child: const Image(
+                      width: 100,
+                      height: 100,
+                      image: AssetImage(TETHER_ICON_PNG),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

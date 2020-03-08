@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:flutter/material.dart';
 
 @jsonSerializable
 class Avatar {
@@ -179,7 +178,9 @@ class Room {
           case 'm.room.avatar':
             final avatarFile = event.content['thumbnail_file'];
             if (avatarFile == null) {
-              avatar = Avatar(uri: event.content['url']);
+              avatar = Avatar(
+                uri: event.content['url'],
+              );
             }
             break;
           case 'm.room.member':
@@ -231,12 +232,13 @@ class Room {
         rawTimelineEvents.map((event) => Event.fromJson(event)).toList();
 
     return this
-        .fromStateEvents(
-          stateEvents,
-        )
+        // TODO: overriding avatar
+        // .fromStateEvents(
+        //   stateEvents,
+        // )
         .fromMessageEvents(
-          messageEvents,
-        );
+      messageEvents,
+    );
   }
 
   @override

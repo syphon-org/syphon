@@ -11,9 +11,9 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/model.dart';
 
 // Styling Widgets
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/behaviors.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import './step-username.dart';
 import './step-password.dart';
@@ -42,14 +42,19 @@ class SignupState extends State<Signup> {
   bool onboarding = false;
   bool validStep = false;
   bool naving = false;
-  SwiperController controller;
   StreamSubscription subscription;
+  PageController pageController;
 
   SignupState({Key key, this.title, this.store});
 
   @override
   void initState() {
-    controller = new SwiperController();
+    super.initState();
+    pageController = PageController(
+      initialPage: 0,
+      keepPage: false,
+      viewportFraction: 1.5,
+    );
     subscription = store.onChange.listen((state) {
       // toggle button to a creating user state
       if (state.userStore.creating && this.currentStep != 3) {
@@ -74,7 +79,6 @@ class SignupState extends State<Signup> {
         }
       }
     });
-    super.initState();
   }
 
   @override
@@ -84,18 +88,23 @@ class SignupState extends State<Signup> {
   }
 
   Function onCheckStepValidity(UserStore userStore) {
-    print('Running Step Validity');
     switch (this.currentStep) {
       case 0:
         return userStore.isHomeserverValid
             ? () {
-                controller.next(animation: true);
+                pageController.nextPage(
+                  duration: Duration(milliseconds: 350),
+                  curve: Curves.ease,
+                );
               }
             : null;
       case 1:
         return userStore.isUsernameValid
             ? () {
-                controller.next(animation: true);
+                pageController.nextPage(
+                  duration: Duration(milliseconds: 350),
+                  curve: Curves.ease,
+                );
               }
             : null;
       case 2:
@@ -122,73 +131,141 @@ class SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
+    final appBar = AppBar(
+      elevation: 0,
+      iconTheme: IconThemeData(
+        color: Color(store.state.settingsStore.primaryColor),
+      ),
+      backgroundColor: Colors.transparent,
+      brightness: Brightness.light,
+    );
+
+    // TODO: document
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    // -
+    //     MediaQuery.of(context).viewPadding.top -
+    //     appBar.preferredSize.height;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: appBar,
       body: ScrollConfiguration(
-          behavior: DefaultScrollBehavior(),
-          child: SingleChildScrollView(
-              child: Container(
-                  height: height,
-                  width: width,
+        behavior: DefaultScrollBehavior(),
+        child: SingleChildScrollView(
+          child: Container(
+            height: height,
+            width: width,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 12,
+                  fit: FlexFit.tight,
                   child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     direction: Axis.vertical,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                          width: width,
-                          height: height * 0.7,
-                          constraints: BoxConstraints(
-                              minWidth: 125, minHeight: 345, maxHeight: height),
-                          child: Swiper(
-                            itemBuilder: (BuildContext context, int index) {
-                              return sections[index];
-                            },
-                            onIndexChanged: (index) {
-                              setState(() {
-                                currentStep = index;
-                              });
-                            },
-                            loop: false,
-                            itemCount: 5,
-                            controller: controller,
-                          )),
-                      Spacer(flex: 8),
+                        width: width,
+                        margin: EdgeInsets.only(top: 64, bottom: 32),
+                        constraints: BoxConstraints(
+                          minHeight: 326,
+                          maxHeight: 400,
+                          minWidth: 200,
+                        ),
+                        child: PageView(
+                          physics: NeverScrollableScrollPhysics(),
+                          pageSnapping: true,
+                          allowImplicitScrolling: false,
+                          controller: pageController,
+                          children: sections,
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentStep = index;
+                              onboarding =
+                                  index != 0 && index != sections.length - 1;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    direction: Axis.vertical,
+                    children: <Widget>[
                       StoreConnector<AppState, UserStore>(
                         converter: (Store<AppState> store) =>
                             store.state.userStore,
-                        builder: (context, userStore) {
-                          return Container(
-                            width: width * 0.7,
-                            height: DEFAULT_BUTTON_HEIGHT,
-                            margin: const EdgeInsets.all(10.0),
-                            constraints: BoxConstraints(
-                                minWidth: 200,
-                                maxWidth: 400,
-                                minHeight: 45,
-                                maxHeight: 65),
-                            child: FlatButton(
-                                disabledColor: Colors.grey,
-                                disabledTextColor: Colors.grey[300],
-                                onPressed: onCheckStepValidity(userStore),
-                                color: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0)),
-                                child: !userStore.creating
-                                    ? buildButtonText()
-                                    : CircularProgressIndicator(
-                                        backgroundColor: Colors.white,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.grey),
-                                      )),
-                          );
-                        },
+                        builder: (context, userStore) => Container(
+                          width: width * 0.725,
+                          height: DEFAULT_BUTTON_HEIGHT,
+                          constraints: BoxConstraints(
+                            minWidth: 256,
+                            maxWidth: 400,
+                            minHeight: 45,
+                            maxHeight: 65,
+                          ),
+                          child: FlatButton(
+                            disabledColor: Colors.grey,
+                            disabledTextColor: Colors.grey[300],
+                            onPressed: onCheckStepValidity(userStore),
+                            color: Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            child: !userStore.creating
+                                ? buildButtonText()
+                                : CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.grey,
+                                    ),
+                                  ),
+                          ),
+                        ),
                       ),
-                      Spacer(flex: 4),
                     ],
-                  )))),
+                  ),
+                ),
+                Container(
+                  height: DEFAULT_INPUT_HEIGHT,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 16,
+                  ),
+                  constraints: BoxConstraints(
+                    minHeight: 45,
+                  ),
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SmoothPageIndicator(
+                        controller: pageController, // PageController
+                        count: sections.length,
+                        effect: WormEffect(
+                          spacing: 16,
+                          dotHeight: 12,
+                          dotWidth: 12,
+                          activeDotColor: Color(
+                            store.state.settingsStore.primaryColor,
+                          ),
+                        ), // your preferred effect
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

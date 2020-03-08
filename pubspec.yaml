@@ -11,6 +11,11 @@ description: Privacy centric matrix client for everyone
 # - xcrun simctl boot <device-id>
 # - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
 
+# desktop support options
+# * Desktop support breaks the iOS xcode build
+# - flutter config --enable-macos-desktop
+# - flutter config --no-enable-macos-desktop
+# - pub cache repair # after disabling enabled -> disabled
 # serializable generation
 # - flutter pub run build_runner build
 # - flutter pub run build_runner watch - if making schema changes
@@ -21,6 +26,7 @@ description: Privacy centric matrix client for everyone
 # android icons - use Android Studio with generic png
 
 # env setup
+# - defaults delete com.apple.dt.Xcode # Reset XCode settings
 # - synctl start on 192.168.1.2 or respective local server
 # - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
 
@@ -45,7 +51,7 @@ dependencies:
   hive: ^1.3.0
   hive_flutter:  ^0.3.0
   flutter_secure_storage: 3.3.1+1 
-  path_provider: 1.3.1 
+  path_provider: 1.6.0  #https://github.com/flutter/plugins/pull/1570
 
   # Services
   http: 0.12.0+2
@@ -59,6 +65,9 @@ dependencies:
   flutter_swiper : 1.1.6
   touchable_opacity: 1.0.2
   smooth_page_indicator: 0.1.1
+
+  # Desktop UI Only - UNCOMMENT FOR BUILDS
+  # window_utils: 1.0.2
 
   # Converters
   dart_json_mapper: 1.3.3
