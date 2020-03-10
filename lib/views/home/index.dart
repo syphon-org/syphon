@@ -205,6 +205,7 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        brightness: Brightness.dark,
         titleSpacing: 22.00,
         title: Row(children: <Widget>[
           Container(

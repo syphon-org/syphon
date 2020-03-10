@@ -141,13 +141,11 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   // Store should not need to be passed to a widget to affect
   // lifecycle widget functions
   @override
-  Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      store: store,
-      child: StoreConnector<AppState, dynamic>(
-        converter: (store) => store.state.settingsStore.theme,
-        builder: (context, theme) {
-          return MaterialApp(
+  Widget build(BuildContext context) => StoreProvider<AppState>(
+        store: store,
+        child: StoreConnector<AppState, dynamic>(
+          converter: (store) => store.state.settingsStore.theme,
+          builder: (context, theme) => MaterialApp(
             title: 'Tether',
             theme: Themes.getThemeFromKey(theme),
             navigatorKey: NavigationService.navigatorKey,
@@ -155,25 +153,31 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
             routes: <String, WidgetBuilder>{
               '/intro': (BuildContext context) => Intro(),
               '/login': (BuildContext context) => Login(store: store),
-              '/search_home': (BuildContext context) =>
-                  HomeSearch(title: 'Find Your Homeserver', store: store),
-              '/signup': (BuildContext context) =>
-                  Signup(title: 'Signup', store: store),
+              '/search_home': (BuildContext context) => HomeSearch(
+                    title: 'Find Your Homeserver',
+                    store: store,
+                  ),
+              '/signup': (BuildContext context) => Signup(
+                    title: 'Signup',
+                    store: store,
+                  ),
               '/home': (BuildContext context) => Home(
                     title: 'Tether',
                   ),
-              '/home/messages': (BuildContext context) => Messages(),
               '/draft': (BuildContext context) => Draft(),
               '/profile': (BuildContext context) => Profile(),
-              '/appearance': (BuildContext context) =>
-                  ApperanceScreen(title: 'Appearance'),
-              '/settings': (BuildContext context) =>
-                  SettingsScreen(title: 'Settings'),
-              '/loading': (BuildContext context) => Loading(title: 'Loading'),
+              '/home/messages': (BuildContext context) => Messages(),
+              '/appearance': (BuildContext context) => ApperanceScreen(
+                    title: 'Appearance',
+                  ),
+              '/settings': (BuildContext context) => SettingsScreen(
+                    title: 'Settings',
+                  ),
+              '/loading': (BuildContext context) => Loading(
+                    title: 'Loading',
+                  ),
             },
-          );
-        },
-      ),
-    );
-  }
+          ),
+        ),
+      );
 }
