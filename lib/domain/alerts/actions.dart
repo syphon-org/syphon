@@ -31,7 +31,7 @@ ThunkAction<AppState> testAlerts({type, message}) {
   return (Store<AppState> store) async {
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert =
-        new Alert(type: 'warning', message: 'testing alert messages, hi! :D');
+        Alert(type: 'warning', message: 'testing alert messages, hi! :D');
 
     // Test adding alert from observer and store
     // TODO: consider the observer add() in the reducer

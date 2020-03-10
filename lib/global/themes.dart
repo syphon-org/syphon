@@ -4,17 +4,30 @@ import './colors.dart';
 enum ThemeType { LIGHT, DARK, DARKER }
 
 class Themes {
+  static ThemeData getThemeFromKey(ThemeType themeKey) {
+    switch (themeKey) {
+      case ThemeType.LIGHT:
+        return lightTheme;
+      case ThemeType.DARK:
+        return darkTheme;
+      case ThemeType.DARKER:
+        return darkerTheme;
+      default:
+        return lightTheme;
+    }
+  }
+
   static final ThemeData lightTheme = ThemeData(
     primaryColor: PRIMARY_COLOR,
     accentColor: ACCENT_COLOR,
     brightness: Brightness.light,
     appBarTheme: AppBarTheme(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: const Color(0xFFFEFEFE),
+    scaffoldBackgroundColor: BACKGROUND_COLOR,
     fontFamily: 'Rubik',
     primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
-    cursorColor: const Color(0xff34C7B5),
+    cursorColor: PRIMARY_COLOR,
     textTheme: TextTheme(
       headline5: TextStyle(fontWeight: FontWeight.w100),
       headline6: TextStyle(fontWeight: FontWeight.w100),
@@ -25,12 +38,12 @@ class Themes {
   );
 
   static final ThemeData primaryTheme = ThemeData(
-      primaryColor: const Color(PRIMARY),
+      primaryColor: PRIMARY_COLOR,
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: const Color(0xff34C7B5),
+      scaffoldBackgroundColor: PRIMARY_COLOR,
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       textTheme: TextTheme(
@@ -72,39 +85,4 @@ class Themes {
           subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
           caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
           button: TextStyle(fontWeight: FontWeight.w100)));
-
-  static ThemeData getThemeFromKey(ThemeType themeKey) {
-    switch (themeKey) {
-      case ThemeType.LIGHT:
-        return lightTheme;
-      case ThemeType.DARK:
-        return darkTheme;
-      case ThemeType.DARKER:
-        return darkerTheme;
-      default:
-        return lightTheme;
-    }
-  }
-
-  static ThemeData getTheme({int primary, int secondary, int}) {
-    return ThemeData(
-      primaryColor: Color(primary),
-      accentColor: Color(secondary),
-      brightness: Brightness.light,
-      appBarTheme: AppBarTheme(
-        brightness: Brightness.dark,
-      ),
-      scaffoldBackgroundColor: const Color(0xFFFEFEFE),
-      fontFamily: 'Rubik',
-      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
-      cursorColor: const Color(0xff34C7B5),
-      textTheme: TextTheme(
-        headline5: TextStyle(fontWeight: FontWeight.w100),
-        headline6: TextStyle(fontWeight: FontWeight.w100),
-        subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
-        caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-        button: TextStyle(fontWeight: FontWeight.w100),
-      ),
-    );
-  }
 }

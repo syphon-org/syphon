@@ -161,7 +161,7 @@ class SignupState extends State<Signup> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Flexible(
-                  flex: 12,
+                  flex: 11,
                   fit: FlexFit.tight,
                   child: Flex(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -208,7 +208,7 @@ class SignupState extends State<Signup> {
                           constraints: BoxConstraints(
                             minWidth: 256,
                             maxWidth: 400,
-                            minHeight: 45,
+                            minHeight: DEFAULT_BUTTON_HEIGHT,
                             maxHeight: 65,
                           ),
                           child: FlatButton(
@@ -234,7 +234,6 @@ class SignupState extends State<Signup> {
                   ),
                 ),
                 Container(
-                  height: DEFAULT_INPUT_HEIGHT,
                   margin: const EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 16,

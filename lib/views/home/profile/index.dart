@@ -40,8 +40,13 @@ class Profile extends StatelessWidget {
         icon: Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context, false),
       ),
-      title: Text(title,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w100,
+        ),
+      ),
     );
 
     double width = MediaQuery.of(context).size.width;

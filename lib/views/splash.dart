@@ -33,33 +33,35 @@ class Splash extends StatelessWidget {
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
-            // Use a container of the same height and width
-            // to flex dynamically but within a single child scroll
-            child: Container(
-                height: height,
-                width: width,
-                child: StoreConnector<AppState, dynamic>(
-                    converter: (store) =>
-                        () => store.dispatch(incrementTheme()),
-                    builder: (context, onIncrementTheme) {
-                      return Flex(
-                        direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Spacer(flex: 8),
-                          TouchableOpacity(
-                            onTap: () {
-                              onIncrementTheme();
-                            },
-                            child: const Image(
-                              width: 150,
-                              height: 150,
-                              image: AssetImage(TETHER_ICON_PNG),
-                            ),
-                          ),
-                        ],
-                      );
-                    }))),
+          // Use a container of the same height and width
+          // to flex dynamically but within a single child scroll
+          child: Container(
+            height: height,
+            width: width,
+            child: StoreConnector<AppState, dynamic>(
+              converter: (store) => () => store.dispatch(incrementTheme()),
+              builder: (context, onIncrementTheme) {
+                return Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Spacer(flex: 8),
+                    TouchableOpacity(
+                      onTap: () {
+                        onIncrementTheme();
+                      },
+                      child: const Image(
+                        width: 150,
+                        height: 150,
+                        image: AssetImage(TETHER_ICON_PNG),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }

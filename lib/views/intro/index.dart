@@ -1,3 +1,4 @@
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -125,7 +126,7 @@ class IntroState extends State<Intro> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = 'Already created a username?';
+                            loginText = INTRO_LOGIN_TEXT;
                             onboarding = false;
                           });
                         }
@@ -201,7 +202,7 @@ class IntroState extends State<Intro> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              'Login',
+                              INTRO_LOGIN_ACTION,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,

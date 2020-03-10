@@ -137,25 +137,23 @@ class Room {
   // follows spec naming priority and thumbnail downloading
   Room fromStateEvents(
     List<Event> stateEvents, {
-    String currentUsername,
+    String originDEBUG,
+    String username,
     int limit,
   }) {
     String name;
     Avatar avatar;
     String topic;
-    int lastUpdate = this.lastUpdate;
     int namePriority = 4;
+    int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
 
-    Error wizards;
     try {
       stateEvents.forEach((event) {
         lastUpdate =
             event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
         switch (event.type) {
-          case 'm.room.message':
-            break;
           case 'm.room.name':
             namePriority = 1;
             name = event.content['name'];
@@ -178,26 +176,36 @@ class Room {
           case 'm.room.avatar':
             final avatarFile = event.content['thumbnail_file'];
             if (avatarFile == null) {
-              avatar = Avatar(
+              // Keep previous avatar url until the new uri is fetched
+              avatar = this.avatar != null ? this.avatar : Avatar();
+              avatar = avatar.copyWith(
                 uri: event.content['url'],
               );
             }
             break;
           case 'm.room.member':
-            if (this.direct &&
-                event.content['displayname'] != currentUsername) {
+            if (this.direct && event.content['displayname'] != username) {
+              print(
+                '[m.room.member direct] ${event.content['displayname']} ${username}',
+              );
               name = event.content['displayname'];
             }
             break;
+          case 'm.room.message':
           default:
             break;
         }
       });
     } catch (error) {
-      wizards = error;
       print(error);
     } finally {
-      print('[From State Events] ${this.id} ${stateEvents.length} ${wizards}');
+      // final numberOfEvents = stateEvents != null ? stateEvents.length : 0;
+      // print(
+      //     '[fromStateEvents] ******** ${originDEBUG} ${this.id} ${numberOfEvents} ******** ');
+      // print('[fromStateEvents] name ${name}, ${this.name}');
+      // print('[fromStateEvents] avatar ${avatar}, ${this.avatar}');
+      // print('[fromStateEvents] topic ${topic}, ${this.topic}');
+      // print('[fromStateEvents] last update ${lastUpdate}, ${this.lastUpdate}');
     }
 
     return this.copyWith(
@@ -210,18 +218,17 @@ class Room {
   }
 
   Room fromSync({
-    String id,
-    String startTime,
+    String username,
     Map<String, dynamic> json,
   }) {
     // contains message events
     final List<dynamic> rawTimelineEvents = json['timeline']['events'];
     final List<dynamic> rawStateEvents = json['state']['events'];
 
-    print(json['summary']);
-    print(json['ephemeral']);
+    // print(json['summary']);
+    // print(json['ephemeral']);
     // Check for message events
-    print('TIMELINE OUTPUT ${json['timeline']}');
+    // print('TIMELINE OUTPUT ${json['timeline']}');
     // TODO: final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
     // TODO: final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
 
@@ -232,13 +239,14 @@ class Room {
         rawTimelineEvents.map((event) => Event.fromJson(event)).toList();
 
     return this
-        // TODO: overriding avatar
-        // .fromStateEvents(
-        //   stateEvents,
-        // )
+        .fromStateEvents(
+          stateEvents,
+          username: username,
+          originDEBUG: '[fetchSync]',
+        )
         .fromMessageEvents(
-      messageEvents,
-    );
+          messageEvents,
+        );
   }
 
   @override

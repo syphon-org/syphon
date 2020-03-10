@@ -29,8 +29,10 @@ class HomeSearch extends StatefulWidget {
   const HomeSearch({Key key, this.title, this.store}) : super(key: key);
 
   @override
-  HomeSearchState createState() =>
-      HomeSearchState(title: this.title, store: this.store);
+  HomeSearchState createState() => HomeSearchState(
+        title: this.title,
+        store: this.store,
+      );
 }
 
 class HomeSearchState extends State<HomeSearch> {

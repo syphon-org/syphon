@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/domain/index.dart';
+// Store
 import 'package:redux/redux.dart';
+import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/rooms/events/actions.dart';
 
 /**
  * Resources:
@@ -46,6 +48,9 @@ class Messages extends StatefulWidget {
 class MessagesState extends State<Messages> {
   FocusNode inputFieldNode;
 
+  bool sendable = false;
+  final editorController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -64,32 +69,28 @@ class MessagesState extends State<Messages> {
       builder: (context, state) {
         final messages = room(id: roomId, state: state).messages;
         final userId = state.userStore.user.userId;
+
         return ListView.builder(
           reverse: true,
           itemCount: messages.length,
           scrollDirection: Axis.vertical,
           itemBuilder: (BuildContext context, int index) {
             final message = messages[index];
-            // if (message.userId != userId) {
-            //   return Container(
-            // child: Container(
-            //   padding: const EdgeInsets.symmetric(
-            //     vertical: 16,
-            //     horizontal: 24,
-            //   ),
-            //   child: Text(
-            //     message.body,
-            //     style: TextStyle(),
-            //   ),
-            // ),
-            //   );
-            // }
+            final userSent = userId == message.sender;
+
+            var messageAlignment = CrossAxisAlignment.start;
+            var textAlign = TextAlign.start;
+
+            if (userSent) {
+              messageAlignment = CrossAxisAlignment.end;
+              textAlign = TextAlign.end;
+            }
 
             return Container(
               child: Flex(
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: messageAlignment,
                 children: <Widget>[
                   Card(
                     elevation: 4.0,
@@ -114,6 +115,7 @@ class MessagesState extends State<Messages> {
                     ),
                     child: Text(
                       message.body,
+                      textAlign: textAlign,
                       style: TextStyle(),
                     ),
                   ),
@@ -126,14 +128,11 @@ class MessagesState extends State<Messages> {
     );
   }
 
-  void onSendMessage() {
-    print('onSendMessage STUB');
-  }
-
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, AppState>(
-        converter: (Store<AppState> store) => store.state,
-        builder: (context, state) {
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) {
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
 
@@ -209,7 +208,7 @@ class MessagesState extends State<Messages> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Visibility(
-                      visible: state.roomStore.loading,
+                      visible: store.state.roomStore.loading,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: CircularProgressIndicator(
@@ -235,21 +234,31 @@ class MessagesState extends State<Messages> {
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Container(
                           constraints: BoxConstraints(
                             maxWidth: messageInputWidth,
                           ),
                           child: TextField(
-                            onEditingComplete: () {
-                              print('On Edit complete');
-                            },
-                            onSubmitted: (testing) {
-                              print(testing);
+                            controller: editorController,
+                            // onEditingComplete: () {
+                            //    store.dispatch(sendMessage(
+                            //     body: editorController.text,
+                            //     type: 'm.room.message',
+                            //   ));
+                            // },
+                            onSubmitted: (text) {
+                              store.dispatch(sendMessage(
+                                body: text,
+                                type: 'm.room.message',
+                              ));
+                              editorController.clear();
                             },
                             onChanged: (text) {
-                              print('$text ${text.split('\n').length}');
+                              this.setState(() {
+                                sendable = text != null && text.isNotEmpty;
+                              });
                             },
                             maxLines: null,
                             keyboardType: TextInputType.multiline,
@@ -263,15 +272,24 @@ class MessagesState extends State<Messages> {
                                 horizontal: 20.0,
                               ),
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24.0)),
-                              hintText: 'Tether Message',
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
+                              hintText: 'Tether message',
                             ),
                           ),
                         ),
                         Container(
                           width: 48.0,
+                          padding: EdgeInsets.all(4),
                           child: InkWell(
-                            onTap: onSendMessage,
+                            borderRadius: BorderRadius.circular(48),
+                            onTap: () {
+                              store.dispatch(sendMessage(
+                                body: editorController.text,
+                                type: 'm.room.message',
+                              ));
+                              editorController.clear();
+                            },
                             child: CircleAvatar(
                               backgroundColor: Color(PRIMARY),
                               child: Icon(

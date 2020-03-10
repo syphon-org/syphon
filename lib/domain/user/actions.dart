@@ -86,11 +86,13 @@ ThunkAction<AppState> startAuthObserver() {
     final user = store.state.userStore.user;
     final Function onAuthStateChanged = (user) async {
       if (user != null && user.accessToken != null) {
+        await store.dispatch(fetchUserProfile());
+
         // Run for new authed user without a proper sync
         if (store.state.roomStore.lastSince == null) {
           await store.dispatch(initialRoomSync());
         }
-        store.dispatch(fetchUserProfile());
+
         store.dispatch(startRoomsObserver());
       } else {
         store.dispatch(stopRoomsObserver());
@@ -157,7 +159,6 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      print('loginUser failure : $error');
       store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -205,7 +206,9 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      // submit empty auth before logging out of matrix
       final authObserver = store.state.userStore.authObserver;
+      authObserver.add(null);
 
       final request = buildLogoutUserRequest(
         protocol: protocol,
@@ -213,17 +216,16 @@ ThunkAction<AppState> logoutUser() {
         accessToken: store.state.userStore.user.accessToken,
       );
 
-      final response = await http.post(
+      await http.post(
         request['url'],
         headers: request['headers'],
       );
 
-      json.decode(response.body);
-
-      authObserver.add(null);
       store.dispatch(ResetUser());
+      store.dispatch(ResetRooms());
+      store.dispatch(SetSynced(synced: false, lastSince: null));
     } catch (error) {
-      print(error);
+      store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

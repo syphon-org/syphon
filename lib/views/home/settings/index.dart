@@ -26,15 +26,23 @@ class SettingsScreen extends StatelessWidget {
         builder: (context, store) {
           return Scaffold(
             appBar: AppBar(
+              brightness: Brightness.light,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.pop(context, false),
               ),
-              title: Text(title,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w100)),
+              title: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
             ),
-            body: Container(
+            body: SingleChildScrollView(
+              // Use a container of the same height and width
+              // to flex dynamically but within a single child scroll
+              child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 child: Column(
                   children: <Widget>[
@@ -193,7 +201,9 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                )),
+                ),
+              ),
+            ),
           );
         },
       );

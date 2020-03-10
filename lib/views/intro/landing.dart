@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -29,21 +30,24 @@ class LandingSection extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             MOBILE_USER_GRAPHIC,
-            semanticsLabel: 'Relaxed, Lounging User',
+            semanticsLabel: INTRO_IMAGE_LABEL,
           ),
         ),
         Container(
           margin: EdgeInsets.only(bottom: 16),
           child: Text(
-            'Welcome to Tether',
+            INTRO_TITLE,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline4,
           ),
         ),
-        Text(
-          'Take back your privacy and freedom \nwithout the hassle',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.subtitle2,
+        FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            INTRO_SUBTITLE,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.subtitle2,
+          ),
         ),
       ],
     ));

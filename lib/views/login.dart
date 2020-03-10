@@ -1,5 +1,6 @@
 import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -116,7 +117,7 @@ class LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Flexible(
-                    flex: 3,
+                    flex: 4,
                     child: Flex(
                       direction: Axis.vertical,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -127,9 +128,9 @@ class LoginState extends State<Login> {
                               incrementTheme(),
                             );
                           },
-                          child: const Image(
-                            width: 164,
-                            height: 164,
+                          child: Image(
+                            width: width * 0.35,
+                            height: width * 0.35,
                             image: AssetImage(TETHER_ICON_PNG),
                           ),
                         ),
@@ -142,19 +143,22 @@ class LoginState extends State<Login> {
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Take back the chat',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline4,
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              LOGIN_TITLE,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
                           ),
                         ]),
                   ),
                   Flexible(
-                    flex: 2,
+                    flex: 3,
                     fit: FlexFit.loose,
                     child: Flex(
                         direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
                             width: defaultWidgetScaling,
@@ -201,7 +205,7 @@ class LoginState extends State<Login> {
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.help_outline),
-                                  tooltip: 'Select your usernames homeserver',
+                                  tooltip: SELECT_USERNAME_TITLE,
                                   onPressed: () {
                                     Navigator.pushNamed(
                                       context,
@@ -212,11 +216,9 @@ class LoginState extends State<Login> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(28.0),
                                 ),
-                                hintText: store.state.userStore.homeserver
-                                            .length !=
-                                        0
-                                    ? 'username:${store.state.userStore.homeserver}'
-                                    : 'username:tether.org',
+                                hintText: formatUsernameHint(
+                                  store.state.userStore.homeserver,
+                                ),
                                 labelText: 'username',
                               ),
                             ),
@@ -289,7 +291,7 @@ class LoginState extends State<Login> {
                               ),
                             )
                           : Text(
-                              'Login',
+                              LOGIN_BUTTON_TEXT,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -316,7 +318,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            'Don\'t have a username?',
+                            CREATE_USER_TEXT,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -326,7 +328,7 @@ class LoginState extends State<Login> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              'Create one',
+                              CREATE_USER_TEXT_ACTION,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,

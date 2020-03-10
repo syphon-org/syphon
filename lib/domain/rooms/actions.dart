@@ -44,6 +44,10 @@ class SetRooms {
   SetRooms({this.rooms});
 }
 
+class ResetRooms {
+  ResetRooms();
+}
+
 class SetRoomState {
   final String id; // room id
   final List<Event> state;
@@ -156,13 +160,12 @@ ThunkAction<AppState> fetchSync({String since}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
-      print('[fetchSync] started');
 
       final request = buildSyncRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
-        fullState: store.state.roomStore.rooms.length == 0,
+        fullState: store.state.roomStore.rooms == null,
         since: since ?? store.state.roomStore.lastSince,
       );
 
@@ -179,13 +182,31 @@ ThunkAction<AppState> fetchSync({String since}) {
       // init new store containers
       final Map<String, Room> rooms = store.state.roomStore.rooms;
 
+      final user = store.state.userStore.user;
+
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
+        Room room;
+
+        // use pre-existing values where available
         if (rooms.containsKey(id)) {
-          store.dispatch(SetRoom(room: rooms[id].fromSync(json: json)));
+          room = rooms[id].fromSync(
+            json: json,
+            username: user.displayName,
+          );
         } else {
-          store.dispatch(SetRoom(room: Room(id: id).fromSync(json: json)));
+          room = Room(id: id).fromSync(
+            json: json,
+            username: user.displayName,
+          );
         }
+
+        // fetch avatar if a uri was found
+        if (room.avatar != null) {
+          store.dispatch(fetchRoomAvatar(room));
+        }
+
+        store.dispatch(SetRoom(room: room));
       });
 
       // TODO: save the initial sync, but not like this
@@ -199,7 +220,6 @@ ThunkAction<AppState> fetchSync({String since}) {
     } catch (error) {
       print('[fetchSync] error $error');
     } finally {
-      print('[fetchSync] completed successfully');
       store.dispatch(SetSyncing(syncing: false));
     }
   };
@@ -260,11 +280,7 @@ ThunkAction<AppState> fetchDirectRooms() {
 
       // Mark specified rooms as direct chats
       rawDirectRooms.forEach((name, ids) {
-        store.dispatch(SetRoom(
-            room: Room(
-          id: ids[0],
-          direct: true,
-        )));
+        store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
       });
     } catch (error) {
       print('[fetchDirectRooms] error: $error');
@@ -337,6 +353,8 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
       // Add State events to room and toggle syncing
       final user = store.state.userStore.user;
 
+      print('[USERNAME] ${user}');
+
       store.dispatch(SetRoomState(
         id: room.id,
         state: stateEvents,
@@ -385,10 +403,6 @@ ThunkAction<AppState> fetchRoomAvatar(Room room, {bool force}) {
     try {
       if (room.avatar == null || room.avatar.uri == null) {
         throw 'avatar is null';
-      }
-
-      if (room.avatar.url != null && !force) {
-        return;
       }
 
       final request = buildThumbnailRequest(
