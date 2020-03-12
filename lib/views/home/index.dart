@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:flutter/foundation.dart';
@@ -101,103 +103,99 @@ class Home extends StatelessWidget {
   }
 
   Widget buildConversationList(List<Room> rooms, BuildContext context) {
-    if (rooms.length > 0) {
-      return ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: rooms.length,
-        itemBuilder: (BuildContext context, int index) {
-          final room = rooms[index];
-
-          // GestureDetector w/ animation
-          return InkWell(
-              onTap: () => Navigator.pushNamed(
-                    context,
-                    '/home/messages',
-                    arguments: MessageArguments(
-                      roomId: room.id,
-                      title: room.name,
-                    ),
-                  ),
-              child: Container(
-                child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 18,
-                    ),
-                    child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            child: CircleAvatar(
-                              radius: 24,
-                              backgroundColor: room.avatar != null
-                                  ? Colors.white70
-                                  : Colors.grey,
-                              child: buildChatAvatar(room: room),
-                            ),
-                            margin: const EdgeInsets.only(right: 12),
-                          ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Flex(
-                                direction: Axis.vertical,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        formatRoomName(room: room),
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                      Text(
-                                        formatSinceLastUpdate(
-                                            lastUpdateMillis: room.lastUpdate),
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w100),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    formatPreview(room: room),
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ]),
-                          ),
-                        ])),
-              ));
-        },
-      );
+    if (rooms.isEmpty) {
+      return Center(
+          child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+              constraints:
+                  BoxConstraints(minWidth: 200, maxWidth: 400, maxHeight: 200),
+              child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
+                  semanticsLabel: 'Tiny cute monsters hidding behind foliage')),
+          Container(
+              margin: EdgeInsets.only(bottom: 48),
+              padding: EdgeInsets.only(top: 16),
+              child: Text(
+                'Seems there\'s no messages yet',
+                style: Theme.of(context).textTheme.title,
+              ))
+        ],
+      ));
     }
 
-    return Center(
-        child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-            constraints:
-                BoxConstraints(minWidth: 200, maxWidth: 400, maxHeight: 200),
-            child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
-                semanticsLabel: 'Tiny cute monsters hidding behind foliage')),
-        Container(
-            margin: EdgeInsets.only(bottom: 48),
-            padding: EdgeInsets.only(top: 16),
-            child: Text(
-              'Seems there\'s no messages yet',
-              style: Theme.of(context).textTheme.title,
-            ))
-      ],
-    ));
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: rooms.length,
+      itemBuilder: (BuildContext context, int index) {
+        final room = rooms[index];
+
+        // GestureDetector w/ animation
+        return InkWell(
+          onTap: () => Navigator.pushNamed(
+            context,
+            '/home/messages',
+            arguments: MessageArguments(
+              roomId: room.id,
+              title: room.name,
+            ),
+          ),
+          child: Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 18,
+              ),
+              child: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundColor:
+                            room.avatar != null ? Colors.white70 : Colors.grey,
+                        child: buildChatAvatar(room: room),
+                      ),
+                      margin: const EdgeInsets.only(right: 12),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      fit: FlexFit.tight,
+                      child: Flex(
+                          direction: Axis.vertical,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  formatRoomName(room: room),
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                Text(
+                                  formatSinceLastUpdate(
+                                      lastUpdateMillis: room.lastUpdate),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w100),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              formatPreview(room: room),
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ]),
+                    ),
+                  ])),
+        );
+      },
+    );
   }
 
   @override
@@ -297,11 +295,22 @@ class Home extends StatelessWidget {
                           ),
                         )),
                     Expanded(
-                      child: buildConversationList(
-                        sortRoomsByPriority(state),
-                        context,
+                      child: RefreshIndicator(
+                        onRefresh: () {
+                          print('STUB REFRESH');
+                          return Future.delayed(
+                            const Duration(milliseconds: 3000),
+                            () {
+                              return 'done';
+                            },
+                          );
+                        },
+                        child: buildConversationList(
+                          sortRoomsByPriority(state),
+                          context,
+                        ),
                       ),
-                    )
+                    ),
                   ]);
             }),
       ),

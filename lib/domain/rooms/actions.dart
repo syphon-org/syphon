@@ -181,7 +181,6 @@ ThunkAction<AppState> fetchSync({String since}) {
 
       // init new store containers
       final Map<String, Room> rooms = store.state.roomStore.rooms;
-
       final user = store.state.userStore.user;
 
       // update those that exist or add a new room

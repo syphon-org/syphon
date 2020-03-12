@@ -27,12 +27,17 @@ class Event {
   final String stateKey;
   final int timestamp;
 
+  /* 
+  * TODO: content will not always be a string? configure parsing data
+  * or more complex objects
+  */
   @JsonProperty(ignore: true)
   final dynamic content;
 
-  // For m.room.message only
-  String get body => content != null ? content['body'] : '';
-  String get contentType => content != null ? content['msgtype'] : null;
+  // TODO: remove need - for m.room.message only
+  String get body => type == 'm.room.message' ? content['body'] : '';
+  String get contentType =>
+      type == 'm.room.message' ? content['msgtype'] : null;
 
   const Event({
     this.id,
@@ -77,4 +82,43 @@ class Event {
       content: json['content'] as dynamic,
     );
   }
+}
+
+@jsonSerializable
+class Message extends Event {
+  final String body;
+  final String msgtype;
+  final String format;
+  final String filename;
+  final String formattedBody;
+
+  // TODO: this would work when originally converting content
+  final Map<String, dynamic> extraPropsMap;
+
+  @JsonProperty()
+  void unmappedSet(String name, dynamic value) {
+    extraPropsMap[name] = value;
+  }
+
+  @JsonProperty()
+  Map<String, dynamic> unmappedGet() {
+    return extraPropsMap;
+  }
+
+  const Message({
+    this.body,
+    this.msgtype,
+    this.format,
+    this.filename,
+    this.formattedBody,
+    this.extraPropsMap,
+  }) : super();
+
+  factory Message.fromEvent(Event event) => Message(
+        body: event.content['body'],
+        msgtype: event.content['msgtype'],
+        format: event.content['format'],
+        filename: event.content['filename'],
+        formattedBody: event.content['formattedBody'],
+      );
 }

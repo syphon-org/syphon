@@ -68,8 +68,13 @@ class MessagesState extends State<Messages> {
       converter: (Store<AppState> store) => store.state,
       builder: (context, state) {
         final messages = room(id: roomId, state: state).messages;
+        final testing = room(id: roomId, state: state).testing;
         final userId = state.userStore.user.userId;
 
+        if (testing.isNotEmpty) {
+          print(testing[0].body);
+          print(testing[0].timestamp);
+        }
         return ListView.builder(
           reverse: true,
           itemCount: messages.length,
@@ -140,6 +145,8 @@ class MessagesState extends State<Messages> {
           double messageInputWidth = width - 64;
           return Scaffold(
             appBar: AppBar(
+              brightness:
+                  Brightness.dark, // TOOD: this should inherit from theme
               automaticallyImplyLeading: false,
               titleSpacing: 0.0,
               title: Row(children: <Widget>[

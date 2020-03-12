@@ -57,6 +57,7 @@ class Room {
   final List<Event> state;
   final List<Event> events; // DEPRECATE - every event should never be in store
   final List<Event> messages;
+  final List<Message> testing; // this is working
 
   const Room({
     this.id,
@@ -72,6 +73,7 @@ class Room {
     this.lastUpdate = 0,
     this.startTime,
     this.endTime,
+    this.testing = const [],
   });
 
   Room copyWith({
@@ -88,6 +90,7 @@ class Room {
     messages,
     startTime,
     endTime,
+    testing,
   }) {
     return Room(
       id: id ?? this.id,
@@ -100,6 +103,7 @@ class Room {
       state: state ?? this.state,
       events: events ?? this.events,
       messages: messages ?? this.messages,
+      testing: testing ?? this.testing,
     );
   }
 
@@ -109,24 +113,35 @@ class Room {
     String endTime,
   }) {
     int lastUpdate = this.lastUpdate;
+    List<Message> testing = [];
 
     // Converting only message events
-    messageEvents.retainWhere((event) => event.type == 'm.room.message');
-    var updatedMessages = messageEvents;
+    List<Event> messages =
+        messageEvents.where((event) => event.type == 'm.room.message').toList();
 
-    updatedMessages.forEach((event) {
+    messages.forEach((event) {
       lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
     });
 
+    // Converting message events as messages
+    testing = messages.map((event) => Message.fromEvent(event)).toList();
+
+    if (testing.isNotEmpty) {
+      print(testing[0].body);
+    }
+
     // Combine current and new
     if (this.messages.length > 0) {
-      updatedMessages =
-          [messageEvents, this.messages].expand((x) => x).toList();
+      messages = [
+        messageEvents,
+        this.messages,
+      ].expand((x) => x).toList();
     }
 
     // Add to room
     return this.copyWith(
-      messages: updatedMessages,
+      testing: testing,
+      messages: messages,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -185,13 +200,9 @@ class Room {
             break;
           case 'm.room.member':
             if (this.direct && event.content['displayname'] != username) {
-              print(
-                '[m.room.member direct] ${event.content['displayname']} ${username}',
-              );
               name = event.content['displayname'];
             }
             break;
-          case 'm.room.message':
           default:
             break;
         }
