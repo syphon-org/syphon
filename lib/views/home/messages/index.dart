@@ -1,5 +1,6 @@
 import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/formatters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -47,9 +48,11 @@ class Messages extends StatefulWidget {
 
 class MessagesState extends State<Messages> {
   FocusNode inputFieldNode;
+  Map<String, Color> senderColors;
 
   bool sendable = false;
   final editorController = TextEditingController();
+  final messagesController = ScrollController();
 
   @override
   void initState() {
@@ -68,61 +71,178 @@ class MessagesState extends State<Messages> {
       converter: (Store<AppState> store) => store.state,
       builder: (context, state) {
         final messages = room(id: roomId, state: state).messages;
-        final testing = room(id: roomId, state: state).testing;
         final userId = state.userStore.user.userId;
 
-        if (testing.isNotEmpty) {
-          print(testing[0].body);
-          print(testing[0].timestamp);
-        }
         return ListView.builder(
           reverse: true,
           itemCount: messages.length,
           scrollDirection: Axis.vertical,
+          controller: messagesController,
           itemBuilder: (BuildContext context, int index) {
             final message = messages[index];
+            final lastMessage = index != 0 ? messages[index - 1] : null;
+            final nextMessage =
+                index + 1 < messages.length ? messages[index + 1] : null;
+
+            final isLastSender =
+                lastMessage != null && lastMessage.sender == message.sender;
+
+            final isNextSender =
+                nextMessage != null && nextMessage.sender == message.sender;
+
             final userSent = userId == message.sender;
 
+            var textColor = Colors.white;
+            var backgroundColor = Colors.blue;
+            var bubbleBorder = BorderRadius.circular(16);
             var messageAlignment = CrossAxisAlignment.start;
-            var textAlign = TextAlign.start;
+            var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
 
-            if (userSent) {
-              messageAlignment = CrossAxisAlignment.end;
-              textAlign = TextAlign.end;
+            if (isLastSender) {
+              if (isNextSender) {
+                // Message in the middle of a sender messages block
+                bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+                bubbleBorder = BorderRadius.only(
+                  topRight: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                  topLeft: Radius.circular(4),
+                  bottomLeft: Radius.circular(4),
+                );
+              } else {
+                // Message at the beginning of a sender messages block
+                bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+                bubbleBorder = BorderRadius.only(
+                  topRight: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(4),
+                );
+              }
             }
 
+            if (!isLastSender && isNextSender) {
+              // End of a sender messages block
+              bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+              bubbleBorder = BorderRadius.only(
+                topRight: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+                topLeft: Radius.circular(4),
+              );
+            }
+
+            if (userSent) {
+              textColor = GREY_DARK_COLOR;
+              backgroundColor = ENABLED_GREY_COLOR;
+              messageAlignment = CrossAxisAlignment.end;
+            }
+
+            /**
+             * Text(
+                message.body,
+                textAlign: textAlign,
+                style: TextStyle(),
+              ),
+             */
             return Container(
               child: Flex(
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: messageAlignment,
                 children: <Widget>[
-                  Card(
-                    elevation: 4.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        // lighter gradient effect
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.red,
-                            Colors.cyan,
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   Container(
+                    margin: bubbleSpacing,
                     padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 24,
+                      horizontal: 12,
                     ),
-                    child: Text(
-                      message.body,
-                      textAlign: textAlign,
-                      style: TextStyle(),
-                    ),
+                    // decoration: BoxDecoration( // DEBUG ONLY
+                    //   color: Colors.red,
+                    // ),
+                    child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Visibility(
+                            visible: !isLastSender,
+                            maintainState: true,
+                            maintainAnimation: true,
+                            maintainSize: true,
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                right: 12,
+                              ),
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: backgroundColor,
+                                child: Text(
+                                  formatSenderInitials(message.sender),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                  color: Colors.lightBlue,
+                                  borderRadius: bubbleBorder),
+                              child: Flex(
+                                  direction: Axis.vertical,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          formatSender(message.sender),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: textColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        vertical: 4,
+                                      ),
+                                      child: Text(
+                                        message.body,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: textColor,
+                                          fontWeight: FontWeight.w100,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      formatTimestamp(
+                                        lastUpdateMillis: message.timestamp,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ]),
+                            ),
+                          ),
+                        ]),
                   ),
                 ],
               ),
@@ -143,6 +263,8 @@ class MessagesState extends State<Messages> {
 
           double width = MediaQuery.of(context).size.width;
           double messageInputWidth = width - 64;
+
+          final isEditing = inputFieldNode.hasFocus;
           return Scaffold(
             appBar: AppBar(
               brightness:
@@ -238,7 +360,23 @@ class MessagesState extends State<Messages> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: false
+                          ? [
+                              BoxShadow(
+                                blurRadius: 6,
+                                offset: Offset(0, -4),
+                                color: Colors.black12,
+                              )
+                            ]
+                          : [],
+                    ),
+                    padding: EdgeInsets.only(
+                        top: 12,
+                        bottom: isEditing ? 12 : 32,
+                        left: 8,
+                        right: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -249,12 +387,9 @@ class MessagesState extends State<Messages> {
                           ),
                           child: TextField(
                             controller: editorController,
-                            // onEditingComplete: () {
-                            //    store.dispatch(sendMessage(
-                            //     body: editorController.text,
-                            //     type: 'm.room.message',
-                            //   ));
-                            // },
+                            onEditingComplete: () {
+                              print('they pressed it');
+                            },
                             onSubmitted: (text) {
                               store.dispatch(sendMessage(
                                 body: text,

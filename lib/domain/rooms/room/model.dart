@@ -113,7 +113,6 @@ class Room {
     String endTime,
   }) {
     int lastUpdate = this.lastUpdate;
-    List<Message> testing = [];
 
     // Converting only message events
     List<Event> messages =
@@ -123,17 +122,19 @@ class Room {
       lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
     });
 
-    // Converting message events as messages
-    testing = messages.map((event) => Message.fromEvent(event)).toList();
+    // List<Message> testing = [];
 
-    if (testing.isNotEmpty) {
-      print(testing[0].body);
-    }
+    // // Converting message events as messages
+    // testing = messages.map((event) => Message.fromEvent(event)).toList();
+
+    // if (testing.isNotEmpty) {
+    //   print(testing[0].body);
+    // }
 
     // Combine current and new
     if (this.messages.length > 0) {
       messages = [
-        messageEvents,
+        messages,
         this.messages,
       ].expand((x) => x).toList();
     }

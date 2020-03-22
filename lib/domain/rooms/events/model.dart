@@ -84,8 +84,18 @@ class Event {
   }
 }
 
+// TODO: make this actually inherit Event but also allow immutability (dart says no?)
 @jsonSerializable
 class Message extends Event {
+  final String id; // event_id
+  final String userId;
+  final String roomId;
+  final String type;
+  final String sender;
+  final String stateKey;
+  final int timestamp;
+
+  // Message Only
   final String body;
   final String msgtype;
   final String format;
@@ -106,6 +116,13 @@ class Message extends Event {
   }
 
   const Message({
+    this.id,
+    this.userId,
+    this.roomId,
+    this.type,
+    this.sender,
+    this.stateKey,
+    this.timestamp,
     this.body,
     this.msgtype,
     this.format,
@@ -115,6 +132,14 @@ class Message extends Event {
   }) : super();
 
   factory Message.fromEvent(Event event) => Message(
+        id: event.id,
+        userId: event.userId,
+        roomId: event.roomId,
+        type: event.type,
+        sender: event.sender,
+        stateKey: event.stateKey,
+        timestamp: event.timestamp,
+        // extracted content
         body: event.content['body'],
         msgtype: event.content['msgtype'],
         format: event.content['format'],

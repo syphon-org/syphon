@@ -13,6 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/room/model.dart';
 import 'package:Tether/domain/rooms/selectors.dart';
+import 'package:Tether/global/formatters.dart';
 
 // View And Styling
 import 'package:Tether/views/home/messages/index.dart';
@@ -49,51 +50,27 @@ class Home extends StatelessWidget {
     return shortened ? '$preview...' : preview;
   }
 
-  String formatSinceLastUpdate({int lastUpdateMillis}) {
-    if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
-
-    final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
-    final sinceLastUpdate = DateTime.now().difference(timestamp);
-
-    if (sinceLastUpdate.inDays > 6) {
-      // Abbreviated month and day number - Jan 1
-      return DateFormat.MMMd().format(timestamp);
-    } else if (sinceLastUpdate.inDays > 0) {
-      // Abbreviated weekday - Fri
-      return DateFormat.E().format(timestamp);
-    } else if (sinceLastUpdate.inHours > 0) {
-      // Abbreviated hours since - 1h
-      return '${sinceLastUpdate.inHours}h';
-    } else if (sinceLastUpdate.inMinutes > 0) {
-      // Abbreviated minutes since - 1m
-      return '${sinceLastUpdate.inMinutes}m';
-    } else if (sinceLastUpdate.inSeconds > 1) {
-      // Just say now if it's been within the minute
-      return 'Now';
-    } else {
-      return '';
-    }
-  }
-
   Widget buildChatAvatar({Room room}) {
     if (room.syncing) {
       return Container(
-          margin: EdgeInsets.all(8),
-          child: CircularProgressIndicator(
-            strokeWidth: 3,
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-            value: null,
-          ));
+        margin: EdgeInsets.all(8),
+        child: CircularProgressIndicator(
+          strokeWidth: 3,
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+          value: null,
+        ),
+      );
     }
 
     if (room.avatar != null && room.avatar.data != null) {
       return ClipRRect(
-          borderRadius: BorderRadius.circular(25),
-          child: Image(
-            width: 52,
-            height: 52,
-            image: MemoryImage(room.avatar.data),
-          ));
+        borderRadius: BorderRadius.circular(25),
+        child: Image(
+          width: 52,
+          height: 52,
+          image: MemoryImage(room.avatar.data),
+        ),
+      );
     }
 
     return Text(
@@ -109,16 +86,22 @@ class Home extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-              constraints:
-                  BoxConstraints(minWidth: 200, maxWidth: 400, maxHeight: 200),
-              child: SvgPicture.asset(GRAPHIC_EMPTY_MESSAGES,
-                  semanticsLabel: 'Tiny cute monsters hidding behind foliage')),
+            constraints: BoxConstraints(
+              minWidth: 200,
+              maxWidth: 400,
+              maxHeight: 200,
+            ),
+            child: SvgPicture.asset(
+              GRAPHIC_EMPTY_MESSAGES,
+              semanticsLabel: 'Tiny cute monsters hidding behind foliage',
+            ),
+          ),
           Container(
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
                 'Seems there\'s no messages yet',
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.headline6,
               ))
         ],
       ));
@@ -178,8 +161,9 @@ class Home extends StatelessWidget {
                                       fontWeight: FontWeight.w400),
                                 ),
                                 Text(
-                                  formatSinceLastUpdate(
-                                      lastUpdateMillis: room.lastUpdate),
+                                  formatTimestamp(
+                                    lastUpdateMillis: room.lastUpdate,
+                                  ),
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w100),
