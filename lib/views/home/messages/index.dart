@@ -52,12 +52,13 @@ class MessagesState extends State<Messages> {
 
   bool sendable = false;
   final editorController = TextEditingController();
-  final messagesController = ScrollController();
+  final messagesController = ScrollController(initialScrollOffset: 0);
 
   @override
   void initState() {
     super.initState();
     inputFieldNode = FocusNode();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {});
   }
 
   @override
@@ -265,6 +266,8 @@ class MessagesState extends State<Messages> {
           double messageInputWidth = width - 64;
 
           final isEditing = inputFieldNode.hasFocus;
+          final isScrolling =
+              messagesController.hasClients && messagesController.offset != 0;
           return Scaffold(
             appBar: AppBar(
               brightness:
@@ -362,7 +365,7 @@ class MessagesState extends State<Messages> {
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      boxShadow: false
+                      boxShadow: isScrolling
                           ? [
                               BoxShadow(
                                 blurRadius: 6,
