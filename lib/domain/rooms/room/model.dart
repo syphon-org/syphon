@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:flutter/foundation.dart';
 
 @jsonSerializable
 class Avatar {
@@ -113,36 +114,31 @@ class Room {
     String endTime,
   }) {
     int lastUpdate = this.lastUpdate;
+    List<Event> mergedMessages = this.messages;
 
     // Converting only message events
-    List<Event> messages =
+    final messages =
         messageEvents.where((event) => event.type == 'm.room.message').toList();
 
-    messages.forEach((event) {
-      lastUpdate = event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
-    });
-
-    // List<Message> testing = [];
-
-    // // Converting message events as messages
-    // testing = messages.map((event) => Message.fromEvent(event)).toList();
-
-    // if (testing.isNotEmpty) {
-    //   print(testing[0].body);
-    // }
-
-    // Combine current and new
-    if (this.messages.length > 0) {
-      messages = [
-        messages,
-        this.messages,
-      ].expand((x) => x).toList();
+    // See if the newest message has a greater timestamp
+    if (messages.length > 0) {
+      final newestEvent = messages[0];
+      lastUpdate = newestEvent.timestamp > lastUpdate
+          ? newestEvent.timestamp
+          : lastUpdate;
     }
+
+    // Combine incoming messages and existing
+    if (!listEquals(messages, this.messages)) {
+      mergedMessages = [messages, this.messages].expand((x) => x).toList();
+    }
+
+    // TODO: sort on timestamp
 
     // Add to room
     return this.copyWith(
       testing: testing,
-      messages: messages,
+      messages: mergedMessages,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,

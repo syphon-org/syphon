@@ -93,7 +93,7 @@ class MessagesState extends State<Messages> {
             final userSent = userId == message.sender;
 
             var textColor = Colors.white;
-            var backgroundColor = Colors.blue;
+            var senderColor = hashedColor(message.sender);
             var bubbleBorder = BorderRadius.circular(16);
             var messageAlignment = CrossAxisAlignment.start;
             var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
@@ -133,7 +133,7 @@ class MessagesState extends State<Messages> {
 
             if (userSent) {
               textColor = GREY_DARK_COLOR;
-              backgroundColor = ENABLED_GREY_COLOR;
+              senderColor = ENABLED_GREY_COLOR;
               messageAlignment = CrossAxisAlignment.end;
             }
 
@@ -159,90 +159,90 @@ class MessagesState extends State<Messages> {
                     //   color: Colors.red,
                     // ),
                     child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Visibility(
-                            visible: !isLastSender,
-                            maintainState: true,
-                            maintainAnimation: true,
-                            maintainSize: true,
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                right: 12,
-                              ),
-                              child: CircleAvatar(
-                                radius: 14,
-                                backgroundColor: backgroundColor,
-                                child: Text(
-                                  formatSenderInitials(message.sender),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Visibility(
+                          visible: !isLastSender && !userSent,
+                          maintainState: true,
+                          maintainAnimation: true,
+                          maintainSize: true,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                              right: 12,
+                            ),
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: senderColor,
+                              child: Text(
+                                formatSenderInitials(message.sender),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Colors.lightBlue,
-                                  borderRadius: bubbleBorder),
-                              child: Flex(
-                                  direction: Axis.vertical,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          formatSender(message.sender),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: textColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 4,
-                                      ),
-                                      child: Text(
-                                        message.body,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: textColor,
-                                          fontWeight: FontWeight.w100,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      formatTimestamp(
-                                        lastUpdateMillis: message.timestamp,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: textColor,
-                                      ),
-                                    ),
-                                  ]),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
                             ),
+                            decoration: BoxDecoration(
+                                color: senderColor, borderRadius: bubbleBorder),
+                            child: Flex(
+                                direction: Axis.vertical,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        formatSender(message.sender),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: textColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    child: Text(
+                                      message.body,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w100,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    formatTimestamp(
+                                      lastUpdateMillis: message.timestamp,
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ]),
                           ),
-                        ]),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -433,7 +433,7 @@ class MessagesState extends State<Messages> {
                               editorController.clear();
                             },
                             child: CircleAvatar(
-                              backgroundColor: Color(PRIMARY),
+                              backgroundColor: PRIMARY_COLOR,
                               child: Icon(
                                 Icons.send,
                                 color: Colors.white,
