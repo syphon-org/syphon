@@ -1,9 +1,64 @@
 import 'package:flutter/material.dart';
 import './colors.dart';
 
-enum ThemeType { LIGHT, DARK, DARKER }
+enum ThemeType {
+  LIGHT,
+  DARK,
+  CUSTOM,
+  DARKER,
+}
 
 class Themes {
+  static ThemeData generateCustomTheme({
+    Color primary,
+    Color accent,
+    ThemeType themeType,
+  }) {
+    var brightness = Brightness.light;
+    var scaffoldBackgroundColor = BACKGROUND_COLOR;
+    var primaryColor = primary ?? PRIMARY_COLOR;
+    var aceentColor = accent ?? ACCENT_COLOR;
+
+    switch (themeType) {
+      case ThemeType.DARK:
+        brightness = Brightness.dark;
+        primaryColor = PRIMRARY_DARK_COLOR;
+        scaffoldBackgroundColor = PRIMARY_COLOR;
+        break;
+      case ThemeType.DARKER:
+        brightness = Brightness.dark;
+        primaryColor = PRIMRARY_DARK_COLOR;
+        break;
+      case ThemeType.LIGHT:
+      default:
+        brightness = Brightness.light;
+        scaffoldBackgroundColor = BACKGROUND_COLOR;
+        break;
+    }
+
+    return ThemeData(
+      primaryColor: primaryColor,
+      accentColor: aceentColor,
+      brightness: brightness,
+      scaffoldBackgroundColor: scaffoldBackgroundColor,
+      cursorColor: PRIMARY_COLOR,
+
+      // Always the same
+      appBarTheme: AppBarTheme(brightness: Brightness.dark),
+      fontFamily: 'Rubik',
+      primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
+      textTheme: TextTheme(
+        headline5: TextStyle(fontWeight: FontWeight.w100),
+        headline6: TextStyle(fontWeight: FontWeight.w100),
+        subtitle2: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+        caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
+        button: TextStyle(
+          fontWeight: FontWeight.w100,
+        ),
+      ),
+    );
+  }
+
   static ThemeData getThemeFromKey(ThemeType themeKey) {
     switch (themeKey) {
       case ThemeType.LIGHT:
@@ -22,7 +77,7 @@ class Themes {
     accentColor: ACCENT_COLOR,
     brightness: Brightness.light,
     appBarTheme: AppBarTheme(
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
     ),
     scaffoldBackgroundColor: BACKGROUND_COLOR,
     fontFamily: 'Rubik',

@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
@@ -114,31 +115,34 @@ class Room {
     String endTime,
   }) {
     int lastUpdate = this.lastUpdate;
-    List<Event> mergedMessages = this.messages;
+    List<Event> existingMessages =
+        this.messages.isNotEmpty ? List<Event>.from(this.messages) : [];
+    List<Event> messages = messageEvents ?? [];
 
     // Converting only message events
-    final messages =
-        messageEvents.where((event) => event.type == 'm.room.message').toList();
+    final newMessages =
+        messages.where((event) => event.type == 'm.room.message').toList();
 
     // See if the newest message has a greater timestamp
-    if (messages.length > 0) {
-      final newestEvent = messages[0];
-      lastUpdate = newestEvent.timestamp > lastUpdate
-          ? newestEvent.timestamp
-          : lastUpdate;
+    if (newMessages.isNotEmpty && messages[0].timestamp > lastUpdate) {
+      lastUpdate = messages[0].timestamp;
     }
 
-    // Combine incoming messages and existing
-    if (!listEquals(messages, this.messages)) {
-      mergedMessages = [messages, this.messages].expand((x) => x).toList();
-    }
+    // Combine current and existing messages on unique ids
+    final combinedMessagesMap = HashMap.fromIterable(
+      [existingMessages, newMessages].expand((x) => x),
+      key: (message) => message.id,
+      value: (message) => message,
+    );
 
-    // TODO: sort on timestamp
+    final combinedMessages = List<Event>.from(combinedMessagesMap.values);
+
+    // // Should we sort here?
+    // combinedMessages.sort((a, b) => b.timestamp - a.timestamp);
 
     // Add to room
     return this.copyWith(
-      testing: testing,
-      messages: mergedMessages,
+      messages: combinedMessages,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,

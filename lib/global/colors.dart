@@ -10,7 +10,7 @@ const BACKGROUND = 0xffFEFEFE;
 
 const PRIMARY_COLOR = const Color(PRIMARY);
 const ACCENT_COLOR = const Color(ACCENT);
-const PRIMRARY_DAR_COLOR = const Color(PRIMARY_DARK);
+const PRIMRARY_DARK_COLOR = const Color(PRIMARY_DARK);
 const ENABLED_GREY_COLOR = const Color(ENABLED_GREY);
 const DISABLED_GREY_COLOR = const Color(DISABLED_GREY);
 const BACKGROUND_COLOR = const Color(BACKGROUND);

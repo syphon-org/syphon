@@ -1,3 +1,4 @@
+import 'package:Tether/global/widgets/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -5,7 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/domain/index.dart';
 
-enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
+enum DraftOptions { newGroup, markAllRead, inviteFriends, settings, help }
 
 class Draft extends StatelessWidget {
   Draft({Key key, this.title}) : super(key: key);
@@ -55,35 +56,36 @@ class Draft extends StatelessWidget {
             },
             tooltip: 'Search Messages',
           ),
-          PopupMenuButton<Overflow>(
-            onSelected: (Overflow result) {
+          RoundedPopupMenu<DraftOptions>(
+            onSelected: (DraftOptions result) {
               switch (result) {
-                case Overflow.settings:
+                case DraftOptions.settings:
                   Navigator.pushNamed(context, '/settings');
                   break;
                 default:
                   break;
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<Overflow>>[
-              const PopupMenuItem<Overflow>(
-                value: Overflow.newGroup,
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<DraftOptions>>[
+              const PopupMenuItem<DraftOptions>(
+                value: DraftOptions.newGroup,
                 child: Text('New Group'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.markAllRead,
+              const PopupMenuItem<DraftOptions>(
+                value: DraftOptions.markAllRead,
                 child: Text('Mark All Read'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.inviteFriends,
+              const PopupMenuItem<DraftOptions>(
+                value: DraftOptions.inviteFriends,
                 child: Text('Invite Friends'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.settings,
+              const PopupMenuItem<DraftOptions>(
+                value: DraftOptions.settings,
                 child: Text('Settings'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.help,
+              const PopupMenuItem<DraftOptions>(
+                value: DraftOptions.help,
                 child: Text('Help'),
               ),
             ],

@@ -1,4 +1,5 @@
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/settings/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -24,6 +25,10 @@ class ApperanceScreen extends StatelessWidget {
     },
   ];
 
+  displayThemeType(String themeTypeName) {
+    return themeTypeName.split('.')[1].toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
@@ -44,7 +49,9 @@ class ApperanceScreen extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        store.dispatch(incrementTheme());
+                      },
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       title: Text(
@@ -52,9 +59,9 @@ class ApperanceScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 18.0),
                       ),
                       trailing: Text(
-                        store.state.settingsStore.brightness < 1
-                            ? 'Light'
-                            : 'Dark',
+                        displayThemeType(
+                          store.state.settingsStore.theme.toString(),
+                        ),
                         style: TextStyle(fontSize: 18.0),
                       ),
                     ),

@@ -1,0 +1,31 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+/**
+ * RoundedPopupMenu
+ * Mostly an example for myself on how to override styling or other options on
+ * existing components app wide
+ */
+class RoundedPopupMenu<T> extends StatelessWidget {
+  RoundedPopupMenu({
+    Key key,
+    this.icon,
+    @required this.itemBuilder,
+    this.onSelected,
+  }) : super(key: key);
+
+  /// Called when the button is pressed to create the items to show in the menu.
+  final PopupMenuItemBuilder<T> itemBuilder;
+  final PopupMenuItemSelected<T> onSelected;
+  final Widget icon;
+
+  @override
+  Widget build(BuildContext context) => PopupMenuButton<T>(
+        onSelected: this.onSelected,
+        icon: this.icon ?? Icon(Icons.more_vert, color: Colors.white),
+        itemBuilder: this.itemBuilder,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      );
+}

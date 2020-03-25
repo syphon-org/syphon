@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
@@ -13,6 +14,14 @@ ThunkAction<AppState> initSettings() {
   return (Store<AppState> store) async {
     // TODO: get theme selection from local storage
     store.dispatch(SetTheme(ThemeType.LIGHT));
+  };
+}
+
+ThunkAction<AppState> updatePrimaryColor() {
+  return (Store<AppState> store) async {
+    int primaryColor = store.state.settingsStore.primaryColor;
+
+    Color(primaryColor);
   };
 }
 

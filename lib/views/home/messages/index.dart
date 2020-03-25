@@ -1,6 +1,7 @@
 import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
+import 'package:Tether/global/widgets/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -18,7 +19,7 @@ import 'package:Tether/domain/rooms/events/actions.dart';
  * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
  * 
  */
-enum Overflow {
+enum MessageOptions {
   search,
   allMedia,
   chatSettings,
@@ -67,192 +68,192 @@ class MessagesState extends State<Messages> {
     super.dispose();
   }
 
-  Widget buildMessageList(String roomId, BuildContext context) {
-    return StoreConnector<AppState, AppState>(
-      converter: (Store<AppState> store) => store.state,
-      builder: (context, state) {
-        final messages = room(id: roomId, state: state).messages;
-        final userId = state.userStore.user.userId;
+  Widget buildMessageList(String roomId, BuildContext context) =>
+      StoreConnector<AppState, AppState>(
+        converter: (Store<AppState> store) => store.state,
+        builder: (context, state) {
+          final messages = room(id: roomId, state: state).messages;
+          final userId = state.userStore.user.userId;
 
-        return ListView.builder(
-          reverse: true,
-          itemCount: messages.length,
-          scrollDirection: Axis.vertical,
-          controller: messagesController,
-          itemBuilder: (BuildContext context, int index) {
-            final message = messages[index];
-            final lastMessage = index != 0 ? messages[index - 1] : null;
-            final nextMessage =
-                index + 1 < messages.length ? messages[index + 1] : null;
+          return ListView.builder(
+            reverse: true,
+            itemCount: messages.length,
+            scrollDirection: Axis.vertical,
+            controller: messagesController,
+            itemBuilder: (BuildContext context, int index) {
+              final message = messages[index];
+              final lastMessage = index != 0 ? messages[index - 1] : null;
+              final nextMessage =
+                  index + 1 < messages.length ? messages[index + 1] : null;
 
-            final isLastSender =
-                lastMessage != null && lastMessage.sender == message.sender;
+              final isLastSender =
+                  lastMessage != null && lastMessage.sender == message.sender;
 
-            final isNextSender =
-                nextMessage != null && nextMessage.sender == message.sender;
+              final isNextSender =
+                  nextMessage != null && nextMessage.sender == message.sender;
 
-            final userSent = userId == message.sender;
+              final userSent = userId == message.sender;
 
-            var textColor = Colors.white;
-            var senderColor = hashedColor(message.sender);
-            var bubbleBorder = BorderRadius.circular(16);
-            var messageAlignment = CrossAxisAlignment.start;
-            var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
+              var textColor = Colors.white;
+              var senderColor = hashedColor(message.sender);
+              var bubbleBorder = BorderRadius.circular(16);
+              var messageAlignment = CrossAxisAlignment.start;
+              var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
 
-            if (isLastSender) {
-              if (isNextSender) {
-                // Message in the middle of a sender messages block
-                bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+              if (isLastSender) {
+                if (isNextSender) {
+                  // Message in the middle of a sender messages block
+                  bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+                  bubbleBorder = BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                    topLeft: Radius.circular(4),
+                    bottomLeft: Radius.circular(4),
+                  );
+                } else {
+                  // Message at the beginning of a sender messages block
+                  bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+                  bubbleBorder = BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(4),
+                  );
+                }
+              }
+
+              if (!isLastSender && isNextSender) {
+                // End of a sender messages block
+                bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
                 bubbleBorder = BorderRadius.only(
                   topRight: Radius.circular(16),
                   bottomRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
                   topLeft: Radius.circular(4),
-                  bottomLeft: Radius.circular(4),
-                );
-              } else {
-                // Message at the beginning of a sender messages block
-                bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
-                bubbleBorder = BorderRadius.only(
-                  topRight: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                  topLeft: Radius.circular(16),
-                  bottomLeft: Radius.circular(4),
                 );
               }
-            }
 
-            if (!isLastSender && isNextSender) {
-              // End of a sender messages block
-              bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
-              bubbleBorder = BorderRadius.only(
-                topRight: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-                bottomLeft: Radius.circular(16),
-                topLeft: Radius.circular(4),
-              );
-            }
+              if (userSent) {
+                textColor = GREY_DARK_COLOR;
+                senderColor = ENABLED_GREY_COLOR;
+                messageAlignment = CrossAxisAlignment.end;
+              }
 
-            if (userSent) {
-              textColor = GREY_DARK_COLOR;
-              senderColor = ENABLED_GREY_COLOR;
-              messageAlignment = CrossAxisAlignment.end;
-            }
-
-            /**
+              /**
              * Text(
                 message.body,
                 textAlign: textAlign,
                 style: TextStyle(),
               ),
              */
-            return Container(
-              child: Flex(
-                direction: Axis.vertical,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: messageAlignment,
-                children: <Widget>[
-                  Container(
-                    margin: bubbleSpacing,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
-                    // decoration: BoxDecoration( // DEBUG ONLY
-                    //   color: Colors.red,
-                    // ),
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        Visibility(
-                          visible: !isLastSender && !userSent,
-                          maintainState: true,
-                          maintainAnimation: true,
-                          maintainSize: true,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                              right: 12,
-                            ),
-                            child: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: senderColor,
-                              child: Text(
-                                formatSenderInitials(message.sender),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
+              return Container(
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: messageAlignment,
+                  children: <Widget>[
+                    Container(
+                      margin: bubbleSpacing,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
+                      // decoration: BoxDecoration( // DEBUG ONLY
+                      //   color: Colors.red,
+                      // ),
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Visibility(
+                            visible: !isLastSender && !userSent,
+                            maintainState: true,
+                            maintainAnimation: true,
+                            maintainSize: true,
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                right: 12,
+                              ),
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: senderColor,
+                                child: Text(
+                                  formatSenderInitials(message.sender),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                                color: senderColor, borderRadius: bubbleBorder),
-                            child: Flex(
-                                direction: Axis.vertical,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        formatSender(message.sender),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                  color: senderColor,
+                                  borderRadius: bubbleBorder),
+                              child: Flex(
+                                  direction: Axis.vertical,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          formatSender(message.sender),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: textColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        vertical: 4,
+                                      ),
+                                      child: Text(
+                                        message.body,
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 14,
                                           color: textColor,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w100,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: 4,
                                     ),
-                                    child: Text(
-                                      message.body,
+                                    Text(
+                                      formatTimestamp(
+                                        lastUpdateMillis: message.timestamp,
+                                      ),
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 12,
                                         color: textColor,
-                                        fontWeight: FontWeight.w100,
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    formatTimestamp(
-                                      lastUpdateMillis: message.timestamp,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: textColor,
-                                    ),
-                                  ),
-                                ]),
+                                  ]),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
 
   @override
   Widget build(BuildContext context) =>
@@ -300,34 +301,34 @@ class MessagesState extends State<Messages> {
                         color: Colors.white, fontWeight: FontWeight.w100)),
               ]),
               actions: <Widget>[
-                PopupMenuButton<Overflow>(
-                  icon: Icon(Icons.more_vert, color: Colors.white),
-                  onSelected: (Overflow result) {
+                RoundedPopupMenu<MessageOptions>(
+                  onSelected: (MessageOptions result) {
                     switch (result) {
                       default:
                         break;
                     }
                   },
+                  icon: Icon(Icons.more_vert, color: Colors.white),
                   itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<Overflow>>[
-                    const PopupMenuItem<Overflow>(
-                      value: Overflow.search,
+                      <PopupMenuEntry<MessageOptions>>[
+                    const PopupMenuItem<MessageOptions>(
+                      value: MessageOptions.search,
                       child: Text('Search'),
                     ),
-                    const PopupMenuItem<Overflow>(
-                      value: Overflow.allMedia,
+                    const PopupMenuItem<MessageOptions>(
+                      value: MessageOptions.allMedia,
                       child: Text('All Media'),
                     ),
-                    const PopupMenuItem<Overflow>(
-                      value: Overflow.chatSettings,
+                    const PopupMenuItem<MessageOptions>(
+                      value: MessageOptions.chatSettings,
                       child: Text('Chat Settings'),
                     ),
-                    const PopupMenuItem<Overflow>(
-                      value: Overflow.inviteFriends,
+                    const PopupMenuItem<MessageOptions>(
+                      value: MessageOptions.inviteFriends,
                       child: Text('Invite Friends'),
                     ),
-                    const PopupMenuItem<Overflow>(
-                      value: Overflow.muteNotifications,
+                    const PopupMenuItem<MessageOptions>(
+                      value: MessageOptions.muteNotifications,
                       child: Text('Mute Notifications'),
                     ),
                   ],

@@ -107,7 +107,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     });
   }
 
-  // TODO: REMOVE WHEN DEPLOYED
+  // INFO: Used to check when the app is backgrounded
   // @override
   // void didChangeAppLifecycleState(AppLifecycleState state) {
   //   print('state = $state');

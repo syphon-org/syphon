@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
+import 'package:Tether/global/widgets/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,7 @@ import 'package:Tether/global/formatters.dart';
 import 'package:Tether/views/home/messages/index.dart';
 import 'package:Tether/global/colors.dart';
 
-enum Overflow { newGroup, markAllRead, inviteFriends, settings, help }
+enum Options { newGroup, markAllRead, inviteFriends, settings, help }
 
 class Home extends StatelessWidget {
   Home({Key key, this.title}) : super(key: key);
@@ -223,36 +224,36 @@ class Home extends StatelessWidget {
             },
             tooltip: 'Search Chats',
           ),
-          PopupMenuButton<Overflow>(
+          RoundedPopupMenu<Options>(
             icon: Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (Overflow result) {
+            onSelected: (Options result) {
               switch (result) {
-                case Overflow.settings:
+                case Options.settings:
                   Navigator.pushNamed(context, '/settings');
                   break;
                 default:
                   break;
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<Overflow>>[
-              const PopupMenuItem<Overflow>(
-                value: Overflow.newGroup,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
+              const PopupMenuItem<Options>(
+                value: Options.newGroup,
                 child: Text('New Group'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.markAllRead,
+              const PopupMenuItem<Options>(
+                value: Options.markAllRead,
                 child: Text('Mark All Read'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.inviteFriends,
+              const PopupMenuItem<Options>(
+                value: Options.inviteFriends,
                 child: Text('Invite Friends'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.settings,
+              const PopupMenuItem<Options>(
+                value: Options.settings,
                 child: Text('Settings'),
               ),
-              const PopupMenuItem<Overflow>(
-                value: Overflow.help,
+              const PopupMenuItem<Options>(
+                value: Options.help,
                 child: Text('Help'),
               ),
             ],
