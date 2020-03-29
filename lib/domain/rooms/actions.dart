@@ -29,8 +29,14 @@ class SetSyncing {
   SetSyncing({this.syncing});
 }
 
+class SetSending {
+  final bool sending;
+  final Room room;
+  SetSending({this.sending, this.room});
+}
+
 class SetRoomObserver {
-  final Timer roomObserver; // testing as a implicit observer
+  final Timer roomObserver;
   SetRoomObserver({this.roomObserver});
 }
 

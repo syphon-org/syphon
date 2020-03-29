@@ -11,8 +11,8 @@ class SettingsStore {
   final bool notificationsEnabled;
 
   const SettingsStore({
-    this.primaryColor = PRIMARY,
-    this.accentColor = ACCENT,
+    this.primaryColor = TETHERED_CYAN,
+    this.accentColor = BESIDES_BLUE,
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.language = 'English',

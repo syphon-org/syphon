@@ -35,9 +35,10 @@ class Event {
   final dynamic content;
 
   // TODO: remove need - for m.room.message only
-  String get body => type == 'm.room.message' ? content['body'] : '';
-  String get contentType =>
-      type == 'm.room.message' ? content['msgtype'] : null;
+  String get body =>
+      type == 'm.room.message' && content != null ? content['body'] : '';
+  String get msgtype =>
+      type == 'm.room.message' && content != null ? content['msgtype'] : null;
 
   const Event({
     this.id,

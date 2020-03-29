@@ -55,6 +55,12 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       );
       return state.copyWith(rooms: rooms);
 
+    case SetSending:
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.room.id] = rooms[action.room.id].copyWith(
+        sending: action.sending,
+      );
+      return state.copyWith(rooms: rooms);
     case ResetRooms:
       return RoomStore();
     default:

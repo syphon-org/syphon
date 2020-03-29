@@ -65,6 +65,8 @@ Future<Store> initStore() async {
   // Load available json list decorators
   final iterableEventDecorator = (value) => value.cast<Event>();
   JsonMapper.registerValueDecorator<List<Event>>(iterableEventDecorator);
+  final iterableMessageDecorator = (value) => value.cast<Message>();
+  JsonMapper.registerValueDecorator<List<Message>>(iterableMessageDecorator);
   final iterableDecorator = (value) => value.cast<Room>();
   JsonMapper.registerValueDecorator<List<Room>>(iterableDecorator);
 

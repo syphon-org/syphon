@@ -51,15 +51,15 @@ class Room {
   final String topic;
   final bool direct;
   final bool syncing;
+  final bool sending;
   final String startTime;
   final String endTime;
   final int lastUpdate;
 
   // Event lists
   final List<Event> state;
-  final List<Event> events; // DEPRECATE - every event should never be in store
-  final List<Event> messages;
-  final List<Message> testing; // this is working
+  final List<Message> messages;
+  final Event draft;
 
   const Room({
     this.id,
@@ -69,13 +69,13 @@ class Room {
     this.topic = '',
     this.direct = false,
     this.syncing = false,
-    this.events = const [],
+    this.sending = false,
     this.messages = const [],
     this.state = const [],
     this.lastUpdate = 0,
+    this.draft,
     this.startTime,
     this.endTime,
-    this.testing = const [],
   });
 
   Room copyWith({
@@ -87,12 +87,13 @@ class Room {
     lastUpdate,
     direct,
     syncing,
+    sending,
     state,
     events,
     messages,
     startTime,
     endTime,
-    testing,
+    draft,
   }) {
     return Room(
       id: id ?? this.id,
@@ -101,11 +102,11 @@ class Room {
       avatar: avatar ?? this.avatar,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       direct: direct ?? this.direct,
+      sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
       state: state ?? this.state,
-      events: events ?? this.events,
       messages: messages ?? this.messages,
-      testing: testing ?? this.testing,
+      draft: draft ?? this.draft,
     );
   }
 
@@ -130,12 +131,16 @@ class Room {
 
     // Combine current and existing messages on unique ids
     final combinedMessagesMap = HashMap.fromIterable(
-      [existingMessages, newMessages].expand((x) => x),
+      [existingMessages, newMessages].expand(
+        (sublist) => sublist.map(
+          (event) => Message.fromEvent(event),
+        ),
+      ),
       key: (message) => message.id,
       value: (message) => message,
     );
 
-    final combinedMessages = List<Event>.from(combinedMessagesMap.values);
+    final combinedMessages = List<Message>.from(combinedMessagesMap.values);
 
     // // Should we sort here?
     // combinedMessages.sort((a, b) => b.timestamp - a.timestamp);
