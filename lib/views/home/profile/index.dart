@@ -35,6 +35,8 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = 800; // testing only
     AppBar appBar = AppBar(
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -49,27 +51,31 @@ class Profile extends StatelessWidget {
       ),
     );
 
-    double width = MediaQuery.of(context).size.width;
-    double height =
-        MediaQuery.of(context).size.height - appBar.preferredSize.height * 2;
-
-    return Scaffold(
+    return StoreConnector<AppState, Store<AppState>>(
+      converter: (Store<AppState> store) => store,
+      builder: (context, store) => Scaffold(
         appBar: appBar,
         body: ScrollConfiguration(
-            behavior: DefaultScrollBehavior(),
-            child: SingleChildScrollView(
-                child: Container(
-              height: height,
-              width: width,
-              child: Align(
-                  alignment: Alignment.topCenter,
-                  child: StoreConnector<AppState, Store<AppState>>(
-                      converter: (Store<AppState> store) => store,
-                      builder: (context, store) {
-                        return Column(children: <Widget>[
-                          Container(
-                              height: width * 0.25,
+          behavior: DefaultScrollBehavior(),
+          child: SingleChildScrollView(
+            child: Container(
+              constraints: BoxConstraints(maxHeight: height),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
                               width: width * 0.25,
+                              height: width * 0.25,
                               margin: const EdgeInsets.all(16.0),
                               child: TouchableOpacity(
                                 activeOpacity: 0.2,
@@ -82,24 +88,50 @@ class Profile extends StatelessWidget {
                                         color: Colors.white, fontSize: 32.0),
                                   ),
                                 ),
-                              )),
-                          StoreConnector<AppState, Store<AppState>>(
-                              converter: (Store<AppState> store) => store,
-                              builder: (context, store) {
-                                return Container(
-                                  width: width * 0.7,
-                                  height: DEFAULT_INPUT_HEIGHT,
-                                  margin: const EdgeInsets.all(8.0),
-                                  constraints: BoxConstraints(
-                                      minWidth: 200,
-                                      maxWidth: 400,
-                                      minHeight: 45),
-                                  child: TextField(
-                                    onChanged: (name) {
-                                      print('On Change Display Name Stub');
-                                    },
-                                    controller: TextEditingController.fromValue(
-                                        TextEditingValue(
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    fit: FlexFit.tight,
+                    child: Container(
+                      // TODO: have a default max expension for certain widgets
+                      constraints: BoxConstraints(
+                        minWidth: 125,
+                        minHeight: 200,
+                        maxHeight: 400,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: width * 0.7,
+                                      height: DEFAULT_INPUT_HEIGHT,
+                                      margin: const EdgeInsets.all(8.0),
+                                      constraints: BoxConstraints(
+                                          minWidth: 200,
+                                          maxWidth: 400,
+                                          minHeight: 45),
+                                      child: TextField(
+                                        onChanged: (name) {
+                                          print('On Change Display Name Stub');
+                                        },
+                                        controller:
+                                            TextEditingController.fromValue(
+                                          TextEditingValue(
                                             text: displayName(store.state),
                                             selection: TextSelection(
                                                 baseOffset: store
@@ -111,34 +143,32 @@ class Profile extends StatelessWidget {
                                                     .state
                                                     .userStore
                                                     .homeserver
-                                                    .length))),
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Display Name',
+                                                    .length),
+                                          ),
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Display Name',
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
-                          StoreConnector<AppState, Store<AppState>>(
-                              converter: (Store<AppState> store) => store,
-                              builder: (context, store) {
-                                return Container(
-                                  width: width * 0.7,
-                                  height: DEFAULT_INPUT_HEIGHT,
-                                  margin: const EdgeInsets.all(8.0),
-                                  constraints: BoxConstraints(
-                                      minWidth: 200,
-                                      maxWidth: 400,
-                                      minHeight: 45),
-                                  child: TextField(
-                                    onChanged: (name) {
-                                      print('On Change User Id Stub');
-                                    },
-                                    controller: TextEditingController.fromValue(
-                                        TextEditingValue(
-                                            text:
-                                                store.state.userStore.user
-                                                    .userId,
+                                    Container(
+                                      width: width * 0.7,
+                                      height: DEFAULT_INPUT_HEIGHT,
+                                      margin: const EdgeInsets.all(8.0),
+                                      constraints: BoxConstraints(
+                                          minWidth: 200,
+                                          maxWidth: 400,
+                                          minHeight: 45),
+                                      child: TextField(
+                                        onChanged: (name) {
+                                          print('On Change User Id Stub');
+                                        },
+                                        controller:
+                                            TextEditingController.fromValue(
+                                          TextEditingValue(
+                                            text: store
+                                                .state.userStore.user.userId,
                                             selection: TextSelection(
                                                 baseOffset: store
                                                     .state
@@ -151,57 +181,83 @@ class Profile extends StatelessWidget {
                                                     .userStore
                                                     .user
                                                     .userId
-                                                    .length))),
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'User ID',
+                                                    .length),
+                                          ),
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'User ID',
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
-                          Spacer(flex: 1),
-                          Container(
-                            width: width * 0.7,
-                            height: DEFAULT_BUTTON_HEIGHT,
-                            margin: const EdgeInsets.all(10.0),
-                            constraints: BoxConstraints(
-                                minWidth: 200,
-                                maxWidth: 400,
-                                minHeight: 45,
-                                maxHeight: 65),
-                            child: FlatButton(
-                                onPressed: () {},
-                                color: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(30.0)),
-                                child: Text('Finish',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white))),
-                          ),
-                          Container(
-                              height: DEFAULT_INPUT_HEIGHT,
-                              margin: const EdgeInsets.all(10.0),
-                              constraints:
-                                  BoxConstraints(minWidth: 200, minHeight: 45),
-                              child: Visibility(
-                                  child: TouchableOpacity(
-                                activeOpacity: 0.4,
-                                onTap: () => Navigator.pushNamed(
-                                  context,
-                                  '/login',
+                                  ],
                                 ),
-                                child: Text(
-                                  'Set Later',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w100,
-                                  ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(bottom: 24),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: width * 0.7,
+                                      height: DEFAULT_BUTTON_HEIGHT,
+                                      margin: const EdgeInsets.all(10.0),
+                                      constraints: BoxConstraints(
+                                          minWidth: 200,
+                                          maxWidth: 400,
+                                          minHeight: 45,
+                                          maxHeight: 65),
+                                      child: FlatButton(
+                                        onPressed: () {},
+                                        color: Theme.of(context).primaryColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                new BorderRadius.circular(
+                                                    30.0)),
+                                        child: Text(
+                                          'save',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: DEFAULT_INPUT_HEIGHT,
+                                      margin: const EdgeInsets.all(10.0),
+                                      constraints: BoxConstraints(
+                                          minWidth: 200, minHeight: 45),
+                                      child: Visibility(
+                                        child: TouchableOpacity(
+                                          activeOpacity: 0.4,
+                                          onTap: () => Navigator.pop(context),
+                                          child: Text(
+                                            'Quit editing',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w100,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ))),
-                        ]);
-                      })),
-            ))));
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

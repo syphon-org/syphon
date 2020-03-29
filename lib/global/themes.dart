@@ -17,17 +17,17 @@ class Themes {
     var brightness = Brightness.light;
     var scaffoldBackgroundColor = BACKGROUND_COLOR;
     var primaryColor = primary ?? PRIMARY_COLOR;
-    var aceentColor = accent ?? ACCENT_COLOR;
+    var accentColor = accent ?? ACCENT_COLOR;
 
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = PRIMRARY_DARK_COLOR;
+        primaryColor = BASICALLY_BLACK_COLOR;
         scaffoldBackgroundColor = PRIMARY_COLOR;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = PRIMRARY_DARK_COLOR;
+        primaryColor = BASICALLY_BLACK_COLOR;
         break;
       case ThemeType.LIGHT:
       default:
@@ -38,7 +38,7 @@ class Themes {
 
     return ThemeData(
       primaryColor: primaryColor,
-      accentColor: aceentColor,
+      accentColor: accentColor,
       brightness: brightness,
       scaffoldBackgroundColor: scaffoldBackgroundColor,
       cursorColor: PRIMARY_COLOR,
@@ -112,7 +112,7 @@ class Themes {
           button: TextStyle(fontWeight: FontWeight.w100, color: Colors.white)));
 
   static final ThemeData darkTheme = ThemeData(
-      primaryColor: const Color(PRIMARY),
+      primaryColor: const Color(TETHERED_CYAN),
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,
@@ -127,7 +127,7 @@ class Themes {
           button: TextStyle(fontWeight: FontWeight.w100)));
 
   static final ThemeData darkerTheme = ThemeData(
-      primaryColor: const Color(PRIMARY_DARK),
+      primaryColor: const Color(BASICALLY_BLACK),
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         brightness: Brightness.dark,

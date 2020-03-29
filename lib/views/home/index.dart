@@ -306,7 +306,6 @@ class Home extends StatelessWidget {
               Icons.edit,
               color: Colors.white,
             ),
-            backgroundColor: PRIMARY_COLOR,
             tooltip: 'New Chat',
             onPressed: () => onNavigateToDraft(context)),
       ),

@@ -1,7 +1,9 @@
+import 'package:Tether/domain/rooms/events/selectors.dart';
 import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
 import 'package:Tether/global/widgets/menu.dart';
+import 'package:Tether/views/home/messages/message.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -72,7 +74,9 @@ class MessagesState extends State<Messages> {
       StoreConnector<AppState, AppState>(
         converter: (Store<AppState> store) => store.state,
         builder: (context, state) {
-          final messages = room(id: roomId, state: state).messages;
+          final messages = sortedMessages(
+            room(id: roomId, state: state).messages,
+          );
           final userId = state.userStore.user.userId;
 
           return ListView.builder(
@@ -92,165 +96,102 @@ class MessagesState extends State<Messages> {
               final isNextSender =
                   nextMessage != null && nextMessage.sender == message.sender;
 
-              final userSent = userId == message.sender;
+              final isUserSent = userId == message.sender;
 
-              var textColor = Colors.white;
-              var senderColor = hashedColor(message.sender);
-              var bubbleBorder = BorderRadius.circular(16);
-              var messageAlignment = CrossAxisAlignment.start;
-              var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
-
-              if (isLastSender) {
-                if (isNextSender) {
-                  // Message in the middle of a sender messages block
-                  bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
-                  bubbleBorder = BorderRadius.only(
-                    topRight: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                    topLeft: Radius.circular(4),
-                    bottomLeft: Radius.circular(4),
-                  );
-                } else {
-                  // Message at the beginning of a sender messages block
-                  bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
-                  bubbleBorder = BorderRadius.only(
-                    topRight: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(4),
-                  );
-                }
-              }
-
-              if (!isLastSender && isNextSender) {
-                // End of a sender messages block
-                bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
-                bubbleBorder = BorderRadius.only(
-                  topRight: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(16),
-                  topLeft: Radius.circular(4),
-                );
-              }
-
-              if (userSent) {
-                textColor = GREY_DARK_COLOR;
-                senderColor = ENABLED_GREY_COLOR;
-                messageAlignment = CrossAxisAlignment.end;
-              }
-
-              /**
-             * Text(
-                message.body,
-                textAlign: textAlign,
-                style: TextStyle(),
-              ),
-             */
-              return Container(
-                child: Flex(
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: messageAlignment,
-                  children: <Widget>[
-                    Container(
-                      margin: bubbleSpacing,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                      ),
-                      // decoration: BoxDecoration( // DEBUG ONLY
-                      //   color: Colors.red,
-                      // ),
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Visibility(
-                            visible: !isLastSender && !userSent,
-                            maintainState: true,
-                            maintainAnimation: true,
-                            maintainSize: true,
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                right: 12,
-                              ),
-                              child: CircleAvatar(
-                                radius: 14,
-                                backgroundColor: senderColor,
-                                child: Text(
-                                  formatSenderInitials(message.sender),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: senderColor,
-                                  borderRadius: bubbleBorder),
-                              child: Flex(
-                                  direction: Axis.vertical,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          formatSender(message.sender),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: textColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 4,
-                                      ),
-                                      child: Text(
-                                        message.body,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: textColor,
-                                          fontWeight: FontWeight.w100,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      formatTimestamp(
-                                        lastUpdateMillis: message.timestamp,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: textColor,
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              return Message(
+                message: message,
+                isUserSent: isUserSent,
+                isLastSender: isLastSender,
+                isNextSender: isNextSender,
               );
             },
+          );
+        },
+      );
+
+  Widget buildChatInput({BuildContext context}) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (Store<AppState> store) => store,
+        builder: (context, store) {
+          double width = MediaQuery.of(context).size.width;
+          double messageInputWidth = width - 64;
+
+          Color inputTextColor = const Color(BASICALLY_BLACK);
+          Color inputColorBackground = const Color(ENABLED_GREY);
+
+          if (Theme.of(context).brightness == Brightness.dark) {
+            inputTextColor = Colors.white;
+            inputColorBackground = Colors.blueGrey;
+          }
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: messageInputWidth,
+                ),
+                child: TextField(
+                  controller: editorController,
+                  onChanged: (text) {
+                    this.setState(() {
+                      sendable = text != null && text.isNotEmpty;
+                    });
+                  },
+                  onSubmitted: (text) {
+                    store.dispatch(sendMessage(
+                      body: text,
+                      type: 'm.room.message',
+                    ));
+                    editorController.clear();
+                  },
+                  // onEditingComplete: () {
+                  //   print('they pressed it');
+                  // },
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  focusNode: inputFieldNode,
+                  style: TextStyle(
+                    height: 1.5,
+                    color: inputTextColor,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: inputColorBackground,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                    ),
+                    hintText: 'Tether message',
+                  ),
+                ),
+              ),
+              Container(
+                width: 48.0,
+                padding: EdgeInsets.all(4),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(48),
+                  onTap: () {
+                    store.dispatch(sendMessage(
+                      body: editorController.text,
+                      type: 'm.room.message',
+                    ));
+                    editorController.clear();
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: PRIMARY_COLOR,
+                    child: Icon(
+                      Icons.send,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       );
@@ -263,12 +204,15 @@ class MessagesState extends State<Messages> {
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
 
-          double width = MediaQuery.of(context).size.width;
-          double messageInputWidth = width - 64;
-
           final isEditing = inputFieldNode.hasFocus;
           final isScrolling =
               messagesController.hasClients && messagesController.offset != 0;
+
+          Color inputColor = Colors.white;
+
+          if (Theme.of(context).brightness == Brightness.dark) {
+            inputColor = BASICALLY_BLACK_COLOR;
+          }
           return Scaffold(
             appBar: AppBar(
               brightness:
@@ -303,6 +247,7 @@ class MessagesState extends State<Messages> {
               actions: <Widget>[
                 RoundedPopupMenu<MessageOptions>(
                   onSelected: (MessageOptions result) {
+                    print(result);
                     switch (result) {
                       default:
                         break;
@@ -340,32 +285,61 @@ class MessagesState extends State<Messages> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Visibility(
-                      visible: store.state.roomStore.loading,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4.0,
-                          valueColor: new AlwaysStoppedAnimation<Color>(
-                            PRIMARY_COLOR,
-                          ),
-                          value: null,
-                        ),
-                      )),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () {
-                        print('STUB REFRESH');
+                        // TODO: refresh sync?
+                        return Future.value();
                       },
-                      child: buildMessageList(
-                        arguments.roomId,
-                        context,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Disimiss keyboard if they click outside the text input
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Stack(
+                          children: [
+                            buildMessageList(
+                              arguments.roomId,
+                              context,
+                            ),
+                            Positioned(
+                              // red box
+                              child: Visibility(
+                                visible: store.state.roomStore.loading,
+                                child: Container(
+                                    child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    // TODO: distinguish between loading and refreshing?
+                                    // CircularProgressIndicator(
+                                    //   strokeWidth: 4.0,
+                                    //   backgroundColor: Colors.transparent,
+                                    //   valueColor:
+                                    //       new AlwaysStoppedAnimation<Color>(
+                                    //     PRIMARY_COLOR,
+                                    //   ),
+                                    //   value: null,
+                                    // ),
+                                    RefreshProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      valueColor:
+                                          new AlwaysStoppedAnimation<Color>(
+                                        PRIMARY_COLOR,
+                                      ),
+                                      value: null,
+                                    ),
+                                  ],
+                                )),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: inputColor,
                       boxShadow: isScrolling
                           ? [
                               BoxShadow(
@@ -377,76 +351,12 @@ class MessagesState extends State<Messages> {
                           : [],
                     ),
                     padding: EdgeInsets.only(
-                        top: 12,
-                        bottom: isEditing ? 12 : 32,
-                        left: 8,
-                        right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          constraints: BoxConstraints(
-                            maxWidth: messageInputWidth,
-                          ),
-                          child: TextField(
-                            controller: editorController,
-                            onEditingComplete: () {
-                              print('they pressed it');
-                            },
-                            onSubmitted: (text) {
-                              store.dispatch(sendMessage(
-                                body: text,
-                                type: 'm.room.message',
-                              ));
-                              editorController.clear();
-                            },
-                            onChanged: (text) {
-                              this.setState(() {
-                                sendable = text != null && text.isNotEmpty;
-                              });
-                            },
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            textInputAction: TextInputAction.newline,
-                            focusNode: inputFieldNode,
-                            style: TextStyle(height: 1.5, color: Colors.black),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(ENABLED_GREY),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              hintText: 'Tether message',
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 48.0,
-                          padding: EdgeInsets.all(4),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(48),
-                            onTap: () {
-                              store.dispatch(sendMessage(
-                                body: editorController.text,
-                                type: 'm.room.message',
-                              ));
-                              editorController.clear();
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: PRIMARY_COLOR,
-                              child: Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      top: 12,
+                      left: 8,
+                      right: 8,
+                      bottom: isEditing ? 12 : 48,
                     ),
+                    child: buildChatInput(context: context),
                   ),
                 ],
               ),
