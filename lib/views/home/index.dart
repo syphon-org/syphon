@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Tether/domain/rooms/room/selectors.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:Tether/global/widgets/menu.dart';
@@ -30,25 +31,6 @@ class Home extends StatelessWidget {
   @protected
   onNavigateToDraft(context) {
     Navigator.pushNamed(context, '/draft');
-  }
-
-  String formatRoomName({Room room}) {
-    final name = room.name;
-    return name.length > 22 ? '${name.substring(0, 22)}...' : name;
-  }
-
-  String formatPreview({Room room}) {
-    if (room.messages.length < 1) {
-      return room.topic;
-    }
-
-    final lastMessage = room.messages[0].body;
-    final shortened = lastMessage.length > 42;
-    final preview = shortened
-        ? lastMessage.substring(0, 42).replaceAll('\n', '')
-        : lastMessage;
-
-    return shortened ? '$preview...' : preview;
   }
 
   Widget buildChatAvatar({Room room}) {

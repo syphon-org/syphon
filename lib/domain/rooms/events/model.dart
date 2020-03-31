@@ -37,7 +37,7 @@ class Event {
   // TODO: remove need - for m.room.message only
   String get body =>
       type == 'm.room.message' && content != null ? content['body'] : '';
-  String get msgtype =>
+  String get msgtypeRaw =>
       type == 'm.room.message' && content != null ? content['msgtype'] : null;
 
   const Event({
@@ -132,7 +132,9 @@ class Message extends Event {
     this.extraPropsMap,
   }) : super();
 
-  factory Message.fromEvent(Event event) => Message(
+  factory Message.fromEvent(Event event) {
+    try {
+      return Message(
         id: event.id,
         userId: event.userId,
         roomId: event.roomId,
@@ -141,10 +143,24 @@ class Message extends Event {
         stateKey: event.stateKey,
         timestamp: event.timestamp,
         // extracted content
-        body: event.content['body'],
+        body: event.content['body'] ?? [],
         msgtype: event.content['msgtype'],
         format: event.content['format'],
         filename: event.content['filename'],
         formattedBody: event.content['formattedBody'],
       );
+    } catch (error) {
+      print('FAILED AT EVENT $error');
+      print('event that killed it $event');
+      return Message(
+        id: event.id,
+        userId: event.userId,
+        roomId: event.roomId,
+        type: event.type,
+        sender: event.sender,
+        stateKey: event.stateKey,
+        timestamp: event.timestamp,
+      );
+    }
+  }
 }

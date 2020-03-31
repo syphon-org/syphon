@@ -1,5 +1,4 @@
 import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:Tether/domain/rooms/room/model.dart';
 
 List<Event> sortedMessages(List<Event> messages) {
   final sortedList = List<Event>.from(messages);

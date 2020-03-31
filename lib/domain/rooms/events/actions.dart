@@ -39,7 +39,7 @@ ThunkAction<AppState> sendMessage({
         protocol: protocol,
         accessToken: store.state.userStore.user.accessToken,
         homeserver: store.state.userStore.homeserver,
-        body: body,
+        messageBody: body,
         roomId: room.id,
         requestId: DateTime.now().millisecond.toString(),
       );
@@ -47,14 +47,19 @@ ThunkAction<AppState> sendMessage({
       final response = await http.put(
         request['url'],
         headers: request['headers'],
+        body: json.encode(request['body']),
       );
 
       final data = json.decode(response.body);
 
-      print('sendMessage action completed');
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('sendMessage action completed $data');
       return true;
     } catch (error) {
-      print('[fetchRooms] error: $error');
+      print('[sendMessage] error: $error');
     } finally {
       store.dispatch(SetSending(room: room, sending: false));
     }

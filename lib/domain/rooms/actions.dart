@@ -143,8 +143,6 @@ ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Dispatch Background Sync
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
-      // debugPrint('${timer.tick}');
-
       if (store.state.roomStore.lastSince != null) {
         store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
       }
@@ -357,8 +355,6 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
 
       // Add State events to room and toggle syncing
       final user = store.state.userStore.user;
-
-      print('[USERNAME] ${user}');
 
       store.dispatch(SetRoomState(
         id: room.id,

@@ -34,13 +34,19 @@ dynamic buildSendMessageRequest({
   String accessToken,
   String roomId,
   String eventType = 'm.room.message',
+  String messageType = 'm.text',
   String requestId,
-  final body,
+  final messageBody,
 }) {
   String url =
       '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/$eventType/$requestId';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url, 'headers': headers};
+  Map body = {
+    "msgtype": messageType,
+    "body": messageBody,
+  };
+
+  return {'url': url, 'headers': headers, 'body': body};
 }

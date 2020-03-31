@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
  * Mostly an example for myself on how to override styling or other options on
  * existing components app wide
  */
-class Message extends StatelessWidget {
-  Message({
+class MessageWidget extends StatelessWidget {
+  MessageWidget({
     Key key,
     @required this.message,
     this.isUserSent,
@@ -18,7 +18,7 @@ class Message extends StatelessWidget {
     this.isNextSender,
   }) : super(key: key);
 
-  final Event message;
+  final Message message;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
@@ -29,7 +29,8 @@ class Message extends StatelessWidget {
     var textColor = Colors.white;
     var senderColor = hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
-    var messageAlignment = CrossAxisAlignment.start;
+    var messageAlignment = MainAxisAlignment.start;
+    var messageTextAlignment = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
 
     if (isLastSender) {
@@ -68,14 +69,15 @@ class Message extends StatelessWidget {
     if (isUserSent) {
       textColor = GREY_DARK_COLOR;
       senderColor = ENABLED_GREY_COLOR;
-      messageAlignment = CrossAxisAlignment.end;
+      messageAlignment = MainAxisAlignment.end;
+      messageTextAlignment = CrossAxisAlignment.end;
     }
 
     return Container(
       child: Flex(
         direction: Axis.vertical,
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: messageAlignment,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             margin: bubbleSpacing,
@@ -87,7 +89,7 @@ class Message extends StatelessWidget {
             // ),
             child: Flex(
               direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: messageAlignment,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Visibility(
@@ -114,24 +116,24 @@ class Message extends StatelessWidget {
                 ),
                 Flexible(
                   flex: 1,
-                  fit: FlexFit.tight,
+                  fit: FlexFit.loose,
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                         color: senderColor, borderRadius: bubbleBorder),
                     child: Flex(
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: messageTextAlignment,
                         children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
+                          Visibility(
+                            visible: !isUserSent,
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 4),
+                              child: Text(
                                 formatSender(message.sender),
                                 style: TextStyle(
                                   fontSize: 12,
@@ -139,30 +141,31 @@ class Message extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                           Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: 4,
-                            ),
+                            margin: EdgeInsets.only(bottom: 4),
                             child: Text(
-                              message.body,
+                              message.body.trim(),
                               style: TextStyle(
                                 fontSize: 14,
+                                color: textColor,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            child: Text(
+                              formatTimestamp(
+                                lastUpdateMillis: message.timestamp,
+                              ),
+                              style: TextStyle(
+                                fontSize: 12,
                                 color: textColor,
                                 fontWeight: FontWeight.w100,
                               ),
                             ),
-                          ),
-                          Text(
-                            formatTimestamp(
-                              lastUpdateMillis: message.timestamp,
-                            ),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: textColor,
-                            ),
-                          ),
+                          )
                         ]),
                   ),
                 ),

@@ -70,7 +70,29 @@ class MessagesState extends State<Messages> {
     super.dispose();
   }
 
-  Widget buildMessageList(String roomId, BuildContext context) =>
+  @protected
+  onSendMessage({
+    BuildContext context,
+    Store<AppState> store,
+    String roomId,
+    String text,
+  }) {
+    if (text != null && text.length > 1) {
+      store.dispatch(sendMessage(
+        body: text,
+        room: store.state.roomStore.rooms[roomId],
+        type: 'm.room.message',
+      ));
+    }
+
+    editorController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  Widget buildMessageList(
+    BuildContext context,
+    String roomId,
+  ) =>
       StoreConnector<AppState, AppState>(
         converter: (Store<AppState> store) => store.state,
         builder: (context, state) {
@@ -98,7 +120,7 @@ class MessagesState extends State<Messages> {
 
               final isUserSent = userId == message.sender;
 
-              return Message(
+              return MessageWidget(
                 message: message,
                 isUserSent: isUserSent,
                 isLastSender: isLastSender,
@@ -109,7 +131,10 @@ class MessagesState extends State<Messages> {
         },
       );
 
-  Widget buildChatInput({BuildContext context}) =>
+  Widget buildChatInput({
+    BuildContext context,
+    String roomId,
+  }) =>
       StoreConnector<AppState, Store<AppState>>(
         converter: (Store<AppState> store) => store,
         builder: (context, store) {
@@ -139,13 +164,12 @@ class MessagesState extends State<Messages> {
                       sendable = text != null && text.isNotEmpty;
                     });
                   },
-                  onSubmitted: (text) {
-                    store.dispatch(sendMessage(
-                      body: text,
-                      type: 'm.room.message',
-                    ));
-                    editorController.clear();
-                  },
+                  onSubmitted: (text) => onSendMessage(
+                    text: text,
+                    roomId: roomId,
+                    context: context,
+                    store: store,
+                  ),
                   // onEditingComplete: () {
                   //   print('they pressed it');
                   // },
@@ -175,13 +199,12 @@ class MessagesState extends State<Messages> {
                 padding: EdgeInsets.all(4),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(48),
-                  onTap: () {
-                    store.dispatch(sendMessage(
-                      body: editorController.text,
-                      type: 'm.room.message',
-                    ));
-                    editorController.clear();
-                  },
+                  onTap: () => onSendMessage(
+                    text: editorController.text,
+                    roomId: roomId,
+                    context: context,
+                    store: store,
+                  ),
                   child: CircleAvatar(
                     backgroundColor: PRIMARY_COLOR,
                     child: Icon(
@@ -299,8 +322,8 @@ class MessagesState extends State<Messages> {
                         child: Stack(
                           children: [
                             buildMessageList(
-                              arguments.roomId,
                               context,
+                              arguments.roomId,
                             ),
                             Positioned(
                               // red box
@@ -356,7 +379,10 @@ class MessagesState extends State<Messages> {
                       right: 8,
                       bottom: isEditing ? 12 : 48,
                     ),
-                    child: buildChatInput(context: context),
+                    child: buildChatInput(
+                      context: context,
+                      roomId: arguments.roomId,
+                    ),
                   ),
                 ],
               ),

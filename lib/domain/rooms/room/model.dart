@@ -133,7 +133,7 @@ class Room {
     final combinedMessagesMap = HashMap.fromIterable(
       [existingMessages, newMessages].expand(
         (sublist) => sublist.map(
-          (event) => Message.fromEvent(event),
+          (event) => event is Message ? event : Message.fromEvent(event),
         ),
       ),
       key: (message) => message.id,
