@@ -2,7 +2,7 @@ name: Tether
 description: Privacy centric matrix client for everyone
 
 # commands:
-# - flutter run --no-fast-start #
+# - flutter run --no-fast-start # fixing issues building?
 # - flutter pub global run devtools 
 # - emulator -list-avds
 # - emulator -avd Pixel_3a_API_29
@@ -33,7 +33,7 @@ description: Privacy centric matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.2+1
+version: 0.0.3+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -109,6 +109,7 @@ flutter:
   # On release, change .env.debug to .env
   assets: 
    - .env.debug
+   - .env.release
    - assets/graphics/undraw_mobile_user.svg
    - assets/graphics/undraw_messaging_fun.svg
    - assets/graphics/undraw_connection.svg

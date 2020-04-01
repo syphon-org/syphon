@@ -1,7 +1,7 @@
 import 'package:Tether/domain/rooms/events/model.dart';
 
-List<Event> sortedMessages(List<Event> messages) {
-  final sortedList = List<Event>.from(messages);
+List<Message> sortedMessages(List<Message> messages) {
+  final sortedList = List<Message>.from(messages);
 
   // sort descending
   sortedList.sort((a, b) {
