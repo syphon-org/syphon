@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:Tether/domain/rooms/events/selectors.dart';
 import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/colors.dart';
@@ -70,40 +73,38 @@ class MessagesState extends State<Messages> {
     super.dispose();
   }
 
-  @protected
-  onSendMessage({
-    BuildContext context,
-    Store<AppState> store,
-    String roomId,
-    String text,
-  }) {
-    if (text != null && text.length > 1) {
-      store.dispatch(sendMessage(
-        body: text,
-        room: store.state.roomStore.rooms[roomId],
-        type: 'm.room.message',
-      ));
-    }
-
-    editorController.clear();
-    FocusScope.of(context).unfocus();
-  }
+  // TODO: I like having this top level, but it's a nightmare to pass in vars
+  // @protected
+  // onSendMessage({
+  //   Function sendMessage,
+  //   String roomId,
+  //   String text,
+  // }) {
+  //   if (sendMessage != null) {
+  //     sendMessage();
+  //   }
+  //   editorController.clear();
+  //   FocusScope.of(context).unfocus();
+  // }
 
   Widget buildMessageList(
     BuildContext context,
     String roomId,
   ) =>
-      StoreConnector<AppState, AppState>(
-        converter: (Store<AppState> store) => store.state,
-        builder: (context, state) {
-          final messages = sortedMessages(
-            room(id: roomId, state: state).messages,
-          );
-          final userId = state.userStore.user.userId;
-
+      StoreConnector<AppState, MessageListProps>(
+        distinct: true,
+        converter: (Store<AppState> store) => MessageListProps.mapStoreToProps(
+          store: store,
+          roomId: roomId,
+        ),
+        builder: (context, props) {
+          final messages = props.messages;
+          final userId = props.userId;
+          print('rebuilding buildMessageList');
           return ListView.builder(
             reverse: true,
             itemCount: messages.length,
+            padding: EdgeInsets.only(bottom: 8),
             scrollDirection: Axis.vertical,
             controller: messagesController,
             itemBuilder: (BuildContext context, int index) {
@@ -114,10 +115,8 @@ class MessagesState extends State<Messages> {
 
               final isLastSender =
                   lastMessage != null && lastMessage.sender == message.sender;
-
               final isNextSender =
                   nextMessage != null && nextMessage.sender == message.sender;
-
               final isUserSent = userId == message.sender;
 
               return MessageWidget(
@@ -135,18 +134,28 @@ class MessagesState extends State<Messages> {
     BuildContext context,
     String roomId,
   }) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) {
+      StoreConnector<AppState, ChatInputProps>(
+        distinct: true,
+        converter: (Store<AppState> store) => ChatInputProps.mapStoreToProps(
+          store,
+        ),
+        builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
-          double messageInputWidth = width - 64;
+          double messageInputWidth = width - 72;
 
           Color inputTextColor = const Color(BASICALLY_BLACK);
           Color inputColorBackground = const Color(ENABLED_GREY);
+          Color inputCursorColor = Colors.blueGrey;
+          Color sendButtonColor = const Color(DISABLED_GREY);
+
+          if (sendable) {
+            sendButtonColor = const Color(TETHERED_CYAN);
+          }
 
           if (Theme.of(context).brightness == Brightness.dark) {
             inputTextColor = Colors.white;
             inputColorBackground = Colors.blueGrey;
+            inputCursorColor = Colors.white;
           }
 
           return Row(
@@ -155,28 +164,29 @@ class MessagesState extends State<Messages> {
             children: <Widget>[
               Container(
                 constraints: BoxConstraints(
+                  maxHeight: 46,
                   maxWidth: messageInputWidth,
                 ),
                 child: TextField(
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  cursorColor: inputCursorColor,
+                  focusNode: inputFieldNode,
                   controller: editorController,
                   onChanged: (text) {
                     this.setState(() {
                       sendable = text != null && text.isNotEmpty;
                     });
                   },
-                  onSubmitted: (text) => onSendMessage(
-                    text: text,
-                    roomId: roomId,
-                    context: context,
-                    store: store,
-                  ),
-                  // onEditingComplete: () {
-                  //   print('they pressed it');
-                  // },
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.newline,
-                  focusNode: inputFieldNode,
+                  onSubmitted: (text) {
+                    props.onSendMessage(
+                      body: editorController.text,
+                      roomId: roomId,
+                    );
+                    editorController.clear();
+                    FocusScope.of(context).unfocus();
+                  },
                   style: TextStyle(
                     height: 1.5,
                     color: inputTextColor,
@@ -190,23 +200,27 @@ class MessagesState extends State<Messages> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24.0),
                     ),
-                    hintText: 'Tether message',
+                    hintText: 'Matrix message',
                   ),
                 ),
               ),
               Container(
                 width: 48.0,
-                padding: EdgeInsets.all(4),
+                padding: EdgeInsets.symmetric(vertical: 4),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(48),
-                  onTap: () => onSendMessage(
-                    text: editorController.text,
-                    roomId: roomId,
-                    context: context,
-                    store: store,
-                  ),
+                  onTap: sendable
+                      ? () {
+                          props.onSendMessage(
+                            body: editorController.text,
+                            roomId: roomId,
+                          );
+                          editorController.clear();
+                          FocusScope.of(context).unfocus();
+                        }
+                      : null,
                   child: CircleAvatar(
-                    backgroundColor: PRIMARY_COLOR,
+                    backgroundColor: sendButtonColor,
                     child: Icon(
                       Icons.send,
                       color: Colors.white,
@@ -220,22 +234,32 @@ class MessagesState extends State<Messages> {
       );
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) {
+  Widget build(BuildContext context) => StoreConnector<AppState, MessagesProps>(
+        distinct: true,
+        rebuildOnChange: false,
+        onDidChange: (MessagesProps props) {
+          print('changing');
+        },
+        ignoreChange: (AppState state) {
+          return true;
+        },
+        converter: (Store<AppState> store) =>
+            MessagesProps.mapStoreToProps(store),
+        builder: (context, props) {
+          print('rebuilding build (Messages)');
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
 
-          final isEditing = inputFieldNode.hasFocus;
+          final hasExtraPadding = inputFieldNode.hasFocus && Platform.isIOS;
           final isScrolling =
               messagesController.hasClients && messagesController.offset != 0;
 
-          Color inputColor = Colors.white;
+          Color inputContainerColor = Colors.white;
 
           if (Theme.of(context).brightness == Brightness.dark) {
-            inputColor = BASICALLY_BLACK_COLOR;
+            inputContainerColor = Colors.grey[850];
           }
+
           return Scaffold(
             appBar: AppBar(
               brightness:
@@ -328,7 +352,7 @@ class MessagesState extends State<Messages> {
                             Positioned(
                               // red box
                               child: Visibility(
-                                visible: store.state.roomStore.loading,
+                                visible: props.roomsLoading,
                                 child: Container(
                                     child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -362,7 +386,7 @@ class MessagesState extends State<Messages> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: inputColor,
+                      color: inputContainerColor,
                       boxShadow: isScrolling
                           ? [
                               BoxShadow(
@@ -377,7 +401,7 @@ class MessagesState extends State<Messages> {
                       top: 12,
                       left: 8,
                       right: 8,
-                      bottom: isEditing ? 12 : 48,
+                      bottom: hasExtraPadding ? 48 : 12,
                     ),
                     child: buildChatInput(
                       context: context,
@@ -388,6 +412,90 @@ class MessagesState extends State<Messages> {
               ),
             ),
           );
+        },
+      );
+}
+
+class MessagesProps {
+  final bool roomsLoading;
+
+  MessagesProps({
+    @required this.roomsLoading,
+  });
+
+  @override
+  int get hashCode => roomsLoading.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessagesProps &&
+          runtimeType == other.runtimeType &&
+          roomsLoading == other.roomsLoading;
+
+  static MessagesProps mapStoreToProps(Store<AppState> store) => MessagesProps(
+        roomsLoading: store.state.roomStore.loading,
+      );
+}
+
+class ChatInputProps {
+  final Function onSendMessage;
+
+  ChatInputProps({
+    @required this.onSendMessage,
+  });
+
+  static ChatInputProps mapStoreToProps(Store<AppState> store) =>
+      ChatInputProps(
+        onSendMessage: ({
+          String roomId,
+          String body,
+        }) {
+          if (body != null && body.length > 1) {
+            store.dispatch(sendMessage(
+              body: body,
+              room: store.state.roomStore.rooms[roomId],
+              type: 'm.room.message',
+            ));
+          }
+        },
+      );
+}
+
+class MessageListProps {
+  final String userId;
+  final List<Message> messages;
+  final Function(String) onTestingViewModal;
+
+  MessageListProps({
+    @required this.messages,
+    @required this.userId,
+    @required this.onTestingViewModal,
+  });
+
+  @override
+  int get hashCode =>
+      userId.hashCode ^ messages.hashCode ^ onTestingViewModal.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MessageListProps &&
+          runtimeType == other.runtimeType &&
+          userId == other.userId &&
+          messages == other.messages &&
+          onTestingViewModal == other.onTestingViewModal;
+
+  /* effectively mapStateToProps */
+  static MessageListProps mapStoreToProps(
+          {Store<AppState> store, String roomId}) =>
+      MessageListProps(
+        userId: store.state.userStore.user.userId,
+        messages: sortedMessages(
+          room(id: roomId, state: store.state).messages,
+        ),
+        onTestingViewModal: (String testing) {
+          // store.dispatch(action)
         },
       );
 }
