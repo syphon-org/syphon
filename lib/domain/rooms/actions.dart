@@ -143,6 +143,7 @@ ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Dispatch Background Sync
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
+      print('what?');
       if (store.state.roomStore.lastSince != null) {
         store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
       }
@@ -156,6 +157,7 @@ ThunkAction<AppState> stopRoomsObserver() {
   return (Store<AppState> store) async {
     if (store.state.roomStore.roomObserver != null) {
       store.state.roomStore.roomObserver.cancel();
+      store.dispatch(SetRoomObserver(roomObserver: null));
     }
   };
 }

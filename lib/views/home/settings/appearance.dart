@@ -10,21 +10,6 @@ class ApperanceScreen extends StatelessWidget {
 
   final String title;
 
-  final List<Map> options = [
-    {
-      "title": 'Theme',
-    },
-    {
-      "title": 'Primary Color',
-    },
-    {
-      "title": 'Accent Color',
-    },
-    {
-      "title": 'Langauge',
-    },
-  ];
-
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
   }

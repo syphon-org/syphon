@@ -2,6 +2,7 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -160,7 +161,9 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushNamed(context, '/advanced');
+                          },
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 4,

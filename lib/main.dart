@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:Tether/domain/alerts/actions.dart';
 import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/global/notifications.dart';
+import 'package:Tether/views/home/settings/advanced.dart';
 import 'package:Tether/views/home/settings/appearance.dart';
 import 'package:Tether/views/navigation.dart';
 import 'package:flutter/foundation.dart';
@@ -87,10 +89,21 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   Widget defaultHome = Home(title: 'Tether');
   TetherState({this.store});
 
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Testing Notifications'),
+        content: Text('Payload : $payload'),
+      ),
+    );
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
 
@@ -131,8 +144,14 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
       } else if (user != null &&
           user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
+        // Default Authenticated App Home
         defaultHome = Home(title: 'Tether');
         NavigationService.clearTo('/home', context);
+
+        // Default Authenticated Services
+        initNotifications(
+          onSelectNotification: onSelectNotification,
+        );
       }
     });
   }
@@ -166,6 +185,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
               '/draft': (BuildContext context) => Draft(),
               '/profile': (BuildContext context) => Profile(),
               '/home/messages': (BuildContext context) => Messages(),
+              '/advanced': (BuildContext context) => AdvancedScreen(),
               '/appearance': (BuildContext context) => ApperanceScreen(
                     title: 'Appearance',
                   ),
