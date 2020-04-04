@@ -1,6 +1,7 @@
 import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:Tether/global/themes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -199,11 +200,17 @@ class LoginState extends State<Login> {
                                 }
                               },
                               decoration: InputDecoration(
+                                labelText: 'username',
+                                hintText: formatUsernameHint(
+                                  store.state.userStore.homeserver,
+                                ),
                                 contentPadding: EdgeInsets.only(
                                   left: 20,
                                   top: 32,
                                 ),
                                 suffixIcon: IconButton(
+                                  highlightColor:
+                                      Theme.of(context).primaryColor,
                                   icon: Icon(Icons.help_outline),
                                   tooltip: SELECT_USERNAME_TITLE,
                                   onPressed: () {
@@ -213,13 +220,6 @@ class LoginState extends State<Login> {
                                     );
                                   },
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(28.0),
-                                ),
-                                hintText: formatUsernameHint(
-                                  store.state.userStore.homeserver,
-                                ),
-                                labelText: 'username',
                               ),
                             ),
                           ),
@@ -333,7 +333,7 @@ class LoginState extends State<Login> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w100,
-                                color: Theme.of(context).primaryColor,
+                                color: Themes.invertedPrimaryColor(context),
                                 decoration: TextDecoration.underline,
                               ),
                             ),

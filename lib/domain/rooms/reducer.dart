@@ -3,6 +3,8 @@ import './model.dart';
 import './room/model.dart';
 
 RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
+  print(action.runtimeType);
+
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);
@@ -11,6 +13,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
     case SetSynced:
       return state.copyWith(
         synced: action.synced,
+        syncing: action.syncing,
         lastSince: action.lastSince,
       );
     case SetRoomObserver:

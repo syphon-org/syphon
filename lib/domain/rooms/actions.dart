@@ -91,8 +91,9 @@ class UpdateRoom {
 
 class SetSynced {
   final bool synced;
+  final bool syncing;
   final String lastSince;
-  SetSynced({this.synced, this.lastSince});
+  SetSynced({this.synced, this.syncing, this.lastSince});
 }
 
 /**
@@ -143,10 +144,18 @@ ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Dispatch Background Sync
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
-      print('what?');
-      if (store.state.roomStore.lastSince != null) {
-        store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
+      if (store.state.roomStore.syncing) {
+        print('[Room Observer] still syncing');
+        return;
       }
+
+      if (store.state.roomStore.lastSince == null) {
+        print('[Room Observer] skipping sync, needs full sync');
+        return;
+      }
+
+      print('[Room Observer] running sync');
+      store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
     });
 
     store.dispatch(SetRoomObserver(roomObserver: roomObserver));
@@ -221,10 +230,13 @@ ThunkAction<AppState> fetchSync({String since}) {
       }
 
       // Set "Synced" and since so we know you've run the inital sync
-      store.dispatch(SetSynced(synced: true, lastSince: lastSince));
+      store.dispatch(SetSynced(
+        synced: true,
+        syncing: false,
+        lastSince: lastSince,
+      ));
     } catch (error) {
       print('[fetchSync] error $error');
-    } finally {
       store.dispatch(SetSyncing(syncing: false));
     }
   };

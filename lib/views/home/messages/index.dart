@@ -93,6 +93,7 @@ class MessagesState extends State<Messages> {
   ) =>
       StoreConnector<AppState, MessageListProps>(
         distinct: true,
+        rebuildOnChange: false,
         converter: (Store<AppState> store) => MessageListProps.mapStoreToProps(
           store: store,
           roomId: roomId,
@@ -100,7 +101,7 @@ class MessagesState extends State<Messages> {
         builder: (context, props) {
           final messages = props.messages;
           final userId = props.userId;
-          print('rebuilding buildMessageList');
+          print('[Messages List Widget] rebuilding...');
           return ListView.builder(
             reverse: true,
             itemCount: messages.length,
@@ -134,12 +135,14 @@ class MessagesState extends State<Messages> {
     BuildContext context,
     String roomId,
   }) =>
-      StoreConnector<AppState, ChatInputProps>(
+      StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => ChatInputProps.mapStoreToProps(
+        rebuildOnChange: false,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(
           store,
         ),
         builder: (context, props) {
+          print('[Messages Widget Chat Input] building...');
           double width = MediaQuery.of(context).size.width;
           double messageInputWidth = width - 72;
 
@@ -234,19 +237,11 @@ class MessagesState extends State<Messages> {
       );
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, MessagesProps>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        rebuildOnChange: false,
-        onDidChange: (MessagesProps props) {
-          print('changing');
-        },
-        ignoreChange: (AppState state) {
-          return true;
-        },
-        converter: (Store<AppState> store) =>
-            MessagesProps.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
-          print('rebuilding build (Messages)');
+          print('[Messages Widget] building...');
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
 
@@ -416,6 +411,11 @@ class MessagesState extends State<Messages> {
       );
 }
 
+/*
+
+// The following works just fine with distinct where as the _Props
+// class continually updates
+
 class MessagesProps {
   final bool roomsLoading;
 
@@ -437,16 +437,29 @@ class MessagesProps {
         roomsLoading: store.state.roomStore.loading,
       );
 }
-
-class ChatInputProps {
+*/
+class _Props {
+  final String userId;
+  final bool roomsLoading;
+  final List<Message> messages;
   final Function onSendMessage;
 
-  ChatInputProps({
+  _Props({
+    @required this.messages,
+    @required this.userId,
+    @required this.roomsLoading,
     @required this.onSendMessage,
   });
 
-  static ChatInputProps mapStoreToProps(Store<AppState> store) =>
-      ChatInputProps(
+  static _Props mapStoreToProps(Store<AppState> store, {String roomId}) =>
+      _Props(
+        userId: store.state.userStore.user.userId,
+        messages: roomId == null
+            ? []
+            : sortedMessages(
+                room(id: roomId, state: store.state).messages,
+              ),
+        roomsLoading: store.state.roomStore.loading,
         onSendMessage: ({
           String roomId,
           String body,
@@ -460,6 +473,44 @@ class ChatInputProps {
           }
         },
       );
+
+  @override
+  int get hashCode =>
+      userId.hashCode ^ messages.hashCode ^ roomsLoading.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _Props &&
+          runtimeType == other.runtimeType &&
+          // TODO: MAKE  messages == other.messages &&
+          userId == other.userId &&
+          roomsLoading == other.roomsLoading;
+
+  // @override
+  // bool operator ==(Object other) {
+  //   if (!other is _Props) {
+  //     return false;
+  //   }
+
+  //   print('== i\'ll find you');
+  //   print(
+  //     'userId == other.userId, ${userId == (other as _Props).userId}',
+  //   );
+  //   print(
+  //     'messages == other.messages, ${messages == (other as _Props).messages}',
+  //   );
+  //   print(
+  //     'roomsLoading == other.roomsLoading, ${roomsLoading == (other as _Props).roomsLoading}',
+  //   );
+
+  //   return identical(this, other) ||
+  //       other is _Props &&
+  //           runtimeType == other.runtimeType &&
+  //           userId == other.userId &&
+  //           messages == other.messages &&
+  //           roomsLoading == other.roomsLoading;
+  // }
 }
 
 class MessageListProps {

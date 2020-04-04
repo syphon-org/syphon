@@ -30,7 +30,7 @@ class IntroState extends State<Intro> {
 
   int currentStep = 0;
   bool onboarding = false;
-  String loginText = 'Already have a username?';
+  String loginText = INTRO_LOGIN_TEXT;
   PageController pageController;
 
   final List<Widget> sections = [
@@ -207,7 +207,10 @@ class IntroState extends State<Intro> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w100,
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.white,
                                 decoration: TextDecoration.underline,
                               ),
                             ),

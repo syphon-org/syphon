@@ -143,7 +143,7 @@ class Message extends Event {
         stateKey: event.stateKey,
         timestamp: event.timestamp,
         // extracted content
-        body: event.content['body'] ?? [],
+        body: event.content['body'] ?? '',
         msgtype: event.content['msgtype'],
         format: event.content['format'],
         filename: event.content['filename'],
@@ -151,7 +151,7 @@ class Message extends Event {
       );
     } catch (error) {
       print('FAILED AT EVENT $error');
-      print('event that killed it $event');
+      print('event that killed it ${event.type}, ${event.id}');
       return Message(
         id: event.id,
         userId: event.userId,
@@ -160,6 +160,7 @@ class Message extends Event {
         sender: event.sender,
         stateKey: event.stateKey,
         timestamp: event.timestamp,
+        body: '',
       );
     }
   }

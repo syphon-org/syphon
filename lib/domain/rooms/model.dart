@@ -23,6 +23,8 @@ class RoomStore {
     this.rooms,
   });
 
+  bool get isSynced => lastUpdate != null && lastUpdate != 0;
+
   List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
 
   RoomStore copyWith({
@@ -47,8 +49,9 @@ class RoomStore {
 
   @override
   int get hashCode =>
-      loading.hashCode ^
-      syncing.hashCode ^
+      synced.hashCode ^
+      lastUpdate.hashCode ^
+      lastSince.hashCode ^
       roomObserver.hashCode ^
       rooms.hashCode;
 
@@ -56,9 +59,10 @@ class RoomStore {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RoomStore &&
+          synced == other.synced &&
           runtimeType == other.runtimeType &&
-          loading == other.loading &&
-          syncing == other.syncing &&
+          lastUpdate == other.lastUpdate &&
+          lastSince == other.lastSince &&
           roomObserver == other.roomObserver &&
           rooms == other.rooms;
 
