@@ -150,13 +150,16 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
         child: StoreConnector<AppState, ThemeType>(
           distinct: true,
           converter: (store) => store.state.settingsStore.theme,
-          builder: (context, theme) => MaterialApp(
-            title: 'Tether',
-            theme: Themes.generateCustomTheme(themeType: theme),
-            navigatorKey: NavigationService.navigatorKey,
-            routes: NavigationProvider.getRoutes(store),
-            home: defaultHome,
-          ),
+          builder: (context, theme) {
+            print('[Main Widget] rebuilding');
+            return MaterialApp(
+              title: 'Tether',
+              theme: Themes.generateCustomTheme(themeType: theme),
+              navigatorKey: NavigationService.navigatorKey,
+              routes: NavigationProvider.getRoutes(store),
+              home: defaultHome,
+            );
+          },
         ),
       );
 }

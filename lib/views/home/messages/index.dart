@@ -74,6 +74,7 @@ class MessagesState extends State<Messages> {
   }
 
   // TODO: I like having this top level, but it's a nightmare to pass in vars
+  // if passed through navigator (ModalRoute) args
   // @protected
   // onSendMessage({
   //   Function sendMessage,
@@ -91,17 +92,16 @@ class MessagesState extends State<Messages> {
     BuildContext context,
     String roomId,
   ) =>
-      StoreConnector<AppState, MessageListProps>(
+      StoreConnector<AppState, _Props>(
         distinct: true,
-        rebuildOnChange: false,
-        converter: (Store<AppState> store) => MessageListProps.mapStoreToProps(
-          store: store,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(
+          store,
           roomId: roomId,
         ),
         builder: (context, props) {
           final messages = props.messages;
           final userId = props.userId;
-          print('[Messages List Widget] rebuilding...');
+          print('[Messages buildMessageList] widget rebuilding');
           return ListView.builder(
             reverse: true,
             itemCount: messages.length,
@@ -140,9 +140,11 @@ class MessagesState extends State<Messages> {
         rebuildOnChange: false,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(
           store,
+          roomId: roomId,
         ),
         builder: (context, props) {
-          print('[Messages Widget Chat Input] building...');
+          print('[Messages buildChatInput] widget rebuilding');
+
           double width = MediaQuery.of(context).size.width;
           double messageInputWidth = width - 72;
 
@@ -237,13 +239,13 @@ class MessagesState extends State<Messages> {
       );
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+  Widget build(BuildContext context) => StoreConnector<AppState, bool>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
-        builder: (context, props) {
-          print('[Messages Widget] building...');
+        converter: (Store<AppState> store) => store.state.roomStore.loading,
+        builder: (context, roomLoading) {
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
+          print('[Messages Widget] widget rebuilding');
 
           final hasExtraPadding = inputFieldNode.hasFocus && Platform.isIOS;
           final isScrolling =
@@ -347,7 +349,7 @@ class MessagesState extends State<Messages> {
                             Positioned(
                               // red box
                               child: Visibility(
-                                visible: props.roomsLoading,
+                                visible: roomLoading,
                                 child: Container(
                                     child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -411,33 +413,6 @@ class MessagesState extends State<Messages> {
       );
 }
 
-/*
-
-// The following works just fine with distinct where as the _Props
-// class continually updates
-
-class MessagesProps {
-  final bool roomsLoading;
-
-  MessagesProps({
-    @required this.roomsLoading,
-  });
-
-  @override
-  int get hashCode => roomsLoading.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MessagesProps &&
-          runtimeType == other.runtimeType &&
-          roomsLoading == other.roomsLoading;
-
-  static MessagesProps mapStoreToProps(Store<AppState> store) => MessagesProps(
-        roomsLoading: store.state.roomStore.loading,
-      );
-}
-*/
 class _Props {
   final String userId;
   final bool roomsLoading;
@@ -454,11 +429,7 @@ class _Props {
   static _Props mapStoreToProps(Store<AppState> store, {String roomId}) =>
       _Props(
         userId: store.state.userStore.user.userId,
-        messages: roomId == null
-            ? []
-            : sortedMessages(
-                room(id: roomId, state: store.state).messages,
-              ),
+        messages: latestMessages(room(id: roomId, state: store.state).messages),
         roomsLoading: store.state.roomStore.loading,
         onSendMessage: ({
           String roomId,
@@ -483,70 +454,7 @@ class _Props {
       identical(this, other) ||
       other is _Props &&
           runtimeType == other.runtimeType &&
-          // TODO: MAKE  messages == other.messages &&
+          messages == other.messages &&
           userId == other.userId &&
           roomsLoading == other.roomsLoading;
-
-  // @override
-  // bool operator ==(Object other) {
-  //   if (!other is _Props) {
-  //     return false;
-  //   }
-
-  //   print('== i\'ll find you');
-  //   print(
-  //     'userId == other.userId, ${userId == (other as _Props).userId}',
-  //   );
-  //   print(
-  //     'messages == other.messages, ${messages == (other as _Props).messages}',
-  //   );
-  //   print(
-  //     'roomsLoading == other.roomsLoading, ${roomsLoading == (other as _Props).roomsLoading}',
-  //   );
-
-  //   return identical(this, other) ||
-  //       other is _Props &&
-  //           runtimeType == other.runtimeType &&
-  //           userId == other.userId &&
-  //           messages == other.messages &&
-  //           roomsLoading == other.roomsLoading;
-  // }
-}
-
-class MessageListProps {
-  final String userId;
-  final List<Message> messages;
-  final Function(String) onTestingViewModal;
-
-  MessageListProps({
-    @required this.messages,
-    @required this.userId,
-    @required this.onTestingViewModal,
-  });
-
-  @override
-  int get hashCode =>
-      userId.hashCode ^ messages.hashCode ^ onTestingViewModal.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MessageListProps &&
-          runtimeType == other.runtimeType &&
-          userId == other.userId &&
-          messages == other.messages &&
-          onTestingViewModal == other.onTestingViewModal;
-
-  /* effectively mapStateToProps */
-  static MessageListProps mapStoreToProps(
-          {Store<AppState> store, String roomId}) =>
-      MessageListProps(
-        userId: store.state.userStore.user.userId,
-        messages: sortedMessages(
-          room(id: roomId, state: store.state).messages,
-        ),
-        onTestingViewModal: (String testing) {
-          // store.dispatch(action)
-        },
-      );
 }

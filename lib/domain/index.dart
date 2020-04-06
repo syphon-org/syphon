@@ -55,8 +55,10 @@ Future<Store> initStore() async {
     storageEngine = FileStorage(storageLocation);
   }
 
+  // TODO: this is causing a small blip in rendering
   final persistor = Persistor<AppState>(
     storage: storageEngine,
+    throttleDuration: Duration(seconds: 5),
     serializer: JsonSerializer<AppState>(
       AppState.fromJson,
     ),

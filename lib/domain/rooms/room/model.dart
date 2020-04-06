@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:typed_data';
+import 'package:Tether/domain/rooms/events/selectors.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:flutter/foundation.dart';
@@ -95,6 +96,7 @@ class Room {
     endTime,
     draft,
   }) {
+    print('[Room copyWith] ${this.messages.hashCode}');
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -140,10 +142,10 @@ class Room {
       value: (message) => message,
     );
 
+    // Confirm sorting the messages here, I think this should be done by the
     final combinedMessages = List<Message>.from(combinedMessagesMap.values);
 
-    // // Should we sort here?
-    // combinedMessages.sort((a, b) => b.timestamp - a.timestamp);
+    // latestMessages(List<Message>.from(combinedMessagesMap.values));
 
     // Add to room
     return this.copyWith(

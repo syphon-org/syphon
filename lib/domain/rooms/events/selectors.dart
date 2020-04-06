@@ -1,10 +1,10 @@
 import 'package:Tether/domain/rooms/events/model.dart';
 
-List<Message> sortedMessages(List<Message> messages) {
-  final sortedList = List<Message>.from(messages);
+List<Message> latestMessages(List<Message> messages) {
+  final sortedList = messages;
 
   // sort descending
-  sortedList.sort((a, b) {
+  messages.sort((a, b) {
     if (a.timestamp > b.timestamp) {
       return -1;
     }
