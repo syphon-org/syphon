@@ -14,6 +14,8 @@ const String INTRO_IMAGE_LABEL = 'Relaxed, Lounging User';
 const String INTRO_TITLE = 'Welcome to Tether';
 const String INTRO_SUBTITLE =
     'Take back your privacy and freedom\nwithout the hassle';
+const String NOTIFICATION_PROMPT_INFO =
+    'Your device will prompt you to turn on notifications for tether.\n\nDo you want to turn on message notifications?';
 
 String formatUsernameHint(String homeserver) {
   return homeserver.length != 0

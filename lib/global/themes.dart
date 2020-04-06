@@ -31,7 +31,7 @@ class Themes {
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = customPrimary ?? BASICALLY_BLACK_COLOR;
+        primaryColor = customPrimary ?? PRIMARY_COLOR;
         accentColor = customAccent ?? Color(TETHERED_CYAN);
         scaffoldBackgroundColor = null;
         appBarColor = customPrimary ?? BASICALLY_BLACK_COLOR;

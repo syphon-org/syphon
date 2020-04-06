@@ -1,3 +1,4 @@
+import 'package:Tether/global/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -8,6 +9,10 @@ class SetTheme {
   final ThemeType theme;
 
   SetTheme(this.theme);
+}
+
+class ToggleNotifications {
+  ToggleNotifications();
 }
 
 ThunkAction<AppState> initSettings() {
@@ -22,6 +27,14 @@ ThunkAction<AppState> updatePrimaryColor() {
     int primaryColor = store.state.settingsStore.primaryColor;
 
     Color(primaryColor);
+  };
+}
+
+ThunkAction<AppState> toggleNotifications() {
+  return (Store<AppState> store) async {
+    if (await promptNativeNotificationsRequest()) {
+      store.dispatch(ToggleNotifications());
+    }
   };
 }
 

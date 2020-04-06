@@ -14,9 +14,9 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
 
   var initializationSettingsIOS = IOSInitializationSettings(
-    // requestSoundPermission: false,
-    // requestBadgePermission: false,
-    // requestAlertPermission: false,
+    requestSoundPermission: false,
+    requestBadgePermission: false,
+    requestAlertPermission: false,
     onDidReceiveLocalNotification: onDidReceiveLocalNotification,
   );
 
@@ -31,6 +31,25 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   );
 
   return flutterLocalNotificationsPlugin;
+}
+
+// TODO: impliement this? can you disable natively after enabling?
+Future<bool> disableNotifications() {
+  return Future.value(false);
+}
+
+Future<bool> promptNativeNotificationsRequest() async {
+  final result = await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+  // result means it's not needed, since it's iOS only
+  return result == null ? true : result;
 }
 
 Future showMessageNotification({int messageHash, String content}) async {

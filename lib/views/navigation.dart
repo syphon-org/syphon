@@ -37,6 +37,8 @@ class NavigationService {
   }
 }
 
+// https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter
+// TODO: consistant transition styles
 class NavigationProvider {
   static getRoutes(Store<AppState> store) {
     return <String, WidgetBuilder>{

@@ -2,7 +2,6 @@ import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/user/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -13,9 +12,9 @@ class SettingsScreen extends StatelessWidget {
 
   final String title;
 
-  Widget buildToggledSubtitle({String option}) {
+  Widget buildToggledSubtitle({bool value}) {
     return Text(
-      option == null ? 'Off' : 'On',
+      value ? 'On' : 'Off',
       style: TextStyle(fontSize: 14.0),
     );
   }
@@ -27,18 +26,18 @@ class SettingsScreen extends StatelessWidget {
         converter: (Store<AppState> store) => store,
         builder: (context, store) {
           final double width = MediaQuery.of(context).size.width;
-          final double height = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           // TODO: set max contstraints
           final headerPadding = EdgeInsets.symmetric(
             horizontal: width * 0.0575,
-            vertical: height * 0.05,
+            vertical: height * 0.04,
           );
 
           // Static horizontal: 16, vertical: 8
           final contentPadding = EdgeInsets.symmetric(
             horizontal: width * 0.08,
-            vertical: height * 0.01,
+            vertical: height * 0.005,
           );
 
           return Scaffold(
@@ -86,10 +85,12 @@ class SettingsScreen extends StatelessWidget {
                               'SMS and MMS',
                               style: TextStyle(fontSize: 18.0),
                             ),
-                            subtitle: buildToggledSubtitle(),
+                            subtitle: buildToggledSubtitle(value: false),
                           ),
                           ListTile(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushNamed(context, '/notifications');
+                            },
                             contentPadding: contentPadding,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -101,7 +102,10 @@ class SettingsScreen extends StatelessWidget {
                               'Notifications',
                               style: TextStyle(fontSize: 18.0),
                             ),
-                            subtitle: buildToggledSubtitle(),
+                            subtitle: buildToggledSubtitle(
+                              value: store
+                                  .state.settingsStore.notificationsEnabled,
+                            ),
                           ),
                           ListTile(
                             onTap: () {},

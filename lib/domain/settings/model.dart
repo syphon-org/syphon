@@ -20,6 +20,26 @@ class SettingsStore {
     this.notificationsEnabled = false,
   });
 
+  SettingsStore copyWith({
+    int primaryColor,
+    int accentColor,
+    int brightness,
+    ThemeType theme,
+    String language,
+    bool smsEnabled,
+    bool notificationsEnabled,
+  }) {
+    return SettingsStore(
+      primaryColor: primaryColor ?? this.primaryColor,
+      accentColor: accentColor ?? this.accentColor,
+      brightness: brightness ?? this.brightness,
+      theme: theme ?? this.theme,
+      language: language ?? this.language,
+      smsEnabled: smsEnabled ?? this.smsEnabled,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+    );
+  }
+
   @override
   int get hashCode => theme.hashCode;
 

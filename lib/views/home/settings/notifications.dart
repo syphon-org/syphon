@@ -1,8 +1,6 @@
 import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/actions.dart';
 import 'package:Tether/domain/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/notifications.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,12 +12,50 @@ final String debug = DotEnv().env['DEBUG'];
 class NotificationSettings extends StatelessWidget {
   NotificationSettings({Key key}) : super(key: key);
 
+  @protected
+  onConfirmToggle({
+    context,
+    Function onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Confirm Notifications"),
+        content: Text(
+          NOTIFICATION_PROMPT_INFO,
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text('Sure'),
+            onPressed: () {
+              if (onConfirm != null) {
+                onConfirm();
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         converter: (Store<AppState> store) => Props.mapStoreToProps(store),
         builder: (context, props) {
-          final contentPadding =
-              EdgeInsets.symmetric(horizontal: 24, vertical: 8);
+          // Static horizontal: 16, vertical: 8
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
+          final contentPadding = EdgeInsets.symmetric(
+            horizontal: width * 0.08,
+            vertical: height * 0.01,
+          );
 
           return Scaffold(
             appBar: AppBar(
@@ -38,15 +74,39 @@ class NotificationSettings extends StatelessWidget {
               children: <Widget>[
                 ListTile(
                   dense: true,
-                  onTap: props.onToggleSyncing,
+                  onTap: () {
+                    if (props.notificationsEnabled) {
+                      props.onToggleNotifications();
+                    } else {
+                      onConfirmToggle(
+                        context: context,
+                        onConfirm: () {
+                          props.onToggleNotifications();
+                        },
+                      );
+                    }
+                  },
                   contentPadding: contentPadding,
                   title: Text(
                     'Notifications',
                     style: TextStyle(fontSize: 18.0),
                   ),
                   trailing: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: ToggleButtons(),
+                    child: Switch(
+                      value: props.notificationsEnabled,
+                      onChanged: (value) {
+                        if (!value) {
+                          props.onToggleNotifications();
+                        } else {
+                          onConfirmToggle(
+                            context: context,
+                            onConfirm: () {
+                              props.onToggleNotifications();
+                            },
+                          );
+                        }
+                      },
+                    ),
                   ),
                 )
               ],
@@ -57,24 +117,12 @@ class NotificationSettings extends StatelessWidget {
 }
 
 class Props {
-  final bool syncing;
-  final bool loading;
-  final bool roomsLoading;
-  final bool roomsObserverEnabled;
-  final String language;
-  final Function onToggleSyncing;
-  final Function onManualSync;
-  final Function onForceFullSync;
+  final bool notificationsEnabled;
+  final Function onToggleNotifications;
 
   Props({
-    @required this.syncing,
-    @required this.loading,
-    @required this.roomsLoading,
-    @required this.language,
-    @required this.onManualSync,
-    @required this.onForceFullSync,
-    @required this.onToggleSyncing,
-    @required this.roomsObserverEnabled,
+    @required this.notificationsEnabled,
+    @required this.onToggleNotifications,
   });
 
   /* effectively mapStateToProps, but includes functions */
@@ -82,39 +130,18 @@ class Props {
     Store<AppState> store,
   ) =>
       Props(
-          syncing: store.state.roomStore.syncing,
-          loading:
-              store.state.roomStore.syncing || store.state.roomStore.loading,
-          roomsLoading: store.state.roomStore.loading,
-          language: store.state.settingsStore.language,
-          roomsObserverEnabled: store.state.roomStore.roomObserver.isActive,
-          onToggleSyncing: () {
-            final observer = store.state.roomStore.roomObserver;
-            if (observer != null && observer.isActive) {
-              store.dispatch(stopRoomsObserver());
-            } else {
-              store.dispatch(startRoomsObserver());
-            }
-          },
-          onForceFullSync: () {
-            store.dispatch(fetchSync());
-          },
-          onManualSync: () {
-            if (store.state.roomStore.lastSince != null) {
-              store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
-            }
+          notificationsEnabled: store.state.settingsStore.notificationsEnabled,
+          onToggleNotifications: () {
+            store.dispatch(toggleNotifications());
           });
 
   @override
-  int get hashCode => syncing.hashCode ^ roomsLoading.hashCode;
+  int get hashCode => notificationsEnabled.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Props &&
           runtimeType == other.runtimeType &&
-          syncing == other.syncing &&
-          loading == other.loading &&
-          roomsObserverEnabled == other.roomsObserverEnabled &&
-          roomsLoading == other.roomsLoading;
+          notificationsEnabled == other.notificationsEnabled;
 }
