@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -12,9 +14,9 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
 
   var initializationSettingsIOS = IOSInitializationSettings(
-    requestSoundPermission: false,
-    requestBadgePermission: false,
-    requestAlertPermission: false,
+    // requestSoundPermission: false,
+    // requestBadgePermission: false,
+    // requestAlertPermission: false,
     onDidReceiveLocalNotification: onDidReceiveLocalNotification,
   );
 
@@ -37,7 +39,7 @@ Future showMessageNotification({int messageHash, String content}) async {
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     'tether_notifications',
     'Tether',
-    'Notifications for tether messenger',
+    'S',
     importance: Importance.Default,
     priority: Priority.High,
   );
@@ -70,10 +72,12 @@ Future showDebugNotification() async {
     iOSPlatformChannelSpecifics,
   );
 
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    'Debug Regular Notifcation',
-    'This is a test for styling notifications',
-    platformChannelSpecifics,
-  );
+  Timer(Duration(seconds: 5), () async {
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Debug Regular Notifcation',
+      'This is a test for styling notifications',
+      platformChannelSpecifics,
+    );
+  });
 }

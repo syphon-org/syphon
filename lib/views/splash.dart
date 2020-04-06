@@ -25,9 +25,8 @@ class Splash extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
 
     /* 
-     * TODO: find a more explicit way to style with flex
-     * Should be able to specify flex as a ratio of screen coverage without
-     * stretching elements, a mix of container and expanded
+     * COMPLETED: find a more explicit way to style with flex 
+     * reference the intro and signup screens
     */
     return Scaffold(
       body: ScrollConfiguration(
@@ -40,25 +39,23 @@ class Splash extends StatelessWidget {
             width: width,
             child: StoreConnector<AppState, dynamic>(
               converter: (store) => () => store.dispatch(incrementTheme()),
-              builder: (context, onIncrementTheme) {
-                return Flex(
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Spacer(flex: 8),
-                    TouchableOpacity(
-                      onTap: () {
-                        onIncrementTheme();
-                      },
-                      child: const Image(
-                        width: 150,
-                        height: 150,
-                        image: AssetImage(TETHER_ICON_PNG),
-                      ),
+              builder: (context, onIncrementTheme) => Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Spacer(flex: 8),
+                  TouchableOpacity(
+                    onTap: () {
+                      onIncrementTheme();
+                    },
+                    child: const Image(
+                      width: 150,
+                      height: 150,
+                      image: AssetImage(TETHER_ICON_PNG),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

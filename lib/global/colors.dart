@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const TETHERED_CYAN = 0xff34C7B5;
 const BESIDES_BLUE = 0xff4476CC;
 const BASICALLY_BLACK = 0xff121212;
+const ACTUALLY_BLACK = 0xff000000;
 const ENABLED_GREY = 0xffFAFAFA;
 const DISABLED_GREY = 0xffD8D8D8;
 const GREY_DARK = 0xff4D5767;

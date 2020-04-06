@@ -171,7 +171,7 @@ class Home extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
-        titleSpacing: 22.00,
+        titleSpacing: 18.00,
         title: Row(children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 8),

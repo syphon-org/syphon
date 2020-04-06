@@ -1,6 +1,5 @@
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/actions.dart';
-import 'package:Tether/domain/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
@@ -41,6 +40,7 @@ class AdvancedScreen extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
+                    contentPadding: contentPadding,
                     onTap: () {
                       showDialog(
                         context: context,
@@ -50,7 +50,6 @@ class AdvancedScreen extends StatelessWidget {
                         ),
                       );
                     },
-                    contentPadding: contentPadding,
                     title: Text(
                       'Test Dialog',
                       style: TextStyle(fontSize: 18.0),

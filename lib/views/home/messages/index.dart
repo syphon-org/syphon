@@ -101,7 +101,6 @@ class MessagesState extends State<Messages> {
         builder: (context, props) {
           final messages = props.messages;
           final userId = props.userId;
-          print('[Messages buildMessageList] widget rebuilding');
           return ListView.builder(
             reverse: true,
             itemCount: messages.length,
@@ -143,8 +142,6 @@ class MessagesState extends State<Messages> {
           roomId: roomId,
         ),
         builder: (context, props) {
-          print('[Messages buildChatInput] widget rebuilding');
-
           double width = MediaQuery.of(context).size.width;
           double messageInputWidth = width - 72;
 
@@ -245,7 +242,6 @@ class MessagesState extends State<Messages> {
         builder: (context, roomLoading) {
           final MessageArguments arguments =
               ModalRoute.of(context).settings.arguments;
-          print('[Messages Widget] widget rebuilding');
 
           final hasExtraPadding = inputFieldNode.hasFocus && Platform.isIOS;
           final isScrolling =

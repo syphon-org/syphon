@@ -28,14 +28,14 @@ bool isAuthLoading(AppState state) {
 }
 
 // Auth
-String shortname(AppState state) {
+String displayShortname(AppState state) {
   // If user has yet to save a username, format the userId to show the shortname
   final userId = state.userStore.user.userId;
   return userId != null ? userId.split(':')[0].replaceAll('@', '') : '';
 }
 
 String displayName(AppState state) {
-  return state.userStore.user.displayName ?? shortname(state);
+  return state.userStore.user.displayName ?? displayShortname(state);
 }
 
 String displayInitials(AppState state) {

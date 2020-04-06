@@ -4,7 +4,6 @@ import './colors.dart';
 enum ThemeType {
   LIGHT,
   DARK,
-  CUSTOM,
   DARKER,
 }
 
@@ -26,6 +25,8 @@ class Themes {
     var primaryColor = customPrimary ?? PRIMARY_COLOR;
     var accentColor = customAccent ?? ACCENT_COLOR;
     var scaffoldBackgroundColor = BACKGROUND_COLOR;
+    var appBarColor = PRIMARY_COLOR;
+    var appBarElevation;
 
     switch (themeType) {
       case ThemeType.DARK:
@@ -33,12 +34,15 @@ class Themes {
         primaryColor = customPrimary ?? BASICALLY_BLACK_COLOR;
         accentColor = customAccent ?? Color(TETHERED_CYAN);
         scaffoldBackgroundColor = null;
+        appBarColor = customPrimary ?? BASICALLY_BLACK_COLOR;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
         primaryColor = customPrimary ?? BASICALLY_BLACK_COLOR;
         accentColor = customAccent ?? Color(TETHERED_CYAN);
-        scaffoldBackgroundColor = null;
+        scaffoldBackgroundColor = BASICALLY_BLACK_COLOR;
+        appBarColor = customPrimary ?? BASICALLY_BLACK_COLOR;
+        appBarElevation = 0.0;
         break;
       case ThemeType.LIGHT:
       default:
@@ -49,18 +53,22 @@ class Themes {
         brightness == Brightness.light ? primaryColor : accentColor;
 
     return ThemeData(
-      // Main Dynamics
+      // Main Colors
       primaryColor: primaryColor,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
       accentColor: accentColor,
       brightness: brightness,
 
-      // Secondary Dynamics
-      scaffoldBackgroundColor: scaffoldBackgroundColor,
+      // Core UI
       focusColor: primaryColor,
       cursorColor: primaryColor,
-
+      scaffoldBackgroundColor: scaffoldBackgroundColor,
+      appBarTheme: AppBarTheme(
+        elevation: appBarElevation,
+        brightness: brightness,
+        color: appBarColor,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,
@@ -79,87 +87,20 @@ class Themes {
         ),
       ),
 
-      // Core UI
-      appBarTheme: AppBarTheme(brightness: brightness),
-
       // Fonts
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(
         headline6: TextStyle(color: Colors.white),
       ),
       textTheme: TextTheme(
+        subtitle1: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
+        bodyText1: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
         headline5: TextStyle(fontWeight: FontWeight.w100),
-        headline6: TextStyle(fontWeight: FontWeight.w100),
+        headline6: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
         subtitle2: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
         caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-        button: TextStyle(
-          fontWeight: FontWeight.w100,
-        ),
+        button: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
       ),
     );
   }
 }
-
-// static ThemeData getThemeFromKey(ThemeType themeKey) {
-//   switch (themeKey) {
-//     case ThemeType.LIGHT:
-//       return lightTheme;
-//     case ThemeType.DARK:
-//       return darkTheme;
-//     case ThemeType.DARKER:
-//       return darkerTheme;
-//     default:
-//       return lightTheme;
-//   }
-// }
-
-//   static final ThemeData lightTheme = ThemeData(
-//     primaryColor: PRIMARY_COLOR,
-//     accentColor: ACCENT_COLOR,
-//     brightness: Brightness.light,
-//     appBarTheme: AppBarTheme(
-//       brightness: Brightness.dark,
-//     ),
-//     scaffoldBackgroundColor: BACKGROUND_COLOR,
-//     fontFamily: 'Rubik',
-//     primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
-//     cursorColor: PRIMARY_COLOR,
-//     textTheme: TextTheme(
-//       headline5: TextStyle(fontWeight: FontWeight.w100),
-//       headline6: TextStyle(fontWeight: FontWeight.w100),
-//       subtitle2: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-//       caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-//       button: TextStyle(fontWeight: FontWeight.w100),
-//     ),
-//   );
-
-//   static final ThemeData darkTheme = ThemeData(
-//       primaryColor: const Color(TETHERED_CYAN),
-//       brightness: Brightness.dark,
-//       appBarTheme: AppBarTheme(
-//         brightness: Brightness.dark,
-//       ),
-//       fontFamily: 'Rubik',
-//       primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
-//       textTheme: TextTheme(
-//           headline5: TextStyle(fontWeight: FontWeight.w100),
-//           headline6: TextStyle(fontWeight: FontWeight.w100),
-//           subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
-//           caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-//           button: TextStyle(fontWeight: FontWeight.w100)));
-
-//   static final ThemeData darkerTheme = ThemeData(
-//       primaryColor: const Color(BASICALLY_BLACK),
-//       brightness: Brightness.dark,
-//       appBarTheme: AppBarTheme(
-//         brightness: Brightness.dark,
-//       ),
-//       fontFamily: 'Rubik',
-//       primaryTextTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
-//       textTheme: TextTheme(
-//           headline5: TextStyle(fontWeight: FontWeight.w100),
-//           headline6: TextStyle(fontWeight: FontWeight.w100),
-//           subtitle2: TextStyle(fontWeight: FontWeight.w100, fontSize: 18),
-//           caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-//           button: TextStyle(fontWeight: FontWeight.w100)));
-// }

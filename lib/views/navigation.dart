@@ -19,6 +19,7 @@ import 'package:Tether/views/home/messages/draft.dart';
 
 // Settings
 import 'package:Tether/views/home/settings/advanced.dart';
+import 'package:Tether/views/home/settings/notifications.dart';
 import 'package:Tether/views/home/settings/appearance.dart';
 import 'package:redux/redux.dart';
 
@@ -55,9 +56,10 @@ class NavigationProvider {
       '/draft': (BuildContext context) => Draft(),
       '/profile': (BuildContext context) => Profile(),
       '/home/messages': (BuildContext context) => Messages(),
+      '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
       '/appearance': (BuildContext context) => ApperanceScreen(
-            title: 'Appearance',
+            title: 'Customization',
           ),
       '/settings': (BuildContext context) => SettingsScreen(
             title: 'Settings',
