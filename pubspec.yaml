@@ -58,6 +58,7 @@ dependencies:
   html: ^0.13.3+3
   intl: ^0.16.1
   flutter_dotenv: ^2.0.3
+  workmanager: ^0.2.0
 
   # UI Only
   flutter_local_notifications: 1.4.0

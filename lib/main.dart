@@ -123,7 +123,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   @protected
   void onMounted() {
     // init authenticated navigation
-    store.state.userStore.onAuthStateChanged.listen((user) {
+    store.state.userStore.onAuthStateChanged.listen((user) async {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
@@ -135,7 +135,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
         NavigationService.clearTo('/home', context);
 
         // Default Authenticated Services
-        initNotifications(
+        globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: onSelectNotification,
         );
       }

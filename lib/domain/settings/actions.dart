@@ -32,7 +32,9 @@ ThunkAction<AppState> updatePrimaryColor() {
 
 ThunkAction<AppState> toggleNotifications() {
   return (Store<AppState> store) async {
-    if (await promptNativeNotificationsRequest()) {
+    if (await promptNativeNotificationsRequest(
+      pluginInstance: globalNotificationPluginInstance,
+    )) {
       store.dispatch(ToggleNotifications());
     }
   };

@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
   Function onDidReceiveLocalNotification,
@@ -25,12 +24,15 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
     initializationSettingsIOS,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(
+  FlutterLocalNotificationsPlugin pluginInstance =
+      FlutterLocalNotificationsPlugin();
+
+  await pluginInstance.initialize(
     initializationSettings,
     onSelectNotification: onSelectNotification,
   );
 
-  return flutterLocalNotificationsPlugin;
+  return pluginInstance;
 }
 
 // TODO: impliement this? can you disable natively after enabling?
@@ -38,8 +40,10 @@ Future<bool> disableNotifications() {
   return Future.value(false);
 }
 
-Future<bool> promptNativeNotificationsRequest() async {
-  final result = await flutterLocalNotificationsPlugin
+Future<bool> promptNativeNotificationsRequest({
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
+  final result = await pluginInstance
       .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin>()
       ?.requestPermissions(
@@ -52,7 +56,11 @@ Future<bool> promptNativeNotificationsRequest() async {
   return result == null ? true : result;
 }
 
-Future showMessageNotification({int messageHash, String content}) async {
+Future showMessageNotification({
+  int messageHash,
+  String content,
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -68,7 +76,7 @@ Future showMessageNotification({int messageHash, String content}) async {
     iOSPlatformChannelSpecifics,
   );
 
-  await flutterLocalNotificationsPlugin.show(
+  await pluginInstance.show(
     messageHash,
     'New Message',
     content ?? 'Tap to open message',
@@ -76,7 +84,10 @@ Future showMessageNotification({int messageHash, String content}) async {
   );
 }
 
-Future showDebugNotification() async {
+Future showDebugNotification({
+  String customMessage,
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     'tether_notifications',
@@ -91,12 +102,12 @@ Future showDebugNotification() async {
     iOSPlatformChannelSpecifics,
   );
 
-  Timer(Duration(seconds: 5), () async {
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Debug Regular Notifcation',
-      'This is a test for styling notifications',
-      platformChannelSpecifics,
-    );
-  });
+  // Timer(Duration(seconds: 5), () async {
+  await pluginInstance.show(
+    0,
+    'Debug Regular Notifcation',
+    customMessage ?? 'This is a test for styling notifications',
+    platformChannelSpecifics,
+  );
+  // });
 }

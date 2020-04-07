@@ -1,5 +1,6 @@
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/actions.dart';
+import 'package:Tether/domain/rooms/service.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
@@ -40,6 +41,37 @@ class AdvancedScreen extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
+                    onTap: () {
+                      stopRoomObserverService();
+                    },
+                    contentPadding: contentPadding,
+                    title: Text(
+                      'Kill Isolate',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  maintainSize: false,
+                  visible: debug == 'true',
+                  child: ListTile(
+                    dense: true,
+                    onTap: () async {
+                      await sendServiceAction('bye bye');
+                      print('action completed');
+                    },
+                    contentPadding: contentPadding,
+                    title: Text(
+                      'Toggle Isolate Timer',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  maintainSize: false,
+                  visible: debug == 'true',
+                  child: ListTile(
+                    dense: true,
                     contentPadding: contentPadding,
                     onTap: () {
                       showDialog(
@@ -62,7 +94,9 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      showDebugNotification();
+                      showDebugNotification(
+                        pluginInstance: globalNotificationPluginInstance,
+                      );
                     },
                     contentPadding: contentPadding,
                     title: Text(

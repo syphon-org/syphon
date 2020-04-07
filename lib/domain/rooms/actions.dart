@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:Tether/domain/rooms/service.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:http/http.dart' as http;
 
@@ -143,6 +144,8 @@ ThunkAction<AppState> initialRoomSync() {
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     // Dispatch Background Sync
+    startRoomObserverService();
+
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
       if (store.state.roomStore.syncing) {
         print('[Room Observer] still syncing');
@@ -167,6 +170,7 @@ ThunkAction<AppState> stopRoomsObserver() {
     if (store.state.roomStore.roomObserver != null) {
       store.state.roomStore.roomObserver.cancel();
       store.dispatch(SetRoomObserver(roomObserver: null));
+      stopRoomObserverService();
     }
   };
 }
