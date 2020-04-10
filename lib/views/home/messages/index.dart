@@ -2,6 +2,7 @@ import 'dart:io';
 
 // Domain
 import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/views/home/messages/settings.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,13 +42,11 @@ enum MessageOptions {
 class MessageArguments {
   final String roomId;
   final String title;
-  final String photo;
 
   // Improve loading times
   MessageArguments({
     this.roomId,
     this.title,
-    this.photo,
   });
 }
 
@@ -306,8 +305,9 @@ class MessagesState extends State<Messages> {
                       return Navigator.pushNamed(
                         context,
                         '/home/messages/settings',
-                        arguments: MessageArguments(
+                        arguments: ChatSettingsArguments(
                           roomId: props.room.id,
+                          title: arguments.title,
                         ),
                       );
                     default:
