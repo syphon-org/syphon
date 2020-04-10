@@ -73,8 +73,13 @@ Future<Store> initStore() async {
   JsonMapper.registerValueDecorator<List<Room>>(iterableDecorator);
 
   // Finally load persisted store
-  final initialState = await persistor.load();
-  print('[initStore] $initialState');
+  var initialState;
+  try {
+    initialState = await persistor.load();
+    print('[initStore] persist loaded successfully');
+  } catch (error) {
+    print('[initStore] error $error');
+  }
 
   final Store<AppState> store = new Store<AppState>(
     appReducer,

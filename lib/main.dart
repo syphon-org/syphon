@@ -39,6 +39,7 @@ void _enablePlatformOverrideForDesktop() {
 
 void main() async {
   initializeReflectable();
+  WidgetsFlutterBinding();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
   _enablePlatformOverrideForDesktop();
 
@@ -123,7 +124,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   @protected
   void onMounted() {
     // init authenticated navigation
-    store.state.userStore.onAuthStateChanged.listen((user) async {
+    store.state.userStore.onAuthStateChanged.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
@@ -133,11 +134,6 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
         // Default Authenticated App Home
         defaultHome = Home(title: 'Tether');
         NavigationService.clearTo('/home', context);
-
-        // Default Authenticated Services
-        globalNotificationPluginInstance = await initNotifications(
-          onSelectNotification: onSelectNotification,
-        );
       }
     });
   }

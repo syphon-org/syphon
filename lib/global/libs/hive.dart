@@ -87,5 +87,4 @@ Future<dynamic> initHiveStorage() async {
 void closeStorage() async {
   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
   box.close();
-  // print();
 }

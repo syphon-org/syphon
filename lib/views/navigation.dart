@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 // Intro
 import 'package:Tether/views/login/index.dart';
 import 'package:Tether/views/signup/index.dart';
+import 'package:Tether/views/signup/loading.dart';
 import 'package:Tether/views/homesearch/index.dart';
 import 'package:Tether/views/intro/index.dart';
-import 'package:Tether/views/loading.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
+// import 'package:Tether/views/home/draft.dart';
 import 'package:Tether/views/home/profile/index.dart';
 import 'package:Tether/views/home/settings/index.dart';
 
 // Messages
 import 'package:Tether/views/home/messages/index.dart';
-import 'package:Tether/views/home/messages/draft.dart';
+import 'package:Tether/views/home/messages/settings.dart';
 
 // Settings
 import 'package:Tether/views/home/settings/advanced.dart';
@@ -55,9 +56,9 @@ class NavigationProvider {
       '/home': (BuildContext context) => Home(
             title: 'Tether',
           ),
-      '/draft': (BuildContext context) => Draft(),
-      '/profile': (BuildContext context) => Profile(),
       '/home/messages': (BuildContext context) => Messages(),
+      '/home/messages/settings': (BuildContext context) => ChatSettings(),
+      '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
       '/appearance': (BuildContext context) => ApperanceScreen(

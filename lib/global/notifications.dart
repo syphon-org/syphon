@@ -32,6 +32,7 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
     onSelectNotification: onSelectNotification,
   );
 
+  print('[initNotifications] successfully initialized $pluginInstance');
   return pluginInstance;
 }
 

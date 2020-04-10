@@ -42,11 +42,18 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      stopRoomObserverService();
+                      // Dispatch Background Sync
+                      if (roomObserverIsolate != null) {
+                        stopRoomObserverService();
+                      } else {
+                        startRoomObserverService();
+                      }
                     },
                     contentPadding: contentPadding,
                     title: Text(
-                      'Kill Isolate',
+                      roomObserverIsolate != null
+                          ? 'Kill Isolate'
+                          : 'Start Isolate',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),

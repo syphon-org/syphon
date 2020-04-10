@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import './profile-preview.dart';
+import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({Key key, this.title}) : super(key: key);

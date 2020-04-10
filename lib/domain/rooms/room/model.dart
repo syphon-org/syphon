@@ -96,7 +96,6 @@ class Room {
     endTime,
     draft,
   }) {
-    print('[Room copyWith] ${this.messages.hashCode}');
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -216,15 +215,7 @@ class Room {
         }
       });
     } catch (error) {
-      print(error);
-    } finally {
-      // final numberOfEvents = stateEvents != null ? stateEvents.length : 0;
-      // print(
-      //     '[fromStateEvents] ******** ${originDEBUG} ${this.id} ${numberOfEvents} ******** ');
-      // print('[fromStateEvents] name ${name}, ${this.name}');
-      // print('[fromStateEvents] avatar ${avatar}, ${this.avatar}');
-      // print('[fromStateEvents] topic ${topic}, ${this.topic}');
-      // print('[fromStateEvents] last update ${lastUpdate}, ${this.lastUpdate}');
+      print('[fromStateEvents] error $error');
     }
 
     return this.copyWith(

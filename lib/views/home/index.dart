@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:Tether/domain/rooms/room/selectors.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
-import 'package:Tether/global/widgets/menu.dart';
+import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +18,7 @@ import 'package:Tether/domain/rooms/selectors.dart';
 import 'package:Tether/global/formatters.dart';
 
 // View And Styling
+import 'package:Tether/views/widgets/menu.dart';
 import 'package:Tether/views/home/messages/index.dart';
 import 'package:Tether/global/colors.dart';
 
@@ -31,35 +32,6 @@ class Home extends StatelessWidget {
   @protected
   onNavigateToDraft(context) {
     Navigator.pushNamed(context, '/draft');
-  }
-
-  Widget buildChatAvatar({Room room}) {
-    if (room.syncing) {
-      return Container(
-        margin: EdgeInsets.all(8),
-        child: CircularProgressIndicator(
-          strokeWidth: 3,
-          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-          value: null,
-        ),
-      );
-    }
-
-    if (room.avatar != null && room.avatar.data != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(25),
-        child: Image(
-          width: 52,
-          height: 52,
-          image: MemoryImage(room.avatar.data),
-        ),
-      );
-    }
-
-    return Text(
-      room.name.substring(0, 2).toUpperCase(),
-      style: TextStyle(fontSize: 18, color: Colors.white),
-    );
   }
 
   Widget buildConversationList(List<Room> rooms, BuildContext context) {
@@ -119,8 +91,9 @@ class Home extends StatelessWidget {
                     Container(
                       child: CircleAvatar(
                         radius: 24,
-                        backgroundColor:
-                            room.avatar != null ? Colors.white70 : Colors.grey,
+                        backgroundColor: room.avatar != null
+                            ? Colors.transparent
+                            : Colors.grey,
                         child: buildChatAvatar(room: room),
                       ),
                       margin: const EdgeInsets.only(right: 12),
@@ -177,6 +150,7 @@ class Home extends StatelessWidget {
             margin: EdgeInsets.only(right: 8),
             child: IconButton(
               icon: StoreConnector<AppState, String>(
+                  distinct: true,
                   converter: (store) => displayInitials(store.state),
                   builder: (context, initials) {
                     return CircleAvatar(
@@ -245,41 +219,41 @@ class Home extends StatelessWidget {
       body: Align(
         alignment: Alignment.topCenter,
         child: StoreConnector<AppState, AppState>(
-            converter: (Store<AppState> store) => store.state,
-            builder: (context, state) {
-              return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Visibility(
-                        visible: state.roomStore.loading,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: CircularProgressIndicator(
-                            strokeWidth: 4.0,
-                            valueColor: new AlwaysStoppedAnimation<Color>(
-                                PRIMARY_COLOR),
-                            value: null,
-                          ),
-                        )),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () {
-                          print('STUB REFRESH');
-                          return Future.delayed(
-                            const Duration(milliseconds: 3000),
-                            () {
-                              return 'done';
-                            },
-                          );
-                        },
-                        child: buildConversationList(
-                          sortRoomsByPriority(state),
-                          context,
-                        ),
-                      ),
+          converter: (Store<AppState> store) => store.state,
+          builder: (context, state) => Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Visibility(
+                  visible: state.roomStore.loading,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 4.0,
+                      valueColor:
+                          new AlwaysStoppedAnimation<Color>(PRIMARY_COLOR),
+                      value: null,
                     ),
-                  ]);
-            }),
+                  )),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () {
+                    print('STUB REFRESH');
+                    return Future.delayed(
+                      const Duration(milliseconds: 3000),
+                      () {
+                        return 'done';
+                      },
+                    );
+                  },
+                  child: buildConversationList(
+                    sortRoomsByPriority(state),
+                    context,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: StoreConnector<AppState, dynamic>(
         converter: (store) => () => print('Add Room Stub'),

@@ -1,15 +1,16 @@
-import 'package:Tether/global/widgets/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-
 import 'package:Tether/domain/index.dart';
+
+import 'package:Tether/views/widgets/menu.dart';
 
 enum DraftOptions { newGroup, markAllRead, inviteFriends, settings, help }
 
-class Draft extends StatelessWidget {
-  Draft({Key key, this.title}) : super(key: key);
+class ChatSettings extends StatelessWidget {
+  ChatSettings({Key key, this.title}) : super(key: key);
 
   final String title;
 

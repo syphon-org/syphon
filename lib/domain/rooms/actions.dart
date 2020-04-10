@@ -143,9 +143,6 @@ ThunkAction<AppState> initialRoomSync() {
  */
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
-    // Dispatch Background Sync
-    startRoomObserverService();
-
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
       if (store.state.roomStore.syncing) {
         print('[Room Observer] still syncing');
@@ -341,7 +338,7 @@ ThunkAction<AppState> fetchMessageEvents({Room room}) {
         endTime: endTime,
       ));
     } catch (error) {
-      print(error);
+      print('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -410,9 +407,9 @@ ThunkAction<AppState> fetchMemberEvents({String roomId}) {
       final data = json.decode(response.body);
 
       // Convert rooms to rooms
-      print('$data');
+      print('[fetchMemberEvents] TESTING $data');
     } catch (error) {
-      print(error);
+      print('[fetchMemberEvents] error $error');
     }
   };
 }
@@ -490,7 +487,7 @@ Future<dynamic> readFullSyncJson() async {
     return await jsonDecode(contents);
   } catch (error) {
     // If encountering an error, return 0.
-    print(error);
+    print('readFullSyncJson $error');
     return null;
   } finally {
     print('** Read State From Disk Successfully **');

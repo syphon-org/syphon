@@ -150,8 +150,8 @@ class Message extends Event {
         formattedBody: event.content['formattedBody'],
       );
     } catch (error) {
-      print('FAILED AT EVENT $error');
-      print('event that killed it ${event.type}, ${event.id}');
+      print('[Message.fromEvent] error $error');
+      print('[Message.fromEvent] event ${event.type}, ${event.id}');
       return Message(
         id: event.id,
         userId: event.userId,

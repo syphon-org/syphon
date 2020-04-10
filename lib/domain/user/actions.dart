@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:Tether/domain/rooms/actions.dart';
+import 'package:Tether/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -93,6 +94,11 @@ ThunkAction<AppState> startAuthObserver() {
           await store.dispatch(initialRoomSync());
         }
 
+        globalNotificationPluginInstance = await initNotifications(
+          onSelectNotification: (String payload) {
+            print('[onSelectNotification] payload');
+          },
+        );
         store.dispatch(startRoomsObserver());
       } else {
         store.dispatch(stopRoomsObserver());
@@ -194,7 +200,7 @@ ThunkAction<AppState> fetchUserProfile() {
         ),
       ));
     } catch (error) {
-      print(error);
+      print('[fetchUserProfile] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

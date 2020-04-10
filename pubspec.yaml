@@ -58,12 +58,13 @@ dependencies:
   html: ^0.13.3+3
   intl: ^0.16.1
   flutter_dotenv: ^2.0.3
-  workmanager: ^0.2.0
+  android_alarm_manager: 0.4.5+8
+  # workmanager: ^0.2.0
 
   # UI Only
   flutter_local_notifications: 1.4.0
   expandable: 3.0.1
-  flutter_svg: 0.14.2
+  flutter_svg: ^0.17.0
   flutter_swiper : 1.1.6
   touchable_opacity: 1.0.2
   smooth_page_indicator: 0.1.1
@@ -80,8 +81,7 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter 
-  hive_generator: ^0.7.0
+    sdk: flutter
   build_runner: ^1.0.0
   # json_serializable: ^3.2.0
 
