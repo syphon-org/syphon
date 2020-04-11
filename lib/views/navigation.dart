@@ -57,7 +57,7 @@ class NavigationProvider {
             title: 'Tether',
           ),
       '/home/messages': (BuildContext context) => Messages(),
-      '/home/messages/settings': (BuildContext context) => ChatSettings(),
+      '/home/messages/settings': (BuildContext context) => ChatSettingsScreen(),
       '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),

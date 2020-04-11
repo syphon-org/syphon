@@ -59,10 +59,10 @@ class Room {
   final int lastUpdate;
 
   // Event lists
+  final List<User> users;
   final List<Event> state;
   final List<Message> messages;
-  final List<User> users;
-  final Event draft;
+  final List<Message> drafts;
 
   const Room({
     this.id,
@@ -73,11 +73,11 @@ class Room {
     this.direct = false,
     this.syncing = false,
     this.sending = false,
-    this.messages = const [],
-    this.state = const [],
     this.users = const [],
+    this.state = const [],
+    this.drafts = const [],
+    this.messages = const [],
     this.lastUpdate = 0,
-    this.draft,
     this.startTime,
     this.endTime,
   });
@@ -95,10 +95,10 @@ class Room {
     endTime,
     lastUpdate,
     state,
-    events,
-    messages,
     users,
-    draft,
+    events,
+    drafts,
+    messages,
   }) {
     return Room(
       id: id ?? this.id,
@@ -110,9 +110,9 @@ class Room {
       syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       state: state ?? this.state,
+      drafts: drafts ?? this.drafts,
       messages: messages ?? this.messages,
       users: users ?? this.users,
-      draft: draft ?? this.draft,
     );
   }
 

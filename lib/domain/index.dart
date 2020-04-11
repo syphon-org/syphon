@@ -65,6 +65,8 @@ Future<Store> initStore() async {
   );
 
   // Load available json list decorators
+  final iterableUserDecorator = (value) => value.cast<User>();
+  JsonMapper.registerValueDecorator<List<User>>(iterableUserDecorator);
   final iterableEventDecorator = (value) => value.cast<Event>();
   JsonMapper.registerValueDecorator<List<Event>>(iterableEventDecorator);
   final iterableMessageDecorator = (value) => value.cast<Message>();
@@ -151,23 +153,29 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
+    try {
+      print(JsonMapper.toJson(settingsStore));
+      print('[AppState.toJson] success');
+    } catch (error) {
+      print('[AppState.toJson] error - $error');
+    }
     return {
       'loading': loading,
       'userStore': userStore.toJson(),
-      'settingsStore': settingsStore.toJson(),
+      'settingsStore': JsonMapper.toJson(settingsStore),
       'roomStore': roomStore.toJson()
     };
   }
 
   // // Allows conversion FROM json for redux_persist
-  static AppState fromJson(dynamic json) {
-    return json == null
-        ? AppState()
-        : AppState(
-            loading: json['loading'],
-            userStore: UserStore.fromJson(json['userStore']),
-            settingsStore: SettingsStore.fromJson(json['settingsStore']),
-            roomStore: RoomStore.fromJson(json['roomStore']),
-          );
-  }
+  static AppState fromJson(dynamic json) => json == null
+      ? AppState()
+      : AppState(
+          loading: json['loading'],
+          userStore: UserStore.fromJson(json['userStore']),
+          settingsStore: JsonMapper.fromJson<SettingsStore>(
+            json['settingsStore'],
+          ),
+          roomStore: RoomStore.fromJson(json['roomStore']),
+        );
 }

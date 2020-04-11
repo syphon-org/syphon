@@ -34,7 +34,7 @@ class Home extends StatelessWidget {
     Navigator.pushNamed(context, '/draft');
   }
 
-  Widget buildConversationList(List<Room> rooms, BuildContext context) {
+  Widget buildChatList(List<Room> rooms, BuildContext context) {
     if (rooms.isEmpty) {
       return Center(
           child: Column(
@@ -223,17 +223,6 @@ class Home extends StatelessWidget {
           builder: (context, state) => Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Visibility(
-                  visible: state.roomStore.loading,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4.0,
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(PRIMARY_COLOR),
-                      value: null,
-                    ),
-                  )),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () {
@@ -245,9 +234,32 @@ class Home extends StatelessWidget {
                       },
                     );
                   },
-                  child: buildConversationList(
-                    sortRoomsByPriority(state),
-                    context,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        // red box
+                        child: Visibility(
+                          visible: state.roomStore.loading,
+                          child: Container(
+                              child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              RefreshProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                  PRIMARY_COLOR,
+                                ),
+                                value: null,
+                              ),
+                            ],
+                          )),
+                        ),
+                      ),
+                      buildChatList(
+                        sortRoomsByPriority(state),
+                        context,
+                      ),
+                    ],
                   ),
                 ),
               ),

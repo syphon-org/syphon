@@ -25,15 +25,15 @@ class ChatSettingsArguments {
   });
 }
 
-class ChatSettings extends StatefulWidget {
-  const ChatSettings({Key key}) : super(key: key);
+class ChatSettingsScreen extends StatefulWidget {
+  const ChatSettingsScreen({Key key}) : super(key: key);
 
   @override
   ChatSettingsState createState() => ChatSettingsState();
 }
 
 // https://flutter.dev/docs/development/ui/animations
-class ChatSettingsState extends State<ChatSettings> {
+class ChatSettingsState extends State<ChatSettingsScreen> {
   ChatSettingsState({Key key}) : super();
 
   final ScrollController scrollController = ScrollController(
@@ -84,6 +84,7 @@ class ChatSettingsState extends State<ChatSettings> {
       horizontal: width * 0.04,
       vertical: 4,
     );
+
     final titlePadding = EdgeInsets.only(
       left: width * 0.04,
       right: width * 0.04,

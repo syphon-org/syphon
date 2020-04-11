@@ -1,6 +1,8 @@
+import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:flutter/material.dart';
 import './colors.dart';
 
+@jsonSerializable
 enum ThemeType {
   LIGHT,
   DARK,

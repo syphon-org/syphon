@@ -62,12 +62,13 @@ dependencies:
   # workmanager: ^0.2.0
 
   # UI Only
-  flutter_local_notifications: 1.4.0
   expandable: 3.0.1
   flutter_svg: ^0.17.0
   flutter_swiper : 1.1.6
   touchable_opacity: 1.0.2
   smooth_page_indicator: 0.1.1
+  flutter_local_notifications: 1.4.0
+  flutter_material_color_picker: ^1.0.5
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
