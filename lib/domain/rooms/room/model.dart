@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 import 'package:Tether/domain/rooms/events/selectors.dart';
+import 'package:Tether/domain/user/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:flutter/foundation.dart';
@@ -60,6 +61,7 @@ class Room {
   // Event lists
   final List<Event> state;
   final List<Message> messages;
+  final List<User> users;
   final Event draft;
 
   const Room({
@@ -73,6 +75,7 @@ class Room {
     this.sending = false,
     this.messages = const [],
     this.state = const [],
+    this.users = const [],
     this.lastUpdate = 0,
     this.draft,
     this.startTime,
@@ -85,15 +88,16 @@ class Room {
     homeserver,
     avatar,
     topic,
-    lastUpdate,
     direct,
     syncing,
     sending,
+    startTime,
+    endTime,
+    lastUpdate,
     state,
     events,
     messages,
-    startTime,
-    endTime,
+    users,
     draft,
   }) {
     return Room(
@@ -101,12 +105,13 @@ class Room {
       name: name ?? this.name,
       homeserver: homeserver ?? this.homeserver,
       avatar: avatar ?? this.avatar,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
       direct: direct ?? this.direct,
       sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
       state: state ?? this.state,
       messages: messages ?? this.messages,
+      users: users ?? this.users,
       draft: draft ?? this.draft,
     );
   }
@@ -169,6 +174,7 @@ class Room {
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
+    List<User> users = List<User>();
 
     try {
       stateEvents.forEach((event) {
@@ -208,6 +214,9 @@ class Room {
           case 'm.room.member':
             if (this.direct && event.content['displayname'] != username) {
               name = event.content['displayname'];
+            }
+            if (event.content['membership'] == 'membership') {
+              print('m.room.memeber ${event.content}');
             }
             break;
           default:

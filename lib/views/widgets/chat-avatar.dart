@@ -29,7 +29,29 @@ Widget buildChatAvatar({Room room}) {
   }
 
   return Text(
-    room.name.substring(0, 2).toUpperCase(),
+    room != null && room.name != null
+        ? room.name.substring(0, 2).toUpperCase()
+        : '',
     style: TextStyle(fontSize: 18, color: Colors.white),
+  );
+}
+
+Widget buildChatHero({Room room, double size, int fontSize}) {
+  if (room.avatar != null && room.avatar.data != null) {
+    return Image(
+      fit: BoxFit.fitHeight,
+      width: size ?? 52,
+      height: size ?? 52,
+      image: MemoryImage(room.avatar.data),
+    );
+  }
+
+  return Container(
+    child: Text(
+      room != null && room.name != null
+          ? room.name.substring(0, 2).toUpperCase()
+          : '',
+      style: TextStyle(fontSize: fontSize ?? 18, color: Colors.white),
+    ),
   );
 }

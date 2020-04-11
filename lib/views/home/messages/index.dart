@@ -248,6 +248,7 @@ class MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     final MessageArguments arguments =
         ModalRoute.of(context).settings.arguments;
+    final double width = MediaQuery.of(context).size.width;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -279,18 +280,32 @@ class MessagesState extends State<Messages> {
                   onPressed: () => Navigator.pop(context, false),
                 ),
               ),
-              IconButton(
-                icon: CircleAvatar(
-                  radius: 24,
-                  backgroundColor: props.room.avatar != null
-                      ? Colors.transparent
-                      : Colors.grey,
-                  child: buildChatAvatar(room: props.room),
+              GestureDetector(
+                child: Hero(
+                  tag: "ChatAvatar",
+                  child: Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: props.room.avatar != null
+                          ? Colors.transparent
+                          : Colors.grey,
+                      child: buildChatAvatar(
+                        room: props.room,
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/home/messages/settings',
+                    arguments: ChatSettingsArguments(
+                      roomId: props.room.id,
+                      title: arguments.title,
+                    ),
+                  );
                 },
-                tooltip: 'Profile and settings',
               ),
               Text(arguments.title,
                   style: TextStyle(

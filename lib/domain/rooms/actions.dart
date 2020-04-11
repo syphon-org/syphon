@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:Tether/domain/rooms/service.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
+import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -188,6 +189,9 @@ ThunkAction<AppState> fetchSync({String since}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
+      if (since == null) {
+        print('[fetchSync] fetching full sync');
+      }
 
       final request = buildSyncRequest(
         protocol: protocol,
@@ -243,6 +247,9 @@ ThunkAction<AppState> fetchSync({String since}) {
       }
 
       // Set "Synced" and since so we know you've run the inital sync
+      if (since == null) {
+        print('[fetchSync] full sync completed');
+      }
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
@@ -404,7 +411,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
 ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {
     try {
-      final request = buildRoomMembersRequest(
+      final request = buildFastRoomMembersRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,

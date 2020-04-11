@@ -12,7 +12,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/selectors.dart' as roomSelectors;
 
-import 'package:Tether/views/widgets/menu.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class ChatSettingsArguments {
@@ -26,9 +25,54 @@ class ChatSettingsArguments {
   });
 }
 
+class ChatSettings extends StatefulWidget {
+  const ChatSettings({Key key}) : super(key: key);
+
+  @override
+  ChatSettingsState createState() => ChatSettingsState();
+}
+
 // https://flutter.dev/docs/development/ui/animations
-class ChatSettings extends StatelessWidget {
-  ChatSettings({Key key}) : super(key: key);
+class ChatSettingsState extends State<ChatSettings> {
+  ChatSettingsState({Key key}) : super();
+
+  final ScrollController scrollController = ScrollController(
+    initialScrollOffset: 0,
+  );
+
+  double headerOpacity = 1;
+  double headerSize = 54;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(() {
+      final height = MediaQuery.of(context).size.height;
+      final minOffset = 0;
+      final maxOffset = height * 0.2;
+      final offsetRatio = scrollController.offset / maxOffset;
+
+      final isOpaque = scrollController.offset <= minOffset;
+      final isTransparent = scrollController.offset > maxOffset;
+      final isFading = !isOpaque && !isTransparent;
+
+      if (isFading) {
+        return this.setState(() {
+          headerOpacity = 1 - offsetRatio;
+        });
+      }
+
+      if (isTransparent) {
+        return this.setState(() {
+          headerOpacity = 0;
+        });
+      }
+
+      return this.setState(() {
+        headerOpacity = 1;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,382 +111,406 @@ class ChatSettings extends StatelessWidget {
       ),
       builder: (context, props) => Scaffold(
         backgroundColor: mainBackgroundColor,
-        appBar: AppBar(
-          brightness: Brightness.dark, // TOOD: this should inherit from theme
-          automaticallyImplyLeading: false,
-          titleSpacing: 0.0,
-          title: Row(children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 8),
-              child: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
+        body: CustomScrollView(
+          controller: scrollController,
+          scrollDirection: Axis.vertical,
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: height * 0.3,
+              brightness:
+                  Brightness.dark, // TOOD: this should inherit from theme
+              automaticallyImplyLeading: false,
+              titleSpacing: 0.0,
+              title: Row(children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 8),
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context, false),
+                  ),
+                ),
+                Text(
+                  arguments.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+              ]),
+              flexibleSpace: Hero(
+                tag: "ChatAvatar",
+                child: Container(
+                  padding: EdgeInsets.only(top: height * 0.05),
+                  color: props.roomColorPlaceholder,
+                  width: width, // TODO: use flex, i'm rushing
+                  child: OverflowBox(
+                    minHeight: 64,
+                    maxHeight: height * 0.25,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Opacity(
+                          opacity: headerOpacity,
+                          child: buildChatHero(
+                            room: props.room,
+                            size: height * 0.15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-            IconButton(
-              icon: CircleAvatar(
-                radius: 24,
-                backgroundColor: props.room.avatar != null
-                    ? Colors.transparent
-                    : Colors.grey,
-                child: buildChatAvatar(room: props.room),
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/settings');
-              },
-              tooltip: 'Profile and settings',
-            ),
-            Text(
-              arguments.title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
-            ),
-          ]),
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.only(bottom: 12),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  margin: EdgeInsets.only(top: 8, bottom: 4),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: width, // TODO: use flex, i'm rushing
-                        padding: titlePadding,
-                        // decoration: BoxDecoration(
-                        //   border: Border.all(width: 1, color: Colors.white),
-                        // ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            SliverList(
+                delegate: SliverChildListDelegate([
+              Container(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: <Widget>[
+                    Card(
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      margin: EdgeInsets.only(bottom: 4),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: titlePadding,
+                            // decoration: BoxDecoration(
+                            //   border: Border.all(width: 1, color: Colors.white),
+                            // ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Users',
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TouchableOpacity(
+                                  onTap: () {},
+                                  activeOpacity: 0.4,
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                        left: 24, right: 4, top: 8, bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'See all users',
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4),
+                                          child: Text(
+                                            '(10)',
+                                            textAlign: TextAlign.start,
+                                            style: TextStyle(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              print('testing');
+                            },
+                            contentPadding: contentPadding,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.chat,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'TODO: list user avai here',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              child: Row(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: titlePadding,
+                              // decoration: BoxDecoration(
+                              //   border: Border.all(width: 1, color: Colors.white),
+                              // ),
+                              child: Text(
+                                'About',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                            ),
+                            Container(
+                              padding: contentPadding,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Users',
+                                    props.room.name,
                                     textAlign: TextAlign.start,
-                                    style: TextStyle(),
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
+                                  Visibility(
+                                    visible: props.room.topic != null &&
+                                        props.room.topic.length > 0,
+                                    maintainSize: false,
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 12),
+                                      child: Text(props.room.topic,
+                                          style: TextStyle(fontSize: 16)),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            TouchableOpacity(
-                              onTap: () {},
-                              activeOpacity: 0.4,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 24, right: 4, top: 8, bottom: 8),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'See all users',
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 4),
-                                      child: Text(
-                                        '(10)',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
                           ],
                         ),
                       ),
-                      ListTile(
-                        onTap: () {
-                          print('testing');
-                        },
-                        contentPadding: contentPadding,
-                        leading: Container(
-                            padding: EdgeInsets.all(4),
-                            child: Icon(
-                              Icons.chat,
-                              size: 28,
-                            )),
-                        title: Text(
-                          'TODO: list user avai here',
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Card(
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: titlePadding,
-                          // decoration: BoxDecoration(
-                          //   border: Border.all(width: 1, color: Colors.white),
-                          // ),
-                          child: Text(
-                            'About',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                        ),
-                        Container(
-                          padding: contentPadding,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                props.room.name,
+                    ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: titlePadding,
+                              child: Text(
+                                'Chat Settings',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.headline6,
+                                style: TextStyle(),
                               ),
-                              Visibility(
-                                visible: props.room.topic != null &&
-                                    props.room.topic.length > 0,
-                                maintainSize: false,
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 12),
-                                  child: Text(props.room.topic,
-                                      style: TextStyle(fontSize: 16)),
+                            ),
+                            ListTile(
+                              dense: true,
+                              onTap: () {
+                                print('testing');
+                              },
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Mute conversation',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                child: Switch(
+                                  value: false,
+                                  onChanged: (value) {
+                                    // TODO: also prevent updates from pushing the chat up in home
+                                    // TODO: prevent notification if room id exists in this setting
+                                  },
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: titlePadding,
-                          child: Text(
-                            'Chat Settings',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(),
-                          ),
-                        ),
-                        ListTile(
-                          dense: true,
-                          onTap: () {
-                            print('testing');
-                          },
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Mute conversation',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            child: Switch(
-                              value: false,
-                              onChanged: (value) {
-                                // TODO: also prevent updates from pushing the chat up in home
-                                // TODO: prevent notification if room id exists in this setting
+                            ),
+                            ListTile(
+                              onTap: () {
+                                print('testing');
                               },
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Notification Sound',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default (Argon)',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {
-                            print('testing');
-                          },
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Notification Sound',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'Default (Argon)',
-                              style: TextStyle(fontSize: 18.0),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Vibrate',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Vibrate',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'Default',
-                              style: TextStyle(fontSize: 18.0),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Color',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.only(right: 6),
+                                child: CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: props.roomColorPlaceholder,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Color',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            padding: EdgeInsets.only(right: 6),
-                            child: CircleAvatar(
-                              radius: 16,
-                              backgroundColor: props.roomColorPlaceholder,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: titlePadding,
+                              child: Text(
+                                'Call Settings',
+                                textAlign: TextAlign.start,
+                                style: TextStyle(),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Mute Notifications',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                child: Switch(
+                                  value: false,
+                                  onChanged: (value) {
+                                    // TODO: prevent notification if room id exists in this setting
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Notification Sound',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: titlePadding,
+                              child: Text(
+                                'Privacy and Status',
+                                textAlign: TextAlign.start,
+                                style: TextStyle(),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'View Encryption Key',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Export Key',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Generate New Key',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      child: Container(
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Delete All Messages',
+                                style: TextStyle(
+                                    fontSize: 18.0, color: Colors.redAccent),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Leave group',
+                                style: TextStyle(
+                                    fontSize: 18.0, color: Colors.redAccent),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: titlePadding,
-                          child: Text(
-                            'Call Settings',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Mute Notifications',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            child: Switch(
-                              value: false,
-                              onChanged: (value) {
-                                // TODO: prevent notification if room id exists in this setting
-                              },
-                            ),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Notification Sound',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          trailing: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'Default',
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: titlePadding,
-                          child: Text(
-                            'Privacy and Status',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'View Encryption Key',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Export Key',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Generate New Key',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  child: Container(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Delete Permited Messages',
-                            style: TextStyle(
-                                fontSize: 18.0, color: Colors.redAccent),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Leave group',
-                            style: TextStyle(
-                                fontSize: 18.0, color: Colors.redAccent),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
+              ),
+            ])),
+          ],
         ),
       ),
     );
@@ -476,7 +544,8 @@ class _Props {
         messages: latestMessages(
           roomSelectors.room(id: roomId, state: store.state).messages,
         ),
-        roomColorPlaceholder: Color(store.state.settingsStore.accentColor),
+        roomColorPlaceholder:
+            Colors.grey ?? Color(store.state.settingsStore.accentColor),
         roomsLoading: store.state.roomStore.loading,
         onSendMessage: ({
           String roomId,
