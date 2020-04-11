@@ -13,6 +13,9 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
         synced: action.synced,
         syncing: action.syncing,
         lastSince: action.lastSince,
+        lastUpdate: action.synced
+            ? DateTime.now().millisecondsSinceEpoch
+            : state.lastUpdate,
       );
     case SetRoomObserver:
       return state.copyWith(roomObserver: action.roomObserver);

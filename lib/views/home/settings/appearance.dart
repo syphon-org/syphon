@@ -19,6 +19,15 @@ class ApperanceScreen extends StatelessWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (Store<AppState> store) => store,
         builder: (context, store) {
+          double width = MediaQuery.of(context).size.width;
+          double height = MediaQuery.of(context).size.height;
+
+          // Static horizontal: 16, vertical: 8
+          final contentPadding = EdgeInsets.symmetric(
+            horizontal: width * 0.08,
+            vertical: height * 0.005,
+          );
+
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -30,71 +39,66 @@ class ApperanceScreen extends StatelessWidget {
                       color: Colors.white, fontWeight: FontWeight.w100)),
             ),
             body: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      onTap: () {
-                        store.dispatch(incrementTheme());
-                      },
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      title: Text(
-                        'Theme',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: Text(
-                        displayThemeType(
-                          store.state.settingsStore.theme.toString(),
-                        ),
-                        style: TextStyle(fontSize: 18.0),
-                      ),
+              children: <Widget>[
+                ListTile(
+                  onTap: () {
+                    store.dispatch(incrementTheme());
+                  },
+                  contentPadding: contentPadding,
+                  title: Text(
+                    'Theme',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  trailing: Text(
+                    displayThemeType(
+                      store.state.settingsStore.theme.toString(),
                     ),
-                    ListTile(
-                      onTap: () {},
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      title: Text(
-                        'Primary Color',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Color(
-                          store.state.settingsStore.primaryColor,
-                        ),
-                      ),
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+                ListTile(
+                  onTap: () {},
+                  contentPadding: contentPadding,
+                  title: Text(
+                    'Primary Color',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  trailing: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(
+                      store.state.settingsStore.primaryColor,
                     ),
-                    ListTile(
-                      onTap: () {},
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      title: Text(
-                        'Accent Color',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Color(
-                          store.state.settingsStore.accentColor,
-                        ),
-                      ),
+                  ),
+                ),
+                ListTile(
+                  onTap: () {},
+                  contentPadding: contentPadding,
+                  title: Text(
+                    'Accent Color',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  trailing: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(
+                      store.state.settingsStore.accentColor,
                     ),
-                    ListTile(
-                      onTap: () {},
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      title: Text(
-                        'Language',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: Text(
-                        store.state.settingsStore.language,
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                    ),
-                  ],
-                )),
+                  ),
+                ),
+                ListTile(
+                  onTap: () {},
+                  contentPadding: contentPadding,
+                  title: Text(
+                    'Language',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  trailing: Text(
+                    store.state.settingsStore.language,
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+              ],
+            )),
           );
         },
       );

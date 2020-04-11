@@ -66,7 +66,7 @@ class Themes {
       scaffoldBackgroundColor: scaffoldBackgroundColor,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
-        brightness: brightness,
+        brightness: Brightness.dark,
         color: appBarColor,
       ),
       inputDecorationTheme: InputDecorationTheme(

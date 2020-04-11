@@ -144,13 +144,25 @@ ThunkAction<AppState> initialRoomSync() {
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
     Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
-      if (store.state.roomStore.syncing) {
-        print('[Room Observer] still syncing');
+      if (store.state.roomStore.lastSince == null) {
+        print('[Room Observer] skipping sync, needs full sync');
         return;
       }
 
-      if (store.state.roomStore.lastSince == null) {
-        print('[Room Observer] skipping sync, needs full sync');
+      final lastUpdate = DateTime.fromMillisecondsSinceEpoch(
+        store.state.roomStore.lastUpdate,
+      );
+      final retryTimeout =
+          DateTime.now().difference(lastUpdate).compareTo(Duration(hours: 1));
+
+      if (0 < retryTimeout) {
+        print('[Room Observer] forced retry timeout');
+        store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
+        return;
+      }
+
+      if (store.state.roomStore.syncing) {
+        print('[Room Observer] still syncing');
         return;
       }
 
