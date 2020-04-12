@@ -38,8 +38,8 @@ class SettingsStore {
     bool notificationsEnabled,
   }) {
     return SettingsStore(
-      primaryColor: primaryColor ?? this.primaryColor,
-      accentColor: accentColor ?? this.accentColor,
+      primaryColor: primaryColor,
+      accentColor: accentColor,
       brightness: brightness ?? this.brightness,
       theme: theme ?? this.theme,
       language: language ?? this.language,

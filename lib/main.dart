@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:Tether/domain/alerts/actions.dart';
+import 'package:Tether/domain/settings/model.dart';
 import 'package:Tether/domain/user/actions.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
@@ -143,12 +144,16 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => StoreProvider<AppState>(
         store: store,
-        child: StoreConnector<AppState, ThemeType>(
+        child: StoreConnector<AppState, SettingsStore>(
           distinct: true,
-          converter: (store) => store.state.settingsStore.theme,
-          builder: (context, theme) => MaterialApp(
+          converter: (store) => store.state.settingsStore,
+          builder: (context, settings) => MaterialApp(
             title: 'Tether',
-            theme: Themes.generateCustomTheme(themeType: theme),
+            theme: Themes.generateCustomTheme(
+              themeType: settings.theme,
+              primaryColorHex: settings.primaryColor,
+              accentColorHex: settings.accentColor,
+            ),
             navigatorKey: NavigationService.navigatorKey,
             routes: NavigationProvider.getRoutes(store),
             home: defaultHome,

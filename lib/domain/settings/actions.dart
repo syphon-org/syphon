@@ -7,8 +7,22 @@ import 'package:Tether/global/themes.dart';
 
 class SetTheme {
   final ThemeType theme;
-
   SetTheme(this.theme);
+}
+
+class SetPrimaryColor {
+  final int color;
+  SetPrimaryColor({this.color});
+}
+
+class SetAccentColor {
+  final int color;
+  SetAccentColor({this.color});
+}
+
+class SetLanguage {
+  final String language;
+  SetLanguage({this.language});
 }
 
 class ToggleNotifications {
@@ -22,11 +36,30 @@ ThunkAction<AppState> initSettings() {
   };
 }
 
-ThunkAction<AppState> updatePrimaryColor() {
+/**
+ * Send in a hex value to be used as the primary color
+ */
+ThunkAction<AppState> selectPrimaryColor(int color) {
   return (Store<AppState> store) async {
-    int primaryColor = store.state.settingsStore.primaryColor;
+    store.dispatch(SetPrimaryColor(color: color));
+  };
+}
 
-    Color(primaryColor);
+/**
+ * Send in a hex value to be used as the primary color
+ */
+ThunkAction<AppState> selectAccentColor(int color) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetAccentColor(color: color));
+  };
+}
+
+/**
+ * Send in a hex value to be used as the primary color
+ */
+ThunkAction<AppState> updateLanguage(String language) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLanguage(language: language));
   };
 }
 

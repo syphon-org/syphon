@@ -127,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, '/appearance');
+                              Navigator.pushNamed(context, '/customization');
                             },
                             contentPadding: contentPadding,
                             leading: Container(

@@ -153,12 +153,12 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    try {
-      print(JsonMapper.toJson(settingsStore));
-      print('[AppState.toJson] success');
-    } catch (error) {
-      print('[AppState.toJson] error - $error');
-    }
+    // try {
+    //   print(JsonMapper.toJson(settingsStore));
+    //   print('[AppState.toJson] success');
+    // } catch (error) {
+    //   print('[AppState.toJson] error - $error');
+    // }
     return {
       'loading': loading,
       'userStore': userStore.toJson(),

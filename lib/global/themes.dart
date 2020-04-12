@@ -17,33 +17,32 @@ class Themes {
   }
 
   static ThemeData generateCustomTheme({
-    Color customPrimary,
-    Color customAccent,
+    int primaryColorHex,
+    int accentColorHex,
     ThemeType themeType,
   }) {
-    // final accentFontColor = Colors.grey[500];
+    int primaryColor = primaryColorHex ?? TETHERED_CYAN;
+    int accentColor = accentColorHex ?? BESIDES_BLUE;
+    int appBarColor = primaryColorHex ?? TETHERED_CYAN;
+    int scaffoldBackgroundColor = BACKGROUND;
 
     var brightness = Brightness.light;
-    var primaryColor = customPrimary ?? PRIMARY_COLOR;
-    var accentColor = customAccent ?? ACCENT_COLOR;
-    var scaffoldBackgroundColor = BACKGROUND_COLOR;
-    var appBarColor = PRIMARY_COLOR;
     var appBarElevation;
 
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = customPrimary ?? PRIMARY_COLOR;
-        accentColor = customAccent ?? Color(TETHERED_CYAN);
+        primaryColor = primaryColorHex ?? TETHERED_CYAN;
+        accentColor = accentColorHex ?? TETHERED_CYAN;
+        appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = null;
-        appBarColor = customPrimary ?? BASICALLY_BLACK_COLOR;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = customPrimary ?? BASICALLY_BLACK_COLOR;
-        accentColor = customAccent ?? Color(TETHERED_CYAN);
-        scaffoldBackgroundColor = BASICALLY_BLACK_COLOR;
-        appBarColor = customPrimary ?? BASICALLY_BLACK_COLOR;
+        primaryColor = primaryColorHex ?? BASICALLY_BLACK;
+        accentColor = accentColorHex ?? TETHERED_CYAN;
+        appBarColor = primaryColorHex ?? BASICALLY_BLACK;
+        scaffoldBackgroundColor = BASICALLY_BLACK;
         appBarElevation = 0.0;
         break;
       case ThemeType.LIGHT:
@@ -56,35 +55,37 @@ class Themes {
 
     return ThemeData(
       // Main Colors
-      primaryColor: primaryColor,
-      primaryColorDark: primaryColor,
-      primaryColorLight: primaryColor,
-      accentColor: accentColor,
+      primaryColor: Color(primaryColor),
+      primaryColorDark: Color(primaryColor),
+      primaryColorLight: Color(primaryColor),
+      accentColor: Color(accentColor),
       brightness: brightness,
 
       // Core UI
-      focusColor: primaryColor,
-      cursorColor: primaryColor,
-      scaffoldBackgroundColor: scaffoldBackgroundColor,
+      focusColor: Color(primaryColor),
+      cursorColor: Color(primaryColor),
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null
+          ? Color(scaffoldBackgroundColor)
+          : null,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
-        color: appBarColor,
+        color: Color(appBarColor),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
-          color: invertedPrimaryColor,
+          color: Color(invertedPrimaryColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(
-            color: invertedPrimaryColor,
+            color: Color(invertedPrimaryColor),
           ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(
-            color: invertedPrimaryColor,
+            color: Color(invertedPrimaryColor),
           ),
         ),
       ),
