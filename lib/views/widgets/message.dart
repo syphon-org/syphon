@@ -125,7 +125,6 @@ class MessageWidget extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  flex: 0,
                   fit: FlexFit.loose,
                   child: Container(
                     padding: EdgeInsets.symmetric(
@@ -138,6 +137,7 @@ class MessageWidget extends StatelessWidget {
                     ),
                     child: Flex(
                       direction: Axis.vertical,
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: messageTextAlignment,
                       children: <Widget>[
@@ -168,6 +168,7 @@ class MessageWidget extends StatelessWidget {
                         ),
                         Flex(
                           direction: Axis.horizontal,
+                          mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: messageTextAlignment,
                           children: [
