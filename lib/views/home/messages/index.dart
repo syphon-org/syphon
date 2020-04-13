@@ -2,6 +2,7 @@ import 'dart:io';
 
 // Domain
 import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/home/messages/settings.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
@@ -133,6 +134,7 @@ class MessagesState extends State<Messages> {
           isUserSent: isUserSent,
           isLastSender: isLastSender,
           isNextSender: isNextSender,
+          theme: props.theme,
         );
       },
     );
@@ -248,7 +250,6 @@ class MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     final MessageArguments arguments =
         ModalRoute.of(context).settings.arguments;
-    final double width = MediaQuery.of(context).size.width;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -386,16 +387,6 @@ class MessagesState extends State<Messages> {
                                   child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  // TODO: distinguish between loading and refreshing?
-                                  // CircularProgressIndicator(
-                                  //   strokeWidth: 4.0,
-                                  //   backgroundColor: Colors.transparent,
-                                  //   valueColor:
-                                  //       new AlwaysStoppedAnimation<Color>(
-                                  //     PRIMARY_COLOR,
-                                  //   ),
-                                  //   value: null,
-                                  // ),
                                   RefreshProgressIndicator(
                                     strokeWidth: 2.0,
                                     valueColor:
@@ -456,26 +447,35 @@ class _Props {
   final Room room;
   final String userId;
   final List<Message> messages;
+  final List<Message> outbox;
   final bool roomsLoading;
+  final ThemeType theme;
 
   final Function onSendMessage;
 
   _Props({
     @required this.room,
+    @required this.theme,
     @required this.userId,
     @required this.messages,
+    @required this.outbox,
     @required this.roomsLoading,
     @required this.onSendMessage,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.userStore.user.userId,
+        theme: store.state.settingsStore.theme,
         room: roomSelectors.room(
           id: roomId,
           state: store.state,
         ),
         messages: latestMessages(
-          roomSelectors.room(id: roomId, state: store.state).messages,
+          wrapOutboxMessages(
+            messages:
+                roomSelectors.room(id: roomId, state: store.state).messages,
+            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+          ),
         ),
         roomsLoading: store.state.roomStore.loading,
         onSendMessage: ({

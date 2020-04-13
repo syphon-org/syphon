@@ -1,6 +1,7 @@
 import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
+import 'package:Tether/global/themes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,18 +17,20 @@ class MessageWidget extends StatelessWidget {
     this.isUserSent,
     this.isLastSender,
     this.isNextSender,
+    this.theme = ThemeType.LIGHT,
   }) : super(key: key);
 
   final Message message;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
+  final ThemeType theme;
 
   @override
   Widget build(BuildContext context) {
     final message = this.message;
     var textColor = Colors.white;
-    var senderColor = hashedColor(message.sender);
+    var bubbleColor = hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var messageAlignment = MainAxisAlignment.start;
     var messageTextAlignment = CrossAxisAlignment.start;
@@ -67,10 +70,17 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      textColor = GREY_DARK_COLOR;
-      senderColor = ENABLED_GREY_COLOR;
+      textColor = theme != ThemeType.LIGHT ? Colors.white : GREY_DARK_COLOR;
       messageAlignment = MainAxisAlignment.end;
       messageTextAlignment = CrossAxisAlignment.end;
+
+      if (theme == ThemeType.DARK) {
+        bubbleColor = Colors.grey[700];
+      } else if (theme == ThemeType.DARKER) {
+        bubbleColor = Colors.grey[850];
+      } else {
+        bubbleColor = ENABLED_GREY_COLOR;
+      }
     }
 
     return Container(
@@ -103,7 +113,7 @@ class MessageWidget extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       radius: 14,
-                      backgroundColor: senderColor,
+                      backgroundColor: bubbleColor,
                       child: Text(
                         formatSenderInitials(message.sender),
                         style: TextStyle(
@@ -115,7 +125,7 @@ class MessageWidget extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  flex: 1,
+                  flex: 0,
                   fit: FlexFit.loose,
                   child: Container(
                     padding: EdgeInsets.symmetric(
@@ -123,50 +133,108 @@ class MessageWidget extends StatelessWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                        color: senderColor, borderRadius: bubbleBorder),
+                      color: bubbleColor,
+                      borderRadius: bubbleBorder,
+                    ),
                     child: Flex(
-                        direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: messageTextAlignment,
-                        children: <Widget>[
-                          Visibility(
-                            visible: !isUserSent,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                formatSender(message.sender),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: textColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: messageTextAlignment,
+                      children: <Widget>[
+                        Visibility(
+                          visible: !isUserSent,
+                          child: Container(
                             margin: EdgeInsets.only(bottom: 4),
                             child: Text(
-                              message.body.trim(),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: textColor,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            child: Text(
-                              formatTimestamp(
-                                lastUpdateMillis: message.timestamp,
-                              ),
+                              formatSender(message.sender),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: textColor,
-                                fontWeight: FontWeight.w100,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          )
-                        ]),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 5),
+                          child: Text(
+                            message.body.trim(),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textColor,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ),
+                        Flex(
+                          direction: Axis.horizontal,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: messageTextAlignment,
+                          children: [
+                            Container(
+                              child: Text(
+                                formatTimestamp(
+                                  lastUpdateMillis: message.timestamp,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: textColor,
+                                  fontWeight: FontWeight.w100,
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: isUserSent,
+                              child: Stack(children: [
+                                Visibility(
+                                    visible: !message.pending,
+                                    child: Container(
+                                      width: 14,
+                                      height: 14,
+                                      margin: EdgeInsets.only(left: 4),
+                                      child: Icon(
+                                        Icons.check,
+                                        size: 10,
+                                        color: bubbleColor,
+                                      ),
+                                      decoration: ShapeDecoration(
+                                        color: Colors.white,
+                                        shape: CircleBorder(
+                                          side: BorderSide(
+                                            color: bubbleColor,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                                Visibility(
+                                  visible: !message.syncing,
+                                  child: Container(
+                                    width: 14,
+                                    height: 14,
+                                    margin: EdgeInsets.only(left: 11),
+                                    child: Icon(
+                                      Icons.check,
+                                      size: 10,
+                                      color: bubbleColor,
+                                    ),
+                                    decoration: ShapeDecoration(
+                                      color: Colors.white,
+                                      shape: CircleBorder(
+                                        side: BorderSide(
+                                          color: bubbleColor,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
