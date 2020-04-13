@@ -78,6 +78,21 @@ class SetRoomMessages {
   });
 }
 
+/**
+ * tempId for messages that have attempted sending but not finished
+ */
+class SaveOutboxMessage {
+  final String id; // room id
+  final String tempId;
+  final Message pendingMessage;
+
+  SaveOutboxMessage({
+    this.id,
+    this.tempId,
+    this.pendingMessage,
+  });
+}
+
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id

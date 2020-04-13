@@ -29,13 +29,6 @@ class ToggleNotifications {
   ToggleNotifications();
 }
 
-ThunkAction<AppState> initSettings() {
-  return (Store<AppState> store) async {
-    // TODO: get theme selection from local storage
-    store.dispatch(SetTheme(ThemeType.LIGHT));
-  };
-}
-
 /**
  * Send in a hex value to be used as the primary color
  */

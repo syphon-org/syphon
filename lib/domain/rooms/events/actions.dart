@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/rooms/actions.dart';
+import 'package:Tether/domain/rooms/events/model.dart';
 import 'package:Tether/domain/rooms/room/model.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -21,6 +23,7 @@ final msgtypes = {
   'audio': 'm.audio', // TODO: not impliemented
   'video': 'm.video', // TODO: not impliemented
 };
+
 /**
  * Send Room Event (Send Message)
  */
@@ -34,6 +37,23 @@ ThunkAction<AppState> sendMessage({
     store.dispatch(SetSending(room: room, sending: true));
     try {
       print('[sendMessage] ${type} ${body}');
+
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String tempId = Random.secure().nextInt(1 << 32).toString();
+
+      // Save unsent message to outbox
+      store.dispatch(SaveOutboxMessage(
+        id: room.id,
+        pendingMessage: Message(
+          id: tempId.toString(),
+          body: body,
+          type: type,
+          sender: store.state.userStore.user.userId,
+          roomId: room.id,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          pending: true,
+        ),
+      ));
 
       final request = buildSendMessageRequest(
         protocol: protocol,
@@ -57,9 +77,26 @@ ThunkAction<AppState> sendMessage({
       }
 
       print('sendMessage action completed $data');
+
+      // Update sent message with event id but needs to be
+      // synced to remove from outbox
+      store.dispatch(SaveOutboxMessage(
+        id: room.id,
+        tempId: tempId.toString(),
+        pendingMessage: Message(
+          id: data['event_id'],
+          body: body,
+          type: type,
+          sender: store.state.userStore.user.userId,
+          roomId: room.id,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          syncing: true,
+        ),
+      ));
+
       return true;
     } catch (error) {
-      print('[sendMessage] error: $error');
+      print('[sendMessage] failed to send: $error');
     } finally {
       store.dispatch(SetSending(room: room, sending: false));
     }

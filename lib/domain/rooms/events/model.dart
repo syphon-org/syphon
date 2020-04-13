@@ -95,6 +95,8 @@ class Message extends Event {
   final String sender;
   final String stateKey;
   final int timestamp;
+  final bool pending;
+  final bool syncing;
 
   // Message Only
   final String body;
@@ -130,6 +132,8 @@ class Message extends Event {
     this.filename,
     this.formattedBody,
     this.extraPropsMap,
+    this.syncing = false,
+    this.pending = false,
   }) : super();
 
   factory Message.fromEvent(Event event) {
@@ -148,6 +152,8 @@ class Message extends Event {
         format: event.content['format'],
         filename: event.content['filename'],
         formattedBody: event.content['formattedBody'],
+        pending: false,
+        syncing: false,
       );
     } catch (error) {
       print('[Message.fromEvent] error $error');
@@ -156,11 +162,13 @@ class Message extends Event {
         id: event.id,
         userId: event.userId,
         roomId: event.roomId,
+        body: '',
         type: event.type,
         sender: event.sender,
         stateKey: event.stateKey,
         timestamp: event.timestamp,
-        body: '',
+        pending: false,
+        syncing: false,
       );
     }
   }

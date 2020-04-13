@@ -3,6 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+/**
+ * Notifications are handled by APNS when running in iOS
+ * Only need to handle local notifications on desktop and android 
+ */
+// https://matrix.org/docs/spec/client_server/latest#id470
+
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({

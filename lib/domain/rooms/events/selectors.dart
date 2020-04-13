@@ -5,6 +5,10 @@ List<Message> latestMessages(List<Message> messages) {
 
   // sort descending
   messages.sort((a, b) {
+    if (a.pending && !b.pending) {
+      return -1;
+    }
+
     if (a.timestamp > b.timestamp) {
       return -1;
     }
@@ -16,4 +20,9 @@ List<Message> latestMessages(List<Message> messages) {
   });
 
   return sortedList;
+}
+
+List<Message> wrapOutboxMessages(
+    {List<Message> messages, List<Message> outbox}) {
+  return [outbox, messages].expand((x) => x).toList();
 }

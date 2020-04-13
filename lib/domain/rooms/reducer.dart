@@ -1,3 +1,4 @@
+import './events/model.dart';
 import './actions.dart';
 import './model.dart';
 import './room/model.dart';
@@ -17,6 +18,22 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
             ? DateTime.now().millisecondsSinceEpoch
             : state.lastUpdate,
       );
+    case SetSending:
+      final rooms = Map<String, Room>.from(state.rooms);
+      rooms[action.room.id] = rooms[action.room.id].copyWith(
+        sending: action.sending,
+      );
+      return state.copyWith(rooms: rooms);
+    case SaveOutboxMessage:
+      final rooms = Map<String, Room>.from(state.rooms);
+      final outbox = List<Message>.from(rooms[action.id].outbox);
+      if (action.tempId != null) {
+        outbox.retainWhere((element) => element.id != action.tempId);
+      }
+      outbox.add(action.pendingMessage);
+      rooms[action.id] = rooms[action.id].copyWith(outbox: outbox);
+      return state.copyWith(rooms: rooms);
+
     case SetRoomObserver:
       return state.copyWith(roomObserver: action.roomObserver);
 
@@ -59,12 +76,6 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       );
       return state.copyWith(rooms: rooms);
 
-    case SetSending:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.room.id] = rooms[action.room.id].copyWith(
-        sending: action.sending,
-      );
-      return state.copyWith(rooms: rooms);
     case ResetRooms:
       return RoomStore();
     default:

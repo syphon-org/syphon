@@ -62,7 +62,8 @@ class Room {
   final List<User> users;
   final List<Event> state;
   final List<Message> messages;
-  final List<Message> drafts;
+  final List<Message> outbox;
+  final Message draft;
 
   const Room({
     this.id,
@@ -73,9 +74,10 @@ class Room {
     this.direct = false,
     this.syncing = false,
     this.sending = false,
+    this.draft,
     this.users = const [],
     this.state = const [],
-    this.drafts = const [],
+    this.outbox = const [],
     this.messages = const [],
     this.lastUpdate = 0,
     this.startTime,
@@ -94,10 +96,11 @@ class Room {
     startTime,
     endTime,
     lastUpdate,
+    draft,
     state,
     users,
     events,
-    drafts,
+    outbox,
     messages,
   }) {
     return Room(
@@ -110,7 +113,7 @@ class Room {
       syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       state: state ?? this.state,
-      drafts: drafts ?? this.drafts,
+      outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
       users: users ?? this.users,
     );
@@ -124,6 +127,8 @@ class Room {
     int lastUpdate = this.lastUpdate;
     List<Event> existingMessages =
         this.messages.isNotEmpty ? List<Event>.from(this.messages) : [];
+    List<Message> outbox =
+        this.outbox.isNotEmpty ? List<Message>.from(this.outbox) : [];
     List<Event> messages = messageEvents ?? [];
 
     // Converting only message events
@@ -136,7 +141,7 @@ class Room {
     }
 
     // Combine current and existing messages on unique ids
-    final combinedMessagesMap = HashMap.fromIterable(
+    final messagesMap = HashMap.fromIterable(
       [existingMessages, newMessages].expand(
         (sublist) => sublist.map(
           (event) => event is Message ? event : Message.fromEvent(event),
@@ -146,14 +151,15 @@ class Room {
       value: (message) => message,
     );
 
-    // Confirm sorting the messages here, I think this should be done by the
-    final combinedMessages = List<Message>.from(combinedMessagesMap.values);
+    outbox.removeWhere((message) => messagesMap.containsKey(message.id));
 
-    // latestMessages(List<Message>.from(combinedMessagesMap.values));
+    // Confirm sorting the messages here, I think this should be done by the
+    final combinedMessages = List<Message>.from(messagesMap.values);
 
     // Add to room
     return this.copyWith(
       messages: combinedMessages,
+      outbox: outbox,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,

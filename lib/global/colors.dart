@@ -19,23 +19,26 @@ const DISABLED_GREY_COLOR = const Color(DISABLED_GREY);
 const BACKGROUND_COLOR = const Color(BACKGROUND);
 const GREY_DARK_COLOR = const Color(GREY_DARK);
 
-const DEFAULT_RED = 0xffc96480;
-const DEFAULT_ORANGE = 0xffb47978;
-const DEFAULT_YELLOW = 0xffb1ae91;
-const DEFAULT_GREEN = 0xff95bf8f;
-const DEFAULT_SEA_FOAM = 0xff99d17b;
-const DEFAULT_BLUE = 0xff20639b;
+// Material colors at shades of 700
+const DEFAULT_RED = 0xFFC62828;
+const DEFAULT_ORANGE = 0xFFF57C00;
+const DEFAULT_PURPLE = 0xFF7B1FA2;
+const DEFAULT_GREEN = 0xFF388E3C;
+const DEFAULT_MAGENTA = 0xFFC2185B;
+const DEFAULT_TEAL = 0xFF00796B;
+const DEFAULT_BLUE = 0xFF1976D2;
 
-const SENDER_COLORS = [
+const CHAT_COLORS = [
   Color(DEFAULT_RED),
   Color(DEFAULT_ORANGE),
-  Color(DEFAULT_YELLOW),
+  Color(DEFAULT_PURPLE),
+  Color(DEFAULT_TEAL),
+  Color(DEFAULT_MAGENTA),
   Color(DEFAULT_GREEN),
-  Color(DEFAULT_SEA_FOAM),
   Color(DEFAULT_BLUE),
 ];
 
 Color hashedColor(String hashable) {
   int hash = hashable.codeUnits.reduce((value, element) => value + element);
-  return SENDER_COLORS[hash % SENDER_COLORS.length];
+  return CHAT_COLORS[hash % CHAT_COLORS.length];
 }
