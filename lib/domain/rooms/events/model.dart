@@ -97,6 +97,7 @@ class Message extends Event {
   final int timestamp;
   final bool pending;
   final bool syncing;
+  final bool failed;
 
   // Message Only
   final String body;
@@ -134,6 +135,7 @@ class Message extends Event {
     this.extraPropsMap,
     this.syncing = false,
     this.pending = false,
+    this.failed = false,
   }) : super();
 
   factory Message.fromEvent(Event event) {
@@ -154,6 +156,7 @@ class Message extends Event {
         formattedBody: event.content['formattedBody'],
         pending: false,
         syncing: false,
+        failed: false,
       );
     } catch (error) {
       print('[Message.fromEvent] error $error');
@@ -169,6 +172,7 @@ class Message extends Event {
         timestamp: event.timestamp,
         pending: false,
         syncing: false,
+        failed: false,
       );
     }
   }

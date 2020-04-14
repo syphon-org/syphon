@@ -52,6 +52,7 @@ ThunkAction<AppState> sendMessage({
           roomId: room.id,
           timestamp: DateTime.now().millisecondsSinceEpoch,
           pending: true,
+          syncing: true,
         ),
       ));
 

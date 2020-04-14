@@ -63,6 +63,7 @@ class MessagesState extends State<Messages> {
   Map<String, Color> senderColors;
 
   bool sendable = false;
+  Message selectedMessage;
   final editorController = TextEditingController();
   final messagesController = ScrollController(initialScrollOffset: 0);
 
@@ -77,6 +78,19 @@ class MessagesState extends State<Messages> {
   void dispose() {
     inputFieldNode.dispose();
     super.dispose();
+  }
+
+  @protected
+  onToggleMessageOptions({Message message}) {
+    this.setState(() {
+      selectedMessage = message;
+    });
+  }
+
+  onDismissMessageOptions() {
+    this.setState(() {
+      selectedMessage = null;
+    });
   }
 
   // TODO: I like having this top level, but it's a nightmare to pass in vars
@@ -111,32 +125,36 @@ class MessagesState extends State<Messages> {
     final messages = props.messages;
     final userId = props.userId;
 
-    return ListView.builder(
-      reverse: true,
-      itemCount: messages.length,
-      padding: EdgeInsets.only(bottom: 8),
-      scrollDirection: Axis.vertical,
-      controller: messagesController,
-      itemBuilder: (BuildContext context, int index) {
-        final message = messages[index];
-        final lastMessage = index != 0 ? messages[index - 1] : null;
-        final nextMessage =
-            index + 1 < messages.length ? messages[index + 1] : null;
+    return GestureDetector(
+      onTap: onDismissMessageOptions,
+      child: ListView.builder(
+        reverse: true,
+        itemCount: messages.length,
+        padding: EdgeInsets.only(bottom: 8),
+        scrollDirection: Axis.vertical,
+        controller: messagesController,
+        itemBuilder: (BuildContext context, int index) {
+          final message = messages[index];
+          final lastMessage = index != 0 ? messages[index - 1] : null;
+          final nextMessage =
+              index + 1 < messages.length ? messages[index + 1] : null;
 
-        final isLastSender =
-            lastMessage != null && lastMessage.sender == message.sender;
-        final isNextSender =
-            nextMessage != null && nextMessage.sender == message.sender;
-        final isUserSent = userId == message.sender;
+          final isLastSender =
+              lastMessage != null && lastMessage.sender == message.sender;
+          final isNextSender =
+              nextMessage != null && nextMessage.sender == message.sender;
+          final isUserSent = userId == message.sender;
 
-        return MessageWidget(
-          message: message,
-          isUserSent: isUserSent,
-          isLastSender: isLastSender,
-          isNextSender: isNextSender,
-          theme: props.theme,
-        );
-      },
+          return MessageWidget(
+            message: message,
+            isUserSent: isUserSent,
+            isLastSender: isLastSender,
+            isNextSender: isNextSender,
+            onLongPress: onToggleMessageOptions,
+            theme: props.theme,
+          );
+        },
+      ),
     );
   }
 
@@ -246,6 +264,128 @@ class MessagesState extends State<Messages> {
     );
   }
 
+  @protected
+  buildRoomAppBar({
+    _Props props,
+    BuildContext context,
+  }) {
+    return AppBar(
+      brightness: Brightness.dark, // TOOD: this should inherit from theme
+      automaticallyImplyLeading: false,
+      titleSpacing: 0.0,
+      title: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(left: 8),
+            child: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+          ),
+          GestureDetector(
+            child: Hero(
+              tag: "ChatAvatar",
+              child: Container(
+                padding: EdgeInsets.only(right: 8),
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: props.room.avatar != null
+                      ? Colors.transparent
+                      : Colors.grey,
+                  child: buildChatAvatar(
+                    room: props.room,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/home/messages/settings',
+                arguments: ChatSettingsArguments(
+                  roomId: props.room.id,
+                  title: props.room.name,
+                ),
+              );
+            },
+          ),
+          Text(props.room.name,
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+        ],
+      ),
+      actions: <Widget>[
+        RoundedPopupMenu<MessageOptions>(
+          onSelected: (MessageOptions result) {
+            print(result);
+            switch (result) {
+              case MessageOptions.chatSettings:
+                return Navigator.pushNamed(
+                  context,
+                  '/home/messages/settings',
+                  arguments: ChatSettingsArguments(
+                    roomId: props.room.id,
+                    title: props.room.name,
+                  ),
+                );
+              default:
+                break;
+            }
+          },
+          icon: Icon(Icons.more_vert, color: Colors.white),
+          itemBuilder: (BuildContext context) =>
+              <PopupMenuEntry<MessageOptions>>[
+            const PopupMenuItem<MessageOptions>(
+              value: MessageOptions.search,
+              child: Text('Search'),
+            ),
+            const PopupMenuItem<MessageOptions>(
+              value: MessageOptions.allMedia,
+              child: Text('All Media'),
+            ),
+            const PopupMenuItem<MessageOptions>(
+              value: MessageOptions.chatSettings,
+              child: Text('Chat Settings'),
+            ),
+            const PopupMenuItem<MessageOptions>(
+              value: MessageOptions.inviteFriends,
+              child: Text('Invite Friends'),
+            ),
+            const PopupMenuItem<MessageOptions>(
+              value: MessageOptions.muteNotifications,
+              child: Text('Mute Notifications'),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
+  @protected
+  buildMessageAppBar({
+    _Props props,
+    BuildContext context,
+  }) {
+    return AppBar(
+      brightness: Brightness.dark, // TOOD: this should inherit from theme
+      backgroundColor: Colors.grey[500],
+      automaticallyImplyLeading: false,
+      titleSpacing: 0.0,
+      title: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(left: 8),
+            child: IconButton(
+              icon: Icon(Icons.close, color: Colors.white),
+              onPressed: onDismissMessageOptions,
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final MessageArguments arguments =
@@ -268,95 +408,19 @@ class MessagesState extends State<Messages> {
           inputContainerColor = Colors.grey[850];
         }
 
+        var currentAppBar = buildRoomAppBar(
+          props: props,
+          context: context,
+        );
+        if (this.selectedMessage != null) {
+          currentAppBar = buildMessageAppBar(
+            props: props,
+            context: context,
+          );
+        }
+
         return Scaffold(
-          appBar: AppBar(
-            brightness: Brightness.dark, // TOOD: this should inherit from theme
-            automaticallyImplyLeading: false,
-            titleSpacing: 0.0,
-            title: Row(children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 8),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context, false),
-                ),
-              ),
-              GestureDetector(
-                child: Hero(
-                  tag: "ChatAvatar",
-                  child: Container(
-                    padding: EdgeInsets.only(right: 8),
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: props.room.avatar != null
-                          ? Colors.transparent
-                          : Colors.grey,
-                      child: buildChatAvatar(
-                        room: props.room,
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/home/messages/settings',
-                    arguments: ChatSettingsArguments(
-                      roomId: props.room.id,
-                      title: arguments.title,
-                    ),
-                  );
-                },
-              ),
-              Text(arguments.title,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w100)),
-            ]),
-            actions: <Widget>[
-              RoundedPopupMenu<MessageOptions>(
-                onSelected: (MessageOptions result) {
-                  print(result);
-                  switch (result) {
-                    case MessageOptions.chatSettings:
-                      return Navigator.pushNamed(
-                        context,
-                        '/home/messages/settings',
-                        arguments: ChatSettingsArguments(
-                          roomId: props.room.id,
-                          title: arguments.title,
-                        ),
-                      );
-                    default:
-                      break;
-                  }
-                },
-                icon: Icon(Icons.more_vert, color: Colors.white),
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<MessageOptions>>[
-                  const PopupMenuItem<MessageOptions>(
-                    value: MessageOptions.search,
-                    child: Text('Search'),
-                  ),
-                  const PopupMenuItem<MessageOptions>(
-                    value: MessageOptions.allMedia,
-                    child: Text('All Media'),
-                  ),
-                  const PopupMenuItem<MessageOptions>(
-                    value: MessageOptions.chatSettings,
-                    child: Text('Chat Settings'),
-                  ),
-                  const PopupMenuItem<MessageOptions>(
-                    value: MessageOptions.inviteFriends,
-                    child: Text('Invite Friends'),
-                  ),
-                  const PopupMenuItem<MessageOptions>(
-                    value: MessageOptions.muteNotifications,
-                    child: Text('Mute Notifications'),
-                  ),
-                ],
-              )
-            ],
-          ),
+          appBar: currentAppBar,
           body: Align(
             alignment: Alignment.topRight,
             child: Column(
