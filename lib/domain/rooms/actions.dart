@@ -82,7 +82,7 @@ class SetRoomMessages {
  * tempId for messages that have attempted sending but not finished
  */
 class SaveOutboxMessage {
-  final String id; // room id
+  final String id; // TODO: room id
   final String tempId;
   final Message pendingMessage;
 
@@ -90,6 +90,14 @@ class SaveOutboxMessage {
     this.id,
     this.tempId,
     this.pendingMessage,
+  });
+}
+
+class DeleteOutboxMessage {
+  final Message message; // room id
+
+  DeleteOutboxMessage({
+    this.message,
   });
 }
 

@@ -382,129 +382,162 @@ class MessagesState extends State<Messages> {
           ),
         ],
       ),
-      actions: <Widget>[],
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.info),
+          tooltip: 'Message Details',
+          color: Colors.white,
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.delete),
+          iconSize: 28.0,
+          tooltip: 'Delete Message',
+          color: Colors.white,
+          onPressed: () => props.onDeleteMessage(
+            message: this.selectedMessage,
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.content_copy),
+          iconSize: 22.0,
+          tooltip: 'Copy Message Content',
+          color: Colors.white,
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.reply),
+          iconSize: 28.0,
+          tooltip: 'Quote and Reply',
+          color: Colors.white,
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.share),
+          iconSize: 24.0,
+          tooltip: 'Search Chats',
+          color: Colors.white,
+          onPressed: () {},
+        ),
+      ],
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    final MessageArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(
+          store,
+          (ModalRoute.of(context).settings.arguments as MessageArguments)
+              .roomId,
+        ),
+        builder: (context, props) {
+          final closedInputPadding = !inputFieldNode.hasFocus && Platform.isIOS;
+          final isScrolling =
+              messagesController.hasClients && messagesController.offset != 0;
 
-    return StoreConnector<AppState, _Props>(
-      distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(
-        store,
-        arguments.roomId,
-      ),
-      builder: (context, props) {
-        final closedInputPadding = !inputFieldNode.hasFocus && Platform.isIOS;
-        final isScrolling =
-            messagesController.hasClients && messagesController.offset != 0;
+          Color inputContainerColor = Colors.white;
 
-        Color inputContainerColor = Colors.white;
+          if (Theme.of(context).brightness == Brightness.dark) {
+            inputContainerColor = Colors.grey[850];
+          }
 
-        if (Theme.of(context).brightness == Brightness.dark) {
-          inputContainerColor = Colors.grey[850];
-        }
-
-        var currentAppBar = buildRoomAppBar(
-          props: props,
-          context: context,
-        );
-        if (this.selectedMessage != null) {
-          currentAppBar = buildMessageAppBar(
+          var currentAppBar = buildRoomAppBar(
             props: props,
             context: context,
           );
-        }
+          if (this.selectedMessage != null) {
+            currentAppBar = buildMessageAppBar(
+              props: props,
+              context: context,
+            );
+          }
 
-        return Scaffold(
-          appBar: currentAppBar,
-          body: Align(
-            alignment: Alignment.topRight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () {
-                      // TODO: refresh sync?
-                      return Future.value();
-                    },
-                    child: GestureDetector(
-                      onTap: () {
-                        // Disimiss keyboard if they click outside the text input
-                        FocusScope.of(context).unfocus();
+          return Scaffold(
+            appBar: currentAppBar,
+            body: Align(
+              alignment: Alignment.topRight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () {
+                        // TODO: refresh sync?
+                        return Future.value();
                       },
-                      child: Stack(
-                        children: [
-                          buildMessageList(
-                            context,
-                            props,
-                          ),
-                          Positioned(
-                            // red box
-                            child: Visibility(
-                              visible: props.roomsLoading,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: 2.0,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Disimiss keyboard if they click outside the text input
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Stack(
+                          children: [
+                            buildMessageList(
+                              context,
+                              props,
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              // red box
+                              child: Visibility(
+                                visible: props.roomsLoading,
+                                child: Container(
+                                    child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    RefreshProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      valueColor:
+                                          new AlwaysStoppedAnimation<Color>(
+                                        PRIMARY_COLOR,
+                                      ),
+                                      value: null,
+                                    ),
+                                  ],
+                                )),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 12,
-                    left: 8,
-                    right: 8,
-                    bottom: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: inputContainerColor,
-                    boxShadow: isScrolling
-                        ? [
-                            BoxShadow(
-                                blurRadius: 6,
-                                offset: Offset(0, -4),
-                                color: Colors.black12)
-                          ]
-                        : [],
-                  ),
-                  child: AnimatedPadding(
-                    duration: Duration(
-                        milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                  Container(
                     padding: EdgeInsets.only(
-                      bottom: closedInputPadding ? 48 : 0,
+                      top: 12,
+                      left: 8,
+                      right: 8,
+                      bottom: 12,
                     ),
-                    child: buildChatInput(
-                      context,
-                      props,
+                    decoration: BoxDecoration(
+                      color: inputContainerColor,
+                      boxShadow: isScrolling
+                          ? [
+                              BoxShadow(
+                                  blurRadius: 6,
+                                  offset: Offset(0, -4),
+                                  color: Colors.black12)
+                            ]
+                          : [],
+                    ),
+                    child: AnimatedPadding(
+                      duration: Duration(
+                          milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                      padding: EdgeInsets.only(
+                        bottom: closedInputPadding ? 48 : 0,
+                      ),
+                      child: buildChatInput(
+                        context,
+                        props,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
 }
 
 class _Props {
@@ -516,6 +549,7 @@ class _Props {
   final ThemeType theme;
 
   final Function onSendMessage;
+  final Function onDeleteMessage;
 
   _Props({
     @required this.room,
@@ -525,6 +559,7 @@ class _Props {
     @required this.outbox,
     @required this.roomsLoading,
     @required this.onSendMessage,
+    @required this.onDeleteMessage,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -542,6 +577,13 @@ class _Props {
           ),
         ),
         roomsLoading: store.state.roomStore.loading,
+        onDeleteMessage: ({
+          Message message,
+        }) {
+          if (message != null) {
+            store.dispatch(deleteMessage(message: message));
+          }
+        },
         onSendMessage: ({
           String roomId,
           String body,

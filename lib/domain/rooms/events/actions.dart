@@ -103,3 +103,23 @@ ThunkAction<AppState> sendMessage({
     }
   };
 }
+
+/**
+ * Delete Room Event (For Outbox, Local, and Remote)
+ */
+
+ThunkAction<AppState> deleteMessage({
+  Message message,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      if (message.pending) {
+        print("Deleting Message");
+        store.dispatch(DeleteOutboxMessage(message: message));
+        return;
+      }
+    } catch (error) {
+      print('[deleteMessage] failed to delete $error');
+    }
+  };
+}
