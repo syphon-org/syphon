@@ -3,10 +3,12 @@ import 'dart:io';
 // Domain
 import 'package:Tether/domain/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/views/home/messages/message-details.dart';
 import 'package:Tether/views/home/messages/settings.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
@@ -123,7 +125,6 @@ class MessagesState extends State<Messages> {
     _Props props,
   ) {
     final messages = props.messages;
-    final userId = props.userId;
 
     return GestureDetector(
       onTap: onDismissMessageOptions,
@@ -143,13 +144,16 @@ class MessagesState extends State<Messages> {
               lastMessage != null && lastMessage.sender == message.sender;
           final isNextSender =
               nextMessage != null && nextMessage.sender == message.sender;
-          final isUserSent = userId == message.sender;
+          final isUserSent = props.userId == message.sender;
+          final selectedMessageId =
+              this.selectedMessage != null ? this.selectedMessage.id : null;
 
           return MessageWidget(
             message: message,
             isUserSent: isUserSent,
             isLastSender: isLastSender,
             isNextSender: isNextSender,
+            selectedMessageId: selectedMessageId,
             onLongPress: onToggleMessageOptions,
             theme: props.theme,
           );
@@ -309,9 +313,13 @@ class MessagesState extends State<Messages> {
               );
             },
           ),
-          Text(props.room.name,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
+          Text(
+            props.room.name,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w100,
+            ),
+          ),
         ],
       ),
       actions: <Widget>[
@@ -387,7 +395,16 @@ class MessagesState extends State<Messages> {
           icon: Icon(Icons.info),
           tooltip: 'Message Details',
           color: Colors.white,
-          onPressed: () {},
+          onPressed: () => {
+            Navigator.pushNamed(
+              context,
+              '/home/messages/details',
+              arguments: MessageDetailArguments(
+                roomId: props.room.id,
+                message: selectedMessage,
+              ),
+            )
+          },
         ),
         IconButton(
           icon: Icon(Icons.delete),
@@ -398,12 +415,24 @@ class MessagesState extends State<Messages> {
             message: this.selectedMessage,
           ),
         ),
-        IconButton(
-          icon: Icon(Icons.content_copy),
-          iconSize: 22.0,
-          tooltip: 'Copy Message Content',
-          color: Colors.white,
-          onPressed: () {},
+        Visibility(
+          visible: isTextMessage(message: selectedMessage),
+          child: IconButton(
+            icon: Icon(Icons.content_copy),
+            iconSize: 22.0,
+            tooltip: 'Copy Message Content',
+            color: Colors.white,
+            onPressed: () {
+              Clipboard.setData(
+                ClipboardData(
+                  text: selectedMessage.formattedBody ?? selectedMessage.body,
+                ),
+              );
+              this.setState(() {
+                selectedMessage = null;
+              });
+            },
+          ),
         ),
         IconButton(
           icon: Icon(Icons.reply),
@@ -473,9 +502,14 @@ class MessagesState extends State<Messages> {
                         },
                         child: Stack(
                           children: [
-                            buildMessageList(
-                              context,
-                              props,
+                            Container(
+                              color: this.selectedMessage != null
+                                  ? Color.fromARGB(100, 0, 0, 0)
+                                  : null,
+                              child: buildMessageList(
+                                context,
+                                props,
+                              ),
                             ),
                             Positioned(
                               // red box

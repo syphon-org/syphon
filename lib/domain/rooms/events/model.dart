@@ -85,6 +85,30 @@ class Event {
   }
 }
 
+/** https://matrix.org/docs/spec/client_server/latest#m-room-message-msgtypes
+   * 
+    13.2.1.7.1   m.text
+    13.2.1.7.2   m.emote
+    13.2.1.7.3   m.notice
+    13.2.1.7.4   m.image
+    13.2.1.7.5   m.file
+    13.2.1.7.6   m.audio
+    13.2.1.7.7   m.location
+    13.2.1.7.8   m.video 
+   *
+   */
+
+class MessageTypes {
+  static const TEXT = 'm.text';
+  static const EMOTE = 'm.emote';
+  static const NOTICE = 'm.notice';
+  static const IMAGE = 'm.text';
+  static const FILE = 'm.file';
+  static const AUDIO = 'm.text';
+  static const LOCATION = 'm.location';
+  static const VIDEO = 'm.video';
+}
+
 // TODO: make this actually inherit Event but also allow immutability (dart says no?)
 @jsonSerializable
 class Message extends Event {
@@ -153,7 +177,7 @@ class Message extends Event {
         msgtype: event.content['msgtype'],
         format: event.content['format'],
         filename: event.content['filename'],
-        formattedBody: event.content['formattedBody'],
+        formattedBody: event.content['formatted_body'],
         pending: false,
         syncing: false,
         failed: false,

@@ -1,4 +1,5 @@
 import 'package:Tether/domain/index.dart'; // TODO: remove need for store in view dependencies
+import 'package:Tether/views/home/messages/message-details.dart';
 import 'package:flutter/material.dart';
 
 // Intro
@@ -58,6 +59,7 @@ class NavigationProvider {
           ),
       '/home/messages': (BuildContext context) => Messages(),
       '/home/messages/settings': (BuildContext context) => ChatSettingsScreen(),
+      '/home/messages/details': (BuildContext context) => MessageDetails(),
       '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),

@@ -19,10 +19,10 @@ String formatTimestamp({int lastUpdateMillis}) {
 
   if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
-    return DateFormat.MMMd().format(timestamp);
+    return DateFormat('MMMd h:m a').format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat.E().format(timestamp);
+    return DateFormat('E h:m a').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';
@@ -33,6 +33,6 @@ String formatTimestamp({int lastUpdateMillis}) {
     // Just say now if it's been within the minute
     return 'Now';
   } else {
-    return '';
+    return 'Now';
   }
 }

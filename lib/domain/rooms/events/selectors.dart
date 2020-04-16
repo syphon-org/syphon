@@ -26,3 +26,9 @@ List<Message> wrapOutboxMessages(
     {List<Message> messages, List<Message> outbox}) {
   return [outbox, messages].expand((x) => x).toList();
 }
+
+bool isTextMessage({Message message}) {
+  return message.msgtype == MessageTypes.TEXT ||
+      message.msgtype == MessageTypes.EMOTE ||
+      message.msgtype == MessageTypes.NOTICE;
+}
