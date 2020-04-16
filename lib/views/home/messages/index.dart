@@ -67,7 +67,7 @@ class MessagesState extends State<Messages> {
   bool sendable = false;
   Message selectedMessage;
   final editorController = TextEditingController();
-  final messagesController = ScrollController(initialScrollOffset: 0);
+  final messagesController = ScrollController();
 
   @override
   void initState() {
@@ -130,6 +130,8 @@ class MessagesState extends State<Messages> {
       onTap: onDismissMessageOptions,
       child: ListView.builder(
         reverse: true,
+        addRepaintBoundaries: true,
+        addAutomaticKeepAlives: true,
         itemCount: messages.length,
         padding: EdgeInsets.only(bottom: 8),
         scrollDirection: Axis.vertical,
@@ -484,6 +486,9 @@ class MessagesState extends State<Messages> {
 
           return Scaffold(
             appBar: currentAppBar,
+            backgroundColor: selectedMessage != null
+                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(64)
+                : Theme.of(context).scaffoldBackgroundColor,
             body: Align(
               alignment: Alignment.topRight,
               child: Column(
@@ -502,14 +507,9 @@ class MessagesState extends State<Messages> {
                         },
                         child: Stack(
                           children: [
-                            Container(
-                              color: this.selectedMessage != null
-                                  ? Color.fromARGB(100, 0, 0, 0)
-                                  : null,
-                              child: buildMessageList(
-                                context,
-                                props,
-                              ),
+                            buildMessageList(
+                              context,
+                              props,
                             ),
                             Positioned(
                               // red box
