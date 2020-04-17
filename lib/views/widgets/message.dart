@@ -197,6 +197,7 @@ class MessageWidget extends StatelessWidget {
                                   child: Text(
                                     formatTimestamp(
                                       lastUpdateMillis: message.timestamp,
+                                      showTime: true,
                                     ),
                                     style: TextStyle(
                                       fontSize: 12,

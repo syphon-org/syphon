@@ -111,127 +111,126 @@ class HomeSearchState extends State<HomeSearch> {
         ],
       ),
       body: Center(
-          child: StoreConnector<AppState, List<dynamic>>(
-              converter: (Store<AppState> store) => searchResults(store.state),
-              builder: (context, homeservers) {
-                return ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  scrollDirection: Axis.vertical,
-                  itemCount: homeservers.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        store.dispatch(
-                            selectHomeserver(homeserver: homeservers[index]));
-                        Navigator.pop(context);
-                      },
-                      child: Card(
-                          child: Padding(
-                              padding: const EdgeInsets.only(top: 8, bottom: 8),
-                              child: ExpandablePanel(
-                                header: ListTile(
-                                  leading: CircleAvatar(
-                                      backgroundColor: Colors.grey[100],
-                                      child:
-                                          homeservers[index]['favicon'] != null
-                                              ? Image(
-                                                  width: 75,
-                                                  height: 75,
-                                                  image: NetworkImage(
-                                                      homeservers[index]
-                                                          ['favicon']),
-                                                )
-                                              : Text(
-                                                  homeservers[index]['hostname']
-                                                      .toString()
-                                                      .substring(0, 2)
-                                                      .toUpperCase(),
-                                                  style: TextStyle(
-                                                      color: Colors.black),
-                                                )),
-                                  title: Text(
-                                    homeservers[index]['hostname'],
-                                    style: TextStyle(
-                                        fontSize: 22.0, color: Colors.black),
-                                  ),
-                                  subtitle:
-                                      Text(homeservers[index]['description']),
-                                ),
-                                expanded: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                        child: Column(children: <Widget>[
-                                      Text(
-                                        'Location',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        softWrap: true,
-                                      ),
-                                      Text(
-                                        homeservers[index]['location'],
-                                        softWrap: true,
-                                      )
-                                    ])),
-                                    Expanded(
-                                        child: Column(children: <Widget>[
-                                      Text(
-                                        'Users',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400),
-                                        softWrap: true,
-                                      ),
-                                      homeservers[index]['users_active'] != null
-                                          ? Text(
-                                              homeservers[index]['users_active']
-                                                  .toString(),
-                                              softWrap: true,
-                                            )
-                                          : Text(
-                                              homeservers[index]
-                                                      ['public_room_count']
-                                                  .toString(),
-                                              softWrap: true,
-                                            ),
-                                    ])),
-                                    Expanded(
-                                        child: Column(children: <Widget>[
-                                      Text(
-                                        'Founded',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400),
-                                        softWrap: true,
-                                      ),
-                                      Text(
-                                        homeservers[index]['online_since']
-                                            .toString(),
-                                        softWrap: true,
-                                      ),
-                                    ])),
-                                    Expanded(
-                                        child: Column(children: <Widget>[
-                                      Text(
-                                        'Avg Speed',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400),
-                                        softWrap: true,
-                                      ),
-                                      Text(
-                                        homeservers[index]['last_response_time']
-                                                .toString() +
-                                            'ms',
-                                        softWrap: true,
-                                      ),
-                                    ])),
-                                  ],
-                                ),
-                                tapHeaderToExpand: false,
-                                hasIcon: true,
-                              ))),
-                    );
+        child: StoreConnector<AppState, List<dynamic>>(
+          converter: (Store<AppState> store) => searchResults(store.state),
+          builder: (context, homeservers) {
+            return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              scrollDirection: Axis.vertical,
+              itemCount: homeservers.length,
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: () {
+                    store.dispatch(
+                        selectHomeserver(homeserver: homeservers[index]));
+                    Navigator.pop(context);
                   },
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 8),
+                      child: ExpandablePanel(
+                        header: ListTile(
+                          leading: CircleAvatar(
+                              backgroundColor: Colors.grey[100],
+                              child: homeservers[index]['favicon'] != null
+                                  ? Image(
+                                      width: 75,
+                                      height: 75,
+                                      image: NetworkImage(
+                                          homeservers[index]['favicon']),
+                                    )
+                                  : Text(
+                                      homeservers[index]['hostname']
+                                          .toString()
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                      style: TextStyle(color: Colors.black),
+                                    )),
+                          title: Text(
+                            homeservers[index]['hostname'],
+                            style:
+                                TextStyle(fontSize: 22.0, color: Colors.black),
+                          ),
+                          subtitle: Text(homeservers[index]['description']),
+                        ),
+                        expanded: Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: Column(children: <Widget>[
+                              Text(
+                                'Location',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                softWrap: true,
+                              ),
+                              Text(
+                                homeservers[index]['location'],
+                                softWrap: true,
+                              )
+                            ])),
+                            Expanded(
+                                child: Column(children: <Widget>[
+                              Text(
+                                'Users',
+                                style: TextStyle(fontWeight: FontWeight.w400),
+                                softWrap: true,
+                              ),
+                              homeservers[index]['users_active'] != null
+                                  ? Text(
+                                      homeservers[index]['users_active']
+                                          .toString(),
+                                      softWrap: true,
+                                    )
+                                  : Text(
+                                      homeservers[index]['public_room_count']
+                                          .toString(),
+                                      softWrap: true,
+                                    ),
+                            ])),
+                            Expanded(
+                                child: Column(children: <Widget>[
+                              Text(
+                                'Founded',
+                                style: TextStyle(fontWeight: FontWeight.w400),
+                                softWrap: true,
+                              ),
+                              Text(
+                                homeservers[index]['online_since'].toString(),
+                                softWrap: true,
+                              ),
+                            ])),
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    'Avg Speed',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w400),
+                                    softWrap: true,
+                                  ),
+                                  Text(
+                                    homeservers[index]['last_response_time']
+                                            .toString() +
+                                        'ms',
+                                    softWrap: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        tapHeaderToExpand: false,
+                        hasIcon: true,
+                      ),
+                    ),
+                  ),
                 );
-              })),
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }

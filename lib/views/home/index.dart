@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:Tether/domain/rooms/room/selectors.dart';
+import 'package:Tether/domain/user/model.dart';
 import 'package:Tether/domain/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +21,7 @@ import 'package:Tether/global/formatters.dart';
 import 'package:Tether/views/widgets/menu.dart';
 import 'package:Tether/views/home/messages/index.dart';
 import 'package:Tether/global/colors.dart';
+import 'package:fab_circular_menu/fab_circular_menu.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, help }
 
@@ -31,7 +32,7 @@ class Home extends StatelessWidget {
 
   @protected
   onNavigateToDraft(context) {
-    Navigator.pushNamed(context, '/draft');
+    Navigator.pushNamed(context, '/home/groups/search');
   }
 
   Widget buildChatList(List<Room> rooms, BuildContext context) {
@@ -79,204 +80,272 @@ class Home extends StatelessWidget {
             ),
           ),
           child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 16,
-                horizontal: 18,
-              ),
-              child: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: room.avatar != null
-                            ? Colors.transparent
-                            : Colors.grey,
-                        child: buildChatAvatar(room: room),
+            padding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 18,
+            ),
+            child: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor:
+                        room.avatar != null ? Colors.transparent : Colors.grey,
+                    child: buildChatAvatar(room: room),
+                  ),
+                  margin: const EdgeInsets.only(right: 12),
+                ),
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: Flex(
+                    direction: Axis.vertical,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            formatRoomName(room: room),
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w400),
+                          ),
+                          Text(
+                            formatTimestamp(
+                              lastUpdateMillis: room.lastUpdate,
+                            ),
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w100),
+                          ),
+                        ],
                       ),
-                      margin: const EdgeInsets.only(right: 12),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: Flex(
-                          direction: Axis.vertical,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  formatRoomName(room: room),
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                Text(
-                                  formatTimestamp(
-                                    lastUpdateMillis: room.lastUpdate,
-                                  ),
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w100),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              formatPreview(room: room),
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ]),
-                    ),
-                  ])),
+                      Text(
+                        formatPreview(room: room),
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        brightness: Brightness.dark,
-        titleSpacing: 18.00,
-        title: Row(children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(right: 8),
-            child: IconButton(
-              icon: StoreConnector<AppState, String>(
-                  distinct: true,
-                  converter: (store) => displayInitials(store.state),
-                  builder: (context, initials) {
-                    return CircleAvatar(
-                      backgroundColor: Colors.grey,
-                      child: Text(
-                        initials.toUpperCase(),
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    );
-                  }),
-              onPressed: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-              tooltip: 'Profile and Settings',
-            ),
-          ),
-          Text(title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w100)),
-        ]),
-        actions: <Widget>[
-          IconButton(
-            color: Colors.white,
-            icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            tooltip: 'Search Chats',
-          ),
-          RoundedPopupMenu<Options>(
-            icon: Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (Options result) {
-              switch (result) {
-                case Options.settings:
-                  Navigator.pushNamed(context, '/settings');
-                  break;
-                default:
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
-              const PopupMenuItem<Options>(
-                value: Options.newGroup,
-                child: Text('New Group'),
-              ),
-              const PopupMenuItem<Options>(
-                value: Options.markAllRead,
-                child: Text('Mark All Read'),
-              ),
-              const PopupMenuItem<Options>(
-                value: Options.inviteFriends,
-                child: Text('Invite Friends'),
-              ),
-              const PopupMenuItem<Options>(
-                value: Options.settings,
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<Options>(
-                value: Options.help,
-                child: Text('Help'),
-              ),
-            ],
-          )
-        ],
-      ),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: StoreConnector<AppState, AppState>(
-          converter: (Store<AppState> store) => store.state,
-          builder: (context, state) => Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () {
-                    print('STUB REFRESH');
-                    return Future.delayed(
-                      const Duration(milliseconds: 3000),
-                      () {
-                        return 'done';
-                      },
-                    );
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        builder: (context, props) => Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            brightness: Brightness.dark,
+            titleSpacing: 18.00,
+            title: Row(children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 8),
+                child: IconButton(
+                  icon: CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    child: Text(
+                      displayInitials(props.currentUser).toUpperCase(),
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/profile');
                   },
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        // red box
-                        child: Visibility(
-                          visible: state.roomStore.loading,
-                          child: Container(
-                              child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RefreshProgressIndicator(
-                                strokeWidth: 2.0,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                  PRIMARY_COLOR,
+                  tooltip: 'Profile and Settings',
+                ),
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
+            ]),
+            actions: <Widget>[
+              IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/search');
+                },
+                tooltip: 'Search Chats',
+              ),
+              RoundedPopupMenu<Options>(
+                icon: Icon(Icons.more_vert, color: Colors.white),
+                onSelected: (Options result) {
+                  switch (result) {
+                    case Options.settings:
+                      Navigator.pushNamed(context, '/settings');
+                      break;
+                    case Options.newGroup:
+                      Navigator.pushNamed(context, '/home/groups/search');
+                      break;
+                    default:
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<Options>>[
+                  const PopupMenuItem<Options>(
+                    value: Options.newGroup,
+                    child: Text('New Group'),
+                  ),
+                  const PopupMenuItem<Options>(
+                    value: Options.markAllRead,
+                    child: Text('Mark All Read'),
+                  ),
+                  const PopupMenuItem<Options>(
+                    value: Options.inviteFriends,
+                    child: Text('Invite Friends'),
+                  ),
+                  const PopupMenuItem<Options>(
+                    value: Options.settings,
+                    child: Text('Settings'),
+                  ),
+                  const PopupMenuItem<Options>(
+                    value: Options.help,
+                    child: Text('Help'),
+                  ),
+                ],
+              )
+            ],
+          ),
+          body: Align(
+            alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                      print('STUB REFRESH');
+                      return Future.delayed(
+                        const Duration(milliseconds: 3000),
+                        () {
+                          return 'done';
+                        },
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          // red box
+                          child: Visibility(
+                            visible: props.loadingRooms,
+                            child: Container(
+                                child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                RefreshProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  valueColor: new AlwaysStoppedAnimation<Color>(
+                                    PRIMARY_COLOR,
+                                  ),
+                                  value: null,
                                 ),
-                                value: null,
-                              ),
-                            ],
-                          )),
+                              ],
+                            )),
+                          ),
                         ),
-                      ),
-                      buildChatList(
-                        sortRoomsByPriority(state),
-                        context,
-                      ),
-                    ],
+                        buildChatList(
+                          sortedPrioritizedRooms(props.rooms),
+                          context,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
+          floatingActionButton: FabCircularMenu(
+            key: Key('FabCircleMenu'),
+            fabSize: 58,
+            fabElevation: 4.0,
+            fabMargin: EdgeInsets.all(24),
+            fabOpenIcon: Icon(Icons.widgets),
+            fabColor: Theme.of(context).accentColor,
+            ringDiameter: MediaQuery.of(context).size.width * 0.66,
+            ringColor: Theme.of(context).accentColor.withAlpha(144),
+            animationDuration: Duration(milliseconds: 275),
+            children: [
+              FloatingActionButton(
+                heroTag: 'fab3',
+                child: Icon(
+                  Icons.edit,
+                  // Icons.widgets,
+                  color: Colors.white,
+                ),
+                tooltip: 'Direct Message',
+                onPressed: () => onNavigateToDraft(context),
+              ),
+              FloatingActionButton(
+                heroTag: 'fab2',
+                child: Icon(
+                  Icons.add,
+                  // Icons.widgets,
+                  color: Colors.white,
+                ),
+                tooltip: 'Create Chat Or Group',
+                onPressed: () => onNavigateToDraft(context),
+              ),
+              FloatingActionButton(
+                heroTag: 'fab1',
+                child: Icon(
+                  Icons.search,
+                  // Icons.widgets,
+                  color: Colors.white,
+                ),
+                tooltip: 'Search Groups',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/home/groups/search');
+                },
               ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: StoreConnector<AppState, dynamic>(
-        converter: (store) => () => print('Add Room Stub'),
-        builder: (context, onAction) => FloatingActionButton(
-            child: Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-            tooltip: 'New Chat',
-            onPressed: () => onNavigateToDraft(context)),
-      ),
-    );
-  }
+      );
+}
+
+class _Props {
+  final Map rooms;
+  final bool loadingRooms;
+  final User currentUser;
+
+  _Props({
+    @required this.rooms,
+    @required this.currentUser,
+    @required this.loadingRooms,
+  });
+
+  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+        rooms: store.state.roomStore.rooms,
+        loadingRooms: store.state.roomStore.loading,
+        currentUser: store.state.userStore.user,
+      );
+
+  @override
+  int get hashCode =>
+      rooms.hashCode ^ loadingRooms.hashCode ^ currentUser.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _Props &&
+          runtimeType == other.runtimeType &&
+          rooms == other.rooms &&
+          currentUser == other.currentUser &&
+          loadingRooms == other.loadingRooms;
 }

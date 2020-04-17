@@ -83,7 +83,7 @@ class Profile extends StatelessWidget {
                                 child: CircleAvatar(
                                   backgroundColor: Colors.grey,
                                   child: Text(
-                                    displayInitials(store.state),
+                                    displayInitials(store.state.userStore.user),
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 32.0),
                                   ),

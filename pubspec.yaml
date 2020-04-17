@@ -33,7 +33,7 @@ description: Privacy centric matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.4+1
+version: 0.0.5+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -65,7 +65,8 @@ dependencies:
   expandable: 3.0.1
   flutter_svg: ^0.17.0
   flutter_swiper : 1.1.6
-  touchable_opacity: 1.0.2
+  touchable_opacity: 1.0.2 
+  fab_circular_menu: ^1.0.0
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5

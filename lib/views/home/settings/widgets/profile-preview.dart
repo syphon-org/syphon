@@ -70,7 +70,7 @@ class Props {
   ) =>
       Props(
           shortname: displayShortname(store.state),
-          initials: displayInitials(store.state),
+          initials: displayInitials(store.state.userStore.user),
           username: store.state.userStore.user != null
               ? store.state.userStore.user.userId
               : '');

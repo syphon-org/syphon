@@ -1,4 +1,5 @@
 import 'package:Tether/domain/index.dart'; // TODO: remove need for store in view dependencies
+import 'package:Tether/views/home/groups/search.dart';
 import 'package:Tether/views/home/messages/message-details.dart';
 import 'package:flutter/material.dart';
 
@@ -60,6 +61,12 @@ class NavigationProvider {
       '/home/messages': (BuildContext context) => Messages(),
       '/home/messages/settings': (BuildContext context) => ChatSettingsScreen(),
       '/home/messages/details': (BuildContext context) => MessageDetails(),
+      '/home/search': (BuildContext context) => GroupSearchScreen(
+            title: 'Explore Groups',
+          ),
+      '/home/groups/search': (BuildContext context) => GroupSearchScreen(
+            title: 'Explore Groups',
+          ),
       '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),

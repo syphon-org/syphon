@@ -25,9 +25,19 @@ final msgtypes = {
 };
 
 /**
+ * https://matrix-client.matrix.org/_matrix/client/r0/rooms/!ajJxpUAIJjYYTzvsHo%3Amatrix.org/read_markers
+ * {"m.fully_read":"$15870915721387891MHmpg:matrix.org","m.read":"$15870915721387891MHmpg:matrix.org","m.hidden":false}
+ * TODO: 
+ */
+ThunkAction<AppState> readMessages({
+  Room room,
+  Message message,
+  bool readAll,
+}) {}
+
+/**
  * Send Room Event (Send Message)
  */
-
 ThunkAction<AppState> sendMessage({
   final body,
   String type = 'm.text',
@@ -72,12 +82,9 @@ ThunkAction<AppState> sendMessage({
       );
 
       final data = json.decode(response.body);
-
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('sendMessage action completed $data');
 
       // Update sent message with event id but needs to be
       // synced to remove from outbox

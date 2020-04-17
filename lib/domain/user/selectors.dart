@@ -1,4 +1,5 @@
 import 'package:Tether/domain/index.dart';
+import 'package:Tether/domain/user/model.dart';
 
 // Preauth
 dynamic homeserver(AppState state) {
@@ -38,8 +39,7 @@ String displayName(AppState state) {
   return state.userStore.user.displayName ?? displayShortname(state);
 }
 
-String displayInitials(AppState state) {
-  final user = state.userStore.user;
+String displayInitials(User user) {
   if (user.userId == null) return 'NA';
 
   final displayName = user.displayName ?? user.userId.replaceFirst('@', '');
@@ -49,3 +49,16 @@ String displayInitials(AppState state) {
       : displayName.substring(0, 2);
   return initials.toUpperCase();
 }
+
+// String displayInitials({AppState state}) {
+//   final user = state.userStore.user;
+
+//   if (user.userId == null) return 'NA';
+
+//   final displayName = user.displayName ?? user.userId.replaceFirst('@', '');
+//   final initials = displayName.contains(' ')
+//       ? displayName.split(' ')[0].substring(0, 1) +
+//           displayName.split(' ')[1].substring(0, 1)
+//       : displayName.substring(0, 2);
+//   return initials.toUpperCase();
+// }

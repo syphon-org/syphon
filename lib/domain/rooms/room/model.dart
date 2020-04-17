@@ -119,6 +119,27 @@ class Room {
     );
   }
 
+  factory Room.fromJson(Map<String, dynamic> json) {
+    try {
+      return Room(
+        id: json['room_id'],
+        name: json['name'],
+        homeserver: (json['room_id'] as String).split(':')[1],
+        topic: json['topic'],
+        avatar: Avatar(uri: json['url']), // mxc://
+        // TODO: add from public room json response
+        // TODO: canonical_alias
+        // TODO: num_joined_members | members
+        // TODO: world_readable
+        // TODO: guest_can_joi
+        syncing: false,
+      );
+    } catch (error) {
+      print('[Room.fromPublicRoom] error $error');
+      return Room();
+    }
+  }
+
   Room fromMessageEvents(
     List<Event> messageEvents, {
     String startTime,

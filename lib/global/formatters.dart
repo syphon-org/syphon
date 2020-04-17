@@ -11,7 +11,7 @@ String formatSenderInitials(String sender) {
 }
 
 // 1237597223894 -> 30m, now, etc
-String formatTimestamp({int lastUpdateMillis}) {
+String formatTimestamp({int lastUpdateMillis, bool showTime = false}) {
   if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
@@ -19,10 +19,13 @@ String formatTimestamp({int lastUpdateMillis}) {
 
   if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
-    return DateFormat('MMMd h:m a').format(timestamp);
+
+    return DateFormat(
+      showTime ? 'MMM d h:m a' : 'MMM d',
+    ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat('E h:m a').format(timestamp);
+    return DateFormat(showTime ? 'E h:m a' : 'E').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';

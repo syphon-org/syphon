@@ -108,24 +108,6 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () {},
-                            contentPadding: contentPadding,
-                            leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
-                                  Icons.lock,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              'Privacy',
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-                            subtitle: Text(
-                              'Screen Lock Off, Registration Lock Off',
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                          ),
-                          ListTile(
                             onTap: () {
                               Navigator.pushNamed(context, '/customization');
                             },
@@ -161,12 +143,16 @@ class SettingsScreen extends StatelessWidget {
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
-                                  Icons.phone_android,
+                                  Icons.lock,
                                   size: 28,
                                 )),
                             title: Text(
-                              'Devices',
+                              'Security & Privacy',
                               style: TextStyle(fontSize: 18.0),
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: TextStyle(fontSize: 14.0),
                             ),
                           ),
                           ListTile(

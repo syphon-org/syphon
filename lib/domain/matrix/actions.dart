@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/global/libs/matrix/search.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,6 +11,8 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/domain/index.dart';
 
 import 'package:Tether/global/libs/hello-matrix/index.dart';
+
+final protocol = DotEnv().env['PROTOCOL'];
 
 class SetLoading {
   final bool loading;
@@ -27,10 +32,17 @@ class UpdateHomeservers {
   UpdateHomeservers({this.homeservers});
 }
 
+// sets the "since" variable for pagination
 class SetSearchResults {
+  String since;
+  int totalResults;
   final List<dynamic> searchResults;
 
-  SetSearchResults({this.searchResults});
+  SetSearchResults({
+    this.searchResults,
+    this.totalResults,
+    this.since,
+  });
 }
 
 Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
@@ -99,6 +111,53 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
             homeserver['hostname'].contains(searchText) ||
             homeserver['description'].contains(searchText))
         .toList();
-    store.dispatch(SetSearchResults(searchResults: searchResults));
+    store.dispatch(SetSearchResults(
+      searchResults: searchResults,
+    ));
+  };
+}
+
+/**
+ *  TODO: filter is different from a search
+ *  search requires remote access
+ */
+ThunkAction<AppState> searchPublicRooms({String searchText}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+      final request = buildPublicRoomSearch(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        searchText: searchText,
+      );
+
+      final response = await http.post(
+        request['url'],
+        headers: request['headers'],
+        body: json.encode(request['body']),
+      );
+
+      final data = json.decode(response.body);
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final List<dynamic> rawPublicRooms = data['chunk'];
+      final List<Room> convertedRooms =
+          rawPublicRooms.map((room) => Room.fromJson(room)).toList();
+
+      print('[searchPublicRooms] conversion successful');
+
+      store.dispatch(SetSearchResults(
+        since: data['next_batch'],
+        searchResults: convertedRooms,
+        totalResults: data['total_room_count_estimate'],
+      ));
+    } catch (error) {
+      print('[searchPublicRooms] $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
   };
 }
