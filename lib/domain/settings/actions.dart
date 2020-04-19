@@ -25,6 +25,11 @@ class SetLanguage {
   SetLanguage({this.language});
 }
 
+class SetEnterSend {
+  final bool enterSend;
+  SetEnterSend({this.enterSend});
+}
+
 class ToggleNotifications {
   ToggleNotifications();
 }
@@ -53,6 +58,16 @@ ThunkAction<AppState> selectAccentColor(int color) {
 ThunkAction<AppState> updateLanguage(String language) {
   return (Store<AppState> store) async {
     store.dispatch(SetLanguage(language: language));
+  };
+}
+
+ThunkAction<AppState> toggleEnterSend() {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      SetEnterSend(
+        enterSend: !store.state.settingsStore.enterSend,
+      ),
+    );
   };
 }
 

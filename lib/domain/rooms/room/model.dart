@@ -48,6 +48,7 @@ class Avatar {
 class Room {
   final String id;
   final String name;
+  final String alias;
   final String homeserver;
   final Avatar avatar;
   final String topic;
@@ -57,6 +58,10 @@ class Room {
   final String startTime;
   final String endTime;
   final int lastUpdate;
+  final int totalJoinedUsers;
+  final bool guestEnabled;
+  final bool encryptionEnabled;
+  final bool worldReadable;
 
   // Event lists
   final List<User> users;
@@ -68,6 +73,7 @@ class Room {
   const Room({
     this.id,
     this.name = 'New Room',
+    this.alias = '',
     this.homeserver,
     this.avatar,
     this.topic = '',
@@ -80,6 +86,10 @@ class Room {
     this.outbox = const [],
     this.messages = const [],
     this.lastUpdate = 0,
+    this.totalJoinedUsers = 0,
+    this.guestEnabled = false,
+    this.encryptionEnabled = false,
+    this.worldReadable = false,
     this.startTime,
     this.endTime,
   });
@@ -96,6 +106,9 @@ class Room {
     startTime,
     endTime,
     lastUpdate,
+    totalJoinedUsers,
+    guestEnabled,
+    encryptionEnabled,
     draft,
     state,
     users,
@@ -106,12 +119,16 @@ class Room {
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
+      alias: alias ?? this.alias,
       homeserver: homeserver ?? this.homeserver,
       avatar: avatar ?? this.avatar,
       direct: direct ?? this.direct,
       sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
+      totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
+      guestEnabled: guestEnabled ?? this.guestEnabled,
+      encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
@@ -124,14 +141,13 @@ class Room {
       return Room(
         id: json['room_id'],
         name: json['name'],
+        alias: json['canonical_alias'],
         homeserver: (json['room_id'] as String).split(':')[1],
         topic: json['topic'],
         avatar: Avatar(uri: json['url']), // mxc://
-        // TODO: add from public room json response
-        // TODO: canonical_alias
-        // TODO: num_joined_members | members
-        // TODO: world_readable
-        // TODO: guest_can_joi
+        totalJoinedUsers: json['num_joined_members'],
+        guestEnabled: json['guest_can_join'],
+        worldReadable: json['world_readable'],
         syncing: false,
       );
     } catch (error) {

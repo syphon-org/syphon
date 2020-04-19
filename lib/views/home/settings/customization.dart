@@ -112,10 +112,17 @@ class Customization extends StatelessWidget {
           double height = MediaQuery.of(context).size.height;
 
           // Static horizontal: 16, vertical: 8
-          final contentPadding = EdgeInsets.symmetric(
-            horizontal: width * 0.08,
-            vertical: height * 0.005,
+          final contentPadding = EdgeInsets.only(
+            left: width * 0.04,
+            right: width * 0.04,
+            top: 6,
+            bottom: 14,
           );
+
+          final sectionBackgroundColor =
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color(BASICALLY_BLACK)
+                  : const Color(BACKGROUND);
 
           return Scaffold(
             appBar: AppBar(
@@ -130,60 +137,132 @@ class Customization extends StatelessWidget {
             body: Container(
                 child: Column(
               children: <Widget>[
-                ListTile(
-                  onTap: () => props.onIncrementTheme(),
-                  contentPadding: contentPadding,
-                  title: Text(
-                    'Theme',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  trailing: Text(
-                    displayThemeType(props.themeType),
-                    style: TextStyle(fontSize: 18.0),
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width, // TODO: use flex, i'm rushing
+                          padding: contentPadding,
+                          child: Text(
+                            'App',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => onShowColorPicker(
+                            context: context,
+                            onSelectColor: props.onSelectPrimaryColor,
+                            originalColor: props.primaryColor,
+                          ),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Primary Color',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Color(props.primaryColor),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => onShowColorPicker(
+                            context: context,
+                            onSelectColor: props.onSelectAccentColor,
+                            originalColor: props.accentColor,
+                          ),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Accent Color',
+                          ),
+                          trailing: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Color(props.accentColor),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => props.onIncrementTheme(),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Theme',
+                          ),
+                          trailing: Text(
+                            displayThemeType(props.themeType),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Font Size',
+                          ),
+                          trailing: Text(
+                            props.fontSize,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Language',
+                          ),
+                          trailing: Text(
+                            props.language,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                ListTile(
-                  onTap: () => onShowColorPicker(
-                    context: context,
-                    onSelectColor: props.onSelectPrimaryColor,
-                    originalColor: props.primaryColor,
-                  ),
-                  contentPadding: contentPadding,
-                  title: Text(
-                    'Primary Color',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  trailing: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Color(props.primaryColor),
-                  ),
-                ),
-                ListTile(
-                  onTap: () => onShowColorPicker(
-                    context: context,
-                    onSelectColor: props.onSelectAccentColor,
-                    originalColor: props.accentColor,
-                  ),
-                  contentPadding: contentPadding,
-                  title: Text(
-                    'Accent Color',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  trailing: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Color(props.accentColor),
-                  ),
-                ),
-                ListTile(
-                  onTap: () {},
-                  contentPadding: contentPadding,
-                  title: Text(
-                    'Language',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  trailing: Text(
-                    props.language,
-                    style: TextStyle(fontSize: 18.0),
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width, // TODO: use flex, i'm rushing
+                          padding: contentPadding,
+                          child: Text(
+                            'Chats',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => props.onToggleEnterSend(),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Enter Key Sends',
+                          ),
+                          subtitle: Text(
+                            'Pressing the enter key will send a message',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          trailing: Switch(
+                            value: props.enterSend,
+                            onChanged: (enterSend) => props.onToggleEnterSend(),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Message Font Size Only',
+                          ),
+                          trailing: Text(
+                            props.chatFontSize,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -198,25 +277,37 @@ class Props {
   final int accentColor;
   final String themeType;
   final String language;
+  final String fontSize;
+  final String chatFontSize;
+  final bool enterSend;
+
   final Function onSelectPrimaryColor;
   final Function onSelectAccentColor;
   final Function onIncrementTheme;
+  final Function onToggleEnterSend;
 
   Props({
     @required this.primaryColor,
     @required this.accentColor,
     @required this.themeType,
     @required this.language,
+    @required this.fontSize,
+    @required this.chatFontSize,
+    @required this.enterSend,
     @required this.onSelectPrimaryColor,
     @required this.onSelectAccentColor,
     @required this.onIncrementTheme,
+    @required this.onToggleEnterSend,
   });
 
   static Props mapStoreToProps(Store<AppState> store) => Props(
         primaryColor: store.state.settingsStore.primaryColor ?? TETHERED_CYAN,
-        accentColor: store.state.settingsStore.accentColor ?? BESIDES_BLUE,
+        accentColor: store.state.settingsStore.accentColor ?? TETHERED_CYAN,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
+        enterSend: store.state.settingsStore.enterSend,
+        fontSize: "Normal",
+        chatFontSize: "Normal",
         onSelectPrimaryColor: (int color) => store.dispatch(
           // convert to int hex color code
           selectPrimaryColor(color),
@@ -228,6 +319,9 @@ class Props {
         onIncrementTheme: () => store.dispatch(
           incrementTheme(),
         ),
+        onToggleEnterSend: () => store.dispatch(
+          toggleEnterSend(),
+        ),
       );
 
   @override
@@ -236,6 +330,7 @@ class Props {
       accentColor.hashCode ^
       language.hashCode ^
       themeType.hashCode ^
+      enterSend.hashCode ^
       onSelectPrimaryColor.hashCode ^
       onSelectAccentColor.hashCode ^
       onIncrementTheme.hashCode;
@@ -249,6 +344,7 @@ class Props {
           accentColor == other.accentColor &&
           language == other.language &&
           themeType == other.themeType &&
+          enterSend == other.enterSend &&
           onSelectPrimaryColor == other.onSelectPrimaryColor &&
           onSelectAccentColor == other.onSelectAccentColor &&
           onIncrementTheme == other.onIncrementTheme;

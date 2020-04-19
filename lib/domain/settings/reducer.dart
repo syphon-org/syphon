@@ -20,6 +20,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         theme: action.theme,
       );
+    case SetEnterSend:
+      return state.copyWith(
+        enterSend: action.enterSend,
+      );
     case ToggleNotifications:
       return state.copyWith(
         notificationsEnabled: !state.notificationsEnabled,

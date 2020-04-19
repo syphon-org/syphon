@@ -113,7 +113,9 @@ class Home extends StatelessWidget {
                           Text(
                             formatRoomName(room: room),
                             style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           Text(
                             formatTimestamp(
@@ -126,7 +128,7 @@ class Home extends StatelessWidget {
                       ),
                       Text(
                         formatPreview(room: room),
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(fontSize: 12, letterSpacing: 0.2),
                       ),
                     ],
                   ),
@@ -275,7 +277,14 @@ class Home extends StatelessWidget {
             fabSize: 58,
             fabElevation: 4.0,
             fabMargin: EdgeInsets.all(24),
-            fabOpenIcon: Icon(Icons.widgets),
+            fabOpenIcon: Icon(
+              Icons.widgets,
+              color: Colors.white,
+            ),
+            fabCloseIcon: Icon(
+              Icons.close,
+              color: Colors.white,
+            ),
             fabColor: Theme.of(context).accentColor,
             ringDiameter: MediaQuery.of(context).size.width * 0.66,
             ringColor: Theme.of(context).accentColor.withAlpha(144),

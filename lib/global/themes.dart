@@ -22,9 +22,10 @@ class Themes {
     ThemeType themeType,
   }) {
     int primaryColor = primaryColorHex ?? TETHERED_CYAN;
-    int accentColor = accentColorHex ?? BESIDES_BLUE;
+    int accentColor = accentColorHex ?? TETHERED_CYAN;
     int appBarColor = primaryColorHex ?? TETHERED_CYAN;
     int scaffoldBackgroundColor = BACKGROUND;
+    int fontColor = Colors.white.value;
 
     var brightness = Brightness.light;
     var appBarElevation;
@@ -36,6 +37,7 @@ class Themes {
         accentColor = accentColorHex ?? TETHERED_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = null;
+        fontColor = Colors.white.value;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
@@ -44,9 +46,11 @@ class Themes {
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = BASICALLY_BLACK;
         appBarElevation = 0.0;
+        fontColor = Colors.white.value;
         break;
       case ThemeType.LIGHT:
       default:
+        fontColor = Colors.black.value;
         break;
     }
 
@@ -96,13 +100,40 @@ class Themes {
         headline6: TextStyle(color: Colors.white),
       ),
       textTheme: TextTheme(
-        subtitle1: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
-        bodyText1: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
-        headline5: TextStyle(fontWeight: FontWeight.w100),
-        headline6: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
-        subtitle2: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-        caption: TextStyle(fontSize: 16, fontWeight: FontWeight.w100),
-        button: TextStyle(fontWeight: FontWeight.w100, letterSpacing: 0.4),
+        headline5: TextStyle(
+          fontWeight: FontWeight.w100,
+        ),
+        headline6: TextStyle(
+          fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
+        ),
+        subtitle1: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
+        ),
+        subtitle2: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.4,
+        ),
+        bodyText1: TextStyle(
+          fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
+        ),
+        // default Text() styling if none specified
+        bodyText2: TextStyle(
+          fontSize: 18,
+          letterSpacing: 0.4,
+        ),
+        caption: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w100,
+        ),
+        button: TextStyle(
+          fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
+        ),
       ),
     );
   }

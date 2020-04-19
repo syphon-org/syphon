@@ -48,14 +48,6 @@ class LoginState extends State<Login> {
     });
   }
 
-  @override
-  void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    passwordFocus.dispose();
-    super.dispose();
-  }
-
   @protected
   void onMounted() {
     // Init alerts listener
@@ -87,6 +79,14 @@ class LoginState extends State<Login> {
         ),
       ));
     });
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    passwordFocus.dispose();
+    super.dispose();
   }
 
   void handleSubmitted(String value) {
