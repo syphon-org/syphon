@@ -7,8 +7,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
-class Customization extends StatelessWidget {
-  Customization({Key key, this.title}) : super(key: key);
+class ChatPreferences extends StatelessWidget {
+  ChatPreferences({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -149,60 +149,9 @@ class Customization extends StatelessWidget {
                           width: width, // TODO: use flex, i'm rushing
                           padding: contentPadding,
                           child: Text(
-                            'App',
+                            'Chats',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.subtitle2,
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectPrimaryColor,
-                            originalColor: props.primaryColor,
-                          ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Primary Color',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          trailing: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Color(props.primaryColor),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectAccentColor,
-                            originalColor: props.accentColor,
-                          ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Accent Color',
-                          ),
-                          trailing: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Color(props.accentColor),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => props.onIncrementTheme(),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Theme',
-                          ),
-                          trailing: Text(
-                            displayThemeType(props.themeType),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Font Size',
-                          ),
-                          trailing: Text(
-                            props.fontSize,
                           ),
                         ),
                         ListTile(
@@ -213,6 +162,46 @@ class Customization extends StatelessWidget {
                           ),
                           trailing: Text(
                             props.language,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Message Font Size',
+                          ),
+                          trailing: Text(
+                            props.chatFontSize,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => props.onToggleEnterSend(),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Show Membership Events',
+                          ),
+                          subtitle: Text(
+                            'Show membership changes within the chat',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          trailing: Switch(
+                            value: props.enterSend,
+                            onChanged: (enterSend) => props.onToggleEnterSend(),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => props.onToggleEnterSend(),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Enter Key Sends',
+                          ),
+                          subtitle: Text(
+                            'Pressing the enter key will send a message',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          trailing: Switch(
+                            value: props.enterSend,
+                            onChanged: (enterSend) => props.onToggleEnterSend(),
                           ),
                         ),
                       ],
@@ -231,34 +220,57 @@ class Customization extends StatelessWidget {
                           width: width, // TODO: use flex, i'm rushing
                           padding: contentPadding,
                           child: Text(
-                            'Chats',
+                            'Media auto-download',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.subtitle2,
                           ),
                         ),
                         ListTile(
-                          onTap: () => props.onToggleEnterSend(),
+                          onTap: () => onShowColorPicker(
+                            context: context,
+                            onSelectColor: props.onSelectPrimaryColor,
+                            originalColor: props.primaryColor,
+                          ),
                           contentPadding: contentPadding,
                           title: Text(
-                            'Enter Key Sends',
+                            'When using mobile data',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
-                            'Pressing the enter key will send a message',
+                            'Images, Audio, Video, Documents, Other',
                             style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: props.enterSend,
-                            onChanged: (enterSend) => props.onToggleEnterSend(),
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () => onShowColorPicker(
+                            context: context,
+                            onSelectColor: props.onSelectPrimaryColor,
+                            originalColor: props.primaryColor,
+                          ),
                           contentPadding: contentPadding,
                           title: Text(
-                            'Message Font Size Only',
+                            'When using Wi-Fi',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
-                          trailing: Text(
-                            props.chatFontSize,
+                          subtitle: Text(
+                            'Images, Audio, Video, Documents, Other',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => onShowColorPicker(
+                            context: context,
+                            onSelectColor: props.onSelectPrimaryColor,
+                            originalColor: props.primaryColor,
+                          ),
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'When Roaming',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          subtitle: Text(
+                            'Images, Audio, Video, Documents, Other',
+                            style: Theme.of(context).textTheme.caption,
                           ),
                         ),
                       ],
@@ -285,6 +297,7 @@ class Props {
   final Function onSelectAccentColor;
   final Function onIncrementTheme;
   final Function onToggleEnterSend;
+  final Function onToggleMembershipEvents;
 
   Props({
     @required this.primaryColor,
@@ -298,6 +311,7 @@ class Props {
     @required this.onSelectAccentColor,
     @required this.onIncrementTheme,
     @required this.onToggleEnterSend,
+    @required this.onToggleMembershipEvents,
   });
 
   static Props mapStoreToProps(Store<AppState> store) => Props(
@@ -318,6 +332,9 @@ class Props {
         ),
         onIncrementTheme: () => store.dispatch(
           incrementTheme(),
+        ),
+        onToggleMembershipEvents: () => store.dispatch(
+          toggleEnterSend(),
         ),
         onToggleEnterSend: () => store.dispatch(
           toggleEnterSend(),

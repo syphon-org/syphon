@@ -276,7 +276,7 @@ class Home extends StatelessWidget {
             key: Key('FabCircleMenu'),
             fabSize: 58,
             fabElevation: 4.0,
-            fabMargin: EdgeInsets.all(24),
+            fabMargin: EdgeInsets.all(16),
             fabOpenIcon: Icon(
               Icons.widgets,
               color: Colors.white,

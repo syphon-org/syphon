@@ -1,6 +1,9 @@
 import 'package:Tether/domain/index.dart'; // TODO: remove need for store in view dependencies
 import 'package:Tether/views/home/groups/search.dart';
 import 'package:Tether/views/home/messages/message-details.dart';
+import 'package:Tether/views/home/settings/chats.dart';
+import 'package:Tether/views/home/settings/privacy.dart';
+import 'package:Tether/views/home/settings/theming.dart';
 import 'package:flutter/material.dart';
 
 // Intro
@@ -23,7 +26,6 @@ import 'package:Tether/views/home/messages/settings.dart';
 // Settings
 import 'package:Tether/views/home/settings/advanced.dart';
 import 'package:Tether/views/home/settings/notifications.dart';
-import 'package:Tether/views/home/settings/customization.dart';
 import 'package:redux/redux.dart';
 
 class NavigationService {
@@ -70,8 +72,14 @@ class NavigationProvider {
       '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
-      '/customization': (BuildContext context) => Customization(
-            title: 'Customization',
+      '/privacy': (BuildContext context) => PrivacyPreferences(
+            title: 'Privacy',
+          ),
+      '/chat-preferences': (BuildContext context) => ChatPreferences(
+            title: 'Chat Preferences',
+          ),
+      '/theming': (BuildContext context) => Theming(
+            title: 'Theming',
           ),
       '/settings': (BuildContext context) => SettingsScreen(
             title: 'Settings',

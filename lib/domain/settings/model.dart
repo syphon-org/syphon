@@ -9,13 +9,17 @@ class SettingsStore {
   final int accentColor;
   final int brightness;
   final bool smsEnabled;
-  final bool notificationsEnabled;
   final bool enterSend;
+  final bool readReceipts; // on / off
+  final bool typingIndicators; // on / off
+  final bool notificationsEnabled;
+  final bool membershipEventsEnabled;
   final String language;
 
   @JsonProperty(enumValues: ThemeType.values)
   final ThemeType theme;
 
+  // mapped by roomId
   final Map<String, ChatSetting> customChatSettings;
 
   const SettingsStore({
@@ -24,9 +28,12 @@ class SettingsStore {
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.language = 'English',
-    this.smsEnabled = false,
-    this.notificationsEnabled = false,
     this.enterSend = false,
+    this.smsEnabled = false,
+    this.readReceipts = true,
+    this.typingIndicators = true,
+    this.notificationsEnabled = false,
+    this.membershipEventsEnabled = true,
     this.customChatSettings,
   });
 
@@ -37,8 +44,11 @@ class SettingsStore {
     ThemeType theme,
     String language,
     bool smsEnabled,
-    bool notificationsEnabled,
     bool enterSend,
+    bool readReceipts,
+    bool typingIndicators,
+    bool notificationsEnabled,
+    bool membershipEventsEnabled,
   }) {
     return SettingsStore(
       primaryColor: primaryColor,
@@ -47,8 +57,13 @@ class SettingsStore {
       theme: theme ?? this.theme,
       language: language ?? this.language,
       smsEnabled: smsEnabled ?? this.smsEnabled,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       enterSend: enterSend != null ? enterSend : this.enterSend,
+      readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
+      typingIndicators:
+          typingIndicators != null ? typingIndicators : this.typingIndicators,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      membershipEventsEnabled:
+          membershipEventsEnabled ?? this.membershipEventsEnabled,
       customChatSettings: customChatSettings ?? this.customChatSettings,
     );
   }
@@ -61,8 +76,10 @@ class SettingsStore {
       theme.hashCode ^
       language.hashCode ^
       smsEnabled.hashCode ^
-      notificationsEnabled.hashCode ^
       enterSend.hashCode ^
+      readReceipts.hashCode ^
+      typingIndicators.hashCode ^
+      notificationsEnabled.hashCode ^
       customChatSettings.hashCode;
 
   @override

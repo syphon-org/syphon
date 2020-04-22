@@ -109,7 +109,48 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, '/customization');
+                              Navigator.pushNamed(context, '/chat-preferences');
+                            },
+                            contentPadding: contentPadding,
+                            leading: Container(
+                                padding: EdgeInsets.only(
+                                  top: 4,
+                                  left: 4,
+                                  bottom: 4,
+                                  right: 4,
+                                ),
+                                child: Icon(
+                                  Icons.photo_filter,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Chats And Media',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/privacy');
+                            },
+                            contentPadding: contentPadding,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Security & Privacy',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/theming');
                             },
                             contentPadding: contentPadding,
                             leading: Container(
@@ -119,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Customization',
+                              'Theming',
                               style: TextStyle(fontSize: 18.0),
                             ),
                           ),
@@ -135,24 +176,6 @@ class SettingsScreen extends StatelessWidget {
                             title: Text(
                               'Storage',
                               style: TextStyle(fontSize: 18.0),
-                            ),
-                          ),
-                          ListTile(
-                            onTap: () {},
-                            contentPadding: contentPadding,
-                            leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
-                                  Icons.lock,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              'Security & Privacy',
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-                            subtitle: Text(
-                              'Screen Lock Off, Registration Lock Off',
-                              style: TextStyle(fontSize: 14.0),
                             ),
                           ),
                           ListTile(

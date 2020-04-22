@@ -24,6 +24,18 @@ SettingsStore settingsReducer(
       return state.copyWith(
         enterSend: action.enterSend,
       );
+    case ToggleTypingIndicators:
+      return state.copyWith(
+        typingIndicators: !state.typingIndicators,
+      );
+    case ToggleReadReceipts:
+      return state.copyWith(
+        readReceipts: !state.readReceipts,
+      );
+    case ToggleMembershipEvents:
+      return state.copyWith(
+        membershipEventsEnabled: !state.membershipEventsEnabled,
+      );
     case ToggleNotifications:
       return state.copyWith(
         notificationsEnabled: !state.notificationsEnabled,

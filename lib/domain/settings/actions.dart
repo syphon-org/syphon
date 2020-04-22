@@ -30,8 +30,21 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
+class ToggleMembershipEvents {
+  final bool membershipEventsEnabled;
+  ToggleMembershipEvents({this.membershipEventsEnabled});
+}
+
 class ToggleNotifications {
   ToggleNotifications();
+}
+
+class ToggleTypingIndicators {
+  ToggleTypingIndicators();
+}
+
+class ToggleReadReceipts {
+  ToggleReadReceipts();
 }
 
 /**
@@ -61,11 +74,34 @@ ThunkAction<AppState> updateLanguage(String language) {
   };
 }
 
+ThunkAction<AppState> toggleReadReceipts() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleReadReceipts());
+  };
+}
+
+ThunkAction<AppState> toggleTypingIndicators() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleTypingIndicators());
+  };
+}
+
 ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(
       SetEnterSend(
         enterSend: !store.state.settingsStore.enterSend,
+      ),
+    );
+  };
+}
+
+ThunkAction<AppState> toggleMembershipEvents() {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      ToggleMembershipEvents(
+        membershipEventsEnabled:
+            !store.state.settingsStore.membershipEventsEnabled,
       ),
     );
   };

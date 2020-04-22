@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:Tether/domain/index.dart';
 import 'package:Tether/domain/settings/actions.dart';
+import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,39 +14,6 @@ final String debug = DotEnv().env['DEBUG'];
 
 class NotificationSettings extends StatelessWidget {
   NotificationSettings({Key key}) : super(key: key);
-
-  @protected
-  onConfirmToggle({
-    context,
-    Function onConfirm,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirm Notifications"),
-        content: Text(
-          NOTIFICATION_PROMPT_INFO,
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('No'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            child: Text('Sure'),
-            onPressed: () {
-              if (onConfirm != null) {
-                onConfirm();
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -57,6 +27,11 @@ class NotificationSettings extends StatelessWidget {
             vertical: height * 0.01,
           );
 
+          final sectionBackgroundColor =
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color(BASICALLY_BLACK)
+                  : const Color(BACKGROUND);
+
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -65,50 +40,86 @@ class NotificationSettings extends StatelessWidget {
               ),
               title: Text(
                 'Notifications',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w100,
+                ),
               ),
             ),
             body: Container(
                 child: Column(
               children: <Widget>[
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    if (props.notificationsEnabled) {
-                      props.onToggleNotifications();
-                    } else {
-                      onConfirmToggle(
-                        context: context,
-                        onConfirm: () {
-                          props.onToggleNotifications();
-                        },
-                      );
-                    }
-                  },
-                  contentPadding: contentPadding,
-                  title: Text(
-                    'Notifications',
-                    style: TextStyle(fontSize: 18.0),
+                Card(
+                  margin: EdgeInsets.only(top: 8, bottom: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(children: [
+                      Container(
+                        width: width, // TODO: use flex, i'm rushing
+                        padding: contentPadding,
+                        child: Text(
+                          'Basic',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ),
+                      ListTile(
+                        dense: true,
+                        onTap: () => props.onToggleNotifications(context),
+                        contentPadding: contentPadding,
+                        title: Text(
+                          'Notifications',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        trailing: Container(
+                          child: Switch(
+                            value: props.notificationsEnabled,
+                            onChanged: (value) =>
+                                props.onToggleNotifications(context),
+                          ),
+                        ),
+                      ),
+                    ]),
                   ),
-                  trailing: Container(
-                    child: Switch(
-                      value: props.notificationsEnabled,
-                      onChanged: (value) {
-                        if (!value) {
-                          props.onToggleNotifications();
-                        } else {
-                          onConfirmToggle(
-                            context: context,
-                            onConfirm: () {
-                              props.onToggleNotifications();
-                            },
-                          );
-                        }
-                      },
-                    ),
+                ),
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(children: [
+                      Container(
+                        width: width, // TODO: use flex, i'm rushing
+                        padding: contentPadding,
+                        child: Text(
+                          'Remote',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ),
+                      ListTile(
+                        dense: true,
+                        onTap: () => props.onToggleNotifications(context),
+                        contentPadding: contentPadding,
+                        title: Text(
+                          'Notifications',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        trailing: Container(
+                          child: Switch(
+                            value: props.notificationsEnabled,
+                            onChanged: (value) => props.onToggleNotifications(
+                              context,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
                   ),
-                )
+                ),
               ],
             )),
           );
@@ -131,8 +142,44 @@ class Props {
   ) =>
       Props(
           notificationsEnabled: store.state.settingsStore.notificationsEnabled,
-          onToggleNotifications: () {
-            store.dispatch(toggleNotifications());
+          onToggleNotifications: (BuildContext context) {
+            try {
+              // If the platform is iOS, we'll want to confirm they understand
+              // the native notification prompt
+              if (Platform.isIOS &&
+                  !store.state.settingsStore.notificationsEnabled) {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("Confirm Notifications"),
+                    content: Text(
+                      NOTIFICATION_PROMPT_INFO,
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('No'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text('Sure'),
+                        onPressed: () {
+                          store.dispatch(toggleNotifications());
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+                return;
+              }
+
+              // Otherwise, attempt the toggle
+              store.dispatch(toggleNotifications());
+            } catch (error) {
+              print(error);
+            }
           });
 
   @override

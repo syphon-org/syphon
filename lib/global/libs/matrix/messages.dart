@@ -50,3 +50,25 @@ dynamic buildSendMessageRequest({
 
   return {'url': url, 'headers': headers, 'body': body};
 }
+
+/**
+ * Notes on requestId (considered a transactionId in Matrix)
+ * 
+ * The transaction ID for this event. 
+ * Clients should generate an ID unique across requests with the same access token; 
+ * it will be used by the server to ensure idempotency of requests. <- really a requestId
+ */
+dynamic buildSendTypingRequest({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String roomId,
+  String userId,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/typing/${userId}';
+
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  return {'url': url, 'headers': headers};
+}
