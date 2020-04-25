@@ -42,10 +42,11 @@ class Theming extends StatelessWidget {
               maxHeight: height * 0.25,
             ),
             child: MaterialColorPicker(
-                onColorChange: (Color color) {
-                  onSelectColor(color.value);
-                },
-                selectedColor: Colors.red),
+              selectedColor: Colors.red,
+              onColorChange: (Color color) {
+                onSelectColor(color.value);
+              },
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

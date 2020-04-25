@@ -27,6 +27,13 @@ List<Message> wrapOutboxMessages(
   return [outbox, messages].expand((x) => x).toList();
 }
 
+List<Message> wrapTypingIndicatoor(List<Message> messages) {
+  if (false) {
+    return messages;
+  }
+  return messages;
+}
+
 bool isTextMessage({Message message}) {
   return message.msgtype == MessageTypes.TEXT ||
       message.msgtype == MessageTypes.EMOTE ||

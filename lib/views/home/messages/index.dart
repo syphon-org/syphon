@@ -638,11 +638,13 @@ class _Props {
           id: roomId,
           state: store.state,
         ),
-        messages: latestMessages(
-          wrapOutboxMessages(
-            messages:
-                roomSelectors.room(id: roomId, state: store.state).messages,
-            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+        messages: wrapTypingIndicatoor(
+          latestMessages(
+            wrapOutboxMessages(
+              messages:
+                  roomSelectors.room(id: roomId, state: store.state).messages,
+              outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+            ),
           ),
         ),
         roomsLoading: store.state.roomStore.loading,

@@ -278,7 +278,7 @@ class Home extends StatelessWidget {
             fabSize: 58,
             fabElevation: 4.0,
             fabOpenIcon: Icon(
-              Icons.widgets,
+              Icons.bubble_chart,
               color: Colors.white,
             ),
             fabCloseIcon: Icon(

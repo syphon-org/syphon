@@ -1,10 +1,9 @@
 import 'dart:collection';
 import 'dart:typed_data';
-import 'package:Tether/store/rooms/events/selectors.dart';
+import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/store/rooms/events/model.dart';
-import 'package:flutter/foundation.dart';
 
 @jsonSerializable
 class Avatar {
@@ -63,12 +62,14 @@ class Room {
   final bool encryptionEnabled;
   final bool worldReadable;
 
-  // Event lists
+  // Event lists and handlers
+  final Message draft;
   final List<User> users;
   final List<Event> state;
   final List<Message> messages;
   final List<Message> outbox;
-  final Message draft;
+  // eventId -> users read
+  final Map<String, List<ReadStatus>> messageReads;
 
   const Room({
     this.id,
@@ -92,6 +93,7 @@ class Room {
     this.worldReadable = false,
     this.startTime,
     this.endTime,
+    this.messageReads,
   });
 
   Room copyWith({
@@ -115,6 +117,7 @@ class Room {
     events,
     outbox,
     messages,
+    messageReads,
   }) {
     return Room(
       id: id ?? this.id,
@@ -123,6 +126,7 @@ class Room {
       homeserver: homeserver ?? this.homeserver,
       avatar: avatar ?? this.avatar,
       direct: direct ?? this.direct,
+      draft: draft ?? this.draft,
       sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
@@ -133,6 +137,7 @@ class Room {
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
       users: users ?? this.users,
+      messageReads: messageReads ?? this.messageReads,
     );
   }
 
@@ -203,6 +208,31 @@ class Room {
     );
   }
 
+  Room fromEphemeralEvents(
+    List<Event> events, {
+    String originDEBUG,
+  }) {
+    var messageReads = this.messageReads ?? Map<String, List<ReadStatus>>();
+
+    try {
+      events.forEach((event) {
+        switch (event.type) {
+          case 'm.receipt':
+            break;
+          default:
+            print('[fromEphemeralEvents] unknown event type ${event.type}');
+            break;
+        }
+      });
+    } catch (error) {
+      print('[fromStateEvents] error $error');
+    }
+
+    return this.copyWith(
+      messageReads: messageReads,
+    );
+  }
+
   // Find details of room based on state events
   // follows spec naming priority and thumbnail downloading
   Room fromStateEvents(
@@ -217,7 +247,7 @@ class Room {
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
-    List<User> users = List<User>();
+    // TODO: List<User> users = List<User>();
 
     try {
       stateEvents.forEach((event) {
@@ -283,16 +313,20 @@ class Room {
     String username,
     Map<String, dynamic> json,
   }) {
-    // contains message events
-    final List<dynamic> rawTimelineEvents = json['timeline']['events'];
-    final List<dynamic> rawStateEvents = json['state']['events'];
-
     // print(json['summary']);
-    // print(json['ephemeral']);
-    // Check for message events
     // print('TIMELINE OUTPUT ${json['timeline']}');
     // TODO: final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
-    // TODO: final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
+
+    // Check for message events
+    final List<dynamic> rawStateEvents = json['state']['events'];
+    final List<dynamic> rawTimelineEvents =
+        json['timeline']['events']; // contains message events
+    final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
+
+    print('${this.id} ${json['ephemeral']}');
+
+    final List<Event> ephemeralEvents =
+        rawEphemeralEvents.map((event) => Event.fromJson(event)).toList();
 
     final List<Event> stateEvents =
         rawStateEvents.map((event) => Event.fromJson(event)).toList();
@@ -308,6 +342,9 @@ class Room {
         )
         .fromMessageEvents(
           messageEvents,
+        )
+        .fromEphemeralEvents(
+          ephemeralEvents,
         );
   }
 

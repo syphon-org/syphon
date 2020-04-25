@@ -7,7 +7,10 @@ String formatSender(String sender) {
 
 // @again_ereio:matrix.org -> ER
 String formatSenderInitials(String sender) {
-  return formatSender(sender).substring(0, 2).toUpperCase();
+  var formattedSender = formatSender(sender).toUpperCase();
+  return formattedSender.length < 2
+      ? formattedSender
+      : formattedSender.substring(0, 2);
 }
 
 // 1237597223894 -> 30m, now, etc
