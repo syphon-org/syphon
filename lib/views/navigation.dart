@@ -1,4 +1,4 @@
-import 'package:Tether/domain/index.dart'; // TODO: remove need for store in view dependencies
+import 'package:Tether/store/index.dart'; // TODO: remove need for store in view dependencies
 import 'package:Tether/views/home/groups/search.dart';
 import 'package:Tether/views/home/messages/message-details.dart';
 import 'package:Tether/views/home/settings/chats.dart';

@@ -48,7 +48,11 @@ dynamic buildSendMessageRequest({
     "body": messageBody,
   };
 
-  return {'url': url, 'headers': headers, 'body': body};
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
 }
 
 /**
@@ -64,11 +68,50 @@ dynamic buildSendTypingRequest({
   String accessToken,
   String roomId,
   String userId,
+  bool typing,
 }) {
   String url =
       '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/typing/${userId}';
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
 
-  return {'url': url, 'headers': headers};
+  Map body = {
+    "typing": typing,
+    "timeout": 5000,
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
+}
+
+/**
+ * Send a read receipt for a message
+ * 
+*  https://matrix.org/docs/spec/client_server/latest#id373
+ * POST /_matrix/client/r0/rooms/{roomId}/receipt/{receiptType}/{eventId}
+ */
+dynamic buildSendReadReceipt({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String roomId,
+  String receiptType,
+  String messageId,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/receipt/${receiptType}/${messageId}';
+
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+  };
 }

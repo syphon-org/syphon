@@ -1,6 +1,6 @@
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/actions.dart';
-import 'package:Tether/domain/rooms/service.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/actions.dart';
+import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';

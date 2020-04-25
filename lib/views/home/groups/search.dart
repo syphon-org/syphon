@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:Tether/domain/rooms/room/model.dart';
-import 'package:Tether/domain/rooms/room/selectors.dart';
+import 'package:Tether/store/rooms/room/model.dart';
+import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
@@ -13,9 +13,9 @@ import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/domain/matrix/actions.dart';
+import 'package:Tether/store/matrix/actions.dart';
 
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Assets

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/user/selectors.dart';
 
 class ProfilePreview extends StatelessWidget {
   ProfilePreview({Key key}) : super(key: key);
@@ -69,7 +69,7 @@ class Props {
     Store<AppState> store,
   ) =>
       Props(
-          shortname: displayShortname(store.state),
+          shortname: displayShortname(store.state.userStore.user),
           initials: displayInitials(store.state.userStore.user),
           username: store.state.userStore.user != null
               ? store.state.userStore.user.userId

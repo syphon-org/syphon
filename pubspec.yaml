@@ -63,6 +63,7 @@ dependencies:
 
   # UI Only
   expandable: 3.0.1
+  equatable: ^1.1.0
   flutter_svg: ^0.17.0
   flutter_swiper : 1.1.6
   touchable_opacity: 1.0.2 
@@ -70,6 +71,7 @@ dependencies:
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5
+  # flutter_staggered_animations: "^0.1.2"
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2

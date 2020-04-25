@@ -1,5 +1,5 @@
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/settings/actions.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

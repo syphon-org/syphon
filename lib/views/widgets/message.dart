@@ -1,9 +1,10 @@
-import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /**
  * RoundedPopupMenu
@@ -36,12 +37,16 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final message = this.message;
     var textColor = Colors.white;
+    double indicatorSize = 14;
+    var indicatorColor = Colors.white;
+    var indicatorIconColor = Colors.white;
     var bubbleColor = hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var messageAlignment = MainAxisAlignment.start;
     var messageTextAlignment = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
     var opacity = 1.0;
+    var isRead = false;
 
     if (isLastSender) {
       if (isNextSender) {
@@ -77,17 +82,21 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      textColor = theme != ThemeType.LIGHT ? Colors.white : GREY_DARK_COLOR;
-      messageAlignment = MainAxisAlignment.end;
-      messageTextAlignment = CrossAxisAlignment.end;
-
+      textColor = theme != ThemeType.LIGHT ? Colors.white : Color(GREY_DARK);
       if (theme == ThemeType.DARK) {
         bubbleColor = Colors.grey[700];
       } else if (theme == ThemeType.DARKER) {
         bubbleColor = Colors.grey[850];
       } else {
-        bubbleColor = ENABLED_GREY_COLOR;
+        bubbleColor = const Color(GREY_BUBBLE);
       }
+
+      indicatorColor = isRead ? textColor : bubbleColor;
+      indicatorIconColor = isRead ? bubbleColor : textColor;
+      indicatorSize = isRead ? 14 : 14;
+
+      messageAlignment = MainAxisAlignment.end;
+      messageTextAlignment = CrossAxisAlignment.end;
     }
 
     if (selectedMessageId != null) {
@@ -96,8 +105,8 @@ class MessageWidget extends StatelessWidget {
 
     return GestureDetector(
       onLongPress: () {
-        print('${message.id}, ${message.type}, ${message.timestamp}');
         if (this.onLongPress != null) {
+          HapticFeedback.lightImpact();
           this.onLongPress(message: message);
         }
       },
@@ -212,8 +221,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: message.failed,
                                       child: Container(
-                                        width: 14,
-                                        height: 14,
+                                        width: indicatorSize,
+                                        height: indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: CircularProgressIndicator(
                                           strokeWidth: 1.5,
@@ -223,8 +232,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: message.pending,
                                       child: Container(
-                                        width: 14,
-                                        height: 14,
+                                        width: indicatorSize,
+                                        height: indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: CircularProgressIndicator(
                                           strokeWidth: 1.5,
@@ -235,20 +244,20 @@ class MessageWidget extends StatelessWidget {
                                       visible: !message.pending &&
                                           message.id.contains(':'),
                                       child: Container(
-                                        width: 14,
-                                        height: 14,
+                                        width: indicatorSize,
+                                        height: indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: Icon(
                                           Icons.check,
                                           size: 10,
-                                          color: bubbleColor,
+                                          color: indicatorIconColor,
                                         ),
                                         decoration: ShapeDecoration(
-                                          color: Colors.white,
+                                          color: indicatorColor,
                                           shape: CircleBorder(
                                             side: BorderSide(
-                                              color: bubbleColor,
-                                              width: 1.5,
+                                              color: indicatorIconColor,
+                                              width: isRead ? 1.5 : 1,
                                             ),
                                           ),
                                         ),
@@ -258,20 +267,20 @@ class MessageWidget extends StatelessWidget {
                                       visible: !message.syncing &&
                                           message.id.contains(':'),
                                       child: Container(
-                                        width: 14,
-                                        height: 14,
+                                        width: indicatorSize,
+                                        height: indicatorSize,
                                         margin: EdgeInsets.only(left: 11),
                                         child: Icon(
                                           Icons.check,
                                           size: 10,
-                                          color: bubbleColor,
+                                          color: indicatorIconColor,
                                         ),
                                         decoration: ShapeDecoration(
-                                          color: Colors.white,
+                                          color: indicatorColor,
                                           shape: CircleBorder(
                                             side: BorderSide(
-                                              color: bubbleColor,
-                                              width: 1.5,
+                                              color: indicatorIconColor,
+                                              width: isRead ? 1.5 : 1,
                                             ),
                                           ),
                                         ),

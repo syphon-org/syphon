@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/libs/matrix/search.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:html/parser.dart';
@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 
 import 'package:Tether/global/libs/hello-matrix/index.dart';
 
@@ -50,7 +50,7 @@ Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
   try {
     final hostname = homeserver['hostname'];
 
-    // get the root domain
+    // get the root store
     final origins = hostname.toString().split('.');
     final rootorigin = origins.length > 1
         ? origins[origins.length - 2] + '.' + origins[origins.length - 1]

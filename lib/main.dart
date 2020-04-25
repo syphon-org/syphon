@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:Tether/domain/alerts/actions.dart';
-import 'package:Tether/domain/settings/model.dart';
-import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/store/alerts/actions.dart';
+import 'package:Tether/store/settings/model.dart';
+import 'package:Tether/store/user/actions.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +13,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/global/libs/hive.dart';
 
 // Redux - State Managment - "store" - IMPORT ONLY ONCE
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 
 // Navigation
 import 'package:Tether/views/navigation.dart';

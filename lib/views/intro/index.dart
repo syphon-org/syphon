@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 // Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 
 // Styling Widgets
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

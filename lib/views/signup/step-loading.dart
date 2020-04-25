@@ -1,12 +1,12 @@
-import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/store/user/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Domain
+// Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/user/selectors.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';

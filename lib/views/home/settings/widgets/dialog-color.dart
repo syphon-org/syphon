@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/user/selectors.dart';
 
 class DialogColor extends StatelessWidget {
   DialogColor({Key key}) : super(key: key);

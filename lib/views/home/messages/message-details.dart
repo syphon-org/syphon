@@ -1,6 +1,6 @@
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/actions.dart';
-import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/actions.dart';
+import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/message.dart';

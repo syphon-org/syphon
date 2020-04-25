@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Tether/domain/alerts/model.dart';
+import 'package:Tether/store/alerts/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';

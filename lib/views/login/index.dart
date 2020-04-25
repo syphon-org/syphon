@@ -1,5 +1,5 @@
-import 'package:Tether/domain/user/actions.dart';
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:flutter/foundation.dart';
@@ -9,9 +9,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-// Domain
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/settings/actions.dart';
+// Store
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';

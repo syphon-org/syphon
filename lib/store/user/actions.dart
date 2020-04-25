@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Tether/domain/rooms/actions.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -8,9 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Domain
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/alerts/actions.dart';
+// Store
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import './model.dart';

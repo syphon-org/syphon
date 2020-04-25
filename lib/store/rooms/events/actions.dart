@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/actions.dart';
-import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/actions.dart';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
@@ -32,8 +32,52 @@ final msgtypes = {
 ThunkAction<AppState> readMessages({
   Room room,
   Message message,
-  bool readAll,
-}) {}
+  bool readAll = true,
+}) {
+  return (Store<AppState> store) async {
+    try {} catch (error) {
+      print('[readMessage] failed to send: $error');
+    }
+  };
+}
+
+ThunkAction<AppState> sendTyping({
+  String roomId,
+  bool typing = false,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // Skip if typing indicators are disabled
+      if (!store.state.settingsStore.typingIndicators) {
+        print('[sendTyping] typing indicators are disabled $typing');
+        return;
+      }
+
+      print('[sendTyping] pushing $typing');
+      final request = buildSendTypingRequest(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        roomId: roomId,
+        userId: store.state.userStore.user.userId,
+        typing: typing,
+      );
+
+      final response = await http.put(
+        request['url'],
+        headers: request['headers'],
+        body: json.encode(request['body']),
+      );
+
+      final data = json.decode(response.body);
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+    } catch (error) {
+      print('[toggleTyping] $error');
+    }
+  };
+}
 
 /**
  * Send Room Event (Send Message)

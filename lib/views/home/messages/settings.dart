@@ -1,7 +1,7 @@
-import 'package:Tether/domain/rooms/events/actions.dart';
-import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:Tether/domain/rooms/events/selectors.dart';
-import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/store/rooms/events/actions.dart';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/events/selectors.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/selectors.dart' as roomSelectors;
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/selectors.dart' as roomSelectors;
 
 import 'package:touchable_opacity/touchable_opacity.dart';
 

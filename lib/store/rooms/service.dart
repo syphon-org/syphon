@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'dart:math';
-import 'package:Tether/domain/rooms/service.isolate.dart';
+import 'package:Tether/store/rooms/service.isolate.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';

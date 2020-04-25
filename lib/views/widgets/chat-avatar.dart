@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:Tether/domain/rooms/room/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 
 // TODO: make a proper widget instead of a selector
 

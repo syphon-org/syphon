@@ -1,10 +1,13 @@
+import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/user/model.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/user/selectors.dart';
 
 import 'package:Tether/global/dimensions.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -36,54 +39,59 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    final double height = 800; // testing only
-    AppBar appBar = AppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Navigator.pop(context, false),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w100,
-        ),
-      ),
-    );
+    final double height = MediaQuery.of(context).size.height;
 
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (context, store) => Scaffold(
-        appBar: appBar,
-        body: ScrollConfiguration(
-          behavior: DefaultScrollBehavior(),
-          child: SingleChildScrollView(
-            child: Container(
-              constraints: BoxConstraints(maxHeight: height),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Column(
+    return StoreConnector<AppState, Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        builder: (context, props) {
+          // Space for confirming re
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              title: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
+            ),
+            body: ScrollConfiguration(
+              behavior: DefaultScrollBehavior(),
+              child: SingleChildScrollView(
+                // eventually expand as profile grows
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+                  constraints: BoxConstraints(
+                    maxHeight: height * 0.9,
+                    maxWidth: width,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Container(
-                              width: width * 0.25,
-                              height: width * 0.25,
+                              width: width * 0.24,
+                              height: width * 0.24,
                               margin: const EdgeInsets.all(16.0),
                               child: TouchableOpacity(
                                 activeOpacity: 0.2,
-                                onTap: onChangeAvatar(store),
+                                onTap: props.onChangeAvatar,
                                 child: CircleAvatar(
                                   backgroundColor: Colors.grey,
                                   child: Text(
-                                    displayInitials(store.state.userStore.user),
+                                    displayInitials(props.user),
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 32.0),
                                   ),
@@ -91,107 +99,75 @@ class Profile extends StatelessWidget {
                               ),
                             ),
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    flex: 2,
-                    fit: FlexFit.tight,
-                    child: Container(
-                      // TODO: have a default max expension for certain widgets
-                      constraints: BoxConstraints(
-                        minWidth: 125,
-                        minHeight: 200,
-                        maxHeight: 400,
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Column(
+                      Flexible(
+                          flex: 2,
+                          fit: FlexFit.loose,
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Container(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      width: width * 0.7,
-                                      height: DEFAULT_INPUT_HEIGHT,
-                                      margin: const EdgeInsets.all(8.0),
-                                      constraints: BoxConstraints(
-                                          minWidth: 200,
-                                          maxWidth: 400,
-                                          minHeight: 45),
-                                      child: TextField(
-                                        onChanged: (name) {
-                                          print('On Change Display Name Stub');
-                                        },
-                                        controller:
-                                            TextEditingController.fromValue(
-                                          TextEditingValue(
-                                            text: displayName(store.state),
-                                            selection: TextSelection(
-                                                baseOffset: store
-                                                    .state
-                                                    .userStore
-                                                    .homeserver
-                                                    .length,
-                                                extentOffset: store
-                                                    .state
-                                                    .userStore
-                                                    .homeserver
-                                                    .length),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    margin: const EdgeInsets.all(8.0),
+                                    constraints: BoxConstraints(
+                                      maxHeight: DEFAULT_INPUT_HEIGHT,
+                                      maxWidth: Themes.maxInputWidth,
+                                    ),
+                                    child: TextField(
+                                      onChanged: (name) {
+                                        print('On Change Display Name Stub');
+                                      },
+                                      controller:
+                                          TextEditingController.fromValue(
+                                        TextEditingValue(
+                                          text: displayName(props.user),
+                                          selection: TextSelection(
+                                            baseOffset:
+                                                props.user.homeserver.length,
+                                            extentOffset:
+                                                props.user.homeserver.length,
                                           ),
                                         ),
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Display Name',
-                                        ),
+                                      ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Display Name',
                                       ),
                                     ),
-                                    Container(
-                                      width: width * 0.7,
-                                      height: DEFAULT_INPUT_HEIGHT,
-                                      margin: const EdgeInsets.all(8.0),
-                                      constraints: BoxConstraints(
-                                          minWidth: 200,
-                                          maxWidth: 400,
-                                          minHeight: 45),
-                                      child: TextField(
-                                        onChanged: (name) {
-                                          print('On Change User Id Stub');
-                                        },
-                                        controller:
-                                            TextEditingController.fromValue(
-                                          TextEditingValue(
-                                            text: store
-                                                .state.userStore.user.userId,
-                                            selection: TextSelection(
-                                                baseOffset: store
-                                                    .state
-                                                    .userStore
-                                                    .user
-                                                    .userId
-                                                    .length,
-                                                extentOffset: store
-                                                    .state
-                                                    .userStore
-                                                    .user
-                                                    .userId
-                                                    .length),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.all(8.0),
+                                    constraints: BoxConstraints(
+                                      maxHeight: DEFAULT_INPUT_HEIGHT,
+                                      maxWidth: Themes.maxInputWidth,
+                                    ),
+                                    child: TextField(
+                                      onChanged: (name) {
+                                        print('On Change User Id Stub');
+                                      },
+                                      controller:
+                                          TextEditingController.fromValue(
+                                        TextEditingValue(
+                                          text: props.user.userId,
+                                          selection: TextSelection(
+                                            baseOffset:
+                                                props.user.userId.length,
+                                            extentOffset:
+                                                props.user.userId.length,
                                           ),
                                         ),
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: 'User ID',
-                                        ),
+                                      ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'User ID',
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                               Container(
                                 padding: EdgeInsets.only(bottom: 24),
@@ -200,21 +176,22 @@ class Profile extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     Container(
-                                      width: width * 0.7,
                                       height: DEFAULT_BUTTON_HEIGHT,
                                       margin: const EdgeInsets.all(10.0),
                                       constraints: BoxConstraints(
-                                          minWidth: 200,
-                                          maxWidth: 400,
-                                          minHeight: 45,
-                                          maxHeight: 65),
+                                        minWidth: 200,
+                                        maxWidth: 400,
+                                        minHeight: 45,
+                                        maxHeight: 65,
+                                      ),
                                       child: FlatButton(
-                                        onPressed: () {},
+                                        onPressed: props.onSaveProfile,
                                         color: Theme.of(context).primaryColor,
                                         shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                new BorderRadius.circular(
-                                                    30.0)),
+                                          borderRadius: BorderRadius.circular(
+                                            30.0,
+                                          ),
+                                        ),
                                         child: Text(
                                           'save',
                                           style: TextStyle(
@@ -247,17 +224,39 @@ class Profile extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          )
-                        ],
-                      ),
-                    ),
+                          )),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
+}
+
+class Props extends Equatable {
+  final User user;
+  final Function onSaveProfile;
+  final Function onChangeAvatar;
+  final Function onUpdateDisplayName;
+
+  Props({
+    @required this.user,
+    @required this.onSaveProfile,
+    @required this.onChangeAvatar,
+    @required this.onUpdateDisplayName,
+  });
+
+  @override
+  List<Object> get props => [
+        user,
+      ];
+
+  static Props mapStoreToProps(Store<AppState> store) => Props(
+        user: store.state.userStore.user,
+        onSaveProfile: () {},
+        onChangeAvatar: () {},
+        onUpdateDisplayName: () {},
+      );
 }

@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:typed_data';
-import 'package:Tether/domain/rooms/events/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
+import 'package:Tether/store/rooms/events/selectors.dart';
+import 'package:Tether/store/user/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
-import 'package:Tether/domain/rooms/events/model.dart';
+import 'package:Tether/store/rooms/events/model.dart';
 import 'package:flutter/foundation.dart';
 
 @jsonSerializable

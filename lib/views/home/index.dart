@@ -1,20 +1,21 @@
 import 'dart:async';
 
-import 'package:Tether/domain/rooms/room/selectors.dart';
-import 'package:Tether/domain/user/model.dart';
-import 'package:Tether/domain/user/selectors.dart';
+import 'package:Tether/store/rooms/room/selectors.dart';
+import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-// Domain
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/room/model.dart';
-import 'package:Tether/domain/rooms/selectors.dart';
+// Store
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/room/model.dart';
+import 'package:Tether/store/rooms/selectors.dart';
 import 'package:Tether/global/formatters.dart';
 
 // View And Styling
@@ -276,7 +277,6 @@ class Home extends StatelessWidget {
             key: Key('FabCircleMenu'),
             fabSize: 58,
             fabElevation: 4.0,
-            fabMargin: EdgeInsets.all(16),
             fabOpenIcon: Icon(
               Icons.widgets,
               color: Colors.white,
@@ -286,9 +286,12 @@ class Home extends StatelessWidget {
               color: Colors.white,
             ),
             fabColor: Theme.of(context).accentColor,
-            ringDiameter: MediaQuery.of(context).size.width * 0.66,
+            ringDiameter: MediaQuery.of(context).size.width * 0.9,
             ringColor: Theme.of(context).accentColor.withAlpha(144),
             animationDuration: Duration(milliseconds: 275),
+            onDisplayChange: (opened) {
+              HapticFeedback.lightImpact();
+            },
             children: [
               FloatingActionButton(
                 heroTag: 'fab3',

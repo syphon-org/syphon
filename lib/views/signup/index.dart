@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:Tether/domain/user/actions.dart';
+import 'package:Tether/store/user/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/user/model.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/user/model.dart';
 
 // Styling Widgets
 import 'package:Tether/global/dimensions.dart';

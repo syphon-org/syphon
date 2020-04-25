@@ -1,5 +1,5 @@
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/settings/actions.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -134,124 +134,126 @@ class Theming extends StatelessWidget {
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w100)),
             ),
-            body: Container(
-                child: Column(
-              children: <Widget>[
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
-                          child: Text(
-                            'App',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+            body: SingleChildScrollView(
+              child: Container(
+                  child: Column(
+                children: <Widget>[
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 0.5,
+                    color: sectionBackgroundColor,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: contentPadding,
+                            child: Text(
+                              'App',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectPrimaryColor,
-                            originalColor: props.primaryColor,
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectPrimaryColor,
+                              originalColor: props.primaryColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Primary Color',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            trailing: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Color(props.primaryColor),
+                            ),
                           ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Primary Color',
-                            style: Theme.of(context).textTheme.subtitle1,
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectAccentColor,
+                              originalColor: props.accentColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Accent Color',
+                            ),
+                            trailing: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Color(props.accentColor),
+                            ),
                           ),
-                          trailing: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Color(props.primaryColor),
+                          ListTile(
+                            onTap: () => props.onIncrementTheme(),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Theme',
+                            ),
+                            trailing: Text(
+                              displayThemeType(props.themeType),
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectAccentColor,
-                            originalColor: props.accentColor,
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Font Size',
+                            ),
+                            trailing: Text(
+                              props.fontSize,
+                            ),
                           ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Accent Color',
-                          ),
-                          trailing: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Color(props.accentColor),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => props.onIncrementTheme(),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Theme',
-                          ),
-                          trailing: Text(
-                            displayThemeType(props.themeType),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Font Size',
-                          ),
-                          trailing: Text(
-                            props.fontSize,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
-                          child: Text(
-                            'Fonts',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 0.5,
+                    color: sectionBackgroundColor,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: contentPadding,
+                            child: Text(
+                              'Fonts',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Chat Title Size',
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Chat Title Size',
+                            ),
+                            trailing: Text(
+                              props.chatFontSize,
+                            ),
                           ),
-                          trailing: Text(
-                            props.chatFontSize,
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Message Body Size',
+                            ),
+                            trailing: Text(
+                              props.chatFontSize,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Message Body Size',
-                          ),
-                          trailing: Text(
-                            props.chatFontSize,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              )),
+            ),
           );
         },
       );

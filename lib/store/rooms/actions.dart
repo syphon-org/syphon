@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:Tether/domain/rooms/service.dart';
+import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 
@@ -167,7 +167,7 @@ ThunkAction<AppState> initialRoomSync() {
  */
 ThunkAction<AppState> startRoomsObserver() {
   return (Store<AppState> store) async {
-    Timer roomObserver = Timer.periodic(Duration(seconds: 2), (timer) async {
+    Timer roomObserver = Timer.periodic(Duration(seconds: 5), (timer) async {
       if (store.state.roomStore.lastSince == null) {
         print('[Room Observer] skipping sync, needs full sync');
         return;

@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
-// Domain
-import 'package:Tether/domain/rooms/room/model.dart';
+// Store
+import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/home/messages/message-details.dart';
 import 'package:Tether/views/home/messages/settings.dart';
@@ -13,11 +14,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
 import 'package:redux/redux.dart';
-import 'package:Tether/domain/index.dart';
-import 'package:Tether/domain/rooms/events/model.dart';
-import 'package:Tether/domain/rooms/events/selectors.dart';
-import 'package:Tether/domain/rooms/selectors.dart' as roomSelectors;
-import 'package:Tether/domain/rooms/events/actions.dart';
+import 'package:Tether/store/index.dart';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/events/selectors.dart';
+import 'package:Tether/store/rooms/selectors.dart' as roomSelectors;
+import 'package:Tether/store/rooms/events/actions.dart';
 
 // Global widgets
 import 'package:Tether/views/widgets/message.dart';
@@ -61,9 +62,10 @@ class Messages extends StatefulWidget {
 }
 
 class MessagesState extends State<Messages> {
+  Timer typingNotifier;
+  Timer typingNotifierTimeout;
   FocusNode inputFieldNode;
   Map<String, Color> senderColors;
-
   bool sendable = false;
   Message selectedMessage;
   final editorController = TextEditingController();
@@ -73,13 +75,64 @@ class MessagesState extends State<Messages> {
   void initState() {
     super.initState();
     inputFieldNode = FocusNode();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {});
+    inputFieldNode.addListener(() {
+      if (!inputFieldNode.hasFocus && this.typingNotifier != null) {
+        print('removing typingNotifier');
+        this.typingNotifier.cancel();
+        this.setState(() {
+          typingNotifier = null;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     inputFieldNode.dispose();
     super.dispose();
+    if (this.typingNotifier != null) {
+      this.typingNotifier.cancel();
+    }
+
+    if (this.typingNotifierTimeout != null) {
+      this.typingNotifierTimeout.cancel();
+    }
+  }
+
+  @protected
+  onUpdateMessage(String text, _Props props) {
+    this.setState(() {
+      sendable = text != null && text.isNotEmpty;
+    });
+
+    // start an interval for updating typing status
+    if (inputFieldNode.hasFocus && this.typingNotifier == null) {
+      props.onSendTyping(typing: true, roomId: props.room.id);
+      this.setState(() {
+        typingNotifier = Timer.periodic(
+          Duration(milliseconds: 4000),
+          (timer) => props.onSendTyping(typing: true, roomId: props.room.id),
+        );
+      });
+    }
+
+    // Handle a timeout of the interval if the user idles with input focused
+    if (inputFieldNode.hasFocus) {
+      if (typingNotifierTimeout != null) {
+        this.typingNotifierTimeout.cancel();
+      }
+      this.setState(() {
+        typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
+          this.typingNotifier.cancel();
+          this.setState(() {
+            typingNotifier = null;
+            typingNotifierTimeout = null;
+          });
+          // run after to avoid flickering
+          props.onSendTyping(typing: false, roomId: props.room.id);
+        });
+      });
+    }
   }
 
   @protected
@@ -95,31 +148,7 @@ class MessagesState extends State<Messages> {
     });
   }
 
-  // TODO: I like having this top level, but it's a nightmare to pass in vars
-  // if passed through navigator (ModalRoute) args
-  // @protected
-  // onSendMessage({
-  //   Function sendMessage,
-  //   String roomId,
-  //   String text,
-  // }) {
-  //   if (sendMessage != null) {
-  //     sendMessage();
-  //   }
-  //   editorController.clear();
-  //   FocusScope.of(context).unfocus();
-  // }
-
-  /** TODO: should these have their own connectors?
-   *    
-        StoreConnector<AppState, _Props>(
-        distinct: true,
-        rebuildOnChange: false,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(
-          store, 
-        ),
-        builder: (context, props) {
-   */
+  // TODO: should these have their own components?
   Widget buildMessageList(
     BuildContext context,
     _Props props,
@@ -136,6 +165,9 @@ class MessagesState extends State<Messages> {
         padding: EdgeInsets.only(bottom: 8),
         scrollDirection: Axis.vertical,
         controller: messagesController,
+        physics: selectedMessage != null
+            ? const NeverScrollableScrollPhysics()
+            : null,
         itemBuilder: (BuildContext context, int index) {
           final message = messages[index];
           final lastMessage = index != 0 ? messages[index - 1] : null;
@@ -166,13 +198,13 @@ class MessagesState extends State<Messages> {
 
   /**
    *    
-        StoreConnector<AppState, _Props>(
-        distinct: true,
-        rebuildOnChange: false,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(
-          store, 
-        ),
-        builder: (context, props) {
+    StoreConnector<AppState, _Props>(
+    distinct: true,
+    rebuildOnChange: false,
+    converter: (Store<AppState> store) => _Props.mapStoreToProps(
+      store, 
+    ),
+    builder: (context, props) {
    */
   Widget buildChatInput(
     BuildContext context,
@@ -212,11 +244,7 @@ class MessagesState extends State<Messages> {
             cursorColor: inputCursorColor,
             focusNode: inputFieldNode,
             controller: editorController,
-            onChanged: (text) {
-              this.setState(() {
-                sendable = text != null && text.isNotEmpty;
-              });
-            },
+            onChanged: (text) => onUpdateMessage(text, props),
             onSubmitted: (text) {
               props.onSendMessage(
                 body: editorController.text,
@@ -238,7 +266,7 @@ class MessagesState extends State<Messages> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(24.0),
               ),
-              hintText: 'Matrix message',
+              hintText: 'Matrix message (unencrypted)',
             ),
           ),
         ),
@@ -463,7 +491,11 @@ class MessagesState extends State<Messages> {
               .roomId,
         ),
         builder: (context, props) {
-          final closedInputPadding = !inputFieldNode.hasFocus && Platform.isIOS;
+          double height = MediaQuery.of(context).size.height;
+          final closedInputPadding = !inputFieldNode.hasFocus &&
+              Platform.isIOS &&
+              Themes.buttonlessHeightiOS < height;
+
           final isScrolling =
               messagesController.hasClients && messagesController.offset != 0;
 
@@ -503,6 +535,7 @@ class MessagesState extends State<Messages> {
                       child: GestureDetector(
                         onTap: () {
                           // Disimiss keyboard if they click outside the text input
+                          inputFieldNode.unfocus();
                           FocusScope.of(context).unfocus();
                         },
                         child: Stack(
@@ -558,7 +591,7 @@ class MessagesState extends State<Messages> {
                       duration: Duration(
                           milliseconds: inputFieldNode.hasFocus ? 225 : 0),
                       padding: EdgeInsets.only(
-                        bottom: closedInputPadding ? 48 : 0,
+                        bottom: closedInputPadding ? 16 : 0,
                       ),
                       child: buildChatInput(
                         context,
@@ -582,6 +615,7 @@ class _Props {
   final bool roomsLoading;
   final ThemeType theme;
 
+  final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
 
@@ -592,6 +626,7 @@ class _Props {
     @required this.messages,
     @required this.outbox,
     @required this.roomsLoading,
+    @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
   });
@@ -611,6 +646,12 @@ class _Props {
           ),
         ),
         roomsLoading: store.state.roomStore.loading,
+        onSendTyping: ({typing, roomId}) => store.dispatch(
+          sendTyping(
+            typing: typing,
+            roomId: roomId,
+          ),
+        ),
         onDeleteMessage: ({
           Message message,
         }) {

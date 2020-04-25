@@ -1,4 +1,4 @@
-import 'package:Tether/domain/index.dart';
+import 'package:Tether/store/index.dart';
 
 import './model.dart';
 
