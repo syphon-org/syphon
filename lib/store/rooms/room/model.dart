@@ -68,8 +68,18 @@ class Room {
   final List<Event> state;
   final List<Message> messages;
   final List<Message> outbox;
-  // eventId -> users read
-  final Map<String, List<ReadStatus>> messageReads;
+
+  //TODO: remove after 0.0.4 release
+  @JsonProperty(ignore: true)
+  final bool userTyping;
+
+  //TODO: remove after 0.0.4 release
+  @JsonProperty(ignore: true)
+  final int lastRead;
+
+  //TODO: remove after 0.0.4 release
+  @JsonProperty(ignore: true)
+  final Map<String, ReadStatus> messageReads;
 
   const Room({
     this.id,
@@ -86,11 +96,13 @@ class Room {
     this.state = const [],
     this.outbox = const [],
     this.messages = const [],
+    this.lastRead = 0,
     this.lastUpdate = 0,
     this.totalJoinedUsers = 0,
     this.guestEnabled = false,
     this.encryptionEnabled = false,
     this.worldReadable = false,
+    this.userTyping = false,
     this.startTime,
     this.endTime,
     this.messageReads,
@@ -107,10 +119,12 @@ class Room {
     sending,
     startTime,
     endTime,
+    lastRead,
     lastUpdate,
     totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
+    userTyping,
     draft,
     state,
     users,
@@ -129,10 +143,12 @@ class Room {
       draft: draft ?? this.draft,
       sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
+      lastRead: lastRead ?? this.lastRead,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
       guestEnabled: guestEnabled ?? this.guestEnabled,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
+      userTyping: userTyping ?? this.userTyping,
       state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
@@ -208,16 +224,51 @@ class Room {
     );
   }
 
+  /**
+   * Appends ephemeral events (mostly read receipts) to a
+   * hashmap of eventIds linking them to users and timestamps
+   */
   Room fromEphemeralEvents(
     List<Event> events, {
     String originDEBUG,
   }) {
-    var messageReads = this.messageReads ?? Map<String, List<ReadStatus>>();
+    var userTyping = false;
+    int latestRead = this.lastRead;
+    var messageReads = this.messageReads != null
+        ? Map<String, ReadStatus>.from(this.messageReads)
+        : Map<String, ReadStatus>();
 
     try {
+      if (events.length > 0) {
+        print('[${this.name}] saving ephemeral ${events.length}');
+      }
       events.forEach((event) {
         switch (event.type) {
+          case 'm.typing':
+            userTyping =
+                (event.content['user_ids'] as List<dynamic>).length > 0;
+            break;
           case 'm.receipt':
+            final Map<String, dynamic> receiptEventIds = event.content;
+
+            // Filter through every eventId to find receipts
+            receiptEventIds.forEach((key, receipt) {
+              // convert every m.read object to a map of userIds + timestamps for read
+              final newReadStatuses = ReadStatus.fromReceipt(receipt);
+
+              // // Set a new timestamp for the latest read message if it exceeds the current
+              latestRead = latestRead < newReadStatuses.latestRead
+                  ? newReadStatuses.latestRead
+                  : latestRead;
+
+              // update the eventId if that event already has reads
+              if (!messageReads.containsKey(key)) {
+                messageReads[key] = newReadStatuses;
+              } else {
+                // otherwise, add the usersRead to the existing reads
+                messageReads[key].userReads.addAll(newReadStatuses.userReads);
+              }
+            });
             break;
           default:
             print('[fromEphemeralEvents] unknown event type ${event.type}');
@@ -225,11 +276,13 @@ class Room {
         }
       });
     } catch (error) {
-      print('[fromStateEvents] error $error');
+      print('[fromEphemeralEvents] error $error');
     }
 
     return this.copyWith(
+      userTyping: userTyping,
       messageReads: messageReads,
+      lastRead: latestRead,
     );
   }
 
@@ -322,8 +375,6 @@ class Room {
     final List<dynamic> rawTimelineEvents =
         json['timeline']['events']; // contains message events
     final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
-
-    print('${this.id} ${json['ephemeral']}');
 
     final List<Event> ephemeralEvents =
         rawEphemeralEvents.map((event) => Event.fromJson(event)).toList();

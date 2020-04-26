@@ -1,4 +1,5 @@
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 
 List<Message> latestMessages(List<Message> messages) {
   final sortedList = messages;

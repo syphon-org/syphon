@@ -20,6 +20,7 @@ class MessageWidget extends StatelessWidget {
     this.messageOnly = false,
     this.isLastSender = false,
     this.isNextSender = false,
+    this.lastRead = 0,
     this.selectedMessageId,
     this.theme = ThemeType.LIGHT,
   }) : super(key: key);
@@ -29,6 +30,7 @@ class MessageWidget extends StatelessWidget {
   final bool isNextSender;
   final bool isUserSent;
   final bool messageOnly;
+  final int lastRead;
   final ThemeType theme;
   final String selectedMessageId;
   final Function onLongPress;
@@ -46,7 +48,7 @@ class MessageWidget extends StatelessWidget {
     var messageTextAlignment = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
     var opacity = 1.0;
-    var isRead = false;
+    var isRead = message.timestamp < lastRead;
 
     if (isLastSender) {
       if (isNextSender) {

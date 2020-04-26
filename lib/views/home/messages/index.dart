@@ -123,13 +123,15 @@ class MessagesState extends State<Messages> {
       }
       this.setState(() {
         typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
-          this.typingNotifier.cancel();
-          this.setState(() {
-            typingNotifier = null;
-            typingNotifierTimeout = null;
-          });
-          // run after to avoid flickering
-          props.onSendTyping(typing: false, roomId: props.room.id);
+          if (typingNotifier != null) {
+            this.typingNotifier.cancel();
+            this.setState(() {
+              typingNotifier = null;
+              typingNotifierTimeout = null;
+            });
+            // run after to avoid flickering
+            props.onSendTyping(typing: false, roomId: props.room.id);
+          }
         });
       });
     }
@@ -187,6 +189,7 @@ class MessagesState extends State<Messages> {
             isUserSent: isUserSent,
             isLastSender: isLastSender,
             isNextSender: isNextSender,
+            lastRead: props.room.lastRead,
             selectedMessageId: selectedMessageId,
             onLongPress: onToggleMessageOptions,
             theme: props.theme,
@@ -433,7 +436,10 @@ class MessagesState extends State<Messages> {
                 roomId: props.room.id,
                 message: selectedMessage,
               ),
-            )
+            ),
+            this.setState(() {
+              selectedMessage = null;
+            })
           },
         ),
         IconButton(

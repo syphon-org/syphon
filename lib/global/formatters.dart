@@ -24,11 +24,11 @@ String formatTimestamp({int lastUpdateMillis, bool showTime = false}) {
     // Abbreviated month and day number - Jan 1
 
     return DateFormat(
-      showTime ? 'MMM d h:m a' : 'MMM d',
+      showTime ? 'MMM d h:mm a' : 'MMM d',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat(showTime ? 'E h:m a' : 'E').format(timestamp);
+    return DateFormat(showTime ? 'E h:mm a' : 'E').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';

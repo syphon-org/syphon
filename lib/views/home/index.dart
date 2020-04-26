@@ -279,6 +279,7 @@ class Home extends StatelessWidget {
             fabElevation: 4.0,
             fabOpenIcon: Icon(
               Icons.bubble_chart,
+              size: 32.0,
               color: Colors.white,
             ),
             fabCloseIcon: Icon(
@@ -289,9 +290,7 @@ class Home extends StatelessWidget {
             ringDiameter: MediaQuery.of(context).size.width * 0.9,
             ringColor: Theme.of(context).accentColor.withAlpha(144),
             animationDuration: Duration(milliseconds: 275),
-            onDisplayChange: (opened) {
-              HapticFeedback.lightImpact();
-            },
+            onDisplayChange: (opened) {},
             children: [
               FloatingActionButton(
                 heroTag: 'fab3',
@@ -301,7 +300,10 @@ class Home extends StatelessWidget {
                   color: Colors.white,
                 ),
                 tooltip: 'Direct Message',
-                onPressed: () => onNavigateToDraft(context),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  onNavigateToDraft(context);
+                },
               ),
               FloatingActionButton(
                 heroTag: 'fab2',
@@ -311,7 +313,10 @@ class Home extends StatelessWidget {
                   color: Colors.white,
                 ),
                 tooltip: 'Create Chat Or Group',
-                onPressed: () => onNavigateToDraft(context),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  onNavigateToDraft(context);
+                },
               ),
               FloatingActionButton(
                 heroTag: 'fab1',
@@ -322,6 +327,7 @@ class Home extends StatelessWidget {
                 ),
                 tooltip: 'Search Groups',
                 onPressed: () {
+                  HapticFeedback.lightImpact();
                   Navigator.pushNamed(context, '/home/groups/search');
                 },
               ),
