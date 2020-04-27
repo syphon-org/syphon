@@ -10,9 +10,6 @@ enum ThemeType {
 }
 
 class Themes {
-  static const buttonlessHeightiOS = 736;
-  static const double maxInputWidth = 320; // 43 * 8
-
   static Color invertedPrimaryColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? Theme.of(context).primaryColor

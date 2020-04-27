@@ -111,7 +111,7 @@ class LoginState extends State<Login> {
             builder: (context, store) => Container(
               height: height,
               constraints: BoxConstraints(
-                maxHeight: MAX_WIDGET_HEIGHT,
+                maxHeight: Dimensions.widgetHeightMax,
               ),
               child: Flex(
                 direction: Axis.vertical,
@@ -163,13 +163,13 @@ class LoginState extends State<Login> {
                         children: [
                           Container(
                             width: defaultWidgetScaling,
-                            height: DEFAULT_INPUT_HEIGHT,
+                            height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
                             ),
                             constraints: BoxConstraints(
-                              minWidth: MIN_INPUT_WIDTH,
-                              maxWidth: MAX_INPUT_WIDTH,
+                              minWidth: Dimensions.inputWidthMin,
+                              maxWidth: Dimensions.inputWidthMax,
                             ),
                             child: TextField(
                               controller: usernameController,
@@ -225,13 +225,13 @@ class LoginState extends State<Login> {
                           ),
                           Container(
                             width: defaultWidgetScaling,
-                            height: DEFAULT_INPUT_HEIGHT,
+                            height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
                             ),
                             constraints: BoxConstraints(
-                              minWidth: MIN_INPUT_WIDTH,
-                              maxWidth: MAX_INPUT_WIDTH,
+                              minWidth: Dimensions.inputWidthMin,
+                              maxWidth: Dimensions.inputWidthMax,
                             ),
                             child: TextField(
                               focusNode: passwordFocus,
@@ -256,7 +256,7 @@ class LoginState extends State<Login> {
                   ),
                   Container(
                     width: defaultWidgetScaling,
-                    height: DEFAULT_BUTTON_HEIGHT,
+                    height: Dimensions.inputHeight,
                     margin: const EdgeInsets.only(
                       top: 24,
                     ),
@@ -300,9 +300,9 @@ class LoginState extends State<Login> {
                     ),
                   ),
                   Container(
-                    height: DEFAULT_INPUT_HEIGHT,
+                    height: Dimensions.inputHeight,
                     constraints: BoxConstraints(
-                      minHeight: DEFAULT_BUTTON_HEIGHT,
+                      minHeight: Dimensions.inputHeight,
                     ),
                     margin: const EdgeInsets.symmetric(
                       horizontal: 8,

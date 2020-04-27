@@ -29,7 +29,7 @@ class HomeserverStep extends StatelessWidget {
         SizedBox(height: height * 0.1),
         Center(
             child: Container(
-          height: DEFAULT_INPUT_HEIGHT,
+          height: Dimensions.inputHeight,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 220),
           child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
@@ -47,7 +47,7 @@ class HomeserverStep extends StatelessWidget {
             builder: (context, store) {
               return Container(
                 width: width * 0.7,
-                height: DEFAULT_INPUT_HEIGHT,
+                height: Dimensions.inputHeight,
                 margin: const EdgeInsets.all(10.0),
                 constraints:
                     BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 45),

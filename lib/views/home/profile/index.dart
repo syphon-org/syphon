@@ -1,4 +1,3 @@
-import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -114,8 +113,8 @@ class Profile extends StatelessWidget {
                                   Container(
                                     margin: const EdgeInsets.all(8.0),
                                     constraints: BoxConstraints(
-                                      maxHeight: DEFAULT_INPUT_HEIGHT,
-                                      maxWidth: Themes.maxInputWidth,
+                                      maxHeight: Dimensions.inputHeight,
+                                      maxWidth: Dimensions.inputWidthMax,
                                     ),
                                     child: TextField(
                                       onChanged: (name) {
@@ -142,8 +141,8 @@ class Profile extends StatelessWidget {
                                   Container(
                                     margin: const EdgeInsets.all(8.0),
                                     constraints: BoxConstraints(
-                                      maxHeight: DEFAULT_INPUT_HEIGHT,
-                                      maxWidth: Themes.maxInputWidth,
+                                      maxHeight: Dimensions.inputHeight,
+                                      maxWidth: Dimensions.inputWidthMax,
                                     ),
                                     child: TextField(
                                       onChanged: (name) {
@@ -176,7 +175,7 @@ class Profile extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     Container(
-                                      height: DEFAULT_BUTTON_HEIGHT,
+                                      height: Dimensions.inputHeight,
                                       margin: const EdgeInsets.all(10.0),
                                       constraints: BoxConstraints(
                                         minWidth: 200,
@@ -201,7 +200,7 @@ class Profile extends StatelessWidget {
                                       ),
                                     ),
                                     Container(
-                                      height: DEFAULT_INPUT_HEIGHT,
+                                      height: Dimensions.inputHeight,
                                       margin: const EdgeInsets.all(10.0),
                                       constraints: BoxConstraints(
                                           minWidth: 200, minHeight: 45),

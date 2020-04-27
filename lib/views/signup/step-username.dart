@@ -42,80 +42,89 @@ class UsernameStepState extends State<UsernameStep> {
   @override
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) => Container(
-          child: Flex(
-            direction: Axis.vertical,
-            children: <Widget>[
-              Flexible(
-                flex: 3,
-                child: Container(
-                  constraints: BoxConstraints(
-                    minHeight: 256,
-                    minWidth: 256,
-                    maxHeight: 320,
-                    maxWidth: 320,
-                  ),
-                  child: SvgPicture.asset(SIGNUP_USERNAME_GRAPHIC,
-                      semanticsLabel: 'Person resting on I.D. card'),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Flex(
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      'Create a username',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+          converter: (Store<AppState> store) => store,
+          builder: (context, store) {
+            double width = MediaQuery.of(context).size.width;
+            return Container(
+              child: Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    flex: 2,
+                    child: Container(
+                      width: width * 0.75,
+                      constraints: BoxConstraints(
+                        maxHeight: Dimensions.mediaSizeMax,
+                        maxWidth: Dimensions.mediaSizeMax,
+                      ),
+                      child: SvgPicture.asset(
+                        SIGNUP_USERNAME_GRAPHIC,
+                        semanticsLabel: 'Person resting on I.D. card',
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                height: DEFAULT_INPUT_HEIGHT,
-                margin: EdgeInsets.only(
-                  top: 58,
-                ),
-                constraints: BoxConstraints(
-                  minWidth: 200,
-                  maxWidth: 320,
-                ),
-                child: TextField(
-                  controller: usernameController,
-                  onChanged: (username) {
-                    // Trim new username
-                    usernameController.value = TextEditingValue(
-                      text: username.trim(),
-                      selection: TextSelection.fromPosition(
-                        TextPosition(
-                          offset: username.trim().length,
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: Flex(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Create a username',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: Container(
+                      width: width * 0.8,
+                      height: Dimensions.inputHeight,
+                      constraints: BoxConstraints(
+                        minWidth: Dimensions.inputWidthMin,
+                        maxWidth: Dimensions.inputWidthMax,
+                      ),
+                      child: TextField(
+                        controller: usernameController,
+                        onChanged: (username) {
+                          // Trim new username
+                          usernameController.value = TextEditingValue(
+                            text: username.trim(),
+                            selection: TextSelection.fromPosition(
+                              TextPosition(
+                                offset: username.trim().length,
+                              ),
+                            ),
+                          );
+
+                          // Set new username
+                          store.dispatch(setUsername(username: username));
+                        },
+                        onEditingComplete: () {
+                          store.dispatch(
+                            setUsername(
+                                username: store.state.userStore.username),
+                          );
+                          FocusScope.of(context).unfocus();
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          labelText: store.state.userStore.username != null ||
+                                  store.state.userStore.username.length > 0
+                              ? alias(store.state)
+                              : "Username",
                         ),
                       ),
-                    );
-
-                    // Set new username
-                    store.dispatch(setUsername(username: username));
-                  },
-                  onEditingComplete: () {
-                    store.dispatch(
-                      setUsername(username: store.state.userStore.username),
-                    );
-                    FocusScope.of(context).unfocus();
-                  },
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
-                      labelText: store.state.userStore.username != null ||
-                              store.state.userStore.username.length > 0
-                          ? alias(store.state)
-                          : "Username"),
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      );
+            );
+          });
 }

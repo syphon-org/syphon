@@ -87,6 +87,23 @@ class SignupState extends State<Signup> {
     super.deactivate();
   }
 
+  @protected
+  void onBackStep(BuildContext context) {
+    if (this.currentStep < 1) {
+      Navigator.pop(context, false);
+    } else {
+      this.setState(() {
+        currentStep = this.currentStep - 1;
+      });
+      pageController.animateToPage(
+        this.currentStep,
+        duration: Duration(milliseconds: 275),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @protected
   Function onCheckStepValidity(UserStore userStore) {
     switch (this.currentStep) {
       case 0:
@@ -131,55 +148,54 @@ class SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(
-      elevation: 0,
-      iconTheme: IconThemeData(
-        color: Color(store.state.settingsStore.primaryColor),
-      ),
-      backgroundColor: Colors.transparent,
-      brightness: Brightness.light,
-    );
-
-    // TODO: document
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    // -
-    //     MediaQuery.of(context).viewPadding.top -
-    //     appBar.preferredSize.height;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: appBar,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        brightness: Brightness.light,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios,
+              color: Color(store.state.settingsStore.primaryColor)),
+          onPressed: () {
+            onBackStep(context);
+            // ?Navigator.pop(context, false)
+          },
+        ),
+      ),
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),
         child: SingleChildScrollView(
           child: Container(
-            height: height,
-            width: width,
+            width: width, // set actual height and width for flex constraints
+            height: height, // set actual height and width for flex constraints
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Flexible(
-                  flex: 11,
+                  flex: 8,
                   fit: FlexFit.tight,
                   child: Flex(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    direction: Axis.vertical,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    direction: Axis.horizontal,
                     children: <Widget>[
                       Container(
                         width: width,
-                        margin: EdgeInsets.only(top: 64, bottom: 32),
+                        padding: EdgeInsets.only(bottom: height * 0.05),
                         constraints: BoxConstraints(
-                          minHeight: 326,
-                          maxHeight: 400,
-                          minWidth: 200,
+                          minHeight: Dimensions.pageViewerHeightMin,
+                          maxHeight: Dimensions.pageViewerHeightMax,
                         ),
                         child: PageView(
-                          physics: NeverScrollableScrollPhysics(),
                           pageSnapping: true,
                           allowImplicitScrolling: false,
                           controller: pageController,
+                          physics: NeverScrollableScrollPhysics(),
                           children: sections,
                           onPageChanged: (index) {
                             setState(() {
@@ -203,13 +219,12 @@ class SignupState extends State<Signup> {
                         converter: (Store<AppState> store) =>
                             store.state.userStore,
                         builder: (context, userStore) => Container(
+                          // EXAMPLE OF WIDGET PROPORTIONAL SCALING
                           width: width * 0.725,
-                          height: DEFAULT_BUTTON_HEIGHT,
+                          height: Dimensions.inputHeight,
                           constraints: BoxConstraints(
-                            minWidth: 256,
-                            maxWidth: 400,
-                            minHeight: DEFAULT_BUTTON_HEIGHT,
-                            maxHeight: 65,
+                            minWidth: Dimensions.buttonWidthMin,
+                            maxWidth: Dimensions.buttonWidthMax,
                           ),
                           child: FlatButton(
                             disabledColor: Colors.grey,

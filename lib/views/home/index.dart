@@ -244,7 +244,6 @@ class Home extends StatelessWidget {
                     child: Stack(
                       children: [
                         Positioned(
-                          // red box
                           child: Visibility(
                             visible: props.loadingRooms,
                             child: Container(

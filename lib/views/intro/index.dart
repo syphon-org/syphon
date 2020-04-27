@@ -111,10 +111,10 @@ class IntroState extends State<Intro> {
                 children: <Widget>[
                   Container(
                     width: widgetWidthScaling,
-                    height: DEFAULT_BUTTON_HEIGHT,
+                    height: Dimensions.inputHeight,
                     constraints: BoxConstraints(
-                      minWidth: MIN_BUTTON_WIDTH,
-                      maxWidth: MAX_BUTTON_WIDTH,
+                      minWidth: Dimensions.buttonWidthMin,
+                      maxWidth: Dimensions.buttonWidthMax,
                     ),
                     child: FlatButton(
                       onPressed: () {
@@ -153,9 +153,9 @@ class IntroState extends State<Intro> {
               ),
             ),
             Container(
-              height: DEFAULT_INPUT_HEIGHT,
+              height: Dimensions.inputHeight,
               constraints: BoxConstraints(
-                minHeight: DEFAULT_BUTTON_HEIGHT,
+                minHeight: Dimensions.inputHeight,
               ),
               margin: const EdgeInsets.symmetric(
                 horizontal: 8,

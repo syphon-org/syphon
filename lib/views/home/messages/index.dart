@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Store
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/home/messages/message-details.dart';
@@ -500,7 +501,7 @@ class MessagesState extends State<Messages> {
           double height = MediaQuery.of(context).size.height;
           final closedInputPadding = !inputFieldNode.hasFocus &&
               Platform.isIOS &&
-              Themes.buttonlessHeightiOS < height;
+              Dimensions.buttonlessHeightiOS < height;
 
           final isScrolling =
               messagesController.hasClients && messagesController.offset != 0;
@@ -551,7 +552,6 @@ class MessagesState extends State<Messages> {
                               props,
                             ),
                             Positioned(
-                              // red box
                               child: Visibility(
                                 visible: props.roomsLoading,
                                 child: Container(

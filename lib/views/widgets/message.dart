@@ -125,9 +125,6 @@ class MessageWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                 ),
-                // decoration: BoxDecoration( // DEBUG ONLY
-                //   color: Colors.red,
-                // ),
                 child: Flex(
                   direction: Axis.horizontal,
                   mainAxisAlignment: messageAlignment,
