@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:Tether/store/rooms/converter.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:equatable/equatable.dart';
 
 import './room/model.dart';
 
-@jsonSerializable
-class RoomStore {
+class RoomStore extends Equatable {
   final bool synced;
   final bool loading;
   final bool syncing;
@@ -55,61 +55,53 @@ class RoomStore {
   }
 
   @override
-  int get hashCode =>
-      synced.hashCode ^
-      lastUpdate.hashCode ^
-      lastSince.hashCode ^
-      roomObserver.hashCode ^
-      rooms.hashCode;
+  List<Object> get props => [
+        synced,
+        lastUpdate,
+        lastSince,
+        roomObserver,
+        rooms,
+      ];
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RoomStore &&
-          synced == other.synced &&
-          runtimeType == other.runtimeType &&
-          lastUpdate == other.lastUpdate &&
-          lastSince == other.lastSince &&
-          roomObserver == other.roomObserver &&
-          rooms == other.rooms;
+  dynamic toJson() {
+    if (rooms == null || rooms.isEmpty) {
+      return {
+        "synced": synced,
+        "lastSince": lastSince,
+        "lastUpdate": lastUpdate,
+        "rooms": JsonMapper.toJson([]),
+      };
+    }
 
-  // dynamic toJson() {
-  //   if (rooms == null || rooms.isEmpty) {
-  //     return {
-  //       "synced": synced,
-  //       "lastSince": lastSince,
-  //       "lastUpdate": lastUpdate,
-  //       "rooms": JsonMapper.toJson([]),
-  //     };
-  //   }
+    print('roomStore toJson $rooms');
 
-  //   return {
-  //     "synced": synced,
-  //     "lastSince": lastSince,
-  //     "lastUpdate": lastUpdate,
-  //     "rooms": JsonMapper.toJson(List<Room>.from(rooms.values)),
-  //   };
-  // }
+    return {
+      "synced": synced,
+      "lastSince": lastSince,
+      "lastUpdate": lastUpdate,
+      "rooms": JsonMapper.toJson(rooms),
+    };
+  }
 
-  // static RoomStore fromJson(Map<String, dynamic> json) {
-  //   List<Room> rooms = [];
-  //   if (json == null) {
-  //     return RoomStore();
-  //   }
+  static RoomStore fromJson(Map<String, dynamic> json) {
+    List<Room> rooms = [];
+    if (json == null) {
+      return RoomStore();
+    }
 
-  //   if (json['rooms'] != null) {
-  //     rooms = JsonMapper.fromJson<List<Room>>(json['rooms']);
-  //   }
+    if (json['rooms'] != null) {
+      rooms = JsonMapper.fromJson<List<Room>>(json['rooms']);
+    }
 
-  //   return RoomStore(
-  //     synced: json['synced'],
-  //     lastSince: json['lastSince'],
-  //     lastUpdate: json['lastUpdate'],
-  //     rooms: Map.fromIterable(
-  //       rooms,
-  //       key: (room) => room.id,
-  //       value: (room) => room,
-  //     ),
-  //   );
-  // }
+    return RoomStore(
+      synced: json['synced'],
+      lastSince: json['lastSince'],
+      lastUpdate: json['lastUpdate'],
+      rooms: Map.fromIterable(
+        rooms,
+        key: (room) => room.id,
+        value: (room) => room,
+      ),
+    );
+  }
 }

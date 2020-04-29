@@ -274,8 +274,6 @@ ThunkAction<AppState> fetchSync({String since}) {
           store.state.roomStore.rooms ?? Map<String, Room>();
       final user = store.state.userStore.user;
 
-      print('FETCH SYNC ROOMS $rawRooms ${rawRooms.runtimeType}');
-
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
         Room room;
@@ -386,10 +384,9 @@ ThunkAction<AppState> fetchDirectRooms() {
         throw data['error'];
       }
 
-      print('DIRECT ROOMS $data ${data.runtimeType}');
+      Map<String, dynamic> rawDirectRooms = data ?? Map<String, dynamic>();
 
       // Mark specified rooms as direct chats
-      Map<String, dynamic> rawDirectRooms = data;
       rawDirectRooms.forEach((name, ids) {
         store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
       });

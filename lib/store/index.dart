@@ -98,13 +98,14 @@ class AppState {
   final SettingsStore settingsStore;
   final RoomStore roomStore;
 
-  AppState(
-      {this.loading = true,
-      this.alertsStore = const AlertsStore(),
-      this.userStore = const UserStore(),
-      this.matrixStore = const MatrixStore(),
-      this.settingsStore = const SettingsStore(),
-      this.roomStore = const RoomStore()});
+  AppState({
+    this.loading = true,
+    this.alertsStore = const AlertsStore(),
+    this.userStore = const UserStore(),
+    this.matrixStore = const MatrixStore(),
+    this.settingsStore = const SettingsStore(),
+    this.roomStore = const RoomStore(),
+  });
 
   // Helper function to emulate { loading: action.loading, ...appState}
   AppState copyWith({bool loading}) => AppState(
@@ -150,74 +151,44 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
+    String convertedUserstore;
+    String convertedSettingsStore;
+    String convertedRoomStore;
+
     try {
-      print('${JsonMapper.toJson(userStore)}');
+      convertedUserstore = JsonMapper.toJson(userStore);
     } catch (error) {
       print('toJson error userStore $error');
     }
 
     try {
+      convertedSettingsStore = JsonMapper.toJson(settingsStore);
       print('${JsonMapper.toJson(settingsStore)}');
     } catch (error) {
       print('toJson error settingsStore $error');
     }
 
     try {
-      print('ROOM STORE TOJSON ${JsonMapper.toJson(roomStore)}');
+      print('toJson roomStore ${roomStore.rooms}');
+      convertedRoomStore = roomStore.toJson();
     } catch (error) {
       print('toJson error roomStore $error');
     }
+
     return {
       'loading': loading,
-      'userStore': JsonMapper.toJson(userStore),
-      'settingsStore': JsonMapper.toJson(settingsStore),
-      'roomStore': JsonMapper.toJson(roomStore),
+      'userStore': convertedUserstore,
+      'settingsStore': convertedSettingsStore,
+      'roomStore': convertedRoomStore,
     };
   }
 
-  // // Allows partial conversions TO json for redux_persist
-  // dynamic toJson() {
-  //   var userStore;
-  //   var settingsStore;
-  //   var roomStore;
-
-  //   try {
-  //     userStore = JsonMapper.toJson(userStore);
-  //   } catch (error) {
-  //     print('FAILED TO SERIALIZE userStore $error');
-  //     userStore = JsonMapper.toJson(UserStore());
-  //   }
-
-  //   try {
-  //     settingsStore = JsonMapper.toJson(settingsStore);
-  //   } catch (error) {
-  //     print('FAILED TO SERIALIZE settingStore $error');
-  //   }
-
-  //   try {
-  //     roomStore = JsonMapper.toJson(roomStore);
-  //   } catch (error) {
-  //     print('FAILED TO DESERIALIZE roomStore $error');
-  //   }
-
-  //   return {
-  //     'loading': loading,
-  //     'userStore': userStore,
-  //     'settingsStore': settingsStore,
-  //     'roomStore': roomStore,
-  //   };
-  // }
-
   // // Allows conversion FROM json for redux_persist
   static AppState fromJson(dynamic json) {
+    print('RUNNING FROM PERSIST');
     if (json == null) {
       return AppState();
     }
-
-    print('RUNNING FROM PERSIST');
-    print(json['userStore']);
-    print(json['settingsStore']);
-    print(json['roomStore']);
 
     var userStore = UserStore();
     var settingsStore = SettingsStore();
@@ -225,6 +196,7 @@ class AppState {
 
     if (json['userStore'] != null) {
       try {
+        print('fromJson userStore ${json['userStore']}');
         userStore = JsonMapper.fromJson<UserStore>(
           json['userStore'],
         );
@@ -235,6 +207,7 @@ class AppState {
 
     if (json['settingsStore'] != null) {
       try {
+        print('fromJson settingsStore ${json['settingsStore']}');
         settingsStore = JsonMapper.fromJson<SettingsStore>(
           json['settingsStore'],
         );
@@ -245,20 +218,11 @@ class AppState {
 
     if (json['roomStore'] != null) {
       try {
-        print('last since ${roomStore.lastSince}');
-        roomStore = JsonMapper.deserialize<RoomStore>(
-          json['roomStore'],
-          // DeserializationOptions(template: <String, Room>{}),
-        );
-      } catch (error) {
-        print('FAILED TO DESERIALIZE roomStore $error');
-      }
-
-      try {
         roomStore = JsonMapper.fromJson<RoomStore>(
           json['roomStore'],
         );
       } catch (error) {
+        roomStore = RoomStore.fromJson(json['roomStore']);
         print('FAILED TO DESERIALIZE roomStore From Json $error');
       }
     }

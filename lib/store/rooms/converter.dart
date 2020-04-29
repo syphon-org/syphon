@@ -20,6 +20,7 @@ class RoomsConverter implements ICustomConverter<dynamic> {
   // To be done
   @override
   dynamic toJSON(dynamic object, [JsonProperty jsonProperty]) {
+    print('CONVERTER TO $object ${object.runtimeType}');
     return object;
   }
 }
