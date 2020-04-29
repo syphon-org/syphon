@@ -71,6 +71,7 @@ class User {
   }
 }
 
+@jsonSerializable
 class UserStore {
   final User user;
   final String username;
@@ -80,12 +81,23 @@ class UserStore {
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
-  final bool creating;
-  final bool loading;
 
+  @JsonProperty(ignore: true)
+  final bool creating;
+
+  @JsonProperty(ignore: true)
   final bool isUsernameAvailable;
 
+  @JsonProperty(ignore: true)
+  final bool loading;
+
+  @JsonProperty(ignore: true)
   final StreamController<User> authObserver;
+
+  @JsonProperty(ignore: true)
+  Stream<User> get onAuthStateChanged =>
+      authObserver != null ? authObserver.stream : null;
+
 
   const UserStore({
     this.user = const User(),
@@ -116,23 +128,21 @@ class UserStore {
     authObserver,
   }) {
     return UserStore(
-        user: user ?? this.user,
-        loading: loading ?? this.loading,
-        authObserver: authObserver ?? this.authObserver,
-        username: username ?? this.username,
-        password: password ?? this.password,
-        homeserver: homeserver ?? this.homeserver,
-        isUsernameValid: isUsernameValid ?? this.isUsernameValid,
-        isUsernameAvailable: isUsernameAvailable != null
-            ? isUsernameAvailable
-            : this.isUsernameAvailable,
-        isPasswordValid: isPasswordValid ?? this.isPasswordValid,
-        isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
-        creating: creating ?? this.creating);
+      user: user ?? this.user,
+      loading: loading ?? this.loading,
+      authObserver: authObserver ?? this.authObserver,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      homeserver: homeserver ?? this.homeserver,
+      isUsernameValid: isUsernameValid ?? this.isUsernameValid,
+      isUsernameAvailable: isUsernameAvailable != null
+          ? isUsernameAvailable
+          : this.isUsernameAvailable,
+      isPasswordValid: isPasswordValid ?? this.isPasswordValid,
+      isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
+      creating: creating ?? this.creating,
+    );
   }
-
-  Stream<User> get onAuthStateChanged =>
-      authObserver != null ? authObserver.stream : null;
 
   @override
   int get hashCode =>
@@ -170,27 +180,27 @@ class UserStore {
     return '{user: $user, authObserver: $authObserver, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
 
-  dynamic toJson() {
-    return {
-      "user": JsonMapper.toJson(user),
-      "username": username,
-      "password": password,
-      "loading": loading,
-      "homeserver": homeserver,
-    };
-  }
+  // dynamic toJson() {
+  //   return {
+  //     "user": JsonMapper.toJson(user),
+  //     "username": username,
+  //     "password": password,
+  //     "loading": loading,
+  //     "homeserver": homeserver,
+  //   };
+  // }
 
-  static UserStore fromJson(Map<String, dynamic> json) {
-    if (json == null) {
-      return UserStore();
-    }
+  // static UserStore fromJson(Map<String, dynamic> json) {
+  //   if (json == null) {
+  //     return UserStore();
+  //   }
 
-    return UserStore(
-      user: JsonMapper.fromJson<User>(json['user']),
-      loading: json['loading'] != null ? json['loading'] : false,
-      username: json['username'],
-      password: json['password'],
-      homeserver: json['homeserver'],
-    );
-  }
+  //   return UserStore(
+  //     user: JsonMapper.fromJson<User>(json['user']),
+  //     loading: json['loading'] != null ? json['loading'] : false,
+  //     username: json['username'],
+  //     password: json['password'],
+  //     homeserver: json['homeserver'],
+  //   );
+  // }
 }

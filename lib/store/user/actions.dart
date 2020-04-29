@@ -96,6 +96,7 @@ ThunkAction<AppState> startAuthObserver() {
 
         // Run for new authed user without a proper sync
         if (store.state.roomStore.lastSince == null) {
+          print('LAST SINCE IS NULL');
           await store.dispatch(initialRoomSync());
         }
 

@@ -35,8 +35,10 @@ class Event {
   final dynamic content;
 
   // TODO: remove need - for m.room.message only
+  @JsonProperty(ignore: true)
   String get body =>
       type == 'm.room.message' && content != null ? content['body'] : '';
+  @JsonProperty(ignore: true)
   String get msgtypeRaw =>
       type == 'm.room.message' && content != null ? content['msgtype'] : null;
 

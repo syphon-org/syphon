@@ -246,6 +246,7 @@ ThunkAction<AppState> fetchSync({String since}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
+      print(since);
       if (since == null) {
         print('[fetchSync] fetching full sync');
       }
@@ -337,7 +338,7 @@ ThunkAction<AppState> fetchRooms() {
 
       final data = json.decode(response.body);
 
-      if (data['errcode']) {
+      if (data['errcode'] != null) {
         throw data['error'];
       }
 
