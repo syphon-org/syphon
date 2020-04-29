@@ -151,11 +151,22 @@ class AppState {
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
     try {
-      print('${JsonMapper.toJson(roomStore)}');
+      print('${JsonMapper.toJson(userStore)}');
     } catch (error) {
-      print('Error $error');
+      print('toJson error userStore $error');
     }
 
+    try {
+      print('${JsonMapper.toJson(settingsStore)}');
+    } catch (error) {
+      print('toJson error settingsStore $error');
+    }
+
+    try {
+      print('ROOM STORE TOJSON ${JsonMapper.toJson(roomStore)}');
+    } catch (error) {
+      print('toJson error roomStore $error');
+    }
     return {
       'loading': loading,
       'userStore': JsonMapper.toJson(userStore),
@@ -241,6 +252,14 @@ class AppState {
         );
       } catch (error) {
         print('FAILED TO DESERIALIZE roomStore $error');
+      }
+
+      try {
+        roomStore = JsonMapper.fromJson<RoomStore>(
+          json['roomStore'],
+        );
+      } catch (error) {
+        print('FAILED TO DESERIALIZE roomStore From Json $error');
       }
     }
 

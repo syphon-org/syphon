@@ -270,8 +270,11 @@ ThunkAction<AppState> fetchSync({String since}) {
       final String lastSince = data['next_batch'];
 
       // init new store containers
-      final Map<String, Room> rooms = store.state.roomStore.rooms;
+      final Map<String, Room> rooms =
+          store.state.roomStore.rooms ?? Map<String, Room>();
       final user = store.state.userStore.user;
+
+      print('FETCH SYNC ROOMS $rawRooms ${rawRooms.runtimeType}');
 
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
@@ -383,8 +386,10 @@ ThunkAction<AppState> fetchDirectRooms() {
         throw data['error'];
       }
 
+      print('DIRECT ROOMS $data ${data.runtimeType}');
+
       // Mark specified rooms as direct chats
-      Map<String, dynamic> rawDirectRooms = data as Map<String, dynamic>;
+      Map<String, dynamic> rawDirectRooms = data;
       rawDirectRooms.forEach((name, ids) {
         store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
       });

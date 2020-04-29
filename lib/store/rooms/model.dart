@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Tether/store/rooms/converter.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 
 import './room/model.dart';
@@ -12,13 +13,13 @@ class RoomStore {
   final int lastUpdate; // Last timestamp for actual new info
   final String lastSince; // Since we last checked for new info
 
-  @JsonProperty(ignore: true)
-  final Timer roomObserver;
-
-  @JsonProperty(ignoreIfNull: true, defaultValue: {})
+  @JsonProperty(converter: RoomsConverter())
   final Map<String, Room> rooms;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
+
+  @JsonProperty(ignore: true)
+  final Timer roomObserver;
 
   @JsonProperty(ignore: true)
   List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
@@ -71,11 +72,6 @@ class RoomStore {
           lastSince == other.lastSince &&
           roomObserver == other.roomObserver &&
           rooms == other.rooms;
-
-  @override
-  String toString() {
-    return '{loading: $loading, syncing: $syncing, roomObserver: $roomObserver, rooms: $rooms}';
-  }
 
   // dynamic toJson() {
   //   if (rooms == null || rooms.isEmpty) {
