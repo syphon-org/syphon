@@ -166,11 +166,22 @@ class AppState {
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
     try {
-      print(JsonMapper.toJson(userStore));
-      print('[AppState.toJson] success');
+      // print(JsonMapper.toJson(settingsStore));
+      if (settingsStore.customChatSettings != null) {
+        var testingAgain = JsonMapper.toJson(
+            settingsStore.customChatSettings.values.elementAt(0));
+        print(
+          '[settingsStore customChatSettings.values toJson] ${testingAgain}',
+        );
+        var testing = JsonMapper.toMap(settingsStore.customChatSettings);
+        print(
+          '[settings store fromMap customChatSettings] ${testing}',
+        );
+      }
     } catch (error) {
       print('[AppState.toJson] error - $error');
     }
+
     return {
       'loading': loading,
       'userStore': JsonMapper.toJson(userStore),
@@ -179,17 +190,46 @@ class AppState {
     };
   }
 
-  // // Allows conversion FROM json for redux_persist
-  static AppState fromJson(dynamic json) => json == null
-      ? AppState()
-      : AppState(
-          loading: json['loading'],
-          userStore: JsonMapper.fromJson<UserStore>(
-            json['userStore'],
-          ),
-          settingsStore: JsonMapper.fromJson<SettingsStore>(
-            json['settingsStore'],
-          ),
-          roomStore: RoomStore.fromJson(json['roomStore']),
-        );
+  /* 
+    Allows conversion FROM json for redux_persist
+    prevents one store from breaking every persist
+  */
+  static AppState fromJson(dynamic json) {
+    if (json == null) {
+      return AppState();
+    }
+
+    UserStore userStoreConverted = UserStore();
+    SettingsStore settingsStoreConverted = SettingsStore();
+    RoomStore roomStoreConverted = RoomStore();
+
+    try {
+      userStoreConverted = JsonMapper.fromJson<UserStore>(
+        json['userStore'],
+      );
+    } catch (error) {
+      print('[AppState.fromJson] userStoreConverted error $error');
+    }
+
+    try {
+      settingsStoreConverted = JsonMapper.fromJson<SettingsStore>(
+        json['settingsStore'],
+      );
+    } catch (error) {
+      print('[AppState.fromJson] settingsStoreConverted error $error');
+    }
+
+    try {
+      roomStoreConverted = RoomStore.fromJson(json['roomStore']);
+    } catch (error) {
+      print('[AppState.fromJson] roomStoreConverted error $error');
+    }
+
+    return AppState(
+      loading: json['loading'],
+      userStore: userStoreConverted,
+      settingsStore: settingsStoreConverted,
+      roomStore: roomStoreConverted,
+    );
+  }
 }

@@ -34,7 +34,7 @@ class SettingsStore {
     this.typingIndicators = false,
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
-    this.customChatSettings,
+    this.customChatSettings = const {},
   });
 
   SettingsStore copyWith({
