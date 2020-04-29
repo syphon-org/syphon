@@ -65,14 +65,21 @@ Future<Store> initStore() async {
   );
 
   // Load available json list decorators
-  final iterableUserDecorator = (value) => value.cast<User>();
-  JsonMapper.registerValueDecorator<List<User>>(iterableUserDecorator);
-  final iterableEventDecorator = (value) => value.cast<Event>();
-  JsonMapper.registerValueDecorator<List<Event>>(iterableEventDecorator);
-  final iterableMessageDecorator = (value) => value.cast<Message>();
-  JsonMapper.registerValueDecorator<List<Message>>(iterableMessageDecorator);
-  final iterableDecorator = (value) => value.cast<Room>();
-  JsonMapper.registerValueDecorator<List<Room>>(iterableDecorator);
+  JsonMapper.registerValueDecorator<List<User>>(
+    (value) => value.cast<User>(),
+  );
+  JsonMapper.registerValueDecorator<List<Event>>(
+    (value) => value.cast<Event>(),
+  );
+  JsonMapper.registerValueDecorator<List<Message>>(
+    (value) => value.cast<Message>(),
+  );
+  JsonMapper.registerValueDecorator<List<Room>>(
+    (value) => value.cast<Room>(),
+  );
+  JsonMapper.registerValueDecorator<Map<String, Room>>(
+    (value) => value.cast<String, Room>(),
+  );
 
   // Finally load persisted store
   var initialState;
@@ -153,15 +160,15 @@ class AppState {
 
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
-    // try {
-    //   print(JsonMapper.toJson(settingsStore));
-    //   print('[AppState.toJson] success');
-    // } catch (error) {
-    //   print('[AppState.toJson] error - $error');
-    // }
+    try {
+      print(JsonMapper.toJson(userStore));
+      print('[AppState.toJson] success');
+    } catch (error) {
+      print('[AppState.toJson] error - $error');
+    }
     return {
       'loading': loading,
-      'userStore': userStore.toJson(),
+      'userStore': JsonMapper.toJson(userStore),
       'settingsStore': JsonMapper.toJson(settingsStore),
       'roomStore': roomStore.toJson()
     };
@@ -172,7 +179,9 @@ class AppState {
       ? AppState()
       : AppState(
           loading: json['loading'],
-          userStore: UserStore.fromJson(json['userStore']),
+          userStore: JsonMapper.fromJson<UserStore>(
+            json['userStore'],
+          ),
           settingsStore: JsonMapper.fromJson<SettingsStore>(
             json['settingsStore'],
           ),

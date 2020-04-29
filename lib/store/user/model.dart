@@ -71,6 +71,7 @@ class User {
   }
 }
 
+@jsonSerializable
 class UserStore {
   final User user;
   final String username;
@@ -80,12 +81,20 @@ class UserStore {
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
+
+  // Ignore temp state properties
+  @JsonProperty(ignore: true)
+  final bool isUsernameAvailable;
+  @JsonProperty(ignore: true)
   final bool creating;
+  @JsonProperty(ignore: true)
   final bool loading;
 
-  final bool isUsernameAvailable;
-
+  @JsonProperty(ignore: true)
   final StreamController<User> authObserver;
+  @JsonProperty(ignore: true)
+  Stream<User> get onAuthStateChanged =>
+      authObserver != null ? authObserver.stream : null;
 
   const UserStore({
     this.user = const User(),
@@ -131,9 +140,6 @@ class UserStore {
         creating: creating ?? this.creating);
   }
 
-  Stream<User> get onAuthStateChanged =>
-      authObserver != null ? authObserver.stream : null;
-
   @override
   int get hashCode =>
       user.hashCode ^
@@ -170,27 +176,27 @@ class UserStore {
     return '{user: $user, authObserver: $authObserver, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
 
-  dynamic toJson() {
-    return {
-      "user": JsonMapper.toJson(user),
-      "username": username,
-      "password": password,
-      "loading": loading,
-      "homeserver": homeserver,
-    };
-  }
+  // dynamic toJson() {
+  //   return {
+  //     "user": JsonMapper.toJson(user),
+  //     "username": username,
+  //     "password": password,
+  //     "loading": loading,
+  //     "homeserver": homeserver,
+  //   };
+  // }
 
-  static UserStore fromJson(Map<String, dynamic> json) {
-    if (json == null) {
-      return UserStore();
-    }
+  // static UserStore fromJson(Map<String, dynamic> json) {
+  //   if (json == null) {
+  //     return UserStore();
+  //   }
 
-    return UserStore(
-      user: JsonMapper.fromJson<User>(json['user']),
-      loading: json['loading'] != null ? json['loading'] : false,
-      username: json['username'],
-      password: json['password'],
-      homeserver: json['homeserver'],
-    );
-  }
+  //   return UserStore(
+  //     user: JsonMapper.fromJson<User>(json['user']),
+  //     loading: json['loading'] != null ? json['loading'] : false,
+  //     username: json['username'],
+  //     password: json['password'],
+  //     homeserver: json['homeserver'],
+  //   );
+  // }
 }
