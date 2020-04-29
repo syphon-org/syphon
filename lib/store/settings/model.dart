@@ -20,6 +20,7 @@ class SettingsStore {
   final ThemeType theme;
 
   // mapped by roomId
+  @JsonProperty(ignore: true)
   final Map<String, ChatSetting> customChatSettings;
 
   const SettingsStore({
