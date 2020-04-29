@@ -27,6 +27,10 @@ class Dimensions {
   static const double pageViewerHeightMin = 326;
   static const double pageViewerHeightMax = widgetHeightMax / 2;
 
+  // Progress Indicator
+  static const double defaultStrokeWidth = 2;
+  static const double defaultStrokeWidthLite = 1.5;
+
   // * Device Specific *
   static const buttonlessHeightiOS = 736;
 }

@@ -1,14 +1,16 @@
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:equatable/equatable.dart';
 
+// TODO: rename to searchStore
 @jsonSerializable
-class MatrixStore {
-  // TODO: rename to search store
+class MatrixStore extends Equatable {
   final bool loading;
   final String since;
   final int totalResults;
   final String searchText;
-  final List<Room> searchResults;
+  final bool hasMore;
+  final List<dynamic> searchResults;
   final List<dynamic> homeservers;
 
   const MatrixStore({
@@ -18,6 +20,7 @@ class MatrixStore {
     this.homeservers = const [],
     this.searchResults = const [],
     this.searchText,
+    this.hasMore,
   });
 
   MatrixStore copyWith({
@@ -27,6 +30,7 @@ class MatrixStore {
     homeservers,
     searchResults,
     searchText,
+    hasMore,
   }) =>
       MatrixStore(
         since: since,
@@ -35,26 +39,17 @@ class MatrixStore {
         homeservers: homeservers ?? this.homeservers,
         searchResults: searchResults ?? this.searchResults,
         searchText: searchText ?? this.searchText,
+        hasMore: hasMore ?? this.hasMore,
       );
 
   @override
-  int get hashCode =>
-      since.hashCode ^
-      loading.hashCode ^
-      homeservers.hashCode ^
-      totalResults.hashCode ^
-      searchResults.hashCode ^
-      searchText.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MatrixStore &&
-          runtimeType == other.runtimeType &&
-          since == other.since &&
-          loading == other.loading &&
-          totalResults == other.totalResults &&
-          homeservers == other.homeservers &&
-          searchResults == other.searchResults &&
-          searchText == other.searchText;
+  List<Object> get props => [
+        since,
+        loading,
+        homeservers,
+        totalResults,
+        searchResults,
+        searchText,
+        hasMore,
+      ];
 }

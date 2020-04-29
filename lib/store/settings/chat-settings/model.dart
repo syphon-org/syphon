@@ -13,7 +13,7 @@ class ChatSetting {
     this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
-    this.primaryColor = TETHERED_CYAN,
+    this.primaryColor = GREY_DEFAULT,
     this.notificationsEnabled = false,
   });
 

@@ -5,8 +5,8 @@ import 'package:expandable/expandable.dart';
 
 import 'package:redux/redux.dart';
 import 'package:Tether/store/user/actions.dart';
-import 'package:Tether/store/matrix/actions.dart';
-import 'package:Tether/store/matrix/selectors.dart';
+import 'package:Tether/store/search/actions.dart';
+import 'package:Tether/store/search/selectors.dart';
 
 import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';

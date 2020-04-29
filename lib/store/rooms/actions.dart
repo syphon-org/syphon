@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,7 +14,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:Tether/store/index.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
-import 'package:Tether/global/libs/matrix/messages.dart';
 
 import 'room/model.dart';
 import 'events/model.dart';
@@ -208,6 +207,41 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
+/**
+ * TODO: Explaination of this
+ * 
+ * LOAD != FETCH
+ * 
+ * Fetch -> Remote
+ * Store -> Hot Cache / Local
+ * Load (Hive) -> Cold Cache / Local 
+ */
+ThunkAction<AppState> storeSync() {
+  return (Store<AppState> store) async {
+    try {
+      // final json = await readFullSyncJson();
+      // final json = Cache.hive.get('sync');
+      return true;
+    } catch (error) {
+      debugPrint(error);
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> loadSync() {
+  return (Store<AppState> store) async {
+    try {
+      // final json = await readFullSyncJson();
+      // final json = Cache.hive.get('sync');
+      return true;
+    } catch (error) {
+      debugPrint(error);
+      return false;
+    }
+  };
+}
+
 ThunkAction<AppState> fetchSync({String since}) {
   return (Store<AppState> store) async {
     try {
@@ -302,12 +336,17 @@ ThunkAction<AppState> fetchRooms() {
       );
 
       final data = json.decode(response.body);
-      final List<dynamic> rawJoinedRooms = data['joined_rooms'];
+
+      if (data['errcode']) {
+        throw data['error'];
+      }
 
       // Convert joined_rooms to Room objects
+      final List<dynamic> rawJoinedRooms = data['joined_rooms'];
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
       store.dispatch(SetRooms(rooms: joinedRooms));
     } catch (error) {
+      // WARNING: Silent error, throws error if they have no direct messages
       print('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -331,116 +370,7 @@ ThunkAction<AppState> fetchDirectRooms() {
         userId: store.state.userStore.user.userId,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final Map<String, dynamic> rawDirectRooms = json.decode(response.body);
-
-      // Mark specified rooms as direct chats
-      rawDirectRooms.forEach((name, ids) {
-        store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
-      });
-    } catch (error) {
-      print('[fetchDirectRooms] error: $error');
-    }
-  };
-}
-
-ThunkAction<AppState> fetchMessageEvents({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
-
-      final request = buildRoomMessagesRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final Map<String, dynamic> messagesJson = json.decode(response.body);
-      final String startTime = messagesJson['start'];
-      final String endTime = messagesJson['end'];
-      final List<dynamic> messagesChunk = messagesJson['chunk'];
-
-      final List<Event> messageEvents =
-          messagesChunk.map((event) => Event.fromJson(event)).toList();
-
-      store.dispatch(SetRoomMessages(
-        id: room.id,
-        messageEvents: messageEvents,
-        startTime: startTime,
-        endTime: endTime,
-      ));
-    } catch (error) {
-      print('[fetchMessageEvents] error $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchStateEvents({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
-      final request = buildRoomStateRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final List<dynamic> rawStateEvents = json.decode(response.body);
-
-      // Convert all of the events and save
-      final List<Event> stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
-
-      // Add State events to room and toggle syncing
-      final user = store.state.userStore.user;
-
-      store.dispatch(SetRoomState(
-        id: room.id,
-        state: stateEvents,
-        username: user.displayName,
-      ));
-
-      final updatedRoom = store.state.roomStore.rooms[room.id];
-      if (updatedRoom.avatar != null) {
-        store.dispatch(fetchRoomAvatar(updatedRoom));
-      }
-    } catch (error) {
-      print('[fetchRoomState] error: ${room.id} $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchMemberEvents({String roomId}) {
-  return (Store<AppState> store) async {
-    try {
-      final request = buildFastRoomMembersRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        roomId: roomId,
-      );
-
+      print('[fetchDirectRooms] ${request}');
       final response = await http.get(
         request['url'],
         headers: request['headers'],
@@ -448,11 +378,18 @@ ThunkAction<AppState> fetchMemberEvents({String roomId}) {
 
       final data = json.decode(response.body);
 
-      // Convert rooms to rooms
-      print('[fetchMemberEvents] TESTING $data');
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      // Mark specified rooms as direct chats
+      Map<String, dynamic> rawDirectRooms = data as Map<String, dynamic>;
+      rawDirectRooms.forEach((name, ids) {
+        store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
+      });
     } catch (error) {
-      print('[fetchMemberEvents] error $error');
-    }
+      print('[fetchDirectRooms] error: $error');
+    } finally {}
   };
 }
 
@@ -495,18 +432,7 @@ ThunkAction<AppState> fetchRoomAvatar(Room room, {bool force}) {
   };
 }
 
-ThunkAction<AppState> loadSync() {
-  return (Store<AppState> store) async {
-    try {
-      // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
-      return true;
-    } catch (error) {
-      debugPrint(error);
-      return false;
-    }
-  };
-}
+/******* DEV TOOLS BEYOND THIS POINT ********/
 
 // WARNING: ONLY FOR TESTING OUTPUT
 Future<String> get _localPath async {

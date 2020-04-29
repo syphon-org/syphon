@@ -35,3 +35,7 @@ String formatRoomName({Room room}) {
   final name = room.name;
   return name.length > 22 ? '${name.substring(0, 22)}...' : name;
 }
+
+String formatRoomInitials({Room room}) {
+  return room.name.substring(0, 2).toUpperCase();
+}

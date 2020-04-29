@@ -1,11 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:Tether/store/rooms/room/model.dart';
 
 // TODO: make a proper widget instead of a selector
-
-Widget buildChatAvatar({Room room}) {
+Widget buildChatAvatar({Room room, bool defaultInitials = true}) {
   if (room.syncing) {
     return Container(
       margin: EdgeInsets.all(8),
@@ -28,12 +27,17 @@ Widget buildChatAvatar({Room room}) {
     );
   }
 
-  return Text(
-    room != null && room.name != null
-        ? room.name.substring(0, 2).toUpperCase()
-        : '',
-    style: TextStyle(fontSize: 18, color: Colors.white),
-  );
+  if (defaultInitials) {
+    return Text(
+      formatRoomInitials(room: room),
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  return null;
 }
 
 Widget buildChatHero({Room room, double size, int fontSize}) {

@@ -11,13 +11,14 @@ class User {
   final String displayName;
   final String avatarUrl;
 
-  const User(
-      {this.userId,
-      this.deviceId,
-      this.homeserver,
-      this.displayName,
-      this.avatarUrl,
-      this.accessToken});
+  const User({
+    this.userId,
+    this.deviceId,
+    this.homeserver,
+    this.displayName,
+    this.avatarUrl,
+    this.accessToken,
+  });
 
   User copyWith({
     String userId,
@@ -56,6 +57,14 @@ class User {
           homeserver == other.homeserver &&
           accessToken == other.accessToken;
 
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['user_id'] as String,
+      displayName: json['display_name'] as String,
+      avatarUrl: json['avatar_url'] as String,
+    );
+  }
+
   @override
   String toString() {
     return '{id: $deviceId,  userId: $userId, homeserver: $homeserver, accessToken: $accessToken}';
@@ -74,6 +83,8 @@ class UserStore {
   final bool creating;
   final bool loading;
 
+  final bool isUsernameAvailable;
+
   final StreamController<User> authObserver;
 
   const UserStore({
@@ -84,6 +95,7 @@ class UserStore {
     this.homeserver = 'matrix.org',
     this.loginType = 'm.login.dummy',
     this.isUsernameValid = false,
+    this.isUsernameAvailable = false,
     this.isPasswordValid = false,
     this.isHomeserverValid = false,
     this.creating = false,
@@ -97,6 +109,7 @@ class UserStore {
     password,
     homeserver,
     isUsernameValid,
+    isUsernameAvailable,
     isPasswordValid,
     isHomeserverValid,
     creating,
@@ -110,6 +123,9 @@ class UserStore {
         password: password ?? this.password,
         homeserver: homeserver ?? this.homeserver,
         isUsernameValid: isUsernameValid ?? this.isUsernameValid,
+        isUsernameAvailable: isUsernameAvailable != null
+            ? isUsernameAvailable
+            : this.isUsernameAvailable,
         isPasswordValid: isPasswordValid ?? this.isPasswordValid,
         isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
         creating: creating ?? this.creating);
@@ -128,6 +144,7 @@ class UserStore {
       isUsernameValid.hashCode ^
       isPasswordValid.hashCode ^
       isHomeserverValid.hashCode ^
+      isUsernameAvailable.hashCode ^
       loading.hashCode ^
       creating.hashCode;
 
@@ -144,6 +161,7 @@ class UserStore {
           isUsernameValid == other.isUsernameValid &&
           isPasswordValid == other.isPasswordValid &&
           isHomeserverValid == other.isHomeserverValid &&
+          isUsernameAvailable == other.isUsernameAvailable &&
           loading == other.loading &&
           creating == other.creating;
 

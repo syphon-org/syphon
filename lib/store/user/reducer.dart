@@ -19,6 +19,8 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
       return state.copyWith(username: action.username);
     case SetUsernameValid:
       return state.copyWith(isUsernameValid: action.valid);
+    case SetUsernameAvailability:
+      return state.copyWith(isUsernameAvailable: action.availability);
     case SetPassword:
       return state.copyWith(password: action.password);
     case SetPasswordValid:

@@ -3,9 +3,13 @@ import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/events/selectors.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/store/settings/chat-settings/actions.dart';
+import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -25,16 +29,16 @@ class ChatSettingsArguments {
   });
 }
 
-class ChatSettingsScreen extends StatefulWidget {
-  const ChatSettingsScreen({Key key}) : super(key: key);
+class ChatDetailsView extends StatefulWidget {
+  const ChatDetailsView({Key key}) : super(key: key);
 
   @override
-  ChatSettingsState createState() => ChatSettingsState();
+  ChatDetailsState createState() => ChatDetailsState();
 }
 
 // https://flutter.dev/docs/development/ui/animations
-class ChatSettingsState extends State<ChatSettingsScreen> {
-  ChatSettingsState({Key key}) : super();
+class ChatDetailsState extends State<ChatDetailsView> {
+  ChatDetailsState({Key key}) : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
@@ -72,6 +76,92 @@ class ChatSettingsState extends State<ChatSettingsScreen> {
         headerOpacity = 1;
       });
     });
+  }
+
+  @protected
+  onShowColorPicker({
+    Function onSelectColor,
+    context,
+    int originalColor,
+  }) async {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('Primary Color'),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: width * 0.02,
+          vertical: 12,
+        ),
+        children: <Widget>[
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: width * 0.8,
+              maxHeight: height * 0.25,
+            ),
+            child: MaterialColorPicker(
+              selectedColor: Colors.red,
+              onColorChange: (Color color) {
+                onSelectColor(color.value);
+              },
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SimpleDialogOption(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
+                onPressed: () {
+                  onSelectColor(null);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'reset',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SimpleDialogOption(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'cancel',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ),
+                  SimpleDialogOption(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'save',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -143,7 +233,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> {
                 tag: "ChatAvatar",
                 child: Container(
                   padding: EdgeInsets.only(top: height * 0.05),
-                  color: props.roomColorPlaceholder,
+                  color: props.roomPrimaryColor,
                   width: width, // TODO: use flex, i'm rushing
                   child: OverflowBox(
                     minHeight: 64,
@@ -363,7 +453,11 @@ class ChatSettingsState extends State<ChatSettingsScreen> {
                               ),
                             ),
                             ListTile(
-                              onTap: () {},
+                              onTap: () => onShowColorPicker(
+                                context: context,
+                                onSelectColor: props.onSelectPrimaryColor,
+                                originalColor: props.roomPrimaryColor.value,
+                              ),
                               contentPadding: contentPadding,
                               title: Text(
                                 'Color',
@@ -373,7 +467,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> {
                                 padding: EdgeInsets.only(right: 6),
                                 child: CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: props.roomColorPlaceholder,
+                                  backgroundColor: props.roomPrimaryColor,
                                 ),
                               ),
                             ),
@@ -518,60 +612,55 @@ class ChatSettingsState extends State<ChatSettingsScreen> {
   }
 }
 
-class _Props {
+class _Props extends Equatable {
   final Room room;
   final String userId;
-  final Color roomColorPlaceholder;
+  final Color roomPrimaryColor;
   final List<Message> messages;
-  final bool roomsLoading;
 
-  final Function onSendMessage;
+  final Function onSelectPrimaryColor;
 
   _Props({
     @required this.room,
     @required this.userId,
     @required this.messages,
-    @required this.roomColorPlaceholder,
-    @required this.roomsLoading,
-    @required this.onSendMessage,
+    @required this.roomPrimaryColor,
+    @required this.onSelectPrimaryColor,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.userStore.user.userId,
-        room: roomSelectors.room(
-          id: roomId,
-          state: store.state,
-        ),
+        room: roomSelectors.room(id: roomId, state: store.state),
         messages: latestMessages(
           roomSelectors.room(id: roomId, state: store.state).messages,
         ),
-        roomColorPlaceholder:
-            Colors.grey ?? Color(store.state.settingsStore.accentColor),
-        roomsLoading: store.state.roomStore.loading,
-        onSendMessage: ({
-          String roomId,
-          String body,
-        }) {
-          if (body != null && body.length > 1) {
-            store.dispatch(sendMessage(
-              body: body,
-              room: store.state.roomStore.rooms[roomId],
-              type: 'm.room.message',
-            ));
+        roomPrimaryColor: () {
+          final customChatSettings =
+              store.state.settingsStore.customChatSettings ??
+                  Map<String, ChatSetting>();
+
+          if (customChatSettings[roomId] != null) {
+            print('check update found it $roomId');
+            return customChatSettings[roomId].primaryColor != null
+                ? Color(customChatSettings[roomId].primaryColor)
+                : Colors.grey;
           }
+
+          print('check update default');
+          return Colors.grey;
+        }(),
+        onSelectPrimaryColor: (color) {
+          store.dispatch(
+            updateRoomPrimaryColor(roomId: roomId, color: color),
+          );
         },
       );
 
   @override
-  int get hashCode =>
-      userId.hashCode ^ messages.hashCode ^ roomsLoading.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Props &&
-          runtimeType == other.runtimeType &&
-          messages == other.messages &&
-          userId == other.userId &&
-          roomsLoading == other.roomsLoading;
+  List<Object> get props => [
+        room,
+        userId,
+        messages,
+        roomPrimaryColor,
+      ];
 }

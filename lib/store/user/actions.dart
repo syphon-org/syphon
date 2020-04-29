@@ -65,6 +65,11 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class SetUsernameAvailability {
+  final bool availability;
+  SetUsernameAvailability({this.availability});
+}
+
 class SetAuthObserver {
   final StreamController authObserver;
   SetAuthObserver({this.authObserver});
@@ -207,6 +212,36 @@ ThunkAction<AppState> fetchUserProfile() {
   };
 }
 
+ThunkAction<AppState> checkUsernameAvailability() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final request = buildCheckUsernameAvailability(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        username: store.state.userStore.username,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final data = json.decode(response.body);
+
+      store.dispatch(SetUsernameAvailability(
+        availability: data['available'],
+      ));
+    } catch (error) {
+      print('[checkUsernameAvailability] $error');
+      store.dispatch(SetUsernameAvailability(availability: false));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 ThunkAction<AppState> logoutUser() {
   return (Store<AppState> store) async {
     try {
@@ -238,40 +273,52 @@ ThunkAction<AppState> logoutUser() {
   };
 }
 
+/**
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id204
+ */
 ThunkAction<AppState> createUser() {
   return (Store<AppState> store) async {
-    store.dispatch(SetLoading(loading: true));
-    store.dispatch(SetCreating(creating: true));
+    try {
+      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetCreating(creating: true));
 
-    final loginType = store.state.userStore.loginType;
+      final loginType = store.state.userStore.loginType;
 
-    final request = buildRegisterUserRequest(
-      protocol: protocol,
-      homeserver: store.state.userStore.homeserver,
-      username: store.state.userStore.username,
-      password: store.state.userStore.password,
-      type: loginType,
-    );
+      final request = buildRegisterUserRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        username: store.state.userStore.username,
+        password: store.state.userStore.password,
+        type: loginType,
+      );
 
-    final response = await http.post(
-      request['url'],
-      body: request['body'],
-    );
+      print('[createUser] calling ');
+      final response = await http.post(
+        request['url'],
+        body: json.encode(request['body']),
+      );
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    // TODO: use homeserver from login call param instead in dev
-    store.dispatch(SetUser(
+      print('[createUser] $data');
+
+      // TODO: use homeserver from login call param instead in dev
+      store.dispatch(SetUser(
         user: User(
-      userId: data['user_id'],
-      deviceId: data['device_id'],
-      accessToken: data['access_token'],
-      homeserver: store.state.userStore.homeserver,
-    )));
-
-    store.dispatch(SetCreating(creating: false));
-    store.dispatch(SetLoading(loading: false));
-    store.dispatch(ResetOnboarding());
+          userId: data['user_id'],
+          deviceId: data['device_id'],
+          accessToken: data['access_token'],
+          homeserver: data['user_id'].split(':')[1], // per matrix spec
+        ),
+      ));
+      store.dispatch(ResetOnboarding());
+    } catch (error) {
+      print('[createUser] $error');
+    } finally {
+      store.dispatch(SetCreating(creating: false));
+      store.dispatch(SetLoading(loading: false));
+    }
   };
 }
 

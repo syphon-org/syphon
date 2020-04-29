@@ -15,21 +15,23 @@ dynamic buildLoginTypesRequest() {
   return {'url': url};
 }
 
-/** 
- * GET login
+/**  
+ * Username Availability Check
  * Used to check what types of logins are available on the server
- * curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/register/available?username=testing"
-{
-    "flows": [ 
-        {
-            "type": "m.login.password"
-        }
-    ]
-}
+ * https://matrix.org/docs/spec/client_server/latest#id211 
  */
-dynamic buildCheckRegisterAvailableRequest({String username}) {
-  String url = '_matrix/client/r0/register/available?username=${username}';
-  return {'url': url};
+dynamic buildCheckUsernameAvailability({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String username,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/register/available';
+
+  url += username != null ? '?username=$username' : '';
+
+  Map<String, String> headers = {};
+
+  return {'url': url, 'headers': headers};
 }
 
 /**   

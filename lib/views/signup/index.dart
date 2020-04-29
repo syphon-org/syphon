@@ -116,7 +116,7 @@ class SignupState extends State<Signup> {
               }
             : null;
       case 1:
-        return userStore.isUsernameValid
+        return userStore.isUsernameValid && userStore.isUsernameAvailable
             ? () {
                 pageController.nextPage(
                   duration: Duration(milliseconds: 350),
@@ -158,11 +158,12 @@ class SignupState extends State<Signup> {
         backgroundColor: Colors.transparent,
         brightness: Brightness.light,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios,
-              color: Color(store.state.settingsStore.primaryColor)),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).primaryColor,
+          ),
           onPressed: () {
             onBackStep(context);
-            // ?Navigator.pop(context, false)
           },
         ),
       ),
@@ -267,9 +268,7 @@ class SignupState extends State<Signup> {
                           spacing: 16,
                           dotHeight: 12,
                           dotWidth: 12,
-                          activeDotColor: Color(
-                            store.state.settingsStore.primaryColor,
-                          ),
+                          activeDotColor: Theme.of(context).primaryColor,
                         ), // your preferred effect
                       ),
                     ],

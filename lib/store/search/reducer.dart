@@ -22,6 +22,8 @@ MatrixStore matrixReducer(
         searchResults: action.searchResults,
         totalResults: action.totalResults,
       );
+    case ResetSearchResults:
+      return state.copyWith(searchResults: []);
     default:
       return state;
   }

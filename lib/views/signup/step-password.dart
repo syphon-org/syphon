@@ -21,9 +21,9 @@ class PasswordStep extends StatefulWidget {
 class PasswordStepState extends State<PasswordStep> {
   PasswordStepState({Key key});
 
-  final passwordController = TextEditingController();
-
   bool visibility = false;
+  FocusNode passwordFocusNode = FocusNode();
+  final passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -46,6 +46,7 @@ class PasswordStepState extends State<PasswordStep> {
                   fit: FlexFit.tight,
                   child: Container(
                     width: width * 0.65,
+                    padding: EdgeInsets.only(bottom: 8),
                     constraints: BoxConstraints(
                       maxHeight: Dimensions.mediaSizeMax,
                       maxWidth: Dimensions.mediaSizeMax,
@@ -64,11 +65,11 @@ class PasswordStepState extends State<PasswordStep> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.only(bottom: 8, top: 16),
+                        padding: EdgeInsets.only(bottom: 8, top: 8),
                         child: Text(
-                          'Come up with 4 random words you\'ll\nremember easily',
+                          'Come up with 4 random words\nyou\'ll easily remember',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.subtitle2,
+                          style: Theme.of(context).textTheme.caption,
                         ),
                       ),
                       Container(
@@ -93,6 +94,7 @@ class PasswordStepState extends State<PasswordStep> {
                     ),
                     child: TextField(
                       controller: passwordController,
+                      focusNode: passwordFocusNode,
                       obscureText: !visibility,
                       onChanged: (text) {
                         store.dispatch(
@@ -102,23 +104,40 @@ class PasswordStepState extends State<PasswordStep> {
                         store.dispatch(
                           setPassword(password: store.state.userStore.password),
                         );
-                        FocusScope.of(context).unfocus();
+                        passwordFocusNode.unfocus();
                       },
                       decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                            icon: Icon(
-                              visibility
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            tooltip: 'Show password in plaintext',
-                            onPressed: () {
-                              this.setState(() {
-                                visibility = !visibility;
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            if (!passwordFocusNode.hasFocus) {
+                              // Unfocus all focus nodes
+                              passwordFocusNode.unfocus();
+
+                              // Disable text field's focus node request
+                              passwordFocusNode.canRequestFocus = false;
+                            }
+
+                            // Do your stuff
+                            this.setState(() {
+                              visibility = !this.visibility;
+                            });
+
+                            if (!passwordFocusNode.hasFocus) {
+                              //Enable the text field's focus node request after some delay
+                              Future.delayed(Duration(milliseconds: 100), () {
+                                passwordFocusNode.canRequestFocus = true;
                               });
-                            }),
+                            }
+                          },
+                          child: Icon(
+                            visibility
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                        ),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(34.0)),
+                          borderRadius: BorderRadius.circular(34.0),
+                        ),
                         labelText: 'Password',
                       ),
                     ),

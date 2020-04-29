@@ -1,6 +1,9 @@
 import 'package:Tether/store/index.dart'; // TODO: remove need for store in view dependencies
-import 'package:Tether/views/home/groups/search.dart';
-import 'package:Tether/views/home/messages/message-details.dart';
+
+import 'package:Tether/views/home/messages/details-chat.dart';
+import 'package:Tether/views/home/messages/details-message.dart';
+import 'package:Tether/views/home/search/seach-groups.dart';
+import 'package:Tether/views/home/search/search-users.dart';
 import 'package:Tether/views/home/settings/chats.dart';
 import 'package:Tether/views/home/settings/privacy.dart';
 import 'package:Tether/views/home/settings/theming.dart';
@@ -15,13 +18,11 @@ import 'package:Tether/views/intro/index.dart';
 
 // Home
 import 'package:Tether/views/home/index.dart';
-// import 'package:Tether/views/home/draft.dart';
 import 'package:Tether/views/home/profile/index.dart';
 import 'package:Tether/views/home/settings/index.dart';
 
 // Messages
 import 'package:Tether/views/home/messages/index.dart';
-import 'package:Tether/views/home/messages/settings.dart';
 
 // Settings
 import 'package:Tether/views/home/settings/advanced.dart';
@@ -61,13 +62,13 @@ class NavigationProvider {
             title: 'Tether',
           ),
       '/home/messages': (BuildContext context) => Messages(),
-      '/home/messages/settings': (BuildContext context) => ChatSettingsScreen(),
+      '/home/messages/settings': (BuildContext context) => ChatDetailsView(),
       '/home/messages/details': (BuildContext context) => MessageDetails(),
-      '/home/search': (BuildContext context) => GroupSearchScreen(
+      '/home/groups/search': (BuildContext context) => GroupSearchView(
             title: 'Explore Groups',
           ),
-      '/home/groups/search': (BuildContext context) => GroupSearchScreen(
-            title: 'Explore Groups',
+      '/home/user/search': (BuildContext context) => SearchUserView(
+            title: 'Search Users',
           ),
       '/profile': (BuildContext context) => Profile(),
       '/notifications': (BuildContext context) => NotificationSettings(),

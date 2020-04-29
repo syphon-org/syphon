@@ -12,11 +12,11 @@ import './settings/model.dart';
 import './rooms/model.dart';
 import './rooms/room/model.dart';
 import './rooms/events/model.dart';
-import './matrix/model.dart';
+import './search/model.dart';
 
 import './alerts/reducer.dart';
 import './rooms/reducer.dart';
-import './matrix/reducer.dart';
+import './search/reducer.dart';
 import './user/reducer.dart';
 import './settings/reducer.dart';
 

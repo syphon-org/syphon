@@ -15,6 +15,16 @@ class SetPrimaryColor {
   SetPrimaryColor({this.color});
 }
 
+class SetRoomPrimaryColor {
+  final int color;
+  final String roomId;
+
+  SetRoomPrimaryColor({
+    this.color,
+    this.roomId,
+  });
+}
+
 class SetAccentColor {
   final int color;
   SetAccentColor({this.color});

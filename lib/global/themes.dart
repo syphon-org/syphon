@@ -41,7 +41,7 @@ class Themes {
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? BASICALLY_BLACK;
+        primaryColor = primaryColorHex ?? TETHERED_CYAN;
         accentColor = accentColorHex ?? TETHERED_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = BASICALLY_BLACK;
@@ -68,6 +68,8 @@ class Themes {
       // Core UI
       focusColor: Color(primaryColor),
       cursorColor: Color(primaryColor),
+      textSelectionColor: Color(primaryColor).withAlpha(100),
+      textSelectionHandleColor: Color(primaryColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
           ? Color(scaffoldBackgroundColor)
           : null,
@@ -129,6 +131,7 @@ class Themes {
         caption: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
         ),
         button: TextStyle(
           fontWeight: FontWeight.w100,

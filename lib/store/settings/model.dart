@@ -49,6 +49,7 @@ class SettingsStore {
     bool typingIndicators,
     bool notificationsEnabled,
     bool membershipEventsEnabled,
+    Map<String, ChatSetting> customChatSettings,
   }) {
     return SettingsStore(
       primaryColor: primaryColor,

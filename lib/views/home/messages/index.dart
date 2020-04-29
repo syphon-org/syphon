@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
-import 'package:Tether/views/home/messages/message-details.dart';
-import 'package:Tether/views/home/messages/settings.dart';
+import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/views/home/messages/details-message.dart';
+import 'package:Tether/views/home/messages/details-chat.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,11 +49,13 @@ enum MessageOptions {
 class MessageArguments {
   final String roomId;
   final String title;
+  final bool draftRoom;
 
   // Improve loading times
   MessageArguments({
     this.roomId,
     this.title,
+    this.draftRoom,
   });
 }
 
@@ -223,7 +227,7 @@ class MessagesState extends State<Messages> {
     Color sendButtonColor = const Color(DISABLED_GREY);
 
     if (sendable) {
-      sendButtonColor = const Color(TETHERED_CYAN);
+      sendButtonColor = Theme.of(context).primaryColor;
     }
 
     if (Theme.of(context).brightness == Brightness.dark) {
@@ -329,7 +333,7 @@ class MessagesState extends State<Messages> {
                   radius: 20,
                   backgroundColor: props.room.avatar != null
                       ? Colors.transparent
-                      : Colors.grey,
+                      : props.roomPrimaryColor,
                   child: buildChatAvatar(
                     room: props.room,
                   ),
@@ -613,13 +617,14 @@ class MessagesState extends State<Messages> {
       );
 }
 
-class _Props {
+class _Props extends Equatable {
   final Room room;
   final String userId;
   final List<Message> messages;
   final List<Message> outbox;
   final bool roomsLoading;
   final ThemeType theme;
+  final Color roomPrimaryColor;
 
   final Function onSendTyping;
   final Function onSendMessage;
@@ -635,6 +640,7 @@ class _Props {
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
+    @required this.roomPrimaryColor,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -654,6 +660,16 @@ class _Props {
           ),
         ),
         roomsLoading: store.state.roomStore.loading,
+        roomPrimaryColor: () {
+          final customChatSettings =
+              store.state.settingsStore.customChatSettings ?? Map();
+
+          if (customChatSettings[roomId] != null) {
+            return Color(customChatSettings[roomId].primaryColor);
+          }
+
+          return Colors.grey;
+        }(),
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(
             typing: typing,
@@ -682,15 +698,10 @@ class _Props {
       );
 
   @override
-  int get hashCode =>
-      userId.hashCode ^ messages.hashCode ^ roomsLoading.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Props &&
-          runtimeType == other.runtimeType &&
-          messages == other.messages &&
-          userId == other.userId &&
-          roomsLoading == other.roomsLoading;
+  List<Object> get props => [
+        userId,
+        messages,
+        roomPrimaryColor,
+        roomsLoading,
+      ];
 }

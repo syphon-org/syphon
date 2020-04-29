@@ -145,7 +145,8 @@ class IntroState extends State<Intro> {
                       },
                       color: Theme.of(context).primaryColor,
                       shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
+                        borderRadius: new BorderRadius.circular(30.0),
+                      ),
                       child: buildButtonText(),
                     ),
                   ),
@@ -175,9 +176,7 @@ class IntroState extends State<Intro> {
                             dotWidth: 12,
                             paintStyle: PaintingStyle.fill,
                             strokeWidth: 12,
-                            activeDotColor: Color(
-                              state.settingsStore.primaryColor,
-                            ),
+                            activeDotColor: Theme.of(context).primaryColor,
                           ), // your preferred effect
                         ),
                       ],

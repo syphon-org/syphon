@@ -42,6 +42,3 @@ class ReadStatus {
     );
   }
 }
-
-@jsonSerializable
-class UserReadStatus {}

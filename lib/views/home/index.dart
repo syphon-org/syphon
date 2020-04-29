@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:Tether/store/rooms/room/selectors.dart';
+import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,11 +34,19 @@ class Home extends StatelessWidget {
   final String title;
 
   @protected
-  onNavigateToDraft(context) {
+  onNavigateToGroupSearch(context) {
+    HapticFeedback.lightImpact();
     Navigator.pushNamed(context, '/home/groups/search');
   }
 
-  Widget buildChatList(List<Room> rooms, BuildContext context) {
+  @protected
+  onNavigateToDraft(context) {
+    HapticFeedback.lightImpact();
+    Navigator.pushNamed(context, '/home/user/search');
+  }
+
+  @protected
+  Widget buildChatList(List<Room> rooms, BuildContext context, _Props props) {
     if (rooms.isEmpty) {
       return Center(
           child: Column(
@@ -64,11 +74,23 @@ class Home extends StatelessWidget {
       ));
     }
 
+    print('warning, rebuilding chat list');
+
     return ListView.builder(
       scrollDirection: Axis.vertical,
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
+        final roomSettings = props.chatSettings[room.id] ?? null;
+
+        Color primaryColor =
+            room.avatar != null ? Colors.transparent : Colors.grey;
+
+        if (roomSettings != null) {
+          primaryColor = Color(roomSettings.primaryColor);
+        }
+
+        print('warning, rebuilding chat list in builder');
 
         // GestureDetector w/ animation
         return InkWell(
@@ -93,8 +115,7 @@ class Home extends StatelessWidget {
                 Container(
                   child: CircleAvatar(
                     radius: 24,
-                    backgroundColor:
-                        room.avatar != null ? Colors.transparent : Colors.grey,
+                    backgroundColor: primaryColor,
                     child: buildChatAvatar(room: room),
                   ),
                   margin: const EdgeInsets.only(right: 12),
@@ -158,7 +179,7 @@ class Home extends StatelessWidget {
                   icon: CircleAvatar(
                     backgroundColor: Colors.grey,
                     child: Text(
-                      displayInitials(props.currentUser).toUpperCase(),
+                      displayInitials(props.currentUser),
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ),
@@ -264,6 +285,7 @@ class Home extends StatelessWidget {
                         buildChatList(
                           sortedPrioritizedRooms(props.rooms),
                           context,
+                          props,
                         ),
                       ],
                     ),
@@ -292,30 +314,25 @@ class Home extends StatelessWidget {
             onDisplayChange: (opened) {},
             children: [
               FloatingActionButton(
-                heroTag: 'fab3',
-                child: Icon(
-                  Icons.edit,
-                  // Icons.widgets,
-                  color: Colors.white,
-                ),
-                tooltip: 'Direct Message',
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  onNavigateToDraft(context);
-                },
-              ),
-              FloatingActionButton(
                 heroTag: 'fab2',
                 child: Icon(
-                  Icons.add,
+                  Icons.group_add,
                   // Icons.widgets,
                   color: Colors.white,
                 ),
                 tooltip: 'Create Chat Or Group',
                 onPressed: () {
                   HapticFeedback.lightImpact();
-                  onNavigateToDraft(context);
                 },
+              ),
+              FloatingActionButton(
+                heroTag: 'fab3',
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                ),
+                tooltip: 'Direct Message',
+                onPressed: () => onNavigateToDraft(context),
               ),
               FloatingActionButton(
                 heroTag: 'fab1',
@@ -325,10 +342,7 @@ class Home extends StatelessWidget {
                   color: Colors.white,
                 ),
                 tooltip: 'Search Groups',
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  Navigator.pushNamed(context, '/home/groups/search');
-                },
+                onPressed: () => onNavigateToGroupSearch(context),
               ),
             ],
           ),
@@ -336,33 +350,31 @@ class Home extends StatelessWidget {
       );
 }
 
-class _Props {
+class _Props extends Equatable {
   final Map rooms;
   final bool loadingRooms;
   final User currentUser;
+  final Map<String, ChatSetting> chatSettings;
 
   _Props({
     @required this.rooms,
     @required this.currentUser,
     @required this.loadingRooms,
+    @required this.chatSettings,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         rooms: store.state.roomStore.rooms,
         loadingRooms: store.state.roomStore.loading,
         currentUser: store.state.userStore.user,
+        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
       );
 
   @override
-  int get hashCode =>
-      rooms.hashCode ^ loadingRooms.hashCode ^ currentUser.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Props &&
-          runtimeType == other.runtimeType &&
-          rooms == other.rooms &&
-          currentUser == other.currentUser &&
-          loadingRooms == other.loadingRooms;
+  List<Object> get props => [
+        rooms,
+        currentUser,
+        loadingRooms,
+        chatSettings,
+      ];
 }

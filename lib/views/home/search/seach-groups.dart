@@ -13,7 +13,7 @@ import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/store/matrix/actions.dart';
+import 'package:Tether/store/search/actions.dart';
 
 import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -28,24 +28,24 @@ class SearchScrollBehavior extends ScrollBehavior {
   }
 }
 
-class GroupSearchScreen extends StatefulWidget {
+class GroupSearchView extends StatefulWidget {
   final String title;
   final Store<AppState> store;
-  const GroupSearchScreen({Key key, this.title, this.store}) : super(key: key);
+  const GroupSearchView({Key key, this.title, this.store}) : super(key: key);
 
   @override
-  GroupSearchScreenState createState() => GroupSearchScreenState(
+  GroupSearchState createState() => GroupSearchState(
         title: this.title,
         store: this.store,
       );
 }
 
-class GroupSearchScreenState extends State<GroupSearchScreen> {
+class GroupSearchState extends State<GroupSearchView> {
   final String title;
   final Store<AppState> store;
   final searchInputFocusNode = FocusNode();
 
-  GroupSearchScreenState({
+  GroupSearchState({
     Key key,
     this.title,
     this.store,
@@ -64,13 +64,18 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
   }
 
   @protected
-  void onMounted() {
+  void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
+    final searchResults = store.state.matrixStore.searchResults;
 
     if (!this.searching) {
       this.onToggleSearch(context: context);
     }
 
+    // Clear search if previous results are not from User searching
+    if (searchResults.isNotEmpty && !(searchResults[0] is Room)) {
+      store.dispatch(clearSearchResults());
+    }
     // Initial search to show rooms by most popular
     if (store.state.matrixStore.searchResults.isEmpty) {
       store.dispatch(searchPublicRooms(searchText: ''));
@@ -220,7 +225,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                     scrollDirection: Axis.vertical,
                     itemCount: props.searchResults.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final result = (props.searchResults[index] as Room);
+                      final room = (props.searchResults[index] as Room);
                       final sectionBackgroundColor =
                           Theme.of(context).brightness == Brightness.dark
                               ? const Color(BASICALLY_BLACK)
@@ -228,6 +233,19 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
 
                       final formattedUserTotal = NumberFormat.compact();
                       final localUserTotal = NumberFormat();
+
+                      Widget roomAvatar = Text(
+                        formatRoomInitials(room: room),
+                        style: Theme.of(context).textTheme.bodyText2.merge(
+                              TextStyle(color: Colors.white),
+                            ),
+                      );
+
+                      // Override the initials if an avatar is present
+                      if (room.avatar.uri != null) {
+                        roomAvatar = buildChatAvatar(room: room);
+                      }
+
                       return GestureDetector(
                         onTap: () {
                           // TODO: Navigate.pushNamed(context, /home/messages/details
@@ -249,13 +267,13 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                 ),
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: result.avatar != null
+                                    backgroundColor: room.avatar.uri != null
                                         ? Colors.transparent
                                         : Colors.grey,
-                                    child: buildChatAvatar(room: result),
+                                    child: roomAvatar,
                                   ),
                                   title: Text(
-                                    formatRoomName(room: result),
+                                    formatRoomName(room: room),
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 20,
@@ -268,8 +286,8 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                     children: [
                                       Visibility(
                                         visible:
-                                            result.encryptionEnabled == null ||
-                                                !result.encryptionEnabled,
+                                            room.encryptionEnabled == null ||
+                                                !room.encryptionEnabled,
                                         child: Container(
                                           child: Icon(
                                             Icons.lock_open,
@@ -290,7 +308,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                             ),
                                             Text(
                                               formattedUserTotal.format(
-                                                  result.totalJoinedUsers),
+                                                  room.totalJoinedUsers),
                                               style: TextStyle(
                                                 fontSize: 10,
                                               ),
@@ -312,7 +330,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        formatPreviewTopic(result.topic),
+                                        formatPreviewTopic(room.topic),
                                         softWrap: true,
                                         overflow: TextOverflow.ellipsis,
                                         style:
@@ -332,7 +350,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                       vertical: 8,
                                     ),
                                     child: Text(
-                                      result.topic ?? 'No Topic Available',
+                                      room.topic ?? 'No Topic Available',
                                       style:
                                           Theme.of(context).textTheme.caption,
                                     ),
@@ -343,7 +361,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                       vertical: 8,
                                     ),
                                     child: Text(
-                                      result.name,
+                                      room.name,
                                       textAlign: TextAlign.start,
                                       softWrap: true,
                                       style:
@@ -365,7 +383,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                                 padding: EdgeInsets.symmetric(
                                                   vertical: 4,
                                                 ),
-                                                child: !result.encryptionEnabled
+                                                child: !room.encryptionEnabled
                                                     ? Icon(
                                                         Icons.lock_open,
                                                         size: 24.0,
@@ -399,7 +417,7 @@ class GroupSearchScreenState extends State<GroupSearchScreen> {
                                                 ),
                                                 child: Text(
                                                   localUserTotal.format(
-                                                      result.totalJoinedUsers),
+                                                      room.totalJoinedUsers),
                                                   style: TextStyle(
                                                     fontSize: 24,
                                                   ),

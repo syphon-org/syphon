@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:Tether/global/libs/matrix/user.dart';
+import 'package:Tether/global/libs/matrix/messages.dart';
+import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -23,6 +25,118 @@ final msgtypes = {
   'audio': 'm.audio', // TODO: not impliemented
   'video': 'm.video', // TODO: not impliemented
 };
+
+ThunkAction<AppState> fetchMessageEvents({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
+      final request = buildRoomMessagesRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final Map<String, dynamic> messagesJson = json.decode(response.body);
+      final String startTime = messagesJson['start'];
+      final String endTime = messagesJson['end'];
+      final List<dynamic> messagesChunk = messagesJson['chunk'];
+
+      final List<Event> messageEvents =
+          messagesChunk.map((event) => Event.fromJson(event)).toList();
+
+      store.dispatch(SetRoomMessages(
+        id: room.id,
+        messageEvents: messageEvents,
+        startTime: startTime,
+        endTime: endTime,
+      ));
+    } catch (error) {
+      print('[fetchMessageEvents] error $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchStateEvents({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+      final request = buildRoomStateRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final List<dynamic> rawStateEvents = json.decode(response.body);
+
+      // Convert all of the events and save
+      final List<Event> stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+
+      // Add State events to room and toggle syncing
+      final user = store.state.userStore.user;
+
+      store.dispatch(SetRoomState(
+        id: room.id,
+        state: stateEvents,
+        username: user.displayName,
+      ));
+
+      final updatedRoom = store.state.roomStore.rooms[room.id];
+      if (updatedRoom.avatar != null) {
+        store.dispatch(fetchRoomAvatar(updatedRoom));
+      }
+    } catch (error) {
+      print('[fetchRoomState] error: ${room.id} $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+ThunkAction<AppState> fetchMemberEvents({String roomId}) {
+  return (Store<AppState> store) async {
+    try {
+      final request = buildFastRoomMembersRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        roomId: roomId,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final data = json.decode(response.body);
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      // Convert rooms to rooms
+      print('[fetchMemberEvents] TESTING $data');
+    } catch (error) {
+      print('[fetchMemberEvents] error $error');
+    }
+  };
+}
 
 /**
  * https://matrix-client.matrix.org/_matrix/client/r0/rooms/!ajJxpUAIJjYYTzvsHo%3Amatrix.org/read_markers

@@ -38,3 +38,25 @@ dynamic buildPublicRoomSearch({
     'body': body,
   };
 }
+
+dynamic buildUserSearch({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String searchText,
+  String since,
+}) {
+  String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
+  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+  Map body = {
+    "limit": 10,
+    "search_term": searchText,
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
+}
