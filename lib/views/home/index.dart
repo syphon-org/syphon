@@ -74,8 +74,6 @@ class Home extends StatelessWidget {
       ));
     }
 
-    print('warning, rebuilding chat list');
-
     return ListView.builder(
       scrollDirection: Axis.vertical,
       itemCount: rooms.length,
@@ -89,8 +87,6 @@ class Home extends StatelessWidget {
         if (roomSettings != null) {
           primaryColor = Color(roomSettings.primaryColor);
         }
-
-        print('warning, rebuilding chat list in builder');
 
         // GestureDetector w/ animation
         return InkWell(

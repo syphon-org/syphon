@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Tether/store/alerts/model.dart';
+import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -58,6 +59,7 @@ Future<Store> initStore() async {
   // TODO: this is causing a small blip in rendering
   final persistor = Persistor<AppState>(
     storage: storageEngine,
+    debug: true,
     throttleDuration: Duration(seconds: 5),
     serializer: JsonSerializer<AppState>(
       AppState.fromJson,
@@ -76,6 +78,9 @@ Future<Store> initStore() async {
   );
   JsonMapper.registerValueDecorator<List<Room>>(
     (value) => value.cast<Room>(),
+  );
+  JsonMapper.registerValueDecorator<Map<String, ChatSetting>>(
+    (value) => value.cast<String, ChatSetting>(),
   );
   JsonMapper.registerValueDecorator<Map<String, Room>>(
     (value) => value.cast<String, Room>(),
