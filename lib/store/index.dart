@@ -151,7 +151,7 @@ class AppState {
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
     try {
-      print('${JsonMapper.toJson(settingsStore)}');
+      print('${JsonMapper.toJson(roomStore)}');
     } catch (error) {
       print('Error $error');
     }
@@ -163,6 +163,39 @@ class AppState {
       'roomStore': JsonMapper.toJson(roomStore),
     };
   }
+
+  // // Allows partial conversions TO json for redux_persist
+  // dynamic toJson() {
+  //   var userStore;
+  //   var settingsStore;
+  //   var roomStore;
+
+  //   try {
+  //     userStore = JsonMapper.toJson(userStore);
+  //   } catch (error) {
+  //     print('FAILED TO SERIALIZE userStore $error');
+  //     userStore = JsonMapper.toJson(UserStore());
+  //   }
+
+  //   try {
+  //     settingsStore = JsonMapper.toJson(settingsStore);
+  //   } catch (error) {
+  //     print('FAILED TO SERIALIZE settingStore $error');
+  //   }
+
+  //   try {
+  //     roomStore = JsonMapper.toJson(roomStore);
+  //   } catch (error) {
+  //     print('FAILED TO DESERIALIZE roomStore $error');
+  //   }
+
+  //   return {
+  //     'loading': loading,
+  //     'userStore': userStore,
+  //     'settingsStore': settingsStore,
+  //     'roomStore': roomStore,
+  //   };
+  // }
 
   // // Allows conversion FROM json for redux_persist
   static AppState fromJson(dynamic json) {
@@ -204,7 +237,7 @@ class AppState {
         print('last since ${roomStore.lastSince}');
         roomStore = JsonMapper.deserialize<RoomStore>(
           json['roomStore'],
-          DeserializationOptions(template: <String, Room>{}),
+          // DeserializationOptions(template: <String, Room>{}),
         );
       } catch (error) {
         print('FAILED TO DESERIALIZE roomStore $error');

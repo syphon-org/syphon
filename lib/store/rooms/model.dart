@@ -15,7 +15,7 @@ class RoomStore {
   @JsonProperty(ignore: true)
   final Timer roomObserver;
 
-  @JsonProperty(ignoreIfNull: true)
+  @JsonProperty(ignoreIfNull: true, defaultValue: {})
   final Map<String, Room> rooms;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
