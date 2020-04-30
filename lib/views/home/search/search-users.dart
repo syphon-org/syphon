@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
@@ -115,9 +116,13 @@ class SearchUserState extends State<SearchUserView> {
   @protected
   Widget buildUserAvatar({User user}) {
     if (user.avatarUri != null) {
-      return Container(
-        margin: EdgeInsets.all(8),
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(
+          Dimensions.thumbnailSizeMax,
+        ),
         child: MatrixImage(
+          width: 52,
+          height: 52,
           mxcUri: user.avatarUri,
         ),
       );
@@ -125,7 +130,10 @@ class SearchUserState extends State<SearchUserView> {
 
     return Text(
       displayInitials(user),
-      style: TextStyle(fontSize: 18, color: Colors.white),
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
     );
   }
 
@@ -145,6 +153,9 @@ class SearchUserState extends State<SearchUserView> {
                 ? const Color(BASICALLY_BLACK)
                 : const Color(BACKGROUND);
 
+        Color avatarBackground =
+            user.avatarUri != null ? Colors.transparent : Colors.grey;
+
         return GestureDetector(
           onTap: () {
             // TODO: navigate to draft?
@@ -159,8 +170,7 @@ class SearchUserState extends State<SearchUserView> {
               child: ListTile(
                 leading: CircleAvatar(
                   child: buildUserAvatar(user: user),
-                  backgroundColor:
-                      user.avatarUri != null ? Colors.grey : Colors.transparent,
+                  backgroundColor: avatarBackground,
                 ),
                 title: Text(
                   formatDisplayName(user),
@@ -172,9 +182,11 @@ class SearchUserState extends State<SearchUserView> {
                 ),
                 subtitle: Text(
                   user.userId,
-                  style: TextStyle(
-                    color: props.loading ? Color(DISABLED_GREY) : null,
-                  ),
+                  style: Theme.of(context).textTheme.caption.merge(
+                        TextStyle(
+                          color: props.loading ? Color(DISABLED_GREY) : null,
+                        ),
+                      ),
                 ),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

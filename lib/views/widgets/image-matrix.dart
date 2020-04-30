@@ -26,11 +26,11 @@ class MatrixImage extends StatefulWidget {
   const MatrixImage({
     Key key,
     @required this.mxcUri,
-    this.width,
-    this.height,
+    this.width = 48,
+    this.height = 48,
+    this.strokeWidth = 1.5,
     this.imageType,
-    this.strokeWidth,
-    this.fit,
+    this.fit = BoxFit.fill,
     this.thumbnail = true,
   }) : super(key: key);
 
@@ -39,13 +39,6 @@ class MatrixImage extends StatefulWidget {
 }
 
 class MatrixImageState extends State<MatrixImage> {
-  final double width;
-  final double height;
-  final double strokeWidth;
-  final String imageType;
-  final bool thumbnail;
-  final BoxFit fit;
-
   @override
   void initState() {
     super.initState();
@@ -60,19 +53,12 @@ class MatrixImageState extends State<MatrixImage> {
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      print('[MatrixImage] first hit, fetching $widget.mxcUri');
       store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
     }
   }
 
   MatrixImageState({
     Key key,
-    this.width = 48,
-    this.height = 48,
-    this.strokeWidth = 1.5,
-    this.imageType,
-    this.fit,
-    this.thumbnail = true,
   });
 
   @override
@@ -81,22 +67,22 @@ class MatrixImageState extends State<MatrixImage> {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           if (!props.mediaCache.containsKey(widget.mxcUri)) {
-            print('[MatrixImage] loading $widget.mxcUri');
+            print('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               margin: EdgeInsets.all(8),
               child: CircularProgressIndicator(
-                strokeWidth: strokeWidth,
+                strokeWidth: widget.strokeWidth,
                 valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
                 value: null,
               ),
             );
           }
 
-          print('[MatrixImage] cache loaded $widget.mxcUri');
+          print('[MatrixImage] cache hit ${widget.mxcUri}');
           return Image(
-            width: width,
-            height: height,
-            fit: fit,
+            width: widget.width,
+            height: widget.height,
+            fit: widget.fit,
             image: MemoryImage(
               props.mediaCache[widget.mxcUri],
             ),

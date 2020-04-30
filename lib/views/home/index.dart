@@ -55,9 +55,9 @@ class Home extends StatelessWidget {
         children: <Widget>[
           Container(
             constraints: BoxConstraints(
-              minWidth: 200,
-              maxWidth: 400,
-              maxHeight: 200,
+              minWidth: Dimensions.mediaSizeMin,
+              maxWidth: Dimensions.mediaSizeMax,
+              maxHeight: Dimensions.mediaSizeMin,
             ),
             child: SvgPicture.asset(
               GRAPHIC_EMPTY_MESSAGES,
@@ -89,7 +89,6 @@ class Home extends StatelessWidget {
           primaryColor = Color(roomSettings.primaryColor);
         }
 
-        print(room.avatarUri);
         // GestureDetector w/ animation
         return InkWell(
           onTap: () => Navigator.pushNamed(
