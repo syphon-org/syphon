@@ -180,7 +180,7 @@ class SearchUserState extends State<SearchUserView> {
                       avatarWidget is Text ? Colors.grey : Colors.transparent,
                 ),
                 title: Text(
-                  displayName(user),
+                  formatDisplayName(user),
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 20,

@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:flutter/services.dart';
+
 dynamic buildThumbnailRequest({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
@@ -41,22 +45,32 @@ dynamic buildMediaDownloadRequest({
   return {'url': url, 'headers': headers};
 }
 
+/**
+ * https://matrix.org/docs/spec/client_server/latest#id392
+ * 
+ * Upload some content to the content repository.
+ */
 dynamic buildMediaUploadRequest({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String fileName,
   String fileType = 'application/jpeg', // Content-Type: application/pdf
+  int fileLength,
 }) {
   String url = '$protocol$homeserver/_matrix/media/r0/upload';
 
   // Params
-  url += fileName != null ? '?filename=${fileName}' : '';
+  url += fileName != null ? '?filename=$fileName' : '';
 
   Map<String, String> headers = {
-    'Content-Type': '$fileType',
     'Authorization': 'Bearer $accessToken',
+    'Content-Type': '$fileType',
+    'Content-Length': '$fileLength',
   };
 
-  return {'url': url, 'headers': headers};
+  return {
+    'url': url,
+    'headers': headers,
+  };
 }

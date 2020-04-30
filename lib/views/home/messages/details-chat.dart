@@ -585,7 +585,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               title: Text(
                                 'Delete All Messages',
                                 style: TextStyle(
-                                    fontSize: 18.0, color: Colors.redAccent),
+                                  fontSize: 18.0,
+                                  color: Colors.redAccent,
+                                ),
                               ),
                             ),
                             ListTile(

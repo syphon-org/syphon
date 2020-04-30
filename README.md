@@ -10,9 +10,12 @@ A privacy centric messenger for the people
 - Finish .env selection
 - Loader screen with animations
 
-## From Scatch
-
+## From Scatch 
 Another reason this project was so important was the ability to go from zero to usable open-source cross-platform app as soon as possible. The more accessible a platform is, the easier it is for people to create alternatives to tools that may be prohibited, discouraged, or just daunting. 
+
+## Before Hitting The Code
+- Urls are always referencing matrix mxc:// protocol resources. Though they're actually URIs, they are referenced as URLs in the app to be consistant with the protocol spec
+
 ## Resources
 - (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
 - (iOS icons)[https://github.com/smallmuou/ios-icon-generator]

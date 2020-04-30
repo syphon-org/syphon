@@ -46,6 +46,7 @@ ThunkAction<AppState> testAlerts({type, message}) {
 
 ThunkAction<AppState> addAlert({type, message}) {
   return (Store<AppState> store) async {
+    print('[addAlert] $type : $message');
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);
     store.dispatch(AddAlert(alert: alert));

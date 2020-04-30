@@ -54,6 +54,7 @@ class Room {
   final bool direct;
   final bool syncing;
   final bool sending;
+  final bool isDraftRoom;
   final String startTime;
   final String endTime;
   final int lastUpdate;
@@ -103,6 +104,7 @@ class Room {
     this.encryptionEnabled = false,
     this.worldReadable = false,
     this.userTyping = false,
+    this.isDraftRoom = false,
     this.startTime,
     this.endTime,
     this.messageReads,
@@ -125,6 +127,7 @@ class Room {
     guestEnabled,
     encryptionEnabled,
     userTyping,
+    isDraftRoom,
     draft,
     state,
     users,
@@ -149,6 +152,7 @@ class Room {
       guestEnabled: guestEnabled ?? this.guestEnabled,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       userTyping: userTyping ?? this.userTyping,
+      isDraftRoom: isDraftRoom ?? this.isDraftRoom,
       state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,

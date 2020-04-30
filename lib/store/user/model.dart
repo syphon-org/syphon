@@ -84,6 +84,8 @@ class UserStore {
 
   // Ignore temp state properties
   @JsonProperty(ignore: true)
+  final String newAvatarUri;
+  @JsonProperty(ignore: true)
   final bool isUsernameAvailable;
   @JsonProperty(ignore: true)
   final bool creating;
@@ -108,6 +110,7 @@ class UserStore {
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
     this.isHomeserverValid = false,
+    this.newAvatarUri,
     this.creating = false,
     this.loading = false,
   });
@@ -126,19 +129,21 @@ class UserStore {
     authObserver,
   }) {
     return UserStore(
-        user: user ?? this.user,
-        loading: loading ?? this.loading,
-        authObserver: authObserver ?? this.authObserver,
-        username: username ?? this.username,
-        password: password ?? this.password,
-        homeserver: homeserver ?? this.homeserver,
-        isUsernameValid: isUsernameValid ?? this.isUsernameValid,
-        isUsernameAvailable: isUsernameAvailable != null
-            ? isUsernameAvailable
-            : this.isUsernameAvailable,
-        isPasswordValid: isPasswordValid ?? this.isPasswordValid,
-        isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
-        creating: creating ?? this.creating);
+      user: user ?? this.user,
+      loading: loading ?? this.loading,
+      authObserver: authObserver ?? this.authObserver,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      homeserver: homeserver ?? this.homeserver,
+      isUsernameValid: isUsernameValid ?? this.isUsernameValid,
+      isUsernameAvailable: isUsernameAvailable != null
+          ? isUsernameAvailable
+          : this.isUsernameAvailable,
+      isPasswordValid: isPasswordValid ?? this.isPasswordValid,
+      isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
+      newAvatarUri: newAvatarUri ?? this.newAvatarUri,
+      creating: creating ?? this.creating,
+    );
   }
 
   @override

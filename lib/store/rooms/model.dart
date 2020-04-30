@@ -72,25 +72,21 @@ class RoomStore {
   }
 
   dynamic toJson() {
-    if (rooms == null || rooms.isEmpty) {
-      return {
-        "synced": synced,
-        "lastSince": lastSince,
-        "lastUpdate": lastUpdate,
-        "rooms": JsonMapper.toJson([]),
-      };
-    }
+    var roomsConverted = JsonMapper.toJson([]);
 
+    if (rooms != null && rooms.isNotEmpty) {
+      roomsConverted = JsonMapper.toJson(List<Room>.from(rooms.values));
+    }
     return {
       "synced": synced,
       "lastSince": lastSince,
       "lastUpdate": lastUpdate,
-      "rooms": JsonMapper.toJson(List<Room>.from(rooms.values)),
+      "rooms": roomsConverted,
     };
   }
 
   static RoomStore fromJson(Map<String, dynamic> json) {
-    List<Room> rooms = [];
+    var rooms = [];
     if (json == null) {
       return RoomStore();
     }

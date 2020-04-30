@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:Tether/global/colors.dart';
 import "package:Tether/global/themes.dart";
 import './chat-settings/model.dart';
@@ -34,7 +36,7 @@ class SettingsStore {
     this.typingIndicators = false,
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
-    this.customChatSettings = const {},
+    this.customChatSettings,
   });
 
   SettingsStore copyWith({

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/libs/matrix/media.dart';
+import 'package:Tether/store/user/model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -370,7 +372,6 @@ ThunkAction<AppState> fetchDirectRooms() {
         userId: store.state.userStore.user.userId,
       );
 
-      print('[fetchDirectRooms] ${request}');
       final response = await http.get(
         request['url'],
         headers: request['headers'],
@@ -431,6 +432,59 @@ ThunkAction<AppState> fetchRoomAvatar(Room room, {bool force}) {
     }
   };
 }
+
+ThunkAction<AppState> createDraftRoom({
+  List<User> users,
+  bool isDirect = false,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final draftId = Random.secure().nextInt(1 << 32).toString();
+
+      final draftRoom = Room(
+        id: draftId,
+        isDraftRoom: true,
+        users: users,
+      );
+
+      store.dispatch(SetRoom(room: draftRoom));
+    } catch (error) {
+      print('[createDraftRoom] error: $error');
+    }
+  };
+}
+
+ThunkAction<AppState> convertDraftRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      if (!room.isDraftRoom) {
+        throw 'Room has already been created';
+      }
+
+      final request = buildCreateRoom(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        invites: room.users.map((user) => user.userId).toList(),
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final data = json.decode(response.body);
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+    } catch (error) {
+      print('[createRoom] error: $error');
+    }
+  };
+}
+
+// /_matrix/client/r0/createRoom
 
 /******* DEV TOOLS BEYOND THIS POINT ********/
 

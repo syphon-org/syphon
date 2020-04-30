@@ -70,7 +70,7 @@ class NavigationProvider {
       '/home/user/search': (BuildContext context) => SearchUserView(
             title: 'Search Users',
           ),
-      '/profile': (BuildContext context) => Profile(),
+      '/profile': (BuildContext context) => ProfileView(),
       '/notifications': (BuildContext context) => NotificationSettings(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
       '/privacy': (BuildContext context) => PrivacyPreferences(

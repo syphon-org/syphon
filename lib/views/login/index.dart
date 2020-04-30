@@ -197,6 +197,9 @@ class LoginState extends State<Login> {
                                   store.dispatch(setUsername(
                                     username: username.trim(),
                                   ));
+                                  store.dispatch(setHomeserver(
+                                    homeserver: 'matrix.org',
+                                  ));
                                 }
                               },
                               decoration: InputDecoration(

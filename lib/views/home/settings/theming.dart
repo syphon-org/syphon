@@ -71,20 +71,6 @@ class Theming extends StatelessWidget {
                   SimpleDialogOption(
                     padding: EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: 12,
-                    ),
-                    onPressed: () {
-                      onSelectColor(originalColor);
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'cancel',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ),
-                  SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12,
                       vertical: 8,
                     ),
                     onPressed: () {

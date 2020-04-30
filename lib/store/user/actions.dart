@@ -1,5 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -317,6 +326,153 @@ ThunkAction<AppState> createUser() {
       print('[createUser] $error');
     } finally {
       store.dispatch(SetCreating(creating: false));
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> updateDisplayName(String newDisplayName) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final request = buildUpdateDisplayName(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        userId: store.state.userStore.user.userId,
+        newDisplayName: newDisplayName,
+      );
+
+      final response = await http.put(
+        request['url'],
+        headers: request['headers'],
+        body: json.encode(request['body']),
+      );
+
+      final data = json.decode(response.body);
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final String fileType = lookupMimeType(localFile.path);
+      print('fileType $fileType');
+
+      final String fileName = store.state.userStore.user.displayName +
+          "_profile_photo." +
+          fileType.split('/')[1];
+      print('fileName $fileName');
+
+      final int fileLength = await localFile.length();
+      print('fileLength $fileLength');
+
+      final Stream<List<int>> fileStream = localFile.openRead();
+
+      final List<int> fileStreamSync = localFile.readAsBytesSync();
+      print('fileStream $fileStream');
+
+      // // Upload the file to matrix
+      final mediaUploadRequest = buildMediaUploadRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        fileName: fileName,
+        fileType: fileType,
+        fileLength: fileLength,
+      );
+
+      // final contentTypes = fileType.split('/');
+      // final multipartFile = http.MultipartFile(
+      //   'file',
+      //   fileStream,
+      //   fileLength,
+      //   filename: fileName,
+      //   contentType: MediaType(contentTypes[0], contentTypes[1]),
+      // );
+      // final multipartLength = multipartFile.length;
+      // requestUrl, not the file url
+      // print('multipartLength $multipartLength');
+
+      // final multipartUrl = Uri.parse(mediaUploadRequest['url']);
+      // final multipartRequest = http.MultipartRequest("POST", multipartUrl);
+
+      // multipartRequest.files.add(multipartFile);
+      // multipartRequest.fields['ext'] = contentTypes[1];
+      // multipartRequest.headers.addAll(mediaUploadRequest['headers']);
+
+      // print(
+      //   'double checking ${multipartRequest.headers} ${multipartRequest.contentLength}',
+      // );
+      // final http.StreamedResponse mediaUploadResponseStream =
+      //     await multipartRequest.send();
+      // final mediaUploadResponse =
+      //     await http.Response.fromStream(mediaUploadResponseStream);
+
+      // final mediaUploadRequest = http.Request(
+      //   'POST',
+      //   mediaUploadRequest['url'],
+      // );
+
+      print('${mediaUploadRequest['url']}');
+
+      print('${mediaUploadRequest['headers']}');
+
+      print('${fileStreamSync}');
+      final mediaUploadResponse = await http.post(
+        mediaUploadRequest['url'],
+        headers: mediaUploadRequest['headers'],
+        body: fileStreamSync,
+      );
+
+      // If upload fails, throw an error for the whole update
+      final mediaUploadData = json.decode(mediaUploadResponse.body);
+
+      print('help me $mediaUploadData');
+      if (mediaUploadData['errcode'] != null) {
+        throw mediaUploadData['error'];
+      }
+
+      print('help me');
+      final newAvatarUrl = mediaUploadData['content_uri'];
+
+      final avatarUrlRequest = buildUpdateAvatarUrl(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        userId: store.state.userStore.user.userId,
+        newAvatarUrl: newAvatarUrl,
+      );
+
+      final avatarUrlResponse = await http.post(
+        avatarUrlRequest['url'],
+        headers: avatarUrlRequest['request'],
+        body: json.encode(avatarUrlRequest['body']),
+      );
+
+      final avatarUrlData = json.decode(avatarUrlResponse.body);
+      if (avatarUrlData['errcode'] != null) {
+        throw avatarUrlData['error'];
+      }
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      return false;
+    } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };

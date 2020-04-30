@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:Tether/store/alerts/model.dart';
@@ -59,7 +60,7 @@ Future<Store> initStore() async {
   // TODO: this is causing a small blip in rendering
   final persistor = Persistor<AppState>(
     storage: storageEngine,
-    debug: true,
+    // debug: true,
     throttleDuration: Duration(seconds: 5),
     serializer: JsonSerializer<AppState>(
       AppState.fromJson,

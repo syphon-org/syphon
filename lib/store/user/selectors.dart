@@ -36,7 +36,7 @@ String displayShortname(User user) {
       : '';
 }
 
-String displayName(User user) {
+String formatDisplayName(User user) {
   return user.displayName ?? displayShortname(user);
 }
 

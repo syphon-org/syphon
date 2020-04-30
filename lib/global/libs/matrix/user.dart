@@ -60,3 +60,67 @@ dynamic buildFastRoomMembersRequest({
 
   return {'url': url, 'headers': headers};
 }
+
+/**
+ * https://matrix.org/docs/spec/client_server/latest#id260
+ *  
+ * This API sets the given user's display name.
+ *  You must have permission to set this user's display name, 
+ * e.g. you need to have their access_token.
+ */
+dynamic buildUpdateDisplayName({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String userId,
+  String newDisplayName,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
+
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
+
+  Map body = {
+    "displayname": newDisplayName,
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
+}
+
+/**
+ * https://matrix.org/docs/spec/client_server/latest#id303
+ *  
+ * This API sets the given user's avatar URL. 
+ * You must have permission to set this user's avatar URL, e.g. 
+ * you need to have their access_token.
+ */
+dynamic buildUpdateAvatarUrl({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String userId,
+  String newAvatarUrl, // mxc:// resource
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/profile/${userId}/avatar_url';
+
+  Map headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
+
+  Map body = {
+    "avatar_url": newAvatarUrl, // mxc:// resource
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
+}
