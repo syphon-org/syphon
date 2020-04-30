@@ -656,13 +656,11 @@ class _Props extends Equatable {
                   Map<String, ChatSetting>();
 
           if (customChatSettings[roomId] != null) {
-            print('check update found it $roomId');
             return customChatSettings[roomId].primaryColor != null
                 ? Color(customChatSettings[roomId].primaryColor)
                 : Colors.grey;
           }
 
-          print('check update default');
           return Colors.grey;
         }(),
         onSelectPrimaryColor: (color) {

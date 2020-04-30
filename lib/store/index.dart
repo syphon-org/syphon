@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Tether/global/libs/hive.dart';
+import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/media/state.dart';
 import 'package:Tether/store/media/reducer.dart';
@@ -12,7 +12,7 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 import './alerts/model.dart';
 import './user/model.dart';
-import './settings/model.dart';
+import './settings/state.dart';
 import './rooms/model.dart';
 import './rooms/room/model.dart';
 import './rooms/events/model.dart';
@@ -173,17 +173,25 @@ class AppState {
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
     try {
-      print('proof this is running $mediaStore');
-      print('proof this is running ${Cache.hive.isOpen}');
-      Cache.hive.put(MediaStore.hiveBox, mediaStore);
+      Cache.hive.put(
+        mediaStore.runtimeType.toString(),
+        mediaStore,
+      );
     } catch (error) {
-      print('[AppState.toJson] error - $error');
+      print('[AppState.toJson - MediaStore] - $error');
+    }
+    try {
+      Cache.hive.put(
+        settingsStore.runtimeType.toString(),
+        settingsStore,
+      );
+    } catch (error) {
+      print('[AppState.toJson - SettingsStore] error - $error');
     }
 
     return {
       'loading': loading,
       'userStore': JsonMapper.toJson(userStore),
-      'settingsStore': JsonMapper.toJson(settingsStore),
       'roomStore': roomStore.toJson()
     };
   }
@@ -197,21 +205,28 @@ class AppState {
       return AppState();
     }
 
-    UserStore userStoreConverted = UserStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
-    RoomStore roomStoreConverted = RoomStore();
     MediaStore mediaStoreConverted = MediaStore();
+    SettingsStore settingsStoreConverted = SettingsStore();
+
+    UserStore userStoreConverted = UserStore();
+    RoomStore roomStoreConverted = RoomStore();
 
     try {
-      print('[AppState.fromJson] mediaStoreTesting');
-      mediaStoreConverted = Cache.hive.get(MediaStore.hiveBox);
-      if (mediaStoreConverted != null) {
-        print('media store found ${mediaStoreConverted is MediaStore}');
-      } else {
-        print('media store is null ${mediaStoreConverted is MediaStore}');
-      }
+      mediaStoreConverted = Cache.hive.get(
+        mediaStoreConverted.runtimeType.toString(),
+        defaultValue: MediaStore(),
+      );
     } catch (error) {
-      print('[AppState.toJson] error - $error');
+      print('[AppState.fromJson - MediaStore] error - $error');
+    }
+
+    try {
+      settingsStoreConverted = Cache.hive.get(
+        settingsStoreConverted.runtimeType.toString(),
+        defaultValue: SettingsStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - SettingsStore] error $error');
     }
 
     try {
@@ -220,14 +235,6 @@ class AppState {
       );
     } catch (error) {
       print('[AppState.fromJson] userStoreConverted error $error');
-    }
-
-    try {
-      settingsStoreConverted = JsonMapper.fromJson<SettingsStore>(
-        json['settingsStore'],
-      );
-    } catch (error) {
-      print('[AppState.fromJson] settingsStoreConverted error $error');
     }
 
     try {

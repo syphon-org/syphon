@@ -1,27 +1,41 @@
-import 'dart:collection';
-
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/libs/hive/type-ids.dart';
 import "package:Tether/global/themes.dart";
+import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
 import './chat-settings/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 
-@jsonSerializable
-class SettingsStore {
+part 'state.g.dart';
+
+@HiveType(typeId: SettingsStoreHiveId)
+class SettingsStore extends Equatable {
+  @HiveField(0)
   final int primaryColor;
+  @HiveField(1)
   final int accentColor;
+  @HiveField(2)
   final int brightness;
+  @HiveField(3)
   final bool smsEnabled;
+  @HiveField(4)
   final bool enterSend;
+
+  @HiveField(5)
   final bool readReceipts; // on / off
+  @HiveField(6)
   final bool typingIndicators; // on / off
+  @HiveField(7)
   final bool notificationsEnabled;
+  @HiveField(8)
   final bool membershipEventsEnabled;
+  @HiveField(9)
   final String language;
 
-  @JsonProperty(enumValues: ThemeType.values)
+  @HiveField(10)
   final ThemeType theme;
 
   // mapped by roomId
+  @HiveField(11)
   final Map<String, ChatSetting> customChatSettings;
 
   const SettingsStore({
@@ -38,6 +52,21 @@ class SettingsStore {
     this.membershipEventsEnabled = true,
     this.customChatSettings,
   });
+
+  @override
+  List<Object> get props => [
+        primaryColor,
+        accentColor,
+        brightness,
+        theme,
+        language,
+        smsEnabled,
+        enterSend,
+        readReceipts,
+        typingIndicators,
+        notificationsEnabled,
+        customChatSettings,
+      ];
 
   SettingsStore copyWith({
     int primaryColor,
@@ -70,33 +99,4 @@ class SettingsStore {
       customChatSettings: customChatSettings ?? this.customChatSettings,
     );
   }
-
-  @override
-  int get hashCode =>
-      primaryColor.hashCode ^
-      accentColor.hashCode ^
-      brightness.hashCode ^
-      theme.hashCode ^
-      language.hashCode ^
-      smsEnabled.hashCode ^
-      enterSend.hashCode ^
-      readReceipts.hashCode ^
-      typingIndicators.hashCode ^
-      notificationsEnabled.hashCode ^
-      customChatSettings.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SettingsStore &&
-          runtimeType == other.runtimeType &&
-          primaryColor == other.primaryColor &&
-          accentColor == other.accentColor &&
-          brightness == other.brightness &&
-          theme == other.theme &&
-          language == other.language &&
-          smsEnabled == other.smsEnabled &&
-          enterSend == other.enterSend &&
-          notificationsEnabled == other.notificationsEnabled &&
-          customChatSettings == other.customChatSettings;
 }

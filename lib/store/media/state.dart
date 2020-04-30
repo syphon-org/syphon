@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: MediaStoreHiveId)
 class MediaStore extends Equatable {
   @HiveField(0)
   final bool fetching;

@@ -1,8 +1,12 @@
-import 'package:Tether/store/media/state.dart';
+import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+
+import 'package:Tether/store/media/state.dart';
+import 'package:Tether/store/settings/state.dart';
 
 // Global cache
 class Cache {
@@ -13,7 +17,6 @@ class Cache {
 
 Future<dynamic> initHiveStorageUnsafe() async {
   var storageLocation;
-  var storageEngine;
 
   // Init storage location
   try {
@@ -22,16 +25,12 @@ Future<dynamic> initHiveStorageUnsafe() async {
     print('[initHiveStorage] storage location failure - $error');
   }
 
-  // Init hive cache
+  // Init hive cache + adapters
   Hive.init(storageLocation.path);
   Hive.registerAdapter(MediaStoreAdapter());
-
-  // Init storage engine for hive key
-  try {
-    storageEngine = FlutterSecureStorage();
-  } catch (error) {
-    print('[initHiveStorage] storage engine failure - $error');
-  }
+  Hive.registerAdapter(SettingsStoreAdapter());
+  Hive.registerAdapter(ThemeTypeAdapter());
+  Hive.registerAdapter(ChatSettingAdapter());
 
   return await Hive.openBox(Cache.globalBox);
 }

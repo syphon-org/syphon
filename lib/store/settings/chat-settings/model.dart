@@ -1,12 +1,21 @@
 import 'package:Tether/global/colors.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
 
-@jsonSerializable
-class ChatSetting {
+part 'model.g.dart';
+
+@HiveType(typeId: ChatSettingsHiveId)
+class ChatSetting extends Equatable {
+  @HiveField(0)
   final String roomId;
+  @HiveField(1)
   final int primaryColor;
+  @HiveField(2)
   final bool smsEnabled;
+  @HiveField(3)
   final bool notificationsEnabled;
+  @HiveField(4)
   final String language;
 
   const ChatSetting({
@@ -16,6 +25,15 @@ class ChatSetting {
     this.primaryColor = GREY_DEFAULT,
     this.notificationsEnabled = false,
   });
+
+  @override
+  List<Object> get props => [
+        roomId,
+        primaryColor,
+        smsEnabled,
+        notificationsEnabled,
+        language,
+      ];
 
   ChatSetting copyWith({
     String roomId,
@@ -32,23 +50,4 @@ class ChatSetting {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }
-
-  @override
-  int get hashCode =>
-      roomId.hashCode ^
-      language.hashCode ^
-      smsEnabled.hashCode ^
-      primaryColor.hashCode ^
-      notificationsEnabled.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ChatSetting &&
-          runtimeType == other.runtimeType &&
-          roomId == other.roomId &&
-          language == other.language &&
-          smsEnabled == other.smsEnabled &&
-          primaryColor == other.primaryColor &&
-          notificationsEnabled == other.notificationsEnabled;
 }
