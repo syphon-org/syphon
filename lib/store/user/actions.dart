@@ -365,6 +365,42 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   };
 }
 
+/**
+ *  
+ *  Wasted time on multipart code
+ *  But now I know at least
+    final contentTypes = fileType.split('/');
+    final multipartFile = http.MultipartFile(
+      'file',
+      fileStream,
+      fileLength,
+      filename: fileName,
+      contentType: MediaType(contentTypes[0], contentTypes[1]),
+    );
+    final multipartLength = multipartFile.length;
+    requestUrl, not the file url
+    print('multipartLength $multipartLength');
+
+    final multipartUrl = Uri.parse(mediaUploadRequest['url']);
+    final multipartRequest = http.MultipartRequest("POST", multipartUrl);
+
+    multipartRequest.files.add(multipartFile);
+    multipartRequest.fields['ext'] = contentTypes[1];
+    multipartRequest.headers.addAll(mediaUploadRequest['headers']);
+
+    print(
+      'double checking ${multipartRequest.headers} ${multipartRequest.contentLength}',
+    );
+    final http.StreamedResponse mediaUploadResponseStream =
+        await multipartRequest.send();
+    final mediaUploadResponse =
+        await http.Response.fromStream(mediaUploadResponseStream);
+
+    final mediaUploadRequest = http.Request(
+      'POST',
+      mediaUploadRequest['url'],
+    );
+ */
 ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
   return (Store<AppState> store) async {
     try {
@@ -383,7 +419,6 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
 
       final Stream<List<int>> fileStream = localFile.openRead();
 
-      final List<int> fileStreamSync = localFile.readAsBytesSync();
       print('fileStream $fileStream');
 
       // // Upload the file to matrix
@@ -396,58 +431,34 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
         fileLength: fileLength,
       );
 
-      // final contentTypes = fileType.split('/');
-      // final multipartFile = http.MultipartFile(
-      //   'file',
-      //   fileStream,
-      //   fileLength,
-      //   filename: fileName,
-      //   contentType: MediaType(contentTypes[0], contentTypes[1]),
-      // );
-      // final multipartLength = multipartFile.length;
-      // requestUrl, not the file url
-      // print('multipartLength $multipartLength');
-
-      // final multipartUrl = Uri.parse(mediaUploadRequest['url']);
-      // final multipartRequest = http.MultipartRequest("POST", multipartUrl);
-
-      // multipartRequest.files.add(multipartFile);
-      // multipartRequest.fields['ext'] = contentTypes[1];
-      // multipartRequest.headers.addAll(mediaUploadRequest['headers']);
-
-      // print(
-      //   'double checking ${multipartRequest.headers} ${multipartRequest.contentLength}',
-      // );
-      // final http.StreamedResponse mediaUploadResponseStream =
-      //     await multipartRequest.send();
-      // final mediaUploadResponse =
-      //     await http.Response.fromStream(mediaUploadResponseStream);
-
-      // final mediaUploadRequest = http.Request(
-      //   'POST',
-      //   mediaUploadRequest['url'],
-      // );
-
+      // Logging to confirm
       print('${mediaUploadRequest['url']}');
-
       print('${mediaUploadRequest['headers']}');
 
-      print('${fileStreamSync}');
-      final mediaUploadResponse = await http.post(
-        mediaUploadRequest['url'],
-        headers: mediaUploadRequest['headers'],
-        body: fileStreamSync,
+      // Special StreamedRequest for Steam of bytes in post
+      final request = new http.StreamedRequest(
+        'POST',
+        Uri.parse(mediaUploadRequest['url']),
       );
+      request.headers.addAll(mediaUploadRequest['headers']);
+
+      fileStream.listen(request.sink.add, onDone: () => request.sink.close());
+      // Attempting to await the upload response successfully
+      final mediaUploadResponseStream = await request.send();
+      final mediaUploadResponse = await http.Response.fromStream(
+        mediaUploadResponseStream,
+      );
+
+      print('there is a god $mediaUploadResponse');
 
       // If upload fails, throw an error for the whole update
       final mediaUploadData = json.decode(mediaUploadResponse.body);
 
       print('help me $mediaUploadData');
+
       if (mediaUploadData['errcode'] != null) {
         throw mediaUploadData['error'];
       }
-
-      print('help me');
       final newAvatarUrl = mediaUploadData['content_uri'];
 
       final avatarUrlRequest = buildUpdateAvatarUrl(
