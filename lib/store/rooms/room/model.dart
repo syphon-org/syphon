@@ -50,6 +50,7 @@ class Room {
   final String alias;
   final String homeserver;
   final Avatar avatar;
+  final String avatarUri;
   final String topic;
   final bool direct;
   final bool syncing;
@@ -88,6 +89,7 @@ class Room {
     this.alias = '',
     this.homeserver,
     this.avatar,
+    this.avatarUri,
     this.topic = '',
     this.direct = false,
     this.syncing = false,
@@ -115,6 +117,7 @@ class Room {
     name,
     homeserver,
     avatar,
+    avatarUri,
     topic,
     direct,
     syncing,
@@ -140,6 +143,7 @@ class Room {
       id: id ?? this.id,
       name: name ?? this.name,
       alias: alias ?? this.alias,
+      avatarUri: avatarUri ?? this.avatarUri,
       homeserver: homeserver ?? this.homeserver,
       avatar: avatar ?? this.avatar,
       direct: direct ?? this.direct,
@@ -300,6 +304,7 @@ class Room {
   }) {
     String name;
     Avatar avatar;
+    String avatarUri;
     String topic;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
@@ -339,6 +344,7 @@ class Room {
               avatar = avatar.copyWith(
                 uri: event.content['url'],
               );
+              avatarUri = event.content['url'];
             }
             break;
           case 'm.room.member':
@@ -360,6 +366,7 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? 'New Room',
       avatar: avatar ?? this.avatar,
+      avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       state: cachedStateEvents,

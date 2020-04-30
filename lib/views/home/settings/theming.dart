@@ -96,7 +96,6 @@ class Theming extends StatelessWidget {
         converter: (Store<AppState> store) => Props.mapStoreToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
 
           // Static horizontal: 16, vertical: 8
           final contentPadding = EdgeInsets.only(

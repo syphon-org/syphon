@@ -450,14 +450,17 @@ class _Props extends Equatable {
           }
 
           if (newAvatarFile != null) {
-            print('THESE ARE DIFFERENT? ${newAvatarFile.uri}');
+            // final bool successful = await store.dispatch(
+            //   updateAvatarPhoto(localFile: newAvatarFile),
+            // );
             final bool successful = await store.dispatch(
-              updateAvatarPhoto(localFile: newAvatarFile),
+              updateAvatarUri(
+                mxcUri: 'mxc://matrix.org/dvbKIMzaFQWETZfKgSnOsnFs',
+              ),
             );
             if (!successful) return false;
           }
 
-          print('ITS FINISHING');
           await store.dispatch(fetchUserProfile());
           return true;
         },

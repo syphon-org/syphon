@@ -59,12 +59,14 @@ class _Props extends Equatable {
   final String shortname;
   final String initials;
   final String username;
+  final String avatarUri;
   final String displayName;
 
   _Props({
     @required this.shortname,
     @required this.username,
     @required this.initials,
+    @required this.avatarUri,
     @required this.displayName,
   });
 
@@ -75,6 +77,7 @@ class _Props extends Equatable {
           displayName: store.state.userStore.user.displayName,
           shortname: displayShortname(store.state.userStore.user),
           initials: displayInitials(store.state.userStore.user),
+          avatarUri: store.state.userStore.user.avatarUri,
           username: store.state.userStore.user != null
               ? store.state.userStore.user.userId
               : '');
@@ -85,5 +88,6 @@ class _Props extends Equatable {
         shortname,
         initials,
         username,
+        avatarUri,
       ];
 }

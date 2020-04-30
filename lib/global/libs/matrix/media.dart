@@ -23,9 +23,14 @@ dynamic buildThumbnailRequest({
   // Params
   url += '?height=${size}&width=${size}&method=${method}';
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
 
-  return {'url': url, 'headers': headers};
+  return {
+    'url': url,
+    'headers': headers,
+  };
 }
 
 dynamic buildMediaDownloadRequest({
@@ -35,14 +40,20 @@ dynamic buildMediaDownloadRequest({
   String serverName,
   String mediaUri,
 }) {
-  List<String> mediaUriParts = mediaUri.split('/');
-  String mediaId = mediaUriParts[mediaUriParts.length - 1];
-  String url =
-      '$protocol$homeserver/_matrix/media/r0/download/${serverName ?? homeserver}/$mediaId';
+  final List<String> mediaUriParts = mediaUri.split('/');
+  final String mediaId = mediaUriParts[mediaUriParts.length - 1];
+  final String mediaOrigin = serverName ?? homeserver;
+  final String url =
+      '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
 
-  return {'url': url, 'headers': headers};
+  return {
+    'url': url,
+    'headers': headers,
+  };
 }
 
 /**

@@ -135,151 +135,192 @@ class ChatPreferences extends StatelessWidget {
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w100)),
             ),
-            body: Container(
-                child: Column(
-              children: <Widget>[
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
-                          child: Text(
-                            'Chats',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+            body: SingleChildScrollView(
+              child: Container(
+                  child: Column(
+                children: <Widget>[
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 0.5,
+                    color: sectionBackgroundColor,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: contentPadding,
+                            child: Text(
+                              'Chats',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Language',
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Language',
+                            ),
+                            trailing: Text(
+                              props.language,
+                            ),
                           ),
-                          trailing: Text(
-                            props.language,
+                          ListTile(
+                            onTap: () {},
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Message Font Size',
+                            ),
+                            trailing: Text(
+                              props.chatFontSize,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Message Font Size',
+                          ListTile(
+                            onTap: () => props.onToggleEnterSend(),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Show Membership Events',
+                            ),
+                            subtitle: Text(
+                              'Show membership changes within the chat',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                            trailing: Switch(
+                              value: props.enterSend,
+                              onChanged: (enterSend) =>
+                                  props.onToggleEnterSend(),
+                            ),
                           ),
-                          trailing: Text(
-                            props.chatFontSize,
+                          ListTile(
+                            onTap: () => props.onToggleEnterSend(),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Enter Key Sends',
+                            ),
+                            subtitle: Text(
+                              'Pressing the enter key will send a message',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                            trailing: Switch(
+                              value: props.enterSend,
+                              onChanged: (enterSend) =>
+                                  props.onToggleEnterSend(),
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () => props.onToggleEnterSend(),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Show Membership Events',
-                          ),
-                          subtitle: Text(
-                            'Show membership changes within the chat',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: props.enterSend,
-                            onChanged: (enterSend) => props.onToggleEnterSend(),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => props.onToggleEnterSend(),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'Enter Key Sends',
-                          ),
-                          subtitle: Text(
-                            'Pressing the enter key will send a message',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: props.enterSend,
-                            onChanged: (enterSend) => props.onToggleEnterSend(),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
-                          child: Text(
-                            'Media auto-download',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 0.5,
+                    color: sectionBackgroundColor,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: contentPadding,
+                            child: Text(
+                              'Media',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectPrimaryColor,
-                            originalColor: props.primaryColor,
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectPrimaryColor,
+                              originalColor: props.primaryColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'View all uploaded Media',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'See all uploaded data, even those unaccessible from messages',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
                           ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'When using mobile data',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          subtitle: Text(
-                            'Images, Audio, Video, Documents, Other',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectPrimaryColor,
-                            originalColor: props.primaryColor,
-                          ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'When using Wi-Fi',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          subtitle: Text(
-                            'Images, Audio, Video, Documents, Other',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => onShowColorPicker(
-                            context: context,
-                            onSelectColor: props.onSelectPrimaryColor,
-                            originalColor: props.primaryColor,
-                          ),
-                          contentPadding: contentPadding,
-                          title: Text(
-                            'When Roaming',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          subtitle: Text(
-                            'Images, Audio, Video, Documents, Other',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )),
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 0.5,
+                    color: sectionBackgroundColor,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width, // TODO: use flex, i'm rushing
+                            padding: contentPadding,
+                            child: Text(
+                              'Media auto-download',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectPrimaryColor,
+                              originalColor: props.primaryColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'When using mobile data',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Images, Audio, Video, Documents, Other',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectPrimaryColor,
+                              originalColor: props.primaryColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'When using Wi-Fi',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Images, Audio, Video, Documents, Other',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onShowColorPicker(
+                              context: context,
+                              onSelectColor: props.onSelectPrimaryColor,
+                              originalColor: props.primaryColor,
+                            ),
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'When Roaming',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                            subtitle: Text(
+                              'Images, Audio, Video, Documents, Other',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )),
+            ),
           );
         },
       );

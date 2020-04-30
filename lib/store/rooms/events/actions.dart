@@ -5,6 +5,7 @@ import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/store/index.dart';
+import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
@@ -99,7 +100,9 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
 
       final updatedRoom = store.state.roomStore.rooms[room.id];
       if (updatedRoom.avatar != null) {
-        store.dispatch(fetchRoomAvatar(updatedRoom));
+        store.dispatch(fetchThumbnail(
+          mxcUri: updatedRoom.avatarUri,
+        ));
       }
     } catch (error) {
       print('[fetchRoomState] error: ${room.id} $error');

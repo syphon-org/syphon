@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +84,7 @@ class Home extends StatelessWidget {
         final roomSettings = props.chatSettings[room.id] ?? null;
 
         Color primaryColor =
-            room.avatar != null ? Colors.transparent : Colors.grey;
+            room.avatarUri != null ? Colors.transparent : Colors.grey;
 
         if (roomSettings != null) {
           primaryColor = Color(roomSettings.primaryColor);
@@ -112,7 +114,24 @@ class Home extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 24,
                     backgroundColor: primaryColor,
-                    child: buildChatAvatar(room: room),
+                    child: room.avatarUri != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.thumbnailSizeMax,
+                            ),
+                            child: MatrixImage(
+                              width: 52,
+                              height: 52,
+                              mxcUri: room.avatarUri,
+                            ),
+                          )
+                        : Text(
+                            formatRoomInitials(room: room),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                   margin: const EdgeInsets.only(right: 12),
                 ),
@@ -174,10 +193,23 @@ class Home extends StatelessWidget {
                 child: IconButton(
                   icon: CircleAvatar(
                     backgroundColor: Colors.grey,
-                    child: Text(
-                      displayInitials(props.currentUser),
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
+                    child: props.currentUser.avatarUri != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.thumbnailSizeMax,
+                            ),
+                            child: MatrixImage(
+                              mxcUri: props.currentUser.avatarUri,
+                              thumbnail: true,
+                            ),
+                          )
+                        : Text(
+                            displayInitials(props.currentUser),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
                   ),
                   onPressed: () {
                     Navigator.pushNamed(context, '/profile');

@@ -5,10 +5,12 @@ import 'dart:io';
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/home/messages/details-message.dart';
 import 'package:Tether/views/home/messages/details-chat.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -334,9 +336,24 @@ class MessagesState extends State<Messages> {
                   backgroundColor: props.room.avatar != null
                       ? Colors.transparent
                       : props.roomPrimaryColor,
-                  child: buildChatAvatar(
-                    room: props.room,
-                  ),
+                  child: props.room.avatarUri != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            Dimensions.thumbnailSizeMax,
+                          ),
+                          child: MatrixImage(
+                            width: 52,
+                            height: 52,
+                            mxcUri: props.room.avatarUri,
+                          ),
+                        )
+                      : Text(
+                          formatRoomInitials(room: props.room),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ),

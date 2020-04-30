@@ -9,14 +9,14 @@ class User {
   final String homeserver;
   final String accessToken;
   final String displayName;
-  final String avatarUrl;
+  final String avatarUri;
 
   const User({
     this.userId,
     this.deviceId,
     this.homeserver,
     this.displayName,
-    this.avatarUrl,
+    this.avatarUri,
     this.accessToken,
   });
 
@@ -26,7 +26,7 @@ class User {
     String homeserver,
     String accessToken,
     String displayName,
-    String avatarUrl,
+    String avatarUri,
   }) {
     return User(
       userId: userId ?? this.userId,
@@ -34,7 +34,7 @@ class User {
       homeserver: homeserver ?? this.homeserver,
       accessToken: accessToken ?? this.accessToken,
       displayName: displayName ?? this.displayName,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
+      avatarUri: avatarUri ?? this.avatarUri,
     );
   }
 
@@ -44,7 +44,7 @@ class User {
       deviceId.hashCode ^
       homeserver.hashCode ^
       displayName.hashCode ^
-      avatarUrl.hashCode ^
+      avatarUri.hashCode ^
       accessToken.hashCode;
 
   @override
@@ -61,13 +61,8 @@ class User {
     return User(
       userId: json['user_id'] as String,
       displayName: json['display_name'] as String,
-      avatarUrl: json['avatar_url'] as String,
+      avatarUri: json['avatar_url'] as String,
     );
-  }
-
-  @override
-  String toString() {
-    return '{id: $deviceId,  userId: $userId, homeserver: $homeserver, accessToken: $accessToken}';
   }
 }
 

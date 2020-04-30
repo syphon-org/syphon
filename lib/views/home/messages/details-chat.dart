@@ -6,6 +6,7 @@ import 'package:Tether/global/colors.dart';
 import 'package:Tether/store/settings/chat-settings/actions.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -243,10 +244,24 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       children: [
                         Opacity(
                           opacity: headerOpacity,
-                          child: buildChatHero(
-                            room: props.room,
-                            size: height * 0.15,
-                          ),
+                          child: props.room.avatarUri != null
+                              ? MatrixImage(
+                                  mxcUri: props.room.avatarUri,
+                                  fit: BoxFit.fitHeight,
+                                  width: height * 0.15,
+                                  height: height * 0.15,
+                                )
+                              : Container(
+                                  child: Text(
+                                    props.room.name
+                                        .substring(0, 2)
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ],
                     ),

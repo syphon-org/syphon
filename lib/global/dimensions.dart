@@ -10,6 +10,9 @@ class Dimensions {
   static const double mediaSizeMin = 208;
   static const double mediaSizeMax = 320;
 
+  static const double thumbnailSizeMin = 48;
+  static const double thumbnailSizeMax = 48;
+
   // Buttons
   static const double buttonWidthMin = 256;
   static const double buttonWidthMax = 384;

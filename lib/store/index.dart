@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:Tether/store/alerts/model.dart';
+import 'package:Tether/store/media/model.dart';
+import 'package:Tether/store/media/reducer.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:redux/redux.dart';
@@ -28,6 +30,7 @@ AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
     alertsStore: alertsReducer(state.alertsStore, action),
+    mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     userStore: userReducer(state.userStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
@@ -105,28 +108,31 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-// https://matrix.org/docs/api/client-server/#!/User32data/register
 class AppState {
   final bool loading;
   final AlertsStore alertsStore;
   final UserStore userStore;
   final MatrixStore matrixStore;
+  final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
 
-  AppState(
-      {this.loading = true,
-      this.alertsStore = const AlertsStore(),
-      this.userStore = const UserStore(),
-      this.matrixStore = const MatrixStore(),
-      this.settingsStore = const SettingsStore(),
-      this.roomStore = const RoomStore()});
+  AppState({
+    this.loading = true,
+    this.alertsStore = const AlertsStore(),
+    this.userStore = const UserStore(),
+    this.matrixStore = const MatrixStore(),
+    this.mediaStore = const MediaStore(),
+    this.settingsStore = const SettingsStore(),
+    this.roomStore = const RoomStore(),
+  });
 
   // Helper function to emulate { loading: action.loading, ...appState}
   AppState copyWith({bool loading}) => AppState(
         loading: loading ?? this.loading,
         alertsStore: alertsStore ?? this.alertsStore,
         userStore: userStore ?? this.userStore,
+        mediaStore: mediaStore ?? this.mediaStore,
         matrixStore: matrixStore ?? this.matrixStore,
         roomStore: roomStore ?? this.roomStore,
         settingsStore: settingsStore ?? this.settingsStore,

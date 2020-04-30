@@ -210,7 +210,7 @@ ThunkAction<AppState> fetchUserProfile() {
       store.dispatch(SetUser(
         user: user.copyWith(
           displayName: data['displayname'],
-          avatarUrl: data['avatar_url'],
+          avatarUri: data['avatar_url'],
         ),
       ));
     } catch (error) {
@@ -365,63 +365,22 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   };
 }
 
-/**
- *  
- *  Wasted time on multipart code
- *  But now I know at least
-    final contentTypes = fileType.split('/');
-    final multipartFile = http.MultipartFile(
-      'file',
-      fileStream,
-      fileLength,
-      filename: fileName,
-      contentType: MediaType(contentTypes[0], contentTypes[1]),
-    );
-    final multipartLength = multipartFile.length;
-    requestUrl, not the file url
-    print('multipartLength $multipartLength');
-
-    final multipartUrl = Uri.parse(mediaUploadRequest['url']);
-    final multipartRequest = http.MultipartRequest("POST", multipartUrl);
-
-    multipartRequest.files.add(multipartFile);
-    multipartRequest.fields['ext'] = contentTypes[1];
-    multipartRequest.headers.addAll(mediaUploadRequest['headers']);
-
-    print(
-      'double checking ${multipartRequest.headers} ${multipartRequest.contentLength}',
-    );
-    final http.StreamedResponse mediaUploadResponseStream =
-        await multipartRequest.send();
-    final mediaUploadResponse =
-        await http.Response.fromStream(mediaUploadResponseStream);
-
-    final mediaUploadRequest = http.Request(
-      'POST',
-      mediaUploadRequest['url'],
-    );
- */
 ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      // Extension handling
+      final String displayName = store.state.userStore.user.displayName;
       final String fileType = lookupMimeType(localFile.path);
-      print('fileType $fileType');
+      final String fileExtension = fileType.split('/')[1];
 
-      final String fileName = store.state.userStore.user.displayName +
-          "_profile_photo." +
-          fileType.split('/')[1];
-      print('fileName $fileName');
-
+      // Setting up params for upload
       final int fileLength = await localFile.length();
-      print('fileLength $fileLength');
-
       final Stream<List<int>> fileStream = localFile.openRead();
+      final String fileName = '${displayName}_profile_photo.${fileExtension}';
 
-      print('fileStream $fileStream');
-
-      // // Upload the file to matrix
+      // Create request vars for upload
       final mediaUploadRequest = buildMediaUploadRequest(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
@@ -431,54 +390,32 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
         fileLength: fileLength,
       );
 
-      // Logging to confirm
-      print('${mediaUploadRequest['url']}');
-      print('${mediaUploadRequest['headers']}');
-
-      // Special StreamedRequest for Steam of bytes in post
+      // POST StreamedRequest for uploading byteStream
       final request = new http.StreamedRequest(
         'POST',
         Uri.parse(mediaUploadRequest['url']),
       );
       request.headers.addAll(mediaUploadRequest['headers']);
-
       fileStream.listen(request.sink.add, onDone: () => request.sink.close());
+
       // Attempting to await the upload response successfully
       final mediaUploadResponseStream = await request.send();
       final mediaUploadResponse = await http.Response.fromStream(
         mediaUploadResponseStream,
       );
-
-      print('there is a god $mediaUploadResponse');
+      final mediaUploadData = json.decode(
+        mediaUploadResponse.body,
+      );
 
       // If upload fails, throw an error for the whole update
-      final mediaUploadData = json.decode(mediaUploadResponse.body);
-
-      print('help me $mediaUploadData');
-
       if (mediaUploadData['errcode'] != null) {
         throw mediaUploadData['error'];
       }
-      final newAvatarUrl = mediaUploadData['content_uri'];
 
-      final avatarUrlRequest = buildUpdateAvatarUrl(
-        protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
-        newAvatarUrl: newAvatarUrl,
-      );
+      await store.dispatch(updateAvatarUri(
+        mxcUri: mediaUploadData['content_uri'],
+      ));
 
-      final avatarUrlResponse = await http.post(
-        avatarUrlRequest['url'],
-        headers: avatarUrlRequest['request'],
-        body: json.encode(avatarUrlRequest['body']),
-      );
-
-      final avatarUrlData = json.decode(avatarUrlResponse.body);
-      if (avatarUrlData['errcode'] != null) {
-        throw avatarUrlData['error'];
-      }
       return true;
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
@@ -486,6 +423,37 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
+  };
+}
+
+/**
+ * updateAvatarUri
+ * 
+ * Helper action - no try catch as it's meant to be
+ * included in other update actions
+ */
+ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
+  return (Store<AppState> store) async {
+    final avatarUriRequest = buildUpdateAvatarUri(
+      protocol: protocol,
+      homeserver: store.state.userStore.homeserver,
+      accessToken: store.state.userStore.user.accessToken,
+      userId: store.state.userStore.user.userId,
+      newAvatarUri: mxcUri,
+    );
+
+    final avatarUriResponse = await http.put(
+      avatarUriRequest['url'],
+      headers: avatarUriRequest['headers'],
+      body: json.encode(avatarUriRequest['body']),
+    );
+
+    final avatarUriData = json.decode(avatarUriResponse.body);
+
+    if (avatarUriData['errcode'] != null) {
+      throw avatarUriData['error'];
+    }
+    print(avatarUriData);
   };
 }
 

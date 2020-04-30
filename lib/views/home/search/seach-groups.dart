@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/chat-avatar.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -243,7 +245,16 @@ class GroupSearchState extends State<GroupSearchView> {
 
                       // Override the initials if an avatar is present
                       if (room.avatar.uri != null) {
-                        roomAvatar = buildChatAvatar(room: room);
+                        roomAvatar = ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            Dimensions.thumbnailSizeMax,
+                          ),
+                          child: MatrixImage(
+                            width: 52,
+                            height: 52,
+                            mxcUri: room.avatarUri,
+                          ),
+                        );
                       }
 
                       return GestureDetector(

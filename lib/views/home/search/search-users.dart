@@ -4,6 +4,7 @@ import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -113,24 +114,11 @@ class SearchUserState extends State<SearchUserView> {
 
   @protected
   Widget buildUserAvatar({User user}) {
-    if (user.avatarUrl != null && user.avatarUrl.contains('mxc')) {
+    if (user.avatarUri != null) {
       return Container(
         margin: EdgeInsets.all(8),
-        child: CircularProgressIndicator(
-          strokeWidth: 3,
-          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-          value: null,
-        ),
-      );
-    }
-
-    if (user.avatarUrl != null && !user.avatarUrl.contains('mxc')) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(25),
-        child: Image(
-          width: 52,
-          height: 52,
-          image: NetworkImage(user.avatarUrl),
+        child: MatrixImage(
+          mxcUri: user.avatarUri,
         ),
       );
     }
@@ -157,14 +145,9 @@ class SearchUserState extends State<SearchUserView> {
                 ? const Color(BASICALLY_BLACK)
                 : const Color(BACKGROUND);
 
-        final formattedUserTotal = NumberFormat.compact();
-        final localUserTotal = NumberFormat();
-
-        final avatarWidget = buildUserAvatar(user: user);
-
         return GestureDetector(
           onTap: () {
-            // TODO:
+            // TODO: navigate to draft?
           },
           child: Card(
             color: sectionBackgroundColor,
@@ -175,9 +158,9 @@ class SearchUserState extends State<SearchUserView> {
               ),
               child: ListTile(
                 leading: CircleAvatar(
-                  child: avatarWidget,
+                  child: buildUserAvatar(user: user),
                   backgroundColor:
-                      avatarWidget is Text ? Colors.grey : Colors.transparent,
+                      user.avatarUri != null ? Colors.grey : Colors.transparent,
                 ),
                 title: Text(
                   formatDisplayName(user),

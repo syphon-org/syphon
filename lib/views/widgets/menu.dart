@@ -10,14 +10,14 @@ class RoundedPopupMenu<T> extends StatelessWidget {
   RoundedPopupMenu({
     Key key,
     this.icon,
-    @required this.itemBuilder,
     this.onSelected,
+    @required this.itemBuilder,
   }) : super(key: key);
 
   /// Called when the button is pressed to create the items to show in the menu.
-  final PopupMenuItemBuilder<T> itemBuilder;
-  final PopupMenuItemSelected<T> onSelected;
   final Widget icon;
+  final PopupMenuItemSelected<T> onSelected;
+  final PopupMenuItemBuilder<T> itemBuilder;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<T>(

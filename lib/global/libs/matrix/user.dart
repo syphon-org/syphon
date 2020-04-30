@@ -100,22 +100,22 @@ dynamic buildUpdateDisplayName({
  * You must have permission to set this user's avatar URL, e.g. 
  * you need to have their access_token.
  */
-dynamic buildUpdateAvatarUrl({
+dynamic buildUpdateAvatarUri({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
   String userId,
-  String newAvatarUrl, // mxc:// resource
+  String newAvatarUri, // mxc:// resource
 }) {
   String url =
-      '$protocol$homeserver/_matrix/client/r0/profile/${userId}/avatar_url';
+      '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
 
-  Map headers = {
+  Map<String, String> headers = {
     'Authorization': 'Bearer $accessToken',
   };
 
   Map body = {
-    "avatar_url": newAvatarUrl, // mxc:// resource
+    "avatar_url": newAvatarUri, // mxc:// resource
   };
 
   return {
