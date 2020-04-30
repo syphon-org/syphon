@@ -35,13 +35,10 @@ class MatrixImage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  MatrixImageState createState() => MatrixImageState(
-        mxcUri: this.mxcUri,
-      );
+  MatrixImageState createState() => MatrixImageState();
 }
 
 class MatrixImageState extends State<MatrixImage> {
-  final String mxcUri;
   final double width;
   final double height;
   final double strokeWidth;
@@ -62,15 +59,14 @@ class MatrixImageState extends State<MatrixImage> {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
-    if (!mediaCache.containsKey(mxcUri)) {
-      print('[MatrixImage] first hit, fetching $mxcUri');
-      store.dispatch(fetchThumbnail(mxcUri: mxcUri));
+    if (!mediaCache.containsKey(widget.mxcUri)) {
+      print('[MatrixImage] first hit, fetching $widget.mxcUri');
+      store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
     }
   }
 
   MatrixImageState({
     Key key,
-    @required this.mxcUri,
     this.width = 48,
     this.height = 48,
     this.strokeWidth = 1.5,
@@ -84,8 +80,8 @@ class MatrixImageState extends State<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
-          if (!props.mediaCache.containsKey(this.mxcUri)) {
-            print('[MatrixImage] loading $mxcUri');
+          if (!props.mediaCache.containsKey(widget.mxcUri)) {
+            print('[MatrixImage] loading $widget.mxcUri');
             return Container(
               margin: EdgeInsets.all(8),
               child: CircularProgressIndicator(
@@ -96,13 +92,13 @@ class MatrixImageState extends State<MatrixImage> {
             );
           }
 
-          print('[MatrixImage] cache loaded $mxcUri');
+          print('[MatrixImage] cache loaded $widget.mxcUri');
           return Image(
             width: width,
             height: height,
             fit: fit,
             image: MemoryImage(
-              props.mediaCache[this.mxcUri],
+              props.mediaCache[widget.mxcUri],
             ),
           );
         },

@@ -6,7 +6,6 @@ import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -90,6 +89,7 @@ class Home extends StatelessWidget {
           primaryColor = Color(roomSettings.primaryColor);
         }
 
+        print(room.avatarUri);
         // GestureDetector w/ animation
         return InkWell(
           onTap: () => Navigator.pushNamed(

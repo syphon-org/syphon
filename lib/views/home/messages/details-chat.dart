@@ -5,7 +5,6 @@ import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/store/settings/chat-settings/actions.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';

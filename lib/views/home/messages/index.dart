@@ -9,7 +9,6 @@ import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/home/messages/details-message.dart';
 import 'package:Tether/views/home/messages/details-chat.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
