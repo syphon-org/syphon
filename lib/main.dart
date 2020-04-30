@@ -46,7 +46,7 @@ void main() async {
 
   // init cold cache (mobile only)
   if (Platform.isIOS || Platform.isAndroid) {
-    Cache.hive = await initHiveStorage();
+    Cache.hive = await initHiveStorageUnsafe();
   }
 
   // init state cache (hot)

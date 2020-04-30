@@ -1,8 +1,8 @@
-import 'dart:collection';
 import 'dart:io';
 
+import 'package:Tether/global/libs/hive.dart';
 import 'package:Tether/store/alerts/model.dart';
-import 'package:Tether/store/media/model.dart';
+import 'package:Tether/store/media/state.dart';
 import 'package:Tether/store/media/reducer.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
@@ -63,7 +63,7 @@ Future<Store> initStore() async {
   // TODO: this is causing a small blip in rendering
   final persistor = Persistor<AppState>(
     storage: storageEngine,
-    // debug: true,
+    debug: true,
     throttleDuration: Duration(seconds: 5),
     serializer: JsonSerializer<AppState>(
       AppState.fromJson,
@@ -173,18 +173,9 @@ class AppState {
   // Allows conversion TO json for redux_persist
   dynamic toJson() {
     try {
-      // print(JsonMapper.toJson(settingsStore));
-      if (settingsStore.customChatSettings != null) {
-        var testingAgain = JsonMapper.toJson(
-            settingsStore.customChatSettings.values.elementAt(0));
-        print(
-          '[settingsStore customChatSettings.values toJson] ${testingAgain}',
-        );
-        var testing = JsonMapper.toMap(settingsStore.customChatSettings);
-        print(
-          '[settings store fromMap customChatSettings] ${testing}',
-        );
-      }
+      print('proof this is running $mediaStore');
+      print('proof this is running ${Cache.hive.isOpen}');
+      Cache.hive.put(MediaStore.hiveBox, mediaStore);
     } catch (error) {
       print('[AppState.toJson] error - $error');
     }
@@ -209,6 +200,19 @@ class AppState {
     UserStore userStoreConverted = UserStore();
     SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
+    MediaStore mediaStoreConverted = MediaStore();
+
+    try {
+      print('[AppState.fromJson] mediaStoreTesting');
+      mediaStoreConverted = Cache.hive.get(MediaStore.hiveBox);
+      if (mediaStoreConverted != null) {
+        print('media store found ${mediaStoreConverted is MediaStore}');
+      } else {
+        print('media store is null ${mediaStoreConverted is MediaStore}');
+      }
+    } catch (error) {
+      print('[AppState.toJson] error - $error');
+    }
 
     try {
       userStoreConverted = JsonMapper.fromJson<UserStore>(
@@ -237,6 +241,7 @@ class AppState {
       userStore: userStoreConverted,
       settingsStore: settingsStoreConverted,
       roomStore: roomStoreConverted,
+      mediaStore: mediaStoreConverted,
     );
   }
 }

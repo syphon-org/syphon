@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import './model.dart';
+import './state.dart';
 import './actions.dart';
 
 MediaStore mediaReducer(

@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
-import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:http/http.dart' as http;
 

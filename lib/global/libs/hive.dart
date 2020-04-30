@@ -1,15 +1,39 @@
+import 'package:Tether/store/media/state.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
-const STORAGE_ENCRYPTION_KEY = 'tether@hivekey';
-const HIVE_BOX_NAME = 'tether';
-const APPSTATE_HIVE_KEY = 'app_state';
-
 // Global cache
 class Cache {
   static Box hive;
+  static const globalBox = 'tether';
+  static const defaultKey = 'tether@publicKey';
+}
+
+Future<dynamic> initHiveStorageUnsafe() async {
+  var storageLocation;
+  var storageEngine;
+
+  // Init storage location
+  try {
+    storageLocation = await getApplicationDocumentsDirectory();
+  } catch (error) {
+    print('[initHiveStorage] storage location failure - $error');
+  }
+
+  // Init hive cache
+  Hive.init(storageLocation.path);
+  Hive.registerAdapter(MediaStoreAdapter());
+
+  // Init storage engine for hive key
+  try {
+    storageEngine = FlutterSecureStorage();
+  } catch (error) {
+    print('[initHiveStorage] storage engine failure - $error');
+  }
+
+  return await Hive.openBox(Cache.globalBox);
 }
 
 /**
@@ -41,7 +65,7 @@ Future<dynamic> initHiveStorage() async {
 
     // Check if storage has been created before
     storageEncryptionKeyRaw = await storageEngine.read(
-      key: STORAGE_ENCRYPTION_KEY,
+      key: Cache.defaultKey,
     );
 
     // Create a encryptionKey if a serialized one is not found
@@ -49,12 +73,12 @@ Future<dynamic> initHiveStorage() async {
       storageEncryptionKey = Hive.generateSecureKey();
 
       await storageEngine.write(
-        key: STORAGE_ENCRYPTION_KEY,
+        key: Cache.defaultKey,
         value: jsonEncode(storageEncryptionKey),
       );
 
       storageEncryptionKeyRaw = await storageEngine.read(
-        key: STORAGE_ENCRYPTION_KEY,
+        key: Cache.defaultKey,
       );
     }
 
@@ -64,7 +88,8 @@ Future<dynamic> initHiveStorage() async {
     print('[initHiveStorage] storage engine failure - $error');
   }
 
-  return await Hive.openBox(HIVE_BOX_NAME, encryptionKey: storageEncryptionKey);
+  return await Hive.openBox(Cache.globalBox,
+      encryptionKey: storageEncryptionKey);
 }
 
 // AppState rehydateStore() {
@@ -85,6 +110,6 @@ Future<dynamic> initHiveStorage() async {
 
 // // Closes and saves storage
 void closeStorage() async {
-  Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
+  Box<dynamic> box = Hive.box(Cache.globalBox);
   box.close();
 }
