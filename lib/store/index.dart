@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
-import 'package:Tether/store/media/state.dart';
 import 'package:Tether/store/media/reducer.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
@@ -12,12 +11,16 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 import './alerts/model.dart';
 import './user/model.dart';
-import './settings/state.dart';
-import './rooms/model.dart';
 import './rooms/room/model.dart';
 import './rooms/events/model.dart';
 import './search/model.dart';
 
+// States for Stores
+import './media/state.dart';
+import './rooms/state.dart';
+import './settings/state.dart';
+
+// Reducers for Stores
 import './alerts/reducer.dart';
 import './rooms/reducer.dart';
 import './search/reducer.dart';
@@ -73,21 +76,6 @@ Future<Store> initStore() async {
   // Load available json list decorators
   JsonMapper.registerValueDecorator<List<User>>(
     (value) => value.cast<User>(),
-  );
-  JsonMapper.registerValueDecorator<List<Event>>(
-    (value) => value.cast<Event>(),
-  );
-  JsonMapper.registerValueDecorator<List<Message>>(
-    (value) => value.cast<Message>(),
-  );
-  JsonMapper.registerValueDecorator<List<Room>>(
-    (value) => value.cast<Room>(),
-  );
-  JsonMapper.registerValueDecorator<Map<String, ChatSetting>>(
-    (value) => value.cast<String, ChatSetting>(),
-  );
-  JsonMapper.registerValueDecorator<Map<String, Room>>(
-    (value) => value.cast<String, Room>(),
   );
 
   // Finally load persisted store
@@ -189,10 +177,18 @@ class AppState {
       print('[AppState.toJson - SettingsStore] error - $error');
     }
 
+    try {
+      Cache.hive.put(
+        roomStore.runtimeType.toString(),
+        roomStore,
+      );
+    } catch (error) {
+      print('[AppState.toJson - SettingsStore] error - $error');
+    }
+
     return {
       'loading': loading,
       'userStore': JsonMapper.toJson(userStore),
-      'roomStore': roomStore.toJson()
     };
   }
 
@@ -207,9 +203,9 @@ class AppState {
 
     MediaStore mediaStoreConverted = MediaStore();
     SettingsStore settingsStoreConverted = SettingsStore();
+    RoomStore roomStoreConverted = RoomStore();
 
     UserStore userStoreConverted = UserStore();
-    RoomStore roomStoreConverted = RoomStore();
 
     try {
       mediaStoreConverted = Cache.hive.get(
@@ -230,17 +226,20 @@ class AppState {
     }
 
     try {
+      roomStoreConverted = Cache.hive.get(
+        roomStoreConverted.runtimeType.toString(),
+        defaultValue: RoomStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
       userStoreConverted = JsonMapper.fromJson<UserStore>(
         json['userStore'],
       );
     } catch (error) {
       print('[AppState.fromJson] userStoreConverted error $error');
-    }
-
-    try {
-      roomStoreConverted = RoomStore.fromJson(json['roomStore']);
-    } catch (error) {
-      print('[AppState.fromJson] roomStoreConverted error $error');
     }
 
     return AppState(

@@ -1,6 +1,6 @@
 import './events/model.dart';
 import './actions.dart';
-import './model.dart';
+import './state.dart';
 import './room/model.dart';
 
 RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
@@ -62,7 +62,6 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
     case UpdateRoom:
       final rooms = Map<String, Room>.from(state.rooms);
       rooms[action.id] = rooms[action.id].copyWith(
-        avatar: action.avatar,
         syncing: action.syncing,
       );
       return state.copyWith(rooms: rooms);

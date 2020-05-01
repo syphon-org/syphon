@@ -243,7 +243,7 @@ class GroupSearchState extends State<GroupSearchView> {
                       );
 
                       // Override the initials if an avatar is present
-                      if (room.avatar.uri != null) {
+                      if (room.avatarUri != null) {
                         roomAvatar = ClipRRect(
                           borderRadius: BorderRadius.circular(
                             Dimensions.thumbnailSizeMax,
@@ -277,7 +277,7 @@ class GroupSearchState extends State<GroupSearchView> {
                                 ),
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: room.avatar.uri != null
+                                    backgroundColor: room.avatarUri != null
                                         ? Colors.transparent
                                         : Colors.grey,
                                     child: roomAvatar,

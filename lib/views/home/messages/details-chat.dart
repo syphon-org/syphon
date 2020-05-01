@@ -1,4 +1,3 @@
-import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/events/selectors.dart';
 import 'package:Tether/store/rooms/room/model.dart';
@@ -194,6 +193,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
         ? null
         : const Color(DISABLED_GREY);
 
+    print('rebuilding?');
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStoreToProps(
@@ -249,6 +249,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   fit: BoxFit.fitHeight,
                                   width: height * 0.15,
                                   height: height * 0.15,
+                                  disableRebuild: true,
                                 )
                               : Container(
                                   child: Text(

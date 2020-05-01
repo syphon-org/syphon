@@ -1,4 +1,8 @@
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
+import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,10 +31,19 @@ Future<dynamic> initHiveStorageUnsafe() async {
 
   // Init hive cache + adapters
   Hive.init(storageLocation.path);
-  Hive.registerAdapter(MediaStoreAdapter());
-  Hive.registerAdapter(SettingsStoreAdapter());
+
+  // Custom Models
   Hive.registerAdapter(ThemeTypeAdapter());
   Hive.registerAdapter(ChatSettingAdapter());
+  Hive.registerAdapter(RoomAdapter());
+  Hive.registerAdapter(MessageAdapter());
+  Hive.registerAdapter(EventAdapter());
+  Hive.registerAdapter(ReadStatusAdapter());
+
+  // Custom Store Models
+  Hive.registerAdapter(MediaStoreAdapter());
+  Hive.registerAdapter(SettingsStoreAdapter());
+  Hive.registerAdapter(RoomStoreAdapter());
 
   return await Hive.openBox(Cache.globalBox);
 }

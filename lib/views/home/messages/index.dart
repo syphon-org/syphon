@@ -332,7 +332,7 @@ class MessagesState extends State<Messages> {
                 padding: EdgeInsets.only(right: 8),
                 child: CircleAvatar(
                   radius: 20,
-                  backgroundColor: props.room.avatar != null
+                  backgroundColor: props.room.avatarUri != null
                       ? Colors.transparent
                       : props.roomPrimaryColor,
                   child: props.room.avatarUri != null
