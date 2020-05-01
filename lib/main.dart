@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/settings/state.dart';
 import 'package:Tether/store/user/actions.dart';
@@ -74,7 +75,7 @@ class Tether extends StatefulWidget {
 
 class TetherState extends State<Tether> with WidgetsBindingObserver {
   final Store<AppState> store;
-  Widget defaultHome = Home(title: 'Tether');
+  Widget defaultHome = Home();
   TetherState({this.store});
 
   Future onSelectNotification(String payload) async {
@@ -133,7 +134,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
           user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
         // Default Authenticated App Home
-        defaultHome = Home(title: 'Tether');
+        defaultHome = Home();
         NavigationService.clearTo('/home', context);
       }
     });
@@ -148,7 +149,6 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
-            title: 'Tether',
             theme: Themes.generateCustomTheme(
               themeType: settings.theme,
               primaryColorHex: settings.primaryColor,

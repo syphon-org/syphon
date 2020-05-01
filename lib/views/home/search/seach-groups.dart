@@ -258,7 +258,7 @@ class GroupSearchState extends State<GroupSearchView> {
 
                       return GestureDetector(
                         onTap: () {
-                          // TODO: Navigate.pushNamed(context, /home/messages/details
+                          // TODO: Navigate.pushNamed(context, /home/chat/details
                         },
                         child: Card(
                           color: sectionBackgroundColor,

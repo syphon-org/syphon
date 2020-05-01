@@ -53,6 +53,11 @@ class SetRooms {
   SetRooms({this.rooms});
 }
 
+class RemoveRoom {
+  final Room room;
+  RemoveRoom({this.room});
+}
+
 class ResetRooms {
   ResetRooms();
 }
@@ -105,10 +110,12 @@ class DeleteOutboxMessage {
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id
+  final Message draft;
   final bool syncing;
 
   UpdateRoom({
     this.id,
+    this.draft,
     this.syncing,
   });
 }
@@ -269,7 +276,8 @@ ThunkAction<AppState> fetchSync({String since}) {
       final String lastSince = data['next_batch'];
 
       // init new store containers
-      final Map<String, Room> rooms = store.state.roomStore.rooms;
+      final Map<String, Room> rooms =
+          store.state.roomStore.rooms ?? Map<String, Room>();
       final user = store.state.userStore.user;
 
       // update those that exist or add a new room
@@ -394,23 +402,60 @@ ThunkAction<AppState> fetchDirectRooms() {
   };
 }
 
+/**
+ * Delete Room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * the user can only delete if owning the room, or leave if
+ * just a member
+ */
+ThunkAction<AppState> deleteRoom({String roomId}) {
+  return (Store<AppState> store) async {
+    try {
+      final deletableRoom = store.state.roomStore.rooms[roomId];
+      store.dispatch(RemoveRoom(room: deletableRoom));
+    } catch (error) {
+      print('[deleteRoom] error: $error');
+    }
+  };
+}
+
+ThunkAction<AppState> leaveRoom({String roomId}) {
+  return (Store<AppState> store) async {
+    try {
+      final deletableRoom = store.state.roomStore.rooms[roomId];
+      store.dispatch(RemoveRoom(room: deletableRoom));
+    } catch (error) {
+      print('[createDraftRoom] error: $error');
+    }
+  };
+}
+
 ThunkAction<AppState> createDraftRoom({
   List<User> users,
+  String name = 'New Chat',
+  String topic,
   bool isDirect = false,
 }) {
   return (Store<AppState> store) async {
     try {
       final draftId = Random.secure().nextInt(1 << 32).toString();
 
+      print(draftId);
+
       final draftRoom = Room(
         id: draftId,
+        name: name,
+        topic: topic,
         isDraftRoom: true,
         users: users,
       );
 
-      store.dispatch(SetRoom(room: draftRoom));
+      await store.dispatch(SetRoom(room: draftRoom));
+      return draftRoom;
     } catch (error) {
       print('[createDraftRoom] error: $error');
+      return null;
     }
   };
 }

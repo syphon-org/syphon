@@ -1,3 +1,5 @@
+import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/store/index.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:Tether/store/user/selectors.dart';
 
@@ -27,10 +28,24 @@ class ProfilePreview extends StatelessWidget {
                   margin: EdgeInsets.only(right: 16),
                   child: CircleAvatar(
                     backgroundColor: Colors.grey,
-                    child: Text(
-                      props.initials,
-                      style: TextStyle(color: Colors.white, fontSize: 20.0),
-                    ),
+                    child: props.avatarUri != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.thumbnailSizeMax,
+                            ),
+                            child: MatrixImage(
+                              width: 52,
+                              height: 52,
+                              mxcUri: props.avatarUri,
+                            ),
+                          )
+                        : Text(
+                            props.initials,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ),
                 Column(

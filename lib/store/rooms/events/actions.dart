@@ -198,13 +198,31 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
+ThunkAction<AppState> saveDraft({
+  final body,
+  String type = 'm.text',
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        type: type,
+        body: body,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    ));
+  };
+}
+
 /**
  * Send Room Event (Send Message)
  */
 ThunkAction<AppState> sendMessage({
-  final body,
-  String type = 'm.text',
   Room room,
+  final body,
+  String type = MessageTypes.TEXT,
 }) {
   return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));

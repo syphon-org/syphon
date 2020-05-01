@@ -22,3 +22,7 @@ String formatUsernameHint(String homeserver) {
       ? 'username:$homeserver'
       : 'username:matrix.org';
 }
+
+class StringStore {
+  static const app_name = 'Tether';
+}

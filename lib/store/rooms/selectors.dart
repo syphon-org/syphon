@@ -17,6 +17,13 @@ List<Room> sortedPrioritizedRooms(Map rooms) {
 
   // sort descending
   sortedList.sort((a, b) {
+    // Prioritze draft rooms
+    if (a.isDraftRoom && !b.isDraftRoom) {
+      return -1;
+    }
+    if (!a.isDraftRoom && b.isDraftRoom) {
+      return 1;
+    }
     // Prioritze if a direct chat
     if (a.direct && !b.direct) {
       return -1;

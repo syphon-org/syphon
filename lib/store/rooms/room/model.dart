@@ -2,8 +2,8 @@ import 'dart:collection';
 import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
@@ -52,8 +52,11 @@ class Room {
   // Event lists and handlers
   @HiveField(17)
   final Message draft;
+
+  // TODO: consider making this a map
   @HiveField(18)
   final List<User> users;
+
   @HiveField(19)
   final List<Event> state;
   @HiveField(20)
@@ -72,7 +75,7 @@ class Room {
 
   const Room({
     this.id,
-    this.name = 'New Room',
+    this.name = 'New Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,

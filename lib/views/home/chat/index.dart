@@ -7,12 +7,13 @@ import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/views/home/messages/details-message.dart';
-import 'package:Tether/views/home/messages/details-chat.dart';
+import 'package:Tether/views/home/chat/details-message.dart';
+import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -39,7 +40,7 @@ import 'package:Tether/views/widgets/menu.dart';
  * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
  * 
  */
-enum MessageOptions {
+enum ChatOptions {
   search,
   allMedia,
   chatSettings,
@@ -47,27 +48,25 @@ enum MessageOptions {
   muteNotifications
 }
 
-class MessageArguments {
+class ChatViewArguements {
   final String roomId;
   final String title;
-  final bool draftRoom;
 
   // Improve loading times
-  MessageArguments({
+  ChatViewArguements({
     this.roomId,
     this.title,
-    this.draftRoom,
   });
 }
 
-class Messages extends StatefulWidget {
-  const Messages({Key key}) : super(key: key);
+class ChatView extends StatefulWidget {
+  const ChatView({Key key}) : super(key: key);
 
   @override
-  MessagesState createState() => MessagesState();
+  ChatViewState createState() => ChatViewState();
 }
 
-class MessagesState extends State<Messages> {
+class ChatViewState extends State<ChatView> {
   Timer typingNotifier;
   Timer typingNotifierTimeout;
   FocusNode inputFieldNode;
@@ -83,13 +82,37 @@ class MessagesState extends State<Messages> {
     inputFieldNode = FocusNode();
     inputFieldNode.addListener(() {
       if (!inputFieldNode.hasFocus && this.typingNotifier != null) {
-        print('removing typingNotifier');
         this.typingNotifier.cancel();
         this.setState(() {
           typingNotifier = null;
         });
       }
     });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
+
+  @protected
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    final arguements =
+        ModalRoute.of(context).settings.arguments as ChatViewArguements;
+
+    final room = store.state.roomStore.rooms[arguements.roomId];
+    final draft = room.draft;
+
+    if (room.draft != null && room.draft.type == MessageTypes.TEXT) {
+      editorController.value = TextEditingValue(
+        text: draft.body,
+        selection: TextSelection.fromPosition(
+          TextPosition(
+            offset: draft.body.length,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -110,6 +133,11 @@ class MessagesState extends State<Messages> {
     this.setState(() {
       sendable = text != null && text.isNotEmpty;
     });
+
+    props.onSaveDraftMessage(
+      body: text,
+      type: MessageTypes.TEXT,
+    );
 
     // start an interval for updating typing status
     if (inputFieldNode.hasFocus && this.typingNotifier == null) {
@@ -359,7 +387,7 @@ class MessagesState extends State<Messages> {
             onTap: () {
               Navigator.pushNamed(
                 context,
-                '/home/messages/settings',
+                '/home/chat/settings',
                 arguments: ChatSettingsArguments(
                   roomId: props.room.id,
                   title: props.room.name,
@@ -377,14 +405,14 @@ class MessagesState extends State<Messages> {
         ],
       ),
       actions: <Widget>[
-        RoundedPopupMenu<MessageOptions>(
-          onSelected: (MessageOptions result) {
+        RoundedPopupMenu<ChatOptions>(
+          onSelected: (ChatOptions result) {
             print(result);
             switch (result) {
-              case MessageOptions.chatSettings:
+              case ChatOptions.chatSettings:
                 return Navigator.pushNamed(
                   context,
-                  '/home/messages/settings',
+                  '/home/chat/settings',
                   arguments: ChatSettingsArguments(
                     roomId: props.room.id,
                     title: props.room.name,
@@ -395,26 +423,25 @@ class MessagesState extends State<Messages> {
             }
           },
           icon: Icon(Icons.more_vert, color: Colors.white),
-          itemBuilder: (BuildContext context) =>
-              <PopupMenuEntry<MessageOptions>>[
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.search,
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<ChatOptions>>[
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.search,
               child: Text('Search'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.allMedia,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.allMedia,
               child: Text('All Media'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.chatSettings,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.chatSettings,
               child: Text('Chat Settings'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.inviteFriends,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.inviteFriends,
               child: Text('Invite Friends'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.muteNotifications,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.muteNotifications,
               child: Text('Mute Notifications'),
             ),
           ],
@@ -424,7 +451,7 @@ class MessagesState extends State<Messages> {
   }
 
   @protected
-  buildMessageAppBar({
+  buildMessageOptionsBar({
     _Props props,
     BuildContext context,
   }) {
@@ -452,7 +479,7 @@ class MessagesState extends State<Messages> {
           onPressed: () => {
             Navigator.pushNamed(
               context,
-              '/home/messages/details',
+              '/home/chat/details',
               arguments: MessageDetailArguments(
                 roomId: props.room.id,
                 message: selectedMessage,
@@ -514,7 +541,7 @@ class MessagesState extends State<Messages> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(
           store,
-          (ModalRoute.of(context).settings.arguments as MessageArguments)
+          (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
         ),
         builder: (context, props) {
@@ -536,8 +563,9 @@ class MessagesState extends State<Messages> {
             props: props,
             context: context,
           );
+
           if (this.selectedMessage != null) {
-            currentAppBar = buildMessageAppBar(
+            currentAppBar = buildMessageOptionsBar(
               props: props,
               context: context,
             );
@@ -645,6 +673,7 @@ class _Props extends Equatable {
   final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
+  final Function onSaveDraftMessage;
 
   _Props({
     @required this.room,
@@ -653,10 +682,11 @@ class _Props extends Equatable {
     @required this.messages,
     @required this.outbox,
     @required this.roomsLoading,
+    @required this.roomPrimaryColor,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
-    @required this.roomPrimaryColor,
+    @required this.onSaveDraftMessage,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -686,12 +716,28 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
-        onSendTyping: ({typing, roomId}) => store.dispatch(
-          sendTyping(
-            typing: typing,
-            roomId: roomId,
-          ),
-        ),
+        onSaveDraftMessage: ({
+          String body,
+          String type,
+        }) {
+          store.dispatch(saveDraft(
+            body: body,
+            room: store.state.roomStore.rooms[roomId],
+            type: type,
+          ));
+        },
+        onSendMessage: ({
+          String body,
+          String type,
+        }) {
+          if (body != null && body.length > 1) {
+            store.dispatch(sendMessage(
+              body: body,
+              room: store.state.roomStore.rooms[roomId],
+              type: type,
+            ));
+          }
+        },
         onDeleteMessage: ({
           Message message,
         }) {
@@ -699,18 +745,12 @@ class _Props extends Equatable {
             store.dispatch(deleteMessage(message: message));
           }
         },
-        onSendMessage: ({
-          String roomId,
-          String body,
-        }) {
-          if (body != null && body.length > 1) {
-            store.dispatch(sendMessage(
-              body: body,
-              room: store.state.roomStore.rooms[roomId],
-              type: 'm.room.message',
-            ));
-          }
-        },
+        onSendTyping: ({typing, roomId}) => store.dispatch(
+          sendTyping(
+            typing: typing,
+            roomId: roomId,
+          ),
+        ),
       );
 
   @override

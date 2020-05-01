@@ -19,6 +19,7 @@ class Dimensions {
   // Buttons
   static const double buttonWidthMin = 256;
   static const double buttonWidthMax = 384;
+  static const double buttonAppBarSize = 28;
 
   // Inputs
   static const double inputSizeMin = 200;

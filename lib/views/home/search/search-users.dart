@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
+import 'package:Tether/views/home/chat/index.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -31,25 +33,24 @@ class SearchScrollBehavior extends ScrollBehavior {
 
 class SearchUserView extends StatefulWidget {
   final String title;
-  final Store<AppState> store;
-  const SearchUserView({Key key, this.title, this.store}) : super(key: key);
+  const SearchUserView({
+    Key key,
+    this.title,
+  }) : super(key: key);
 
   @override
   SearchUserState createState() => SearchUserState(
         title: this.title,
-        store: this.store,
       );
 }
 
 class SearchUserState extends State<SearchUserView> {
   final String title;
-  final Store<AppState> store;
   final searchInputFocusNode = FocusNode();
 
   SearchUserState({
     Key key,
     this.title,
-    this.store,
   });
 
   Timer searchTimeout;
@@ -137,8 +138,8 @@ class SearchUserState extends State<SearchUserView> {
     );
   }
 
-  @override
-  buildUserList(BuildContext context, _Props props) {
+  @protected
+  Widget buildUserList(BuildContext context, _Props props) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: 2,
@@ -157,8 +158,16 @@ class SearchUserState extends State<SearchUserView> {
             user.avatarUri != null ? Colors.transparent : Colors.grey;
 
         return GestureDetector(
-          onTap: () {
-            // TODO: navigate to draft?
+          onTap: () async {
+            final newRoom = await props.onSelectUser(user: user);
+            Navigator.popAndPushNamed(
+              context,
+              '/home/chat',
+              arguments: ChatViewArguements(
+                roomId: newRoom.id,
+                title: newRoom.name,
+              ),
+            );
           },
           child: Card(
             color: sectionBackgroundColor,
@@ -351,12 +360,14 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
+  final Function onSelectUser;
 
   _Props({
     @required this.theme,
     @required this.loading,
     @required this.searchResults,
     @required this.onSearch,
+    @required this.onSelectUser,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
@@ -365,6 +376,13 @@ class _Props extends Equatable {
         searchResults: store.state.matrixStore.searchResults,
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
+        },
+        onSelectUser: ({User user}) async {
+          return store.dispatch(createDraftRoom(
+            users: <User>[user],
+            name: user.displayName,
+            isDirect: true,
+          ));
         },
       );
 

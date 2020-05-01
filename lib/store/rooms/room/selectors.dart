@@ -14,22 +14,29 @@ String formatTotalUsers(int totalUsers) {
 }
 
 String formatPreview({Room room, Message recentMessage}) {
-  if (room == null) {
-    return 'No preview available';
+  // Prioritize drafts for any room, regardless of state
+  if (room.draft != null) {
+    return 'Draft: ${room.draft.body}';
   }
 
+  if (room.isDraftRoom) {
+    return 'Draft:';
+  }
+
+  // Show topic if the user has joined a group but not sent anything (lurkin')
   if (room.messages == null || room.messages.length < 1) {
-    return formatPreviewTopic(room.topic, defaultTopic: 'No Preview Available');
+    return formatPreviewTopic(room.topic, defaultTopic: '');
   }
 
   final messages = latestMessages(room.messages);
-  final previewMessage = messages[0].body;
-  final shortened = previewMessage.length > 42;
-  final preview = shortened
-      ? previewMessage.substring(0, 42).replaceAll('\n', '')
-      : previewMessage;
+  var previewMessage = messages[0].body;
 
-  return shortened ? '$preview...' : preview;
+  if (previewMessage.length > 42) {
+    previewMessage = previewMessage.substring(0, 42).replaceAll('\n', '');
+    previewMessage = '$previewMessage...';
+  }
+
+  return previewMessage;
 }
 
 String formatRoomName({Room room}) {
