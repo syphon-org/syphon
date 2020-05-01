@@ -1,14 +1,24 @@
 import 'dart:async';
 
+import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:hive/hive.dart';
 
-@jsonSerializable
+part 'model.g.dart';
+
+@HiveType(typeId: UserHiveId)
 class User {
+  @HiveField(0)
   final String userId;
+  @HiveField(1)
   final String deviceId;
+  @HiveField(2)
   final String homeserver;
+  @HiveField(3)
   final String accessToken;
+  @HiveField(4)
   final String displayName;
+  @HiveField(5)
   final String avatarUri;
 
   const User({
@@ -63,117 +73,5 @@ class User {
       displayName: json['display_name'] as String,
       avatarUri: json['avatar_url'] as String,
     );
-  }
-}
-
-@jsonSerializable
-class UserStore {
-  final User user;
-  final String username;
-  final String password;
-  final String homeserver;
-  final String loginType;
-  final bool isUsernameValid;
-  final bool isPasswordValid;
-  final bool isHomeserverValid;
-
-  // Ignore temp state properties
-  @JsonProperty(ignore: true)
-  final String newAvatarUri;
-  @JsonProperty(ignore: true)
-  final bool isUsernameAvailable;
-  @JsonProperty(ignore: true)
-  final bool creating;
-  @JsonProperty(ignore: true)
-  final bool loading;
-
-  @JsonProperty(ignore: true)
-  final StreamController<User> authObserver;
-
-  @JsonProperty(ignore: true)
-  Stream<User> get onAuthStateChanged =>
-      authObserver != null ? authObserver.stream : null;
-
-  const UserStore({
-    this.user = const User(),
-    this.authObserver,
-    this.username = '', // null
-    this.password = '', // null
-    this.homeserver = 'matrix.org',
-    this.loginType = 'm.login.dummy',
-    this.isUsernameValid = false,
-    this.isUsernameAvailable = false,
-    this.isPasswordValid = false,
-    this.isHomeserverValid = false,
-    this.newAvatarUri,
-    this.creating = false,
-    this.loading = false,
-  });
-
-  UserStore copyWith({
-    user,
-    loading,
-    username,
-    password,
-    homeserver,
-    isUsernameValid,
-    isUsernameAvailable,
-    isPasswordValid,
-    isHomeserverValid,
-    creating,
-    authObserver,
-  }) {
-    return UserStore(
-      user: user ?? this.user,
-      loading: loading ?? this.loading,
-      authObserver: authObserver ?? this.authObserver,
-      username: username ?? this.username,
-      password: password ?? this.password,
-      homeserver: homeserver ?? this.homeserver,
-      isUsernameValid: isUsernameValid ?? this.isUsernameValid,
-      isUsernameAvailable: isUsernameAvailable != null
-          ? isUsernameAvailable
-          : this.isUsernameAvailable,
-      isPasswordValid: isPasswordValid ?? this.isPasswordValid,
-      isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
-      newAvatarUri: newAvatarUri ?? this.newAvatarUri,
-      creating: creating ?? this.creating,
-    );
-  }
-
-  @override
-  int get hashCode =>
-      user.hashCode ^
-      authObserver.hashCode ^
-      username.hashCode ^
-      password.hashCode ^
-      homeserver.hashCode ^
-      isUsernameValid.hashCode ^
-      isPasswordValid.hashCode ^
-      isHomeserverValid.hashCode ^
-      isUsernameAvailable.hashCode ^
-      loading.hashCode ^
-      creating.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserStore &&
-          runtimeType == other.runtimeType &&
-          user == other.user &&
-          authObserver == other.authObserver &&
-          username == other.username &&
-          password == other.password &&
-          homeserver == other.homeserver &&
-          isUsernameValid == other.isUsernameValid &&
-          isPasswordValid == other.isPasswordValid &&
-          isHomeserverValid == other.isHomeserverValid &&
-          isUsernameAvailable == other.isUsernameAvailable &&
-          loading == other.loading &&
-          creating == other.creating;
-
-  @override
-  String toString() {
-    return '{user: $user, authObserver: $authObserver, username: $username, password: $password, homeserver: $homeserver, loading: $loading}';
   }
 }

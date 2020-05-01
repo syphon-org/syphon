@@ -1,7 +1,7 @@
 import 'package:Tether/store/settings/chat-settings/actions.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 
-import './model.dart';
+import './state.dart';
 import './actions.dart';
 
 SettingsStore settingsReducer(

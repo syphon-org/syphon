@@ -1,11 +1,18 @@
+import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import './colors.dart';
 
-@jsonSerializable
+part 'themes.g.dart';
+
+@HiveType(typeId: ThemeTypeHiveId)
 enum ThemeType {
+  @HiveField(0)
   LIGHT,
+  @HiveField(1)
   DARK,
+  @HiveField(2)
   DARKER,
 }
 

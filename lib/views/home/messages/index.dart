@@ -9,7 +9,6 @@ import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/home/messages/details-message.dart';
 import 'package:Tether/views/home/messages/details-chat.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -333,7 +332,7 @@ class MessagesState extends State<Messages> {
                 padding: EdgeInsets.only(right: 8),
                 child: CircleAvatar(
                   radius: 20,
-                  backgroundColor: props.room.avatar != null
+                  backgroundColor: props.room.avatarUri != null
                       ? Colors.transparent
                       : props.roomPrimaryColor,
                   child: props.room.avatarUri != null

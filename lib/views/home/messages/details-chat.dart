@@ -1,11 +1,9 @@
-import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/events/selectors.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/store/settings/chat-settings/actions.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -250,6 +248,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   fit: BoxFit.fitHeight,
                                   width: height * 0.15,
                                   height: height * 0.15,
+                                  disableRebuild: true,
                                 )
                               : Container(
                                   child: Text(
@@ -657,13 +656,11 @@ class _Props extends Equatable {
                   Map<String, ChatSetting>();
 
           if (customChatSettings[roomId] != null) {
-            print('check update found it $roomId');
             return customChatSettings[roomId].primaryColor != null
                 ? Color(customChatSettings[roomId].primaryColor)
                 : Colors.grey;
           }
 
-          print('check update default');
           return Colors.grey;
         }(),
         onSelectPrimaryColor: (color) {

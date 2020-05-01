@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
-import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:http/http.dart' as http;
 
@@ -70,7 +69,7 @@ class SetRoomMessages {
   final String id; // room id
   final String startTime;
   final String endTime;
-  final List<Event> messageEvents;
+  final List<Message> messageEvents;
 
   SetRoomMessages({
     this.id,
@@ -106,12 +105,10 @@ class DeleteOutboxMessage {
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id
-  final Avatar avatar;
   final bool syncing;
 
   UpdateRoom({
     this.id,
-    this.avatar,
     this.syncing,
   });
 }
@@ -293,7 +290,7 @@ ThunkAction<AppState> fetchSync({String since}) {
         }
 
         // fetch avatar if a uri was found
-        if (room.avatar != null) {
+        if (room.avatarUri != null) {
           store.dispatch(fetchThumbnail(
             mxcUri: room.avatarUri,
           ));
@@ -396,46 +393,6 @@ ThunkAction<AppState> fetchDirectRooms() {
     } finally {}
   };
 }
-
-// ThunkAction<AppState> fetchRoomAvatar(Room room, {bool force}) {
-//   return (Store<AppState> store) async {
-//     try {
-//       if (room.avatar == null || room.avatar.uri == null) {
-//         throw 'avatar is null';
-//       }
-
-//       final request = buildThumbnailRequest(
-//         protocol: protocol,
-//         accessToken: store.state.userStore.user.accessToken,
-//         homeserver: store.state.userStore.homeserver,
-//         mediaUri: room.avatar.uri,
-//       );
-
-//       final response = await http.get(
-//         request['url'],
-//         headers: request['headers'],
-//       );
-
-//       if (response.headers['content-type'] == 'application/json') {
-//         final errorData = json.decode(response.body);
-//         throw errorData['errcode'];
-//       }
-
-//       store.dispatch(UpdateRoom(
-//         id: room.id,
-//         avatar: room.avatar.copyWith(
-//             url: request['url'].toString(),
-//             type: response.headers['content-type'],
-//             data: response.bodyBytes),
-//         syncing: false,
-//       ));
-//     } catch (error) {
-//       print('[fetchRoomAvatar] error: ${room.id} $error');
-//     } finally {
-//       store.dispatch(UpdateRoom(id: room.id, syncing: false));
-//     }
-//   };
-// }
 
 ThunkAction<AppState> createDraftRoom({
   List<User> users,

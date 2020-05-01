@@ -8,7 +8,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/state.dart';
 
 // Styling Widgets
 import 'package:Tether/global/dimensions.dart';

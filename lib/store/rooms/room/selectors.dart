@@ -22,7 +22,8 @@ String formatPreview({Room room, Message recentMessage}) {
     return formatPreviewTopic(room.topic, defaultTopic: 'No Preview Available');
   }
 
-  final previewMessage = latestMessages(room.messages)[0].body;
+  final messages = latestMessages(room.messages);
+  final previewMessage = messages[0].body;
   final shortened = previewMessage.length > 42;
   final preview = shortened
       ? previewMessage.substring(0, 42).replaceAll('\n', '')

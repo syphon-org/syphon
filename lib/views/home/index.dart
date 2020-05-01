@@ -6,7 +6,6 @@ import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -56,9 +55,9 @@ class Home extends StatelessWidget {
         children: <Widget>[
           Container(
             constraints: BoxConstraints(
-              minWidth: 200,
-              maxWidth: 400,
-              maxHeight: 200,
+              minWidth: Dimensions.mediaSizeMin,
+              maxWidth: Dimensions.mediaSizeMax,
+              maxHeight: Dimensions.mediaSizeMin,
             ),
             child: SvgPicture.asset(
               GRAPHIC_EMPTY_MESSAGES,

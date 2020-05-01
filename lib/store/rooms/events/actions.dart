@@ -49,12 +49,14 @@ ThunkAction<AppState> fetchMessageEvents({Room room}) {
       final String endTime = messagesJson['end'];
       final List<dynamic> messagesChunk = messagesJson['chunk'];
 
-      final List<Event> messageEvents =
-          messagesChunk.map((event) => Event.fromJson(event)).toList();
+      // TODO: I would really love to use inheritance
+      final List<Message> messages = messagesChunk
+          .map((event) => Message.fromEvent(Event.fromJson(event)))
+          .toList();
 
       store.dispatch(SetRoomMessages(
         id: room.id,
-        messageEvents: messageEvents,
+        messageEvents: messages,
         startTime: startTime,
         endTime: endTime,
       ));
@@ -99,7 +101,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
       ));
 
       final updatedRoom = store.state.roomStore.rooms[room.id];
-      if (updatedRoom.avatar != null) {
+      if (updatedRoom.avatarUri != null) {
         store.dispatch(fetchThumbnail(
           mxcUri: updatedRoom.avatarUri,
         ));

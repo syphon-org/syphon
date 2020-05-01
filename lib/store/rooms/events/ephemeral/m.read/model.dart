@@ -1,16 +1,20 @@
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:hive/hive.dart';
+import 'package:Tether/global/libs/hive/type-ids.dart';
 
-@jsonSerializable
+part 'model.g.dart';
+
+@HiveType(typeId: ReadStatusHiveId)
 class ReadStatus {
+  @HiveField(0)
   final int latestRead;
 
   // UserId -> timestamp
+  @HiveField(1)
   final Map<String, int> userReads;
 
   const ReadStatus({
-    this.userReads,
     this.latestRead = 0,
+    this.userReads,
   });
 
   factory ReadStatus.fromReceipt(Map<String, dynamic> receipt) {
@@ -19,12 +23,14 @@ class ReadStatus {
     final Map<String, dynamic> userTimestamps = receipt['m.read'];
 
     // { @someone:xxx.com: { ts: 15878525620000 }, @anotherone:somewhere.net: { ts: 1587852560000 } } }
-    userTimestamps.forEach((userId, value) {
-      var userTimestamp = (value['ts'] as int);
-      usersRead[userId] = userTimestamp;
-      latestTimestamp =
-          userTimestamp > latestTimestamp ? userTimestamp : latestTimestamp;
-    });
+    userTimestamps.forEach(
+      (userId, value) {
+        var userTimestamp = (value['ts'] as int);
+        usersRead[userId] = userTimestamp;
+        latestTimestamp =
+            userTimestamp > latestTimestamp ? userTimestamp : latestTimestamp;
+      },
+    );
 
     return ReadStatus(
       userReads: usersRead,

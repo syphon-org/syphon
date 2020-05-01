@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+
 import 'package:redux/redux.dart';
 
 /**
@@ -22,32 +23,28 @@ class MatrixImage extends StatefulWidget {
   final String imageType;
   final BoxFit fit;
   final bool thumbnail;
+  final bool disableRebuild;
 
   const MatrixImage({
     Key key,
     @required this.mxcUri,
-    this.width,
-    this.height,
+    this.width = 48,
+    this.height = 48,
+    this.strokeWidth = 1.5,
     this.imageType,
-    this.strokeWidth,
-    this.fit,
+    this.fit = BoxFit.fill,
     this.thumbnail = true,
+    this.disableRebuild = false,
   }) : super(key: key);
 
   @override
-  MatrixImageState createState() => MatrixImageState(
-        mxcUri: this.mxcUri,
-      );
+  MatrixImageState createState() => MatrixImageState();
 }
 
 class MatrixImageState extends State<MatrixImage> {
-  final String mxcUri;
-  final double width;
-  final double height;
-  final double strokeWidth;
-  final String imageType;
-  final bool thumbnail;
-  final BoxFit fit;
+  final bool disableRebuild;
+
+  Uint8List finalUriData;
 
   @override
   void initState() {
@@ -62,21 +59,17 @@ class MatrixImageState extends State<MatrixImage> {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
-    if (!mediaCache.containsKey(mxcUri)) {
-      print('[MatrixImage] first hit, fetching $mxcUri');
-      store.dispatch(fetchThumbnail(mxcUri: mxcUri));
+    if (!mediaCache.containsKey(widget.mxcUri)) {
+      store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
+    }
+    if (this.disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
+      finalUriData = mediaCache[widget.mxcUri];
     }
   }
 
   MatrixImageState({
     Key key,
-    @required this.mxcUri,
-    this.width = 48,
-    this.height = 48,
-    this.strokeWidth = 1.5,
-    this.imageType,
-    this.fit,
-    this.thumbnail = true,
+    this.disableRebuild = false,
   });
 
   @override
@@ -84,25 +77,25 @@ class MatrixImageState extends State<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
-          if (!props.mediaCache.containsKey(this.mxcUri)) {
-            print('[MatrixImage] loading $mxcUri');
+          if (!props.mediaCache.containsKey(finalUriData ?? widget.mxcUri)) {
+            print('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               margin: EdgeInsets.all(8),
               child: CircularProgressIndicator(
-                strokeWidth: strokeWidth,
+                strokeWidth: widget.strokeWidth,
                 valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
                 value: null,
               ),
             );
           }
 
-          print('[MatrixImage] cache loaded $mxcUri');
+          print('[MatrixImage] cache hit ${widget.mxcUri}');
           return Image(
-            width: width,
-            height: height,
-            fit: fit,
+            width: widget.width,
+            height: widget.height,
+            fit: widget.fit,
             image: MemoryImage(
-              props.mediaCache[this.mxcUri],
+              finalUriData ?? props.mediaCache[widget.mxcUri],
             ),
           );
         },

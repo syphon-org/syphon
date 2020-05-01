@@ -5,7 +5,6 @@ import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
-import 'package:Tether/views/widgets/chat-avatar.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -244,7 +243,7 @@ class GroupSearchState extends State<GroupSearchView> {
                       );
 
                       // Override the initials if an avatar is present
-                      if (room.avatar.uri != null) {
+                      if (room.avatarUri != null) {
                         roomAvatar = ClipRRect(
                           borderRadius: BorderRadius.circular(
                             Dimensions.thumbnailSizeMax,
@@ -278,7 +277,7 @@ class GroupSearchState extends State<GroupSearchView> {
                                 ),
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: room.avatar.uri != null
+                                    backgroundColor: room.avatarUri != null
                                         ? Colors.transparent
                                         : Colors.grey,
                                     child: roomAvatar,

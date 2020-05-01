@@ -1,86 +1,73 @@
 import 'dart:collection';
-import 'dart:typed_data';
+import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:hive/hive.dart';
 
-@jsonSerializable
-class Avatar {
-  final String uri;
-  final String url;
-  final String type;
-  final Uint8List data;
+part 'model.g.dart';
 
-  const Avatar({
-    this.uri,
-    this.url,
-    this.type,
-    this.data,
-  });
-  Avatar copyWith({
-    uri,
-    url,
-    type,
-    data,
-  }) {
-    return Avatar(
-      uri: uri ?? this.uri,
-      url: url ?? this.url,
-      type: type ?? this.type,
-      data: data ?? this.data,
-    );
-  }
-
-  @override
-  String toString() {
-    return '{\n' +
-        'uri: $uri,\n' +
-        'url: $url,\b' +
-        'type: $type,\n' +
-        'data: $data,\n' +
-        '}';
-  }
-}
-
-@jsonSerializable
+@HiveType(typeId: RoomHiveId)
 class Room {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final String alias;
+  @HiveField(3)
   final String homeserver;
-  final Avatar avatar;
+  @HiveField(4)
   final String avatarUri;
+  @HiveField(5)
   final String topic;
+
+  @HiveField(6)
   final bool direct;
+  @HiveField(7)
   final bool syncing;
+  @HiveField(8)
   final bool sending;
+  @HiveField(9)
   final bool isDraftRoom;
+
+  @HiveField(10)
   final String startTime;
+  @HiveField(11)
   final String endTime;
+
+  @HiveField(12)
   final int lastUpdate;
+  @HiveField(13)
   final int totalJoinedUsers;
+
+  @HiveField(14)
   final bool guestEnabled;
+  @HiveField(15)
   final bool encryptionEnabled;
+  @HiveField(16)
   final bool worldReadable;
 
   // Event lists and handlers
+  @HiveField(17)
   final Message draft;
+  @HiveField(18)
   final List<User> users;
+  @HiveField(19)
   final List<Event> state;
+  @HiveField(20)
   final List<Message> messages;
+  @HiveField(21)
   final List<Message> outbox;
 
-  //TODO: remove after 0.0.4 release
-  @JsonProperty(ignore: true)
+  @HiveField(22)
   final bool userTyping;
 
-  //TODO: remove after 0.0.4 release
-  @JsonProperty(ignore: true)
+  @HiveField(23)
   final int lastRead;
 
-  //TODO: remove after 0.0.4 release
-  @JsonProperty(ignore: true)
+  @HiveField(24)
   final Map<String, ReadStatus> messageReads;
 
   const Room({
@@ -88,7 +75,6 @@ class Room {
     this.name = 'New Room',
     this.alias = '',
     this.homeserver,
-    this.avatar,
     this.avatarUri,
     this.topic = '',
     this.direct = false,
@@ -145,7 +131,6 @@ class Room {
       alias: alias ?? this.alias,
       avatarUri: avatarUri ?? this.avatarUri,
       homeserver: homeserver ?? this.homeserver,
-      avatar: avatar ?? this.avatar,
       direct: direct ?? this.direct,
       draft: draft ?? this.draft,
       sending: sending ?? this.sending,
@@ -173,7 +158,7 @@ class Room {
         alias: json['canonical_alias'],
         homeserver: (json['room_id'] as String).split(':')[1],
         topic: json['topic'],
-        avatar: Avatar(uri: json['url']), // mxc://
+        avatarUri: json['url'], // mxc uri
         totalJoinedUsers: json['num_joined_members'],
         guestEnabled: json['guest_can_join'],
         worldReadable: json['world_readable'],
@@ -186,50 +171,55 @@ class Room {
   }
 
   Room fromMessageEvents(
-    List<Event> messageEvents, {
+    List<Message> messageEvents, {
     String startTime,
     String endTime,
   }) {
-    int lastUpdate = this.lastUpdate;
-    List<Event> existingMessages =
-        this.messages.isNotEmpty ? List<Event>.from(this.messages) : [];
-    List<Message> outbox =
-        this.outbox.isNotEmpty ? List<Message>.from(this.outbox) : [];
-    List<Event> messages = messageEvents ?? [];
+    try {
+      int lastUpdate = this.lastUpdate;
 
-    // Converting only message events
-    final newMessages =
-        messages.where((event) => event.type == 'm.room.message').toList();
+      List<Message> messages = messageEvents ?? [];
+      List<Message> outbox = List<Message>.from(this.outbox ?? []);
+      List<Message> existingMessages = List<Message>.from(this.messages ?? []);
 
-    // See if the newest message has a greater timestamp
-    if (newMessages.isNotEmpty && messages[0].timestamp > lastUpdate) {
-      lastUpdate = messages[0].timestamp;
-    }
+      // Converting only message events
+      final newMessages =
+          messages.where((event) => event.type == 'm.room.message').toList();
 
-    // Combine current and existing messages on unique ids
-    final messagesMap = HashMap.fromIterable(
-      [existingMessages, newMessages].expand(
-        (sublist) => sublist.map(
-          (event) => event is Message ? event : Message.fromEvent(event),
+      // See if the newest message has a greater timestamp
+      if (newMessages.isNotEmpty && messages[0].timestamp > lastUpdate) {
+        lastUpdate = messages[0].timestamp;
+      }
+
+      // Combine current and existing messages on unique ids
+      final messagesMap = HashMap.fromIterable(
+        [existingMessages, newMessages].expand(
+          (sublist) => sublist.map(
+            (event) => event,
+          ),
         ),
-      ),
-      key: (message) => message.id,
-      value: (message) => message,
-    );
+        key: (message) => message.id,
+        value: (message) => message,
+      );
 
-    outbox.removeWhere((message) => messagesMap.containsKey(message.id));
+      outbox.removeWhere((message) => messagesMap.containsKey(message.id));
 
-    // Confirm sorting the messages here, I think this should be done by the
-    final combinedMessages = List<Message>.from(messagesMap.values);
+      // Confirm sorting the messages here, I think this should be done by the
+      final combinedMessages = List<Message>.from(messagesMap.values);
 
-    // Add to room
-    return this.copyWith(
-      messages: combinedMessages,
-      outbox: outbox,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-    );
+      // Add to room
+      return this.copyWith(
+        messages: combinedMessages,
+        outbox: outbox,
+        lastUpdate: lastUpdate ?? this.lastUpdate,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+      );
+    } catch (error) {
+      print('**** FROM MESSAGE EVENTS ERRO *****');
+      print(error);
+      return this;
+    }
   }
 
   /**
@@ -303,7 +293,6 @@ class Room {
     int limit,
   }) {
     String name;
-    Avatar avatar;
     String avatarUri;
     String topic;
     int namePriority = 4;
@@ -339,11 +328,6 @@ class Room {
           case 'm.room.avatar':
             final avatarFile = event.content['thumbnail_file'];
             if (avatarFile == null) {
-              // Keep previous avatar url until the new uri is fetched
-              avatar = this.avatar != null ? this.avatar : Avatar();
-              avatar = avatar.copyWith(
-                uri: event.content['url'],
-              );
               avatarUri = event.content['url'];
             }
             break;
@@ -365,7 +349,6 @@ class Room {
 
     return this.copyWith(
       name: name ?? this.name ?? 'New Room',
-      avatar: avatar ?? this.avatar,
       avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
@@ -393,8 +376,9 @@ class Room {
     final List<Event> stateEvents =
         rawStateEvents.map((event) => Event.fromJson(event)).toList();
 
-    final List<Event> messageEvents =
-        rawTimelineEvents.map((event) => Event.fromJson(event)).toList();
+    final List<Message> messageEvents = rawTimelineEvents
+        .map((event) => Message.fromEvent(Event.fromJson(event)))
+        .toList();
 
     return this
         .fromStateEvents(
@@ -419,7 +403,6 @@ class Room {
         'direct: $direct,\n' +
         'syncing: $syncing,\n' +
         'state: $state,\n' +
-        'avatar: $avatar,\n' +
         '}';
   }
 }

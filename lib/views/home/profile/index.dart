@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Tether/store/user/actions.dart';
 import 'package:Tether/store/user/model.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +102,10 @@ class ProfileViewState extends State<ProfileView> {
               onTap: () async {
                 final File image = await ImagePicker.pickImage(
                   source: ImageSource.camera,
+                  maxWidth: Dimensions.avatarSizeMax,
+                  maxHeight: Dimensions.avatarSizeMax,
                 );
+
                 this.setState(() {
                   newAvatarFile = image;
                 });
@@ -123,6 +127,8 @@ class ProfileViewState extends State<ProfileView> {
             ListTile(
               onTap: () async {
                 final File image = await ImagePicker.pickImage(
+                  maxWidth: Dimensions.avatarSizeMax,
+                  maxHeight: Dimensions.avatarSizeMax,
                   source: ImageSource.gallery,
                 );
                 this.setState(() {
@@ -175,6 +181,8 @@ class ProfileViewState extends State<ProfileView> {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           final double imageSize = width * 0.28;
+          final currentAvatar = props.user.avatarUri;
+
           // Space for confirming rebuilding
           dynamic avatarWidget = CircleAvatar(
             backgroundColor: Colors.grey,
@@ -191,12 +199,23 @@ class ProfileViewState extends State<ProfileView> {
             avatarWidget = ClipRRect(
               borderRadius: BorderRadius.circular(imageSize),
               child: Image.file(
-                this.newAvatarFile,
+                this.newAvatarFile ?? props.user.avatarUri,
+                width: imageSize,
+                height: imageSize,
+              ),
+            );
+          } else if (currentAvatar != null) {
+            avatarWidget = ClipRRect(
+              borderRadius: BorderRadius.circular(imageSize),
+              child: MatrixImage(
+                fit: BoxFit.fill,
+                mxcUri: props.user.avatarUri,
                 width: imageSize,
                 height: imageSize,
               ),
             );
           }
+
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -341,7 +360,7 @@ class ProfileViewState extends State<ProfileView> {
                                         disabledColor: Colors.grey,
                                         onPressed: !props.loading
                                             ? () async {
-                                                final successful =
+                                                final bool successful =
                                                     await props.onSaveProfile(
                                                   newUserId: null,
                                                   newAvatarFile:
@@ -450,13 +469,8 @@ class _Props extends Equatable {
           }
 
           if (newAvatarFile != null) {
-            // final bool successful = await store.dispatch(
-            //   updateAvatarPhoto(localFile: newAvatarFile),
-            // );
             final bool successful = await store.dispatch(
-              updateAvatarUri(
-                mxcUri: 'mxc://matrix.org/dvbKIMzaFQWETZfKgSnOsnFs',
-              ),
+              updateAvatarPhoto(localFile: newAvatarFile),
             );
             if (!successful) return false;
           }

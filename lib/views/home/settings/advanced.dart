@@ -3,6 +3,7 @@ import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,8 +16,9 @@ class AdvancedScreen extends StatelessWidget {
   AdvancedScreen({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           final contentPadding =
               EdgeInsets.symmetric(horizontal: 24, vertical: 8);
@@ -142,7 +144,10 @@ class AdvancedScreen extends StatelessWidget {
                     contentPadding: contentPadding,
                     title: Text(
                       'Manual Sync',
-                      style: TextStyle(fontSize: 18.0),
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: props.loading ? Color(DISABLED_GREY) : null,
+                      ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
@@ -158,18 +163,16 @@ class AdvancedScreen extends StatelessWidget {
                   ),
                 ),
                 Opacity(
-                  // opacity: props.loading ? 0.5 : 1,
-                  opacity: 0.5,
+                  opacity: props.loading ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: null,
-                    // onTap: props.loading ? null : props.onForceFullSync,
+                    onTap: props.loading ? null : props.onForceFullSync,
                     contentPadding: contentPadding,
                     title: Text(
                       'Force Full Sync',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: props.loading ? Colors.grey : Colors.white,
+                        color: props.loading ? Color(DISABLED_GREY) : null,
                       ),
                     ),
                     subtitle: Text(
@@ -190,7 +193,7 @@ class AdvancedScreen extends StatelessWidget {
       );
 }
 
-class Props {
+class _Props extends Equatable {
   final bool syncing;
   final bool loading;
   final bool roomsLoading;
@@ -200,7 +203,7 @@ class Props {
   final Function onManualSync;
   final Function onForceFullSync;
 
-  Props({
+  _Props({
     @required this.syncing,
     @required this.loading,
     @required this.roomsLoading,
@@ -211,44 +214,39 @@ class Props {
     @required this.roomsObserverEnabled,
   });
 
+  @override
+  List<Object> get props => [
+        syncing,
+        loading,
+        roomsLoading,
+        roomsObserverEnabled,
+      ];
+
   /* effectively mapStateToProps, but includes functions */
-  static Props mapStoreToProps(
+  static _Props mapStoreToProps(
     Store<AppState> store,
   ) =>
-      Props(
-          syncing: store.state.roomStore.syncing,
-          loading:
-              store.state.roomStore.syncing || store.state.roomStore.loading,
-          roomsLoading: store.state.roomStore.loading,
-          language: store.state.settingsStore.language,
-          roomsObserverEnabled: store.state.roomStore.roomObserver.isActive,
-          onToggleSyncing: () {
-            final observer = store.state.roomStore.roomObserver;
-            if (observer != null && observer.isActive) {
-              store.dispatch(stopRoomsObserver());
-            } else {
-              store.dispatch(startRoomsObserver());
-            }
-          },
-          onForceFullSync: () {
-            store.dispatch(fetchSync());
-          },
-          onManualSync: () {
-            if (store.state.roomStore.lastSince != null) {
-              store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
-            }
-          });
-
-  @override
-  int get hashCode => syncing.hashCode ^ roomsLoading.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Props &&
-          runtimeType == other.runtimeType &&
-          syncing == other.syncing &&
-          loading == other.loading &&
-          roomsObserverEnabled == other.roomsObserverEnabled &&
-          roomsLoading == other.roomsLoading;
+      _Props(
+        syncing: store.state.roomStore.syncing,
+        loading: store.state.roomStore.syncing || store.state.roomStore.loading,
+        roomsLoading: store.state.roomStore.loading,
+        language: store.state.settingsStore.language,
+        roomsObserverEnabled: store.state.roomStore.roomObserver.isActive,
+        onToggleSyncing: () {
+          final observer = store.state.roomStore.roomObserver;
+          if (observer != null && observer.isActive) {
+            store.dispatch(stopRoomsObserver());
+          } else {
+            store.dispatch(startRoomsObserver());
+          }
+        },
+        onManualSync: () {
+          if (store.state.roomStore.lastSince != null) {
+            store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
+          }
+        },
+        onForceFullSync: () {
+          store.dispatch(fetchSync());
+        },
+      );
 }
