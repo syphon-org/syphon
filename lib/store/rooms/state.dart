@@ -10,12 +10,11 @@ part 'state.g.dart';
 
 @HiveType(typeId: RoomStoreHiveId)
 class RoomStore extends Equatable {
+  final bool loading;
+  final bool syncing;
+
   @HiveField(0)
   final bool synced;
-  @HiveField(1)
-  final bool loading;
-  @HiveField(2)
-  final bool syncing;
 
   @HiveField(3)
   final int lastUpdate; // Last timestamp for actual new info

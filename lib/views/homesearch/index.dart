@@ -11,7 +11,7 @@ import 'package:Tether/store/search/selectors.dart';
 import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/state.dart';
 
 // Assets
 

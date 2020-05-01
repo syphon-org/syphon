@@ -179,13 +179,8 @@ class Room {
       int lastUpdate = this.lastUpdate;
 
       List<Message> messages = messageEvents ?? [];
-      print('**** FROM MESSAGE EVENTS messages ${messages.runtimeType}');
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
-      print('**** FROM MESSAGE EVENTS outbox ${messages.runtimeType}');
       List<Message> existingMessages = List<Message>.from(this.messages ?? []);
-      print(
-        '**** FROM MESSAGE EVENTS existingMessages ${messages.runtimeType}',
-      );
 
       // Converting only message events
       final newMessages =

@@ -67,9 +67,6 @@ class Event {
   */
   final dynamic content;
 
-  String get msgtypeRaw =>
-      type == 'm.room.message' && content != null ? content['msgtype'] : null;
-
   const Event({
     this.id,
     this.userId,
@@ -152,6 +149,10 @@ class Message {
   @HiveField(14)
   final String formattedBody;
 
+  /* 
+  * TODO: content will not always be a string? configure parsing data
+  * or more complex objects
+  */
   final dynamic content;
 
   const Message({

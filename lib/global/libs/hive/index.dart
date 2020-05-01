@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/state.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,41 +23,10 @@ class Cache {
   static const defaultKey = 'tether@publicKey';
 }
 
-Future<dynamic> initHiveStorageUnsafe() async {
-  var storageLocation;
-
-  // Init storage location
-  try {
-    storageLocation = await getApplicationDocumentsDirectory();
-  } catch (error) {
-    print('[initHiveStorage] storage location failure - $error');
-  }
-
-  // Init hive cache + adapters
-  Hive.init(storageLocation.path);
-
-  // Custom Models
-  Hive.registerAdapter(ThemeTypeAdapter());
-  Hive.registerAdapter(ChatSettingAdapter());
-  Hive.registerAdapter(RoomAdapter());
-  Hive.registerAdapter(MessageAdapter());
-  Hive.registerAdapter(EventAdapter());
-  Hive.registerAdapter(ReadStatusAdapter());
-
-  // Custom Store Models
-  Hive.registerAdapter(MediaStoreAdapter());
-  Hive.registerAdapter(SettingsStoreAdapter());
-  Hive.registerAdapter(RoomStoreAdapter());
-
-  return await Hive.openBox(Cache.globalBox);
-}
-
 /**
- * Initializes encrypted storage for caching 
- * Testing:
-    print(box);
-    print(box.keys);
-    print(box.get('someone')); 
+ * initHiveStorage - default
+ * 
+ * Initializes encrypted storage for caching  
  */
 Future<dynamic> initHiveStorage() async {
   var storageLocation;
@@ -62,14 +35,41 @@ Future<dynamic> initHiveStorage() async {
   var storageEncryptionKey = Hive.generateSecureKey();
 
   // Init storage location
-  try {
-    storageLocation = await getApplicationDocumentsDirectory();
-  } catch (error) {
-    print('[initHiveStorage] storage location failure - $error');
+
+  if (Platform.isIOS || Platform.isAndroid) {
+    try {
+      storageLocation = await getApplicationDocumentsDirectory();
+    } catch (error) {
+      print('[initHiveStorage] storage location failure - $error');
+    }
+  }
+
+  if (Platform.isMacOS) {
+    final storageLocation = await File('cache').create().then(
+          (value) => value.writeAsString(
+            '{}',
+            flush: true,
+          ),
+        );
   }
 
   // Init hive cache
   Hive.init(storageLocation.path);
+
+  // Init Custom Models
+  Hive.registerAdapter(ThemeTypeAdapter());
+  Hive.registerAdapter(ChatSettingAdapter());
+  Hive.registerAdapter(RoomAdapter());
+  Hive.registerAdapter(MessageAdapter());
+  Hive.registerAdapter(EventAdapter());
+  Hive.registerAdapter(ReadStatusAdapter());
+  Hive.registerAdapter(UserAdapter());
+
+  // Init Custom Store Models
+  Hive.registerAdapter(MediaStoreAdapter());
+  Hive.registerAdapter(SettingsStoreAdapter());
+  Hive.registerAdapter(RoomStoreAdapter());
+  Hive.registerAdapter(UserStoreAdapter());
 
   // Init storage engine for hive key
   try {
@@ -124,4 +124,40 @@ Future<dynamic> initHiveStorage() async {
 void closeStorage() async {
   Box<dynamic> box = Hive.box(Cache.globalBox);
   box.close();
+}
+
+/**
+ * initHiveStorage UNSAFE
+ * 
+ * For testing purposes only
+ */
+Future<dynamic> initHiveStorageUnsafe() async {
+  var storageLocation;
+
+  // Init storage location
+  try {
+    storageLocation = await getApplicationDocumentsDirectory();
+  } catch (error) {
+    print('[initHiveStorage] storage location failure - $error');
+  }
+
+  // Init hive cache + adapters
+  Hive.init(storageLocation.path);
+
+  // Custom Models
+  Hive.registerAdapter(ThemeTypeAdapter());
+  Hive.registerAdapter(ChatSettingAdapter());
+  Hive.registerAdapter(RoomAdapter());
+  Hive.registerAdapter(MessageAdapter());
+  Hive.registerAdapter(EventAdapter());
+  Hive.registerAdapter(ReadStatusAdapter());
+  Hive.registerAdapter(UserAdapter());
+
+  // Custom Store Models
+  Hive.registerAdapter(MediaStoreAdapter());
+  Hive.registerAdapter(SettingsStoreAdapter());
+  Hive.registerAdapter(RoomStoreAdapter());
+  Hive.registerAdapter(UserStoreAdapter());
+
+  return await Hive.openBox(Cache.globalBox);
 }

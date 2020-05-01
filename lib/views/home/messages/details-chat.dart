@@ -193,7 +193,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
         ? null
         : const Color(DISABLED_GREY);
 
-    print('rebuilding?');
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStoreToProps(

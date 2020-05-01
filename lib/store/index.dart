@@ -1,24 +1,22 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/media/reducer.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
+// Temporary State Store
 import './alerts/model.dart';
-import './user/model.dart';
-import './rooms/room/model.dart';
-import './rooms/events/model.dart';
 import './search/model.dart';
 
-// States for Stores
+// Persisted State Stores
 import './media/state.dart';
 import './rooms/state.dart';
 import './settings/state.dart';
+import './user/state.dart';
 
 // Reducers for Stores
 import './alerts/reducer.dart';
@@ -45,46 +43,27 @@ AppState appReducer(AppState state, action) {
  * Initialize Store
  * - Hot redux state cache for top level data
  * * Consider still using hive here
+ * 
+ * PLEASE NOTE redux persist manages when the store
+ * should persist and if it can, not where it's persisting too
+ * this is why the "storage: MemoryStore()" property is set and
+ * the Hive Serializer has been impliemented
  */
 Future<Store> initStore() async {
-  var storageEngine;
-
-  if (Platform.isIOS || Platform.isAndroid) {
-    storageEngine = FlutterStorage();
-  }
-
-  if (Platform.isMacOS) {
-    final storageLocation = await File('cache').create().then(
-          (value) => value.writeAsString(
-            '{}',
-            flush: true,
-          ),
-        );
-    storageEngine = FileStorage(storageLocation);
-  }
-
-  // TODO: this is causing a small blip in rendering
   final persistor = Persistor<AppState>(
-    storage: storageEngine,
-    debug: true,
-    throttleDuration: Duration(seconds: 5),
-    serializer: JsonSerializer<AppState>(
-      AppState.fromJson,
-    ),
-  );
-
-  // Load available json list decorators
-  JsonMapper.registerValueDecorator<List<User>>(
-    (value) => value.cast<User>(),
+    storage: MemoryStorage(),
+    throttleDuration: Duration(seconds: 3),
+    serializer: HiveSerializer(),
   );
 
   // Finally load persisted store
   var initialState;
+
   try {
     initialState = await persistor.load();
-    print('[initStore] persist loaded successfully');
+    print('[Redux Persist Load] persist loaded successfully');
   } catch (error) {
-    print('[initStore] error $error');
+    print('[Redux Persist Load] error $error');
   }
 
   final Store<AppState> store = new Store<AppState>(
@@ -157,55 +136,58 @@ class AppState {
         '\nsettingsStore: $settingsStore,' +
         '\n}';
   }
+}
 
-  // Allows conversion TO json for redux_persist
-  dynamic toJson() {
-    try {
-      Cache.hive.put(
-        mediaStore.runtimeType.toString(),
-        mediaStore,
-      );
-    } catch (error) {
-      print('[AppState.toJson - MediaStore] - $error');
-    }
-    try {
-      Cache.hive.put(
-        settingsStore.runtimeType.toString(),
-        settingsStore,
-      );
-    } catch (error) {
-      print('[AppState.toJson - SettingsStore] error - $error');
-    }
+/// Serializer for a [Uint8List] state, basically pass-through
+class HiveSerializer implements StateSerializer<AppState> {
+  @override
+  Uint8List encode(AppState state) {
+    // Fail whole conversion if user fails
+    Cache.hive.put(
+      state.userStore.runtimeType.toString(),
+      state.userStore,
+    );
 
     try {
       Cache.hive.put(
-        roomStore.runtimeType.toString(),
-        roomStore,
+        state.mediaStore.runtimeType.toString(),
+        state.mediaStore,
       );
     } catch (error) {
-      print('[AppState.toJson - SettingsStore] error - $error');
+      print('[Hive Storage MediaStore] - $error');
+    }
+    try {
+      Cache.hive.put(
+        state.settingsStore.runtimeType.toString(),
+        state.settingsStore,
+      );
+    } catch (error) {
+      print('[Hive Storage SettingsStore] error - $error');
     }
 
-    return {
-      'loading': loading,
-      'userStore': JsonMapper.toJson(userStore),
-    };
+    try {
+      Cache.hive.put(
+        state.roomStore.runtimeType.toString(),
+        state.roomStore,
+      );
+    } catch (error) {
+      print('[Hive Storage RoomStore] error - $error');
+    }
+
+    // Disregard redux persist storage saving
+    return null;
   }
 
-  /* 
-    Allows conversion FROM json for redux_persist
-    prevents one store from breaking every persist
-  */
-  static AppState fromJson(dynamic json) {
-    if (json == null) {
-      return AppState();
-    }
-
+  AppState decode(Uint8List data) {
+    UserStore userStoreConverted = UserStore();
     MediaStore mediaStoreConverted = MediaStore();
     SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
 
-    UserStore userStoreConverted = UserStore();
+    userStoreConverted = Cache.hive.get(
+      userStoreConverted.runtimeType.toString(),
+      defaultValue: UserStore(),
+    );
 
     try {
       mediaStoreConverted = Cache.hive.get(
@@ -234,16 +216,8 @@ class AppState {
       print('[AppState.fromJson - roomStoreConverted] error $error');
     }
 
-    try {
-      userStoreConverted = JsonMapper.fromJson<UserStore>(
-        json['userStore'],
-      );
-    } catch (error) {
-      print('[AppState.fromJson] userStoreConverted error $error');
-    }
-
     return AppState(
-      loading: json['loading'],
+      loading: false,
       userStore: userStoreConverted,
       settingsStore: settingsStoreConverted,
       roomStore: roomStoreConverted,
