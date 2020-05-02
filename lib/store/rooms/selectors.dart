@@ -8,7 +8,7 @@ List<Room> rooms(AppState state) {
 
 Room room({AppState state, String id}) {
   if (state.roomStore.rooms == null) return Room();
-  return state.roomStore.rooms[id];
+  return state.roomStore.rooms[id] ?? Room();
 }
 
 List<Room> sortedPrioritizedRooms(Map rooms) {

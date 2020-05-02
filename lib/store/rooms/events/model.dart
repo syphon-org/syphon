@@ -5,9 +5,13 @@ part 'model.g.dart';
 
 /**
  * Event Models and Types
- * 
- * I'd really love to use inheritance here
+ *  
+ * https://matrix.org/docs/spec/client_server/latest#m-room-message-msgtypes
  */
+class AccountDataTypes {
+  static const DIRECT = 'm.direct';
+}
+
 class EventTypes {
   static const MESSAGE = 'm.room.message';
   static const ROOM_CREATION = 'm.room.create';
@@ -19,19 +23,6 @@ class EventTypes {
   static const HISTORY_VISIBILITY = 'm.room.history_visibility';
   static const POWER_LEVELS = 'm.room.power_levels';
 }
-
-/** https://matrix.org/docs/spec/client_server/latest#m-room-message-msgtypes
-   * 
-    13.2.1.7.1   m.text
-    13.2.1.7.2   m.emote
-    13.2.1.7.3   m.notice
-    13.2.1.7.4   m.image
-    13.2.1.7.5   m.file
-    13.2.1.7.6   m.audio
-    13.2.1.7.7   m.location
-    13.2.1.7.8   m.video 
-   *
-   */
 
 class MessageTypes {
   static const TEXT = 'm.text';

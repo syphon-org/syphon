@@ -81,12 +81,32 @@ dynamic buildCreateRoom({
   String accessToken,
   String roomName,
   String roomAlias,
-  List<String> invites,
-  bool isDirect,
+  String roomTopic,
+  List<String> invites = const [],
+  String chatTypePreset = "private_chat",
+  bool isDirect = false,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/createRoom';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url, 'headers': headers};
+  Map body = {
+    "name": roomName,
+    "is_direct": isDirect,
+    "preset": chatTypePreset,
+    'invite': invites
+  };
+
+  // if (roomAlias != null) {
+  //   body['room_alias_name:'] = roomAlias;
+  // }
+  // if (roomTopic != null) {
+  //   body['topic'] = roomTopic;
+  // }
+
+  return {
+    'url': url,
+    'headers': headers,
+    'body': body,
+  };
 }

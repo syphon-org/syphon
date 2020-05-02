@@ -381,6 +381,7 @@ class _Props extends Equatable {
           return store.dispatch(createDraftRoom(
             users: <User>[user],
             name: user.displayName,
+            avatarUri: user.avatarUri,
             isDirect: true,
           ));
         },

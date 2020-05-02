@@ -3,10 +3,10 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
@@ -104,11 +104,16 @@ class ChatViewState extends State<ChatView> {
     final draft = room.draft;
 
     if (room.draft != null && room.draft.type == MessageTypes.TEXT) {
+      final text = draft.body;
+      this.setState(() {
+        sendable = text != null && text.isNotEmpty;
+      });
+
       editorController.value = TextEditingValue(
-        text: draft.body,
+        text: text,
         selection: TextSelection.fromPosition(
           TextPosition(
-            offset: draft.body.length,
+            offset: text.length,
           ),
         ),
       );
@@ -233,6 +238,28 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
+  @protected
+  onSubmitMessage(_Props props) async {
+    if (props.room.isDraftRoom) {
+      final convertedRoomId = await props.onConvertDraftRoom();
+      final arguements =
+          ModalRoute.of(context).settings.arguments as ChatViewArguements;
+      Navigator.of(context).pushReplacementNamed(
+        '/home/chat',
+        arguments: ChatViewArguements(
+          roomId: convertedRoomId.id,
+          title: arguements.title,
+        ),
+      );
+    }
+    props.onSendMessage(
+      body: editorController.text,
+      roomId: props.room.id,
+    );
+    editorController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
   /**
    *    
     StoreConnector<AppState, _Props>(
@@ -271,7 +298,6 @@ class ChatViewState extends State<ChatView> {
       children: <Widget>[
         Container(
           constraints: BoxConstraints(
-            maxHeight: 46,
             maxWidth: messageInputWidth,
           ),
           child: TextField(
@@ -282,14 +308,8 @@ class ChatViewState extends State<ChatView> {
             focusNode: inputFieldNode,
             controller: editorController,
             onChanged: (text) => onUpdateMessage(text, props),
-            onSubmitted: (text) {
-              props.onSendMessage(
-                body: editorController.text,
-                roomId: props.room.id,
-              );
-              editorController.clear();
-              FocusScope.of(context).unfocus();
-            },
+            onSubmitted:
+                !sendable ? null : (text) => this.onSubmitMessage(props),
             style: TextStyle(
               height: 1.5,
               color: inputTextColor,
@@ -312,16 +332,7 @@ class ChatViewState extends State<ChatView> {
           padding: EdgeInsets.symmetric(vertical: 4),
           child: InkWell(
             borderRadius: BorderRadius.circular(48),
-            onTap: sendable
-                ? () {
-                    props.onSendMessage(
-                      body: editorController.text,
-                      roomId: props.room.id,
-                    );
-                    editorController.clear();
-                    FocusScope.of(context).unfocus();
-                  }
-                : null,
+            onTap: !sendable ? null : () => this.onSubmitMessage(props),
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Icon(
@@ -674,6 +685,7 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
+  final Function onConvertDraftRoom;
 
   _Props({
     @required this.room,
@@ -687,11 +699,13 @@ class _Props extends Equatable {
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
+    @required this.onConvertDraftRoom,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.userStore.user.userId,
         theme: store.state.settingsStore.theme,
+        roomsLoading: store.state.roomStore.loading,
         room: roomSelectors.room(
           id: roomId,
           state: store.state,
@@ -705,7 +719,6 @@ class _Props extends Equatable {
             ),
           ),
         ),
-        roomsLoading: store.state.roomStore.loading,
         roomPrimaryColor: () {
           final customChatSettings =
               store.state.settingsStore.customChatSettings ?? Map();
@@ -729,14 +742,12 @@ class _Props extends Equatable {
         onSendMessage: ({
           String body,
           String type,
-        }) {
-          if (body != null && body.length > 1) {
-            store.dispatch(sendMessage(
-              body: body,
-              room: store.state.roomStore.rooms[roomId],
-              type: type,
-            ));
-          }
+        }) async {
+          store.dispatch(sendMessage(
+            body: body,
+            room: store.state.roomStore.rooms[roomId],
+            type: type,
+          ));
         },
         onDeleteMessage: ({
           Message message,
@@ -751,6 +762,10 @@ class _Props extends Equatable {
             roomId: roomId,
           ),
         ),
+        onConvertDraftRoom: () async {
+          final room = store.state.roomStore.rooms[roomId];
+          return store.dispatch(convertDraftRoom(room: room));
+        },
       );
 
   @override

@@ -275,6 +275,7 @@ class HomeViewState extends State<Home> {
           primaryColor = Color(roomSettings.primaryColor);
         }
 
+        print("$room");
         var backgroundColor;
         if (selectedRoom != null) {
           if (selectedRoom.id != room.id) {
@@ -369,6 +370,8 @@ class HomeViewState extends State<Home> {
                       ),
                       Text(
                         formatPreview(room: room),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.caption.merge(
                               TextStyle(
                                 fontStyle:

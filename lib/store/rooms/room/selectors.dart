@@ -9,6 +9,10 @@ String formatPreviewTopic(String fullTopic, {String defaultTopic}) {
       : topic;
 }
 
+String formatPreviewMessage(String message) {
+  return message.replaceAll('\n', ' ');
+}
+
 String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
@@ -16,11 +20,11 @@ String formatTotalUsers(int totalUsers) {
 String formatPreview({Room room, Message recentMessage}) {
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null) {
-    return 'Draft: ${room.draft.body}';
+    return 'Draft: ${formatPreviewMessage(room.draft.body)}';
   }
 
   if (room.isDraftRoom) {
-    return 'Draft:';
+    return 'Empty Draft';
   }
 
   // Show topic if the user has joined a group but not sent anything (lurkin')
@@ -29,12 +33,7 @@ String formatPreview({Room room, Message recentMessage}) {
   }
 
   final messages = latestMessages(room.messages);
-  var previewMessage = messages[0].body;
-
-  if (previewMessage.length > 42) {
-    previewMessage = previewMessage.substring(0, 42).replaceAll('\n', '');
-    previewMessage = '$previewMessage...';
-  }
+  final previewMessage = formatPreviewMessage(messages[0].body);
 
   return previewMessage;
 }

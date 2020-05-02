@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
+import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
@@ -43,14 +44,27 @@ class SetRoomObserver {
   SetRoomObserver({this.roomObserver});
 }
 
+class SetRooms {
+  final List<Room> rooms;
+  SetRooms({this.rooms});
+}
+
 class SetRoom {
   final Room room;
   SetRoom({this.room});
 }
 
-class SetRooms {
-  final List<Room> rooms;
-  SetRooms({this.rooms});
+// Atomically Update specific room attributes
+class UpdateRoom {
+  final String id; // room id
+  final Message draft;
+  final bool syncing;
+
+  UpdateRoom({
+    this.id,
+    this.draft,
+    this.syncing,
+  });
 }
 
 class RemoveRoom {
@@ -104,19 +118,6 @@ class DeleteOutboxMessage {
 
   DeleteOutboxMessage({
     this.message,
-  });
-}
-
-// Atomically Update specific room attributes
-class UpdateRoom {
-  final String id; // room id
-  final Message draft;
-  final bool syncing;
-
-  UpdateRoom({
-    this.id,
-    this.draft,
-    this.syncing,
   });
 }
 
@@ -403,6 +404,168 @@ ThunkAction<AppState> fetchDirectRooms() {
 }
 
 /**
+ * Create Draft Room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * A local only room that has not been established with matrix
+ * meant to prep a room or first message before actually creating it 
+ */
+ThunkAction<AppState> createDraftRoom({
+  String name = 'New Chat',
+  String topic,
+  String avatarUri,
+  List<User> users,
+  bool isDirect = false,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final draftId = Random.secure().nextInt(1 << 32).toString();
+
+      final draftRoom = Room(
+        id: draftId,
+        name: name,
+        topic: topic,
+        direct: isDirect,
+        avatarUri: avatarUri,
+        isDraftRoom: true,
+        users: users,
+      );
+
+      await store.dispatch(SetRoom(room: draftRoom));
+      return draftRoom;
+    } catch (error) {
+      print('[createDraftRoom] error: $error');
+      return null;
+    }
+  };
+}
+
+/**
+ * Create Room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * the user can only delete if owning the room, or leave if
+ * just a member
+ */
+ThunkAction<AppState> createRoom({
+  String name = 'New Chat',
+  String alias,
+  String topic,
+  List<User> invites,
+  bool isDirect = false,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final request = buildCreateRoom(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        roomName: name,
+        roomTopic: topic,
+        roomAlias: alias,
+        invites: invites.map((user) => user.userId).toList(),
+        isDirect: isDirect,
+      );
+
+      print(json.encode(request['body']));
+
+      final response = await http.post(
+        request['url'],
+        headers: request['headers'],
+        body: json.encode(
+          request['body'],
+        ),
+      );
+
+      final data = json.decode(
+        response.body,
+      );
+
+      final newRoomId = data['room_id'];
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('[createRoom] $data $newRoomId');
+
+      if (isDirect) {
+        final request = buildSaveAccountData(
+          protocol: protocol,
+          accessToken: store.state.userStore.user.accessToken,
+          homeserver: store.state.userStore.homeserver,
+          userId: store.state.userStore.user.userId,
+          type: AccountDataTypes.DIRECT,
+        );
+
+        final body = {
+          invites[0].userId: [newRoomId]
+        };
+
+        final response = await http.put(
+          request['url'],
+          headers: request['headers'],
+          body: json.encode(body),
+        );
+
+        final data = json.decode(
+          response.body,
+        );
+
+        print('[Save Account Data] $data');
+      }
+
+      return newRoomId;
+    } catch (error) {
+      print('[createRoom] error: $error');
+      return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Convert a draft room to a remote matrix room
+ */
+ThunkAction<AppState> convertDraftRoom({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // store.dispatch(SetSending(room: room, sending: true));
+      if (!room.isDraftRoom) {
+        throw 'Room has already been created';
+      }
+
+      final newRoomId = await store.dispatch(
+        createRoom(
+          name: room.name,
+          topic: room.topic,
+          invites: room.users,
+          isDirect: room.direct,
+        ),
+      );
+
+      if (newRoomId == null) {
+        throw 'Failed to convert draft room to a real room';
+      }
+
+      // To temporarily redirect to the new room in the UI
+      return Room(
+        id: newRoomId,
+        name: room.name,
+      );
+    } catch (error) {
+      print('[createRoom] error: $error');
+      return null;
+    }
+  };
+}
+
+/**
  * Delete Room
  * 
  * TODO: make sure this is in accordance with matrix in that
@@ -430,68 +593,6 @@ ThunkAction<AppState> leaveRoom({String roomId}) {
     }
   };
 }
-
-ThunkAction<AppState> createDraftRoom({
-  List<User> users,
-  String name = 'New Chat',
-  String topic,
-  bool isDirect = false,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      final draftId = Random.secure().nextInt(1 << 32).toString();
-
-      print(draftId);
-
-      final draftRoom = Room(
-        id: draftId,
-        name: name,
-        topic: topic,
-        isDraftRoom: true,
-        users: users,
-      );
-
-      await store.dispatch(SetRoom(room: draftRoom));
-      return draftRoom;
-    } catch (error) {
-      print('[createDraftRoom] error: $error');
-      return null;
-    }
-  };
-}
-
-ThunkAction<AppState> convertDraftRoom({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      if (!room.isDraftRoom) {
-        throw 'Room has already been created';
-      }
-
-      final request = buildCreateRoom(
-        protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
-        invites: room.users.map((user) => user.userId).toList(),
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      print('[createRoom] error: $error');
-    }
-  };
-}
-
-// /_matrix/client/r0/createRoom
-
 /******* DEV TOOLS BEYOND THIS POINT ********/
 
 // WARNING: ONLY FOR TESTING OUTPUT

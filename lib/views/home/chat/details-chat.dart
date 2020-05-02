@@ -610,7 +610,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               title: Text(
                                 'Leave group',
                                 style: TextStyle(
-                                    fontSize: 18.0, color: Colors.redAccent),
+                                  fontSize: 18.0,
+                                  color: Colors.redAccent,
+                                ),
                               ),
                             ),
                           ],
