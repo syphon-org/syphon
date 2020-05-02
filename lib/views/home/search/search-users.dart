@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/actions.dart';
+import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/views/home/chat/index.dart';
@@ -12,6 +14,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 
@@ -55,6 +58,7 @@ class SearchUserState extends State<SearchUserView> {
 
   Timer searchTimeout;
   bool searching = false;
+  String creatingRoomDisplayName;
 
   @override
   void initState() {
@@ -114,6 +118,89 @@ class SearchUserState extends State<SearchUserView> {
     }
   }
 
+  /**
+   *  
+   * // TODO: Room Drafts
+     Navigator.popAndPushNamed(
+        context,
+        '/home/chat',
+        arguments: ChatViewArguements(
+          roomId: newRoom.id,
+          title: newRoom.name,
+        ),
+      );
+   */
+  @protected
+  void onSelectUser({BuildContext context, _Props props, User user}) async {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text('Chat with ${user.displayName}'),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: width * 0.05,
+          vertical: 12,
+        ),
+        children: <Widget>[
+          Text(
+            StringStore.start_chat_notice,
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SimpleDialogOption(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'cancel',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+                SimpleDialogOption(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  onPressed: () async {
+                    this.setState(() {
+                      creatingRoomDisplayName = user.displayName;
+                    });
+                    final newRoomId = await props.onCreateRoom(user: user);
+                    Navigator.pop(context);
+                    Navigator.popAndPushNamed(
+                      context,
+                      '/home/chat',
+                      arguments: ChatViewArguements(
+                        roomId: newRoomId,
+                        title: creatingRoomDisplayName,
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'lets chat',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @protected
   Widget buildUserAvatar({User user}) {
     if (user.avatarUri != null) {
@@ -158,17 +245,11 @@ class SearchUserState extends State<SearchUserView> {
             user.avatarUri != null ? Colors.transparent : Colors.grey;
 
         return GestureDetector(
-          onTap: () async {
-            final newRoom = await props.onSelectUser(user: user);
-            Navigator.popAndPushNamed(
-              context,
-              '/home/chat',
-              arguments: ChatViewArguements(
-                roomId: newRoom.id,
-                title: newRoom.name,
-              ),
-            );
-          },
+          onTap: () => this.onSelectUser(
+            context: context,
+            props: props,
+            user: user,
+          ),
           child: Card(
             color: sectionBackgroundColor,
             elevation: 0,
@@ -201,18 +282,20 @@ class SearchUserState extends State<SearchUserView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 48.0,
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(48),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/home/draft');
-                        },
-                        child: Icon(
-                          Icons.send,
-                          color: Colors.white,
-                        ),
-                      ),
+                      width: Dimensions.progressIndicatorSize,
+                      height: Dimensions.progressIndicatorSize,
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      child: creatingRoomDisplayName == user.displayName
+                          ? CircularProgressIndicator(
+                              strokeWidth: Dimensions.defaultStrokeWidthLite,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.grey,
+                              ),
+                            )
+                          : Icon(
+                              Icons.send,
+                              size: Dimensions.iconSize,
+                            ),
                     ),
                   ],
                 ),
@@ -230,13 +313,8 @@ class SearchUserState extends State<SearchUserView> {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
-          final mainBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? null
-                  : const Color(DISABLED_GREY);
 
           return Scaffold(
-            backgroundColor: mainBackgroundColor,
             appBar: AppBar(
               brightness: Brightness.dark,
               leading: IconButton(
@@ -360,14 +438,14 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
-  final Function onSelectUser;
+  final Function onCreateRoom;
 
   _Props({
     @required this.theme,
     @required this.loading,
     @required this.searchResults,
     @required this.onSearch,
-    @required this.onSelectUser,
+    @required this.onCreateRoom,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
@@ -377,11 +455,11 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onSelectUser: ({User user}) async {
-          return store.dispatch(createDraftRoom(
-            users: <User>[user],
+        onCreateRoom: ({User user}) async {
+          return store.dispatch(createRoom(
             name: user.displayName,
             avatarUri: user.avatarUri,
+            invites: <User>[user],
             isDirect: true,
           ));
         },

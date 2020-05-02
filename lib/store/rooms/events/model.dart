@@ -17,7 +17,11 @@ class EventTypes {
   static const ROOM_CREATION = 'm.room.create';
   static const ROOM_NAME = '.room.name';
   static const ROOM_TOPIC = 'm.room.topic';
+
+  // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
+  // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}
   static const ROOM_MEMBER = 'm.room.member';
+
   static const GUEST_ACCESS = 'm.room.guest_access';
   static const JOIN_RULES = 'm.room.join_rules';
   static const HISTORY_VISIBILITY = 'm.room.history_visibility';

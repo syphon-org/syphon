@@ -12,6 +12,8 @@ class UserStore extends Equatable {
   @HiveField(0)
   final User user;
 
+  // TODO: consider making a user map
+
   // TODO: move to auth store
   final String username;
   final String password;

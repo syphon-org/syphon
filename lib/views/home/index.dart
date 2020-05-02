@@ -6,6 +6,7 @@ import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
+import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -91,6 +92,22 @@ class HomeViewState extends State<Home> {
       ),
       actions: <Widget>[
         IconButton(
+          icon: Icon(Icons.info_outline),
+          iconSize: Dimensions.buttonAppBarSize,
+          tooltip: 'Chat Details',
+          color: Colors.white,
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/home/chat/settings',
+              arguments: ChatSettingsArguments(
+                roomId: selectedRoom.id,
+                title: selectedRoom.name,
+              ),
+            );
+          },
+        ),
+        IconButton(
           icon: Icon(Icons.archive),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Archive Room',
@@ -99,38 +116,36 @@ class HomeViewState extends State<Home> {
         ),
         Visibility(
           visible: true,
-          child: IconButton(
-            icon: Icon(Icons.remove_circle_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Leave Chat',
-            color: Colors.white,
-            onPressed: () async {
-              await props.onLeaveChat();
-              this.setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
-        ),
-        Visibility(
-          visible: true,
-          child: IconButton(
-            icon: Icon(Icons.delete_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Delete Chat',
-            color: Colors.white,
-            onPressed: () async {
-              await props.onDeleteChat(roomId: this.selectedRoom.id);
-              this.setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
+          child: true
+              ? IconButton(
+                  icon: Icon(Icons.delete_outline),
+                  iconSize: Dimensions.buttonAppBarSize,
+                  tooltip: 'Leave Chat',
+                  color: Colors.white,
+                  onPressed: () async {
+                    await props.onLeaveChat(room: this.selectedRoom);
+                    this.setState(() {
+                      selectedRoom = null;
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.do_not_disturb_alt),
+                  iconSize: Dimensions.buttonAppBarSize,
+                  tooltip: 'Delete Chat',
+                  color: Colors.white,
+                  onPressed: () async {
+                    await props.onDeleteChat(room: this.selectedRoom);
+                    this.setState(() {
+                      selectedRoom = null;
+                    });
+                  },
+                ),
         ),
         IconButton(
           icon: Icon(Icons.select_all),
           iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Delete Chat',
+          tooltip: 'Select All',
           color: Colors.white,
           onPressed: () {},
         ),
@@ -268,21 +283,25 @@ class HomeViewState extends State<Home> {
         final room = rooms[index];
         final roomSettings = props.chatSettings[room.id] ?? null;
 
-        Color primaryColor =
+        var primaryColor =
             room.avatarUri != null ? Colors.transparent : Colors.grey;
+        var backgroundColor;
+        var fontStyle;
 
         if (roomSettings != null) {
           primaryColor = Color(roomSettings.primaryColor);
         }
 
-        print("$room");
-        var backgroundColor;
         if (selectedRoom != null) {
           if (selectedRoom.id != room.id) {
             backgroundColor = Theme.of(context).scaffoldBackgroundColor;
           } else {
             backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
           }
+        }
+
+        if (room.messages == null || room.messages.length < 1) {
+          fontStyle = FontStyle.italic;
         }
 
         // GestureDetector w/ animation
@@ -373,12 +392,7 @@ class HomeViewState extends State<Home> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.caption.merge(
-                              TextStyle(
-                                fontStyle:
-                                    room.draft != null || room.isDraftRoom
-                                        ? FontStyle.italic
-                                        : null,
-                              ),
+                              TextStyle(fontStyle: fontStyle),
                             ),
                       ),
                     ],
@@ -543,12 +557,14 @@ class _Props extends Equatable {
             fetchSync(since: store.state.roomStore.lastSince),
           );
         },
-        onLeaveChat: () {
-          return Future<void>(() {});
-        },
-        onDeleteChat: ({String roomId}) {
+        onLeaveChat: ({Room room}) {
           return store.dispatch(
-            deleteRoom(roomId: roomId),
+            removeRoom(room: room),
+          );
+        },
+        onDeleteChat: ({Room room}) {
+          return store.dispatch(
+            deleteRoom(room: room),
           );
         },
       );

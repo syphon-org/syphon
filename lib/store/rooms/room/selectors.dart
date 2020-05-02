@@ -23,13 +23,14 @@ String formatPreview({Room room, Message recentMessage}) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
   }
 
-  if (room.isDraftRoom) {
-    return 'Empty Draft';
-  }
-
   // Show topic if the user has joined a group but not sent anything (lurkin')
   if (room.messages == null || room.messages.length < 1) {
-    return formatPreviewTopic(room.topic, defaultTopic: '');
+    print('what ${room.direct}');
+    if (room.direct) {
+      return 'No messages yet';
+    } else {
+      return formatPreviewTopic(room.topic, defaultTopic: '');
+    }
   }
 
   final messages = latestMessages(room.messages);

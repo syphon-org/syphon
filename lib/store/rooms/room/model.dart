@@ -219,8 +219,7 @@ class Room {
         endTime: endTime ?? this.endTime,
       );
     } catch (error) {
-      print('**** FROM MESSAGE EVENTS ERRO *****');
-      print(error);
+      print('[fromMessageEvents] $error');
       return this;
     }
   }
@@ -292,21 +291,25 @@ class Room {
   Room fromStateEvents(
     List<Event> stateEvents, {
     String originDEBUG,
-    String username,
+    String currentUser,
     int limit,
   }) {
     String name;
     String avatarUri;
     String topic;
+    bool isDirect;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
+    List<User> users = List<User>();
     // TODO: List<User> users = List<User>();
 
     try {
       stateEvents.forEach((event) {
         lastUpdate =
             event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+
+        print('${event.type} ${event.content}\n');
 
         switch (event.type) {
           case 'm.room.name':
@@ -335,12 +338,14 @@ class Room {
             }
             break;
           case 'm.room.member':
-            if (this.direct && event.content['displayname'] != username) {
-              name = event.content['displayname'];
+            if (event.content['displayname'] != currentUser) {
+              if (this.direct || (event.content['is_direct'] as bool)) {
+                isDirect = event.content['is_direct'];
+                name = event.content['displayname'];
+                avatarUri = event.content['avatar_url'];
+              }
             }
-            if (event.content['membership'] == 'membership') {
-              print('m.room.memeber ${event.content}');
-            }
+
             break;
           default:
             break;
@@ -355,12 +360,13 @@ class Room {
       avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      direct: isDirect ?? this.direct,
       state: cachedStateEvents,
     );
   }
 
   Room fromSync({
-    String username,
+    String currentUser,
     Map<String, dynamic> json,
   }) {
     // print(json['summary']);
@@ -386,7 +392,7 @@ class Room {
     return this
         .fromStateEvents(
           stateEvents,
-          username: username,
+          currentUser: currentUser,
           originDEBUG: '[fetchSync]',
         )
         .fromMessageEvents(
@@ -400,12 +406,13 @@ class Room {
   @override
   String toString() {
     return '{\n' +
-        'id: $id,\n' +
-        'name: $name,\n' +
-        'homeserver: $homeserver,\n' +
-        'direct: $direct,\n' +
-        'syncing: $syncing,\n' +
-        'state: $state,\n' +
-        '}';
+        '\tid: $id,\n' +
+        '\tname: $name,\n' +
+        '\thomeserver: $homeserver,\n' +
+        '\tdirect: $direct,\n' +
+        '\tsyncing: $syncing,\n' +
+        '\tstate: $state,\n' +
+        '\tusers: $users\n'
+            '}';
   }
 }

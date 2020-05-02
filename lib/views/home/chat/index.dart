@@ -101,9 +101,14 @@ class ChatViewState extends State<ChatView> {
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
 
     final room = store.state.roomStore.rooms[arguements.roomId];
-    final draft = room.draft;
 
-    if (room.draft != null && room.draft.type == MessageTypes.TEXT) {
+    if (room == null) {
+      print('ya done goofed');
+      return;
+    }
+
+    final draft = room.draft;
+    if (draft != null && draft.type == MessageTypes.TEXT) {
       final text = draft.body;
       this.setState(() {
         sendable = text != null && text.isNotEmpty;
@@ -138,11 +143,6 @@ class ChatViewState extends State<ChatView> {
     this.setState(() {
       sendable = text != null && text.isNotEmpty;
     });
-
-    props.onSaveDraftMessage(
-      body: text,
-      type: MessageTypes.TEXT,
-    );
 
     // start an interval for updating typing status
     if (inputFieldNode.hasFocus && this.typingNotifier == null) {
@@ -189,7 +189,6 @@ class ChatViewState extends State<ChatView> {
     });
   }
 
-  // TODO: should these have their own components?
   Widget buildMessageList(
     BuildContext context,
     _Props props,
@@ -238,20 +237,23 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
+  /**
+     * TODO: Room Drafts
+     */
+  // if (props.room.isDraftRoom) {
+  //   final convertedRoomId = await props.onConvertDraftRoom();
+  //   final arguements =
+  //       ModalRoute.of(context).settings.arguments as ChatViewArguements;
+  //   Navigator.of(context).pushReplacementNamed(
+  //     '/home/chat',
+  //     arguments: ChatViewArguements(
+  //       roomId: convertedRoomId.id,
+  //       title: arguements.title,
+  //     ),
+  //   );
+  // }
   @protected
   onSubmitMessage(_Props props) async {
-    if (props.room.isDraftRoom) {
-      final convertedRoomId = await props.onConvertDraftRoom();
-      final arguements =
-          ModalRoute.of(context).settings.arguments as ChatViewArguements;
-      Navigator.of(context).pushReplacementNamed(
-        '/home/chat',
-        arguments: ChatViewArguements(
-          roomId: convertedRoomId.id,
-          title: arguements.title,
-        ),
-      );
-    }
     props.onSendMessage(
       body: editorController.text,
       roomId: props.room.id,
@@ -260,16 +262,6 @@ class ChatViewState extends State<ChatView> {
     FocusScope.of(context).unfocus();
   }
 
-  /**
-   *    
-    StoreConnector<AppState, _Props>(
-    distinct: true,
-    rebuildOnChange: false,
-    converter: (Store<AppState> store) => _Props.mapStoreToProps(
-      store, 
-    ),
-    builder: (context, props) {
-   */
   Widget buildChatInput(
     BuildContext context,
     _Props props,
@@ -361,7 +353,15 @@ class ChatViewState extends State<ChatView> {
             margin: EdgeInsets.only(left: 8),
             child: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () {
+                if (editorController.text != null &&
+                    0 < editorController.text.length)
+                  props.onSaveDraftMessage(
+                    body: editorController.text,
+                    type: MessageTypes.TEXT,
+                  );
+                Navigator.pop(context, false);
+              },
             ),
           ),
           GestureDetector(
@@ -418,7 +418,6 @@ class ChatViewState extends State<ChatView> {
       actions: <Widget>[
         RoundedPopupMenu<ChatOptions>(
           onSelected: (ChatOptions result) {
-            print(result);
             switch (result) {
               case ChatOptions.chatSettings:
                 return Navigator.pushNamed(
@@ -676,7 +675,6 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final List<Message> messages;
-  final List<Message> outbox;
   final bool roomsLoading;
   final ThemeType theme;
   final Color roomPrimaryColor;
@@ -685,21 +683,18 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
-  final Function onConvertDraftRoom;
 
   _Props({
     @required this.room,
     @required this.theme,
     @required this.userId,
     @required this.messages,
-    @required this.outbox,
     @required this.roomsLoading,
     @required this.roomPrimaryColor,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
-    @required this.onConvertDraftRoom,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -762,10 +757,13 @@ class _Props extends Equatable {
             roomId: roomId,
           ),
         ),
-        onConvertDraftRoom: () async {
-          final room = store.state.roomStore.rooms[roomId];
-          return store.dispatch(convertDraftRoom(room: room));
-        },
+        /**
+         * TODO: Room Drafts
+         */
+        // onConvertDraftRoom: () async {
+        //   final room = store.state.roomStore.rooms[roomId];
+        //   return store.dispatch(convertDraftRoom(room: room));
+        // },
       );
 
   @override

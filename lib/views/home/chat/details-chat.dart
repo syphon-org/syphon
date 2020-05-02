@@ -330,9 +330,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             ),
                           ),
                           ListTile(
-                            onTap: () {
-                              print('testing');
-                            },
+                            onTap: () {},
                             contentPadding: contentPadding,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -416,9 +414,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             ),
                             ListTile(
                               dense: true,
-                              onTap: () {
-                                print('testing');
-                              },
+                              onTap: () {},
                               contentPadding: contentPadding,
                               title: Text(
                                 'Mute conversation',
@@ -435,9 +431,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ),
                             ),
                             ListTile(
-                              onTap: () {
-                                print('testing');
-                              },
+                              onTap: () {},
                               contentPadding: contentPadding,
                               title: Text(
                                 'Notification Sound',

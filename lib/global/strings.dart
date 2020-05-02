@@ -25,4 +25,8 @@ String formatUsernameHint(String homeserver) {
 
 class StringStore {
   static const app_name = 'Tether';
+  static const start_chat_notice = 'Even if you don\'t send a message, ' +
+      'the user will still see your invite to chat.';
+  static const notificationConfirmation =
+      'Your device will prompt you to turn on notifications for tether.\n\nDo you want to turn on message notifications?';
 }

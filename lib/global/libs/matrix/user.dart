@@ -19,6 +19,8 @@ dynamic buildUserProfileRequest({
 }
 
 /**  
+ * 
+ * Save Account Data
  * https://matrix.org/docs/spec/client_server/latest#id551
  * 
  * This API sets the given user's display name.
@@ -26,6 +28,35 @@ dynamic buildUserProfileRequest({
  * e.g. you need to have their access_token.
  */
 dynamic buildSaveAccountData({
+  String protocol = 'https://',
+  String homeserver = 'matrix.org',
+  String accessToken,
+  String userId,
+  String type,
+}) {
+  String url =
+      '$protocol$homeserver/_matrix/client/r0/user/${userId}/account_data/${type}';
+
+  Map<String, String> headers = {
+    'Authorization': 'Bearer $accessToken',
+  };
+
+  return {
+    'url': url,
+    'headers': headers,
+  };
+}
+
+/**  
+ * 
+ * Save Account Data
+ * https://matrix.org/docs/spec/client_server/latest#id551
+ * 
+ * This API sets the given user's display name.
+ *  You must have permission to set this user's display name, 
+ * e.g. you need to have their access_token.
+ */
+dynamic buildRemoveAccountData({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,
