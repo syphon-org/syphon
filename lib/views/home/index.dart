@@ -344,8 +344,8 @@ class HomeViewState extends State<Home> {
                               Dimensions.thumbnailSizeMax,
                             ),
                             child: MatrixImage(
-                              width: 52,
-                              height: 52,
+                              width: Dimensions.avatarSize,
+                              height: Dimensions.avatarSize,
                               mxcUri: room.avatarUri,
                             ),
                           )

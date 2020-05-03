@@ -10,6 +10,7 @@ import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:Tether/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -192,49 +193,64 @@ class ChatViewState extends State<ChatView> {
 
     return GestureDetector(
       onTap: onDismissMessageOptions,
-      child: ListView.builder(
-        reverse: true,
-        addRepaintBoundaries: true,
-        addAutomaticKeepAlives: true,
-        itemCount: messages.length,
-        padding: EdgeInsets.only(bottom: 8),
-        scrollDirection: Axis.vertical,
-        controller: messagesController,
-        physics: selectedMessage != null
-            ? const NeverScrollableScrollPhysics()
-            : null,
-        itemBuilder: (BuildContext context, int index) {
-          final message = messages[index];
-          final lastMessage = index != 0 ? messages[index - 1] : null;
-          final nextMessage =
-              index + 1 < messages.length ? messages[index + 1] : null;
+      child: Container(
+        child: ListView(
+          reverse: true,
+          physics: selectedMessage != null
+              ? const NeverScrollableScrollPhysics()
+              : null,
+          children: [
+            Visibility(
+              visible: props.room.userTyping,
+              child: MessageTypingWidget(
+                theme: props.theme,
+                lastRead: props.room.lastRead,
+                selectedMessageId: this.selectedMessage != null
+                    ? this.selectedMessage.id
+                    : null,
+              ),
+            ),
+            ListView.builder(
+              reverse: true,
+              shrinkWrap: true,
+              addRepaintBoundaries: true,
+              addAutomaticKeepAlives: true,
+              itemCount: messages.length,
+              padding: EdgeInsets.only(bottom: 8),
+              scrollDirection: Axis.vertical,
+              controller: messagesController,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                final message = messages[index];
+                final lastMessage = index != 0 ? messages[index - 1] : null;
+                final nextMessage =
+                    index + 1 < messages.length ? messages[index + 1] : null;
 
-          final isLastSender =
-              lastMessage != null && lastMessage.sender == message.sender;
-          final isNextSender =
-              nextMessage != null && nextMessage.sender == message.sender;
-          final isUserSent = props.userId == message.sender;
-          final selectedMessageId =
-              this.selectedMessage != null ? this.selectedMessage.id : null;
+                final isLastSender =
+                    lastMessage != null && lastMessage.sender == message.sender;
+                final isNextSender =
+                    nextMessage != null && nextMessage.sender == message.sender;
+                final isUserSent = props.userId == message.sender;
+                final selectedMessageId = this.selectedMessage != null
+                    ? this.selectedMessage.id
+                    : null;
 
-          final avatarUri = props.room.users[message.sender]?.avatarUri;
-
-          print(
-            '[buildMessageList] $avatarUri ${props.room.users[message.sender]}',
-          );
-
-          return MessageWidget(
-            message: message,
-            isUserSent: isUserSent,
-            isLastSender: isLastSender,
-            isNextSender: isNextSender,
-            lastRead: props.room.lastRead,
-            selectedMessageId: selectedMessageId,
-            onLongPress: onToggleMessageOptions,
-            avatarUri: avatarUri,
-            theme: props.theme,
-          );
-        },
+                final avatarUri = props.room.users[message.sender]?.avatarUri;
+                return MessageWidget(
+                  message: message,
+                  isUserSent: isUserSent,
+                  isLastSender: isLastSender,
+                  isNextSender: isNextSender,
+                  lastRead: props.room.lastRead,
+                  selectedMessageId: selectedMessageId,
+                  onLongPress: onToggleMessageOptions,
+                  avatarUri: avatarUri,
+                  theme: props.theme,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -712,13 +728,11 @@ class _Props extends Equatable {
           id: roomId,
           state: store.state,
         ),
-        messages: wrapTypingIndicatoor(
-          latestMessages(
-            wrapOutboxMessages(
-              messages:
-                  roomSelectors.room(id: roomId, state: store.state).messages,
-              outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
-            ),
+        messages: latestMessages(
+          wrapOutboxMessages(
+            messages:
+                roomSelectors.room(id: roomId, state: store.state).messages,
+            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
           ),
         ),
         roomPrimaryColor: () {
@@ -777,6 +791,7 @@ class _Props extends Equatable {
   List<Object> get props => [
         userId,
         messages,
+        room,
         roomPrimaryColor,
         roomsLoading,
       ];

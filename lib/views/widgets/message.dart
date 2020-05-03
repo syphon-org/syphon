@@ -286,8 +286,7 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                     Visibility(
-                                      visible: !message.pending &&
-                                          message.id.contains(':'),
+                                      visible: !message.pending,
                                       child: Container(
                                         width: indicatorSize,
                                         height: indicatorSize,
@@ -309,8 +308,7 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                     Visibility(
-                                      visible: !message.syncing &&
-                                          message.id.contains(':'),
+                                      visible: !message.syncing,
                                       child: Container(
                                         width: indicatorSize,
                                         height: indicatorSize,

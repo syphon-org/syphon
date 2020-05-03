@@ -14,7 +14,7 @@ class Dimensions {
   static const double thumbnailSizeMax = 48;
 
   // Avatars
-  static const double avatarSize = 56;
+  static const double avatarSize = 56; // was 52
   static const double avatarSizeMax = 350; // Change to HeroSize
   static const double avatarHeroSize = 120;
 
@@ -22,6 +22,10 @@ class Dimensions {
   static const double buttonWidthMin = 256;
   static const double buttonWidthMax = 384;
   static const double buttonAppBarSize = 26;
+
+  // Messages
+  static const double bubbleHeightMin = 52;
+  static const double bubbleWidthMin = 122;
 
   // Icons
   static const double iconSize = 26;

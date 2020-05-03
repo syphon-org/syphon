@@ -238,12 +238,17 @@ class Room {
         : Map<String, ReadStatus>();
 
     try {
-      // if (events.length > 0) {
-      //   print('[${this.name}] saving ephemeral ${events.length}');
-      // }
       events.forEach((event) {
         switch (event.type) {
           case 'm.typing':
+            print('[fromEphemeralEvents] saving ${this.name} ${events.length}');
+            print('[fromEphemeralEvents] saving content ${event.content}');
+
+            // TODO: save which users are typing
+            // if ((event.content['user_ids'] as List<dynamic>).length > 0) {
+            //   userTyping = event.content['user_ids'][0];
+            // }
+
             userTyping =
                 (event.content['user_ids'] as List<dynamic>).length > 0;
             break;
