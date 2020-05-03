@@ -1,5 +1,4 @@
 import 'package:Tether/global/libs/hive/type-ids.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import './colors.dart';

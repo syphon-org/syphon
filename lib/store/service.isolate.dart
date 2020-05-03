@@ -23,12 +23,7 @@ class CrossIsolatesMessage<T> {
   });
 }
 
-// TODO: extract store for init data
-
-/**
- * startRoomObserverService
- */
-Future<bool> startRoomObserverService() async {
+void startRoomObserverServiceOld() async {
   // Dispatch Background Sync
 
   ReceivePort receivePort = ReceivePort();

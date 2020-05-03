@@ -1,9 +1,6 @@
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:equatable/equatable.dart';
 
 // TODO: rename to searchStore
-@jsonSerializable
 class MatrixStore extends Equatable {
   final bool loading;
   final String since;

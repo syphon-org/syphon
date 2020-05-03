@@ -38,6 +38,8 @@ lib/generated_plugin_registrant.dart
 
 # Generated Json Serialized Code
 *.reflectable.dart
-*.flutter-plugins-dependencies
+*.flutter-plugins-dependencies 
 *.g.dart
 
+# Code Counter Extension
+*.VSCodeCounter

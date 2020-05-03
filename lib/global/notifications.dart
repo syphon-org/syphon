@@ -15,31 +15,36 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   Function onDidReceiveLocalNotification,
   Function onSelectNotification,
 }) async {
+  try {
 // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
 
-  var initializationSettingsIOS = IOSInitializationSettings(
-    requestSoundPermission: false,
-    requestBadgePermission: false,
-    requestAlertPermission: false,
-    onDidReceiveLocalNotification: onDidReceiveLocalNotification,
-  );
+    var initializationSettingsIOS = IOSInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+      onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+    );
 
-  var initializationSettings = InitializationSettings(
-    initializationSettingsAndroid,
-    initializationSettingsIOS,
-  );
+    var initializationSettings = InitializationSettings(
+      initializationSettingsAndroid,
+      initializationSettingsIOS,
+    );
 
-  FlutterLocalNotificationsPlugin pluginInstance =
-      FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin pluginInstance =
+        FlutterLocalNotificationsPlugin();
 
-  await pluginInstance.initialize(
-    initializationSettings,
-    onSelectNotification: onSelectNotification,
-  );
+    await pluginInstance.initialize(
+      initializationSettings,
+      onSelectNotification: onSelectNotification,
+    );
 
-  print('[initNotifications] successfully initialized $pluginInstance');
-  return pluginInstance;
+    print('[initNotifications] successfully initialized $pluginInstance');
+    return pluginInstance;
+  } catch (error) {
+    print('[initNotifications] $error');
+  }
 }
 
 // TODO: impliement this? can you disable natively after enabling?

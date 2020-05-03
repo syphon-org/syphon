@@ -7,7 +7,6 @@ import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
-import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -213,7 +212,7 @@ ThunkAction<AppState> stopRoomsObserver() {
     if (store.state.roomStore.roomObserver != null) {
       store.state.roomStore.roomObserver.cancel();
       store.dispatch(SetRoomObserver(roomObserver: null));
-      stopRoomObserverService();
+      // stopRoomObserverService();
     }
   };
 }

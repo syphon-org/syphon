@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/alerts/actions.dart';
+import 'package:Tether/store/service.dart';
 import 'package:Tether/store/settings/state.dart';
 import 'package:Tether/store/user/actions.dart';
 import 'package:Tether/global/notifications.dart';
@@ -31,7 +31,7 @@ import 'package:window_utils/window_utils.dart';
  */
 
 // Generated Json Serializables
-import 'main.reflectable.dart'; // Import generated code.
+// import 'main.reflectable.dart'; // Import generated code.
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -40,7 +40,7 @@ void _enablePlatformOverrideForDesktop() {
 }
 
 void main() async {
-  initializeReflectable();
+  // initializeReflectable();
   WidgetsFlutterBinding();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
   _enablePlatformOverrideForDesktop();
@@ -52,6 +52,9 @@ void main() async {
 
   // init state cache (hot)
   final store = await initStore();
+
+  final backgroundSyncStatus = await BackgroundSync.init();
+  print('[main] background service started $backgroundSyncStatus');
 
   // /**
   //  * DESKTOP ONLY
