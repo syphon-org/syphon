@@ -3,16 +3,18 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/views/home/messages/details-message.dart';
-import 'package:Tether/views/home/messages/details-chat.dart';
+import 'package:Tether/views/home/chat/details-message.dart';
+import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:Tether/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -39,7 +41,7 @@ import 'package:Tether/views/widgets/menu.dart';
  * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
  * 
  */
-enum MessageOptions {
+enum ChatOptions {
   search,
   allMedia,
   chatSettings,
@@ -47,27 +49,25 @@ enum MessageOptions {
   muteNotifications
 }
 
-class MessageArguments {
+class ChatViewArguements {
   final String roomId;
   final String title;
-  final bool draftRoom;
 
   // Improve loading times
-  MessageArguments({
+  ChatViewArguements({
     this.roomId,
     this.title,
-    this.draftRoom,
   });
 }
 
-class Messages extends StatefulWidget {
-  const Messages({Key key}) : super(key: key);
+class ChatView extends StatefulWidget {
+  const ChatView({Key key}) : super(key: key);
 
   @override
-  MessagesState createState() => MessagesState();
+  ChatViewState createState() => ChatViewState();
 }
 
-class MessagesState extends State<Messages> {
+class ChatViewState extends State<ChatView> {
   Timer typingNotifier;
   Timer typingNotifierTimeout;
   FocusNode inputFieldNode;
@@ -83,13 +83,42 @@ class MessagesState extends State<Messages> {
     inputFieldNode = FocusNode();
     inputFieldNode.addListener(() {
       if (!inputFieldNode.hasFocus && this.typingNotifier != null) {
-        print('removing typingNotifier');
         this.typingNotifier.cancel();
         this.setState(() {
           typingNotifier = null;
         });
       }
     });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
+
+  @protected
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    final arguements =
+        ModalRoute.of(context).settings.arguments as ChatViewArguements;
+
+    final room = store.state.roomStore.rooms[arguements.roomId];
+
+    final draft = room.draft;
+    if (draft != null && draft.type == MessageTypes.TEXT) {
+      final text = draft.body;
+      this.setState(() {
+        sendable = text != null && text.isNotEmpty;
+      });
+
+      editorController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.fromPosition(
+          TextPosition(
+            offset: text.length,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -156,7 +185,6 @@ class MessagesState extends State<Messages> {
     });
   }
 
-  // TODO: should these have their own components?
   Widget buildMessageList(
     BuildContext context,
     _Props props,
@@ -165,56 +193,94 @@ class MessagesState extends State<Messages> {
 
     return GestureDetector(
       onTap: onDismissMessageOptions,
-      child: ListView.builder(
-        reverse: true,
-        addRepaintBoundaries: true,
-        addAutomaticKeepAlives: true,
-        itemCount: messages.length,
-        padding: EdgeInsets.only(bottom: 8),
-        scrollDirection: Axis.vertical,
-        controller: messagesController,
-        physics: selectedMessage != null
-            ? const NeverScrollableScrollPhysics()
-            : null,
-        itemBuilder: (BuildContext context, int index) {
-          final message = messages[index];
-          final lastMessage = index != 0 ? messages[index - 1] : null;
-          final nextMessage =
-              index + 1 < messages.length ? messages[index + 1] : null;
+      child: Container(
+        child: ListView(
+          reverse: true,
+          physics: selectedMessage != null
+              ? const NeverScrollableScrollPhysics()
+              : null,
+          children: [
+            Visibility(
+              visible: props.room.userTyping,
+              child: MessageTypingWidget(
+                theme: props.theme,
+                lastRead: props.room.lastRead,
+                selectedMessageId: this.selectedMessage != null
+                    ? this.selectedMessage.id
+                    : null,
+              ),
+            ),
+            ListView.builder(
+              reverse: true,
+              shrinkWrap: true,
+              addRepaintBoundaries: true,
+              addAutomaticKeepAlives: true,
+              itemCount: messages.length,
+              padding: EdgeInsets.only(bottom: 8),
+              scrollDirection: Axis.vertical,
+              controller: messagesController,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                final message = messages[index];
+                final lastMessage = index != 0 ? messages[index - 1] : null;
+                final nextMessage =
+                    index + 1 < messages.length ? messages[index + 1] : null;
 
-          final isLastSender =
-              lastMessage != null && lastMessage.sender == message.sender;
-          final isNextSender =
-              nextMessage != null && nextMessage.sender == message.sender;
-          final isUserSent = props.userId == message.sender;
-          final selectedMessageId =
-              this.selectedMessage != null ? this.selectedMessage.id : null;
+                final isLastSender =
+                    lastMessage != null && lastMessage.sender == message.sender;
+                final isNextSender =
+                    nextMessage != null && nextMessage.sender == message.sender;
+                final isUserSent = props.userId == message.sender;
+                final selectedMessageId = this.selectedMessage != null
+                    ? this.selectedMessage.id
+                    : null;
 
-          return MessageWidget(
-            message: message,
-            isUserSent: isUserSent,
-            isLastSender: isLastSender,
-            isNextSender: isNextSender,
-            lastRead: props.room.lastRead,
-            selectedMessageId: selectedMessageId,
-            onLongPress: onToggleMessageOptions,
-            theme: props.theme,
-          );
-        },
+                final avatarUri = props.room.users[message.sender]?.avatarUri;
+                return MessageWidget(
+                  message: message,
+                  isUserSent: isUserSent,
+                  isLastSender: isLastSender,
+                  isNextSender: isNextSender,
+                  lastRead: props.room.lastRead,
+                  selectedMessageId: selectedMessageId,
+                  onLongPress: onToggleMessageOptions,
+                  avatarUri: avatarUri,
+                  theme: props.theme,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /**
-   *    
-    StoreConnector<AppState, _Props>(
-    distinct: true,
-    rebuildOnChange: false,
-    converter: (Store<AppState> store) => _Props.mapStoreToProps(
-      store, 
-    ),
-    builder: (context, props) {
-   */
+     * TODO: Room Drafts
+     */
+  // if (props.room.isDraftRoom) {
+  //   final convertedRoomId = await props.onConvertDraftRoom();
+  //   final arguements =
+  //       ModalRoute.of(context).settings.arguments as ChatViewArguements;
+  //   Navigator.of(context).pushReplacementNamed(
+  //     '/home/chat',
+  //     arguments: ChatViewArguements(
+  //       roomId: convertedRoomId.id,
+  //       title: arguements.title,
+  //     ),
+  //   );
+  // }
+  @protected
+  onSubmitMessage(_Props props) async {
+    print(editorController.text);
+    props.onSendMessage(
+      body: editorController.text,
+      type: MessageTypes.TEXT,
+    );
+    editorController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
   Widget buildChatInput(
     BuildContext context,
     _Props props,
@@ -243,7 +309,6 @@ class MessagesState extends State<Messages> {
       children: <Widget>[
         Container(
           constraints: BoxConstraints(
-            maxHeight: 46,
             maxWidth: messageInputWidth,
           ),
           child: TextField(
@@ -254,14 +319,8 @@ class MessagesState extends State<Messages> {
             focusNode: inputFieldNode,
             controller: editorController,
             onChanged: (text) => onUpdateMessage(text, props),
-            onSubmitted: (text) {
-              props.onSendMessage(
-                body: editorController.text,
-                roomId: props.room.id,
-              );
-              editorController.clear();
-              FocusScope.of(context).unfocus();
-            },
+            onSubmitted:
+                !sendable ? null : (text) => this.onSubmitMessage(props),
             style: TextStyle(
               height: 1.5,
               color: inputTextColor,
@@ -284,16 +343,7 @@ class MessagesState extends State<Messages> {
           padding: EdgeInsets.symmetric(vertical: 4),
           child: InkWell(
             borderRadius: BorderRadius.circular(48),
-            onTap: sendable
-                ? () {
-                    props.onSendMessage(
-                      body: editorController.text,
-                      roomId: props.room.id,
-                    );
-                    editorController.clear();
-                    FocusScope.of(context).unfocus();
-                  }
-                : null,
+            onTap: !sendable ? null : () => this.onSubmitMessage(props),
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Icon(
@@ -322,7 +372,15 @@ class MessagesState extends State<Messages> {
             margin: EdgeInsets.only(left: 8),
             child: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () {
+                if (editorController.text != null &&
+                    0 < editorController.text.length)
+                  props.onSaveDraftMessage(
+                    body: editorController.text,
+                    type: MessageTypes.TEXT,
+                  );
+                Navigator.pop(context, false);
+              },
             ),
           ),
           GestureDetector(
@@ -359,7 +417,7 @@ class MessagesState extends State<Messages> {
             onTap: () {
               Navigator.pushNamed(
                 context,
-                '/home/messages/settings',
+                '/home/chat/settings',
                 arguments: ChatSettingsArguments(
                   roomId: props.room.id,
                   title: props.room.name,
@@ -377,14 +435,13 @@ class MessagesState extends State<Messages> {
         ],
       ),
       actions: <Widget>[
-        RoundedPopupMenu<MessageOptions>(
-          onSelected: (MessageOptions result) {
-            print(result);
+        RoundedPopupMenu<ChatOptions>(
+          onSelected: (ChatOptions result) {
             switch (result) {
-              case MessageOptions.chatSettings:
+              case ChatOptions.chatSettings:
                 return Navigator.pushNamed(
                   context,
-                  '/home/messages/settings',
+                  '/home/chat/settings',
                   arguments: ChatSettingsArguments(
                     roomId: props.room.id,
                     title: props.room.name,
@@ -395,26 +452,25 @@ class MessagesState extends State<Messages> {
             }
           },
           icon: Icon(Icons.more_vert, color: Colors.white),
-          itemBuilder: (BuildContext context) =>
-              <PopupMenuEntry<MessageOptions>>[
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.search,
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<ChatOptions>>[
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.search,
               child: Text('Search'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.allMedia,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.allMedia,
               child: Text('All Media'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.chatSettings,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.chatSettings,
               child: Text('Chat Settings'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.inviteFriends,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.inviteFriends,
               child: Text('Invite Friends'),
             ),
-            const PopupMenuItem<MessageOptions>(
-              value: MessageOptions.muteNotifications,
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.muteNotifications,
               child: Text('Mute Notifications'),
             ),
           ],
@@ -424,7 +480,7 @@ class MessagesState extends State<Messages> {
   }
 
   @protected
-  buildMessageAppBar({
+  buildMessageOptionsBar({
     _Props props,
     BuildContext context,
   }) {
@@ -452,7 +508,7 @@ class MessagesState extends State<Messages> {
           onPressed: () => {
             Navigator.pushNamed(
               context,
-              '/home/messages/details',
+              '/home/chat/details',
               arguments: MessageDetailArguments(
                 roomId: props.room.id,
                 message: selectedMessage,
@@ -464,14 +520,18 @@ class MessagesState extends State<Messages> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.delete),
-          iconSize: 28.0,
-          tooltip: 'Delete Message',
-          color: Colors.white,
-          onPressed: () => props.onDeleteMessage(
-            message: this.selectedMessage,
-          ),
-        ),
+            icon: Icon(Icons.delete),
+            iconSize: 28.0,
+            tooltip: 'Delete Message',
+            color: Colors.white,
+            onPressed: () {
+              props.onDeleteMessage(
+                message: this.selectedMessage,
+              );
+              this.setState(() {
+                selectedMessage = null;
+              });
+            }),
         Visibility(
           visible: isTextMessage(message: selectedMessage),
           child: IconButton(
@@ -514,7 +574,7 @@ class MessagesState extends State<Messages> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(
           store,
-          (ModalRoute.of(context).settings.arguments as MessageArguments)
+          (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
         ),
         builder: (context, props) {
@@ -536,8 +596,9 @@ class MessagesState extends State<Messages> {
             props: props,
             context: context,
           );
+
           if (this.selectedMessage != null) {
-            currentAppBar = buildMessageAppBar(
+            currentAppBar = buildMessageOptionsBar(
               props: props,
               context: context,
             );
@@ -637,7 +698,6 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final List<Message> messages;
-  final List<Message> outbox;
   final bool roomsLoading;
   final ThemeType theme;
   final Color roomPrimaryColor;
@@ -645,37 +705,36 @@ class _Props extends Equatable {
   final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
+  final Function onSaveDraftMessage;
 
   _Props({
     @required this.room,
     @required this.theme,
     @required this.userId,
     @required this.messages,
-    @required this.outbox,
     @required this.roomsLoading,
+    @required this.roomPrimaryColor,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
-    @required this.roomPrimaryColor,
+    @required this.onSaveDraftMessage,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.userStore.user.userId,
         theme: store.state.settingsStore.theme,
+        roomsLoading: store.state.roomStore.loading,
         room: roomSelectors.room(
           id: roomId,
           state: store.state,
         ),
-        messages: wrapTypingIndicatoor(
-          latestMessages(
-            wrapOutboxMessages(
-              messages:
-                  roomSelectors.room(id: roomId, state: store.state).messages,
-              outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
-            ),
+        messages: latestMessages(
+          wrapOutboxMessages(
+            messages:
+                roomSelectors.room(id: roomId, state: store.state).messages,
+            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
           ),
         ),
-        roomsLoading: store.state.roomStore.loading,
         roomPrimaryColor: () {
           final customChatSettings =
               store.state.settingsStore.customChatSettings ?? Map();
@@ -686,12 +745,26 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
-        onSendTyping: ({typing, roomId}) => store.dispatch(
-          sendTyping(
-            typing: typing,
-            roomId: roomId,
-          ),
-        ),
+        onSaveDraftMessage: ({
+          String body,
+          String type,
+        }) {
+          store.dispatch(saveDraft(
+            body: body,
+            type: type,
+            room: store.state.roomStore.rooms[roomId],
+          ));
+        },
+        onSendMessage: ({
+          String body,
+          String type,
+        }) async {
+          store.dispatch(sendMessage(
+            body: body,
+            room: store.state.roomStore.rooms[roomId],
+            type: type,
+          ));
+        },
         onDeleteMessage: ({
           Message message,
         }) {
@@ -699,24 +772,26 @@ class _Props extends Equatable {
             store.dispatch(deleteMessage(message: message));
           }
         },
-        onSendMessage: ({
-          String roomId,
-          String body,
-        }) {
-          if (body != null && body.length > 1) {
-            store.dispatch(sendMessage(
-              body: body,
-              room: store.state.roomStore.rooms[roomId],
-              type: 'm.room.message',
-            ));
-          }
-        },
+        onSendTyping: ({typing, roomId}) => store.dispatch(
+          sendTyping(
+            typing: typing,
+            roomId: roomId,
+          ),
+        ),
+        /**
+         * TODO: Room Drafts
+         */
+        // onConvertDraftRoom: () async {
+        //   final room = store.state.roomStore.rooms[roomId];
+        //   return store.dispatch(convertDraftRoom(room: room));
+        // },
       );
 
   @override
   List<Object> get props => [
         userId,
         messages,
+        room,
         roomPrimaryColor,
         roomsLoading,
       ];

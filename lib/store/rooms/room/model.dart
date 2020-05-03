@@ -2,8 +2,8 @@ import 'dart:collection';
 import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
@@ -52,8 +52,7 @@ class Room {
   // Event lists and handlers
   @HiveField(17)
   final Message draft;
-  @HiveField(18)
-  final List<User> users;
+
   @HiveField(19)
   final List<Event> state;
   @HiveField(20)
@@ -70,9 +69,12 @@ class Room {
   @HiveField(24)
   final Map<String, ReadStatus> messageReads;
 
+  @HiveField(25)
+  final Map<String, User> users;
+
   const Room({
     this.id,
-    this.name = 'New Room',
+    this.name = 'New Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,
@@ -81,7 +83,7 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.draft,
-    this.users = const [],
+    this.users,
     this.state = const [],
     this.outbox = const [],
     this.messages = const [],
@@ -216,8 +218,7 @@ class Room {
         endTime: endTime ?? this.endTime,
       );
     } catch (error) {
-      print('**** FROM MESSAGE EVENTS ERRO *****');
-      print(error);
+      print('[fromMessageEvents] $error');
       return this;
     }
   }
@@ -237,12 +238,17 @@ class Room {
         : Map<String, ReadStatus>();
 
     try {
-      if (events.length > 0) {
-        print('[${this.name}] saving ephemeral ${events.length}');
-      }
       events.forEach((event) {
         switch (event.type) {
           case 'm.typing':
+            print('[fromEphemeralEvents] saving ${this.name} ${events.length}');
+            print('[fromEphemeralEvents] saving content ${event.content}');
+
+            // TODO: save which users are typing
+            // if ((event.content['user_ids'] as List<dynamic>).length > 0) {
+            //   userTyping = event.content['user_ids'][0];
+            // }
+
             userTyping =
                 (event.content['user_ids'] as List<dynamic>).length > 0;
             break;
@@ -289,22 +295,24 @@ class Room {
   Room fromStateEvents(
     List<Event> stateEvents, {
     String originDEBUG,
-    String username,
+    String currentUser,
     int limit,
   }) {
     String name;
     String avatarUri;
     String topic;
+    bool direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
-    // TODO: List<User> users = List<User>();
+    Map<String, User> users = this.users ?? Map<String, User>();
 
     try {
       stateEvents.forEach((event) {
         lastUpdate =
             event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
+        // print('[fromStateEvents] ${event.type} ${event.content}');
         switch (event.type) {
           case 'm.room.name':
             namePriority = 1;
@@ -332,11 +340,28 @@ class Room {
             }
             break;
           case 'm.room.member':
-            if (this.direct && event.content['displayname'] != username) {
-              name = event.content['displayname'];
-            }
-            if (event.content['membership'] == 'membership') {
-              print('m.room.memeber ${event.content}');
+            final memberDisplayName = event.content['displayname'];
+
+            print('[fromStateEvents] content found ${event.content}');
+            print('[fromStateEvents] m.room.member found $memberDisplayName');
+            if (memberDisplayName != currentUser) {
+              final isDirect = event.content['is_direct'];
+
+              if (this.direct || (isDirect != null && isDirect as bool)) {
+                name = memberDisplayName;
+                avatarUri = event.content['avatar_url'];
+                direct = event.content['is_direct'];
+              }
+
+              print('[fromStateEvents] m.room.member found $memberDisplayName');
+
+              if (!users.containsKey(memberDisplayName)) {
+                final avatarUri = event.content['avatar_url'];
+                users[memberDisplayName] = User(
+                  displayName: memberDisplayName,
+                  avatarUri: avatarUri,
+                );
+              }
             }
             break;
           default:
@@ -351,13 +376,15 @@ class Room {
       name: name ?? this.name ?? 'New Room',
       avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
+      users: users ?? this.users,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      direct: direct ?? this.direct,
       state: cachedStateEvents,
     );
   }
 
   Room fromSync({
-    String username,
+    String currentUser,
     Map<String, dynamic> json,
   }) {
     // print(json['summary']);
@@ -383,7 +410,7 @@ class Room {
     return this
         .fromStateEvents(
           stateEvents,
-          username: username,
+          currentUser: currentUser,
           originDEBUG: '[fetchSync]',
         )
         .fromMessageEvents(
@@ -397,12 +424,13 @@ class Room {
   @override
   String toString() {
     return '{\n' +
-        'id: $id,\n' +
-        'name: $name,\n' +
-        'homeserver: $homeserver,\n' +
-        'direct: $direct,\n' +
-        'syncing: $syncing,\n' +
-        'state: $state,\n' +
-        '}';
+        '\tid: $id,\n' +
+        '\tname: $name,\n' +
+        '\thomeserver: $homeserver,\n' +
+        '\tdirect: $direct,\n' +
+        '\tsyncing: $syncing,\n' +
+        '\tstate: $state,\n' +
+        '\tusers: $users\n'
+            '}';
   }
 }

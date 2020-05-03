@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
+import 'package:Tether/global/libs/hive/index.dart';
+import 'package:Tether/global/libs/matrix/errors.dart';
+import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/store/user/model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -43,14 +47,32 @@ class SetRoomObserver {
   SetRoomObserver({this.roomObserver});
 }
 
+class SetRooms {
+  final List<Room> rooms;
+  SetRooms({this.rooms});
+}
+
 class SetRoom {
   final Room room;
   SetRoom({this.room});
 }
 
-class SetRooms {
-  final List<Room> rooms;
-  SetRooms({this.rooms});
+// Atomically Update specific room attributes
+class UpdateRoom {
+  final String id; // room id
+  final Message draft;
+  final bool syncing;
+
+  UpdateRoom({
+    this.id,
+    this.draft,
+    this.syncing,
+  });
+}
+
+class RemoveRoom {
+  final Room room;
+  RemoveRoom({this.room});
 }
 
 class ResetRooms {
@@ -99,17 +121,6 @@ class DeleteOutboxMessage {
 
   DeleteOutboxMessage({
     this.message,
-  });
-}
-
-// Atomically Update specific room attributes
-class UpdateRoom {
-  final String id; // room id
-  final bool syncing;
-
-  UpdateRoom({
-    this.id,
-    this.syncing,
   });
 }
 
@@ -207,42 +218,7 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
-/**
- * TODO: Explaination of this
- * 
- * LOAD != FETCH
- * 
- * Fetch -> Remote
- * Store -> Hot Cache / Local
- * Load (Hive) -> Cold Cache / Local 
- */
-ThunkAction<AppState> storeSync() {
-  return (Store<AppState> store) async {
-    try {
-      // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
-      return true;
-    } catch (error) {
-      debugPrint(error);
-      return false;
-    }
-  };
-}
-
-ThunkAction<AppState> loadSync() {
-  return (Store<AppState> store) async {
-    try {
-      // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
-      return true;
-    } catch (error) {
-      debugPrint(error);
-      return false;
-    }
-  };
-}
-
-ThunkAction<AppState> fetchSync({String since}) {
+ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
@@ -254,8 +230,8 @@ ThunkAction<AppState> fetchSync({String since}) {
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
-        fullState: store.state.roomStore.rooms == null,
-        since: since ?? store.state.roomStore.lastSince,
+        fullState: forceFull || store.state.roomStore.rooms == null,
+        since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
 
       final response = await http.get(
@@ -265,11 +241,22 @@ ThunkAction<AppState> fetchSync({String since}) {
 
       // parse sync data
       final data = json.decode(response.body);
-      final Map<String, dynamic> rawRooms = data['rooms']['join'];
+
+      // if (!kReleaseMode) {
+      //   print('[fetchSync] DEBUGGING **************************');
+      //   (data as Map).forEach((key, value) {
+      //     print('$key $value\n');
+      //   });
+      //   print('[fetchSync] DEBUGGING **************************');
+      // }
+
       final String lastSince = data['next_batch'];
+      final Map<String, dynamic> rawRooms =
+          data['rooms']['join'] ?? Map<String, Room>();
 
       // init new store containers
-      final Map<String, Room> rooms = store.state.roomStore.rooms;
+      final Map<String, Room> rooms =
+          store.state.roomStore.rooms ?? Map<String, Room>();
       final user = store.state.userStore.user;
 
       // update those that exist or add a new room
@@ -280,12 +267,12 @@ ThunkAction<AppState> fetchSync({String since}) {
         if (rooms.containsKey(id)) {
           room = rooms[id].fromSync(
             json: json,
-            username: user.displayName,
+            currentUser: user.displayName,
           );
         } else {
           room = Room(id: id).fromSync(
             json: json,
-            username: user.displayName,
+            currentUser: user.displayName,
           );
         }
 
@@ -299,21 +286,20 @@ ThunkAction<AppState> fetchSync({String since}) {
         store.dispatch(SetRoom(room: room));
       });
 
-      // TODO: save the initial sync, but not like this
-      if (!store.state.roomStore.synced) {
-        final file = await _localFile;
-        file.writeAsString(response.body);
-      }
-
-      // Set "Synced" and since so we know you've run the inital sync
-      if (since == null) {
-        print('[fetchSync] full sync completed');
-      }
+      // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
         lastSince: lastSince,
       ));
+
+      // TODO: encrypt and find a way to reasonably update this
+      if (!store.state.roomStore.synced) {
+        Cache.hive.put(Cache.matrixState, response.body);
+      }
+      if (!kReleaseMode && since == null) {
+        print('[fetchSync] full sync completed');
+      }
     } catch (error) {
       print('[fetchSync] error $error');
       store.dispatch(SetSyncing(syncing: false));
@@ -384,9 +370,14 @@ ThunkAction<AppState> fetchDirectRooms() {
       }
 
       // Mark specified rooms as direct chats
-      Map<String, dynamic> rawDirectRooms = data as Map<String, dynamic>;
-      rawDirectRooms.forEach((name, ids) {
-        store.dispatch(SetRoom(room: Room(id: ids[0], direct: true)));
+      final rawDirectRooms = data as Map<String, dynamic>;
+
+      rawDirectRooms.forEach((userId, roomIds) {
+        store.dispatch(SetRoom(
+            room: Room(
+          id: roomIds[0],
+          direct: true,
+        )));
       });
     } catch (error) {
       print('[fetchDirectRooms] error: $error');
@@ -394,39 +385,200 @@ ThunkAction<AppState> fetchDirectRooms() {
   };
 }
 
-ThunkAction<AppState> createDraftRoom({
-  List<User> users,
+/**
+ * Create Room 
+ */
+ThunkAction<AppState> createRoom({
+  String name = 'New Chat',
+  String alias,
+  String topic,
+  String avatarUri,
+  List<User> invites,
   bool isDirect = false,
 }) {
   return (Store<AppState> store) async {
     try {
-      final draftId = Random.secure().nextInt(1 << 32).toString();
-
-      final draftRoom = Room(
-        id: draftId,
-        isDraftRoom: true,
-        users: users,
-      );
-
-      store.dispatch(SetRoom(room: draftRoom));
-    } catch (error) {
-      print('[createDraftRoom] error: $error');
-    }
-  };
-}
-
-ThunkAction<AppState> convertDraftRoom({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      if (!room.isDraftRoom) {
-        throw 'Room has already been created';
-      }
+      store.dispatch(SetLoading(loading: true));
+      await store.dispatch(stopRoomsObserver());
 
       final request = buildCreateRoom(
         protocol: protocol,
         accessToken: store.state.userStore.user.accessToken,
         homeserver: store.state.userStore.homeserver,
-        invites: room.users.map((user) => user.userId).toList(),
+        roomName: name,
+        roomTopic: topic,
+        roomAlias: alias,
+        invites: invites.map((user) => user.userId).toList(),
+        isDirect: isDirect,
+      );
+
+      final response = await http.post(
+        request['url'],
+        headers: request['headers'],
+        body: json.encode(
+          request['body'],
+        ),
+      );
+
+      final data = json.decode(
+        response.body,
+      );
+
+      final newRoomId = data['room_id'];
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('[createRoom] $data $newRoomId');
+
+      if (isDirect) {
+        final request = buildSaveAccountData(
+          protocol: protocol,
+          accessToken: store.state.userStore.user.accessToken,
+          homeserver: store.state.userStore.homeserver,
+          userId: store.state.userStore.user.userId,
+          type: AccountDataTypes.DIRECT,
+        );
+
+        final body = {
+          invites[0].userId: [newRoomId]
+        };
+
+        final response = await http.put(
+          request['url'],
+          headers: request['headers'],
+          body: json.encode(body),
+        );
+
+        final data = json.decode(
+          response.body,
+        );
+
+        print('[DIRECT Save Account Data] $data');
+
+        if (data['errcode'] != null) {
+          throw data['error'];
+        }
+
+        await store.dispatch(fetchDirectRooms());
+      }
+      await store.dispatch(startRoomsObserver());
+
+      return newRoomId;
+    } catch (error) {
+      print('[createRoom] error: $error');
+      return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Delete Room
+ * 
+ * Both leaves and forgets room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * the user can only delete if owning the room, or leave if
+ * just a member
+ */
+ThunkAction<AppState> removeRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      // submit a leave room request
+      final leaveRequest = buildLeaveRoom(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        roomId: room.id,
+      );
+
+      final leaveResponse = await http.post(
+        leaveRequest['url'],
+        headers: leaveRequest['headers'],
+      );
+
+      final leaveData = json.decode(
+        leaveResponse.body,
+      );
+
+      // Remove the room locally if it's already been removed remotely
+      if (leaveData['errcode'] != null) {
+        if (leaveData['errcode'] == MatrixErrors.room_unknown) {
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
+        throw leaveData['error'];
+      }
+      if (!kReleaseMode) {
+        print('[removeRoom|leaveData] success $leaveData');
+      }
+
+      final forgetRequest = buildForgetRoom(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        roomId: room.id,
+      );
+
+      final forgetResponse = await http.post(
+        forgetRequest['url'],
+        headers: forgetRequest['headers'],
+      );
+
+      final forgetData = json.decode(
+        forgetResponse.body,
+      );
+
+      if (forgetData['errcode'] != null) {
+        if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+          // TODO: confirm this works, deletes room if it doesn't
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
+        throw forgetData['error'];
+      }
+
+      if (room.direct) {
+        await store.dispatch(removeDirectRoom(room: room));
+      }
+
+      if (!kReleaseMode) {
+        print('[removeRoom|forgetData] $forgetData');
+        print('[removeRoom|forgetData] room was successfully removed');
+      }
+
+      await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+    } catch (error) {
+      print('[removeRoom] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Remove Direct Room
+ * 
+ * NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
+ * 
+ * Fetch the direct rooms list and recalculate it without the
+ * given alias
+ */
+ThunkAction<AppState> removeDirectRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final request = buildDirectRoomsRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        userId: store.state.userStore.user.userId,
       );
 
       final response = await http.get(
@@ -439,15 +591,218 @@ ThunkAction<AppState> convertDraftRoom({Room room}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
+
+      final rawDirectRooms = data as Map<String, dynamic>;
+
+      // Remove room id from nested Map<List<String>>
+      var filteredDirectRooms = rawDirectRooms.map((key, value) {
+        List<dynamic> directRoomIds = List.from(value as List<dynamic>);
+        if (directRoomIds.contains(room.id)) {
+          directRoomIds.remove(room.id);
+        }
+        return MapEntry(key, directRoomIds);
+      });
+
+      // Filter out empty list entries for a user
+      filteredDirectRooms.removeWhere((key, value) {
+        final roomIds = value as List<dynamic>;
+        return roomIds.isEmpty;
+      });
+
+      final saveRequest = buildSaveAccountData(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        userId: store.state.userStore.user.userId,
+        type: AccountDataTypes.DIRECT,
+      );
+
+      final saveResponse = await http.put(
+        saveRequest['url'],
+        headers: saveRequest['headers'],
+        body: json.encode(filteredDirectRooms),
+      );
+
+      final saveData = json.decode(
+        saveResponse.body,
+      );
+
+      if (saveData['errcode'] != null) {
+        throw saveData['error'];
+      }
+
+      print('[removeDirectRoom]');
     } catch (error) {
-      print('[createRoom] error: $error');
+      print('[removeDirectRoom] error: $error');
     }
   };
 }
 
-// /_matrix/client/r0/createRoom
+/**
+ * Delete Room
+ * 
+ * NOTE: https://github.com/vector-im/riot-web/issues/722
+ * NOTE: https://github.com/vector-im/riot-web/issues/6978
+ * NOTE: https://github.com/matrix-org/matrix-doc/issues/948
+ * 
+ * Kick all (if owner), tries to delete alias, and leaves
+ * TODO: make sure this is in accordance with matrix in that
+ * the user can only delete if owning the room, or leave if
+ * just a member
+ */
+ThunkAction<AppState> deleteRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final deleteRequest = buildLeaveRoom(
+        protocol: protocol,
+        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.userStore.homeserver,
+        roomId: room.id,
+      );
+
+      final deleteResponse = await http.delete(
+        deleteRequest['url'],
+        headers: deleteRequest['headers'],
+      );
+
+      final deleteData = json.decode(
+        deleteResponse.body,
+      );
+
+      if (deleteData['errcode'] != null) {
+        throw deleteData['error'];
+      }
+
+      if (!kReleaseMode) {
+        print('[deleteRoom] $deleteData');
+        print('[deleteRoom] room was successfully deleted');
+      }
+
+      store.dispatch(RemoveRoom(room: Room(id: room.id)));
+    } catch (error) {
+      print('[deleteRoom] error: $error');
+    }
+  };
+}
 
 /******* DEV TOOLS BEYOND THIS POINT ********/
+
+/**
+ * TODO: Explaination of this
+ * 
+ * LOAD != FETCH
+ * 
+ * Fetch -> Remote
+ * Store -> Hot Cache / Local
+ * Load (Hive) -> Cold Cache / Local 
+ */
+ThunkAction<AppState> storeSync() {
+  return (Store<AppState> store) async {
+    try {
+      // final json = await readFullSyncJson();
+      // final json = Cache.hive.get('sync');
+      return true;
+    } catch (error) {
+      debugPrint(error);
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> loadSync() {
+  return (Store<AppState> store) async {
+    try {
+      // final json = await readFullSyncJson();
+      // final json = Cache.hive.get('sync');
+      return true;
+    } catch (error) {
+      debugPrint(error);
+      return false;
+    }
+  };
+}
+
+/**
+ * Create Draft Room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * A local only room that has not been established with matrix
+ * meant to prep a room or first message before actually creating it 
+ */
+// ThunkAction<AppState> createDraftRoom({
+//   String name = 'New Chat',
+//   String topic,
+//   String avatarUri,
+//   List<User> users,
+//   bool isDirect = false,
+// }) {
+//   return (Store<AppState> store) async {
+//     try {
+//       final draftId = Random.secure().nextInt(1 << 32).toString();
+
+//       final draftRoom = Room(
+//         id: draftId,
+//         name: name,
+//         topic: topic,
+//         direct: isDirect,
+//         avatarUri: avatarUri,
+//         isDraftRoom: true,
+//         users: Map.fromIterable(
+//           users,
+//           key: (user) => user.id,
+//           value: (user) => user,
+//         ),
+//       );
+
+//       await store.dispatch(SetRoom(room: draftRoom));
+//       return draftRoom;
+//     } catch (error) {
+//       print('[createDraftRoom] error: $error');
+//       return null;
+//     }
+//   };
+// }
+
+/**
+ * TODO: Room Drafts
+ * 
+ * Convert a draft room to a remote matrix room
+ */
+// ThunkAction<AppState> convertDraftRoom({
+//   Room room,
+// }) {
+//   return (Store<AppState> store) async {
+//     try {
+//       if (!room.isDraftRoom) {
+//         throw 'Room has already been created';
+//       }
+
+//       final newRoomId = await store.dispatch(
+//         createRoom(
+//           name: room.name,
+//           topic: room.topic,
+//           invites: room.users,
+//           isDirect: room.direct,
+//         ),
+//       );
+
+//       if (newRoomId == null) {
+//         throw 'Failed to convert draft room to a real room';
+//       }
+
+//       // To temporarily redirect to the new room in the UI
+//       return Room(
+//         id: newRoomId,
+//         name: room.name,
+//       );
+//     } catch (error) {
+//       print('[createRoom] error: $error');
+//       return null;
+//     }
+//   };
+// }
 
 // WARNING: ONLY FOR TESTING OUTPUT
 Future<String> get _localPath async {

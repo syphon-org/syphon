@@ -10,15 +10,31 @@ class Dimensions {
   static const double mediaSizeMin = 208;
   static const double mediaSizeMax = 320;
 
-  static const double avatarSizeMin = 250;
-  static const double avatarSizeMax = 350;
-
   static const double thumbnailSizeMin = 48;
   static const double thumbnailSizeMax = 48;
+
+  // Avatars
+  static const double avatarSize = 56; // was 52
+  static const double avatarSizeMax = 350; // Change to HeroSize
+  static const double avatarHeroSize = 120;
 
   // Buttons
   static const double buttonWidthMin = 256;
   static const double buttonWidthMax = 384;
+  static const double buttonAppBarSize = 26;
+
+  // Messages
+  static const double bubbleHeightMin = 52;
+  static const double bubbleWidthMin = 122;
+
+  // Icons
+  static const double iconSize = 26;
+  static const double iconSizeLite = 24;
+  static const double indicatorSize = 16;
+
+  // Progress
+  static const double progressIndicatorSize = 26;
+  static const double progressIndicatorSizeLite = 12;
 
   // Inputs
   static const double inputSizeMin = 200;

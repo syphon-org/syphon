@@ -41,9 +41,8 @@ String formatDisplayName(User user) {
 }
 
 String displayInitials(User user) {
-  if (user.userId == null) return 'NA';
-
-  final displayName = user.displayName ?? user.userId.replaceFirst('@', '');
+  final userId = user.userId ?? 'Unknown';
+  final displayName = user.displayName ?? userId.replaceFirst('@', '');
   final initials = displayName.contains(' ')
       ? displayName.split(' ')[0].substring(0, 1) +
           displayName.split(' ')[1].substring(0, 1)

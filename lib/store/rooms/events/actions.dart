@@ -198,21 +198,42 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
-/**
- * Send Room Event (Send Message)
- */
-ThunkAction<AppState> sendMessage({
+ThunkAction<AppState> saveDraft({
   final body,
   String type = 'm.text',
   Room room,
 }) {
   return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        type: type,
+        body: body,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    ));
+  };
+}
+
+/**
+ * Send Room Event (Send Message)
+ */
+ThunkAction<AppState> sendMessage({
+  Room room,
+  final body,
+  String type = MessageTypes.TEXT,
+}) {
+  return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));
+
+    final roomInstance = store.state.roomStore.rooms[room.id];
+
+    // if you're incredibly unlucky, and fast, you could have a problem here
+    final String tempId = Random.secure().nextInt(1 << 32).toString();
+
     try {
       print('[sendMessage] ${type} ${body}');
-
-      // if you're incredibly unlucky, and fast, you could have a problem here
-      final String tempId = Random.secure().nextInt(1 << 32).toString();
 
       // Save unsent message to outbox
       store.dispatch(SaveOutboxMessage(
@@ -246,6 +267,22 @@ ThunkAction<AppState> sendMessage({
 
       final data = json.decode(response.body);
       if (data['errcode'] != null) {
+        store.dispatch(SaveOutboxMessage(
+          id: room.id,
+          tempId: tempId.toString(),
+          pendingMessage: Message(
+            id: tempId.toString(),
+            body: body,
+            type: type,
+            sender: store.state.userStore.user.userId,
+            roomId: room.id,
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            pending: false,
+            syncing: false,
+            failed: true,
+          ),
+        ));
+
         throw data['error'];
       }
 
@@ -268,6 +305,7 @@ ThunkAction<AppState> sendMessage({
       return true;
     } catch (error) {
       print('[sendMessage] failed to send: $error');
+      return false;
     } finally {
       store.dispatch(SetSending(room: room, sending: false));
     }
@@ -283,7 +321,7 @@ ThunkAction<AppState> deleteMessage({
 }) {
   return (Store<AppState> store) async {
     try {
-      if (message.pending) {
+      if (message.pending || message.failed) {
         print("Deleting Message");
         store.dispatch(DeleteOutboxMessage(message: message));
         return;

@@ -49,9 +49,8 @@ class MessageDetails extends StatelessWidget {
           timestamp = DateTime.fromMillisecondsSinceEpoch(
             userTimestamps[users[index]],
           );
-          print(timestamp);
         } catch (error) {
-          print(error);
+          print('[buildUserReadList] $error');
         }
         return ListTile(
           dense: true,

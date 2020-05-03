@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
@@ -22,6 +23,7 @@ class MessageWidget extends StatelessWidget {
     this.isNextSender = false,
     this.lastRead = 0,
     this.selectedMessageId,
+    this.avatarUri,
     this.theme = ThemeType.LIGHT,
   }) : super(key: key);
 
@@ -34,6 +36,7 @@ class MessageWidget extends StatelessWidget {
   final ThemeType theme;
   final String selectedMessageId;
   final Function onLongPress;
+  final String avatarUri;
 
   @override
   Widget build(BuildContext context) {
@@ -50,37 +53,74 @@ class MessageWidget extends StatelessWidget {
     var opacity = 1.0;
     var isRead = message.timestamp < lastRead;
 
-    if (isLastSender) {
-      if (isNextSender) {
-        // Message in the middle of a sender messages block
-        bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+    // CURRENT USER SENT STYLING
+    if (isUserSent) {
+      if (isLastSender) {
+        if (isNextSender) {
+          // Message in the middle of a sender messages block
+          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleBorder = BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(4),
+            bottomLeft: Radius.circular(16),
+            bottomRight: Radius.circular(4),
+          );
+        } else {
+          // Message at the beginning of a user sender messages block
+          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleBorder = BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(16),
+            bottomRight: Radius.circular(4),
+          );
+        }
+      }
+
+      if (!isLastSender && isNextSender) {
+        // End of a sender messages block
+        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
         bubbleBorder = BorderRadius.only(
-          topRight: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-          topLeft: Radius.circular(4),
-          bottomLeft: Radius.circular(4),
-        );
-      } else {
-        // Message at the beginning of a sender messages block
-        bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
-        bubbleBorder = BorderRadius.only(
-          topRight: Radius.circular(16),
-          bottomRight: Radius.circular(16),
           topLeft: Radius.circular(16),
-          bottomLeft: Radius.circular(4),
+          topRight: Radius.circular(4),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
         );
       }
-    }
+      // OTHER USER SENT STYLING
+    } else {
+      if (isLastSender) {
+        if (isNextSender) {
+          // Message in the middle of a sender messages block
+          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleBorder = BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(4),
+            bottomRight: Radius.circular(16),
+          );
+        } else {
+          // Message at the beginning of a sender messages block
+          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleBorder = BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(4),
+            bottomRight: Radius.circular(16),
+          );
+        }
+      }
 
-    if (!isLastSender && isNextSender) {
-      // End of a sender messages block
-      bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
-      bubbleBorder = BorderRadius.only(
-        topRight: Radius.circular(16),
-        bottomRight: Radius.circular(16),
-        bottomLeft: Radius.circular(16),
-        topLeft: Radius.circular(4),
-      );
+      if (!isLastSender && isNextSender) {
+        // End of a sender messages block
+        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+        bubbleBorder = BorderRadius.only(
+          topLeft: Radius.circular(4),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        );
+      }
     }
 
     if (isUserSent) {
@@ -139,17 +179,19 @@ class MessageWidget extends StatelessWidget {
                         margin: const EdgeInsets.only(
                           right: 12,
                         ),
-                        child: CircleAvatar(
-                          radius: 14,
-                          backgroundColor: bubbleColor,
-                          child: Text(
-                            formatSenderInitials(message.sender),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+                        child: avatarUri != null
+                            ? null
+                            : CircleAvatar(
+                                radius: 14,
+                                backgroundColor: bubbleColor,
+                                child: Text(
+                                  formatSenderInitials(message.sender),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                     Flexible(
@@ -203,10 +245,12 @@ class MessageWidget extends StatelessWidget {
                               children: [
                                 Container(
                                   child: Text(
-                                    formatTimestamp(
-                                      lastUpdateMillis: message.timestamp,
-                                      showTime: true,
-                                    ),
+                                    message.failed
+                                        ? 'Message failed to send'
+                                        : formatTimestamp(
+                                            lastUpdateMillis: message.timestamp,
+                                            showTime: true,
+                                          ),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: textColor,
@@ -222,9 +266,11 @@ class MessageWidget extends StatelessWidget {
                                       child: Container(
                                         width: indicatorSize,
                                         height: indicatorSize,
-                                        margin: EdgeInsets.only(left: 4),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1.5,
+                                        margin: EdgeInsets.only(left: 3),
+                                        child: Icon(
+                                          Icons.close,
+                                          color: Colors.redAccent,
+                                          size: Dimensions.indicatorSize,
                                         ),
                                       ),
                                     ),
@@ -240,8 +286,7 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                     Visibility(
-                                      visible: !message.pending &&
-                                          message.id.contains(':'),
+                                      visible: !message.pending,
                                       child: Container(
                                         width: indicatorSize,
                                         height: indicatorSize,
@@ -263,8 +308,7 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                     Visibility(
-                                      visible: !message.syncing &&
-                                          message.id.contains(':'),
+                                      visible: !message.syncing,
                                       child: Container(
                                         width: indicatorSize,
                                         height: indicatorSize,

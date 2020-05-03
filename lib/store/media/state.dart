@@ -12,6 +12,8 @@ class MediaStore extends Equatable {
   final bool fetching;
   @HiveField(1)
   final Map<String, Uint8List> mediaCache;
+  // @HiveField(2)
+  // final Map<String, Uint8List> mediaHistory;
 
   static const hiveBox = 'MediaStore';
 
