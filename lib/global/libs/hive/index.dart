@@ -19,6 +19,7 @@ import 'package:Tether/store/settings/state.dart';
 // Global cache
 class Cache {
   static Box hive;
+  static const matrixState = 'full_matrix_state';
   static const globalBox = 'tether';
   static const defaultKey = 'tether@publicKey';
 }

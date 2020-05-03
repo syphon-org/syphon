@@ -1,9 +1,12 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/events/selectors.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/store/settings/chat-settings/actions.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -45,6 +48,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
   double headerOpacity = 1;
   double headerSize = 54;
+  List<User> usersList;
 
   @override
   void initState() {
@@ -160,6 +164,57 @@ class ChatDetailsState extends State<ChatDetailsView> {
           )
         ],
       ),
+    );
+  }
+
+  @protected
+  Widget buildUserAvatar({User user}) {
+    if (user.avatarUri != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(
+          Dimensions.thumbnailSizeMax,
+        ),
+        child: MatrixImage(
+          width: Dimensions.avatarSize,
+          height: Dimensions.avatarSize,
+          mxcUri: user.avatarUri,
+        ),
+      );
+    }
+
+    return Text(
+      displayInitials(user),
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  @protected
+  Widget buildUsersPreview(_Props props) {
+    final List<User> users = List.from(props.room.users.values);
+
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: users.length < 12 ? users.length : 12,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (BuildContext context, int index) {
+        return Align(
+          alignment: Alignment.topLeft,
+          heightFactor: 0.8,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            child: CircleAvatar(
+              radius: Dimensions.avatarSize / 2,
+              backgroundColor: Colors.grey,
+              child: buildUserAvatar(
+                user: users[index],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -317,7 +372,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4),
                                           child: Text(
-                                            '(10)',
+                                            '(${props.room.users.length})',
                                             textAlign: TextAlign.start,
                                             style: TextStyle(),
                                           ),
@@ -329,20 +384,18 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ],
                             ),
                           ),
-                          ListTile(
-                            onTap: () {},
-                            contentPadding: contentPadding,
-                            leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
-                                  Icons.chat,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              'TODO: list user avai here',
-                              style: TextStyle(fontSize: 18.0),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 8,
+                              top: 8,
+                              bottom: 8,
                             ),
-                          ),
+                            constraints: BoxConstraints(
+                              maxHeight: Dimensions.avatarSize * 1.5,
+                              maxWidth: width,
+                            ),
+                            child: buildUsersPreview(props),
+                          )
                         ],
                       ),
                     ),

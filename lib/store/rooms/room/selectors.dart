@@ -25,7 +25,6 @@ String formatPreview({Room room, Message recentMessage}) {
 
   // Show topic if the user has joined a group but not sent anything (lurkin')
   if (room.messages == null || room.messages.length < 1) {
-    print('what ${room.direct}');
     if (room.direct) {
       return 'No messages yet';
     } else {

@@ -102,11 +102,6 @@ class ChatViewState extends State<ChatView> {
 
     final room = store.state.roomStore.rooms[arguements.roomId];
 
-    if (room == null) {
-      print('ya done goofed');
-      return;
-    }
-
     final draft = room.draft;
     if (draft != null && draft.type == MessageTypes.TEXT) {
       final text = draft.body;
@@ -222,6 +217,12 @@ class ChatViewState extends State<ChatView> {
           final selectedMessageId =
               this.selectedMessage != null ? this.selectedMessage.id : null;
 
+          final avatarUri = props.room.users[message.sender]?.avatarUri;
+
+          print(
+            '[buildMessageList] $avatarUri ${props.room.users[message.sender]}',
+          );
+
           return MessageWidget(
             message: message,
             isUserSent: isUserSent,
@@ -230,6 +231,7 @@ class ChatViewState extends State<ChatView> {
             lastRead: props.room.lastRead,
             selectedMessageId: selectedMessageId,
             onLongPress: onToggleMessageOptions,
+            avatarUri: avatarUri,
             theme: props.theme,
           );
         },
@@ -254,9 +256,10 @@ class ChatViewState extends State<ChatView> {
   // }
   @protected
   onSubmitMessage(_Props props) async {
+    print(editorController.text);
     props.onSendMessage(
       body: editorController.text,
-      roomId: props.room.id,
+      type: MessageTypes.TEXT,
     );
     editorController.clear();
     FocusScope.of(context).unfocus();
@@ -501,14 +504,18 @@ class ChatViewState extends State<ChatView> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.delete),
-          iconSize: 28.0,
-          tooltip: 'Delete Message',
-          color: Colors.white,
-          onPressed: () => props.onDeleteMessage(
-            message: this.selectedMessage,
-          ),
-        ),
+            icon: Icon(Icons.delete),
+            iconSize: 28.0,
+            tooltip: 'Delete Message',
+            color: Colors.white,
+            onPressed: () {
+              props.onDeleteMessage(
+                message: this.selectedMessage,
+              );
+              this.setState(() {
+                selectedMessage = null;
+              });
+            }),
         Visibility(
           visible: isTextMessage(message: selectedMessage),
           child: IconButton(
@@ -730,8 +737,8 @@ class _Props extends Equatable {
         }) {
           store.dispatch(saveDraft(
             body: body,
-            room: store.state.roomStore.rooms[roomId],
             type: type,
+            room: store.state.roomStore.rooms[roomId],
           ));
         },
         onSendMessage: ({

@@ -246,7 +246,7 @@ class _Props extends Equatable {
           }
         },
         onForceFullSync: () {
-          store.dispatch(fetchSync());
+          store.dispatch(fetchSync(forceFull: true));
         },
       );
 }

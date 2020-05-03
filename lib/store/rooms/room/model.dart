@@ -53,10 +53,6 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: consider making this a map
-  @HiveField(18)
-  final List<User> users;
-
   @HiveField(19)
   final List<Event> state;
   @HiveField(20)
@@ -73,6 +69,9 @@ class Room {
   @HiveField(24)
   final Map<String, ReadStatus> messageReads;
 
+  @HiveField(25)
+  final Map<String, User> users;
+
   const Room({
     this.id,
     this.name = 'New Chat',
@@ -84,7 +83,7 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.draft,
-    this.users = const [],
+    this.users,
     this.state = const [],
     this.outbox = const [],
     this.messages = const [],
@@ -239,9 +238,9 @@ class Room {
         : Map<String, ReadStatus>();
 
     try {
-      if (events.length > 0) {
-        print('[${this.name}] saving ephemeral ${events.length}');
-      }
+      // if (events.length > 0) {
+      //   print('[${this.name}] saving ephemeral ${events.length}');
+      // }
       events.forEach((event) {
         switch (event.type) {
           case 'm.typing':
@@ -297,20 +296,18 @@ class Room {
     String name;
     String avatarUri;
     String topic;
-    bool isDirect;
+    bool direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     List<Event> cachedStateEvents = List<Event>();
-    List<User> users = List<User>();
-    // TODO: List<User> users = List<User>();
+    Map<String, User> users = this.users ?? Map<String, User>();
 
     try {
       stateEvents.forEach((event) {
         lastUpdate =
             event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
-        print('${event.type} ${event.content}\n');
-
+        // print('[fromStateEvents] ${event.type} ${event.content}');
         switch (event.type) {
           case 'm.room.name':
             namePriority = 1;
@@ -338,14 +335,29 @@ class Room {
             }
             break;
           case 'm.room.member':
-            if (event.content['displayname'] != currentUser) {
-              if (this.direct || (event.content['is_direct'] as bool)) {
-                isDirect = event.content['is_direct'];
-                name = event.content['displayname'];
+            final memberDisplayName = event.content['displayname'];
+
+            print('[fromStateEvents] content found ${event.content}');
+            print('[fromStateEvents] m.room.member found $memberDisplayName');
+            if (memberDisplayName != currentUser) {
+              final isDirect = event.content['is_direct'];
+
+              if (this.direct || (isDirect != null && isDirect as bool)) {
+                name = memberDisplayName;
                 avatarUri = event.content['avatar_url'];
+                direct = event.content['is_direct'];
+              }
+
+              print('[fromStateEvents] m.room.member found $memberDisplayName');
+
+              if (!users.containsKey(memberDisplayName)) {
+                final avatarUri = event.content['avatar_url'];
+                users[memberDisplayName] = User(
+                  displayName: memberDisplayName,
+                  avatarUri: avatarUri,
+                );
               }
             }
-
             break;
           default:
             break;
@@ -359,8 +371,9 @@ class Room {
       name: name ?? this.name ?? 'New Room',
       avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
+      users: users ?? this.users,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
-      direct: isDirect ?? this.direct,
+      direct: direct ?? this.direct,
       state: cachedStateEvents,
     );
   }

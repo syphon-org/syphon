@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
+import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
@@ -217,7 +218,7 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
-ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
+ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
@@ -230,7 +231,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
         fullState: forceFull || store.state.roomStore.rooms == null,
-        since: since ?? store.state.roomStore.lastSince,
+        since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
 
       final response = await http.get(
@@ -249,9 +250,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
       //   print('[fetchSync] DEBUGGING **************************');
       // }
 
+      final String lastSince = data['next_batch'];
       final Map<String, dynamic> rawRooms =
           data['rooms']['join'] ?? Map<String, Room>();
-      final String lastSince = data['next_batch'];
 
       // init new store containers
       final Map<String, Room> rooms =
@@ -261,12 +262,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
         Room room;
-
-        print(json.keys);
-
-        json.forEach((id, value) {
-          print(value);
-        });
 
         // use pre-existing values where available
         if (rooms.containsKey(id)) {
@@ -281,7 +276,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
           );
         }
 
-        print(room);
         // fetch avatar if a uri was found
         if (room.avatarUri != null) {
           store.dispatch(fetchThumbnail(
@@ -292,19 +286,17 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = true}) {
         store.dispatch(SetRoom(room: room));
       });
 
-      // TODO: save the initial sync, but not like this
-      if (!store.state.roomStore.synced) {
-        final file = await _localFile;
-        file.writeAsString(response.body);
-      }
-
-      // Set "Synced" and since so we know you've run the inital sync
-
+      // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
         lastSince: lastSince,
       ));
+
+      // TODO: encrypt and find a way to reasonably update this
+      if (!store.state.roomStore.synced) {
+        Cache.hive.put(Cache.matrixState, response.body);
+      }
       if (!kReleaseMode && since == null) {
         print('[fetchSync] full sync completed');
       }
@@ -384,50 +376,12 @@ ThunkAction<AppState> fetchDirectRooms() {
         store.dispatch(SetRoom(
             room: Room(
           id: roomIds[0],
-          users: [User(userId: userId)],
           direct: true,
         )));
       });
     } catch (error) {
       print('[fetchDirectRooms] error: $error');
     } finally {}
-  };
-}
-
-/**
- * Create Draft Room
- * 
- * TODO: make sure this is in accordance with matrix in that
- * A local only room that has not been established with matrix
- * meant to prep a room or first message before actually creating it 
- */
-ThunkAction<AppState> createDraftRoom({
-  String name = 'New Chat',
-  String topic,
-  String avatarUri,
-  List<User> users,
-  bool isDirect = false,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      final draftId = Random.secure().nextInt(1 << 32).toString();
-
-      final draftRoom = Room(
-        id: draftId,
-        name: name,
-        topic: topic,
-        direct: isDirect,
-        avatarUri: avatarUri,
-        isDraftRoom: true,
-        users: users,
-      );
-
-      await store.dispatch(SetRoom(room: draftRoom));
-      return draftRoom;
-    } catch (error) {
-      print('[createDraftRoom] error: $error');
-      return null;
-    }
   };
 }
 
@@ -769,6 +723,48 @@ ThunkAction<AppState> loadSync() {
     }
   };
 }
+
+/**
+ * Create Draft Room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * A local only room that has not been established with matrix
+ * meant to prep a room or first message before actually creating it 
+ */
+// ThunkAction<AppState> createDraftRoom({
+//   String name = 'New Chat',
+//   String topic,
+//   String avatarUri,
+//   List<User> users,
+//   bool isDirect = false,
+// }) {
+//   return (Store<AppState> store) async {
+//     try {
+//       final draftId = Random.secure().nextInt(1 << 32).toString();
+
+//       final draftRoom = Room(
+//         id: draftId,
+//         name: name,
+//         topic: topic,
+//         direct: isDirect,
+//         avatarUri: avatarUri,
+//         isDraftRoom: true,
+//         users: Map.fromIterable(
+//           users,
+//           key: (user) => user.id,
+//           value: (user) => user,
+//         ),
+//       );
+
+//       await store.dispatch(SetRoom(room: draftRoom));
+//       return draftRoom;
+//     } catch (error) {
+//       print('[createDraftRoom] error: $error');
+//       return null;
+//     }
+//   };
+// }
+
 /**
  * TODO: Room Drafts
  * 
