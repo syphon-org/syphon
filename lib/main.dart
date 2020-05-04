@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/alerts/actions.dart';
+import 'package:Tether/store/service.dart';
 import 'package:Tether/store/settings/state.dart';
 import 'package:Tether/store/user/actions.dart';
 import 'package:Tether/global/notifications.dart';
@@ -52,6 +53,9 @@ void main() async {
 
   // init state cache (hot)
   final store = await initStore();
+
+  final backgroundSyncStatus = await BackgroundSync.init();
+  print('[main] background service started $backgroundSyncStatus');
 
   // /**
   //  * DESKTOP ONLY

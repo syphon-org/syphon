@@ -1,8 +1,8 @@
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/service.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
+import 'package:Tether/store/service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,18 +44,11 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      // Dispatch Background Sync
-                      if (roomObserverIsolate != null) {
-                        stopRoomObserverService();
-                      } else {
-                        startRoomObserverService();
-                      }
+                      BackgroundSync.start();
                     },
                     contentPadding: contentPadding,
                     title: Text(
-                      roomObserverIsolate != null
-                          ? 'Kill Isolate'
-                          : 'Start Isolate',
+                      'Start Background Service',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -65,13 +58,12 @@ class AdvancedScreen extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
-                    onTap: () async {
-                      await sendServiceAction('bye bye');
-                      print('action completed');
+                    onTap: () {
+                      BackgroundSync.stop();
                     },
                     contentPadding: contentPadding,
                     title: Text(
-                      'Toggle Isolate Timer',
+                      'Stop All Services',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),

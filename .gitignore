@@ -43,3 +43,5 @@ lib/generated_plugin_registrant.dart
 
 # Code Counter Extension
 *.VSCodeCounter
+
+android_old

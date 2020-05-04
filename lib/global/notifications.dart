@@ -9,6 +9,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  */
 // https://matrix.org/docs/spec/client_server/latest#id470
 
+const String channel_id = 'tether_notifications';
+const String channel_id_background_service = 'tether_background_notification';
+const String channel_name = 'Tether';
+const String channel_description =
+    'Tether messaging client message and status notifications';
+
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
@@ -64,17 +70,59 @@ Future<bool> promptNativeNotificationsRequest({
 }
 
 Future showMessageNotification({
-  int messageHash,
-  String content,
+  int messageHash = 0,
+  String body,
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
+  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
+
+  final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    channel_id,
+    channel_name,
+    channel_description,
+    visibility: NotificationVisibility.Private,
+    importance: Importance.Default,
+    priority: Priority.High,
+  );
+
+  final platformChannelSpecifics = NotificationDetails(
+    androidPlatformChannelSpecifics,
+    iOSPlatformChannelSpecifics,
+  );
+
+  await pluginInstance.show(
+    messageHash,
+    'New Message',
+    body ?? messageHash.toString() ?? 'Tap to open message',
+    platformChannelSpecifics,
+  );
+}
+
+/**
+ * Background Service Notification
+ * 
+ * NOTE: background connection updates are only available on
+ * android. iOS uses APNS to update through push notifications
+ * 
+ * This is used in android to circumvent google play services
+ * 
+ * If the notification is not reinvoked after 61 seconds the service is
+ * likely no longer running and the notification should be automatically
+ * dissmissed
+ */
+Future showBackgroundServiceNotification({
+  int notificationId,
+  String debugContent = '',
   FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'tether_notifications',
-    'Tether',
-    'S',
-    importance: Importance.Default,
+    channel_id_background_service,
+    channel_name,
+    channel_description,
+    timeoutAfter: 120 * 1000, // 61 seconds
+    importance: Importance.Max,
     priority: Priority.High,
   );
 
@@ -84,22 +132,24 @@ Future showMessageNotification({
   );
 
   await pluginInstance.show(
-    messageHash,
-    'New Message',
-    content ?? 'Tap to open message',
+    notificationId,
+    'Tether',
+    'Background connection enabled $debugContent',
     platformChannelSpecifics,
   );
 }
 
 Future showDebugNotification({
+  int notificationId,
   String customMessage,
   FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'tether_notifications',
-    'Tether',
-    'Notifications for tether messenger',
+    channel_id,
+    channel_name,
+    channel_description,
     importance: Importance.Default,
     priority: Priority.High,
   );
@@ -111,7 +161,7 @@ Future showDebugNotification({
 
   // Timer(Duration(seconds: 5), () async {
   await pluginInstance.show(
-    0,
+    notificationId ?? 0,
     'Debug Regular Notifcation',
     customMessage ?? 'This is a test for styling notifications',
     platformChannelSpecifics,
