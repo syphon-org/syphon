@@ -10,10 +10,11 @@ import 'package:intl/intl.dart';
 const tether_service_id = 256;
 const tether_service_debug_id = 244;
 
-/* ****************************** NEW ****************************** */
-
-void testingHello() async {
+void backgroundSync() async {
   final int isolateId = Isolate.current.hashCode;
+  final int syncInterval = 2;
+  final int secondsTimeout = 60;
+
   FlutterLocalNotificationsPlugin pluginInstance = await initNotifications(
     onSelectNotification: (String payload) {
       print('Isolate Notification was opened ${payload}');
@@ -26,13 +27,23 @@ void testingHello() async {
     pluginInstance: pluginInstance,
   );
 
-  for (int i = 0; i < 60; i++) {
-    if (i % 2 == 0) {
+  for (int i = 0; i < secondsTimeout; i++) {
+    if (i % syncInterval == 0) {
       Timer(Duration(seconds: i), () async {
         final DateTime now = DateTime.now();
         print(
           "[AndroidAlarmService] running $i timestamp=$now isolate=${isolateId}",
         );
+
+        // TODO: fetchSync here and check for new messages,
+        // TODO: save an alternate lastSince for the background service only
+
+        /**
+         * Check last since and see if any new messages arrived in the payload
+         * No need to update the hive store for now, just do not save the lastSince
+         * and the next foreground fetchSync will update the state
+         */
+
         if (i == 30) {
           showMessageNotification(
             messageHash: Random.secure().nextInt(20000),
@@ -58,7 +69,7 @@ class BackgroundSync {
     await AndroidAlarmManager.periodic(
       const Duration(seconds: 5),
       tether_service_id,
-      testingHello,
+      backgroundSync,
       rescheduleOnReboot: true,
       exact: true,
       wakeup: true,
