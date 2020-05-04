@@ -13,12 +13,17 @@ description: Privacy centric matrix client for everyone
 
 # desktop support options
 # * Desktop support breaks the iOS xcode build
+# * after disabling enabled -> disabled
 # - flutter config --enable-macos-desktop
 # - flutter config --no-enable-macos-desktop
-# - pub cache repair # after disabling enabled -> disabled
-# serializable generation
+
+# build generation
 # - flutter pub run build_runner build
 # - flutter pub run build_runner watch - if making schema changes
+
+# troubleshooting
+# - pub cache repair
+# - flutter pub cache repair
 
 # asset generation
 # iOS icons - https://github.com/smallmuou/ios-icon-generator
