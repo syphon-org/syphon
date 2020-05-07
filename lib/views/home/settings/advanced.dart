@@ -3,14 +3,17 @@ import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:Tether/store/service.dart';
+import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
 final String debug = DotEnv().env['DEBUG'];
+final String protocol = DotEnv().env['PROTOCOL'];
 
 class AdvancedScreen extends StatelessWidget {
   AdvancedScreen({Key key}) : super(key: key);
@@ -44,7 +47,12 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      BackgroundSync.start();
+                      BackgroundSync.start(
+                        protocol: protocol,
+                        homeserver: props.currentUser.homeserver,
+                        accessToken: props.currentUser.accessToken,
+                        lastSince: props.lastSince,
+                      );
                     },
                     contentPadding: contentPadding,
                     title: Text(
@@ -60,6 +68,9 @@ class AdvancedScreen extends StatelessWidget {
                     dense: true,
                     onTap: () {
                       BackgroundSync.stop();
+                      dismissAllNotifications(
+                        pluginInstance: globalNotificationPluginInstance,
+                      );
                     },
                     contentPadding: contentPadding,
                     title: Text(
@@ -96,6 +107,13 @@ class AdvancedScreen extends StatelessWidget {
                     dense: true,
                     onTap: () {
                       showDebugNotification(
+                        pluginInstance: globalNotificationPluginInstance,
+                      );
+
+                      showBackgroundServiceNotification(
+                        notificationId: tether_service_id,
+                        debugContent:
+                            DateFormat('E h:mm ss a').format(DateTime.now()),
                         pluginInstance: globalNotificationPluginInstance,
                       );
                     },
@@ -191,6 +209,8 @@ class _Props extends Equatable {
   final bool roomsLoading;
   final bool roomsObserverEnabled;
   final String language;
+  final String lastSince;
+  final User currentUser;
   final Function onToggleSyncing;
   final Function onManualSync;
   final Function onForceFullSync;
@@ -204,12 +224,16 @@ class _Props extends Equatable {
     @required this.onForceFullSync,
     @required this.onToggleSyncing,
     @required this.roomsObserverEnabled,
+    @required this.currentUser,
+    @required this.lastSince,
   });
 
   @override
   List<Object> get props => [
         syncing,
         loading,
+        lastSince,
+        currentUser,
         roomsLoading,
         roomsObserverEnabled,
       ];
@@ -223,6 +247,8 @@ class _Props extends Equatable {
         loading: store.state.roomStore.syncing || store.state.roomStore.loading,
         roomsLoading: store.state.roomStore.loading,
         language: store.state.settingsStore.language,
+        currentUser: store.state.userStore.user,
+        lastSince: store.state.roomStore.lastSince,
         roomsObserverEnabled: store.state.roomStore.roomObserver.isActive,
         onToggleSyncing: () {
           final observer = store.state.roomStore.roomObserver;

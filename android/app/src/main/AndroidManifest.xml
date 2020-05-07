@@ -11,7 +11,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="tether"
+        android:label="Tether"
         android:icon="@mipmap/ic_launcher">
         <service
             android:name="io.flutter.plugins.androidalarmmanager.AlarmService"

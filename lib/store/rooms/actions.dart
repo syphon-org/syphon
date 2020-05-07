@@ -295,7 +295,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // TODO: encrypt and find a way to reasonably update this
       if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.matrixState, response.body);
+        Cache.hive.put(Cache.matrixStateBox, response.body);
       }
       if (!kReleaseMode && since == null) {
         print('[fetchSync] full sync completed');
