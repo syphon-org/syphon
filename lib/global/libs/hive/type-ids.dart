@@ -10,6 +10,7 @@ const int EventHiveId = 5;
 const int RoomHiveId = 6;
 const int ReadStatusHiveId = 7;
 const int UserHiveId = 8;
+const int DeviceSettingsHiveId = 9;
 
 // Actual Redux State Stores
 const int MediaStoreHiveId = 0;

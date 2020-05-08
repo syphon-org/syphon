@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'dart:math';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
@@ -251,14 +250,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
 
-      // final response = await http.get(
-      //   request['url'],
-      //   headers: request['headers'],
-      // );
-
-      // // parse sync data
-      // final data = json.decode(response.body);
-
+      // TODO: convert to use fetchSyncIsolate and save in background
       final responseBody = await compute(fetchSyncMicro, request);
       final data = await compute(convertSyncMicro, responseBody);
 
@@ -277,6 +269,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // init new store containers
       final Map<String, Room> rooms =
           store.state.roomStore.rooms ?? Map<String, Room>();
+
       final user = store.state.userStore.user;
 
       // update those that exist or add a new room

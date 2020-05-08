@@ -50,9 +50,9 @@ class NotificationSettings extends StatelessWidget {
                 child: Column(
               children: <Widget>[
                 Card(
-                  margin: EdgeInsets.only(top: 8, bottom: 4),
                   elevation: 0.5,
                   color: sectionBackgroundColor,
+                  margin: EdgeInsets.only(top: 8, bottom: 4),
                   child: Container(
                     padding: EdgeInsets.only(top: 12),
                     child: Column(children: [
@@ -60,14 +60,42 @@ class NotificationSettings extends StatelessWidget {
                         width: width, // TODO: use flex, i'm rushing
                         padding: contentPadding,
                         child: Text(
-                          'Basic',
+                          'On-Device',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.subtitle2,
                         ),
                       ),
+                      Container(
+                        width: width, // TODO: use flex, i'm rushing
+                        padding: contentPadding,
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          text: TextSpan(
+                            text:
+                                'Show notifications using a background service',
+                            style: Theme.of(context).textTheme.caption,
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: ' without ',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption
+                                    .copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                              TextSpan(
+                                text: 'Google Play Services',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       ListTile(
+                        enabled: Platform.isAndroid,
                         dense: true,
-                        onTap: () => props.onToggleNotifications(context),
+                        onTap: () => props.onToggleLocalNotifications(context),
                         contentPadding: contentPadding,
                         title: Text(
                           'Notifications',
@@ -76,8 +104,10 @@ class NotificationSettings extends StatelessWidget {
                         trailing: Container(
                           child: Switch(
                             value: props.notificationsEnabled,
-                            onChanged: (value) =>
-                                props.onToggleNotifications(context),
+                            onChanged: !Platform.isAndroid
+                                ? null
+                                : (value) =>
+                                    props.onToggleLocalNotifications(context),
                           ),
                         ),
                       ),
@@ -95,14 +125,24 @@ class NotificationSettings extends StatelessWidget {
                         width: width, // TODO: use flex, i'm rushing
                         padding: contentPadding,
                         child: Text(
-                          'Remote',
+                          'Matrix (Remote)',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.subtitle2,
                         ),
                       ),
+                      Container(
+                        width: width, // TODO: use flex, i'm rushing
+                        padding: contentPadding,
+                        child: Text(
+                          'Show notifications using Apple Push Notifications through Matrix',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ),
                       ListTile(
+                        enabled: Platform.isIOS,
                         dense: true,
-                        onTap: () => props.onToggleNotifications(context),
+                        onTap: () => props.onToggleRemoteNotifications(context),
                         contentPadding: contentPadding,
                         title: Text(
                           'Notifications',
@@ -111,9 +151,11 @@ class NotificationSettings extends StatelessWidget {
                         trailing: Container(
                           child: Switch(
                             value: props.notificationsEnabled,
-                            onChanged: (value) => props.onToggleNotifications(
-                              context,
-                            ),
+                            onChanged: !Platform.isIOS
+                                ? null
+                                : (value) => props.onToggleRemoteNotifications(
+                                      context,
+                                    ),
                           ),
                         ),
                       ),
@@ -129,11 +171,13 @@ class NotificationSettings extends StatelessWidget {
 
 class Props {
   final bool notificationsEnabled;
-  final Function onToggleNotifications;
+  final Function onToggleLocalNotifications;
+  final Function onToggleRemoteNotifications;
 
   Props({
     @required this.notificationsEnabled,
-    @required this.onToggleNotifications,
+    @required this.onToggleLocalNotifications,
+    @required this.onToggleRemoteNotifications,
   });
 
   /* effectively mapStateToProps, but includes functions */
@@ -142,7 +186,11 @@ class Props {
   ) =>
       Props(
           notificationsEnabled: store.state.settingsStore.notificationsEnabled,
-          onToggleNotifications: (BuildContext context) {
+          onToggleLocalNotifications: () {
+            store.dispatch(toggleNotifications());
+            // TODO: init background service
+          },
+          onToggleRemoteNotifications: (BuildContext context) {
             try {
               // If the platform is iOS, we'll want to confirm they understand
               // the native notification prompt

@@ -165,6 +165,22 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/devices');
+                            },
+                            contentPadding: contentPadding,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.phone_android,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Devices',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ),
+                          ListTile(
                             onTap: () {},
                             contentPadding: contentPadding,
                             leading: Container(

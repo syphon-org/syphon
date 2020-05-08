@@ -32,7 +32,7 @@ import 'package:window_utils/window_utils.dart';
  */
 
 // Generated Json Serializables
-import 'main.reflectable.dart'; // Import generated code.
+// import 'main.reflectable.dart'; // Import generated code.
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -41,7 +41,7 @@ void _enablePlatformOverrideForDesktop() {
 }
 
 void main() async {
-  initializeReflectable();
+  // initializeReflectable();
   WidgetsFlutterBinding();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
   _enablePlatformOverrideForDesktop();

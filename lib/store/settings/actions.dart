@@ -1,9 +1,17 @@
+import 'dart:convert';
+
+import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:http/http.dart' as http;
+import 'package:Tether/global/libs/matrix/devices.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/global/themes.dart';
+
+final protocol = DotEnv().env['PROTOCOL'];
 
 class SetTheme {
   final ThemeType theme;
@@ -23,6 +31,16 @@ class SetRoomPrimaryColor {
     this.color,
     this.roomId,
   });
+}
+
+class SetLoading {
+  final bool loading;
+  SetLoading({this.loading});
+}
+
+class SetDevices {
+  final List<DeviceSetting> devices;
+  SetDevices({this.devices});
 }
 
 class SetAccentColor {
@@ -55,6 +73,51 @@ class ToggleTypingIndicators {
 
 class ToggleReadReceipts {
   ToggleReadReceipts();
+}
+
+/**
+ * Fetch Remote Push Notification Settings
+ */
+ThunkAction<AppState> fetchPushNotificationSettings(int color) {
+  return (Store<AppState> store) async {};
+}
+
+/**
+ * Fetch Active Devices for account
+ */
+ThunkAction<AppState> fetchDevices() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+      final request = buildDevicesRequest(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+      );
+
+      final response = await http.get(
+        request['url'],
+        headers: request['headers'],
+      );
+
+      final data = json.decode(response.body);
+      print('[fetchDevices] $data');
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final List<dynamic> jsonDevices = data['devices'];
+      final List<DeviceSetting> devices = jsonDevices
+          .map((jsonDevice) => DeviceSetting.fromJson(jsonDevice))
+          .toList();
+
+      store.dispatch(SetDevices(devices: devices));
+    } catch (error) {
+      print('[fetchRooms] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
 }
 
 /**

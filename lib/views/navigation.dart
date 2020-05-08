@@ -5,6 +5,7 @@ import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/search/seach-groups.dart';
 import 'package:Tether/views/home/search/search-users.dart';
 import 'package:Tether/views/home/settings/chats.dart';
+import 'package:Tether/views/home/settings/devices.dart';
 import 'package:Tether/views/home/settings/privacy.dart';
 import 'package:Tether/views/home/settings/theming.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,7 @@ class NavigationProvider {
       '/theming': (BuildContext context) => Theming(
             title: 'Theming',
           ),
+      '/devices': (BuildContext context) => DevicesView(),
       '/settings': (BuildContext context) => SettingsScreen(
             title: 'Settings',
           ),

@@ -167,7 +167,7 @@ class Room {
         syncing: false,
       );
     } catch (error) {
-      print('[Room.fromPublicRoom] error $error');
+      print('[Room.fromJson] error $error');
       return Room();
     }
   }

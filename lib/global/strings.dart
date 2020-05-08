@@ -29,4 +29,7 @@ class StringStore {
       'the user will still see your invite to chat.';
   static const notificationConfirmation =
       'Your device will prompt you to turn on notifications for tether.\n\nDo you want to turn on message notifications?';
+
+  static const viewTitleDevices = 'Devices';
+  static const viewTitleSettings = 'Settings';
 }

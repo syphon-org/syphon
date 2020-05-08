@@ -7,9 +7,17 @@ import './actions.dart';
 SettingsStore settingsReducer(
     [SettingsStore state = const SettingsStore(), dynamic action]) {
   switch (action.runtimeType) {
+    case SetLoading:
+      return state.copyWith(
+        loading: action.loading,
+      );
     case SetPrimaryColor:
       return state.copyWith(
         primaryColor: action.color,
+      );
+    case SetDevices:
+      return state.copyWith(
+        devices: action.devices,
       );
     case SetRoomPrimaryColor:
       final chatSettings =
