@@ -54,8 +54,10 @@ void main() async {
   // init state cache (hot)
   final store = await initStore();
 
-  final backgroundSyncStatus = await BackgroundSync.init();
-  print('[main] background service started $backgroundSyncStatus');
+  if (Platform.isAndroid) {
+    final backgroundSyncStatus = await BackgroundSync.init();
+    print('[main] background service started $backgroundSyncStatus');
+  }
 
   // /**
   //  * DESKTOP ONLY

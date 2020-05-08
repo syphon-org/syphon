@@ -218,6 +218,23 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
+FutureOr<dynamic> fetchSyncMicro(dynamic request) async {
+  final response = await http.get(
+    request['url'],
+    headers: request['headers'],
+  );
+
+  print('[fetchSyncMicro] sync finished');
+
+  // parse sync data
+  return response.body;
+}
+
+FutureOr<dynamic> convertSyncMicro(dynamic responseBody) async {
+  print('[convertSyncMicro] converting body');
+  return await json.decode(responseBody);
+}
+
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
@@ -234,13 +251,16 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
+      // final response = await http.get(
+      //   request['url'],
+      //   headers: request['headers'],
+      // );
 
-      // parse sync data
-      final data = json.decode(response.body);
+      // // parse sync data
+      // final data = json.decode(response.body);
+
+      final responseBody = await compute(fetchSyncMicro, request);
+      final data = await compute(convertSyncMicro, responseBody);
 
       // if (!kReleaseMode) {
       //   print('[fetchSync] DEBUGGING **************************');
@@ -295,7 +315,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // TODO: encrypt and find a way to reasonably update this
       if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.matrixStateBox, response.body);
+        Cache.hive.put(Cache.matrixStateBox, responseBody);
       }
       if (!kReleaseMode && since == null) {
         print('[fetchSync] full sync completed');

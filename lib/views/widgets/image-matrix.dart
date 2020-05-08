@@ -89,7 +89,7 @@ class MatrixImageState extends State<MatrixImage> {
             );
           }
 
-          print('[MatrixImage] cache hit ${widget.mxcUri}');
+          // print('[MatrixImage] cache hit ${widget.mxcUri}');
           return Image(
             width: widget.width,
             height: widget.height,

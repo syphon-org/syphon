@@ -249,7 +249,8 @@ class _Props extends Equatable {
         language: store.state.settingsStore.language,
         currentUser: store.state.userStore.user,
         lastSince: store.state.roomStore.lastSince,
-        roomsObserverEnabled: store.state.roomStore.roomObserver.isActive,
+        roomsObserverEnabled: store.state.roomStore.roomObserver != null &&
+            store.state.roomStore.roomObserver.isActive,
         onToggleSyncing: () {
           final observer = store.state.roomStore.roomObserver;
           if (observer != null && observer.isActive) {

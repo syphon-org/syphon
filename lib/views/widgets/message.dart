@@ -259,7 +259,7 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: isUserSent,
+                                  visible: isUserSent && !message.failed,
                                   child: Stack(children: [
                                     Visibility(
                                       visible: message.failed,

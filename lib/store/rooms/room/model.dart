@@ -342,8 +342,6 @@ class Room {
           case 'm.room.member':
             final memberDisplayName = event.content['displayname'];
 
-            print('[fromStateEvents] content found ${event.content}');
-            print('[fromStateEvents] m.room.member found $memberDisplayName');
             if (memberDisplayName != currentUser) {
               final isDirect = event.content['is_direct'];
 
@@ -352,8 +350,6 @@ class Room {
                 avatarUri = event.content['avatar_url'];
                 direct = event.content['is_direct'];
               }
-
-              print('[fromStateEvents] m.room.member found $memberDisplayName');
 
               if (!users.containsKey(memberDisplayName)) {
                 final avatarUri = event.content['avatar_url'];
