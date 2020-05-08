@@ -151,10 +151,12 @@ void backgroundSyncJob() async {
                 );
 
                 if (messageEvent != null) {
-                  final messageSender = messageEvent['sender'].split(':')[0];
+                  final String messageSender = messageEvent['sender'];
+                  final formattedSender =
+                      messageSender.replaceFirst('@', '').split(':')[0];
                   showMessageNotification(
                     messageHash: Random.secure().nextInt(20000),
-                    body: '$messageSender sent you a new message.',
+                    body: '$formattedSender sent you a new message.',
                     pluginInstance: pluginInstance,
                   );
                 }
