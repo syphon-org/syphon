@@ -259,21 +259,21 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                 ),
                                 Visibility(
+                                  visible: isUserSent && message.failed,
+                                  child: Container(
+                                    width: indicatorSize,
+                                    height: indicatorSize,
+                                    margin: EdgeInsets.only(left: 3),
+                                    child: Icon(
+                                      Icons.close,
+                                      color: Colors.redAccent,
+                                      size: Dimensions.indicatorSize,
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
                                   visible: isUserSent && !message.failed,
                                   child: Stack(children: [
-                                    Visibility(
-                                      visible: message.failed,
-                                      child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
-                                        margin: EdgeInsets.only(left: 3),
-                                        child: Icon(
-                                          Icons.close,
-                                          color: Colors.redAccent,
-                                          size: Dimensions.indicatorSize,
-                                        ),
-                                      ),
-                                    ),
                                     Visibility(
                                       visible: message.pending,
                                       child: Container(

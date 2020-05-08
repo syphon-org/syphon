@@ -616,10 +616,7 @@ class ChatViewState extends State<ChatView> {
                 children: <Widget>[
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh: () {
-                        // TODO: refresh sync?
-                        return Future.value();
-                      },
+                      onRefresh: props.onForceFetchSync,
                       child: GestureDetector(
                         onTap: () {
                           // Disimiss keyboard if they click outside the text input
@@ -706,6 +703,7 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
+  final Function onForceFetchSync;
 
   _Props({
     @required this.room,
@@ -718,6 +716,7 @@ class _Props extends Equatable {
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
+    @required this.onForceFetchSync,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -745,6 +744,10 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
+        onForceFetchSync: () async {
+          await store.dispatch(fetchSync());
+          return Future(() => true);
+        },
         onSaveDraftMessage: ({
           String body,
           String type,

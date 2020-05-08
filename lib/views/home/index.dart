@@ -533,18 +533,18 @@ class _Props extends Equatable {
   final User currentUser;
   final Map<String, ChatSetting> chatSettings;
 
-  final Function onFetchSyncForced;
   final Function onLeaveChat;
   final Function onDeleteChat;
+  final Function onFetchSyncForced;
 
   _Props({
     @required this.rooms,
     @required this.currentUser,
     @required this.loadingRooms,
     @required this.chatSettings,
-    @required this.onFetchSyncForced,
     @required this.onLeaveChat,
     @required this.onDeleteChat,
+    @required this.onFetchSyncForced,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
@@ -552,10 +552,11 @@ class _Props extends Equatable {
         loadingRooms: store.state.roomStore.loading,
         currentUser: store.state.userStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
-        onFetchSyncForced: () {
-          store.dispatch(
+        onFetchSyncForced: () async {
+          await store.dispatch(
             fetchSync(since: store.state.roomStore.lastSince),
           );
+          return Future(() => true);
         },
         onLeaveChat: ({Room room}) {
           return store.dispatch(
