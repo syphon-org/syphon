@@ -49,6 +49,8 @@ dependencies:
     sdk: flutter
 
   # Domain / Store
+  crypt: ^3.0.0
+  device_info: ^0.4.2
   redux: 4.0.0
   redux_thunk: 0.3.0
   redux_persist: 0.8.3

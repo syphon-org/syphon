@@ -12,6 +12,12 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
       return state.copyWith(authObserver: action.authObserver);
     case SetUser:
       return state.copyWith(user: action.user);
+    case SetSession:
+      return state.copyWith(session: action.session);
+    case SetInteractiveAuths:
+      return state.copyWith(
+        interactiveAuths: action.interactiveAuths,
+      );
     case SetHomeserver:
       return state.copyWith(homeserver: action.homeserver);
     case SetHomeserverValid:

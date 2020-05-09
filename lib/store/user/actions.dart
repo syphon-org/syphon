@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
+import 'package:crypt/crypt.dart';
 
 import 'package:Tether/global/libs/matrix/media.dart';
 import 'package:Tether/store/rooms/actions.dart';
@@ -18,9 +21,6 @@ import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import './model.dart';
-
-const HOMESERVER_SEARCH_SERVICE =
-    'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -77,6 +77,17 @@ class SetUsernameAvailability {
 class SetAuthObserver {
   final StreamController authObserver;
   SetAuthObserver({this.authObserver});
+}
+
+// TODO: parse out the session
+class SetSession {
+  final String session;
+  SetSession({this.session});
+}
+
+class SetInteractiveAuths {
+  final Map interactiveAuths;
+  SetInteractiveAuths({this.interactiveAuths});
 }
 
 class ResetOnboarding {}
@@ -136,22 +147,53 @@ ThunkAction<AppState> loginUser() {
     try {
       final authObserver = store.state.userStore.authObserver;
 
-      final request = buildLoginUserRequest(
-        type: "m.login.password",
+      final username = store.state.userStore.username;
+      var deviceName = 'New Client';
+      var deviceId = 'main_tim_client';
+
+      try {
+        final deviceInfoPlugin = new DeviceInfoPlugin();
+
+        if (Platform.isAndroid) {
+          final info = await deviceInfoPlugin.androidInfo;
+          final deviceIdentifier = info.androidId;
+          final hashedDeviceId = Crypt.sha256(
+            deviceIdentifier,
+            rounds: 1000,
+            salt: username,
+          );
+
+          deviceId = hashedDeviceId.toString();
+          deviceName = 'Tim iOS Client';
+          // deviceId =
+        } else if (Platform.isIOS) {
+          final info = await deviceInfoPlugin.iosInfo;
+          final deviceIdentifier = info.identifierForVendor;
+          final hashedDeviceId = Crypt.sha256(
+            deviceIdentifier,
+            rounds: 1000,
+            salt: username,
+          );
+          deviceId = hashedDeviceId.toString();
+          deviceName = 'Tim Andoid Client';
+        } else if (Platform.isMacOS) {
+          deviceName = 'Tim Desktop Client';
+        }
+      } catch (error) {
+        print(
+          '[loginUser] failed to parse unique secure device identifier $error',
+        );
+      }
+
+      final data = await MatrixApi.loginUser(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
+        type: "m.login.password",
         username: store.state.userStore.username,
         password: store.state.userStore.password,
+        deviceName: deviceName,
+        deviceId: deviceId,
       );
-
-      final response = await http.post(
-        request['url'],
-        body: json.encode(
-          request['body'],
-        ),
-      );
-
-      final data = json.decode(response.body);
 
       if (data['errcode'] == 'M_FORBIDDEN') {
         throw Exception('Invalid credentials, confirm and try again');
@@ -162,13 +204,14 @@ ThunkAction<AppState> loginUser() {
       }
 
       store.dispatch(SetUser(
-          user: User(
-        userId: data['user_id'],
-        deviceId: data['device_id'],
-        accessToken: data['access_token'],
-        homeserver: store.state.userStore
-            .homeserver, // use homeserver from login call param instead
-      )));
+        user: User(
+          userId: data['user_id'],
+          deviceId: data['device_id'],
+          accessToken: data['access_token'],
+          homeserver: store.state.userStore
+              .homeserver, // use homeserver from login call param instead
+        ),
+      ));
 
       authObserver.add(store.state.userStore.user);
 
@@ -221,18 +264,11 @@ ThunkAction<AppState> checkUsernameAvailability() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildCheckUsernameAvailability(
+      final data = await MatrixApi.checkUsernameAvailability(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         username: store.state.userStore.username,
       );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
 
       store.dispatch(SetUsernameAvailability(
         availability: data['available'],
@@ -455,6 +491,13 @@ ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
 ThunkAction<AppState> setLoading(bool loading) {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: loading));
+  };
+}
+
+ThunkAction<AppState> setInteractiveAuths(Map interactiveAuth) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSession(session: interactiveAuth['session']));
+    store.dispatch(SetInteractiveAuths(interactiveAuths: interactiveAuth));
   };
 }
 

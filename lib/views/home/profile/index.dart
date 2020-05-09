@@ -177,265 +177,265 @@ class ProfileViewState extends State<ProfileView> {
     final double height = MediaQuery.of(context).size.height;
 
     return StoreConnector<AppState, _Props>(
-        distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
-        builder: (context, props) {
-          final double imageSize = width * 0.28;
-          final currentAvatar = props.user.avatarUri;
+      distinct: true,
+      converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+      builder: (context, props) {
+        final double imageSize = width * 0.28;
+        final currentAvatar = props.user.avatarUri;
 
-          // Space for confirming rebuilding
-          dynamic avatarWidget = CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Text(
-              displayInitials(props.user),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32.0,
-              ),
+        // Space for confirming rebuilding
+        dynamic avatarWidget = CircleAvatar(
+          backgroundColor: Colors.grey,
+          child: Text(
+            displayInitials(props.user),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 32.0,
+            ),
+          ),
+        );
+
+        if (this.newAvatarFile != null) {
+          avatarWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(imageSize),
+            child: Image.file(
+              this.newAvatarFile ?? props.user.avatarUri,
+              width: imageSize,
+              height: imageSize,
             ),
           );
+        } else if (currentAvatar != null) {
+          avatarWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(imageSize),
+            child: MatrixImage(
+              fit: BoxFit.fill,
+              mxcUri: props.user.avatarUri,
+              width: imageSize,
+              height: imageSize,
+            ),
+          );
+        }
 
-          if (this.newAvatarFile != null) {
-            avatarWidget = ClipRRect(
-              borderRadius: BorderRadius.circular(imageSize),
-              child: Image.file(
-                this.newAvatarFile ?? props.user.avatarUri,
-                width: imageSize,
-                height: imageSize,
-              ),
-            );
-          } else if (currentAvatar != null) {
-            avatarWidget = ClipRRect(
-              borderRadius: BorderRadius.circular(imageSize),
-              child: MatrixImage(
-                fit: BoxFit.fill,
-                mxcUri: props.user.avatarUri,
-                width: imageSize,
-                height: imageSize,
-              ),
-            );
-          }
-
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                title,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+            title: Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w100,
               ),
             ),
-            body: ScrollConfiguration(
-              behavior: DefaultScrollBehavior(),
-              child: SingleChildScrollView(
-                // eventually expand as profile grows
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.075),
-                  constraints: BoxConstraints(
-                    maxHeight: height * 0.9,
-                    maxWidth: width,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(
-                        flex: 1,
-                        fit: FlexFit.tight,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Container(
-                                  width: imageSize,
-                                  height: imageSize,
-                                  child: GestureDetector(
-                                    onTap: () => onShowBottomSheet(context),
-                                    child: avatarWidget,
+          ),
+          body: ScrollConfiguration(
+            behavior: DefaultScrollBehavior(),
+            child: SingleChildScrollView(
+              // eventually expand as profile grows
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+                constraints: BoxConstraints(
+                  maxHeight: height * 0.9,
+                  maxWidth: width,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      fit: FlexFit.tight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Stack(
+                            children: [
+                              Container(
+                                width: imageSize,
+                                height: imageSize,
+                                child: GestureDetector(
+                                  onTap: () => onShowBottomSheet(context),
+                                  child: avatarWidget,
+                                ),
+                              ),
+                              Positioned(
+                                right: 6,
+                                bottom: 2,
+                                child: Container(
+                                  width: width * 0.08,
+                                  height: width * 0.08,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(
+                                      width * 0.08,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          blurRadius: 6,
+                                          offset: Offset(0, 0),
+                                          color: Colors.black54)
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    color: Theme.of(context).brightness !=
+                                            Brightness.light
+                                        ? Colors.grey[200]
+                                        : Colors.grey[600],
+                                    size: width * 0.06,
                                   ),
                                 ),
-                                Positioned(
-                                  right: 6,
-                                  bottom: 2,
-                                  child: Container(
-                                    width: width * 0.08,
-                                    height: width * 0.08,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(
-                                        width * 0.08,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            blurRadius: 6,
-                                            offset: Offset(0, 0),
-                                            color: Colors.black54)
-                                      ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                        flex: 2,
+                        fit: FlexFit.loose,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  margin: const EdgeInsets.all(8.0),
+                                  constraints: BoxConstraints(
+                                    maxHeight: Dimensions.inputHeight,
+                                    maxWidth: Dimensions.inputWidthMax,
+                                  ),
+                                  child: TextField(
+                                    onTap: () {},
+                                    onChanged: (name) {
+                                      this.setState(() {
+                                        newDisplayName = name;
+                                      });
+                                      print('onChangedName $name');
+                                    },
+                                    controller: displayNameController,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Display Name',
                                     ),
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      color: Theme.of(context).brightness !=
-                                              Brightness.light
-                                          ? Colors.grey[200]
-                                          : Colors.grey[600],
-                                      size: width * 0.06,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(8.0),
+                                  constraints: BoxConstraints(
+                                    maxHeight: Dimensions.inputHeight,
+                                    maxWidth: Dimensions.inputWidthMax,
+                                  ),
+                                  child: TextField(
+                                    enabled: false,
+                                    onChanged: null,
+                                    controller: userIdController,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'User ID',
                                     ),
                                   ),
                                 ),
                               ],
-                            )
-                          ],
-                        ),
-                      ),
-                      Flexible(
-                          flex: 2,
-                          fit: FlexFit.loose,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(bottom: 24),
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Container(
+                                    height: Dimensions.inputHeight,
                                     margin: const EdgeInsets.all(8.0),
                                     constraints: BoxConstraints(
-                                      maxHeight: Dimensions.inputHeight,
-                                      maxWidth: Dimensions.inputWidthMax,
+                                      minWidth: Dimensions.buttonWidthMin,
+                                      maxWidth: Dimensions.buttonWidthMax,
                                     ),
-                                    child: TextField(
-                                      onTap: () {},
-                                      onChanged: (name) {
-                                        this.setState(() {
-                                          newDisplayName = name;
-                                        });
-                                        print('onChangedName $name');
-                                      },
-                                      controller: displayNameController,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: 'Display Name',
+                                    child: FlatButton(
+                                      disabledColor: Colors.grey,
+                                      onPressed: !props.loading
+                                          ? () async {
+                                              final bool successful =
+                                                  await props.onSaveProfile(
+                                                newUserId: null,
+                                                newAvatarFile:
+                                                    this.newAvatarFile,
+                                                newDisplayName:
+                                                    this.newDisplayName,
+                                              );
+                                              if (successful) {
+                                                Navigator.pop(context);
+                                              }
+                                            }
+                                          : null,
+                                      color: Theme.of(context).primaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          30.0,
+                                        ),
                                       ),
+                                      child: props.loading
+                                          ? Container(
+                                              constraints: BoxConstraints(
+                                                maxHeight: 28,
+                                                maxWidth: 28,
+                                              ),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                backgroundColor: Colors.white,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(
+                                                  Colors.grey,
+                                                ),
+                                              ),
+                                            )
+                                          : Text(
+                                              'save',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white),
+                                            ),
                                     ),
                                   ),
                                   Container(
-                                    margin: const EdgeInsets.all(8.0),
+                                    height: Dimensions.inputHeight,
+                                    margin: const EdgeInsets.all(10.0),
                                     constraints: BoxConstraints(
-                                      maxHeight: Dimensions.inputHeight,
-                                      maxWidth: Dimensions.inputWidthMax,
-                                    ),
-                                    child: TextField(
-                                      enabled: false,
-                                      onChanged: null,
-                                      controller: userIdController,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: 'User ID',
+                                        minWidth: 200, minHeight: 45),
+                                    child: Visibility(
+                                      child: TouchableOpacity(
+                                        activeOpacity: 0.4,
+                                        onTap: () => Navigator.pop(context),
+                                        child: Text(
+                                          'quit editing',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w100,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              Container(
-                                padding: EdgeInsets.only(bottom: 24),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      height: Dimensions.inputHeight,
-                                      margin: const EdgeInsets.all(8.0),
-                                      constraints: BoxConstraints(
-                                        minWidth: Dimensions.buttonWidthMin,
-                                        maxWidth: Dimensions.buttonWidthMax,
-                                      ),
-                                      child: FlatButton(
-                                        disabledColor: Colors.grey,
-                                        onPressed: !props.loading
-                                            ? () async {
-                                                final bool successful =
-                                                    await props.onSaveProfile(
-                                                  newUserId: null,
-                                                  newAvatarFile:
-                                                      this.newAvatarFile,
-                                                  newDisplayName:
-                                                      this.newDisplayName,
-                                                );
-                                                if (successful) {
-                                                  Navigator.pop(context);
-                                                }
-                                              }
-                                            : null,
-                                        color: Theme.of(context).primaryColor,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30.0,
-                                          ),
-                                        ),
-                                        child: props.loading
-                                            ? Container(
-                                                constraints: BoxConstraints(
-                                                  maxHeight: 28,
-                                                  maxWidth: 28,
-                                                ),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  backgroundColor: Colors.white,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    Colors.grey,
-                                                  ),
-                                                ),
-                                              )
-                                            : Text(
-                                                'save',
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.white),
-                                              ),
-                                      ),
-                                    ),
-                                    Container(
-                                      height: Dimensions.inputHeight,
-                                      margin: const EdgeInsets.all(10.0),
-                                      constraints: BoxConstraints(
-                                          minWidth: 200, minHeight: 45),
-                                      child: Visibility(
-                                        child: TouchableOpacity(
-                                          activeOpacity: 0.4,
-                                          onTap: () => Navigator.pop(context),
-                                          child: Text(
-                                            'quit editing',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w100,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          )),
-                    ],
-                  ),
+                            ),
+                          ],
+                        )),
+                  ],
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 

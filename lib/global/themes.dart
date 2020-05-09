@@ -130,6 +130,11 @@ class Themes {
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
         ),
+        overline: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w100,
+          letterSpacing: 0.4,
+        ),
         // default Text() styling if none specified
         bodyText2: TextStyle(
           fontSize: 18,

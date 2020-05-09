@@ -40,7 +40,6 @@ class Home extends StatefulWidget {
 class HomeViewState extends State<Home> {
   HomeViewState({Key key}) : super();
 
-  // TODO: allow multi-select
   Room selectedRoom;
 
   @protected
@@ -422,6 +421,7 @@ class HomeViewState extends State<Home> {
               context: context,
             );
           }
+
           return Scaffold(
             appBar: currentAppBar,
             body: Align(

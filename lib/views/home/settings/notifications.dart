@@ -201,7 +201,7 @@ class Props {
                   builder: (context) => AlertDialog(
                     title: Text("Confirm Notifications"),
                     content: Text(
-                      NOTIFICATION_PROMPT_INFO,
+                      StringStore.notificationConfirmation,
                     ),
                     actions: <Widget>[
                       FlatButton(

@@ -13,23 +13,28 @@ class UserStore extends Equatable {
   final User user;
 
   // TODO: consider making a user map
-
   // TODO: move to auth store
   final String username;
   final String password;
   final String homeserver;
   final String loginType;
+
+  // Temporary state propertie
+  final bool loading;
+  final bool creating;
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
   final bool isUsernameAvailable;
-
-  // temporary state propertie
-  final bool loading;
-  final bool creating;
   final String newAvatarUri;
-  final StreamController<User> authObserver;
 
+  // Interactive Auth Data
+  final String session;
+
+  // TODO: this is lazy
+  final Map<String, dynamic> interactiveAuths;
+
+  final StreamController<User> authObserver;
   Stream<User> get onAuthStateChanged =>
       authObserver != null ? authObserver.stream : null;
 
@@ -38,8 +43,10 @@ class UserStore extends Equatable {
     this.authObserver,
     this.username = '', // null
     this.password = '', // null
+    this.session,
     this.homeserver = 'matrix.org',
     this.loginType = 'm.login.dummy',
+    this.interactiveAuths = const {},
     this.isUsernameValid = false,
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
@@ -55,10 +62,12 @@ class UserStore extends Equatable {
     username,
     password,
     homeserver,
+    session,
     isUsernameValid,
     isUsernameAvailable,
     isPasswordValid,
     isHomeserverValid,
+    interactiveAuths,
     creating,
     authObserver,
   }) {
@@ -69,6 +78,7 @@ class UserStore extends Equatable {
       username: username ?? this.username,
       password: password ?? this.password,
       homeserver: homeserver ?? this.homeserver,
+      session: session ?? this.session,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
       isUsernameAvailable: isUsernameAvailable != null
           ? isUsernameAvailable
@@ -76,6 +86,7 @@ class UserStore extends Equatable {
       isPasswordValid: isPasswordValid ?? this.isPasswordValid,
       isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
       newAvatarUri: newAvatarUri ?? this.newAvatarUri,
+      interactiveAuths: interactiveAuths ?? this.interactiveAuths,
       creating: creating ?? this.creating,
     );
   }
@@ -87,11 +98,13 @@ class UserStore extends Equatable {
         username,
         password,
         homeserver,
+        session,
         loginType,
         isUsernameValid,
         isPasswordValid,
         isHomeserverValid,
         isUsernameAvailable,
+        interactiveAuths,
         loading,
         creating,
       ];

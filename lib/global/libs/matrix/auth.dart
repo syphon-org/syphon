@@ -1,3 +1,115 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+/**
+ * https://matrix.org/docs/spec/client_server/latest#id183
+ * 
+ * Authentication Types
+ * 
+ * Can be used during actual login or interactive auth for confirmation
+ */
+class AuthTypes {
+  static const PASSWORD = 'm.login.password';
+  static const RECAPTCHA = 'm.login.recaptcha';
+  static const DUMMY = 'm.login.dummy';
+}
+
+abstract class Auth {
+  static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Login User
+   * 
+   *  Gets the homeserver's supported login types to authenticate
+   *  users. Clients should pick one of these and supply it as 
+   *  the type when logging in.
+   */
+  static Future<dynamic> loginUser({
+    String protocol,
+    String homeserver,
+    String type = "m.login.password",
+    String username,
+    String password,
+    String deviceName,
+    String deviceId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    Map body = {
+      'type': type,
+      "identifier": {"type": "m.id.user", "user": username},
+      'password': password,
+      'device_id': deviceId,
+      "initial_device_display_name": "$username's $deviceName Client",
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   *  https://matrix.org/docs/spec/client_server/latest#id211 
+   * 
+   *  Check Username Availability
+   * 
+   *  Used to check what types of logins are available on the server
+   */
+  static Future<dynamic> checkUsernameAvailability({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String username,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/register/available';
+
+    url += username != null ? '?username=$username' : '';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Change User Password
+   *  
+   */
+  static FutureOr<dynamic> changePassword({
+    String protocol,
+    String homeserver,
+    String type = "m.login.password",
+    String newPassword,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+
+    Map body = {
+      'new_password': type,
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  static FutureOr<dynamic> convertInteractiveAuth({Map auths}) {
+    final flows = auths['flows'];
+    final params = auths['params'];
+    final session = auths['session'];
+    final completed = auths['completed'];
+
+    return auths;
+  }
+}
+
 /** 
  * GET login
  * Used to check what types of logins are available on the server
@@ -15,25 +127,6 @@ dynamic buildLoginTypesRequest() {
   return {'url': url};
 }
 
-/**  
- * Username Availability Check
- * Used to check what types of logins are available on the server
- * https://matrix.org/docs/spec/client_server/latest#id211 
- */
-dynamic buildCheckUsernameAvailability({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String username,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/register/available';
-
-  url += username != null ? '?username=$username' : '';
-
-  Map<String, String> headers = {};
-
-  return {'url': url, 'headers': headers};
-}
-
 /**   
   curl -XPOST \
   -d '{ "identifier": { "type": "m.id.user", "user": "tester2" }, "type": "m.login.password", "password": "test1234!", "initial_device_display_name": "Tether Client" }' \
@@ -45,6 +138,7 @@ dynamic buildLoginUserRequest({
   String homeserver,
   String username,
   String password,
+  String deviceName,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/login';
 
@@ -52,7 +146,7 @@ dynamic buildLoginUserRequest({
     "identifier": {"type": "m.id.user", "user": username},
     'type': type,
     'password': password,
-    "initial_device_display_name": "${username}'s Tether Client",
+    "initial_device_display_name": "${username}'s $deviceName Client",
   };
 
   return {'url': url, 'body': body};
@@ -107,3 +201,25 @@ dynamic buildRegisterUserRequest({
   };
   return {'url': url, 'body': body};
 }
+
+/**
+ * {
+  "flows": [
+    {
+      "stages": [
+        "example.type.foo"
+      ]
+    }
+  ],
+  "params": {
+    "example.type.baz": {
+      "example_key": "foobar"
+    }
+  },
+  "session": "xxxxxxyz",
+  "completed": [
+    "example.type.foo"
+  ]
+}
+ */
+dynamic buildAuthenticationRequestWrapper() {}

@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/user/actions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:Tether/global/libs/matrix/devices.dart';
 import 'package:Tether/global/notifications.dart';
@@ -89,19 +92,13 @@ ThunkAction<AppState> fetchDevices() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-      final request = buildDevicesRequest(
+
+      final data = await MatrixApi.fetchDevices(
         protocol: protocol,
         homeserver: store.state.userStore.homeserver,
         accessToken: store.state.userStore.user.accessToken,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-      print('[fetchDevices] $data');
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -114,6 +111,108 @@ ThunkAction<AppState> fetchDevices() {
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
       print('[fetchRooms] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Fetch Active Devices for account
+ */
+ThunkAction<AppState> updateDevice({String deviceId}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.updateDevice(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+    } catch (error) {
+      print('[fetchRooms] error: $error');
+    } finally {
+      store.dispatch(fetchDevices());
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Delete a device
+ */
+ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.deleteDevice(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        deviceId: deviceId,
+        session: store.state.userStore.session,
+        authType: store.state.userStore.interactiveAuths[''],
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      if (data['flows'] != null) {
+        print('[deleteDevice] need interactive auth');
+        final auths = await MatrixApi.convertInteractiveAuth(
+          auths: data,
+        );
+        print('[deleteDevice] $auths');
+        store.dispatch(setInteractiveAuths(auths));
+      }
+
+      store.dispatch(fetchDevices());
+    } catch (error) {
+      print('[deleteDevice] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Delete multiple devices
+ */
+ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.deleteDevices(
+        protocol: protocol,
+        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.userStore.user.accessToken,
+        deviceIds: deviceIds,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      if (data['flows'] != null) {
+        print('[deleteDevice] need interactive auth');
+        final auths = await MatrixApi.convertInteractiveAuth(
+          auths: data,
+        );
+        print('[deleteDevice] $auths');
+        store.dispatch(setInteractiveAuths(auths));
+        // TODO: prompt auth flow
+        // TODO: save auth result and then retry deletion
+      }
+    } catch (error) {
+      print('[deleteDevice(s)] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
