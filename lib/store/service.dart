@@ -82,7 +82,7 @@ class BackgroundSync {
 void backgroundSyncJob() async {
   try {
     const String SINCE_CACHE_KEY = 'lastSince';
-    const int syncInterval = 2;
+    const int syncInterval = 5;
     const int secondsTimeout = 60;
     final int isolateId = Isolate.current.hashCode;
 
