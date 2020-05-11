@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:hive/hive.dart';
 
+part 'model.g.dart';
+
 @HiveType(typeId: 9)
 class DeviceSetting extends Equatable {
   @HiveField(0)

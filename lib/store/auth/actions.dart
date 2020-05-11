@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/auth/credential/model.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
@@ -81,10 +82,14 @@ class SetAuthObserver {
   SetAuthObserver({this.authObserver});
 }
 
-// TODO: parse out the session
 class SetSession {
   final String session;
   SetSession({this.session});
+}
+
+class SetCredential {
+  final Credential credential;
+  SetCredential({this.credential});
 }
 
 class SetInteractiveAuths {
@@ -264,13 +269,11 @@ ThunkAction<AppState> fetchUserProfile() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final user = store.state.authStore.user;
-
       final request = buildUserProfileRequest(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        userId: user.userId,
+        userId: store.state.authStore.currentUser.userId,
       );
 
       final response = await http.get(
@@ -281,7 +284,7 @@ ThunkAction<AppState> fetchUserProfile() {
       final data = json.decode(response.body);
 
       store.dispatch(SetUser(
-        user: user.copyWith(
+        user: store.state.authStore.currentUser.copyWith(
           displayName: data['displayname'],
           avatarUri: data['avatar_url'],
         ),
@@ -494,7 +497,6 @@ ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
     if (avatarUriData['errcode'] != null) {
       throw avatarUriData['error'];
     }
-    print(avatarUriData);
   };
 }
 
@@ -504,10 +506,58 @@ ThunkAction<AppState> setLoading(bool loading) {
   };
 }
 
-ThunkAction<AppState> setInteractiveAuths(Map interactiveAuth) {
+ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   return (Store<AppState> store) async {
-    store.dispatch(SetSession(session: interactiveAuth['session']));
-    store.dispatch(SetInteractiveAuths(interactiveAuths: interactiveAuth));
+    store.dispatch(SetSession(session: auths['session']));
+
+    if (auths['flows'] != null && auths['flows'].length > 0) {
+      final currentStage = auths['flows'][0]['stages'];
+
+      print('[setInteractiveAuths] $currentStage');
+      if (currentStage.length > 0) {
+        store.dispatch(SetCredential(
+          credential: Credential(
+            type: currentStage[0],
+          ),
+        ));
+      }
+    }
+    store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
+  };
+}
+
+/**
+ * Fetch Active Devices for account
+ */
+ThunkAction<AppState> updateCredential({
+  String type,
+  String value,
+  Map<String, String> params,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final currentCredential = store.state.authStore.credential;
+      store.dispatch(SetCredential(
+        credential: currentCredential.copyWith(
+          type: type,
+          value: value,
+          params: params,
+        ),
+      ));
+    } catch (error) {}
+  };
+}
+
+ThunkAction<AppState> resetCredentials({
+  String type,
+  String value,
+  Map<String, String> params,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSession(session: null));
+    store.dispatch(SetCredential(
+      credential: null,
+    ));
   };
 }
 

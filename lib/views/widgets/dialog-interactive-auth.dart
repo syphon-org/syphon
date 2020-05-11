@@ -11,11 +11,14 @@ import 'package:redux/redux.dart';
 import 'package:Tether/store/index.dart';
 
 class DialogInteractiveAuth extends StatelessWidget {
-  DialogInteractiveAuth({Key key}) : super(key: key);
+  DialogInteractiveAuth({
+    Key key,
+    this.onConfirm,
+    this.onCancel,
+  }) : super(key: key);
 
-  // TODO: onConfirm
-  // After sending confirm, retry the on* handler that prompted the auth
-  // You should create this by passing the function as a prop to this widget
+  final Function onConfirm;
+  final Function onCancel;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -71,7 +74,7 @@ class DialogInteractiveAuth extends StatelessWidget {
                   ),
                   child: TextField(
                     onChanged: (password) {
-                      props.onSetPassword(password);
+                      props.onChangePassword(password);
                     },
                     obscureText: true,
                     decoration: InputDecoration(
@@ -94,13 +97,39 @@ class DialogInteractiveAuth extends StatelessWidget {
               children: <Widget>[
                 FlatButton(
                   child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: !props.loading
+                      ? () {
+                          if (this.onCancel != null) {
+                            this.onCancel();
+                          }
+                          Navigator.of(context).pop();
+                        }
+                      : null,
                 ),
                 FlatButton(
-                  child: Text('Confirm'),
-                  onPressed: () {},
+                  child: !props.loading
+                      ? Text('Confirm')
+                      : Container(
+                          constraints: BoxConstraints(
+                            maxHeight: 16,
+                            maxWidth: 16,
+                          ),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            backgroundColor: Colors.white,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey,
+                            ),
+                          ),
+                        ),
+                  onPressed: !props.valid
+                      ? null
+                      : () {
+                          if (this.onConfirm != null) {
+                            this.onConfirm();
+                          }
+                          Navigator.of(context).pop();
+                        },
                 ),
               ],
             )
@@ -110,21 +139,24 @@ class DialogInteractiveAuth extends StatelessWidget {
 }
 
 class Props extends Equatable {
+  final bool valid;
   final bool loading;
   final List<DeviceSetting> devices;
   final Map interactiveAuths;
 
-  final Function onSetPassword;
+  final Function onChangePassword;
 
   Props({
+    @required this.valid,
     @required this.loading,
     @required this.devices,
     @required this.interactiveAuths,
-    @required this.onSetPassword,
+    @required this.onChangePassword,
   });
 
   @override
   List<Object> get props => [
+        valid,
         loading,
         devices,
         interactiveAuths,
@@ -135,10 +167,13 @@ class Props extends Equatable {
     Store<AppState> store,
   ) =>
       Props(
-          loading: store.state.settingsStore.loading,
-          devices: store.state.settingsStore.devices ?? const [],
-          interactiveAuths: store.state.authStore.interactiveAuths,
-          onSetPassword: (password) {
-            store.dispatch(setPassword(password: password));
-          });
+        valid: store.state.authStore.credential.value != null &&
+            store.state.authStore.credential.value.length > 0,
+        loading: store.state.settingsStore.loading,
+        devices: store.state.settingsStore.devices ?? const [],
+        interactiveAuths: store.state.authStore.interactiveAuths,
+        onChangePassword: (password) {
+          store.dispatch(updateCredential(value: password));
+        },
+      );
 }

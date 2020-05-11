@@ -1,13 +1,9 @@
-import 'dart:convert';
-
+import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/store/auth/actions.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:Tether/global/libs/matrix/devices.dart';
 import 'package:Tether/global/notifications.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -151,13 +147,18 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      final currentCredential =
+          store.state.authStore.credential ?? Credential();
+
       final data = await MatrixApi.deleteDevice(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceId: deviceId,
         session: store.state.authStore.session,
-        authType: store.state.authStore.interactiveAuths[''],
+        userId: store.state.authStore.user.userId,
+        authType: MatrixAuthTypes.PASSWORD,
+        authValue: currentCredential.value,
       );
 
       if (data['errcode'] != null) {
@@ -165,15 +166,12 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
       }
 
       if (data['flows'] != null) {
-        print('[deleteDevice] need interactive auth');
-        final auths = await MatrixApi.convertInteractiveAuth(
-          auths: data,
-        );
-        print('[deleteDevice] $auths');
-        store.dispatch(setInteractiveAuths(auths));
+        print('[deleteDevice] need interactive auths $data');
+        return store.dispatch(setInteractiveAuths(auths: data));
       }
 
       store.dispatch(fetchDevices());
+      return true;
     } catch (error) {
       print('[deleteDevice] error: $error');
     } finally {
@@ -190,11 +188,18 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      final currentCredential =
+          store.state.authStore.credential ?? Credential();
+
       final data = await MatrixApi.deleteDevices(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceIds: deviceIds,
+        session: store.state.authStore.session,
+        userId: store.state.authStore.user.userId,
+        authType: MatrixAuthTypes.PASSWORD,
+        authValue: currentCredential.value,
       );
 
       if (data['errcode'] != null) {
@@ -202,15 +207,12 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
       }
 
       if (data['flows'] != null) {
-        print('[deleteDevice] need interactive auth');
-        final auths = await MatrixApi.convertInteractiveAuth(
-          auths: data,
-        );
-        print('[deleteDevice] $auths');
-        store.dispatch(setInteractiveAuths(auths));
-        // TODO: prompt auth flow
-        // TODO: save auth result and then retry deletion
+        print('[deleteDevice] need interactive auths $data');
+        return store.dispatch(setInteractiveAuths(auths: data));
       }
+
+      store.dispatch(fetchDevices());
+      return true;
     } catch (error) {
       print('[deleteDevice(s)] error: $error');
     } finally {

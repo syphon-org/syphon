@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
  * 
  * Can be used during actual login or interactive auth for confirmation
  */
-class AuthTypes {
+class MatrixAuthTypes {
   static const PASSWORD = 'm.login.password';
   static const RECAPTCHA = 'm.login.recaptcha';
   static const DUMMY = 'm.login.dummy';
@@ -123,15 +123,6 @@ abstract class Auth {
     );
 
     return await json.decode(response.body);
-  }
-
-  static FutureOr<dynamic> convertInteractiveAuth({Map auths}) {
-    final flows = auths['flows'];
-    final params = auths['params'];
-    final session = auths['session'];
-    final completed = auths['completed'];
-
-    return auths;
   }
 }
 

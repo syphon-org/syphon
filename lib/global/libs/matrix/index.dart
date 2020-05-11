@@ -8,7 +8,6 @@ abstract class MatrixApi {
   static final loginUser = Auth.loginUser;
   static final logoutUser = Auth.logoutUser;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
-  static final convertInteractiveAuth = Auth.convertInteractiveAuth;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;

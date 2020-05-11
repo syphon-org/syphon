@@ -7,6 +7,7 @@ import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -175,6 +176,7 @@ Future<dynamic> initHiveStorageUnsafe() async {
   Hive.registerAdapter(EventAdapter());
   Hive.registerAdapter(ReadStatusAdapter());
   Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(DeviceSettingAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(MediaStoreAdapter());

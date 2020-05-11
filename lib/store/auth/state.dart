@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
@@ -12,8 +13,6 @@ class AuthStore extends Equatable {
   @HiveField(0)
   final User user;
 
-  // TODO: consider making a user map
-  // TODO: move to auth store
   final String username;
   final String password;
   final String homeserver;
@@ -27,10 +26,10 @@ class AuthStore extends Equatable {
   final bool isHomeserverValid;
   final bool isUsernameAvailable;
 
+  // TODO: this is lazy
   // Interactive Auth Data
   final String session;
-
-  // TODO: this is lazy
+  final Credential credential;
   final Map<String, dynamic> interactiveAuths;
 
   final StreamController<User> authObserver;
@@ -52,6 +51,7 @@ class AuthStore extends Equatable {
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
     this.isHomeserverValid = false,
+    this.credential,
     this.creating = false,
     this.loading = false,
   });
@@ -68,6 +68,7 @@ class AuthStore extends Equatable {
     isPasswordValid,
     isHomeserverValid,
     interactiveAuths,
+    credential,
     creating,
     authObserver,
   }) {
@@ -86,6 +87,7 @@ class AuthStore extends Equatable {
       isPasswordValid: isPasswordValid ?? this.isPasswordValid,
       isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
       interactiveAuths: interactiveAuths ?? this.interactiveAuths,
+      credential: credential ?? this.credential,
       creating: creating ?? this.creating,
     );
   }
@@ -104,6 +106,7 @@ class AuthStore extends Equatable {
         isHomeserverValid,
         isUsernameAvailable,
         interactiveAuths,
+        credential,
         loading,
         creating,
       ];

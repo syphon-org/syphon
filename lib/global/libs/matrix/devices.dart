@@ -69,8 +69,9 @@ abstract class Devices {
     String accessToken,
     String deviceId,
     String session,
+    String userId,
     String authType,
-    String authCredential,
+    String authValue,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
 
@@ -78,13 +79,18 @@ abstract class Devices {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body = {
-      "auth": {
-        'session': session,
-        'type': authType,
-        'example_credential': authCredential,
-      },
-    };
+    Map body;
+
+    if (session != null) {
+      body = {
+        "auth": {
+          'session': session,
+          'type': authType,
+          'user': userId,
+          'password': authValue, // WARNING: this may not always be password?
+        }
+      };
+    }
 
     final request = http.Request(
       'DELETE',
@@ -93,7 +99,7 @@ abstract class Devices {
 
     request.headers.addAll(headers);
 
-    if (session != null) {
+    if (body != null) {
       request.body = json.encode(body);
     }
 
@@ -101,6 +107,9 @@ abstract class Devices {
     final response = await http.Response.fromStream(
       streamedResponse,
     );
+
+    print('${response.statusCode}');
+    print('${json.decode(response.body)}');
 
     return await json.decode(response.body);
   }
@@ -117,8 +126,9 @@ abstract class Devices {
     String accessToken,
     List<String> deviceIds,
     String session,
+    String userId,
     String authType,
-    String authCredential,
+    String authValue,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/delete_devices';
 
@@ -132,19 +142,23 @@ abstract class Devices {
 
     if (session != null) {
       body['auth'] = {
-        "auth": {
-          'session': session,
-          'type': authType,
-          'example_credential': authCredential,
-        },
+        'session': session,
+        'type': authType,
+        'user': userId,
+        'password': authValue, // WARNING: this may not always be password?
       };
     }
+
+    print('$body');
 
     final response = await http.post(
       url,
       headers: headers,
       body: json.encode(body),
     );
+
+    print('${response.statusCode}');
+    print('${json.decode(response.body)}');
 
     return await json.decode(response.body);
   }

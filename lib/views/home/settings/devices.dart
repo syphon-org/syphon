@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/views/widgets/dialog-interactive-auth.dart';
+import 'package:crypt/crypt.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -126,6 +128,7 @@ class DeviceViewState extends State<DevicesView> {
               : () => props.onDeleteDevices(
                     context,
                     this.selectedDevices,
+                    onComplete: () {},
                   ),
         ),
         IconButton(
@@ -336,8 +339,9 @@ class Props extends Equatable {
         currentDeviceId: store.state.authStore.user.deviceId,
         onDeleteDevices: (
           BuildContext context,
-          List<DeviceSetting> devices,
-        ) async {
+          List<DeviceSetting> devices, {
+          Function onComplete,
+        }) async {
           if (devices.isEmpty) return;
 
           final List<String> deviceIds =
@@ -348,12 +352,30 @@ class Props extends Equatable {
           } else {
             await store.dispatch(deleteDevices(deviceIds: deviceIds));
           }
-
           final authSession = store.state.authStore.session;
           if (authSession != null) {
             showDialog(
               context: context,
-              child: DialogInteractiveAuth(key: Key(authSession)),
+              child: DialogInteractiveAuth(
+                key: Key(authSession),
+                onConfirm: () async {
+                  final List<String> deviceIds =
+                      devices.map((device) => device.deviceId).toList();
+
+                  if (devices.length == 1) {
+                    await store.dispatch(deleteDevice(deviceId: deviceIds[0]));
+                  } else {
+                    await store.dispatch(deleteDevices(deviceIds: deviceIds));
+                  }
+                  store.dispatch(resetCredentials());
+                  if (onComplete != null) {
+                    onComplete();
+                  }
+                },
+                onCancel: () async {
+                  store.dispatch(resetCredentials());
+                },
+              ),
             );
           }
         },

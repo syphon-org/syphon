@@ -14,6 +14,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(user: action.user);
     case SetSession:
       return state.copyWith(session: action.session);
+    case SetCredential:
+      return state.copyWith(credential: action.credential);
     case SetInteractiveAuths:
       return state.copyWith(
         interactiveAuths: action.interactiveAuths,
