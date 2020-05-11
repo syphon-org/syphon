@@ -32,6 +32,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(isUsernameAvailable: action.availability);
     case SetPassword:
       return state.copyWith(password: action.password);
+    case SetPasswordConfirm:
+      return state.copyWith(passwordConfirm: action.password);
     case SetPasswordValid:
       return state.copyWith(isPasswordValid: action.valid);
     case ResetUser:

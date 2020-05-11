@@ -15,6 +15,7 @@ class AuthStore extends Equatable {
 
   final String username;
   final String password;
+  final String passwordConfirm;
   final String homeserver;
   final String loginType;
 
@@ -43,6 +44,7 @@ class AuthStore extends Equatable {
     this.authObserver,
     this.username = '', // null
     this.password = '', // null
+    this.passwordConfirm = '',
     this.session,
     this.homeserver = 'matrix.org',
     this.loginType = 'm.login.dummy',
@@ -61,6 +63,7 @@ class AuthStore extends Equatable {
     loading,
     username,
     password,
+    passwordConfirm,
     homeserver,
     session,
     isUsernameValid,
@@ -78,6 +81,7 @@ class AuthStore extends Equatable {
       authObserver: authObserver ?? this.authObserver,
       username: username ?? this.username,
       password: password ?? this.password,
+      passwordConfirm: passwordConfirm ?? this.passwordConfirm,
       homeserver: homeserver ?? this.homeserver,
       session: session ?? this.session,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
@@ -98,6 +102,7 @@ class AuthStore extends Equatable {
         authObserver,
         username,
         password,
+        passwordConfirm,
         homeserver,
         session,
         loginType,

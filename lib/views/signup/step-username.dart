@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:Tether/store/auth/selectors.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:equatable/equatable.dart';

@@ -67,6 +67,11 @@ class SetPassword {
   SetPassword({this.password});
 }
 
+class SetPasswordConfirm {
+  final String password;
+  SetPasswordConfirm({this.password});
+}
+
 class SetPasswordValid {
   final bool valid;
   SetPasswordValid({this.valid});
@@ -586,8 +591,30 @@ ThunkAction<AppState> setUsername({String username}) {
 
 ThunkAction<AppState> setPassword({String password}) {
   return (Store<AppState> store) async {
-    store.dispatch(
-        SetPasswordValid(valid: password != null && password.length > 0));
     store.dispatch(SetPassword(password: password.trim()));
+
+    final currentPassword = store.state.authStore.password;
+    final currentConfirm = store.state.authStore.passwordConfirm;
+
+    store.dispatch(SetPasswordValid(
+      valid: password != null &&
+          password.length > 0 &&
+          currentPassword == currentConfirm,
+    ));
+  };
+}
+
+ThunkAction<AppState> setPasswordConfirm({String password}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetPasswordConfirm(password: password.trim()));
+
+    final currentPassword = store.state.authStore.password;
+    final currentConfirm = store.state.authStore.passwordConfirm;
+
+    store.dispatch(SetPasswordValid(
+      valid: password != null &&
+          password.length > 0 &&
+          currentPassword == currentConfirm,
+    ));
   };
 }

@@ -77,7 +77,7 @@ class HomeserverStep extends StatelessWidget {
                       ),
                     ),
                     onChanged: (text) {
-                      props.onChangeHomeserver(text);
+                      props.onChangeHomeserver(text.trim());
                     },
                     onEditingComplete: () {
                       props.onChangeHomeserver(props.homeserver);
@@ -120,7 +120,7 @@ class _Props extends Equatable {
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         homeserver: store.state.authStore.homeserver,
         onChangeHomeserver: (String text) {
-          store.dispatch(setHomeserver(homeserver: text));
+          store.dispatch(setHomeserver(homeserver: text.trim()));
         },
       );
 
