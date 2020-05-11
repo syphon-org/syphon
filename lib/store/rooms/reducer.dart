@@ -58,7 +58,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       final rooms = Map<String, Room>.from(state.rooms);
       rooms[action.id] = rooms[action.id].fromStateEvents(
         action.state,
-        currentUser: action.username,
+        currentUser: action.currentUser,
         originDEBUG: '[SetRoomState]',
       );
       return state.copyWith(rooms: rooms);

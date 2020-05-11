@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:Tether/global/libs/matrix/devices.dart';
@@ -95,8 +95,8 @@ ThunkAction<AppState> fetchDevices() {
 
       final data = await MatrixApi.fetchDevices(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
       );
 
       if (data['errcode'] != null) {
@@ -127,8 +127,8 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
 
       final data = await MatrixApi.updateDevice(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
       );
 
       if (data['errcode'] != null) {
@@ -153,11 +153,11 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
 
       final data = await MatrixApi.deleteDevice(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         deviceId: deviceId,
-        session: store.state.userStore.session,
-        authType: store.state.userStore.interactiveAuths[''],
+        session: store.state.authStore.session,
+        authType: store.state.authStore.interactiveAuths[''],
       );
 
       if (data['errcode'] != null) {
@@ -192,8 +192,8 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
 
       final data = await MatrixApi.deleteDevices(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         deviceIds: deviceIds,
       );
 

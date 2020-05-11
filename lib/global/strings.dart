@@ -31,8 +31,11 @@ class StringStore {
   static const interactiveAuthConfirmation =
       'In order to perform this action, you\'ll need to enter your password again';
 
+  static const deleteDevicesTitle = 'Confirm Removing Devices';
   static const deleteDevicesConfirmation =
-      'You will have to sign in again on these devices if you delete them.';
+      'You will have to sign in again on these devices if you remove them.';
+
+  static const viewTitleSignup = 'Signup';
   static const viewTitleDevices = 'Devices';
   static const viewTitleSettings = 'Settings';
 }

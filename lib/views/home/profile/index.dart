@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
@@ -48,18 +48,18 @@ class ProfileViewState extends State<ProfileView> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     displayNameController.value = TextEditingValue(
-      text: store.state.userStore.user.displayName,
+      text: store.state.authStore.user.displayName,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: store.state.userStore.user.displayName.length,
+          offset: store.state.authStore.user.displayName.length,
         ),
       ),
     );
     userIdController.value = TextEditingValue(
-      text: store.state.userStore.user.userId,
+      text: store.state.authStore.user.userId,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: store.state.userStore.user.userId.length,
+          offset: store.state.authStore.user.userId.length,
         ),
       ),
     );
@@ -451,14 +451,14 @@ class _Props extends Equatable {
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
-        user: store.state.userStore.user,
-        loading: store.state.userStore.loading,
+        user: store.state.authStore.user,
+        loading: store.state.authStore.loading,
         onSaveProfile: ({
           File newAvatarFile,
           String newUserId,
           String newDisplayName,
         }) async {
-          final currentUser = store.state.userStore.user;
+          final currentUser = store.state.authStore.user;
 
           if (newDisplayName != null &&
               currentUser.displayName != newDisplayName) {

@@ -247,7 +247,7 @@ class _Props extends Equatable {
         loading: store.state.roomStore.syncing || store.state.roomStore.loading,
         roomsLoading: store.state.roomStore.loading,
         language: store.state.settingsStore.language,
-        currentUser: store.state.userStore.user,
+        currentUser: store.state.authStore.user,
         lastSince: store.state.roomStore.lastSince,
         roomsObserverEnabled: store.state.roomStore.roomObserver != null &&
             store.state.roomStore.roomObserver.isActive,

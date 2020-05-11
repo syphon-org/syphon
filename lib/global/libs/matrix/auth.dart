@@ -53,6 +53,25 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  static Future<dynamic> logoutUser({
+    String protocol,
+    String homeserver,
+    String accessToken,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/logout';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
   /**
    *  https://matrix.org/docs/spec/client_server/latest#id211 
    * 
@@ -83,10 +102,15 @@ abstract class Auth {
   static FutureOr<dynamic> changePassword({
     String protocol,
     String homeserver,
+    String accessToken,
     String type = "m.login.password",
     String newPassword,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
     Map body = {
       'new_password': type,
@@ -94,6 +118,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: headers,
       body: json.encode(body),
     );
 
@@ -125,47 +150,6 @@ abstract class Auth {
 dynamic buildLoginTypesRequest() {
   String url = '_matrix/client/r0/login';
   return {'url': url};
-}
-
-/**   
-  curl -XPOST \
-  -d '{ "identifier": { "type": "m.id.user", "user": "tester2" }, "type": "m.login.password", "password": "test1234!", "initial_device_display_name": "Tether Client" }' \
-  "http://192.168.1.2:8008/_matrix/client/r0/login" 
- */
-dynamic buildLoginUserRequest({
-  String type,
-  String protocol,
-  String homeserver,
-  String username,
-  String password,
-  String deviceName,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/login';
-
-  Map body = {
-    "identifier": {"type": "m.id.user", "user": username},
-    'type': type,
-    'password': password,
-    "initial_device_display_name": "${username}'s $deviceName Client",
-  };
-
-  return {'url': url, 'body': body};
-}
-
-/**  
- * LOGOUT
-  curl -XPOST \
-  "http://192.168.1.2:8008/_matrix/client/r0/logout?access_token=MDAxOGxvY2F0aW9uIG1hdHJpeC5vcmcKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI0Y2lkIHVzZXJfaWQgPSBAZXJlaW86bWF0cml4Lm9yZwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IFJwWkgxalF1a2YuTzhsO2gKMDAyZnNpZ25hdHVyZSDMDyFzbJvI8lwbYjPQb-s128dmt6C5ihFI2PwSJj0IEgo" 
- */
-dynamic buildLogoutUserRequest({
-  String protocol,
-  String homeserver,
-  String accessToken,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/logout';
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
 }
 
 /**  

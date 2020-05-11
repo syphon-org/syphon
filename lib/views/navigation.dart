@@ -50,15 +50,12 @@ class NavigationProvider {
   static getRoutes(Store<AppState> store) {
     return <String, WidgetBuilder>{
       '/intro': (BuildContext context) => Intro(),
-      '/login': (BuildContext context) => Login(store: store),
+      '/login': (BuildContext context) => Login(),
       '/search_home': (BuildContext context) => HomeSearch(
             title: 'Find Your Homeserver',
             store: store,
           ),
-      '/signup': (BuildContext context) => Signup(
-            title: 'Signup',
-            store: store,
-          ),
+      '/signup': (BuildContext context) => SignupView(),
       '/home': (BuildContext context) => Home(),
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),

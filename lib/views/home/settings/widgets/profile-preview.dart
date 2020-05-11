@@ -1,4 +1,6 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/user/model.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -7,8 +9,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/store/index.dart';
-
-import 'package:Tether/store/user/selectors.dart';
 
 class ProfilePreview extends StatelessWidget {
   ProfilePreview({Key key}) : super(key: key);
@@ -19,8 +19,7 @@ class ProfilePreview extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           return Container(
-            child: Container(
-                child: Row(
+            child: Row(
               children: <Widget>[
                 Container(
                   height: 56,
@@ -64,7 +63,7 @@ class ProfilePreview extends StatelessWidget {
                   ],
                 )
               ],
-            )),
+            ),
           );
         },
       );
@@ -85,16 +84,24 @@ class _Props extends Equatable {
     @required this.displayName,
   });
 
+  // Lots of null checks in case the user signed out where
+  // this widget is displaying, could probably be less coupled..
   static _Props mapStoreToProps(
     Store<AppState> store,
   ) =>
       _Props(
-          displayName: store.state.userStore.user.displayName,
-          shortname: displayShortname(store.state.userStore.user),
-          initials: displayInitials(store.state.userStore.user),
-          avatarUri: store.state.userStore.user.avatarUri,
-          username: store.state.userStore.user != null
-              ? store.state.userStore.user.userId
+          displayName: store.state.authStore.user != null
+              ? store.state.authStore.user.displayName
+              : '',
+          shortname: displayShortname(
+            store.state.authStore.user ?? const User(),
+          ),
+          initials: displayInitials(
+            store.state.authStore.user ?? const User(),
+          ),
+          avatarUri: (store.state.authStore.user ?? const User()).avatarUri,
+          username: store.state.authStore.user != null
+              ? store.state.authStore.user.userId
               : '');
 
   @override

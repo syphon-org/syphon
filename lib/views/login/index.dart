@@ -1,7 +1,6 @@
-import 'package:Tether/store/user/actions.dart';
-import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 // Store
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -26,7 +26,7 @@ class Login extends StatefulWidget {
   const Login({Key key, this.store}) : super(key: key);
 
   @override
-  LoginState createState() => LoginState(store: this.store);
+  LoginState createState() => LoginState();
 }
 
 class LoginState extends State<Login> {
@@ -35,9 +35,7 @@ class LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final passwordFocus = FocusNode();
 
-  final Store<AppState> store;
-
-  LoginState({Key key, this.store});
+  LoginState({Key key});
 
   @override
   void initState() {
@@ -50,6 +48,7 @@ class LoginState extends State<Login> {
 
   @protected
   void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
     // Init alerts listener
     store.state.alertsStore.onAlertsChanged.listen((alert) {
       var color;
@@ -99,16 +98,17 @@ class LoginState extends State<Login> {
     double height = MediaQuery.of(context).size.height;
     final double defaultWidgetScaling = width * 0.725;
 
-    return Scaffold(
-      key: loginScaffold,
-      body: ScrollConfiguration(
-        behavior: DefaultScrollBehavior(),
-        child: SingleChildScrollView(
-          // Use a container of the same height and width
-          // to flex dynamically but within a single child scroll
-          child: StoreConnector<AppState, Store<AppState>>(
-            converter: (store) => store,
-            builder: (context, store) => Container(
+    return StoreConnector<AppState, _Props>(
+      distinct: true,
+      converter: (store) => _Props.mapStoreToProps(store),
+      builder: (context, props) => Scaffold(
+        key: loginScaffold,
+        body: ScrollConfiguration(
+          behavior: DefaultScrollBehavior(),
+          child: SingleChildScrollView(
+            // Use a container of the same height and width
+            // to flex dynamically but within a single child scroll
+            child: Container(
               height: height,
               constraints: BoxConstraints(
                 maxHeight: Dimensions.widgetHeightMax,
@@ -125,9 +125,7 @@ class LoginState extends State<Login> {
                       children: <Widget>[
                         TouchableOpacity(
                           onTap: () {
-                            store.dispatch(
-                              incrementTheme(),
-                            );
+                            props.onIncrementTheme();
                           },
                           child: Image(
                             width: width * 0.35,
@@ -184,29 +182,11 @@ class LoginState extends State<Login> {
                                     ),
                                   ),
                                 );
-                                // If user enters full username, make sure to set homeserver
-                                if (username.contains(':')) {
-                                  final alias = username.trim().split(':');
-                                  store.dispatch(setUsername(
-                                    username: alias[0],
-                                  ));
-                                  store.dispatch(setHomeserver(
-                                    homeserver: alias[1],
-                                  ));
-                                } else {
-                                  store.dispatch(setUsername(
-                                    username: username.trim(),
-                                  ));
-                                  store.dispatch(setHomeserver(
-                                    homeserver: 'matrix.org',
-                                  ));
-                                }
+                                props.onChangeUsername(username);
                               },
                               decoration: InputDecoration(
                                 labelText: 'username',
-                                hintText: formatUsernameHint(
-                                  store.state.userStore.homeserver,
-                                ),
+                                hintText: props.usernameHint,
                                 contentPadding: EdgeInsets.only(
                                   left: 20,
                                   top: 32,
@@ -239,7 +219,7 @@ class LoginState extends State<Login> {
                             child: TextField(
                               focusNode: passwordFocus,
                               onChanged: (password) {
-                                store.dispatch(setPassword(password: password));
+                                props.onChangePassword(password);
                               },
                               obscureText: true,
                               decoration: InputDecoration(
@@ -270,16 +250,16 @@ class LoginState extends State<Login> {
                     child: FlatButton(
                       disabledColor: Colors.grey,
                       disabledTextColor: Colors.grey[300],
-                      onPressed: isLoginAttemptable(store.state)
+                      onPressed: props.isLoginAttemptable
                           ? () {
-                              store.dispatch(loginUser());
+                              props.onLoginUser();
                             }
                           : null,
                       color: Theme.of(context).primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28.0),
                       ),
-                      child: isAuthLoading(store.state)
+                      child: props.loading
                           ? Container(
                               constraints: BoxConstraints(
                                 maxHeight: 28,
@@ -353,4 +333,78 @@ class LoginState extends State<Login> {
       ),
     );
   }
+}
+
+class _Props extends Equatable {
+  final bool loading;
+  final String username;
+  final String password;
+  final bool isLoginAttemptable;
+  final String usernameHint;
+
+  final Function onIncrementTheme;
+  final Function onChangeUsername;
+  final Function onChangePassword;
+  final Function onLoginUser;
+
+  _Props({
+    @required this.loading,
+    @required this.username,
+    @required this.password,
+    @required this.isLoginAttemptable,
+    @required this.usernameHint,
+    @required this.onIncrementTheme,
+    @required this.onChangeUsername,
+    @required this.onChangePassword,
+    @required this.onLoginUser,
+  });
+
+  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+      loading: store.state.authStore.loading,
+      username: store.state.authStore.username,
+      password: store.state.authStore.password,
+      isLoginAttemptable: store.state.authStore.isPasswordValid &&
+          store.state.authStore.isUsernameValid &&
+          !store.state.authStore.loading,
+      usernameHint: formatUsernameHint(
+        store.state.authStore.homeserver,
+      ),
+      onChangeUsername: (String text) {
+        // If user enters full username, make sure to set homeserver
+        if (text.contains(':')) {
+          final alias = text.trim().split(':');
+          print('${alias[0]}(:)${alias[1]}');
+          store.dispatch(setUsername(
+            username: alias[0],
+          ));
+          store.dispatch(setHomeserver(
+            homeserver: alias[1],
+          ));
+        } else {
+          store.dispatch(setUsername(
+            username: text.trim(),
+          ));
+          store.dispatch(setHomeserver(
+            homeserver: 'matrix.org',
+          ));
+        }
+      },
+      onChangePassword: (String text) {
+        store.dispatch(setPassword(password: text));
+      },
+      onIncrementTheme: () {
+        store.dispatch(incrementTheme());
+      },
+      onLoginUser: () async {
+        await store.dispatch(loginUser());
+      });
+
+  @override
+  List<Object> get props => [
+        loading,
+        username,
+        password,
+        isLoginAttemptable,
+        usernameHint,
+      ];
 }

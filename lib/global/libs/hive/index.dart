@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/auth/state.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/state.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -69,10 +69,10 @@ Future<dynamic> initHiveStorage() async {
   Hive.registerAdapter(UserAdapter());
 
   // Init Custom Store Models
+  Hive.registerAdapter(AuthStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
-  Hive.registerAdapter(UserStoreAdapter());
 
   // Init storage engine for hive key
   try {
@@ -180,7 +180,7 @@ Future<dynamic> initHiveStorageUnsafe() async {
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
-  Hive.registerAdapter(UserStoreAdapter());
+  Hive.registerAdapter(AuthStoreAdapter());
 
   return await Hive.openBox(Cache.globalBox);
 }

@@ -6,6 +6,7 @@ abstract class MatrixApi {
   static const NEEDS_INTERACTIVE_AUTH = Auth.NEEDS_INTERACTIVE_AUTH;
 
   static final loginUser = Auth.loginUser;
+  static final logoutUser = Auth.logoutUser;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
   static final convertInteractiveAuth = Auth.convertInteractiveAuth;
 

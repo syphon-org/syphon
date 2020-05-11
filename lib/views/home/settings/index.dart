@@ -1,5 +1,6 @@
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -20,11 +21,10 @@ class SettingsScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) {
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
           final double height = MediaQuery.of(context).size.height;
 
@@ -103,8 +103,7 @@ class SettingsScreen extends StatelessWidget {
                               style: TextStyle(fontSize: 18.0),
                             ),
                             subtitle: buildToggledSubtitle(
-                              value: store
-                                  .state.settingsStore.notificationsEnabled,
+                              value: props.notificationsEnabled,
                             ),
                           ),
                           ListTile(
@@ -211,9 +210,7 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () {
-                              store.dispatch(logoutUser());
-                            },
+                            onTap: () => props.onLogoutUser(),
                             contentPadding: contentPadding,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -234,6 +231,37 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
           );
+        },
+      );
+}
+
+class _Props extends Equatable {
+  final bool loading;
+  final bool notificationsEnabled;
+
+  final Function onLogoutUser;
+
+  _Props({
+    @required this.loading,
+    @required this.notificationsEnabled,
+    @required this.onLogoutUser,
+  });
+
+  @override
+  List<Object> get props => [
+        loading,
+        notificationsEnabled,
+      ];
+
+  /* effectively mapStateToProps, but includes functions */
+  static _Props mapStoreToProps(
+    Store<AppState> store,
+  ) =>
+      _Props(
+        loading: store.state.roomStore.syncing || store.state.roomStore.loading,
+        notificationsEnabled: store.state.settingsStore.notificationsEnabled,
+        onLogoutUser: () {
+          store.dispatch(logoutUser());
         },
       );
 }

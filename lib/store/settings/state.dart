@@ -59,7 +59,7 @@ class SettingsStore extends Equatable {
     this.membershipEventsEnabled = true,
     this.customChatSettings,
     this.devices = const [],
-    this.loading,
+    this.loading = false,
   });
 
   @override

@@ -550,7 +550,7 @@ class _Props extends Equatable {
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         rooms: store.state.roomStore.rooms,
         loadingRooms: store.state.roomStore.loading,
-        currentUser: store.state.userStore.user,
+        currentUser: store.state.authStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onFetchSyncForced: () async {
           await store.dispatch(

@@ -233,7 +233,7 @@ class Props extends Equatable {
       Props(
         messageReads: store.state.roomStore.rooms[roomId].messageReads ??
             Map<String, ReadStatus>(),
-        userId: store.state.userStore.user.userId,
+        userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
       );
 

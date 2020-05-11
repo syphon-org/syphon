@@ -1,4 +1,5 @@
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -31,10 +32,10 @@ class PasswordStepState extends State<PasswordStep> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (Store<AppState> store) => store,
-        builder: (context, store) {
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
           return Container(
@@ -97,13 +98,10 @@ class PasswordStepState extends State<PasswordStep> {
                       focusNode: passwordFocusNode,
                       obscureText: !visibility,
                       onChanged: (text) {
-                        store.dispatch(
-                            setPassword(password: text.replaceAll(' ', '')));
+                        props.onChangePassword(text);
                       },
                       onEditingComplete: () {
-                        store.dispatch(
-                          setPassword(password: store.state.userStore.password),
-                        );
+                        props.onChangePassword(props.password);
                         passwordFocusNode.unfocus();
                       },
                       decoration: InputDecoration(
@@ -148,4 +146,27 @@ class PasswordStepState extends State<PasswordStep> {
           );
         },
       );
+}
+
+class _Props extends Equatable {
+  final String password;
+
+  final Function onChangePassword;
+
+  _Props({
+    @required this.password,
+    @required this.onChangePassword,
+  });
+
+  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+        password: store.state.authStore.password,
+        onChangePassword: (String text) {
+          store.dispatch(setPassword(password: text));
+        },
+      );
+
+  @override
+  List<Object> get props => [
+        password,
+      ];
 }

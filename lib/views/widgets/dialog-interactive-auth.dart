@@ -1,7 +1,7 @@
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +41,7 @@ class DialogInteractiveAuth extends StatelessWidget {
             bottom: 16,
           ),
           title: Text(
-            "Confirm Deleting Devices",
+            StringStore.deleteDevicesTitle,
           ),
           children: <Widget>[
             Column(
@@ -137,7 +137,7 @@ class Props extends Equatable {
       Props(
           loading: store.state.settingsStore.loading,
           devices: store.state.settingsStore.devices ?? const [],
-          interactiveAuths: store.state.userStore.interactiveAuths,
+          interactiveAuths: store.state.authStore.interactiveAuths,
           onSetPassword: (password) {
             store.dispatch(setPassword(password: password));
           });

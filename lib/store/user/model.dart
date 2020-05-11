@@ -1,13 +1,11 @@
-import 'dart:async';
-
 import 'package:Tether/global/libs/hive/type-ids.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
 
 @HiveType(typeId: UserHiveId)
-class User {
+class User extends Equatable {
   @HiveField(0)
   final String userId;
   @HiveField(1)
@@ -49,28 +47,22 @@ class User {
   }
 
   @override
-  int get hashCode =>
-      userId.hashCode ^
-      deviceId.hashCode ^
-      homeserver.hashCode ^
-      displayName.hashCode ^
-      avatarUri.hashCode ^
-      accessToken.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is User &&
-          runtimeType == other.runtimeType &&
-          userId == other.userId &&
-          deviceId == other.deviceId &&
-          homeserver == other.homeserver &&
-          accessToken == other.accessToken;
+  List<Object> get props => [
+        userId,
+        deviceId,
+        homeserver,
+        displayName,
+        avatarUri,
+        accessToken,
+      ];
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       userId: json['user_id'] as String,
+      deviceId: json['device_id'] as String,
+      homeserver: json['home_server'] as String,
       displayName: json['display_name'] as String,
+      accessToken: json['access_token'] as String,
       avatarUri: json['avatar_url'] as String,
     );
   }

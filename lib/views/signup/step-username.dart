@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/selectors.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -40,7 +41,9 @@ class UsernameStepState extends State<UsernameStep> {
   @protected
   void runInitTasks() {
     final store = StoreProvider.of<AppState>(context);
-    usernameController.text = username(store.state);
+    usernameController.text = trimmedUserId(
+      userId: store.state.authStore.username,
+    );
   }
 
   @override
@@ -215,11 +218,14 @@ class _Props extends Equatable {
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
-        username: store.state.userStore.username,
-        fullUserId: alias(store.state),
-        isUsernameValid: store.state.userStore.isUsernameValid,
-        isUsernameAvailable: store.state.userStore.isUsernameAvailable,
-        loading: store.state.userStore.loading,
+        username: store.state.authStore.username,
+        fullUserId: userAlias(
+          username: store.state.authStore.username,
+          homeserver: store.state.authStore.homeserver,
+        ),
+        isUsernameValid: store.state.authStore.isUsernameValid,
+        isUsernameAvailable: store.state.authStore.isUsernameAvailable,
+        loading: store.state.authStore.loading,
         onCheckUsernameAvailability: () {
           store.dispatch(checkUsernameAvailability());
         },
@@ -228,7 +234,7 @@ class _Props extends Equatable {
             store.dispatch(setUsername(username: username));
           } else {
             store.dispatch(
-              setUsername(username: store.state.userStore.username),
+              setUsername(username: store.state.authStore.username),
             );
           }
         },

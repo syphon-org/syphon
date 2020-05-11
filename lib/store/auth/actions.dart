@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
@@ -20,7 +22,7 @@ import 'package:Tether/store/index.dart';
 import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
-import './model.dart';
+import '../user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -92,11 +94,13 @@ class SetInteractiveAuths {
 
 class ResetOnboarding {}
 
+class ResetAccessToken {}
+
 class ResetUser {}
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
-    if (store.state.userStore.authObserver != null) {
+    if (store.state.authStore.authObserver != null) {
       throw 'Cannot call startAuthObserver with an existing instance!';
     }
 
@@ -104,7 +108,7 @@ ThunkAction<AppState> startAuthObserver() {
       SetAuthObserver(authObserver: StreamController<User>.broadcast()),
     );
 
-    final user = store.state.userStore.user;
+    final user = store.state.authStore.user;
     final Function onAuthStateChanged = (user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserProfile());
@@ -122,19 +126,22 @@ ThunkAction<AppState> startAuthObserver() {
         store.dispatch(startRoomsObserver());
       } else {
         store.dispatch(stopRoomsObserver());
+        store.dispatch(SetSynced(synced: false, lastSince: null));
+        store.dispatch(ResetRooms());
+        store.dispatch(ResetUser());
       }
     };
 
     // init current auth state and set auth state listener
     onAuthStateChanged(user);
-    store.state.userStore.onAuthStateChanged.listen(onAuthStateChanged);
+    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
   };
 }
 
 ThunkAction<AppState> stopAuthObserver() {
   return (Store<AppState> store) async {
-    if (store.state.userStore.authObserver != null) {
-      store.state.userStore.authObserver.close();
+    if (store.state.authStore.authObserver != null) {
+      store.state.authStore.authObserver.close();
       store.dispatch(SetAuthObserver(authObserver: null));
     }
   };
@@ -145,11 +152,11 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      final authObserver = store.state.userStore.authObserver;
+      final authObserver = store.state.authStore.authObserver;
 
-      final username = store.state.userStore.username;
+      final username = store.state.authStore.username;
       var deviceName = 'New Client';
-      var deviceId = 'main_tim_client';
+      var deviceId = Random.secure().nextInt(1 << 31).toString();
 
       try {
         final deviceInfoPlugin = new DeviceInfoPlugin();
@@ -164,7 +171,7 @@ ThunkAction<AppState> loginUser() {
           );
 
           deviceId = hashedDeviceId.toString();
-          deviceName = 'Tim iOS Client';
+          deviceName = 'Tim Android';
           // deviceId =
         } else if (Platform.isIOS) {
           final info = await deviceInfoPlugin.iosInfo;
@@ -174,10 +181,10 @@ ThunkAction<AppState> loginUser() {
             rounds: 1000,
             salt: username,
           );
-          deviceId = hashedDeviceId.toString();
-          deviceName = 'Tim Andoid Client';
+          deviceId = hashedDeviceId.hash;
+          deviceName = 'Tim iOS';
         } else if (Platform.isMacOS) {
-          deviceName = 'Tim Desktop Client';
+          deviceName = 'Tim Desktop';
         }
       } catch (error) {
         print(
@@ -187,10 +194,10 @@ ThunkAction<AppState> loginUser() {
 
       final data = await MatrixApi.loginUser(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
         type: "m.login.password",
-        username: store.state.userStore.username,
-        password: store.state.userStore.password,
+        homeserver: store.state.authStore.homeserver,
+        username: store.state.authStore.username,
+        password: store.state.authStore.password,
         deviceName: deviceName,
         deviceId: deviceId,
       );
@@ -203,19 +210,47 @@ ThunkAction<AppState> loginUser() {
         throw Exception(data['error']);
       }
 
-      store.dispatch(SetUser(
-        user: User(
-          userId: data['user_id'],
-          deviceId: data['device_id'],
-          accessToken: data['access_token'],
-          homeserver: store.state.userStore
-              .homeserver, // use homeserver from login call param instead
-        ),
+      print(data);
+
+      await store.dispatch(SetUser(
+        user: User.fromJson(data),
       ));
 
-      authObserver.add(store.state.userStore.user);
+      authObserver.add(store.state.authStore.user);
 
       store.dispatch(ResetOnboarding());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error.message));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> logoutUser() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      // submit empty auth before logging out of matrix
+
+      final data = await MatrixApi.logoutUser(
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+      );
+
+      if (data['errcode'] != null) {
+        if (data['errcode'] == MatrixErrors.unknown_token) {
+          final authObserver = store.state.authStore.authObserver;
+          authObserver.add(null);
+        } else {
+          throw Exception(data['error']);
+        }
+      }
+
+      final authObserver = store.state.authStore.authObserver;
+      authObserver.add(null);
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
@@ -229,12 +264,12 @@ ThunkAction<AppState> fetchUserProfile() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final user = store.state.userStore.user;
+      final user = store.state.authStore.user;
 
       final request = buildUserProfileRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         userId: user.userId,
       );
 
@@ -266,9 +301,15 @@ ThunkAction<AppState> checkUsernameAvailability() {
 
       final data = await MatrixApi.checkUsernameAvailability(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        username: store.state.userStore.username,
+        homeserver: store.state.authStore.homeserver,
+        username: store.state.authStore.username,
       );
+
+      print(data);
+
+      if (data['errcode'] != null) {
+        throw Exception(data['error']);
+      }
 
       store.dispatch(SetUsernameAvailability(
         availability: data['available'],
@@ -276,37 +317,6 @@ ThunkAction<AppState> checkUsernameAvailability() {
     } catch (error) {
       print('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-ThunkAction<AppState> logoutUser() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      // submit empty auth before logging out of matrix
-      final authObserver = store.state.userStore.authObserver;
-      authObserver.add(null);
-
-      final request = buildLogoutUserRequest(
-        protocol: protocol,
-        homeserver: store.state.userStore.user.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-      );
-
-      await http.post(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      store.dispatch(ResetUser());
-      store.dispatch(ResetRooms());
-      store.dispatch(SetSynced(synced: false, lastSince: null));
-    } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -323,13 +333,13 @@ ThunkAction<AppState> createUser() {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
-      final loginType = store.state.userStore.loginType;
+      final loginType = store.state.authStore.loginType;
 
       final request = buildRegisterUserRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        username: store.state.userStore.username,
-        password: store.state.userStore.password,
+        homeserver: store.state.authStore.homeserver,
+        username: store.state.authStore.username,
+        password: store.state.authStore.password,
         type: loginType,
       );
 
@@ -369,9 +379,9 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
 
       final request = buildUpdateDisplayName(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
         newDisplayName: newDisplayName,
       );
 
@@ -402,7 +412,7 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
       store.dispatch(SetLoading(loading: true));
 
       // Extension handling
-      final String displayName = store.state.userStore.user.displayName;
+      final String displayName = store.state.authStore.user.displayName;
       final String fileType = lookupMimeType(localFile.path);
       final String fileExtension = fileType.split('/')[1];
 
@@ -414,8 +424,8 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
       // Create request vars for upload
       final mediaUploadRequest = buildMediaUploadRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         fileName: fileName,
         fileType: fileType,
         fileLength: fileLength,
@@ -467,9 +477,9 @@ ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
   return (Store<AppState> store) async {
     final avatarUriRequest = buildUpdateAvatarUri(
       protocol: protocol,
-      homeserver: store.state.userStore.homeserver,
-      accessToken: store.state.userStore.user.accessToken,
-      userId: store.state.userStore.user.userId,
+      homeserver: store.state.authStore.user.homeserver,
+      accessToken: store.state.authStore.user.accessToken,
+      userId: store.state.authStore.user.userId,
       newAvatarUri: mxcUri,
     );
 

@@ -720,7 +720,7 @@ class _Props extends Equatable {
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
-        userId: store.state.userStore.user.userId,
+        userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
         roomsLoading: store.state.roomStore.loading,
         room: roomSelectors.room(

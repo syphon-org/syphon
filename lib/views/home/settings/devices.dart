@@ -182,94 +182,118 @@ class DeviceViewState extends State<DevicesView> {
             appBar: currentAppBar,
             body: Container(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-              child: GridView.builder(
-                primary: true,
-                shrinkWrap: true,
-                itemCount: props.devices.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  final device = props.devices[index];
-
-                  Color iconColor;
-                  Color backgroundColor;
-                  IconData deviceTypeIcon = Icons.phone_android;
-                  TextStyle textStyle = Theme.of(context).textTheme.overline;
-                  bool isCurrentDevice =
-                      props.currentDeviceId == device.deviceId;
-
-                  if (device.displayName.contains('Firefox') ||
-                      device.displayName.contains('Mac')) {
-                    deviceTypeIcon = Icons.laptop;
-                  } else if (device.displayName.contains('iOS')) {
-                    deviceTypeIcon = Icons.phone_iphone;
-                  }
-
-                  if (this.selectedDevices != null &&
-                      this.selectedDevices.contains(device)) {
-                    backgroundColor = hashedColor(device.deviceId);
-                    backgroundColor = Colors.grey[500];
-                    textStyle = textStyle.copyWith(color: Colors.white);
-                    iconColor = Colors.white;
-                  }
-
-                  return InkWell(
-                    onTap: this.selectedDevices == null
-                        ? null
-                        : () => onToggleModifyDevice(device: device),
-                    onLongPress: () => onToggleModifyDevice(device: device),
-                    child: Card(
-                      elevation: 0,
-                      color: backgroundColor ?? sectionBackgroundColor,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Stack(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(bottom: 8, top: 8),
-                                  child: Icon(
-                                    deviceTypeIcon,
-                                    size: Dimensions.iconSize * 1.5,
-                                    color: iconColor,
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: isCurrentDevice,
-                                  child: Positioned(
-                                    right: 0,
-                                    bottom: 4,
-                                    child: CircleAvatar(
-                                      radius: 8,
-                                      backgroundColor: Colors.cyan,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  device.displayName,
-                                  textAlign: TextAlign.center,
-                                  style: textStyle,
-                                ),
-                                Text(
-                                  device.deviceId,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: textStyle,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+              child: Stack(
+                children: [
+                  GridView.builder(
+                    primary: true,
+                    shrinkWrap: true,
+                    itemCount: props.devices.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
                     ),
-                  );
-                },
+                    itemBuilder: (BuildContext context, int index) {
+                      final device = props.devices[index];
+
+                      Color iconColor;
+                      Color backgroundColor;
+                      IconData deviceTypeIcon = Icons.phone_android;
+                      TextStyle textStyle =
+                          Theme.of(context).textTheme.overline;
+                      bool isCurrentDevice =
+                          props.currentDeviceId == device.deviceId;
+
+                      if (device.displayName.contains('Firefox') ||
+                          device.displayName.contains('Mac')) {
+                        deviceTypeIcon = Icons.laptop;
+                      } else if (device.displayName.contains('iOS')) {
+                        deviceTypeIcon = Icons.phone_iphone;
+                      }
+
+                      if (this.selectedDevices != null &&
+                          this.selectedDevices.contains(device)) {
+                        backgroundColor = hashedColor(device.deviceId);
+                        backgroundColor = Colors.grey[500];
+                        textStyle = textStyle.copyWith(color: Colors.white);
+                        iconColor = Colors.white;
+                      }
+
+                      return InkWell(
+                        onTap: this.selectedDevices == null
+                            ? null
+                            : () => onToggleModifyDevice(device: device),
+                        onLongPress: () => onToggleModifyDevice(device: device),
+                        child: Card(
+                          elevation: 0,
+                          color: backgroundColor ?? sectionBackgroundColor,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Stack(
+                                  children: <Widget>[
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(bottom: 8, top: 8),
+                                      child: Icon(
+                                        deviceTypeIcon,
+                                        size: Dimensions.iconSize * 1.5,
+                                        color: iconColor,
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: isCurrentDevice,
+                                      child: Positioned(
+                                        right: 0,
+                                        bottom: 4,
+                                        child: CircleAvatar(
+                                          radius: 8,
+                                          backgroundColor: Colors.cyan,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  children: <Widget>[
+                                    Text(
+                                      device.displayName,
+                                      textAlign: TextAlign.center,
+                                      style: textStyle,
+                                    ),
+                                    Text(
+                                      device.deviceId,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: textStyle,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    child: Visibility(
+                      visible: props.loading,
+                      child: Container(
+                          child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          RefreshProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                              PRIMARY_COLOR,
+                            ),
+                            value: null,
+                          ),
+                        ],
+                      )),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -308,8 +332,8 @@ class Props extends Equatable {
       Props(
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices ?? const [],
-        session: store.state.userStore.session,
-        currentDeviceId: store.state.userStore.user.deviceId,
+        session: store.state.authStore.session,
+        currentDeviceId: store.state.authStore.user.deviceId,
         onDeleteDevices: (
           BuildContext context,
           List<DeviceSetting> devices,
@@ -325,7 +349,7 @@ class Props extends Equatable {
             await store.dispatch(deleteDevices(deviceIds: deviceIds));
           }
 
-          final authSession = store.state.userStore.session;
+          final authSession = store.state.authStore.session;
           if (authSession != null) {
             showDialog(
               context: context,

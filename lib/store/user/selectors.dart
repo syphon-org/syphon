@@ -1,31 +1,18 @@
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/model.dart';
+
+import './model.dart';
 
 // Preauth
 dynamic homeserver(AppState state) {
-  return state.userStore.homeserver;
+  return state.authStore.homeserver;
 }
 
-String username(AppState state) {
-  return state.userStore.username.replaceAll('@', '');
+String trimmedUserId({String userId}) {
+  return userId.replaceAll('@', '');
 }
 
-String alias(AppState state) {
-  return "@" + state.userStore.username + ":" + state.userStore.homeserver;
-}
-
-bool creating(AppState state) {
-  return state.userStore.creating;
-}
-
-bool isLoginAttemptable(AppState state) {
-  return state.userStore.isPasswordValid &&
-      state.userStore.isUsernameValid &&
-      !state.userStore.loading;
-}
-
-bool isAuthLoading(AppState state) {
-  return state.userStore.loading;
+String userAlias({String username, String homeserver}) {
+  return "@" + username + ":" + homeserver;
 }
 
 // Auth

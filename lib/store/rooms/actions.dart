@@ -81,9 +81,9 @@ class ResetRooms {
 class SetRoomState {
   final String id; // room id
   final List<Event> state;
-  final String username;
+  final String currentUser;
 
-  SetRoomState({this.id, this.state, this.username});
+  SetRoomState({this.id, this.state, this.currentUser});
 }
 
 class SetRoomMessages {
@@ -244,8 +244,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       final request = buildSyncRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         fullState: forceFull || store.state.roomStore.rooms == null,
         since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
@@ -262,6 +262,14 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       //   print('[fetchSync] DEBUGGING **************************');
       // }
 
+      if (data['errcode'] != null) {
+        if (data['errcode'] == MatrixErrors.unknown_token) {
+          // TODO: signin prompt needed
+        } else {
+          throw data['error'];
+        }
+      }
+
       final String lastSince = data['next_batch'];
       final Map<String, dynamic> rawRooms =
           data['rooms']['join'] ?? Map<String, Room>();
@@ -270,7 +278,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final Map<String, Room> rooms =
           store.state.roomStore.rooms ?? Map<String, Room>();
 
-      final user = store.state.userStore.user;
+      final user = store.state.authStore.user;
 
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
@@ -327,8 +335,8 @@ ThunkAction<AppState> fetchRooms() {
 
       final request = buildJoinedRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
       );
 
       final response = await http.get(
@@ -366,9 +374,9 @@ ThunkAction<AppState> fetchDirectRooms() {
     try {
       final request = buildDirectRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
       );
 
       final response = await http.get(
@@ -416,8 +424,8 @@ ThunkAction<AppState> createRoom({
 
       final request = buildCreateRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomName: name,
         roomTopic: topic,
         roomAlias: alias,
@@ -448,9 +456,9 @@ ThunkAction<AppState> createRoom({
       if (isDirect) {
         final request = buildSaveAccountData(
           protocol: protocol,
-          accessToken: store.state.userStore.user.accessToken,
-          homeserver: store.state.userStore.homeserver,
-          userId: store.state.userStore.user.userId,
+          accessToken: store.state.authStore.user.accessToken,
+          homeserver: store.state.authStore.user.homeserver,
+          userId: store.state.authStore.user.userId,
           type: AccountDataTypes.DIRECT,
         );
 
@@ -505,8 +513,8 @@ ThunkAction<AppState> removeRoom({Room room}) {
       // submit a leave room request
       final leaveRequest = buildLeaveRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
@@ -534,8 +542,8 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       final forgetRequest = buildForgetRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
@@ -589,9 +597,9 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
 
       final request = buildDirectRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
       );
 
       final response = await http.get(
@@ -624,9 +632,9 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
 
       final saveRequest = buildSaveAccountData(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
-        userId: store.state.userStore.user.userId,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        userId: store.state.authStore.user.userId,
         type: AccountDataTypes.DIRECT,
       );
 
@@ -670,8 +678,8 @@ ThunkAction<AppState> deleteRoom({Room room}) {
 
       final deleteRequest = buildLeaveRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
