@@ -386,7 +386,8 @@ class ProfileViewState extends State<ProfileView> {
                                                 maxWidth: 28,
                                               ),
                                               child: CircularProgressIndicator(
-                                                strokeWidth: 2,
+                                                strokeWidth: Dimensions
+                                                    .defaultStrokeWidth,
                                                 backgroundColor: Colors.white,
                                                 valueColor:
                                                     AlwaysStoppedAnimation<

@@ -637,7 +637,8 @@ class ChatViewState extends State<ChatView> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     RefreshProgressIndicator(
-                                      strokeWidth: 2.0,
+                                      strokeWidth:
+                                          Dimensions.defaultStrokeWidth,
                                       valueColor:
                                           new AlwaysStoppedAnimation<Color>(
                                         PRIMARY_COLOR,

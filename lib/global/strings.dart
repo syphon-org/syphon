@@ -38,4 +38,7 @@ class StringStore {
   static const viewTitleSignup = 'Signup';
   static const viewTitleDevices = 'Devices';
   static const viewTitleSettings = 'Settings';
+
+  static const buttonSignupNext = 'continue';
+  static const buttonSignupFinish = 'finish';
 }

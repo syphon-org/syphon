@@ -12,12 +12,26 @@ part 'state.g.dart';
 class AuthStore extends Equatable {
   @HiveField(0)
   final User user;
+  User get currentUser => user;
 
+  final StreamController<User> authObserver;
+  Stream<User> get onAuthStateChanged =>
+      authObserver != null ? authObserver.stream : null;
+
+  // TODO: this is lazy
+  // Interactive Auth Data
+  final String session;
+  final Credential credential;
+  final Map<String, dynamic> interactiveAuths;
+
+  // Temporary Signup Params
   final String username;
   final String password;
   final String passwordConfirm;
   final String homeserver;
   final String loginType;
+  final bool agreement;
+  final bool captcha;
 
   // Temporary state propertie
   final bool loading;
@@ -27,24 +41,14 @@ class AuthStore extends Equatable {
   final bool isHomeserverValid;
   final bool isUsernameAvailable;
 
-  // TODO: this is lazy
-  // Interactive Auth Data
-  final String session;
-  final Credential credential;
-  final Map<String, dynamic> interactiveAuths;
-
-  final StreamController<User> authObserver;
-  Stream<User> get onAuthStateChanged =>
-      authObserver != null ? authObserver.stream : null;
-
-  User get currentUser => user;
-
   const AuthStore({
     this.user = const User(),
     this.authObserver,
     this.username = '', // null
     this.password = '', // null
     this.passwordConfirm = '',
+    this.agreement = false,
+    this.captcha = false,
     this.session,
     this.homeserver = 'matrix.org',
     this.loginType = 'm.login.dummy',
@@ -64,13 +68,16 @@ class AuthStore extends Equatable {
     username,
     password,
     passwordConfirm,
+    agreement,
     homeserver,
+    captcha,
     session,
     isUsernameValid,
     isUsernameAvailable,
     isPasswordValid,
     isHomeserverValid,
     interactiveAuths,
+    interactiveStages,
     credential,
     creating,
     authObserver,
@@ -81,8 +88,10 @@ class AuthStore extends Equatable {
       authObserver: authObserver ?? this.authObserver,
       username: username ?? this.username,
       password: password ?? this.password,
+      agreement: agreement ?? this.agreement,
       passwordConfirm: passwordConfirm ?? this.passwordConfirm,
       homeserver: homeserver ?? this.homeserver,
+      captcha: captcha ?? this.captcha,
       session: session ?? this.session,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
       isUsernameAvailable: isUsernameAvailable != null
@@ -103,6 +112,8 @@ class AuthStore extends Equatable {
         username,
         password,
         passwordConfirm,
+        agreement,
+        captcha,
         homeserver,
         session,
         loginType,

@@ -77,6 +77,16 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class SetAgreement {
+  final bool agreement;
+  SetAgreement({this.agreement});
+}
+
+class SetCaptcha {
+  final bool completed;
+  SetCaptcha({this.completed});
+}
+
 class SetUsernameAvailability {
   final bool availability;
   SetUsernameAvailability({this.availability});
@@ -102,11 +112,11 @@ class SetInteractiveAuths {
   SetInteractiveAuths({this.interactiveAuths});
 }
 
+class ResetUser {}
+
 class ResetOnboarding {}
 
-class ResetAccessToken {}
-
-class ResetUser {}
+class ResetAuthStore {}
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
@@ -162,8 +172,6 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      final authObserver = store.state.authStore.authObserver;
-
       final username = store.state.authStore.username;
       var deviceName = 'New Client';
       var deviceId = Random.secure().nextInt(1 << 31).toString();
@@ -226,7 +234,9 @@ ThunkAction<AppState> loginUser() {
         user: User.fromJson(data),
       ));
 
-      authObserver.add(store.state.authStore.user);
+      store.state.authStore.authObserver.add(
+        store.state.authStore.user,
+      );
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
@@ -252,15 +262,13 @@ ThunkAction<AppState> logoutUser() {
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
-          final authObserver = store.state.authStore.authObserver;
-          authObserver.add(null);
+          store.state.authStore.authObserver.add(null);
         } else {
           throw Exception(data['error']);
         }
       }
 
-      final authObserver = store.state.authStore.authObserver;
-      authObserver.add(null);
+      store.state.authStore.authObserver.add(null);
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error.message));
     } finally {
@@ -343,7 +351,7 @@ ThunkAction<AppState> createUser() {
 
       final loginType = store.state.authStore.loginType;
 
-      final request = buildRegisterUserRequest(
+      final data = await MatrixApi.registerUser(
         protocol: protocol,
         homeserver: store.state.authStore.homeserver,
         username: store.state.authStore.username,
@@ -351,28 +359,26 @@ ThunkAction<AppState> createUser() {
         type: loginType,
       );
 
-      print('[createUser] calling ');
-      final response = await http.post(
-        request['url'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
-
       print('[createUser] $data');
 
-      // TODO: use homeserver from login call param instead in dev
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      if (data['flows'] != null) {
+        store.dispatch(setInteractiveAuths(auths: data));
+        return false;
+      }
+
       store.dispatch(SetUser(
-        user: User(
-          userId: data['user_id'],
-          deviceId: data['device_id'],
-          accessToken: data['access_token'],
-          homeserver: data['user_id'].split(':')[1], // per matrix spec
-        ),
+        user: User.fromJson(data),
       ));
+
       store.dispatch(ResetOnboarding());
+      return true;
     } catch (error) {
       print('[createUser] $error');
+      return false;
     } finally {
       store.dispatch(SetCreating(creating: false));
       store.dispatch(SetLoading(loading: false));
@@ -539,7 +545,7 @@ ThunkAction<AppState> updateCredential({
   String value,
   Map<String, String> params,
 }) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     try {
       final currentCredential = store.state.authStore.credential;
       store.dispatch(SetCredential(
@@ -567,14 +573,14 @@ ThunkAction<AppState> resetCredentials({
 }
 
 ThunkAction<AppState> selectHomeserver({dynamic homeserver}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetHomeserverValid(valid: true));
     store.dispatch(SetHomeserver(homeserver: homeserver['hostname']));
   };
 }
 
 ThunkAction<AppState> setHomeserver({String homeserver}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(
         SetHomeserverValid(valid: homeserver != null && homeserver.length > 0));
     store.dispatch(SetHomeserver(homeserver: homeserver.trim()));
@@ -582,7 +588,7 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
 }
 
 ThunkAction<AppState> setUsername({String username}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(
         SetUsernameValid(valid: username != null && username.length > 0));
     store.dispatch(SetUsername(username: username.trim()));
@@ -590,7 +596,7 @@ ThunkAction<AppState> setUsername({String username}) {
 }
 
 ThunkAction<AppState> setPassword({String password}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password.trim()));
 
     final currentPassword = store.state.authStore.password;
@@ -605,7 +611,7 @@ ThunkAction<AppState> setPassword({String password}) {
 }
 
 ThunkAction<AppState> setPasswordConfirm({String password}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetPasswordConfirm(password: password.trim()));
 
     final currentPassword = store.state.authStore.password;
@@ -616,5 +622,17 @@ ThunkAction<AppState> setPasswordConfirm({String password}) {
           password.length > 0 &&
           currentPassword == currentConfirm,
     ));
+  };
+}
+
+ThunkAction<AppState> toggleAgreement({bool agreement}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetAgreement(agreement: agreement));
+  };
+}
+
+ThunkAction<AppState> toggleCaptcha({bool completed}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetCaptcha(completed: completed));
   };
 }

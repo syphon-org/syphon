@@ -1,30 +1,28 @@
 name: Tether
 description: Privacy centric matrix client for everyone
 
-# commands:
-# - flutter create --org org.tether tether
-# - flutter run --no-fast-start # fixing issues building?
-# - flutter pub global run devtools 
-# - emulator -list-avds
-# - emulator -avd Pixel_3a_API_29
-# - xcrun simctl delete unavailable
-# - xcrun simctl list devices
-# - xcrun simctl boot <device-id>
-# - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
-
-# desktop support options
-# * Desktop support breaks the iOS xcode build
-# * after disabling enabled -> disabled
-# - flutter config --enable-macos-desktop
-# - flutter config --no-enable-macos-desktop
-
-# build generation
-# - flutter pub run build_runner build
-# - flutter pub run build_runner watch - if making schema changes
+# flutter commands
+# $ flutter create --org org.tether tether
+# $ flutter run --no-fast-start
+# $ flutter pub global run devtools 
+# $ flutter pub run build_runner build
+# $ flutter pub run build_runner watch
 
 # troubleshooting
-# - pub cache repair
-# - flutter pub cache repair
+# $ pub cache repair
+# $ flutter pub cache repair
+
+# mobile development commands
+# $ xcrun simctl delete unavailable
+# $ xcrun simctl list devices
+# $ xcrun simctl boot <device-id>
+# $ xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
+# $ emulator -list-avds
+# $ emulator -avd Pixel_3a_API_29
+
+# desktop support options
+# $ flutter config --enable-macos-desktop
+# $ flutter config --no-enable-macos-desktop
 
 # asset generation
 # iOS icons - https://github.com/smallmuou/ios-icon-generator
@@ -77,8 +75,10 @@ dependencies:
   flutter_svg: ^0.17.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
-  touchable_opacity: 1.0.2 
+  webview_flutter: ^0.3.21
+  touchable_opacity: 1.0.2  
   fab_circular_menu: ^1.0.0
+  flutter_recaptcha_v2: 0.1.0
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5
@@ -128,6 +128,7 @@ flutter:
   assets: 
    - .env.debug
    - .env.release
+   - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg
    - assets/graphics/undraw_messaging_fun.svg
    - assets/graphics/undraw_connection.svg

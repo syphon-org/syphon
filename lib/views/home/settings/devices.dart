@@ -7,8 +7,7 @@ import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/views/widgets/dialog-interactive-auth.dart';
-import 'package:crypt/crypt.dart';
+import 'package:Tether/views/widgets/dialog-confirm-password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -286,7 +285,7 @@ class DeviceViewState extends State<DevicesView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           RefreshProgressIndicator(
-                            strokeWidth: 2.0,
+                            strokeWidth: Dimensions.defaultStrokeWidth,
                             valueColor: new AlwaysStoppedAnimation<Color>(
                               PRIMARY_COLOR,
                             ),
@@ -356,7 +355,7 @@ class Props extends Equatable {
           if (authSession != null) {
             showDialog(
               context: context,
-              child: DialogInteractiveAuth(
+              child: DialogConfirmPassword(
                 key: Key(authSession),
                 onConfirm: () async {
                   final List<String> deviceIds =

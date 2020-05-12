@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/auth/state.dart';
 import 'package:Tether/store/auth/actions.dart';
+import 'package:Tether/views/signup/step-captcha.dart';
+import 'package:Tether/views/signup/step-terms.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/state.dart';
 
 // Styling Widgets
 import 'package:Tether/global/dimensions.dart';
@@ -32,18 +32,18 @@ class SignupView extends StatefulWidget {
 class SignupViewState extends State<SignupView> {
   final String title = StringStore.viewTitleSignup;
 
-  final sections = [
-    HomeserverStep(),
-    UsernameStep(),
-    PasswordStep(),
-  ];
-
   int currentStep = 0;
   bool onboarding = false;
   bool validStep = false;
   bool naving = false;
   StreamSubscription subscription;
   PageController pageController;
+
+  var sections = [
+    HomeserverStep(),
+    UsernameStep(),
+    PasswordStep(),
+  ];
 
   SignupViewState({Key key});
 
@@ -62,21 +62,19 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  void onMounted() {
+  void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
 
     // Init change listener
     subscription = store.onChange.listen((state) {
-      // toggle button to a creating user state
-      if (state.authStore.creating && this.currentStep != 3) {
-        setState(() {
-          currentStep = 3;
-        });
-        // otherwise let them retry
-      } else if (!state.authStore.creating && this.currentStep == 3) {
-        setState(() {
-          currentStep = 2;
-        });
+      print('[signup store onChange] ${state.authStore.creating}');
+
+      // TODO: if creating and it worked
+      if (state.authStore.interactiveAuths.isNotEmpty &&
+          this.sections.length < 4) {
+        print('Testing section increase');
+        sections.add(CaptchaStep());
+        sections.add(TermsStep());
       }
 
       if (state.authStore.user.accessToken != null) {
@@ -114,12 +112,19 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
+  /**
+   * TODO: convert to using interactive auth flows
+   * to know what step is what action
+   */
   @protected
   Function onCheckStepValidity(_Props props) {
     switch (this.currentStep) {
       case 0:
         return props.isHomeserverValid
             ? () {
+                setState(() {
+                  currentStep = this.currentStep + 1;
+                });
                 pageController.nextPage(
                   duration: Duration(milliseconds: 350),
                   curve: Curves.ease,
@@ -129,6 +134,9 @@ class SignupViewState extends State<SignupView> {
       case 1:
         return props.isUsernameValid && props.isUsernameAvailable
             ? () {
+                setState(() {
+                  currentStep = this.currentStep + 1;
+                });
                 pageController.nextPage(
                   duration: Duration(milliseconds: 350),
                   curve: Curves.ease,
@@ -138,8 +146,29 @@ class SignupViewState extends State<SignupView> {
       case 2:
         return !props.isPasswordValid
             ? null
+            : () async {
+                final result = await props.onCreateUser();
+                if (!result && props.interactiveAuths.isNotEmpty) {
+                  setState(() {
+                    currentStep = this.currentStep + 1;
+                  });
+                  pageController.nextPage(
+                    duration: Duration(milliseconds: 350),
+                    curve: Curves.ease,
+                  );
+                }
+              };
+      case 3:
+        return !props.captcha
+            ? null
             : () {
-                props.onCreateUser();
+                print('completing captcha');
+              };
+      case 4:
+        return !props.captcha
+            ? null
+            : () {
+                print('completing captcha');
               };
       default:
         return null;
@@ -147,14 +176,15 @@ class SignupViewState extends State<SignupView> {
   }
 
   Widget buildButtonText() {
-    switch (currentStep) {
-      case 2:
-        return const Text('Finish',
-            style: TextStyle(fontSize: 20, color: Colors.white));
-      default:
-        return const Text('Continue',
-            style: TextStyle(fontSize: 20, color: Colors.white));
+    if (this.currentStep == sections.length - 1) {
+      return const Text(
+        StringStore.buttonSignupFinish,
+      );
     }
+
+    return const Text(
+      StringStore.buttonSignupNext,
+    );
   }
 
   @override
@@ -251,6 +281,8 @@ class SignupViewState extends State<SignupView> {
                                 child: !props.creating
                                     ? buildButtonText()
                                     : CircularProgressIndicator(
+                                        strokeWidth:
+                                            Dimensions.defaultStrokeWidthLite,
                                         backgroundColor: Colors.white,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
@@ -309,6 +341,10 @@ class _Props extends Equatable {
   final bool isHomeserverValid;
 
   final bool creating;
+  final bool captcha;
+  final bool agreement;
+
+  final Map interactiveAuths;
 
   final Function onCreateUser;
 
@@ -321,6 +357,9 @@ class _Props extends Equatable {
     @required this.homeserver,
     @required this.isHomeserverValid,
     @required this.creating,
+    @required this.captcha,
+    @required this.agreement,
+    @required this.interactiveAuths,
     @required this.onCreateUser,
   });
 
@@ -333,8 +372,11 @@ class _Props extends Equatable {
         homeserver: store.state.authStore.homeserver,
         isHomeserverValid: store.state.authStore.isHomeserverValid,
         creating: store.state.authStore.creating,
-        onCreateUser: () {
-          store.dispatch(createUser());
+        captcha: store.state.authStore.captcha,
+        agreement: store.state.authStore.agreement,
+        interactiveAuths: store.state.authStore.interactiveAuths,
+        onCreateUser: () async {
+          return await store.dispatch(createUser());
         },
       );
 
@@ -348,5 +390,6 @@ class _Props extends Equatable {
         homeserver,
         isHomeserverValid,
         creating,
+        interactiveAuths,
       ];
 }

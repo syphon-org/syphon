@@ -287,7 +287,7 @@ class SearchUserState extends State<SearchUserView> {
                       margin: EdgeInsets.symmetric(horizontal: 8),
                       child: creatingRoomDisplayName == user.displayName
                           ? CircularProgressIndicator(
-                              strokeWidth: Dimensions.defaultStrokeWidthLite,
+                              strokeWidth: Dimensions.defaultStrokeWidth,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 Colors.grey,
                               ),
@@ -414,7 +414,7 @@ class SearchUserState extends State<SearchUserView> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               RefreshProgressIndicator(
-                                strokeWidth: 2.0,
+                                strokeWidth: Dimensions.defaultStrokeWidth,
                                 valueColor: new AlwaysStoppedAnimation<Color>(
                                   PRIMARY_COLOR,
                                 ),

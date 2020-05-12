@@ -36,14 +36,23 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(passwordConfirm: action.password);
     case SetPasswordValid:
       return state.copyWith(isPasswordValid: action.valid);
+    case SetCaptcha:
+      return state.copyWith(captcha: action.completed);
+    case SetAgreement:
+      return state.copyWith(agreement: action.agreement);
     case ResetUser:
       return state.copyWith(user: User());
     case ResetOnboarding:
       return state.copyWith(
         username: '',
         password: '',
-        homeserver: '',
+        passwordConfirm: '',
+        agreement: false,
+        captcha: false,
+        interactiveAuths: const {},
       );
+    case ResetAuthStore:
+      return AuthStore();
     default:
       return state;
   }

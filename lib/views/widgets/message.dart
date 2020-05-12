@@ -281,7 +281,8 @@ class MessageWidget extends StatelessWidget {
                                         height: indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 1.5,
+                                          strokeWidth:
+                                              Dimensions.defaultStrokeWidthLite,
                                         ),
                                       ),
                                     ),

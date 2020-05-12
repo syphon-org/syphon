@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -30,7 +31,7 @@ class MatrixImage extends StatefulWidget {
     @required this.mxcUri,
     this.width = 48,
     this.height = 48,
-    this.strokeWidth = 1.5,
+    this.strokeWidth = Dimensions.defaultStrokeWidthLite,
     this.imageType,
     this.fit = BoxFit.fill,
     this.thumbnail = true,

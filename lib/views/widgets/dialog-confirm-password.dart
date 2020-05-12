@@ -10,8 +10,8 @@ import 'package:redux/redux.dart';
 
 import 'package:Tether/store/index.dart';
 
-class DialogInteractiveAuth extends StatelessWidget {
-  DialogInteractiveAuth({
+class DialogConfirmPassword extends StatelessWidget {
+  DialogConfirmPassword({
     Key key,
     this.onConfirm,
     this.onCancel,
@@ -115,7 +115,7 @@ class DialogInteractiveAuth extends StatelessWidget {
                             maxWidth: 16,
                           ),
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: Dimensions.defaultStrokeWidth,
                             backgroundColor: Colors.white,
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Colors.grey,
@@ -142,7 +142,6 @@ class Props extends Equatable {
   final bool valid;
   final bool loading;
   final List<DeviceSetting> devices;
-  final Map interactiveAuths;
 
   final Function onChangePassword;
 
@@ -150,7 +149,6 @@ class Props extends Equatable {
     @required this.valid,
     @required this.loading,
     @required this.devices,
-    @required this.interactiveAuths,
     @required this.onChangePassword,
   });
 
@@ -159,7 +157,6 @@ class Props extends Equatable {
         valid,
         loading,
         devices,
-        interactiveAuths,
       ];
 
   /* effectively mapStateToProps, but includes functions */
@@ -171,7 +168,6 @@ class Props extends Equatable {
             store.state.authStore.credential.value.length > 0,
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices ?? const [],
-        interactiveAuths: store.state.authStore.interactiveAuths,
         onChangePassword: (password) {
           store.dispatch(updateCredential(value: password));
         },

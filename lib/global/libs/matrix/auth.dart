@@ -53,6 +53,31 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  static FutureOr<dynamic> registerUser({
+    String protocol,
+    String homeserver,
+    String username,
+    String password,
+    String type,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/register';
+
+    Map body = {
+      'auth': {
+        'type': 'm.login.dummy',
+      },
+      'username': username,
+      'password': password
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
   static Future<dynamic> logoutUser({
     String protocol,
     String homeserver,

@@ -146,8 +146,9 @@ class Themes {
           letterSpacing: 0.4,
         ),
         button: TextStyle(
+          fontSize: 20,
           fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          letterSpacing: 0.8,
         ),
       ),
     );
