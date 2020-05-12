@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 /**
  * Captcha
@@ -13,10 +16,12 @@ import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
  */
 class Captcha extends StatefulWidget {
   final String publicKey;
+  final Function onVerified;
 
   const Captcha({
     Key key,
     @required this.publicKey,
+    @required this.onVerified,
   }) : super(
           key: key,
         );
@@ -24,13 +29,18 @@ class Captcha extends StatefulWidget {
   @override
   CaptchaState createState() => CaptchaState(
         publickey: publicKey,
+        onVerified: onVerified,
       );
 }
 
 class CaptchaState extends State<Captcha> {
   final String publickey;
+  final Function onVerified;
 
   RecaptchaV2Controller recaptchaV2Controller = RecaptchaV2Controller();
+  final Completer<WebViewController> controller =
+      Completer<WebViewController>();
+
   @override
   void initState() {
     super.initState();
@@ -53,38 +63,47 @@ class CaptchaState extends State<Captcha> {
 
   CaptchaState({
     Key key,
-    this.publickey,
+    this.publickey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb',
+    this.onVerified,
   });
 
   // Matrix Public Key
   // 6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb
+  // TODO: just build the captcha yourself
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.red,
-        child: Stack(
-          overflow: Overflow.visible,
-          children: <Widget>[
-            RecaptchaV2(
-              apiKey:
-                  '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb', // for enabling the reCaptcha
-              apiSecret:
-                  "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe", // for verifying the responded token
-              controller: recaptchaV2Controller,
-              onVerifiedError: (err) {
-                print(err);
-              },
-              onVerifiedSuccessfully: (success) {
-                setState(() {
-                  if (success) {
-                    print('You\'ve been verified successfully.');
-                  } else {
-                    print('Failed to verify.');
+    final captchaUrl =
+        'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=${this.publickey}';
+
+    return Column(
+      children: [
+        Container(
+          height: 94,
+          child: WebView(
+            initialUrl: captchaUrl,
+            javascriptMode: JavascriptMode.unrestricted,
+            javascriptChannels: <JavascriptChannel>[
+              JavascriptChannel(
+                name: 'RecaptchaFlutterChannel',
+                onMessageReceived: (JavascriptMessage receiver) {
+                  // print(receiver.message);
+                  String token = receiver.message;
+                  if (token.contains("verify")) {
+                    token = token.substring(7);
                   }
-                });
-              },
-            ),
-          ],
-        ));
+                  print('[Captcha] success $token');
+                  if (this.onVerified != null) {
+                    this.onVerified(token);
+                  }
+                },
+              ),
+            ].toSet(),
+            onWebViewCreated: (WebViewController webViewController) {
+              controller.complete(webViewController);
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

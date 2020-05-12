@@ -356,7 +356,7 @@ ThunkAction<AppState> createUser() {
         homeserver: store.state.authStore.homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
-        type: loginType,
+        loginType: loginType,
       );
 
       print('[createUser] $data');

@@ -33,7 +33,7 @@ class CaptchaStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Flexible(
-                flex: 2,
+                flex: 4,
                 child: Container(
                   width: width * 0.75,
                   constraints: BoxConstraints(
@@ -100,18 +100,16 @@ class CaptchaStep extends StatelessWidget {
                   ],
                 ),
               ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  width: width * 0.8,
-                  height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
-                    minWidth: Dimensions.inputWidthMin,
-                    maxWidth: Dimensions.inputWidthMax,
-                  ),
-                  child: Captcha(
-                    publicKey: props.publicKey,
-                  ),
+              Container(
+                width: width * 0.8,
+                margin: EdgeInsets.only(top: 24),
+                constraints: BoxConstraints(
+                  minWidth: Dimensions.inputWidthMin,
+                  maxWidth: Dimensions.inputWidthMax,
+                ),
+                child: Captcha(
+                  publicKey: props.publicKey,
+                  onVerified: (token) => props.onCompleteCaptcha(token),
                 ),
               ),
             ],
@@ -138,10 +136,11 @@ class _Props extends Equatable {
           return store.state.authStore.interactiveAuths['params']
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (bool completed) {
+        onCompleteCaptcha: (String token) {
+          print('[onCompleteCaptcha] token');
           store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
-            value: completed.toString(),
+            value: token.toString(),
           ));
           store.dispatch(toggleCaptcha(
             completed: !store.state.authStore.captcha,

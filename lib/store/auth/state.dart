@@ -44,8 +44,8 @@ class AuthStore extends Equatable {
   const AuthStore({
     this.user = const User(),
     this.authObserver,
-    this.username = '', // null
-    this.password = '', // null
+    this.username = 'testing_boi', // null
+    this.password = 'testing', // null
     this.passwordConfirm = '',
     this.agreement = false,
     this.captcha = false,

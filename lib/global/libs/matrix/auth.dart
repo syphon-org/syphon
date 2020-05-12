@@ -58,7 +58,10 @@ abstract class Auth {
     String homeserver,
     String username,
     String password,
-    String type,
+    String loginType = 'm.login.dummy', // same as auth type?
+    String session,
+    String authType,
+    String authValue,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/register';
 
@@ -69,6 +72,19 @@ abstract class Auth {
       'username': username,
       'password': password
     };
+
+    if (session != null) {
+      switch (authType) {
+        case MatrixAuthTypes.RECAPTCHA:
+          body = {
+            'auth': {
+              "type": MatrixAuthTypes.RECAPTCHA,
+              "response": authValue,
+              "session": session,
+            }
+          };
+      }
+    }
 
     final response = await http.post(
       url,

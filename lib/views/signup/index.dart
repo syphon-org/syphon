@@ -23,6 +23,10 @@ import './step-username.dart';
 import './step-password.dart';
 import './step-homeserver.dart';
 
+final Duration nextAnimationDuration = Duration(
+  milliseconds: 350,
+);
+
 class SignupView extends StatefulWidget {
   const SignupView({Key key}) : super(key: key);
 
@@ -75,6 +79,13 @@ class SignupViewState extends State<SignupView> {
         print('Testing section increase');
         sections.add(CaptchaStep());
         sections.add(TermsStep());
+        setState(() {
+          currentStep = this.currentStep + 1;
+        });
+        pageController.nextPage(
+          duration: nextAnimationDuration,
+          curve: Curves.ease,
+        );
       }
 
       if (state.authStore.user.accessToken != null) {
@@ -126,7 +137,7 @@ class SignupViewState extends State<SignupView> {
                   currentStep = this.currentStep + 1;
                 });
                 pageController.nextPage(
-                  duration: Duration(milliseconds: 350),
+                  duration: nextAnimationDuration,
                   curve: Curves.ease,
                 );
               }
@@ -138,7 +149,7 @@ class SignupViewState extends State<SignupView> {
                   currentStep = this.currentStep + 1;
                 });
                 pageController.nextPage(
-                  duration: Duration(milliseconds: 350),
+                  duration: nextAnimationDuration,
                   curve: Curves.ease,
                 );
               }
@@ -153,7 +164,7 @@ class SignupViewState extends State<SignupView> {
                     currentStep = this.currentStep + 1;
                   });
                   pageController.nextPage(
-                    duration: Duration(milliseconds: 350),
+                    duration: nextAnimationDuration,
                     curve: Curves.ease,
                   );
                 }
@@ -161,8 +172,15 @@ class SignupViewState extends State<SignupView> {
       case 3:
         return !props.captcha
             ? null
-            : () {
-                print('completing captcha');
+            : () async {
+                final result = await props.onCreateUser();
+                setState(() {
+                  currentStep = this.currentStep + 1;
+                });
+                pageController.nextPage(
+                  duration: nextAnimationDuration,
+                  curve: Curves.ease,
+                );
               };
       case 4:
         return !props.captcha
