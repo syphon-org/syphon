@@ -14,4 +14,5 @@ const String SIGNUP_HOMESERVER_GRAPHIC = 'assets/graphics/undraw_mention.svg';
 
 class AssetsStore {
   static final heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
+  static final heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
 }

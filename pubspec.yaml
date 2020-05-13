@@ -47,6 +47,8 @@ dependencies:
     sdk: flutter
 
   # Domain / Store
+  expandable: 3.0.1
+  equatable: ^1.1.0
   crypt: ^3.0.0
   device_info: ^0.4.2
   redux: 4.0.0
@@ -70,8 +72,7 @@ dependencies:
   # workmanager: ^0.2.0
 
   # UI Only
-  expandable: 3.0.1
-  equatable: ^1.1.0
+  url_launcher: ^5.4.7
   flutter_svg: ^0.17.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
@@ -128,6 +129,7 @@ flutter:
   assets: 
    - .env.debug
    - .env.release
+   - assets/graphics/undraw_sync_files.svg
    - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg
    - assets/graphics/undraw_messaging_fun.svg

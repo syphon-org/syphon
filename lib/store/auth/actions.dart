@@ -357,6 +357,9 @@ ThunkAction<AppState> createUser() {
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         loginType: loginType,
+        session: store.state.authStore.session,
+        authType: store.state.authStore.credential.type,
+        authValue: store.state.authStore.credential.value,
       );
 
       print('[createUser] $data');
@@ -627,12 +630,16 @@ ThunkAction<AppState> setPasswordConfirm({String password}) {
 
 ThunkAction<AppState> toggleAgreement({bool agreement}) {
   return (Store<AppState> store) async {
-    store.dispatch(SetAgreement(agreement: agreement));
+    store.dispatch(SetAgreement(
+      agreement: agreement ?? !store.state.authStore.agreement,
+    ));
   };
 }
 
 ThunkAction<AppState> toggleCaptcha({bool completed}) {
   return (Store<AppState> store) async {
-    store.dispatch(SetCaptcha(completed: completed));
+    store.dispatch(
+      SetCaptcha(completed: completed ?? !store.state.authStore.captcha),
+    );
   };
 }

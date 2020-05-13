@@ -102,12 +102,14 @@ class CaptchaStep extends StatelessWidget {
               ),
               Container(
                 width: width * 0.8,
-                margin: EdgeInsets.only(top: 24),
                 constraints: BoxConstraints(
                   minWidth: Dimensions.inputWidthMin,
                   maxWidth: Dimensions.inputWidthMax,
+                  minHeight: 94,
+                  maxHeight: 160,
                 ),
                 child: Captcha(
+                  // TODO: confirm user wants to load captcha
                   publicKey: props.publicKey,
                   onVerified: (token) => props.onCompleteCaptcha(token),
                 ),
@@ -137,14 +139,12 @@ class _Props extends Equatable {
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
         onCompleteCaptcha: (String token) {
-          print('[onCompleteCaptcha] token');
+          print('[onCompleteCaptcha] $token');
           store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),
           ));
-          store.dispatch(toggleCaptcha(
-            completed: !store.state.authStore.captcha,
-          ));
+          store.dispatch(toggleCaptcha(completed: true));
         },
       );
 

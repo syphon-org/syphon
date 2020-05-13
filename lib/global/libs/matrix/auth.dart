@@ -12,6 +12,8 @@ import 'package:http/http.dart' as http;
 class MatrixAuthTypes {
   static const PASSWORD = 'm.login.password';
   static const RECAPTCHA = 'm.login.recaptcha';
+  static const TOKEN = 'm.login.token';
+  static const TERMS = 'm.login.terms';
   static const DUMMY = 'm.login.dummy';
 }
 
@@ -76,6 +78,7 @@ abstract class Auth {
     if (session != null) {
       switch (authType) {
         case MatrixAuthTypes.RECAPTCHA:
+        default:
           body = {
             'auth': {
               "type": MatrixAuthTypes.RECAPTCHA,

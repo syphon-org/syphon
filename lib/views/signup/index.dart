@@ -174,19 +174,21 @@ class SignupViewState extends State<SignupView> {
             ? null
             : () async {
                 final result = await props.onCreateUser();
-                setState(() {
-                  currentStep = this.currentStep + 1;
-                });
-                pageController.nextPage(
-                  duration: nextAnimationDuration,
-                  curve: Curves.ease,
-                );
+                if (!result && props.interactiveAuths.isNotEmpty) {
+                  setState(() {
+                    currentStep = this.currentStep + 1;
+                  });
+                  pageController.nextPage(
+                    duration: nextAnimationDuration,
+                    curve: Curves.ease,
+                  );
+                }
               };
       case 4:
-        return !props.captcha
+        return !props.agreement
             ? null
-            : () {
-                print('completing captcha');
+            : () async {
+                final result = await props.onCreateUser();
               };
       default:
         return null;
@@ -251,7 +253,6 @@ class SignupViewState extends State<SignupView> {
                           children: <Widget>[
                             Container(
                               width: width,
-                              padding: EdgeInsets.only(bottom: height * 0.05),
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
                                 maxHeight: Dimensions.pageViewerHeightMax,
@@ -283,6 +284,7 @@ class SignupViewState extends State<SignupView> {
                             Container(
                               // EXAMPLE OF WIDGET PROPORTIONAL SCALING
                               width: width * 0.725,
+                              margin: EdgeInsets.only(top: height * 0.01),
                               height: Dimensions.inputHeight,
                               constraints: BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
@@ -315,7 +317,7 @@ class SignupViewState extends State<SignupView> {
                       Container(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 16,
+                          vertical: 20,
                         ),
                         constraints: BoxConstraints(
                           minHeight: 45,
@@ -409,5 +411,7 @@ class _Props extends Equatable {
         isHomeserverValid,
         creating,
         interactiveAuths,
+        captcha,
+        agreement
       ];
 }

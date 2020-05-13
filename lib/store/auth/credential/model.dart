@@ -1,15 +1,25 @@
+import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:equatable/equatable.dart';
 
 class Credential extends Equatable {
   final String type;
   final String value;
-  final Map<String, String> params;
+  final Map<String, dynamic> params;
 
   const Credential({
     this.type,
     this.value,
     this.params = const {},
   });
+
+  String get termsUrl {
+    if (this.params == null) {
+      return null;
+    }
+
+    // TODO: use localization code to find the right one here
+    return params[MatrixAuthTypes.TERMS]['policies']['en']['url'];
+  }
 
   Credential copyWith({
     type,

@@ -63,7 +63,7 @@ class CaptchaState extends State<Captcha> {
 
   CaptchaState({
     Key key,
-    this.publickey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb',
+    this.publickey,
     this.onVerified,
   });
 
@@ -75,35 +75,30 @@ class CaptchaState extends State<Captcha> {
     final captchaUrl =
         'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=${this.publickey}';
 
-    return Column(
-      children: [
-        Container(
-          height: 94,
-          child: WebView(
-            initialUrl: captchaUrl,
-            javascriptMode: JavascriptMode.unrestricted,
-            javascriptChannels: <JavascriptChannel>[
-              JavascriptChannel(
-                name: 'RecaptchaFlutterChannel',
-                onMessageReceived: (JavascriptMessage receiver) {
-                  // print(receiver.message);
-                  String token = receiver.message;
-                  if (token.contains("verify")) {
-                    token = token.substring(7);
-                  }
-                  print('[Captcha] success $token');
-                  if (this.onVerified != null) {
-                    this.onVerified(token);
-                  }
-                },
-              ),
-            ].toSet(),
-            onWebViewCreated: (WebViewController webViewController) {
-              controller.complete(webViewController);
+    return Container(
+      child: WebView(
+        initialUrl: captchaUrl,
+        javascriptMode: JavascriptMode.unrestricted,
+        javascriptChannels: <JavascriptChannel>[
+          JavascriptChannel(
+            name: 'RecaptchaFlutterChannel',
+            onMessageReceived: (JavascriptMessage receiver) {
+              // print(receiver.message);
+              String token = receiver.message;
+              if (token.contains("verify")) {
+                token = token.substring(7);
+              }
+              print('[Captcha] success $token');
+              if (this.onVerified != null) {
+                this.onVerified(token);
+              }
             },
           ),
-        ),
-      ],
+        ].toSet(),
+        onWebViewCreated: (WebViewController webViewController) {
+          controller.complete(webViewController);
+        },
+      ),
     );
   }
 }

@@ -51,6 +51,7 @@ class UsernameStepState extends State<UsernameStep> {
       converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
       builder: (context, props) {
         double width = MediaQuery.of(context).size.width;
+        double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidget = CircularProgressIndicator(
@@ -77,6 +78,9 @@ class UsernameStepState extends State<UsernameStep> {
         }
 
         return Container(
+          margin: EdgeInsets.symmetric(
+            vertical: height * 0.01,
+          ),
           child: Flex(
             direction: Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.end,
