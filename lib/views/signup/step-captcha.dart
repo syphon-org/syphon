@@ -106,7 +106,7 @@ class CaptchaStep extends StatelessWidget {
                   minWidth: Dimensions.inputWidthMin,
                   maxWidth: Dimensions.inputWidthMax,
                   minHeight: 94,
-                  maxHeight: 160,
+                  maxHeight: 220,
                 ),
                 child: Captcha(
                   // TODO: confirm user wants to load captcha

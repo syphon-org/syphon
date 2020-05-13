@@ -2,14 +2,12 @@ import 'package:Tether/global/colors.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/selectors.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -37,8 +35,11 @@ class TermsStep extends StatelessWidget {
                 flex: 4,
                 child: Container(
                   width: width * 0.75,
+                  padding: EdgeInsets.only(
+                    bottom: 24,
+                  ),
                   constraints: BoxConstraints(
-                    maxHeight: Dimensions.mediaSizeMax,
+                    maxHeight: Dimensions.mediaSizeMax + 24,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: Stack(
@@ -46,11 +47,11 @@ class TermsStep extends StatelessWidget {
                       SvgPicture.asset(
                         AssetsStore.heroSyncFiles,
                         semanticsLabel:
-                            'Hand holding phone with checked terms of service input',
+                            'A couple of documents with a checked circle on the bottom',
                       ),
                       Positioned(
-                        bottom: 2,
-                        right: 38,
+                        bottom: 0,
+                        right: 24,
                         child: Container(
                           height: 56,
                           width: 56,
@@ -204,6 +205,7 @@ class _Props extends Equatable {
         store.dispatch(toggleAgreement());
       },
       onViewTermsOfService: () async {
+        print(store.state.authStore.credential.params);
         final termsOfServiceUrl = store.state.authStore.credential.termsUrl;
         if (await canLaunch(termsOfServiceUrl)) {
           await launch(termsOfServiceUrl);

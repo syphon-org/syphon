@@ -102,6 +102,11 @@ class SetSession {
   SetSession({this.session});
 }
 
+class SetCompleted {
+  final List<String> completed;
+  SetCompleted({this.completed});
+}
+
 class SetCredential {
   final Credential credential;
   SetCredential({this.credential});
@@ -349,18 +354,30 @@ ThunkAction<AppState> createUser() {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
+      var data;
       final loginType = store.state.authStore.loginType;
+      final session = store.state.authStore.session;
 
-      final data = await MatrixApi.registerUser(
-        protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
-        username: store.state.authStore.username,
-        password: store.state.authStore.password,
-        loginType: loginType,
-        session: store.state.authStore.session,
-        authType: store.state.authStore.credential.type,
-        authValue: store.state.authStore.credential.value,
-      );
+      if (session == null) {
+        data = await MatrixApi.registerUser(
+          protocol: protocol,
+          homeserver: store.state.authStore.homeserver,
+          username: store.state.authStore.username,
+          password: store.state.authStore.password,
+          loginType: loginType,
+        );
+      } else {
+        data = await MatrixApi.registerUser(
+          protocol: protocol,
+          homeserver: store.state.authStore.homeserver,
+          username: store.state.authStore.username,
+          password: store.state.authStore.password,
+          loginType: loginType,
+          session: store.state.authStore.session,
+          authType: store.state.authStore.credential.type,
+          authValue: store.state.authStore.credential.value,
+        );
+      }
 
       print('[createUser] $data');
 
@@ -522,21 +539,34 @@ ThunkAction<AppState> setLoading(bool loading) {
 
 ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   return (Store<AppState> store) async {
-    store.dispatch(SetSession(session: auths['session']));
+    try {
+      final List<String> completed = List<String>.from(auths['completed']);
 
-    if (auths['flows'] != null && auths['flows'].length > 0) {
-      final currentStage = auths['flows'][0]['stages'];
+      await store.dispatch(SetSession(session: auths['session']));
+      await store.dispatch(SetCompleted(completed: completed));
+      await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
 
-      print('[setInteractiveAuths] $currentStage');
-      if (currentStage.length > 0) {
-        store.dispatch(SetCredential(
-          credential: Credential(
-            type: currentStage[0],
-          ),
-        ));
+      if (auths['flows'] != null && auths['flows'].length > 0) {
+        final List<dynamic> stages = auths['flows'][0]['stages'];
+        print('stages $stages');
+
+        final currentStage = stages.firstWhere(
+          (stage) => !completed.contains(stage),
+        );
+
+        if (currentStage.length > 0) {
+          store.dispatch(SetCredential(
+            credential: Credential(
+              type: currentStage,
+              params: auths['params'],
+            ),
+          ));
+        }
       }
+    } catch (error) {
+      store.dispatch(SetSession(session: null));
+      print('[setInteractiveAuth] $error');
     }
-    store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
   };
 }
 

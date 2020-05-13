@@ -18,7 +18,8 @@ class Credential extends Equatable {
     }
 
     // TODO: use localization code to find the right one here
-    return params[MatrixAuthTypes.TERMS]['policies']['en']['url'];
+    return params[MatrixAuthTypes.TERMS]['policies']['privacy_policy']['en']
+        ['url'];
   }
 
   Credential copyWith({

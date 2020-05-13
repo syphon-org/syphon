@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/views/signup/step-captcha.dart';
@@ -173,8 +174,11 @@ class SignupViewState extends State<SignupView> {
         return !props.captcha
             ? null
             : () async {
-                final result = await props.onCreateUser();
-                if (!result && props.interactiveAuths.isNotEmpty) {
+                var result = false;
+                if (!props.completed.contains(MatrixAuthTypes.RECAPTCHA)) {
+                  result = await props.onCreateUser();
+                }
+                if (!result) {
                   setState(() {
                     currentStep = this.currentStep + 1;
                   });
@@ -364,6 +368,8 @@ class _Props extends Equatable {
   final bool captcha;
   final bool agreement;
 
+  final List<String> completed;
+
   final Map interactiveAuths;
 
   final Function onCreateUser;
@@ -381,9 +387,11 @@ class _Props extends Equatable {
     @required this.agreement,
     @required this.interactiveAuths,
     @required this.onCreateUser,
+    @required this.completed,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
+        completed: store.state.authStore.completed,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,

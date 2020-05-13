@@ -22,6 +22,7 @@ class AuthStore extends Equatable {
   // Interactive Auth Data
   final String session;
   final Credential credential;
+  final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
 
   // Temporary Signup Params
@@ -50,6 +51,7 @@ class AuthStore extends Equatable {
     this.agreement = false,
     this.captcha = false,
     this.session,
+    this.completed = const [],
     this.homeserver = 'matrix.org',
     this.loginType = 'm.login.dummy',
     this.interactiveAuths = const {},
@@ -70,6 +72,7 @@ class AuthStore extends Equatable {
     passwordConfirm,
     agreement,
     homeserver,
+    completed,
     captcha,
     session,
     isUsernameValid,
@@ -91,6 +94,7 @@ class AuthStore extends Equatable {
       agreement: agreement ?? this.agreement,
       passwordConfirm: passwordConfirm ?? this.passwordConfirm,
       homeserver: homeserver ?? this.homeserver,
+      completed: completed ?? this.completed,
       captcha: captcha ?? this.captcha,
       session: session ?? this.session,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
@@ -115,6 +119,7 @@ class AuthStore extends Equatable {
         agreement,
         captcha,
         homeserver,
+        completed,
         session,
         loginType,
         isUsernameValid,
