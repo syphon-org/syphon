@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: 9)
-class DeviceSetting extends Equatable {
+class Device extends Equatable {
   @HiveField(0)
   final String deviceId;
   @HiveField(1)
@@ -15,7 +15,7 @@ class DeviceSetting extends Equatable {
   @HiveField(3)
   final int lastSeenTs;
 
-  const DeviceSetting({
+  const Device({
     this.deviceId,
     this.displayName,
     this.lastSeenIp,
@@ -30,13 +30,13 @@ class DeviceSetting extends Equatable {
         lastSeenTs,
       ];
 
-  DeviceSetting copyWith({
+  Device copyWith({
     String deviceId,
     String displayName,
     String lastSeenIp,
     int lastSeenTs,
   }) {
-    return DeviceSetting(
+    return Device(
       deviceId: deviceId ?? this.deviceId,
       displayName: displayName ?? this.displayName,
       lastSeenIp: lastSeenIp ?? this.lastSeenIp,
@@ -44,17 +44,17 @@ class DeviceSetting extends Equatable {
     );
   }
 
-  factory DeviceSetting.fromJson(dynamic json) {
+  factory Device.fromJson(dynamic json) {
     try {
-      return DeviceSetting(
+      return Device(
         deviceId: json['device_id'],
         displayName: json['display_name'],
         lastSeenIp: json['last_seen_ip'],
         lastSeenTs: json['last_seen_ts'],
       );
     } catch (error) {
-      print('[DeviceSetting.fromJson] error $error');
-      return DeviceSetting();
+      print('[Device.fromJson] error $error');
+      return Device();
     }
   }
 }

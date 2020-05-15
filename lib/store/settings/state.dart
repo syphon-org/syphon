@@ -40,7 +40,7 @@ class SettingsStore extends Equatable {
   final Map<String, ChatSetting> customChatSettings;
 
   @HiveField(12)
-  final List<DeviceSetting> devices;
+  final List<Device> devices;
 
   // Temporary
   final bool loading;
@@ -92,7 +92,7 @@ class SettingsStore extends Equatable {
     bool notificationsEnabled,
     bool membershipEventsEnabled,
     Map<String, ChatSetting> customChatSettings,
-    List<DeviceSetting> devices,
+    List<Device> devices,
     bool loading,
   }) {
     return SettingsStore(

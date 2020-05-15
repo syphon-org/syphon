@@ -1,4 +1,5 @@
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -135,25 +136,32 @@ class TermsStep extends StatelessWidget {
                   minHeight: 94,
                   maxHeight: 160,
                 ),
-                child: GestureDetector(
-                  onTap: () {
-                    props.onToggleAgreement();
-                    if (!props.agreement) {
-                      props.onViewTermsOfService();
-                    }
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(right: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: 8,
+                        left: 8,
+                        right: 8,
+                        bottom: 8,
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          props.onToggleAgreement();
+                        },
                         child: Icon(
                           props.agreement
                               ? Icons.check_box
                               : Icons.check_box_outline_blank,
                         ),
                       ),
-                      RichText(
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        props.onViewTermsOfService();
+                      },
+                      child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           text: 'Agree to ${props.homeserver} ',
@@ -172,8 +180,8 @@ class TermsStep extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -201,8 +209,18 @@ class _Props extends Equatable {
           store.state.authStore.homeserver.substring(0, 1).toUpperCase() +
               store.state.authStore.homeserver.substring(1),
       agreement: store.state.authStore.agreement,
-      onToggleAgreement: () {
+      onToggleAgreement: () async {
         store.dispatch(toggleAgreement());
+
+        if (store.state.authStore.agreement) {
+          store.dispatch(updateCredential(
+            type: MatrixAuthTypes.TERMS,
+          ));
+        } else {
+          store.dispatch(updateCredential(
+            type: MatrixAuthTypes.DUMMY,
+          ));
+        }
       },
       onViewTermsOfService: () async {
         print(store.state.authStore.credential.params);

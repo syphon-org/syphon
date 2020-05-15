@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/auth/credential/model.dart';
+import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
@@ -172,48 +173,69 @@ ThunkAction<AppState> stopAuthObserver() {
   };
 }
 
+ThunkAction<AppState> generateHashedDeviceId({String salt}) {
+  return (Store<AppState> store) async {
+    final defaultId = Random.secure().nextInt(1 << 31).toString();
+    var device = Device(
+      deviceId: defaultId,
+      displayName: 'Default Tim Client',
+    );
+
+    try {
+      final deviceInfoPlugin = new DeviceInfoPlugin();
+
+      if (Platform.isAndroid) {
+        final info = await deviceInfoPlugin.androidInfo;
+        final deviceIdentifier = info.androidId;
+        final hashedDeviceId = Crypt.sha256(
+          deviceIdentifier,
+          rounds: 1000,
+          salt: salt,
+        );
+
+        device = Device(
+          deviceId: hashedDeviceId.toString(),
+          displayName: 'Tim Android',
+        );
+      } else if (Platform.isIOS) {
+        final info = await deviceInfoPlugin.iosInfo;
+        final deviceIdentifier = info.identifierForVendor;
+        final hashedDeviceId = Crypt.sha256(
+          deviceIdentifier,
+          rounds: 1000,
+          salt: salt,
+        );
+
+        device = Device(
+          deviceId: hashedDeviceId.hash,
+          displayName: 'Tim iOS',
+        );
+      } else if (Platform.isMacOS) {
+        device = Device(
+          deviceId: defaultId,
+          displayName: 'Tim Desktop',
+        );
+      }
+      return device;
+    } catch (error) {
+      print(
+        '[loginUser] failed to parse unique secure device identifier $error',
+      );
+      return device;
+    }
+  };
+}
+
 ThunkAction<AppState> loginUser() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
     try {
       final username = store.state.authStore.username;
-      var deviceName = 'New Client';
-      var deviceId = Random.secure().nextInt(1 << 31).toString();
 
-      try {
-        final deviceInfoPlugin = new DeviceInfoPlugin();
-
-        if (Platform.isAndroid) {
-          final info = await deviceInfoPlugin.androidInfo;
-          final deviceIdentifier = info.androidId;
-          final hashedDeviceId = Crypt.sha256(
-            deviceIdentifier,
-            rounds: 1000,
-            salt: username,
-          );
-
-          deviceId = hashedDeviceId.toString();
-          deviceName = 'Tim Android';
-          // deviceId =
-        } else if (Platform.isIOS) {
-          final info = await deviceInfoPlugin.iosInfo;
-          final deviceIdentifier = info.identifierForVendor;
-          final hashedDeviceId = Crypt.sha256(
-            deviceIdentifier,
-            rounds: 1000,
-            salt: username,
-          );
-          deviceId = hashedDeviceId.hash;
-          deviceName = 'Tim iOS';
-        } else if (Platform.isMacOS) {
-          deviceName = 'Tim Desktop';
-        }
-      } catch (error) {
-        print(
-          '[loginUser] failed to parse unique secure device identifier $error',
-        );
-      }
+      final Device device = await store.dispatch(
+        generateHashedDeviceId(salt: username),
+      );
 
       final data = await MatrixApi.loginUser(
         protocol: protocol,
@@ -221,8 +243,8 @@ ThunkAction<AppState> loginUser() {
         homeserver: store.state.authStore.homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
-        deviceName: deviceName,
-        deviceId: deviceId,
+        deviceName: device.displayName,
+        deviceId: device.deviceId,
       );
 
       if (data['errcode'] == 'M_FORBIDDEN') {
@@ -344,6 +366,39 @@ ThunkAction<AppState> checkUsernameAvailability() {
   };
 }
 
+ThunkAction<AppState> setInteractiveAuths({Map auths}) {
+  return (Store<AppState> store) async {
+    try {
+      final List<String> completed = List<String>.from(auths['completed']);
+
+      await store.dispatch(SetSession(session: auths['session']));
+      await store.dispatch(SetCompleted(completed: completed));
+      await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
+
+      if (auths['flows'] != null && auths['flows'].length > 0) {
+        final List<dynamic> stages = auths['flows'][0]['stages'];
+        print('stages $stages');
+
+        final currentStage = stages.firstWhere(
+          (stage) => !completed.contains(stage),
+        );
+
+        if (currentStage.length > 0) {
+          store.dispatch(SetCredential(
+            credential: Credential(
+              type: currentStage,
+              params: auths['params'],
+            ),
+          ));
+        }
+      }
+    } catch (error) {
+      store.dispatch(SetSession(session: null));
+      print('[setInteractiveAuth] $error');
+    }
+  };
+}
+
 /**
  * 
  * https://matrix.org/docs/spec/client_server/latest#id204
@@ -354,30 +409,27 @@ ThunkAction<AppState> createUser() {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
-      var data;
       final loginType = store.state.authStore.loginType;
+      final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
+      final authType = session != null ? credential.type : loginType;
+      final authValue = session != null ? credential.value : null;
 
-      if (session == null) {
-        data = await MatrixApi.registerUser(
-          protocol: protocol,
-          homeserver: store.state.authStore.homeserver,
-          username: store.state.authStore.username,
-          password: store.state.authStore.password,
-          loginType: loginType,
-        );
-      } else {
-        data = await MatrixApi.registerUser(
-          protocol: protocol,
-          homeserver: store.state.authStore.homeserver,
-          username: store.state.authStore.username,
-          password: store.state.authStore.password,
-          loginType: loginType,
-          session: store.state.authStore.session,
-          authType: store.state.authStore.credential.type,
-          authValue: store.state.authStore.credential.value,
-        );
-      }
+      final device = await store.dispatch(generateHashedDeviceId(
+        salt: store.state.authStore.username,
+      ));
+
+      final data = await MatrixApi.registerUser(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        username: store.state.authStore.username,
+        password: store.state.authStore.password,
+        session: store.state.authStore.session,
+        authType: authType,
+        authValue: authValue,
+        deviceId: device.deviceId,
+        deviceName: device.displayName,
+      );
 
       print('[createUser] $data');
 
@@ -386,8 +438,21 @@ ThunkAction<AppState> createUser() {
       }
 
       if (data['flows'] != null) {
-        store.dispatch(setInteractiveAuths(auths: data));
-        return false;
+        await store.dispatch(setInteractiveAuths(auths: data));
+
+        final List<dynamic> flows =
+            store.state.authStore.interactiveAuths['flows'];
+        final completed = store.state.authStore.completed;
+
+        final bool hasCompleted = flows.reduce((hasCompleted, flow) {
+          print('[creatUser] flow $flow');
+          return hasCompleted ||
+              (flow['stages'] as List<dynamic>).every(
+                (stage) => completed.contains(stage),
+              );
+        });
+
+        return hasCompleted;
       }
 
       store.dispatch(SetUser(
@@ -537,39 +602,6 @@ ThunkAction<AppState> setLoading(bool loading) {
   };
 }
 
-ThunkAction<AppState> setInteractiveAuths({Map auths}) {
-  return (Store<AppState> store) async {
-    try {
-      final List<String> completed = List<String>.from(auths['completed']);
-
-      await store.dispatch(SetSession(session: auths['session']));
-      await store.dispatch(SetCompleted(completed: completed));
-      await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
-
-      if (auths['flows'] != null && auths['flows'].length > 0) {
-        final List<dynamic> stages = auths['flows'][0]['stages'];
-        print('stages $stages');
-
-        final currentStage = stages.firstWhere(
-          (stage) => !completed.contains(stage),
-        );
-
-        if (currentStage.length > 0) {
-          store.dispatch(SetCredential(
-            credential: Credential(
-              type: currentStage,
-              params: auths['params'],
-            ),
-          ));
-        }
-      }
-    } catch (error) {
-      store.dispatch(SetSession(session: null));
-      print('[setInteractiveAuth] $error');
-    }
-  };
-}
-
 /**
  * Fetch Active Devices for account
  */
@@ -588,7 +620,9 @@ ThunkAction<AppState> updateCredential({
           params: params,
         ),
       ));
-    } catch (error) {}
+    } catch (error) {
+      print('[updateCredential] $error');
+    }
   };
 }
 
@@ -659,7 +693,7 @@ ThunkAction<AppState> setPasswordConfirm({String password}) {
 }
 
 ThunkAction<AppState> toggleAgreement({bool agreement}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetAgreement(
       agreement: agreement ?? !store.state.authStore.agreement,
     ));

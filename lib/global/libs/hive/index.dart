@@ -176,7 +176,7 @@ Future<dynamic> initHiveStorageUnsafe() async {
   Hive.registerAdapter(EventAdapter());
   Hive.registerAdapter(ReadStatusAdapter());
   Hive.registerAdapter(UserAdapter());
-  Hive.registerAdapter(DeviceSettingAdapter());
+  Hive.registerAdapter(DeviceAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(MediaStoreAdapter());

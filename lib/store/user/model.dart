@@ -56,7 +56,7 @@ class User extends Equatable {
         accessToken,
       ];
 
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(Map<dynamic, dynamic> json) {
     return User(
       userId: json['user_id'] as String,
       deviceId: json['device_id'] as String,

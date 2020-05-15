@@ -141,7 +141,7 @@ class DialogConfirmPassword extends StatelessWidget {
 class Props extends Equatable {
   final bool valid;
   final bool loading;
-  final List<DeviceSetting> devices;
+  final List<Device> devices;
 
   final Function onChangePassword;
 

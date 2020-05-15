@@ -26,7 +26,7 @@ class DevicesView extends StatefulWidget {
 class DeviceViewState extends State<DevicesView> {
   DeviceViewState({Key key}) : super();
 
-  List<DeviceSetting> selectedDevices;
+  List<Device> selectedDevices;
 
   @override
   void initState() {
@@ -45,8 +45,8 @@ class DeviceViewState extends State<DevicesView> {
   }
 
   @protected
-  onToggleAllDevices({List<DeviceSetting> devices}) {
-    var newSelectedDevices = this.selectedDevices ?? List<DeviceSetting>();
+  onToggleAllDevices({List<Device> devices}) {
+    var newSelectedDevices = this.selectedDevices ?? List<Device>();
 
     if (newSelectedDevices.length == devices.length) {
       newSelectedDevices = [];
@@ -60,8 +60,8 @@ class DeviceViewState extends State<DevicesView> {
   }
 
   @protected
-  onToggleModifyDevice({DeviceSetting device}) {
-    var newSelectedDevices = this.selectedDevices ?? List<DeviceSetting>();
+  onToggleModifyDevice({Device device}) {
+    var newSelectedDevices = this.selectedDevices ?? List<Device>();
 
     if (newSelectedDevices.contains(device)) {
       newSelectedDevices.remove(device);
@@ -306,7 +306,7 @@ class DeviceViewState extends State<DevicesView> {
 class Props extends Equatable {
   final bool loading;
   final String session;
-  final List<DeviceSetting> devices;
+  final List<Device> devices;
   final String currentDeviceId;
 
   final Function onFetchDevices;
@@ -338,7 +338,7 @@ class Props extends Equatable {
         currentDeviceId: store.state.authStore.user.deviceId,
         onDeleteDevices: (
           BuildContext context,
-          List<DeviceSetting> devices, {
+          List<Device> devices, {
           Function onComplete,
         }) async {
           if (devices.isEmpty) return;

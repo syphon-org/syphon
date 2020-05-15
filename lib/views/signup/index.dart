@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/auth/actions.dart';
+import 'package:Tether/store/user/model.dart';
 import 'package:Tether/views/signup/step-captcha.dart';
 import 'package:Tether/views/signup/step-terms.dart';
 import 'package:equatable/equatable.dart';
@@ -193,6 +194,14 @@ class SignupViewState extends State<SignupView> {
             ? null
             : () async {
                 final result = await props.onCreateUser();
+
+                // If the user has a completed auth flow for matrix, reset to
+                // proper auth type to attempt a real account creation
+                // for matrix and try again
+                if (result && props.user.accessToken == null) {
+                  await props.onResetCredential();
+                  props.onCreateUser();
+                }
               };
       default:
         return null;
@@ -354,6 +363,7 @@ class SignupViewState extends State<SignupView> {
 }
 
 class _Props extends Equatable {
+  final User user;
   final String username;
   final bool isUsernameValid;
   final bool isUsernameAvailable;
@@ -373,8 +383,10 @@ class _Props extends Equatable {
   final Map interactiveAuths;
 
   final Function onCreateUser;
+  final Function onResetCredential;
 
   _Props({
+    @required this.user,
     @required this.username,
     @required this.isUsernameValid,
     @required this.isUsernameAvailable,
@@ -386,8 +398,9 @@ class _Props extends Equatable {
     @required this.captcha,
     @required this.agreement,
     @required this.interactiveAuths,
-    @required this.onCreateUser,
     @required this.completed,
+    @required this.onCreateUser,
+    @required this.onResetCredential,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
@@ -403,6 +416,11 @@ class _Props extends Equatable {
         captcha: store.state.authStore.captcha,
         agreement: store.state.authStore.agreement,
         interactiveAuths: store.state.authStore.interactiveAuths,
+        onResetCredential: () async {
+          await store.dispatch(updateCredential(
+            type: MatrixAuthTypes.DUMMY,
+          ));
+        },
         onCreateUser: () async {
           return await store.dispatch(createUser());
         },
@@ -410,6 +428,7 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
+        user,
         username,
         isUsernameValid,
         isUsernameAvailable,

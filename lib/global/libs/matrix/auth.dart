@@ -55,38 +55,62 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  /**
+   * Register New User
+   * 
+   * inhibit_login automatically logs in the user after creation 
+   */
   static FutureOr<dynamic> registerUser({
     String protocol,
     String homeserver,
     String username,
     String password,
-    String loginType = 'm.login.dummy', // same as auth type?
     String session,
-    String authType,
+    String authType = MatrixAuthTypes.DUMMY,
     String authValue,
+    String deviceId,
+    String deviceName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
-      'auth': {
-        'type': 'm.login.dummy',
-      },
       'username': username,
-      'password': password
+      'password': password,
+      'inhibit_login': false,
+      'auth': {
+        'type': MatrixAuthTypes.DUMMY,
+      }
     };
 
+    // Set and configure params for auth types
+    switch (authType) {
+      case MatrixAuthTypes.RECAPTCHA:
+        body = {
+          'auth': {
+            'type': MatrixAuthTypes.RECAPTCHA,
+            'response': authValue,
+          }
+        };
+        break;
+      case MatrixAuthTypes.TERMS:
+        body = {
+          'auth': {
+            'type': MatrixAuthTypes.TERMS,
+          }
+        };
+        break;
+      case MatrixAuthTypes.DUMMY: // default
+      default:
+        break;
+    }
+
+    // Assign session if set
     if (session != null) {
-      switch (authType) {
-        case MatrixAuthTypes.RECAPTCHA:
-        default:
-          body = {
-            'auth': {
-              "type": MatrixAuthTypes.RECAPTCHA,
-              "response": authValue,
-              "session": session,
-            }
-          };
-      }
+      body['auth']['session'] = session;
+    }
+
+    if (deviceId != null) {
+      body['initial_device_display_name'] = "$username's $deviceName Client";
     }
 
     final response = await http.post(
@@ -147,7 +171,7 @@ abstract class Auth {
     String protocol,
     String homeserver,
     String accessToken,
-    String type = "m.login.password",
+    String type = 'm.login.password',
     String newPassword,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/account/password';
@@ -173,7 +197,7 @@ abstract class Auth {
 /** 
  * GET login
  * Used to check what types of logins are available on the server
- * curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login"
+ * curl -XGET 'http://192.168.1.2:8008/_matrix/client/r0/login'
 {
     "flows": [ 
         {
