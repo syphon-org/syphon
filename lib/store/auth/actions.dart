@@ -22,7 +22,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 // Store
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import '../user/model.dart';
 
@@ -248,11 +247,11 @@ ThunkAction<AppState> loginUser() {
       );
 
       if (data['errcode'] == 'M_FORBIDDEN') {
-        throw Exception('Invalid credentials, confirm and try again');
+        throw 'Invalid credentials, confirm and try again';
       }
 
       if (data['errcode'] != null) {
-        throw Exception(data['error']);
+        throw data['error'];
       }
 
       print(data);
@@ -267,7 +266,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error.message));
+      store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -348,10 +347,8 @@ ThunkAction<AppState> checkUsernameAvailability() {
         username: store.state.authStore.username,
       );
 
-      print(data);
-
       if (data['errcode'] != null) {
-        throw Exception(data['error']);
+        throw data['error'];
       }
 
       store.dispatch(SetUsernameAvailability(
@@ -369,13 +366,16 @@ ThunkAction<AppState> checkUsernameAvailability() {
 ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   return (Store<AppState> store) async {
     try {
-      final List<String> completed = List<String>.from(auths['completed']);
+      final List<String> completed =
+          List<String>.from(auths['completed'] ?? []) ?? [];
 
-      await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));
+      await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
 
       if (auths['flows'] != null && auths['flows'].length > 0) {
+        // Set completed if certain flows exist
+
         final List<dynamic> stages = auths['flows'][0]['stages'];
         print('stages $stages');
 
@@ -665,14 +665,8 @@ ThunkAction<AppState> setUsername({String username}) {
 ThunkAction<AppState> setPassword({String password}) {
   return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password.trim()));
-
-    final currentPassword = store.state.authStore.password;
-    final currentConfirm = store.state.authStore.passwordConfirm;
-
     store.dispatch(SetPasswordValid(
-      valid: password != null &&
-          password.length > 0 &&
-          currentPassword == currentConfirm,
+      valid: password != null && password.length > 0,
     ));
   };
 }

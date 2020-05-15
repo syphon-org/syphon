@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:equatable/equatable.dart';
@@ -30,10 +32,12 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
-  final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
+  final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final passwordFocus = FocusNode();
+  final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
+
+  StreamSubscription alertsListener;
 
   LoginState({Key key});
 
@@ -50,7 +54,7 @@ class LoginState extends State<Login> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     // Init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen((alert) {
+    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
       var color;
 
       switch (alert.type) {
@@ -67,7 +71,10 @@ class LoginState extends State<Login> {
 
       loginScaffold.currentState.showSnackBar(SnackBar(
         backgroundColor: color,
-        content: Text(alert.message),
+        content: Text(
+          alert.message,
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
         duration: alert.duration,
         action: SnackBarAction(
           label: 'Dismiss',
@@ -85,6 +92,9 @@ class LoginState extends State<Login> {
     usernameController.dispose();
     passwordController.dispose();
     passwordFocus.dispose();
+    if (alertsListener != null) {
+      alertsListener.cancel();
+    }
     super.dispose();
   }
 

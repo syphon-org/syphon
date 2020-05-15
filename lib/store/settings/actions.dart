@@ -1,5 +1,6 @@
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/store/auth/actions.dart';
@@ -130,7 +131,8 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
         throw data['error'];
       }
     } catch (error) {
-      print('[fetchRooms] error: $error');
+      print('[updateDevice] error: $error');
+      store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(fetchDevices());
       store.dispatch(SetLoading(loading: false));
@@ -173,6 +175,7 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
       return true;
     } catch (error) {
       print('[deleteDevice] error: $error');
+      store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -214,6 +217,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
       return true;
     } catch (error) {
       print('[deleteDevice(s)] error: $error');
+      store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

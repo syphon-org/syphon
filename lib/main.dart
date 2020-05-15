@@ -80,6 +80,7 @@ class Tether extends StatefulWidget {
 }
 
 class TetherState extends State<Tether> with WidgetsBindingObserver {
+  final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
   final Store<AppState> store;
   Widget defaultHome = Home();
   TetherState({this.store});

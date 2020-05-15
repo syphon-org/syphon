@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:Tether/global/dimensions.dart';
@@ -27,6 +28,8 @@ class DeviceViewState extends State<DevicesView> {
   DeviceViewState({Key key}) : super();
 
   List<Device> selectedDevices;
+  StreamSubscription alertsListener;
+  final GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -77,7 +80,47 @@ class DeviceViewState extends State<DevicesView> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
+
     store.dispatch(fetchDevices());
+    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
+      var color;
+
+      switch (alert.type) {
+        case 'warning':
+          color = Colors.red;
+          break;
+        case 'error':
+          color = Colors.red;
+          break;
+        case 'info':
+        default:
+          color = Colors.grey;
+      }
+
+      scaffold.currentState.showSnackBar(SnackBar(
+        backgroundColor: color,
+        content: Text(
+          alert.message,
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        duration: alert.duration,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            scaffold.currentState.removeCurrentSnackBar();
+          },
+        ),
+      ));
+    });
+  }
+
+  @override
+  void dispose() {
+    if (alertsListener != null) {
+      alertsListener.cancel();
+    }
+    super.dispose();
   }
 
   @protected
@@ -181,6 +224,7 @@ class DeviceViewState extends State<DevicesView> {
           }
 
           return Scaffold(
+            key: scaffold,
             appBar: currentAppBar,
             body: Container(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),

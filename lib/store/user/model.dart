@@ -56,14 +56,19 @@ class User extends Equatable {
         accessToken,
       ];
 
-  factory User.fromJson(Map<dynamic, dynamic> json) {
-    return User(
-      userId: json['user_id'] as String,
-      deviceId: json['device_id'] as String,
-      homeserver: json['home_server'] as String,
-      displayName: json['display_name'] as String,
-      accessToken: json['access_token'] as String,
-      avatarUri: json['avatar_url'] as String,
-    );
+  factory User.fromJson(dynamic json) {
+    try {
+      return User(
+        userId: json['user_id'] as String,
+        deviceId: json['device_id'] as String,
+        homeserver: json['home_server'] as String,
+        displayName: json['display_name'] as String,
+        accessToken: json['access_token'] as String,
+        avatarUri: json['avatar_url'] as String,
+      );
+    } catch (error) {
+      print('[User.fromJson] $error');
+      return User();
+    }
   }
 }
