@@ -132,8 +132,8 @@ ThunkAction<AppState> searchPublicRooms({String searchText}) {
       store.dispatch(SetLoading(loading: true));
       final request = buildPublicRoomSearch(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
       );
 
@@ -176,8 +176,8 @@ ThunkAction<AppState> searchUsers({String searchText}) {
       store.dispatch(SetLoading(loading: true));
       final request = buildUserSearch(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
       );
 

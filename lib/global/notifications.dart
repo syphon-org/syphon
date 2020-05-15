@@ -9,6 +9,15 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  */
 // https://matrix.org/docs/spec/client_server/latest#id470
 
+const String channel_id = 'tether_notifications';
+const String channel_id_background_service = 'tether_background_notification';
+const String default_channel_title = 'Tether';
+
+const String channel_name_messages = 'Messages';
+const String channel_name_background_service = 'Background Sync';
+const String channel_description =
+    'Tether messaging client message and status notifications';
+
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
@@ -42,11 +51,6 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   return pluginInstance;
 }
 
-// TODO: impliement this? can you disable natively after enabling?
-Future<bool> disableNotifications() {
-  return Future.value(false);
-}
-
 Future<bool> promptNativeNotificationsRequest({
   FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
@@ -63,19 +67,36 @@ Future<bool> promptNativeNotificationsRequest({
   return result == null ? true : result;
 }
 
-Future showMessageNotification({
-  int messageHash,
-  String content,
+/**
+ * Background Service Notification
+ * 
+ * NOTE: background connection updates are only available on
+ * android. iOS uses APNS to update through push notifications
+ * 
+ * This is used in android to circumvent google play services
+ * 
+ * If the notification is not reinvoked after 61 seconds the service is
+ * likely no longer running and the notification should be automatically
+ * dissmissed
+ */
+Future showBackgroundServiceNotification({
+  int notificationId,
+  String debugContent = '',
   FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'tether_notifications',
-    'Tether',
-    'S',
-    importance: Importance.Default,
-    priority: Priority.High,
+    channel_id_background_service,
+    channel_name_background_service,
+    channel_description,
+    ongoing: true,
+    autoCancel: false,
+    showWhen: false,
+    timeoutAfter: 65 * 1000, // Timeout if not set further
+    importance: Importance.None,
+    priority: Priority.Min,
+    visibility: NotificationVisibility.Secret,
   );
 
   final platformChannelSpecifics = new NotificationDetails(
@@ -83,23 +104,55 @@ Future showMessageNotification({
     iOSPlatformChannelSpecifics,
   );
 
+  final backgroundNotificationBody = 'Background connection enabled';
+  await pluginInstance.show(
+    notificationId,
+    default_channel_title,
+    '$backgroundNotificationBody $debugContent',
+    platformChannelSpecifics,
+  );
+}
+
+Future showMessageNotification({
+  int messageHash = 0,
+  String body,
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
+  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
+
+  final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    channel_id,
+    channel_name_messages,
+    channel_description,
+    priority: Priority.High,
+    importance: Importance.Default,
+    visibility: NotificationVisibility.Private,
+  );
+
+  final platformChannelSpecifics = NotificationDetails(
+    androidPlatformChannelSpecifics,
+    iOSPlatformChannelSpecifics,
+  );
+
   await pluginInstance.show(
     messageHash,
     'New Message',
-    content ?? 'Tap to open message',
+    body ?? 'Tap to open message',
     platformChannelSpecifics,
   );
 }
 
 Future showDebugNotification({
+  int notificationId,
   String customMessage,
   FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'tether_notifications',
-    'Tether',
-    'Notifications for tether messenger',
+    channel_id,
+    channel_name_messages,
+    channel_description,
     importance: Importance.Default,
     priority: Priority.High,
   );
@@ -111,10 +164,21 @@ Future showDebugNotification({
 
   // Timer(Duration(seconds: 5), () async {
   await pluginInstance.show(
-    0,
+    notificationId ?? 0,
     'Debug Regular Notifcation',
     customMessage ?? 'This is a test for styling notifications',
     platformChannelSpecifics,
   );
   // });
+}
+
+// TODO: impliement this? can you disable natively after enabling?
+Future<bool> disableNotifications() {
+  return Future.value(false);
+}
+
+void dismissAllNotifications({
+  FlutterLocalNotificationsPlugin pluginInstance,
+}) {
+  pluginInstance.cancelAll();
 }

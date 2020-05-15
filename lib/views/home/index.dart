@@ -40,7 +40,6 @@ class Home extends StatefulWidget {
 class HomeViewState extends State<Home> {
   HomeViewState({Key key}) : super();
 
-  // TODO: allow multi-select
   Room selectedRoom;
 
   @protected
@@ -422,6 +421,7 @@ class HomeViewState extends State<Home> {
               context: context,
             );
           }
+
           return Scaffold(
             appBar: currentAppBar,
             body: Align(
@@ -444,7 +444,7 @@ class HomeViewState extends State<Home> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   RefreshProgressIndicator(
-                                    strokeWidth: 2.0,
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
                                     valueColor:
                                         new AlwaysStoppedAnimation<Color>(
                                       PRIMARY_COLOR,
@@ -533,29 +533,30 @@ class _Props extends Equatable {
   final User currentUser;
   final Map<String, ChatSetting> chatSettings;
 
-  final Function onFetchSyncForced;
   final Function onLeaveChat;
   final Function onDeleteChat;
+  final Function onFetchSyncForced;
 
   _Props({
     @required this.rooms,
     @required this.currentUser,
     @required this.loadingRooms,
     @required this.chatSettings,
-    @required this.onFetchSyncForced,
     @required this.onLeaveChat,
     @required this.onDeleteChat,
+    @required this.onFetchSyncForced,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         rooms: store.state.roomStore.rooms,
         loadingRooms: store.state.roomStore.loading,
-        currentUser: store.state.userStore.user,
+        currentUser: store.state.authStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
-        onFetchSyncForced: () {
-          store.dispatch(
+        onFetchSyncForced: () async {
+          await store.dispatch(
             fetchSync(since: store.state.roomStore.lastSince),
           );
+          return Future(() => true);
         },
         onLeaveChat: ({Room room}) {
           return store.dispatch(

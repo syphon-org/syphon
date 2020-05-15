@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/store/auth/state.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/state.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,9 +20,11 @@ import 'package:Tether/store/settings/state.dart';
 // Global cache
 class Cache {
   static Box hive;
-  static const matrixState = 'full_matrix_state';
-  static const globalBox = 'tether';
   static const defaultKey = 'tether@publicKey';
+
+  static const globalBox = 'tether';
+  static const matrixStateBox = 'full_matrix_state';
+  static const backgroundServiceBox = 'tether_background_service';
 }
 
 /**
@@ -67,10 +70,10 @@ Future<dynamic> initHiveStorage() async {
   Hive.registerAdapter(UserAdapter());
 
   // Init Custom Store Models
+  Hive.registerAdapter(AuthStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
-  Hive.registerAdapter(UserStoreAdapter());
 
   // Init storage engine for hive key
   try {
@@ -132,6 +135,26 @@ void closeStorage() async {
  * 
  * For testing purposes only
  */
+Future<Box> initHiveBackgroundServiceUnsafe() async {
+  var storageLocation;
+
+  // Init storage location
+  try {
+    storageLocation = await getApplicationDocumentsDirectory();
+  } catch (error) {
+    print('[initHiveBackgroundServiceUnsafe] Storage Location Failure $error');
+  }
+
+  // Init hive cache + adapters
+  Hive.init(storageLocation.path);
+  return await Hive.openBox(Cache.backgroundServiceBox);
+}
+
+/**
+ * initHiveStorage UNSAFE
+ * 
+ * For testing purposes only
+ */
 Future<dynamic> initHiveStorageUnsafe() async {
   var storageLocation;
 
@@ -139,7 +162,7 @@ Future<dynamic> initHiveStorageUnsafe() async {
   try {
     storageLocation = await getApplicationDocumentsDirectory();
   } catch (error) {
-    print('[initHiveStorage] storage location failure - $error');
+    print('[initHiveStorageUnsafe] Storage Location Failure- $error');
   }
 
   // Init hive cache + adapters
@@ -153,12 +176,13 @@ Future<dynamic> initHiveStorageUnsafe() async {
   Hive.registerAdapter(EventAdapter());
   Hive.registerAdapter(ReadStatusAdapter());
   Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(DeviceAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
-  Hive.registerAdapter(UserStoreAdapter());
+  Hive.registerAdapter(AuthStoreAdapter());
 
   return await Hive.openBox(Cache.globalBox);
 }

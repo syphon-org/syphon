@@ -1,24 +1,28 @@
 name: Tether
 description: Privacy centric matrix client for everyone
 
-# commands:
-# - flutter run --no-fast-start # fixing issues building?
-# - flutter pub global run devtools 
-# - emulator -list-avds
-# - emulator -avd Pixel_3a_API_29
-# - xcrun simctl delete unavailable
-# - xcrun simctl list devices
-# - xcrun simctl boot <device-id>
-# - xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
+# flutter commands
+# $ flutter create --org org.tether tether
+# $ flutter run --no-fast-start
+# $ flutter pub global run devtools 
+# $ flutter pub run build_runner build
+# $ flutter pub run build_runner watch
+
+# troubleshooting
+# $ pub cache repair
+# $ flutter pub cache repair
+
+# mobile development commands
+# $ xcrun simctl delete unavailable
+# $ xcrun simctl list devices
+# $ xcrun simctl boot <device-id>
+# $ xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
+# $ emulator -list-avds
+# $ emulator -avd Pixel_3a_API_29
 
 # desktop support options
-# * Desktop support breaks the iOS xcode build
-# - flutter config --enable-macos-desktop
-# - flutter config --no-enable-macos-desktop
-# - pub cache repair # after disabling enabled -> disabled
-# serializable generation
-# - flutter pub run build_runner build
-# - flutter pub run build_runner watch - if making schema changes
+# $ flutter config --enable-macos-desktop
+# $ flutter config --no-enable-macos-desktop
 
 # asset generation
 # iOS icons - https://github.com/smallmuou/ios-icon-generator
@@ -33,7 +37,7 @@ description: Privacy centric matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.6+1
+version: 0.0.7+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -43,6 +47,10 @@ dependencies:
     sdk: flutter
 
   # Domain / Store
+  expandable: 3.0.1
+  equatable: ^1.1.0
+  crypt: ^3.0.0
+  device_info: ^0.4.2
   redux: 4.0.0
   redux_thunk: 0.3.0
   redux_persist: 0.8.3
@@ -64,13 +72,14 @@ dependencies:
   # workmanager: ^0.2.0
 
   # UI Only
-  expandable: 3.0.1
-  equatable: ^1.1.0
+  url_launcher: ^5.4.7
   flutter_svg: ^0.17.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
-  touchable_opacity: 1.0.2 
+  webview_flutter: ^0.3.21
+  touchable_opacity: 1.0.2  
   fab_circular_menu: ^1.0.0
+  flutter_recaptcha_v2: 0.1.0
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5
@@ -120,6 +129,8 @@ flutter:
   assets: 
    - .env.debug
    - .env.release
+   - assets/graphics/undraw_sync_files.svg
+   - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg
    - assets/graphics/undraw_messaging_fun.svg
    - assets/graphics/undraw_connection.svg

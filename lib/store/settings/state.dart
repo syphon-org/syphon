@@ -1,6 +1,7 @@
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/libs/hive/type-ids.dart';
 import "package:Tether/global/themes.dart";
+import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import './chat-settings/model.dart';
@@ -38,6 +39,12 @@ class SettingsStore extends Equatable {
   @HiveField(11)
   final Map<String, ChatSetting> customChatSettings;
 
+  @HiveField(12)
+  final List<Device> devices;
+
+  // Temporary
+  final bool loading;
+
   const SettingsStore({
     this.primaryColor = TETHERED_CYAN,
     this.accentColor = TETHERED_CYAN,
@@ -51,6 +58,8 @@ class SettingsStore extends Equatable {
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
     this.customChatSettings,
+    this.devices = const [],
+    this.loading = false,
   });
 
   @override
@@ -66,6 +75,8 @@ class SettingsStore extends Equatable {
         typingIndicators,
         notificationsEnabled,
         customChatSettings,
+        devices,
+        loading,
       ];
 
   SettingsStore copyWith({
@@ -81,6 +92,8 @@ class SettingsStore extends Equatable {
     bool notificationsEnabled,
     bool membershipEventsEnabled,
     Map<String, ChatSetting> customChatSettings,
+    List<Device> devices,
+    bool loading,
   }) {
     return SettingsStore(
       primaryColor: primaryColor,
@@ -97,6 +110,8 @@ class SettingsStore extends Equatable {
       membershipEventsEnabled:
           membershipEventsEnabled ?? this.membershipEventsEnabled,
       customChatSettings: customChatSettings ?? this.customChatSettings,
+      devices: devices ?? this.devices,
+      loading: loading ?? this.loading,
     );
   }
 }

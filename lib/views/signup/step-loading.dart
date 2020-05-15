@@ -1,4 +1,5 @@
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/selectors.dart';
+import 'package:Tether/store/auth/selectors.dart';
 
 // Styling
 import 'package:Tether/global/assets.dart';
@@ -55,15 +56,15 @@ class HomeserverStep extends StatelessWidget {
                   controller: TextEditingController.fromValue(TextEditingValue(
                       text: homeserver(store.state),
                       selection: TextSelection(
-                          baseOffset: store.state.userStore.homeserver.length,
+                          baseOffset: store.state.authStore.homeserver.length,
                           extentOffset:
-                              store.state.userStore.homeserver.length))),
+                              store.state.authStore.homeserver.length))),
                   onChanged: (text) {
                     store.dispatch(setHomeserver(homeserver: text));
                   },
                   onEditingComplete: () {
                     store.dispatch(setHomeserver(
-                        homeserver: store.state.userStore.homeserver));
+                        homeserver: store.state.authStore.homeserver));
                     FocusScope.of(context).unfocus();
                   },
                   decoration: InputDecoration(

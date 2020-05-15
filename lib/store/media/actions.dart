@@ -33,8 +33,8 @@ ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
 
       final request = buildThumbnailRequest(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.currentUser.homeserver,
         mediaUri: mxcUri,
       );
 

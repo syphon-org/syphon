@@ -34,8 +34,8 @@ ThunkAction<AppState> fetchMessageEvents({Room room}) {
 
       final request = buildRoomMessagesRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         roomId: room.id,
       );
 
@@ -73,10 +73,11 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
     try {
       // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
       final request = buildRoomStateRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         roomId: room.id,
       );
 
@@ -92,12 +93,12 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
 
       // Add State events to room and toggle syncing
-      final user = store.state.userStore.user;
+      final user = store.state.authStore.user;
 
       store.dispatch(SetRoomState(
         id: room.id,
         state: stateEvents,
-        username: user.displayName,
+        currentUser: user.displayName,
       ));
 
       final updatedRoom = store.state.roomStore.rooms[room.id];
@@ -119,8 +120,8 @@ ThunkAction<AppState> fetchMemberEvents({String roomId}) {
     try {
       final request = buildFastRoomMembersRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         roomId: roomId,
       );
 
@@ -175,10 +176,10 @@ ThunkAction<AppState> sendTyping({
       print('[sendTyping] pushing $typing');
       final request = buildSendTypingRequest(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: roomId,
-        userId: store.state.userStore.user.userId,
+        userId: store.state.authStore.user.userId,
         typing: typing,
       );
 
@@ -242,7 +243,7 @@ ThunkAction<AppState> sendMessage({
           id: tempId.toString(),
           body: body,
           type: type,
-          sender: store.state.userStore.user.userId,
+          sender: store.state.authStore.user.userId,
           roomId: room.id,
           timestamp: DateTime.now().millisecondsSinceEpoch,
           pending: true,
@@ -252,8 +253,8 @@ ThunkAction<AppState> sendMessage({
 
       final request = buildSendMessageRequest(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         messageBody: body,
         roomId: room.id,
         requestId: DateTime.now().millisecond.toString(),
@@ -274,7 +275,7 @@ ThunkAction<AppState> sendMessage({
             id: tempId.toString(),
             body: body,
             type: type,
-            sender: store.state.userStore.user.userId,
+            sender: store.state.authStore.user.userId,
             roomId: room.id,
             timestamp: DateTime.now().millisecondsSinceEpoch,
             pending: false,
@@ -295,7 +296,7 @@ ThunkAction<AppState> sendMessage({
           id: data['event_id'],
           body: body,
           type: type,
-          sender: store.state.userStore.user.userId,
+          sender: store.state.authStore.user.userId,
           roomId: room.id,
           timestamp: DateTime.now().millisecondsSinceEpoch,
           syncing: true,

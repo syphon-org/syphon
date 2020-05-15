@@ -1,17 +1,16 @@
+import 'package:Tether/store/auth/state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:expandable/expandable.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/search/actions.dart';
 import 'package:Tether/store/search/selectors.dart';
 
 import 'package:Tether/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:Tether/store/user/state.dart';
 
 // Assets
 
@@ -75,9 +74,9 @@ class HomeSearchState extends State<HomeSearch> {
           onPressed: () => Navigator.pop(context, false),
         ),
         title: searching
-            ? StoreConnector<AppState, UserStore>(
-                converter: (Store<AppState> store) => store.state.userStore,
-                builder: (context, userStore) {
+            ? StoreConnector<AppState, AuthStore>(
+                converter: (Store<AppState> store) => store.state.authStore,
+                builder: (context, authStore) {
                   return TextField(
                       onChanged: (text) {
                         store.dispatch(searchHomeservers(searchText: text));

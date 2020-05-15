@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/alerts/actions.dart';
+import 'package:Tether/store/service.dart';
 import 'package:Tether/store/settings/state.dart';
-import 'package:Tether/store/user/actions.dart';
+import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ import 'package:window_utils/window_utils.dart';
  */
 
 // Generated Json Serializables
-import 'main.reflectable.dart'; // Import generated code.
+// import 'main.reflectable.dart'; // Import generated code.
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -40,7 +41,7 @@ void _enablePlatformOverrideForDesktop() {
 }
 
 void main() async {
-  initializeReflectable();
+  // initializeReflectable();
   WidgetsFlutterBinding();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
   _enablePlatformOverrideForDesktop();
@@ -52,6 +53,11 @@ void main() async {
 
   // init state cache (hot)
   final store = await initStore();
+
+  if (Platform.isAndroid) {
+    final backgroundSyncStatus = await BackgroundSync.init();
+    print('[main] background service started $backgroundSyncStatus');
+  }
 
   // /**
   //  * DESKTOP ONLY
@@ -96,7 +102,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
 
-    final currentUser = store.state.userStore.user;
+    final currentUser = store.state.authStore.user;
     final authed = currentUser.accessToken != null;
 
     if (!authed) {
@@ -126,7 +132,7 @@ class TetherState extends State<Tether> with WidgetsBindingObserver {
   @protected
   void onMounted() {
     // init authenticated navigation
-    store.state.userStore.onAuthStateChanged.listen((user) {
+    store.state.authStore.onAuthStateChanged.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);

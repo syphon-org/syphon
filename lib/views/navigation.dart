@@ -5,6 +5,7 @@ import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/search/seach-groups.dart';
 import 'package:Tether/views/home/search/search-users.dart';
 import 'package:Tether/views/home/settings/chats.dart';
+import 'package:Tether/views/home/settings/devices.dart';
 import 'package:Tether/views/home/settings/privacy.dart';
 import 'package:Tether/views/home/settings/theming.dart';
 import 'package:flutter/material.dart';
@@ -49,15 +50,12 @@ class NavigationProvider {
   static getRoutes(Store<AppState> store) {
     return <String, WidgetBuilder>{
       '/intro': (BuildContext context) => Intro(),
-      '/login': (BuildContext context) => Login(store: store),
+      '/login': (BuildContext context) => Login(),
       '/search_home': (BuildContext context) => HomeSearch(
             title: 'Find Your Homeserver',
             store: store,
           ),
-      '/signup': (BuildContext context) => Signup(
-            title: 'Signup',
-            store: store,
-          ),
+      '/signup': (BuildContext context) => SignupView(),
       '/home': (BuildContext context) => Home(),
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
@@ -80,6 +78,7 @@ class NavigationProvider {
       '/theming': (BuildContext context) => Theming(
             title: 'Theming',
           ),
+      '/devices': (BuildContext context) => DevicesView(),
       '/settings': (BuildContext context) => SettingsScreen(
             title: 'Settings',
           ),

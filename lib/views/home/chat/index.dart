@@ -616,10 +616,7 @@ class ChatViewState extends State<ChatView> {
                 children: <Widget>[
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh: () {
-                        // TODO: refresh sync?
-                        return Future.value();
-                      },
+                      onRefresh: props.onForceFetchSync,
                       child: GestureDetector(
                         onTap: () {
                           // Disimiss keyboard if they click outside the text input
@@ -640,7 +637,8 @@ class ChatViewState extends State<ChatView> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     RefreshProgressIndicator(
-                                      strokeWidth: 2.0,
+                                      strokeWidth:
+                                          Dimensions.defaultStrokeWidth,
                                       valueColor:
                                           new AlwaysStoppedAnimation<Color>(
                                         PRIMARY_COLOR,
@@ -706,6 +704,7 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
+  final Function onForceFetchSync;
 
   _Props({
     @required this.room,
@@ -718,10 +717,11 @@ class _Props extends Equatable {
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
+    @required this.onForceFetchSync,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
-        userId: store.state.userStore.user.userId,
+        userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
         roomsLoading: store.state.roomStore.loading,
         room: roomSelectors.room(
@@ -745,6 +745,10 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
+        onForceFetchSync: () async {
+          await store.dispatch(fetchSync());
+          return Future(() => true);
+        },
         onSaveDraftMessage: ({
           String body,
           String type,

@@ -1,8 +1,6 @@
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/message.dart';
 import 'package:equatable/equatable.dart';
@@ -235,7 +233,7 @@ class Props extends Equatable {
       Props(
         messageReads: store.state.roomStore.rooms[roomId].messageReads ??
             Map<String, ReadStatus>(),
-        userId: store.state.userStore.user.userId,
+        userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
       );
 

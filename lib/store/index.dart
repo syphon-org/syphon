@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
+import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -16,13 +17,12 @@ import './search/model.dart';
 import './media/state.dart';
 import './rooms/state.dart';
 import './settings/state.dart';
-import './user/state.dart';
+import './auth/state.dart';
 
 // Reducers for Stores
 import './alerts/reducer.dart';
 import './rooms/reducer.dart';
 import './search/reducer.dart';
-import './user/reducer.dart';
 import './settings/reducer.dart';
 
 import 'package:redux_persist/redux_persist.dart';
@@ -33,7 +33,7 @@ AppState appReducer(AppState state, action) {
     alertsStore: alertsReducer(state.alertsStore, action),
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
-    userStore: userReducer(state.userStore, action),
+    authStore: authReducer(state.authStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
   );
@@ -78,7 +78,7 @@ Future<Store> initStore() async {
 class AppState {
   final bool loading;
   final AlertsStore alertsStore;
-  final UserStore userStore;
+  final AuthStore authStore;
   final MatrixStore matrixStore;
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
@@ -87,7 +87,7 @@ class AppState {
   AppState({
     this.loading = true,
     this.alertsStore = const AlertsStore(),
-    this.userStore = const UserStore(),
+    this.authStore = const AuthStore(),
     this.matrixStore = const MatrixStore(),
     this.mediaStore = const MediaStore(),
     this.settingsStore = const SettingsStore(),
@@ -98,7 +98,7 @@ class AppState {
   AppState copyWith({bool loading}) => AppState(
         loading: loading ?? this.loading,
         alertsStore: alertsStore ?? this.alertsStore,
-        userStore: userStore ?? this.userStore,
+        authStore: authStore ?? this.authStore,
         mediaStore: mediaStore ?? this.mediaStore,
         matrixStore: matrixStore ?? this.matrixStore,
         roomStore: roomStore ?? this.roomStore,
@@ -109,7 +109,7 @@ class AppState {
   int get hashCode =>
       loading.hashCode ^
       alertsStore.hashCode ^
-      userStore.hashCode ^
+      authStore.hashCode ^
       matrixStore.hashCode ^
       roomStore.hashCode ^
       settingsStore.hashCode;
@@ -121,7 +121,7 @@ class AppState {
           runtimeType == other.runtimeType &&
           loading == other.loading &&
           alertsStore == other.alertsStore &&
-          userStore == other.userStore &&
+          authStore == other.authStore &&
           matrixStore == other.matrixStore &&
           roomStore == other.roomStore &&
           settingsStore == other.settingsStore;
@@ -130,7 +130,7 @@ class AppState {
   String toString() {
     return '{' +
         '\alertsStore: $alertsStore,' +
-        '\nuserStore: $userStore,' +
+        '\authStore: $authStore,' +
         '\nmatrixStore: $matrixStore, ' +
         '\nroomStore: $roomStore,' +
         '\nsettingsStore: $settingsStore,' +
@@ -144,8 +144,8 @@ class HiveSerializer implements StateSerializer<AppState> {
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
     Cache.hive.put(
-      state.userStore.runtimeType.toString(),
-      state.userStore,
+      state.authStore.runtimeType.toString(),
+      state.authStore,
     );
 
     try {
@@ -179,14 +179,14 @@ class HiveSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
-    UserStore userStoreConverted = UserStore();
+    AuthStore authStoreConverted = AuthStore();
     MediaStore mediaStoreConverted = MediaStore();
     SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
 
-    userStoreConverted = Cache.hive.get(
-      userStoreConverted.runtimeType.toString(),
-      defaultValue: UserStore(),
+    authStoreConverted = Cache.hive.get(
+      authStoreConverted.runtimeType.toString(),
+      defaultValue: AuthStore(),
     );
 
     try {
@@ -218,7 +218,7 @@ class HiveSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      userStore: userStoreConverted,
+      authStore: authStoreConverted,
       settingsStore: settingsStoreConverted,
       roomStore: roomStoreConverted,
       mediaStore: mediaStoreConverted,

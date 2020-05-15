@@ -41,3 +41,7 @@ lib/generated_plugin_registrant.dart
 *.flutter-plugins-dependencies
 *.g.dart
 
+# Code Counter Extension
+*.VSCodeCounter
+
+android_old

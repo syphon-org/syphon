@@ -1,7 +1,203 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+/**
+ * https://matrix.org/docs/spec/client_server/latest#id183
+ * 
+ * Authentication Types
+ * 
+ * Can be used during actual login or interactive auth for confirmation
+ */
+class MatrixAuthTypes {
+  static const PASSWORD = 'm.login.password';
+  static const RECAPTCHA = 'm.login.recaptcha';
+  static const TOKEN = 'm.login.token';
+  static const TERMS = 'm.login.terms';
+  static const DUMMY = 'm.login.dummy';
+}
+
+abstract class Auth {
+  static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Login User
+   * 
+   *  Gets the homeserver's supported login types to authenticate
+   *  users. Clients should pick one of these and supply it as 
+   *  the type when logging in.
+   */
+  static Future<dynamic> loginUser({
+    String protocol,
+    String homeserver,
+    String type = "m.login.password",
+    String username,
+    String password,
+    String deviceName,
+    String deviceId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    Map body = {
+      'type': type,
+      "identifier": {"type": "m.id.user", "user": username},
+      'password': password,
+      'device_id': deviceId,
+      "initial_device_display_name": "$username's $deviceName Client",
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Register New User
+   * 
+   * inhibit_login automatically logs in the user after creation 
+   */
+  static FutureOr<dynamic> registerUser({
+    String protocol,
+    String homeserver,
+    String username,
+    String password,
+    String session,
+    String authType = MatrixAuthTypes.DUMMY,
+    String authValue,
+    String deviceId,
+    String deviceName,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/register';
+
+    Map body = {
+      'username': username,
+      'password': password,
+      'inhibit_login': false,
+      'auth': {
+        'type': MatrixAuthTypes.DUMMY,
+      }
+    };
+
+    // Set and configure params for auth types
+    switch (authType) {
+      case MatrixAuthTypes.RECAPTCHA:
+        body = {
+          'auth': {
+            'type': MatrixAuthTypes.RECAPTCHA,
+            'response': authValue,
+          }
+        };
+        break;
+      case MatrixAuthTypes.TERMS:
+        body = {
+          'auth': {
+            'type': MatrixAuthTypes.TERMS,
+          }
+        };
+        break;
+      case MatrixAuthTypes.DUMMY: // default
+      default:
+        break;
+    }
+
+    // Assign session if set
+    if (session != null) {
+      body['auth']['session'] = session;
+    }
+
+    if (deviceId != null) {
+      body['initial_device_display_name'] = "$username's $deviceName Client";
+    }
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  static Future<dynamic> logoutUser({
+    String protocol,
+    String homeserver,
+    String accessToken,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/logout';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   *  https://matrix.org/docs/spec/client_server/latest#id211 
+   * 
+   *  Check Username Availability
+   * 
+   *  Used to check what types of logins are available on the server
+   */
+  static Future<dynamic> checkUsernameAvailability({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String username,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/register/available';
+
+    url += username != null ? '?username=$username' : '';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Change User Password
+   *  
+   */
+  static FutureOr<dynamic> changePassword({
+    String protocol,
+    String homeserver,
+    String accessToken,
+    String type = 'm.login.password',
+    String newPassword,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      'new_password': type,
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+}
+
 /** 
  * GET login
  * Used to check what types of logins are available on the server
- * curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login"
+ * curl -XGET 'http://192.168.1.2:8008/_matrix/client/r0/login'
 {
     "flows": [ 
         {
@@ -16,65 +212,6 @@ dynamic buildLoginTypesRequest() {
 }
 
 /**  
- * Username Availability Check
- * Used to check what types of logins are available on the server
- * https://matrix.org/docs/spec/client_server/latest#id211 
- */
-dynamic buildCheckUsernameAvailability({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String username,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/register/available';
-
-  url += username != null ? '?username=$username' : '';
-
-  Map<String, String> headers = {};
-
-  return {'url': url, 'headers': headers};
-}
-
-/**   
-  curl -XPOST \
-  -d '{ "identifier": { "type": "m.id.user", "user": "tester2" }, "type": "m.login.password", "password": "test1234!", "initial_device_display_name": "Tether Client" }' \
-  "http://192.168.1.2:8008/_matrix/client/r0/login" 
- */
-dynamic buildLoginUserRequest({
-  String type,
-  String protocol,
-  String homeserver,
-  String username,
-  String password,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/login';
-
-  Map body = {
-    "identifier": {"type": "m.id.user", "user": username},
-    'type': type,
-    'password': password,
-    "initial_device_display_name": "${username}'s Tether Client",
-  };
-
-  return {'url': url, 'body': body};
-}
-
-/**  
- * LOGOUT
-  curl -XPOST \
-  "http://192.168.1.2:8008/_matrix/client/r0/logout?access_token=MDAxOGxvY2F0aW9uIG1hdHJpeC5vcmcKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI0Y2lkIHVzZXJfaWQgPSBAZXJlaW86bWF0cml4Lm9yZwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IFJwWkgxalF1a2YuTzhsO2gKMDAyZnNpZ25hdHVyZSDMDyFzbJvI8lwbYjPQb-s128dmt6C5ihFI2PwSJj0IEgo" 
- */
-dynamic buildLogoutUserRequest({
-  String protocol,
-  String homeserver,
-  String accessToken,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/logout';
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
-}
-
-/**  
  * LOGOUT EVERYWHERE
   curl -XPOST \
   "http://192.168.1.2:8008/_matrix/client/r0/logout/all?\
@@ -84,26 +221,4 @@ dynamic buildLogoutUserAllRequest({String accessToken}) {
   String url = '_matrix/client/r0/logout/all';
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
   return {'url': url, 'headers': headers};
-}
-
-/**  
-  curl -XPOST \
-  -d '{ "access_token": "" }'  \
-  "http://192.168.1.2:8008/_matrix/client/r0/register?kind=user" 
- */
-dynamic buildRegisterUserRequest({
-  String protocol,
-  String homeserver,
-  String username,
-  String password,
-  String type,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/register';
-
-  Map body = {
-    'auth': {'type': 'm.login.dummy'},
-    'username': username,
-    'password': password
-  };
-  return {'url': url, 'body': body};
 }

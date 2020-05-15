@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'dart:math';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
@@ -82,9 +81,9 @@ class ResetRooms {
 class SetRoomState {
   final String id; // room id
   final List<Event> state;
-  final String username;
+  final String currentUser;
 
-  SetRoomState({this.id, this.state, this.username});
+  SetRoomState({this.id, this.state, this.currentUser});
 }
 
 class SetRoomMessages {
@@ -218,6 +217,23 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
+FutureOr<dynamic> fetchSyncMicro(dynamic request) async {
+  final response = await http.get(
+    request['url'],
+    headers: request['headers'],
+  );
+
+  print('[fetchSyncMicro] sync finished');
+
+  // parse sync data
+  return response.body;
+}
+
+FutureOr<dynamic> convertSyncMicro(dynamic responseBody) async {
+  print('[convertSyncMicro] converting body');
+  return await json.decode(responseBody);
+}
+
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
@@ -228,19 +244,15 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       final request = buildSyncRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         fullState: forceFull || store.state.roomStore.rooms == null,
         since: forceFull ? null : since ?? store.state.roomStore.lastSince,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      // parse sync data
-      final data = json.decode(response.body);
+      // TODO: convert to use fetchSyncIsolate and save in background
+      final responseBody = await compute(fetchSyncMicro, request);
+      final data = await compute(convertSyncMicro, responseBody);
 
       // if (!kReleaseMode) {
       //   print('[fetchSync] DEBUGGING **************************');
@@ -250,6 +262,14 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       //   print('[fetchSync] DEBUGGING **************************');
       // }
 
+      if (data['errcode'] != null) {
+        if (data['errcode'] == MatrixErrors.unknown_token) {
+          // TODO: signin prompt needed
+        } else {
+          throw data['error'];
+        }
+      }
+
       final String lastSince = data['next_batch'];
       final Map<String, dynamic> rawRooms =
           data['rooms']['join'] ?? Map<String, Room>();
@@ -257,7 +277,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // init new store containers
       final Map<String, Room> rooms =
           store.state.roomStore.rooms ?? Map<String, Room>();
-      final user = store.state.userStore.user;
+
+      final user = store.state.authStore.user;
 
       // update those that exist or add a new room
       rawRooms.forEach((id, json) {
@@ -295,7 +316,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // TODO: encrypt and find a way to reasonably update this
       if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.matrixState, response.body);
+        Cache.hive.put(Cache.matrixStateBox, responseBody);
       }
       if (!kReleaseMode && since == null) {
         print('[fetchSync] full sync completed');
@@ -314,8 +335,8 @@ ThunkAction<AppState> fetchRooms() {
 
       final request = buildJoinedRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
       );
 
       final response = await http.get(
@@ -353,9 +374,9 @@ ThunkAction<AppState> fetchDirectRooms() {
     try {
       final request = buildDirectRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
       );
 
       final response = await http.get(
@@ -403,8 +424,8 @@ ThunkAction<AppState> createRoom({
 
       final request = buildCreateRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomName: name,
         roomTopic: topic,
         roomAlias: alias,
@@ -435,9 +456,9 @@ ThunkAction<AppState> createRoom({
       if (isDirect) {
         final request = buildSaveAccountData(
           protocol: protocol,
-          accessToken: store.state.userStore.user.accessToken,
-          homeserver: store.state.userStore.homeserver,
-          userId: store.state.userStore.user.userId,
+          accessToken: store.state.authStore.user.accessToken,
+          homeserver: store.state.authStore.user.homeserver,
+          userId: store.state.authStore.user.userId,
           type: AccountDataTypes.DIRECT,
         );
 
@@ -492,8 +513,8 @@ ThunkAction<AppState> removeRoom({Room room}) {
       // submit a leave room request
       final leaveRequest = buildLeaveRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
@@ -521,8 +542,8 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       final forgetRequest = buildForgetRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
@@ -576,9 +597,9 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
 
       final request = buildDirectRoomsRequest(
         protocol: protocol,
-        homeserver: store.state.userStore.homeserver,
-        accessToken: store.state.userStore.user.accessToken,
-        userId: store.state.userStore.user.userId,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
       );
 
       final response = await http.get(
@@ -611,9 +632,9 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
 
       final saveRequest = buildSaveAccountData(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
-        userId: store.state.userStore.user.userId,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        userId: store.state.authStore.user.userId,
         type: AccountDataTypes.DIRECT,
       );
 
@@ -657,8 +678,8 @@ ThunkAction<AppState> deleteRoom({Room room}) {
 
       final deleteRequest = buildLeaveRoom(
         protocol: protocol,
-        accessToken: store.state.userStore.user.accessToken,
-        homeserver: store.state.userStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
       );
 
