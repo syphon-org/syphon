@@ -351,9 +351,10 @@ class Room {
                 direct = event.content['is_direct'];
               }
 
-              if (!users.containsKey(memberDisplayName)) {
+              if (!users.containsKey(event.sender)) {
                 final avatarUri = event.content['avatar_url'];
-                users[memberDisplayName] = User(
+                users[event.sender] = User(
+                  userId: event.sender,
                   displayName: memberDisplayName,
                   avatarUri: avatarUri,
                 );

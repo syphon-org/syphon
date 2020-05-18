@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'package:Tether/global/libs/hive/index.dart';
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -44,7 +45,7 @@ class BackgroundSync {
 
     print('[BackgroundSync] Starting Background Sync Service');
     final backgroundServiceHive = await initHiveBackgroundServiceUnsafe();
-    await backgroundServiceHive.put('accessToken', accessToken);
+    await backgroundServiceHive.put(Cache.backgroundAccessToken, accessToken);
 
     await AndroidAlarmManager.periodic(
       service_interval,
@@ -81,7 +82,6 @@ class BackgroundSync {
  */
 void backgroundSyncJob() async {
   try {
-    const String SINCE_CACHE_KEY = 'lastSince';
     const int syncInterval = 5;
     const int secondsTimeout = 60;
     final int isolateId = Isolate.current.hashCode;
@@ -90,20 +90,8 @@ void backgroundSyncJob() async {
     String homeserver = 'matrix.org';
     String accessToken;
 
-    Box backgroundCache;
-
-    // Init storage location
-    var storageLocation;
-    try {
-      storageLocation = await getApplicationDocumentsDirectory();
-    } catch (error) {
-      print('[initHiveStorage] storage location failure - $error');
-    }
-
-    // Init hive cache + adapters
-    Hive.init(storageLocation.path);
-    backgroundCache = await Hive.openBox(Cache.backgroundServiceBox);
-    accessToken = backgroundCache.get('accessToken');
+    Box backgroundCache = await initHiveBackgroundServiceUnsafe();
+    accessToken = backgroundCache.get(Cache.backgroundAccessToken);
 
     // TODO: remove onSelect handler
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
@@ -128,11 +116,11 @@ void backgroundSyncJob() async {
              * No need to update the hive store for now, just do not save the lastSince
              * to the store and the next foreground fetchSync will update the state
              */
-            final data = await fetchSyncIsolate(
+            final data = await MatrixApi.sync(
               protocol: protocol,
               homeserver: homeserver,
               accessToken: accessToken,
-              since: backgroundCache.get(SINCE_CACHE_KEY),
+              since: backgroundCache.get(Cache.backgroundLastSince),
             );
 
             final String lastSince = data['next_batch'];
@@ -163,7 +151,7 @@ void backgroundSyncJob() async {
               }
             });
 
-            backgroundCache.put(SINCE_CACHE_KEY, lastSince);
+            backgroundCache.put(Cache.backgroundLastSince, lastSince);
 
             print(
               "[AndroidAlarmService] New Last Since ${data['next_batch']}",
@@ -181,33 +169,4 @@ void backgroundSyncJob() async {
   } catch (error) {
     print('[BackgroundSync Service] failed $error');
   }
-}
-
-/**
- * Fetch Sync Isolate
- * includes all necessary dependencies to operate
- * independent of the redux store or the main application
- * thread
- */
-
-Future<dynamic> fetchSyncIsolate({
-  String protocol,
-  String homeserver,
-  String accessToken,
-  String since,
-}) async {
-  final request = buildSyncRequest(
-    protocol: protocol,
-    homeserver: homeserver,
-    accessToken: accessToken,
-    fullState: false,
-    since: since,
-  );
-
-  final response = await http.get(
-    request['url'],
-    headers: request['headers'],
-  );
-
-  return await json.decode(response.body);
 }

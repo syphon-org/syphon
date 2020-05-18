@@ -1,24 +1,106 @@
-import 'dart:collection';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-/**   
-  curl -XGET "http://matrix.org/_matrix/client/r0/sync?access_token=MDAxOGxvY2F0aW9uIG1hdHJpeC5vcmcKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI0Y2lkIHVzZXJfaWQgPSBAZXJlaW86bWF0cml4Lm9yZwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IGJ0cmtjdC5XJkdVfkxweVAKMDAyZnNpZ25hdHVyZSDGd2cVbTYZMwapTV-smtSNHg-jwfi5iq9UFc5Kb-9Z2go" 
- */
-dynamic buildSyncRequest({
-  String protocol = 'https://', // http or https ( or libp2p :D )
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String since,
-  bool fullState = false,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/sync';
+abstract class Rooms {
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id251
+   * 
+   * Sync (main functionality)
+   */
+  static Future<dynamic> sync({
+    String protocol = 'https://', // http or https ( or libp2p :D )
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String since,
+    bool fullState = false,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
-  // Params
-  url += '?full_state=${fullState}';
-  url += since != null ? '&since=$since' : '';
+    // Params
+    url += '?full_state=$fullState';
+    url += since != null ? '&since=$since' : '';
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  return {'url': url, 'headers': headers};
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * https://matrix.org/docs/spec/client_server/latest#id251
+   * 
+   * Sync (main functionality)
+   */
+  static Future<dynamic> syncBackground(Map params) async {
+    String protocol = params['protocol'];
+    String homeserver = params['homeserver'];
+    String accessToken = params['accessToken'];
+    String since = params['since'];
+    bool fullState = params['fullState'];
+
+    String url = '$protocol$homeserver/_matrix/client/r0/sync';
+
+    // Params
+    url += '?full_state=$fullState';
+    url += since != null ? '&since=$since' : '';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  static Future<dynamic> fetchRoomState({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String id,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$id/state';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  static Future<dynamic> fetchDirectRoomIds({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
+
+    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
 }
 
 dynamic buildJoinedRoomsRequest({
@@ -27,20 +109,6 @@ dynamic buildJoinedRoomsRequest({
   String accessToken,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
-
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
-}
-
-dynamic buildDirectRoomsRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

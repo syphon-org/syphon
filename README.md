@@ -16,14 +16,14 @@ Another reason this project was so important was the ability to go from zero to 
 ## Before Hitting The Code
 - Urls are always referencing matrix mxc:// protocol resources. Though they're actually URIs, they are referenced as URLs in the app to be consistant with the protocol spec
 
-## Resources
-- (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
-- (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
-
 
 ## Getting Started
 - (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]
 - (Redux Examples)[https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/lib/selectors/selectors.dart]
+
+## Resources
+- (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
+- (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
 
 ## Layouts and Styling
 - (Scrolling With Text Inputs)[https://github.com/flutter/flutter/issues/13339]

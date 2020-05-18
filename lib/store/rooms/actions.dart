@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
@@ -141,7 +142,6 @@ class SetSynced {
 ThunkAction<AppState> initialRoomSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
-    // TODO: use an isolate for initial sync
     store.dispatch(fetchSync());
 
     // Fetch All Room Ids
@@ -217,23 +217,65 @@ ThunkAction<AppState> stopRoomsObserver() {
   };
 }
 
-FutureOr<dynamic> fetchSyncMicro(dynamic request) async {
-  final response = await http.get(
-    request['url'],
-    headers: request['headers'],
-  );
+ThunkAction<AppState> updateRoomData(Map roomData) {
+  return (Store<AppState> store) async {
+    final stopwatch = Stopwatch()..start();
 
-  print('[fetchSyncMicro] sync finished');
+    print('${roomData.runtimeType} $roomData');
 
-  // parse sync data
-  return response.body;
+    // init new store containers
+    final Map<String, Room> rooms =
+        store.state.roomStore.rooms ?? Map<String, Room>();
+
+    final user = store.state.authStore.user;
+
+    // update those that exist or add a new room
+    roomData.forEach((id, json) {
+      Room room;
+
+      // use pre-existing values where available
+      if (rooms.containsKey(id)) {
+        room = rooms[id].fromSync(
+          json: json,
+          currentUser: user.displayName,
+        );
+      } else {
+        room = Room(id: id).fromSync(
+          json: json,
+          currentUser: user.displayName,
+        );
+      }
+
+      // fetch avatar if a uri was found
+      if (room.avatarUri != null) {
+        store.dispatch(fetchThumbnail(
+          mxcUri: room.avatarUri,
+        ));
+      }
+
+      store.dispatch(SetRoom(room: room));
+    });
+
+    print('[fetchSyncResolving] SetRoom ${stopwatch.elapsed}');
+    stopwatch.stop();
+  };
 }
 
-FutureOr<dynamic> convertSyncMicro(dynamic responseBody) async {
-  print('[convertSyncMicro] converting body');
-  return await json.decode(responseBody);
-}
-
+/**
+ * 
+ * Fetch Sync
+ * 
+ * Responsible for updates based on differences from Matrix
+ * 
+ * 
+   if (!kReleaseMode) {
+      print('[fetchSync] DEBUGGING **************************');
+      (data as Map).forEach((key, value) {
+        print('$key $value\n');
+      });
+      print('[fetchSync] DEBUGGING **************************');
+    }
+ */
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
@@ -242,25 +284,14 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         print('[fetchSync] fetching full sync');
       }
 
-      final request = buildSyncRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        fullState: forceFull || store.state.roomStore.rooms == null,
-        since: forceFull ? null : since ?? store.state.roomStore.lastSince,
-      );
-
-      // TODO: convert to use fetchSyncIsolate and save in background
-      final responseBody = await compute(fetchSyncMicro, request);
-      final data = await compute(convertSyncMicro, responseBody);
-
-      // if (!kReleaseMode) {
-      //   print('[fetchSync] DEBUGGING **************************');
-      //   (data as Map).forEach((key, value) {
-      //     print('$key $value\n');
-      //   });
-      //   print('[fetchSync] DEBUGGING **************************');
-      // }
+      // Matrix Sync to homeserver
+      final data = await compute(MatrixApi.syncBackground, {
+        'protocol': protocol,
+        'homeserver': store.state.authStore.user.homeserver,
+        'accessToken': store.state.authStore.user.accessToken,
+        'fullState': forceFull || store.state.roomStore.rooms == null,
+        'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+      });
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
@@ -270,53 +301,22 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         }
       }
 
-      final String lastSince = data['next_batch'];
       final Map<String, dynamic> rawRooms =
           data['rooms']['join'] ?? Map<String, Room>();
 
-      // init new store containers
-      final Map<String, Room> rooms =
-          store.state.roomStore.rooms ?? Map<String, Room>();
-
-      final user = store.state.authStore.user;
-
-      // update those that exist or add a new room
-      rawRooms.forEach((id, json) {
-        Room room;
-
-        // use pre-existing values where available
-        if (rooms.containsKey(id)) {
-          room = rooms[id].fromSync(
-            json: json,
-            currentUser: user.displayName,
-          );
-        } else {
-          room = Room(id: id).fromSync(
-            json: json,
-            currentUser: user.displayName,
-          );
-        }
-
-        // fetch avatar if a uri was found
-        if (room.avatarUri != null) {
-          store.dispatch(fetchThumbnail(
-            mxcUri: room.avatarUri,
-          ));
-        }
-
-        store.dispatch(SetRoom(room: room));
-      });
+      // Local state updates based on changes
+      await store.dispatch(updateRoomData(rawRooms));
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
-        lastSince: lastSince,
+        lastSince: data['next_batch'],
       ));
 
       // TODO: encrypt and find a way to reasonably update this
       if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.matrixStateBox, responseBody);
+        Cache.hive.put(Cache.syncKey, data);
       }
       if (!kReleaseMode && since == null) {
         print('[fetchSync] full sync completed');
@@ -372,33 +372,34 @@ ThunkAction<AppState> fetchRooms() {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      final request = buildDirectRoomsRequest(
+      final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-
       if (data['errcode'] != null) {
         throw data['error'];
       }
+
+      print(data);
 
       // Mark specified rooms as direct chats
       final rawDirectRooms = data as Map<String, dynamic>;
 
       rawDirectRooms.forEach((userId, roomIds) {
-        store.dispatch(SetRoom(
-            room: Room(
-          id: roomIds[0],
-          direct: true,
-        )));
+        roomIds.forEach((roomId) async {
+          final roomData = await MatrixApi.fetchRoomState(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            id: roomId,
+          );
+          store.dispatch(updateRoomData({
+            '$roomId': roomData,
+          }));
+        });
       });
     } catch (error) {
       print('[fetchDirectRooms] error: $error');
@@ -595,19 +596,12 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildDirectRoomsRequest(
+      final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
       );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
 
       if (data['errcode'] != null) {
         throw data['error'];

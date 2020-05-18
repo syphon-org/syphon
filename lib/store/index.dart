@@ -5,6 +5,7 @@ import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
+import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
@@ -26,6 +27,47 @@ import './search/reducer.dart';
 import './settings/reducer.dart';
 
 import 'package:redux_persist/redux_persist.dart';
+
+class AppState extends Equatable {
+  final bool loading;
+  final AlertsStore alertsStore;
+  final AuthStore authStore;
+  final MatrixStore matrixStore;
+  final MediaStore mediaStore;
+  final SettingsStore settingsStore;
+  final RoomStore roomStore;
+
+  AppState({
+    this.loading = true,
+    this.alertsStore = const AlertsStore(),
+    this.authStore = const AuthStore(),
+    this.matrixStore = const MatrixStore(),
+    this.mediaStore = const MediaStore(),
+    this.settingsStore = const SettingsStore(),
+    this.roomStore = const RoomStore(),
+  });
+
+  @override
+  List<Object> get props => [
+        loading,
+        alertsStore,
+        authStore,
+        matrixStore,
+        roomStore,
+        settingsStore,
+      ];
+
+  @override
+  String toString() {
+    return '{' +
+        '\alertsStore: $alertsStore,' +
+        '\authStore: $authStore,' +
+        '\nmatrixStore: $matrixStore, ' +
+        '\nroomStore: $roomStore,' +
+        '\nsettingsStore: $settingsStore,' +
+        '\n}';
+  }
+}
 
 AppState appReducer(AppState state, action) {
   return AppState(
@@ -52,7 +94,7 @@ AppState appReducer(AppState state, action) {
 Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
-    throttleDuration: Duration(seconds: 3),
+    throttleDuration: Duration(seconds: 5),
     serializer: HiveSerializer(),
   );
 
@@ -73,69 +115,6 @@ Future<Store> initStore() async {
   );
 
   return Future.value(store);
-}
-
-class AppState {
-  final bool loading;
-  final AlertsStore alertsStore;
-  final AuthStore authStore;
-  final MatrixStore matrixStore;
-  final MediaStore mediaStore;
-  final SettingsStore settingsStore;
-  final RoomStore roomStore;
-
-  AppState({
-    this.loading = true,
-    this.alertsStore = const AlertsStore(),
-    this.authStore = const AuthStore(),
-    this.matrixStore = const MatrixStore(),
-    this.mediaStore = const MediaStore(),
-    this.settingsStore = const SettingsStore(),
-    this.roomStore = const RoomStore(),
-  });
-
-  // Helper function to emulate { loading: action.loading, ...appState}
-  AppState copyWith({bool loading}) => AppState(
-        loading: loading ?? this.loading,
-        alertsStore: alertsStore ?? this.alertsStore,
-        authStore: authStore ?? this.authStore,
-        mediaStore: mediaStore ?? this.mediaStore,
-        matrixStore: matrixStore ?? this.matrixStore,
-        roomStore: roomStore ?? this.roomStore,
-        settingsStore: settingsStore ?? this.settingsStore,
-      );
-
-  @override
-  int get hashCode =>
-      loading.hashCode ^
-      alertsStore.hashCode ^
-      authStore.hashCode ^
-      matrixStore.hashCode ^
-      roomStore.hashCode ^
-      settingsStore.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppState &&
-          runtimeType == other.runtimeType &&
-          loading == other.loading &&
-          alertsStore == other.alertsStore &&
-          authStore == other.authStore &&
-          matrixStore == other.matrixStore &&
-          roomStore == other.roomStore &&
-          settingsStore == other.settingsStore;
-
-  @override
-  String toString() {
-    return '{' +
-        '\alertsStore: $alertsStore,' +
-        '\authStore: $authStore,' +
-        '\nmatrixStore: $matrixStore, ' +
-        '\nroomStore: $roomStore,' +
-        '\nsettingsStore: $settingsStore,' +
-        '\n}';
-  }
 }
 
 /// Serializer for a [Uint8List] state, basically pass-through

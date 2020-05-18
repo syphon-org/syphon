@@ -51,7 +51,7 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
         passwordConfirm: '',
         agreement: false,
         captcha: false,
-        interactiveAuths: const {},
+        interactiveAuths: null,
       );
     case ResetAuthStore:
       return AuthStore();

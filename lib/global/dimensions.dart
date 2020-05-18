@@ -14,6 +14,7 @@ class Dimensions {
   static const double thumbnailSizeMax = 48;
 
   // Avatars
+  static const double avatarSizeMessage = 32;
   static const double avatarSize = 56; // was 52
   static const double avatarSizeMax = 350; // Change to HeroSize
   static const double avatarHeroSize = 120;

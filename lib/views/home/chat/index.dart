@@ -236,6 +236,7 @@ class ChatViewState extends State<ChatView> {
                     : null;
 
                 final avatarUri = props.room.users[message.sender]?.avatarUri;
+                print(props.room.users.length);
                 return MessageWidget(
                   message: message,
                   isUserSent: isUserSent,

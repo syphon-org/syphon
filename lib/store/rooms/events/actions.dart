@@ -17,15 +17,19 @@ import 'package:http/http.dart' as http;
 
 final protocol = DotEnv().env['PROTOCOL'];
 
-final msgtypes = {
-  'text': 'm.text',
-  'emote': 'm.emote', // TODO: not impliemented
-  'notice': 'm.notice', // TODO: not impliemented
-  'image': 'm.image', // TODO: not impliemented
-  'file': 'm.file', // TODO: not impliemented
-  'audio': 'm.audio', // TODO: not impliemented
-  'video': 'm.video', // TODO: not impliemented
-};
+/**
+ * 
+  class MessageTypes {
+    static const TEXT = 'm.text';
+    static const EMOTE = 'm.emote';
+    static const NOTICE = 'm.notice';
+    static const IMAGE = 'm.text';
+    static const FILE = 'm.file';
+    static const AUDIO = 'm.text';
+    static const LOCATION = 'm.location';
+    static const VIDEO = 'm.video';
+  }
+ */
 
 ThunkAction<AppState> fetchMessageEvents({Room room}) {
   return (Store<AppState> store) async {

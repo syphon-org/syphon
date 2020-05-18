@@ -3,6 +3,7 @@ import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -177,10 +178,19 @@ class MessageWidget extends StatelessWidget {
                       maintainSize: !messageOnly,
                       child: Container(
                         margin: const EdgeInsets.only(
-                          right: 12,
+                          right: 8,
                         ),
                         child: avatarUri != null
-                            ? null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSizeMessage,
+                                  height: Dimensions.avatarSizeMessage,
+                                  mxcUri: avatarUri,
+                                ),
+                              )
                             : CircleAvatar(
                                 radius: 14,
                                 backgroundColor: bubbleColor,

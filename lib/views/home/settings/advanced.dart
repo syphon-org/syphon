@@ -124,6 +124,21 @@ class AdvancedScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                Visibility(
+                  maintainSize: false,
+                  visible: debug == 'true',
+                  child: ListTile(
+                    dense: true,
+                    contentPadding: contentPadding,
+                    onTap: () {
+                      props.onForceFetchDirectRooms();
+                    },
+                    title: Text(
+                      'Force Direct Room Fetch',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                  ),
+                ),
                 ListTile(
                   dense: true,
                   onTap: props.onToggleSyncing,
@@ -211,21 +226,24 @@ class _Props extends Equatable {
   final String language;
   final String lastSince;
   final User currentUser;
+
   final Function onToggleSyncing;
   final Function onManualSync;
   final Function onForceFullSync;
+  final Function onForceFetchDirectRooms;
 
   _Props({
     @required this.syncing,
     @required this.loading,
     @required this.roomsLoading,
     @required this.language,
-    @required this.onManualSync,
-    @required this.onForceFullSync,
-    @required this.onToggleSyncing,
     @required this.roomsObserverEnabled,
     @required this.currentUser,
     @required this.lastSince,
+    @required this.onManualSync,
+    @required this.onForceFullSync,
+    @required this.onToggleSyncing,
+    @required this.onForceFetchDirectRooms,
   });
 
   @override
@@ -266,6 +284,9 @@ class _Props extends Equatable {
         },
         onForceFullSync: () {
           store.dispatch(fetchSync(forceFull: true));
+        },
+        onForceFetchDirectRooms: () {
+          store.dispatch(fetchDirectRooms());
         },
       );
 }

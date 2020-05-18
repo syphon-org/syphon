@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'dart:math';
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/rooms/service.isolate.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
@@ -176,7 +177,7 @@ Future<String> fetchSyncNative({
   String accessToken,
   bool fullState,
 }) async {
-  final request = buildSyncRequest(
+  final data = await MatrixApi.sync(
     protocol: protocol,
     homeserver: homeserver,
     accessToken: accessToken,
@@ -184,13 +185,6 @@ Future<String> fetchSyncNative({
     since: since,
   );
 
-  final response = await http.get(
-    request['url'],
-    headers: request['headers'],
-  );
-
-  // parse sync data
-  final data = json.decode(response.body);
   final Map<String, dynamic> rawRooms = data['rooms']['join'];
   final String lastSince = data['next_batch'];
 

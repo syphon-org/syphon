@@ -28,7 +28,7 @@ abstract class Auth {
    *  users. Clients should pick one of these and supply it as 
    *  the type when logging in.
    */
-  static Future<dynamic> loginUser({
+  static FutureOr<dynamic> loginUser({
     String protocol,
     String homeserver,
     String type = "m.login.password",

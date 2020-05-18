@@ -1,5 +1,6 @@
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/devices.dart';
+import 'package:Tether/global/libs/matrix/rooms.dart';
 
 abstract class MatrixApi {
   // Authentication
@@ -9,6 +10,12 @@ abstract class MatrixApi {
   static final logoutUser = Auth.logoutUser;
   static final registerUser = Auth.registerUser;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
+
+  // Rooms
+  static final sync = Rooms.sync;
+  static final syncBackground = Rooms.syncBackground;
+  static final fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
+  static final fetchRoomState = Rooms.fetchRoomState;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;

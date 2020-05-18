@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/service.dart';
 import 'package:Tether/store/settings/state.dart';
 import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/global/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -47,9 +45,7 @@ void main() async {
   _enablePlatformOverrideForDesktop();
 
   // init cold cache (mobile only)
-  if (Platform.isIOS || Platform.isAndroid) {
-    Cache.hive = await initHiveStorageUnsafe();
-  }
+  Cache.hive = await initHiveStorageUnsafe();
 
   // init state cache (hot)
   final store = await initStore();

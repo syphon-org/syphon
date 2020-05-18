@@ -193,7 +193,7 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
         );
 
         device = Device(
-          deviceId: hashedDeviceId.toString(),
+          deviceId: hashedDeviceId.hash,
           displayName: 'Tim Android',
         );
       } else if (Platform.isIOS) {
@@ -266,6 +266,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
+      print(error);
       store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
