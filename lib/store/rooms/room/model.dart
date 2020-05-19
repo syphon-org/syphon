@@ -248,7 +248,6 @@ class Room {
         lastUpdate =
             event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
-        print('${event.type} ${event.sender} ${event.content}');
         switch (event.type) {
           case 'm.room.name':
             if (namePriority > 0) {
@@ -451,7 +450,7 @@ class Room {
   Room fromAccountData(
     List<Event> accountDataEvents,
   ) {
-    bool isDirect = false;
+    dynamic isDirect;
     try {
       accountDataEvents.forEach((event) {
         switch (event.type) {
@@ -467,7 +466,7 @@ class Room {
     }
 
     return this.copyWith(
-      direct: isDirect,
+      direct: isDirect ?? this.direct,
     );
   }
 }

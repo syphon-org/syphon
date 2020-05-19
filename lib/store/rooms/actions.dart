@@ -141,10 +141,10 @@ class SetSynced {
 ThunkAction<AppState> initialRoomSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
-    // store.dispatch(fetchSync());
+    store.dispatch(fetchSync());
 
     // Fetch All Room Ids
-    // await store.dispatch(fetchRooms());
+    await store.dispatch(fetchRooms());
     await store.dispatch(fetchDirectRooms());
   };
 }
