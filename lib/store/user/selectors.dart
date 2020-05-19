@@ -15,7 +15,11 @@ String userAlias({String username, String homeserver}) {
   return "@" + username + ":" + homeserver;
 }
 
-// Auth
+String formatShortname(String userId) {
+  // If user has yet to save a username, format the userId to show the shortname
+  return userId != null ? userId.split(':')[0].replaceAll('@', '') : '';
+}
+
 String displayShortname(User user) {
   // If user has yet to save a username, format the userId to show the shortname
   return user.userId != null

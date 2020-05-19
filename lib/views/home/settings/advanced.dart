@@ -131,10 +131,10 @@ class AdvancedScreen extends StatelessWidget {
                     dense: true,
                     contentPadding: contentPadding,
                     onTap: () {
-                      props.onForceFetchDirectRooms();
+                      props.onForceFunction();
                     },
                     title: Text(
-                      'Force Direct Room Fetch',
+                      'Force Function',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -230,7 +230,7 @@ class _Props extends Equatable {
   final Function onToggleSyncing;
   final Function onManualSync;
   final Function onForceFullSync;
-  final Function onForceFetchDirectRooms;
+  final Function onForceFunction;
 
   _Props({
     @required this.syncing,
@@ -243,7 +243,7 @@ class _Props extends Equatable {
     @required this.onManualSync,
     @required this.onForceFullSync,
     @required this.onToggleSyncing,
-    @required this.onForceFetchDirectRooms,
+    @required this.onForceFunction,
   });
 
   @override
@@ -272,9 +272,9 @@ class _Props extends Equatable {
         onToggleSyncing: () {
           final observer = store.state.roomStore.roomObserver;
           if (observer != null && observer.isActive) {
-            store.dispatch(stopRoomsObserver());
+            store.dispatch(stopSyncSubscriber());
           } else {
-            store.dispatch(startRoomsObserver());
+            store.dispatch(startSyncSubscriber());
           }
         },
         onManualSync: () {
@@ -285,8 +285,8 @@ class _Props extends Equatable {
         onForceFullSync: () {
           store.dispatch(fetchSync(forceFull: true));
         },
-        onForceFetchDirectRooms: () {
-          store.dispatch(fetchDirectRooms());
+        onForceFunction: () {
+          store.dispatch(initialRoomSync());
         },
       );
 }

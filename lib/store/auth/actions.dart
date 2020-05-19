@@ -148,9 +148,9 @@ ThunkAction<AppState> startAuthObserver() {
             print('[onSelectNotification] payload');
           },
         );
-        store.dispatch(startRoomsObserver());
+        store.dispatch(startSyncSubscriber());
       } else {
-        store.dispatch(stopRoomsObserver());
+        store.dispatch(stopSyncSubscriber());
         store.dispatch(SetSynced(synced: false, lastSince: null));
         store.dispatch(ResetRooms());
         store.dispatch(ResetUser());

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
@@ -31,93 +32,80 @@ final protocol = DotEnv().env['PROTOCOL'];
   }
  */
 
-ThunkAction<AppState> fetchMessageEvents({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+// ThunkAction<AppState> fetchMessageEvents({Room room}) {
+//   return (Store<AppState> store) async {
+//     try {
+//       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      final request = buildRoomMessagesRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        roomId: room.id,
-      );
+//       final messagesJson = await MatrixApi.fetchMessageEvents(
+//         protocol: protocol,
+//         homeserver: store.state.authStore.user.homeserver,
+//         accessToken: store.state.authStore.user.accessToken,
+//         roomId: room.id,
+//       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
+//       final String startTime = messagesJson['start'];
+//       final String endTime = messagesJson['end'];
+//       final List<dynamic> messagesChunk = messagesJson['chunk'];
 
-      final Map<String, dynamic> messagesJson = json.decode(response.body);
-      final String startTime = messagesJson['start'];
-      final String endTime = messagesJson['end'];
-      final List<dynamic> messagesChunk = messagesJson['chunk'];
+//       // TODO: I would really love to use inheritance
+//       final List<Message> messages = messagesChunk
+//           .map((event) => Message.fromEvent(Event.fromJson(event)))
+//           .toList();
 
-      // TODO: I would really love to use inheritance
-      final List<Message> messages = messagesChunk
-          .map((event) => Message.fromEvent(Event.fromJson(event)))
-          .toList();
+//       store.dispatch(SetRoomMessages(
+//         id: room.id,
+//         messageEvents: messages,
+//         startTime: startTime,
+//         endTime: endTime,
+//       ));
+//     } catch (error) {
+//       print('[fetchMessageEvents] error $error');
+//     } finally {
+//       store.dispatch(UpdateRoom(id: room.id, syncing: false));
+//     }
+//   };
+// }
 
-      store.dispatch(SetRoomMessages(
-        id: room.id,
-        messageEvents: messages,
-        startTime: startTime,
-        endTime: endTime,
-      ));
-    } catch (error) {
-      print('[fetchMessageEvents] error $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
+// ThunkAction<AppState> fetchStateEvents({Room room}) {
+//   return (Store<AppState> store) async {
+//     try {
+//       // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
+//       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-ThunkAction<AppState> fetchStateEvents({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+//       final stateEventJson = await MatrixApi.fetchStateEvents(
+//         protocol: protocol,
+//         homeserver: store.state.authStore.user.homeserver,
+//         accessToken: store.state.authStore.user.accessToken,
+//         roomId: room.id,
+//       );
 
-      final request = buildRoomStateRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        roomId: room.id,
-      );
+//       // Convert all of the events and save
+//       final List<Event> stateEvents =
+//           stateEventJson.map((event) => Event.fromJson(event)).toList();
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
+//       // Add State events to room and toggle syncing
+//       final user = store.state.authStore.user;
 
-      final List<dynamic> rawStateEvents = json.decode(response.body);
+//       store.dispatch(SetRoomState(
+//         id: room.id,
+//         state: stateEvents,
+//         currentUser: user.displayName,
+//       ));
 
-      // Convert all of the events and save
-      final List<Event> stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
-
-      // Add State events to room and toggle syncing
-      final user = store.state.authStore.user;
-
-      store.dispatch(SetRoomState(
-        id: room.id,
-        state: stateEvents,
-        currentUser: user.displayName,
-      ));
-
-      final updatedRoom = store.state.roomStore.rooms[room.id];
-      if (updatedRoom.avatarUri != null) {
-        store.dispatch(fetchThumbnail(
-          mxcUri: updatedRoom.avatarUri,
-        ));
-      }
-    } catch (error) {
-      print('[fetchRoomState] error: ${room.id} $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
+//       final updatedRoom = store.state.roomStore.rooms[room.id];
+//       if (updatedRoom.avatarUri != null) {
+//         store.dispatch(fetchThumbnail(
+//           mxcUri: updatedRoom.avatarUri,
+//         ));
+//       }
+//     } catch (error) {
+//       print('[fetchRoomState] error: ${room.id} $error');
+//     } finally {
+//       store.dispatch(UpdateRoom(id: room.id, syncing: false));
+//     }
+//   };
+// }
 
 ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {

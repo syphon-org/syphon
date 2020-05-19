@@ -4,9 +4,10 @@ import 'package:http/http.dart' as http;
 
 abstract class Rooms {
   /**
+   * Sync (main functionality)
+   * 
    * https://matrix.org/docs/spec/client_server/latest#id251
    * 
-   * Sync (main functionality)
    */
   static Future<dynamic> sync({
     String protocol = 'https://', // http or https ( or libp2p :D )
@@ -33,10 +34,37 @@ abstract class Rooms {
     return await json.decode(response.body);
   }
 
+  /** 
+   * Sync (filter by roomId)
+   */
+  static Future<dynamic> syncRoom({
+    String protocol = 'https://', // http or https ( or libp2p :D )
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String since,
+    String roomId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/sync';
+
+    // Params
+    url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
   /**
-   * https://matrix.org/docs/spec/client_server/latest#id251
+   * Sync (Background Isolate) (main functionality)
    * 
-   * Sync (main functionality)
+   * https://matrix.org/docs/spec/client_server/latest#id251 
    */
   static Future<dynamic> syncBackground(Map params) async {
     String protocol = params['protocol'];
@@ -63,13 +91,13 @@ abstract class Rooms {
     return await json.decode(response.body);
   }
 
-  static Future<dynamic> fetchRoomState({
+  static Future<dynamic> fetchRoomIds({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    String id,
+    String userId,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$id/state';
+    String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -101,46 +129,6 @@ abstract class Rooms {
 
     return await json.decode(response.body);
   }
-}
-
-dynamic buildJoinedRoomsRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
-
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
-}
-
-dynamic buildRoomStateRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
-
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
-}
-
-dynamic buildRoomSyncRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/sync';
-
-  url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
-
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
 }
 
 /**

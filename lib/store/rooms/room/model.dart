@@ -3,6 +3,8 @@ import 'package:Tether/global/libs/hive/type-ids.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/user/selectors.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
@@ -172,6 +174,160 @@ class Room {
     }
   }
 
+  Room fromSync({
+    User currentUser,
+    Map<String, dynamic> json,
+  }) {
+    List<Event> stateEvents = [];
+    List<Event> ephemeralEvents = [];
+    List<Message> timelineEvents = [];
+    List<Event> accountDataEvents = [];
+
+    if (json['state'] != null) {
+      final List<dynamic> rawStateEvents = json['state']['events'];
+
+      stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+    }
+
+    if (json['timeline'] != null) {
+      final List<dynamic> rawTimelineEvents = json['timeline']['events'];
+
+      timelineEvents = rawTimelineEvents
+          .map((event) => Message.fromEvent(Event.fromJson(event)))
+          .toList();
+    }
+
+    if (json['ephemeral'] != null) {
+      final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
+
+      ephemeralEvents =
+          rawEphemeralEvents.map((event) => Event.fromJson(event)).toList();
+    }
+
+    if (json['account_data'] != null) {
+      final List<dynamic> rawAccountEvents = json['account_data']['events'];
+
+      accountDataEvents =
+          rawAccountEvents.map((event) => Event.fromJson(event)).toList();
+    }
+
+    return this
+        .fromAccountData(
+          accountDataEvents,
+        )
+        .fromStateEvents(
+          stateEvents,
+          currentUser: currentUser,
+        )
+        .fromMessageEvents(
+          timelineEvents,
+        )
+        .fromEphemeralEvents(
+          ephemeralEvents,
+        );
+  }
+
+  // Find details of room based on state events
+  // follows spec naming priority and thumbnail downloading
+  Room fromStateEvents(
+    List<Event> stateEvents, {
+    User currentUser,
+  }) {
+    String name;
+    String avatarUri;
+    String topic;
+    bool direct;
+    int namePriority = 4;
+    int lastUpdate = this.lastUpdate;
+    List<Event> cachedStateEvents = List<Event>();
+    Map<String, User> users = this.users ?? Map<String, User>();
+
+    try {
+      stateEvents.forEach((event) {
+        lastUpdate =
+            event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+
+        print('${event.type} ${event.sender} ${event.content}');
+        switch (event.type) {
+          case 'm.room.name':
+            if (namePriority > 0) {
+              namePriority = 1;
+              name = event.content['name'];
+            }
+            break;
+          case 'm.room.topic':
+            topic = event.content['topic'];
+            break;
+          case 'm.room.canonical_alias':
+            if (namePriority > 2) {
+              namePriority = 2;
+              name = event.content['alias'];
+            }
+            break;
+          case 'm.room.aliases':
+            if (namePriority > 3) {
+              namePriority = 3;
+              name = event.content['aliases'][0];
+            }
+            break;
+          case 'm.room.avatar':
+            final avatarFile = event.content['thumbnail_file'];
+            if (avatarFile == null) {
+              avatarUri = event.content['url'];
+            }
+            break;
+          case 'm.room.member':
+            final displayName = event.content['displayname'];
+            final memberAvatarUri = event.content['avatar_url'];
+
+            if (this.direct && this.users.length < 3) {
+              if (displayName == null && event.sender != currentUser.userId) {
+                namePriority = 0;
+                name = formatShortname(event.sender);
+                avatarUri = memberAvatarUri;
+              } else if (displayName != null &&
+                  displayName != currentUser.displayName) {
+                namePriority = 0;
+                name = displayName;
+                avatarUri = memberAvatarUri;
+              }
+            }
+
+            if (!users.containsKey(event.sender)) {
+              users[event.sender] = User(
+                userId: event.sender,
+                displayName: displayName,
+                avatarUri: avatarUri,
+              );
+            }
+            break;
+          default:
+            break;
+        }
+      });
+    } catch (error) {
+      print('[fromStateEvents] error $error');
+    }
+
+    return this.copyWith(
+      name: name ?? this.name ?? 'New Room',
+      avatarUri: avatarUri ?? this.avatarUri,
+      topic: topic ?? this.topic,
+      users: users ?? this.users,
+      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      direct: direct ?? this.direct,
+      state: cachedStateEvents,
+    );
+  }
+
+  /**
+   * fromMessageEvents
+   * 
+   * Update room based on messages events, many
+   * message events have side effects on room data
+   * outside displaying messages
+   */
   Room fromMessageEvents(
     List<Message> messageEvents, {
     String startTime,
@@ -228,9 +384,8 @@ class Room {
    * hashmap of eventIds linking them to users and timestamps
    */
   Room fromEphemeralEvents(
-    List<Event> events, {
-    String originDEBUG,
-  }) {
+    List<Event> events,
+  ) {
     var userTyping = false;
     int latestRead = this.lastRead;
     var messageReads = this.messageReads != null
@@ -239,11 +394,9 @@ class Room {
 
     try {
       events.forEach((event) {
+        print('[fromEphemeralEvents] ${event.type}');
         switch (event.type) {
           case 'm.typing':
-            print('[fromEphemeralEvents] saving ${this.name} ${events.length}');
-            print('[fromEphemeralEvents] saving content ${event.content}');
-
             // TODO: save which users are typing
             // if ((event.content['user_ids'] as List<dynamic>).length > 0) {
             //   userTyping = event.content['user_ids'][0];
@@ -275,12 +428,11 @@ class Room {
             });
             break;
           default:
-            print('[fromEphemeralEvents] unknown event type ${event.type}');
             break;
         }
       });
     } catch (error) {
-      print('[fromEphemeralEvents] error $error');
+      print('[fromEphemeralEvents] $error');
     }
 
     return this.copyWith(
@@ -290,144 +442,32 @@ class Room {
     );
   }
 
-  // Find details of room based on state events
-  // follows spec naming priority and thumbnail downloading
-  Room fromStateEvents(
-    List<Event> stateEvents, {
-    String originDEBUG,
-    String currentUser,
-    int limit,
-  }) {
-    String name;
-    String avatarUri;
-    String topic;
-    bool direct;
-    int namePriority = 4;
-    int lastUpdate = this.lastUpdate;
-    List<Event> cachedStateEvents = List<Event>();
-    Map<String, User> users = this.users ?? Map<String, User>();
-
+  /**
+   * 
+   * fromAccountData
+   * 
+   * Mostly used to assign is_direct 
+   */
+  Room fromAccountData(
+    List<Event> accountDataEvents,
+  ) {
+    bool isDirect = false;
     try {
-      stateEvents.forEach((event) {
-        lastUpdate =
-            event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
-
-        // print('[fromStateEvents] ${event.type} ${event.content}');
+      accountDataEvents.forEach((event) {
         switch (event.type) {
-          case 'm.room.name':
-            namePriority = 1;
-            name = event.content['name'];
-            break;
-          case 'm.room.topic':
-            topic = event.content['topic'];
-            break;
-          case 'm.room.canonical_alias':
-            if (namePriority > 2) {
-              namePriority = 2;
-              name = event.content['alias'];
-            }
-            break;
-          case 'm.room.aliases':
-            if (namePriority > 3) {
-              namePriority = 3;
-              name = event.content['aliases'][0];
-            }
-            break;
-          case 'm.room.avatar':
-            final avatarFile = event.content['thumbnail_file'];
-            if (avatarFile == null) {
-              avatarUri = event.content['url'];
-            }
-            break;
-          case 'm.room.member':
-            final memberDisplayName = event.content['displayname'];
-
-            if (memberDisplayName != currentUser) {
-              final isDirect = event.content['is_direct'];
-
-              if (this.direct || (isDirect != null && isDirect as bool)) {
-                name = memberDisplayName;
-                avatarUri = event.content['avatar_url'];
-                direct = event.content['is_direct'];
-              }
-
-              if (!users.containsKey(event.sender)) {
-                final avatarUri = event.content['avatar_url'];
-                users[event.sender] = User(
-                  userId: event.sender,
-                  displayName: memberDisplayName,
-                  avatarUri: avatarUri,
-                );
-              }
-            }
+          case 'm.direct':
+            isDirect = true;
             break;
           default:
             break;
         }
       });
     } catch (error) {
-      print('[fromStateEvents] error $error');
+      print('[fromEphemeralEvents] error $error');
     }
 
     return this.copyWith(
-      name: name ?? this.name ?? 'New Room',
-      avatarUri: avatarUri ?? this.avatarUri,
-      topic: topic ?? this.topic,
-      users: users ?? this.users,
-      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
-      direct: direct ?? this.direct,
-      state: cachedStateEvents,
+      direct: isDirect,
     );
-  }
-
-  Room fromSync({
-    String currentUser,
-    Map<String, dynamic> json,
-  }) {
-    // print(json['summary']);
-    // print('TIMELINE OUTPUT ${json['timeline']}');
-    // TODO: final List<dynamic> rawAccountDataEvents = json['account_data']['events'];
-
-    // Check for message events
-    final List<dynamic> rawStateEvents = json['state']['events'];
-    final List<dynamic> rawTimelineEvents =
-        json['timeline']['events']; // contains message events
-    final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
-
-    final List<Event> ephemeralEvents =
-        rawEphemeralEvents.map((event) => Event.fromJson(event)).toList();
-
-    final List<Event> stateEvents =
-        rawStateEvents.map((event) => Event.fromJson(event)).toList();
-
-    final List<Message> messageEvents = rawTimelineEvents
-        .map((event) => Message.fromEvent(Event.fromJson(event)))
-        .toList();
-
-    return this
-        .fromStateEvents(
-          stateEvents,
-          currentUser: currentUser,
-          originDEBUG: '[fetchSync]',
-        )
-        .fromMessageEvents(
-          messageEvents,
-        )
-        .fromEphemeralEvents(
-          ephemeralEvents,
-        );
-  }
-
-  @override
-  String toString() {
-    return '{\n' +
-        '\tid: $id,\n' +
-        '\tname: $name,\n' +
-        '\thomeserver: $homeserver,\n' +
-        '\tdirect: $direct,\n' +
-        '\tsyncing: $syncing,\n' +
-        '\tstate: $state,\n' +
-        '\tusers: $users\n'
-            '}';
   }
 }

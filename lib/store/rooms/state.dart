@@ -37,7 +37,7 @@ class RoomStore extends Equatable {
     this.lastUpdate = 0,
     this.lastSince,
     this.roomObserver,
-    this.rooms,
+    this.rooms = const {},
   });
 
   @override

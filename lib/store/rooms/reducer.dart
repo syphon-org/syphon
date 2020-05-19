@@ -54,23 +54,22 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       rooms.remove(action.room.id);
       return state.copyWith(rooms: rooms);
 
-    case SetRoomState:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.id] = rooms[action.id].fromStateEvents(
-        action.state,
-        currentUser: action.currentUser,
-        originDEBUG: '[SetRoomState]',
-      );
-      return state.copyWith(rooms: rooms);
+    // case SetRoomState:
+    //   final rooms = Map<String, Room>.from(state.rooms);
+    //   rooms[action.id] = rooms[action.id].fromStateEvents(
+    //     action.state,
+    //     currentUser: action.currentUser,
+    //   );
+    //   return state.copyWith(rooms: rooms);
 
-    case SetRoomMessages:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.id] = rooms[action.id].fromMessageEvents(
-        action.messageEvents,
-        startTime: action.startTime,
-        endTime: action.endTime,
-      );
-      return state.copyWith(rooms: rooms);
+    // case SetRoomMessages:
+    //   final rooms = Map<String, Room>.from(state.rooms);
+    //   rooms[action.id] = rooms[action.id].fromMessageEvents(
+    //     action.messageEvents,
+    //     startTime: action.startTime,
+    //     endTime: action.endTime,
+    //   );
+    //   return state.copyWith(rooms: rooms);
 
     case SaveOutboxMessage:
       final rooms = Map<String, Room>.from(state.rooms);
