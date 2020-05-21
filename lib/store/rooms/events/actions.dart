@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/global/libs/matrix/messages.dart';
-import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
@@ -32,40 +33,85 @@ final protocol = DotEnv().env['PROTOCOL'];
   }
  */
 
-// ThunkAction<AppState> fetchMessageEvents({Room room}) {
-//   return (Store<AppState> store) async {
-//     try {
-//       store.dispatch(UpdateRoom(id: room.id, syncing: true));
+/**
+ * Load Message Events
+ * 
+ * Pulls next message events from cold storage 
+ */
+ThunkAction<AppState> loadMessageEvents({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+    } catch (error) {
+      print('[fetchMessageEvents] error $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
 
-//       final messagesJson = await MatrixApi.fetchMessageEvents(
-//         protocol: protocol,
-//         homeserver: store.state.authStore.user.homeserver,
-//         accessToken: store.state.authStore.user.accessToken,
-//         roomId: room.id,
-//       );
+/**
+ * Fetch Message Events
+ * 
+ * Pulls next message events remotely from homeserverr
+ */
+ThunkAction<AppState> fetchMessageEvents({
+  Room room,
+  int limit = 10,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-//       final String startTime = messagesJson['start'];
-//       final String endTime = messagesJson['end'];
-//       final List<dynamic> messagesChunk = messagesJson['chunk'];
+      print(
+        '[fetchMessageEvents] ${room.toHash}  ${room.prevHash} ${room.prevHash} pre-fetch',
+      );
 
-//       // TODO: I would really love to use inheritance
-//       final List<Message> messages = messagesChunk
-//           .map((event) => Message.fromEvent(Event.fromJson(event)))
-//           .toList();
+      final String from = room.toHash ?? room.fromHash ?? room.prevHash;
 
-//       store.dispatch(SetRoomMessages(
-//         id: room.id,
-//         messageEvents: messages,
-//         startTime: startTime,
-//         endTime: endTime,
-//       ));
-//     } catch (error) {
-//       print('[fetchMessageEvents] error $error');
-//     } finally {
-//       store.dispatch(UpdateRoom(id: room.id, syncing: false));
-//     }
-//   };
-// }
+      // TODO: pulling all messages since last since, no "limit"
+      // final String to = room.fromHash != room.prevHash ? room.prevHash : null;
+
+      // Pull starting at "to" of last fetch
+      // or from the point of last fetch || /sync
+      final Map messagesJson = await MatrixApi.fetchMessageEvents(
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        from: from,
+        roomId: room.id,
+        limit: limit,
+      );
+
+      final String toHash = messagesJson['end'];
+      final String fromHash = messagesJson['start'];
+      final List<dynamic> messages = messagesJson['chunk'];
+
+      print('[fetchMessageEvents] $fromHash $toHash');
+      print('[fetchMessageEvents] ${messages.length}');
+
+      messages.forEach((message) {
+        print('${message['sender']} ${message['content']}');
+      });
+
+      store.dispatch(syncData(
+        {
+          '${room.id}': {
+            'timeline': {
+              'to': toHash,
+              'from': fromHash,
+              'events': messages,
+            }
+          },
+        },
+      ));
+    } catch (error) {
+      print('[fetchMessageEvents] error $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
 
 // ThunkAction<AppState> fetchStateEvents({Room room}) {
 //   return (Store<AppState> store) async {
@@ -219,8 +265,6 @@ ThunkAction<AppState> sendMessage({
 }) {
   return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));
-
-    final roomInstance = store.state.roomStore.rooms[room.id];
 
     // if you're incredibly unlucky, and fast, you could have a problem here
     final String tempId = Random.secure().nextInt(1 << 32).toString();

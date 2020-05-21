@@ -74,8 +74,12 @@ class ChatViewState extends State<ChatView> {
   Map<String, Color> senderColors;
   bool sendable = false;
   Message selectedMessage;
+
+  double overshoot = 0;
+  bool loadMore = false;
   final editorController = TextEditingController();
   final messagesController = ScrollController();
+  final listViewController = ScrollController();
 
   @override
   void initState() {
@@ -97,13 +101,29 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
+    final store = StoreProvider.of<AppState>(context);
+    final props = _Props.mapStoreToProps(store, arguements.roomId);
+    final draft = props.room.draft;
 
-    final room = store.state.roomStore.rooms[arguements.roomId];
+    messagesController.addListener(() {
+      final extentBefore = messagesController.position.extentBefore;
+      final max = messagesController.position.maxScrollExtent;
 
-    final draft = room.draft;
+      final limit = max - extentBefore;
+      if (limit < -32 && !loadMore) {
+        this.setState(() {
+          loadMore = true;
+        });
+        props.onLoadMoreMessages();
+      } else if (limit >= 0 && loadMore && !props.loading) {
+        this.setState(() {
+          loadMore = false;
+        });
+      }
+    });
+
     if (draft != null && draft.type == MessageTypes.TEXT) {
       final text = draft.body;
       this.setState(() {
@@ -124,6 +144,7 @@ class ChatViewState extends State<ChatView> {
   @override
   void dispose() {
     inputFieldNode.dispose();
+    messagesController.dispose();
     super.dispose();
     if (this.typingNotifier != null) {
       this.typingNotifier.cancel();
@@ -199,6 +220,7 @@ class ChatViewState extends State<ChatView> {
           physics: selectedMessage != null
               ? const NeverScrollableScrollPhysics()
               : null,
+          controller: messagesController,
           children: [
             Visibility(
               visible: props.room.userTyping,
@@ -218,7 +240,7 @@ class ChatViewState extends State<ChatView> {
               itemCount: messages.length,
               padding: EdgeInsets.only(bottom: 8),
               scrollDirection: Axis.vertical,
-              controller: messagesController,
+              // controller: messagesController,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 final message = messages[index];
@@ -616,42 +638,57 @@ class ChatViewState extends State<ChatView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: props.onForceFetchSync,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Disimiss keyboard if they click outside the text input
-                          inputFieldNode.unfocus();
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: Stack(
-                          children: [
-                            buildMessageList(
-                              context,
-                              props,
-                            ),
-                            Positioned(
-                              child: Visibility(
-                                visible: props.roomsLoading,
-                                child: Container(
-                                    child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    RefreshProgressIndicator(
-                                      strokeWidth:
-                                          Dimensions.defaultStrokeWidth,
-                                      valueColor:
-                                          new AlwaysStoppedAnimation<Color>(
-                                        PRIMARY_COLOR,
-                                      ),
-                                      value: null,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Disimiss keyboard if they click outside the text input
+                        inputFieldNode.unfocus();
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: Stack(
+                        children: [
+                          buildMessageList(
+                            context,
+                            props,
+                          ),
+                          Positioned(
+                            child: Visibility(
+                              visible: props.loading,
+                              child: Container(
+                                  child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  RefreshProgressIndicator(
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                      PRIMARY_COLOR,
                                     ),
-                                  ],
-                                )),
-                              ),
+                                    value: null,
+                                  ),
+                                ],
+                              )),
                             ),
-                          ],
-                        ),
+                          ),
+                          Positioned(
+                            child: Visibility(
+                              visible: props.loading,
+                              child: Container(
+                                  child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  RefreshProgressIndicator(
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                      PRIMARY_COLOR,
+                                    ),
+                                    value: null,
+                                  ),
+                                ],
+                              )),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -697,7 +734,7 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final List<Message> messages;
-  final bool roomsLoading;
+  final bool loading;
   final ThemeType theme;
   final Color roomPrimaryColor;
 
@@ -705,26 +742,31 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
-  final Function onForceFetchSync;
+  final Function onLoadMoreMessages;
 
   _Props({
     @required this.room,
     @required this.theme,
     @required this.userId,
     @required this.messages,
-    @required this.roomsLoading,
+    @required this.loading,
     @required this.roomPrimaryColor,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
-    @required this.onForceFetchSync,
+    @required this.onLoadMoreMessages,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
-        roomsLoading: store.state.roomStore.loading,
+        loading: roomSelectors
+            .room(
+              id: roomId,
+              state: store.state,
+            )
+            .syncing,
         room: roomSelectors.room(
           id: roomId,
           state: store.state,
@@ -746,10 +788,6 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
-        onForceFetchSync: () async {
-          await store.dispatch(fetchSync());
-          return Future(() => true);
-        },
         onSaveDraftMessage: ({
           String body,
           String type,
@@ -783,6 +821,12 @@ class _Props extends Equatable {
             roomId: roomId,
           ),
         ),
+        onLoadMoreMessages: () => store.dispatch(fetchMessageEvents(
+            room: roomSelectors.room(
+          id: roomId,
+          state: store.state,
+        ))),
+
         /**
          * TODO: Room Drafts
          */
@@ -798,6 +842,6 @@ class _Props extends Equatable {
         messages,
         room,
         roomPrimaryColor,
-        roomsLoading,
+        loading,
       ];
 }

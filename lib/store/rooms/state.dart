@@ -19,6 +19,7 @@ class RoomStore extends Equatable {
   @HiveField(3)
   final int lastUpdate; // Last timestamp for actual new info
 
+  // consider renaming to nextBatch
   @HiveField(4)
   final String lastSince; // Since we last checked for new info
 

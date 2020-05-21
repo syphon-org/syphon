@@ -200,6 +200,48 @@ ThunkAction<AppState> stopSyncSubscriber() {
 }
 
 /**
+ * Sync Data
+ * 
+ * Helper action that will determine how to update a room
+ * from data formatted like a sync request
+ */
+ThunkAction<AppState> syncData(
+  Map roomData,
+) {
+  return (Store<AppState> store) async {
+    // init new store containers
+    final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+    final user = store.state.authStore.user;
+
+    // syncing null data happens sometimes?
+    if (roomData == null) {
+      return;
+    }
+
+    // update those that exist or add a new room
+    roomData.forEach((id, json) {
+      // use pre-existing values where available
+      Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
+
+      // Filter through parsers
+      room = room.fromSync(
+        json: json,
+        currentUser: user,
+      );
+
+      // fetch avatar if a uri was found
+      if (room.avatarUri != null) {
+        store.dispatch(fetchThumbnail(
+          mxcUri: room.avatarUri,
+        ));
+      }
+
+      store.dispatch(SetRoom(room: room));
+    });
+  };
+}
+
+/**
  * 
  * Fetch Sync
  * 
@@ -226,13 +268,13 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
           // TODO: signin prompt needed
+          print('[fetchSync] invalid token - prompt info on offline mode');
         } else {
           throw data['error'];
         }
       }
 
-      final Map<String, dynamic> rawRooms =
-          data['rooms']['join'] ?? Map<String, Room>();
+      final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
       // Local state updates based on changes
       await store.dispatch(syncData(rawRooms));
@@ -279,13 +321,16 @@ ThunkAction<AppState> fetchRooms() {
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
       final fullJoinedRooms = joinedRooms.map((room) async {
         try {
-          store.dispatch(UpdateRoom(id: room.id, syncing: true));
           final stateEvents = await MatrixApi.fetchStateEvents(
             protocol: protocol,
             homeserver: store.state.authStore.user.homeserver,
             accessToken: store.state.authStore.user.accessToken,
             roomId: room.id,
           );
+
+          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+            throw stateEvents['error'];
+          }
 
           final messageEvents = await MatrixApi.fetchMessageEvents(
             protocol: protocol,
@@ -336,6 +381,8 @@ ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     final stopwatch = Stopwatch()..start();
     try {
+      store.dispatch(SetLoading(loading: true));
+
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -386,6 +433,7 @@ ThunkAction<AppState> fetchDirectRooms() {
                 },
                 'timeline': {
                   'events': messageEvents['chunk'],
+                  'prev_batch': messageEvents['from'],
                 },
                 'account_data': {
                   'events': [
@@ -407,44 +455,10 @@ ThunkAction<AppState> fetchDirectRooms() {
     } catch (error) {
       print('[fetchDirectRooms] $error');
     } finally {
+      store.dispatch(SetLoading(loading: false));
       print('[fetchDirectRooms] TIMESTAMP ${stopwatch.elapsed}');
       stopwatch.stop();
     }
-  };
-}
-
-/**
- * Sync Data
- * 
- * Helper action that will determine how to update a room
- * from data formatted like a sync request
- */
-ThunkAction<AppState> syncData(Map roomData) {
-  return (Store<AppState> store) async {
-    // init new store containers
-    final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
-    final user = store.state.authStore.user;
-
-    // update those that exist or add a new room
-    roomData.forEach((id, json) {
-      // use pre-existing values where available
-      Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
-
-      // Filter through parsers
-      room = room.fromSync(
-        json: json,
-        currentUser: user,
-      );
-
-      // fetch avatar if a uri was found
-      if (room.avatarUri != null) {
-        store.dispatch(fetchThumbnail(
-          mxcUri: room.avatarUri,
-        ));
-      }
-
-      store.dispatch(SetRoom(room: room));
-    });
   };
 }
 

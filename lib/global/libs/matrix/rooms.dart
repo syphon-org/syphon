@@ -15,12 +15,14 @@ abstract class Rooms {
     String accessToken,
     String since,
     bool fullState = false,
+    String setPresence = 'unavailable',
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
+    url += '&set_presence=$setPresence';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

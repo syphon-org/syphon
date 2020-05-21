@@ -39,9 +39,9 @@ abstract class Events {
     String homeserver = 'matrix.org',
     String accessToken,
     String roomId,
-    String start,
+    String from,
+    String to,
     int limit = 10,
-    String end,
     bool desc = true, // Direction of events
   }) async {
     String url =
@@ -49,8 +49,8 @@ abstract class Events {
 
     // Params
     url += '?limit=$limit';
-    url += start != null ? '&from=${start}' : '';
-    url += end != null ? '&to=${end}' : '';
+    url += from != null ? '&from=${from}' : '';
+    url += to != null ? '&to=${to}' : '';
     url += desc ? '&dir=b' : '&dir=f';
 
     Map<String, String> headers = {

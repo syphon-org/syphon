@@ -34,10 +34,12 @@ class Room {
   @HiveField(9)
   final bool isDraftRoom;
 
-  @HiveField(10)
-  final String startTime;
   @HiveField(11)
-  final String endTime;
+  final String toHash; // end of last message fetch
+  @HiveField(10)
+  final String fromHash; // start of last messages fetch (usually prev_batch)
+  @HiveField(26)
+  final String prevHash; // fromHash but from /sync only
 
   @HiveField(12)
   final int lastUpdate;
@@ -97,8 +99,9 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.isDraftRoom = false,
-    this.startTime,
-    this.endTime,
+    this.fromHash,
+    this.toHash,
+    this.prevHash,
     this.messageReads,
   });
 
@@ -112,8 +115,6 @@ class Room {
     direct,
     syncing,
     sending,
-    startTime,
-    endTime,
     lastRead,
     lastUpdate,
     totalJoinedUsers,
@@ -128,6 +129,9 @@ class Room {
     outbox,
     messages,
     messageReads,
+    fromHash,
+    toHash,
+    prevHash,
   }) {
     return Room(
       id: id ?? this.id,
@@ -151,6 +155,9 @@ class Room {
       messages: messages ?? this.messages,
       users: users ?? this.users,
       messageReads: messageReads ?? this.messageReads,
+      toHash: toHash ?? this.toHash,
+      fromHash: fromHash ?? this.fromHash,
+      prevHash: prevHash ?? this.prevHash,
     );
   }
 
@@ -178,6 +185,10 @@ class Room {
     User currentUser,
     Map<String, dynamic> json,
   }) {
+    String toHash;
+    String fromHash;
+    String prevHash = this.prevHash;
+
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
     List<Message> timelineEvents = [];
@@ -191,6 +202,10 @@ class Room {
     }
 
     if (json['timeline'] != null) {
+      toHash = json['timeline']['to'];
+      fromHash = json['timeline']['from'];
+      prevHash = json['timeline']['prev_batch'];
+
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
       timelineEvents = rawTimelineEvents
@@ -222,6 +237,9 @@ class Room {
         )
         .fromMessageEvents(
           timelineEvents,
+          toHash: toHash,
+          fromHash: fromHash,
+          prevHash: prevHash,
         )
         .fromEphemeralEvents(
           ephemeralEvents,
@@ -280,7 +298,7 @@ class Room {
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
-            if (this.direct && this.users.length < 3) {
+            if (this.direct && this.users != null && this.users.length < 3) {
               if (displayName == null && event.sender != currentUser.userId) {
                 namePriority = 0;
                 name = formatShortname(event.sender);
@@ -297,7 +315,7 @@ class Room {
               users[event.sender] = User(
                 userId: event.sender,
                 displayName: displayName,
-                avatarUri: avatarUri,
+                avatarUri: memberAvatarUri,
               );
             }
             break;
@@ -329,8 +347,9 @@ class Room {
    */
   Room fromMessageEvents(
     List<Message> messageEvents, {
-    String startTime,
-    String endTime,
+    String toHash,
+    String fromHash,
+    String prevHash,
   }) {
     try {
       int lastUpdate = this.lastUpdate;
@@ -344,7 +363,7 @@ class Room {
           messages.where((event) => event.type == 'm.room.message').toList();
 
       // See if the newest message has a greater timestamp
-      if (newMessages.isNotEmpty && messages[0].timestamp > lastUpdate) {
+      if (newMessages.isNotEmpty && lastUpdate < messages[0].timestamp) {
         lastUpdate = messages[0].timestamp;
       }
 
@@ -359,18 +378,21 @@ class Room {
         value: (message) => message,
       );
 
-      outbox.removeWhere((message) => messagesMap.containsKey(message.id));
+      // Remove outboxed messages
+      outbox.removeWhere(
+        (message) => messagesMap.containsKey(message.id),
+      );
 
-      // Confirm sorting the messages here, I think this should be done by the
-      final combinedMessages = List<Message>.from(messagesMap.values);
+      // Filter to find startTime and endTime
+      final allMessages = List<Message>.from(messagesMap.values);
 
-      // Add to room
       return this.copyWith(
-        messages: combinedMessages,
+        messages: allMessages,
         outbox: outbox,
         lastUpdate: lastUpdate ?? this.lastUpdate,
-        startTime: startTime ?? this.startTime,
-        endTime: endTime ?? this.endTime,
+        toHash: toHash ?? this.toHash,
+        fromHash: fromHash ?? this.fromHash,
+        prevHash: prevHash ?? this.prevHash,
       );
     } catch (error) {
       print('[fromMessageEvents] $error');
@@ -393,7 +415,6 @@ class Room {
 
     try {
       events.forEach((event) {
-        print('[fromEphemeralEvents] ${event.type}');
         switch (event.type) {
           case 'm.typing':
             // TODO: save which users are typing
