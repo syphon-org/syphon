@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:Tether/global/libs/hive/index.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 /** 
  *  Save Full Sync
@@ -21,6 +23,8 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
     encryptionCipher: HiveAesCipher(encryptionKey),
     compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
   );
+
+  print('[saveSyncIsolate] it saves to boox');
 
   await syncBox.put(Cache.syncKey, params['sync']);
   await syncBox.close();

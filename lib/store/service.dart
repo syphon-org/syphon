@@ -79,7 +79,7 @@ class BackgroundSync {
  */
 void backgroundSyncJob() async {
   try {
-    const int syncInterval = 5;
+    const int syncInterval = 30;
     const int secondsTimeout = 60;
     final int isolateId = Isolate.current.hashCode;
 
@@ -98,6 +98,7 @@ void backgroundSyncJob() async {
     final String protocol = 'https://';
     final String homeserver = 'matrix.org';
     final String accessToken = backgroundCache.get(Cache.accessTokenKey);
+    final String lastSince = backgroundCache.get(Cache.lastSinceKey);
 
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
 
@@ -112,13 +113,13 @@ void backgroundSyncJob() async {
       pluginInstance: pluginInstance,
     );
 
-    for (int i = 0; i < secondsTimeout && accessToken != null; i++) {
+    for (int i = 0; i < secondsTimeout; i++) {
       if (i % syncInterval == 0) {
         Timer(Duration(seconds: i), () async {
           try {
             // Check isolate id and maybe see if a new one is created
             print(
-              "[AndroidAlarmService] Running Fetch Sync $i timestamp=${DateTime.now()} isolate=$isolateId",
+              "[AndroidAlarmService] ($isolateId) Running Fetch Sync $i timestamp=${DateTime.now()}",
             );
 
             /**
@@ -126,14 +127,21 @@ void backgroundSyncJob() async {
              * No need to update the hive store for now, just do not save the lastSince
              * to the store and the next foreground fetchSync will update the state
              */
+
+            print(
+              "[AndroidAlarmService] sync running",
+            );
             final data = await MatrixApi.sync(
               protocol: protocol,
               homeserver: homeserver,
               accessToken: accessToken,
-              since: backgroundCache.get(Cache.lastSinceKey),
+              since: lastSince,
             );
 
-            final String lastSince = data['next_batch'];
+            print(
+              "[AndroidAlarmService] sync completed",
+            );
+
             final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
             rawRooms.forEach((roomId, room) {
@@ -161,17 +169,14 @@ void backgroundSyncJob() async {
               }
             });
 
-            backgroundCache.put(Cache.lastSinceKey, lastSince);
+            final newLastSince = data['next_batch'];
+            backgroundCache.put(Cache.lastSinceKey, newLastSince);
 
             print(
-              "[AndroidAlarmService] New Last Since ${data['next_batch']}",
-            );
-
-            print(
-              "[AndroidAlarmService] Room Data $rawRooms}",
+              "[AndroidAlarmService] New Last Since $newLastSince",
             );
           } catch (error) {
-            print('[BackgroundSync Service] Fetching Sync Failure $error');
+            print('[AndroidAlarmService] sync failed $error');
           }
         });
       }

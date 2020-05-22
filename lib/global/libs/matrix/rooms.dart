@@ -19,6 +19,7 @@ abstract class Rooms {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
+    print('[Sync REQUEST] $url $accessToken');
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
@@ -33,7 +34,7 @@ abstract class Rooms {
       headers: headers,
     );
 
-    print('[SYNC RESPONSE] ${response.statusCode} ${response.body}');
+    print('[Sync RESPONSE] ${response.statusCode} ${response.body}');
 
     return await json.decode(response.body);
   }

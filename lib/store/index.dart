@@ -96,10 +96,10 @@ Future<Store> initStore() async {
       switch (action.runtimeType) {
         case SetSyncing:
         case SetSynced:
-          print('[Redux Persist] Not caching');
+          print('[Redux Persist] cache miss');
           return false;
         default:
-          print('[Redux Persist] Caching');
+          print('[Redux Persist] caching');
           return true;
       }
     },

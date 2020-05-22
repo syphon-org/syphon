@@ -41,6 +41,7 @@ void _enablePlatformOverrideForDesktop() {
 void main() async {
   // initializeReflectable();
   WidgetsFlutterBinding();
+  WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
   _enablePlatformOverrideForDesktop();
 
