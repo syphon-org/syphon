@@ -6,6 +6,7 @@ import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/sync/actions.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
@@ -139,8 +140,8 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(fetchUserProfile());
 
         // Run for new authed user without a proper sync
-        if (store.state.roomStore.lastSince == null) {
-          await store.dispatch(initialRoomSync());
+        if (store.state.syncStore.lastSince == null) {
+          await store.dispatch(initialSync());
         }
 
         globalNotificationPluginInstance = await initNotifications(
@@ -150,8 +151,8 @@ ThunkAction<AppState> startAuthObserver() {
         );
         store.dispatch(startSyncObserver());
       } else {
-        store.dispatch(stopSyncObserver());
-        store.dispatch(SetSynced(synced: false, lastSince: null));
+        await store.dispatch(stopSyncObserver());
+        store.dispatch(ResetSync());
         store.dispatch(ResetRooms());
         store.dispatch(ResetUser());
       }

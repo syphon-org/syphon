@@ -47,7 +47,7 @@ void main() async {
   // init cold cache (mobile only)
   await initHive();
   Cache.state = await openHiveState();
-  Cache.sync = await openHiveSyncUnsafe();
+  Cache.sync = await openHiveSync();
 
   // init state cache (hot)
   final store = await initStore();

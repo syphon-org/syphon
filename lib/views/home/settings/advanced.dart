@@ -3,6 +3,7 @@ import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:Tether/store/service.dart';
+import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -261,16 +262,16 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        syncing: store.state.roomStore.syncing,
-        loading: store.state.roomStore.syncing || store.state.roomStore.loading,
-        roomsLoading: store.state.roomStore.loading,
+        syncing: store.state.syncStore.syncing,
+        loading: store.state.syncStore.syncing || store.state.syncStore.loading,
+        roomsLoading: store.state.syncStore.loading,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
-        lastSince: store.state.roomStore.lastSince,
-        roomsObserverEnabled: store.state.roomStore.roomObserver != null &&
-            store.state.roomStore.roomObserver.isActive,
+        lastSince: store.state.syncStore.lastSince,
+        roomsObserverEnabled: store.state.syncStore.syncObserver != null &&
+            store.state.syncStore.syncObserver.isActive,
         onToggleSyncing: () {
-          final observer = store.state.roomStore.roomObserver;
+          final observer = store.state.syncStore.syncObserver;
           if (observer != null && observer.isActive) {
             store.dispatch(stopSyncObserver());
           } else {
@@ -278,15 +279,15 @@ class _Props extends Equatable {
           }
         },
         onManualSync: () {
-          if (store.state.roomStore.lastSince != null) {
-            store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
+          if (store.state.syncStore.lastSince != null) {
+            store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
           }
         },
         onForceFullSync: () {
           store.dispatch(fetchSync(forceFull: true));
         },
         onForceFunction: () {
-          store.dispatch(initialRoomSync());
+          store.dispatch(initialSync());
         },
       );
 }

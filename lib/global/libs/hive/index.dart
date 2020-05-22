@@ -9,6 +9,7 @@ import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/store/rooms/state.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/sync/state.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -73,10 +74,11 @@ Future<void> initHiveConfiguration(dynamic storageLocation) async {
   Hive.registerAdapter(DeviceAdapter());
 
   // Custom Store Models
+  Hive.registerAdapter(AuthStoreAdapter());
+  Hive.registerAdapter(SyncStoreAdapter());
+  Hive.registerAdapter(RoomStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
-  Hive.registerAdapter(RoomStoreAdapter());
-  Hive.registerAdapter(AuthStoreAdapter());
 }
 
 /**
@@ -129,9 +131,9 @@ Future<Box> openHiveBackgroundUnsafe() async {
 }
 
 /**
- * openHiveState - default
+ * Open Hive State
  * 
- * Initializes encrypted storage for caching  
+ * Initializes encrypted storage for caching current state
  */
 Future<Box> openHiveState() async {
   var encryptionKey;
@@ -174,11 +176,11 @@ Future<Box> openHiveState() async {
 }
 
 /**
- * openHiveState - default
+ *  Open Hive Sync
  * 
- * Initializes encrypted storage for caching  
+ * Initializes encrypted storage for caching sync
  */
-Future<Box> openHiveSync() async {
+Future<LazyBox> openHiveSync() async {
   var encryptionKey;
   // Check if storage has been created before
   final storageEngine = FlutterSecureStorage();
@@ -204,15 +206,14 @@ Future<Box> openHiveSync() async {
     // Decode raw encryption key
     encryptionKey = List<int>.from(jsonDecode(encryptionKey));
 
-    print('[openHiveState] $encryptionKey');
-    return await Hive.openBox(
+    return await Hive.openLazyBox(
       Cache.syncKey,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    print('[openHiveState] storage engine failure - $error');
-    return await Hive.openBox(
+    print('[openHiveState] failure $error');
+    return await Hive.openLazyBox(
       Cache.syncKeyUNSAFE,
     );
   }

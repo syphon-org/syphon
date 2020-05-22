@@ -94,7 +94,7 @@ ThunkAction<AppState> fetchMessageEvents({
         print('${message['sender']} ${message['content']}');
       });
 
-      store.dispatch(syncState(
+      store.dispatch(syncRoomState(
         {
           '${room.id}': {
             'timeline': {
@@ -116,45 +116,13 @@ ThunkAction<AppState> fetchMessageEvents({
   };
 }
 
-// ThunkAction<AppState> fetchStateEvents({Room room}) {
-//   return (Store<AppState> store) async {
-//     try {
-//       // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
-//       store.dispatch(UpdateRoom(id: room.id, syncing: true));
-
-//       final stateEventJson = await MatrixApi.fetchStateEvents(
-//         protocol: protocol,
-//         homeserver: store.state.authStore.user.homeserver,
-//         accessToken: store.state.authStore.user.accessToken,
-//         roomId: room.id,
-//       );
-
-//       // Convert all of the events and save
-//       final List<Event> stateEvents =
-//           stateEventJson.map((event) => Event.fromJson(event)).toList();
-
-//       // Add State events to room and toggle syncing
-//       final user = store.state.authStore.user;
-
-//       store.dispatch(SetRoomState(
-//         id: room.id,
-//         state: stateEvents,
-//         currentUser: user.displayName,
-//       ));
-
-//       final updatedRoom = store.state.roomStore.rooms[room.id];
-//       if (updatedRoom.avatarUri != null) {
-//         store.dispatch(fetchThumbnail(
-//           mxcUri: updatedRoom.avatarUri,
-//         ));
-//       }
-//     } catch (error) {
-//       print('[fetchRoomState] error: ${room.id} $error');
-//     } finally {
-//       store.dispatch(UpdateRoom(id: room.id, syncing: false));
-//     }
-//   };
-// }
+/**
+ * DEPRECATED: paginating state events can only be 
+ * done from full state /sync data
+ */
+ThunkAction<AppState> fetchStateEvents({Room room}) {
+  return (Store<AppState> store) async {};
+}
 
 ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {

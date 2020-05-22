@@ -78,8 +78,8 @@ dependencies:
   flutter_svg: ^0.17.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
-  webview_flutter: ^0.3.21
-  touchable_opacity: 1.0.2  
+  webview_flutter: ^0.3.21 
+  touchable_opacity: 1.0.2
   fab_circular_menu: ^1.0.0
   flutter_recaptcha_v2: 0.1.0
   smooth_page_indicator: 0.1.1

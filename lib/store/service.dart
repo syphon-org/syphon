@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
@@ -7,14 +6,11 @@ import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
 
-import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/global/notifications.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 
 const tether_service_id = 255;
 const service_interval = Duration(seconds: 5);

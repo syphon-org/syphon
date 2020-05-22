@@ -6,6 +6,9 @@ import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
 import 'package:Tether/store/rooms/actions.dart';
+import 'package:Tether/store/sync/actions.dart';
+import 'package:Tether/store/sync/reducer.dart';
+import 'package:Tether/store/sync/state.dart';
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -31,21 +34,23 @@ import 'package:redux_persist/redux_persist.dart';
 
 class AppState extends Equatable {
   final bool loading;
-  final AlertsStore alertsStore;
   final AuthStore authStore;
+  final AlertsStore alertsStore;
   final MatrixStore matrixStore;
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
+  final SyncStore syncStore;
 
   AppState({
     this.loading = true,
-    this.alertsStore = const AlertsStore(),
     this.authStore = const AuthStore(),
+    this.alertsStore = const AlertsStore(),
     this.matrixStore = const MatrixStore(),
     this.mediaStore = const MediaStore(),
     this.settingsStore = const SettingsStore(),
     this.roomStore = const RoomStore(),
+    this.syncStore = const SyncStore(),
   });
 
   @override
@@ -62,10 +67,11 @@ class AppState extends Equatable {
 AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
+    authStore: authReducer(state.authStore, action),
     alertsStore: alertsReducer(state.alertsStore, action),
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
-    authStore: authReducer(state.authStore, action),
+    syncStore: syncReducer(state.syncStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
   );
@@ -134,19 +140,11 @@ class HiveSerializer implements StateSerializer<AppState> {
 
     try {
       Cache.state.put(
-        state.mediaStore.runtimeType.toString(),
-        state.mediaStore,
+        state.syncStore.runtimeType.toString(),
+        state.syncStore,
       );
     } catch (error) {
-      print('[Hive Storage MediaStore] - $error');
-    }
-    try {
-      Cache.state.put(
-        state.settingsStore.runtimeType.toString(),
-        state.settingsStore,
-      );
-    } catch (error) {
-      print('[Hive Storage SettingsStore] error - $error');
+      print('[Hive Storage SyncStore] error - $error');
     }
 
     try {
@@ -158,20 +156,57 @@ class HiveSerializer implements StateSerializer<AppState> {
       print('[Hive Storage RoomStore] error - $error');
     }
 
+    try {
+      Cache.state.put(
+        state.mediaStore.runtimeType.toString(),
+        state.mediaStore,
+      );
+    } catch (error) {
+      print('[Hive Storage MediaStore] - $error');
+    }
+
+    try {
+      Cache.state.put(
+        state.settingsStore.runtimeType.toString(),
+        state.settingsStore,
+      );
+    } catch (error) {
+      print('[Hive Storage SettingsStore] error - $error');
+    }
+
     // Disregard redux persist storage saving
     return null;
   }
 
   AppState decode(Uint8List data) {
     AuthStore authStoreConverted = AuthStore();
+    SyncStore syncStoreConverted = SyncStore();
     MediaStore mediaStoreConverted = MediaStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
+    SettingsStore settingsStoreConverted = SettingsStore();
 
     authStoreConverted = Cache.state.get(
       authStoreConverted.runtimeType.toString(),
       defaultValue: AuthStore(),
     );
+
+    try {
+      syncStoreConverted = Cache.state.get(
+        syncStoreConverted.runtimeType.toString(),
+        defaultValue: SyncStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
+      roomStoreConverted = Cache.state.get(
+        roomStoreConverted.runtimeType.toString(),
+        defaultValue: RoomStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
 
     try {
       mediaStoreConverted = Cache.state.get(
@@ -191,21 +226,13 @@ class HiveSerializer implements StateSerializer<AppState> {
       print('[AppState.fromJson - SettingsStore] error $error');
     }
 
-    try {
-      roomStoreConverted = Cache.state.get(
-        roomStoreConverted.runtimeType.toString(),
-        defaultValue: RoomStore(),
-      );
-    } catch (error) {
-      print('[AppState.fromJson - roomStoreConverted] error $error');
-    }
-
     return AppState(
       loading: false,
       authStore: authStoreConverted,
-      settingsStore: settingsStoreConverted,
+      syncStore: syncStoreConverted,
       roomStore: roomStoreConverted,
       mediaStore: mediaStoreConverted,
+      settingsStore: settingsStoreConverted,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/user/selectors.dart';
 import 'package:Tether/global/assets.dart';
@@ -437,6 +438,14 @@ class HomeViewState extends State<Home> {
                       },
                       child: Stack(
                         children: [
+                          GestureDetector(
+                            onTap: this.onDismissMessageOptions,
+                            child: buildChatList(
+                              sortedPrioritizedRooms(props.rooms),
+                              context,
+                              props,
+                            ),
+                          ),
                           Positioned(
                             child: Visibility(
                               visible: props.loadingRooms,
@@ -454,14 +463,6 @@ class HomeViewState extends State<Home> {
                                   ),
                                 ],
                               )),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: this.onDismissMessageOptions,
-                            child: buildChatList(
-                              sortedPrioritizedRooms(props.rooms),
-                              context,
-                              props,
                             ),
                           ),
                         ],
@@ -555,7 +556,7 @@ class _Props extends Equatable {
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onFetchSyncForced: () async {
           await store.dispatch(
-            fetchSync(since: store.state.roomStore.lastSince),
+            fetchSync(since: store.state.syncStore.lastSince),
           );
           return Future(() => true);
         },

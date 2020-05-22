@@ -3,7 +3,6 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
@@ -112,12 +111,14 @@ class ChatViewState extends State<ChatView> {
       final max = messagesController.position.maxScrollExtent;
 
       final limit = max - extentBefore;
-      if (limit < -32 && !loadMore) {
+      final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
+
+      if (atLimit && !loadMore) {
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
-      } else if (limit >= 0 && loadMore && !props.loading) {
+      } else if (!atLimit && loadMore && !props.loading) {
         this.setState(() {
           loadMore = false;
         });
