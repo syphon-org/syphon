@@ -17,15 +17,22 @@ class SyncStore extends Equatable {
   @HiveField(4)
   final String lastSince; // Since we last checked for new info
 
+  @HiveField(5)
+  final int interval = default_interval;
+
+  final int backoff;
   final bool loading;
   final bool syncing;
   final Timer syncObserver;
+
+  static const default_interval = 5;
 
   const SyncStore({
     this.synced = false,
     this.syncing = false,
     this.loading = false,
     this.lastUpdate = 0,
+    this.backoff,
     this.lastSince,
     this.syncObserver,
   });
@@ -47,7 +54,7 @@ class SyncStore extends Equatable {
     lastUpdate,
     syncObserver,
     lastSince,
-    rooms,
+    backoff,
   }) {
     return SyncStore(
       synced: synced ?? this.synced,
@@ -56,6 +63,7 @@ class SyncStore extends Equatable {
       lastUpdate: lastUpdate ?? this.lastUpdate,
       lastSince: lastSince ?? this.lastSince,
       syncObserver: syncObserver ?? this.syncObserver,
+      backoff: backoff ?? this.backoff,
     );
   }
 }

@@ -34,6 +34,8 @@ class Cache {
   static const stateKeyUNSAFE = 'tether_cache_unsafe';
   static const backgroundKeyUNSAFE = 'tether_background_cache_unsafe';
 
+  static const protocol = 'protocol';
+  static const homeserver = 'homeserver';
   static const accessTokenKey = 'accessToken';
   static const lastSinceKey = 'lastSince';
 }

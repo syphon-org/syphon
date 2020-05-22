@@ -1,9 +1,8 @@
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
-import 'package:Tether/store/service.dart';
 import 'package:Tether/store/sync/actions.dart';
+import 'package:Tether/store/sync/background/service.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -112,7 +111,7 @@ class AdvancedScreen extends StatelessWidget {
                       );
 
                       showBackgroundServiceNotification(
-                        notificationId: tether_service_id,
+                        notificationId: BackgroundSync.service_id,
                         debugContent:
                             DateFormat('E h:mm ss a').format(DateTime.now()),
                         pluginInstance: globalNotificationPluginInstance,
