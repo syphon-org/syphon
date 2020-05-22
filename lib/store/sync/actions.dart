@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/sync/services.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:Tether/store/rooms/actions.dart';
@@ -98,17 +102,17 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // Local state updates based on changes
       await store.dispatch(syncRoomState(rawRooms));
 
+      // TODO: encrypt and find a way to reasonably update this
+      if (isFullSync) {
+        store.dispatch(saveSync(data));
+      }
+
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
         lastSince: data['next_batch'],
       ));
-
-      // TODO: encrypt and find a way to reasonably update this
-      if (isFullSync) {
-        Cache.sync.put(Cache.syncKey, data);
-      }
 
       if (!kReleaseMode && isFullSync) {
         print('[fetchSync] full sync completed');
@@ -132,7 +136,7 @@ ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
     Timer syncObserver = Timer.periodic(Duration(seconds: 5), (timer) async {
       if (store.state.syncStore.lastSince == null) {
-        print('[Room Observer] skipping sync, needs full sync');
+        print('[Sync Observer] skipping sync, needs full sync');
         return;
       }
 
@@ -143,17 +147,17 @@ ThunkAction<AppState> startSyncObserver() {
           DateTime.now().difference(lastUpdate).compareTo(Duration(hours: 1));
 
       if (0 < retryTimeout) {
-        print('[Room Observer] forced retry timeout');
+        print('[Sync Observer] forced retry timeout');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
         return;
       }
 
       if (store.state.syncStore.syncing) {
-        print('[Room Observer] still syncing');
+        print('[Sync Observer] still syncing');
         return;
       }
 
-      print('[Room Observer] running sync');
+      print('[Sync Observer] running sync');
       store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
     });
 
@@ -179,13 +183,7 @@ ThunkAction<AppState> stopSyncObserver() {
 /**
  * Sync Storage Data
  * 
- * Will update the cold storage block of data
- * from the full_state /sync call
- */
-ThunkAction<AppState> saveSyncStorage(
-  Map roomData,
-) {
-  return (Store<AppState> store) async {
+ * 
     // Refreshing myself on list concat in dart without spread
     // Map testing = {
     //   "1": ["a", "b", "c"]
@@ -196,6 +194,28 @@ ThunkAction<AppState> saveSyncStorage(
 
     // testing.update("1", (value) => value + again["1"]);
     // print(testing);
+    
+ * Will update the cold storage block of data
+ * from the full_state /sync call
+ */
+ThunkAction<AppState> saveSync(
+  Map syncData,
+) {
+  return (Store<AppState> store) async {
+    // Offload the full state save
+    Cache.sync.close();
+    final storageLocation = await initStorageLocation();
+
+    print('[saveSync] started $storageLocation');
+
+    compute(saveSyncIsolate, {
+      'location': storageLocation,
+      'sync': syncData,
+    });
+
+    print('[saveSync] completed');
+
+    Cache.sync = await openHiveSync();
   };
 }
 
@@ -208,5 +228,42 @@ ThunkAction<AppState> saveSyncStorage(
 ThunkAction<AppState> loadSync(
   Map roomData,
 ) {
-  return (Store<AppState> store) async {};
+  return (Store<AppState> store) async {
+    print('[loadSync] started');
+    final storageLocation = await initStorageLocation();
+
+    final syncData = await compute(loadSyncIsolate, {
+      'location': storageLocation,
+    });
+
+    print('[loadSync] $syncData');
+  };
+}
+
+// WARNING: ONLY FOR TESTING OUTPUT
+Future<String> get _localPath async {
+  final directory = await getApplicationDocumentsDirectory();
+
+  return directory.path;
+}
+
+// WARNING: ONLY FOR TESTING OUTPUT
+Future<File> get _localFile async {
+  final path = await _localPath;
+  return File('$path/matrix.json');
+}
+
+// WARNING: ONLY FOR TESTING OUTPUT
+Future<dynamic> readFullSyncJson() async {
+  try {
+    final file = await _localFile;
+    String contents = await file.readAsString();
+    return await jsonDecode(contents);
+  } catch (error) {
+    // If encountering an error, return 0.
+    print('readFullSyncJson $error');
+    return null;
+  } finally {
+    print('** Read State From Disk Successfully **');
+  }
 }

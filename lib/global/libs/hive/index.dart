@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:convert/convert.dart';
 import 'dart:typed_data';
 
 import 'package:Tether/global/themes.dart';
@@ -33,11 +34,26 @@ class Cache {
   static const stateKeyUNSAFE = 'tether_cache_unsafe';
   static const backgroundKeyUNSAFE = 'tether_background_cache_unsafe';
 
-  static const backgroundAccessToken = 'accessToken';
-  static const backgroundLastSince = 'lastSince';
+  static const accessTokenKey = 'accessToken';
+  static const lastSinceKey = 'lastSince';
 }
 
-Future<dynamic> initColdStorageLocation() async {
+/**
+ * openHiveState UNSAFE
+ * 
+ * For testing purposes only - should be encrypting hive
+ */
+Future<void> initHive() async {
+  // Init storage location
+  final storageLocation = await initStorageLocation();
+
+  print('[initHive] $storageLocation');
+
+  // Init configuration
+  await initHiveConfiguration(storageLocation);
+}
+
+Future<dynamic> initStorageLocation() async {
   var storageLocation;
 
   try {
@@ -54,14 +70,15 @@ Future<dynamic> initColdStorageLocation() async {
       print('Caching is not supported on this platform');
     }
   } catch (error) {
-    print('[initColdStorageLocation] storage location failure - $error');
+    print('[initStorageLocation] storage location failure - $error');
   }
-  return storageLocation;
+  return storageLocation.path;
 }
 
-Future<void> initHiveConfiguration(dynamic storageLocation) async {
+Future<void> initHiveConfiguration(String storageLocationPath) async {
+  print('[initHiveConfiguration] $storageLocationPath');
   // Init hive cache
-  Hive.init(storageLocation.path);
+  Hive.init(storageLocationPath);
 
   // Init Custom Models
   Hive.registerAdapter(ThemeTypeAdapter());
@@ -81,17 +98,26 @@ Future<void> initHiveConfiguration(dynamic storageLocation) async {
   Hive.registerAdapter(SettingsStoreAdapter());
 }
 
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
-Future<void> initHive() async {
-  // Init storage location
-  final storageLocation = await initColdStorageLocation();
+Future<List<int>> unlockEncryptionKey() async {
+  // Check if storage has been created before
+  final storageEngine = FlutterSecureStorage();
 
-  // Init configuration
-  await initHiveConfiguration(storageLocation);
+  var encryptionKey = await storageEngine.read(
+    key: Cache.encryptionKeyLocation,
+  );
+
+  // Create a encryptionKey if a serialized one is not found
+  if (encryptionKey == null) {
+    encryptionKey = hex.encode(Hive.generateSecureKey());
+
+    await storageEngine.write(
+      key: Cache.encryptionKeyLocation,
+      value: encryptionKey,
+    );
+  }
+  print('[unlockEncryptionKey] $encryptionKey');
+
+  return hex.decode(encryptionKey);
 }
 
 /**
@@ -124,10 +150,18 @@ Future<LazyBox> openHiveSyncUnsafe() async {
  * For testing purposes only - should be encrypting hive
  */
 Future<Box> openHiveBackgroundUnsafe() async {
-  return await Hive.openBox(
-    Cache.backgroundKeyUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
+  var storageLocation;
+
+  // Init storage location
+  try {
+    storageLocation = await getApplicationDocumentsDirectory();
+  } catch (error) {
+    print('[openHiveBackgroundUnsafe] Storage Failure $error');
+  }
+
+  // Init hive cache + adapters
+  Hive.init(storageLocation.path);
+  return await Hive.openBox(Cache.backgroundKeyUNSAFE);
 }
 
 /**
@@ -136,39 +170,16 @@ Future<Box> openHiveBackgroundUnsafe() async {
  * Initializes encrypted storage for caching current state
  */
 Future<Box> openHiveState() async {
-  var encryptionKey;
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
   try {
-    encryptionKey = await storageEngine.read(
-      key: Cache.encryptionKeyLocation,
-    );
+    final encryptionKey = await unlockEncryptionKey();
 
-    // Create a encryptionKey if a serialized one is not found
-    if (encryptionKey == null) {
-      final generatedEncryptionkey = Hive.generateSecureKey();
-
-      await storageEngine.write(
-        key: Cache.encryptionKeyLocation,
-        value: jsonEncode(generatedEncryptionkey),
-      );
-
-      encryptionKey = await storageEngine.read(
-        key: Cache.encryptionKeyLocation,
-      );
-    }
-
-    // Decode raw encryption key
-    encryptionKey = List<int>.from(jsonDecode(encryptionKey));
-
-    print('[openHiveState] $encryptionKey');
     return await Hive.openBox(
       Cache.stateKey,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    print('[openHiveState] storage engine failure - $error');
+    print('[openHiveState] open failure: $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -181,30 +192,8 @@ Future<Box> openHiveState() async {
  * Initializes encrypted storage for caching sync
  */
 Future<LazyBox> openHiveSync() async {
-  var encryptionKey;
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
   try {
-    encryptionKey = await storageEngine.read(
-      key: Cache.encryptionKeyLocation,
-    );
-
-    // Create a encryptionKey if a serialized one is not found
-    if (encryptionKey == null) {
-      final generatedEncryptionkey = Hive.generateSecureKey();
-
-      await storageEngine.write(
-        key: Cache.encryptionKeyLocation,
-        value: jsonEncode(generatedEncryptionkey),
-      );
-
-      encryptionKey = await storageEngine.read(
-        key: Cache.encryptionKeyLocation,
-      );
-    }
-
-    // Decode raw encryption key
-    encryptionKey = List<int>.from(jsonDecode(encryptionKey));
+    final encryptionKey = await unlockEncryptionKey();
 
     return await Hive.openLazyBox(
       Cache.syncKey,
@@ -221,22 +210,11 @@ Future<LazyBox> openHiveSync() async {
 
 // // Closes and saves storage
 void closeStorage() async {
-  Box<dynamic> box = Hive.box(Cache.stateKey);
-  box.close();
+  if (Cache.sync != null && Cache.sync.isOpen) {
+    Cache.sync.close();
+  }
+
+  if (Cache.state != null && Cache.state.isOpen) {
+    Cache.sync.close();
+  }
 }
-
-// AppState rehydateStore() {
-//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-//   AppState state = box.get(APPSTATE_HIVE_KEY);
-//   return state;
-// }
-
-// void cacheStore(AppState state) async {
-//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-//   box.put(APPSTATE_HIVE_KEY, state);
-// }
-
-// void clearStorage() {
-//   Box<dynamic> box = Hive.box(HIVE_BOX_NAME);
-//   box.put(APPSTATE_HIVE_KEY, null);
-// }

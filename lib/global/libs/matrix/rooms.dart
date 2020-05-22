@@ -33,32 +33,7 @@ abstract class Rooms {
       headers: headers,
     );
 
-    return await json.decode(response.body);
-  }
-
-  /** 
-   * Sync (filter by roomId)
-   */
-  static Future<dynamic> syncRoom({
-    String protocol = 'https://', // http or https ( or libp2p :D )
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String since,
-    String roomId,
-  }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/sync';
-
-    // Params
-    url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer $accessToken',
-    };
-
-    final response = await http.get(
-      url,
-      headers: headers,
-    );
+    print('[SYNC RESPONSE] ${response.statusCode} ${response.body}');
 
     return await json.decode(response.body);
   }
@@ -75,11 +50,29 @@ abstract class Rooms {
     String since = params['since'];
     bool fullState = params['fullState'];
 
+    return await sync(
+      protocol: protocol,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      since: since,
+      fullState: fullState,
+    );
+  }
+
+  /** 
+   * Sync (filter by roomId)
+   */
+  static Future<dynamic> syncRoom({
+    String protocol = 'https://', // http or https ( or libp2p :D )
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String since,
+    String roomId,
+  }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
     // Params
-    url += '?full_state=$fullState';
-    url += since != null ? '&since=$since' : '';
+    url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

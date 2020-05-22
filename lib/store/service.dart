@@ -11,6 +11,7 @@ import 'package:Tether/global/notifications.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 const tether_service_id = 255;
 const service_interval = Duration(seconds: 5);
@@ -41,7 +42,7 @@ class BackgroundSync {
 
     print('[BackgroundSync] Starting Background Sync Service');
     final backgroundServiceHive = await openHiveBackgroundUnsafe();
-    await backgroundServiceHive.put(Cache.backgroundAccessToken, accessToken);
+    await backgroundServiceHive.put(Cache.accessTokenKey, accessToken);
 
     await AndroidAlarmManager.periodic(
       service_interval,
@@ -82,15 +83,28 @@ void backgroundSyncJob() async {
     const int secondsTimeout = 60;
     final int isolateId = Isolate.current.hashCode;
 
-    String protocol = 'https://';
-    String homeserver = 'matrix.org';
-    String accessToken;
+    // Init storage location
+    var storageLocation;
+    try {
+      storageLocation = await getApplicationDocumentsDirectory();
+    } catch (error) {
+      print('[initHiveStorage] storage location failure - $error');
+    }
 
-    Box backgroundCache = await openHiveBackgroundUnsafe();
-    accessToken = backgroundCache.get(Cache.backgroundAccessToken);
+    // Init hive cache + adapters
+    Hive.init(storageLocation.path);
+    Box backgroundCache = await Hive.openBox(Cache.backgroundKeyUNSAFE);
 
-    // TODO: remove onSelect handler
+    final String protocol = 'https://';
+    final String homeserver = 'matrix.org';
+    final String accessToken = backgroundCache.get(Cache.accessTokenKey);
+
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
+
+    if (accessToken == null) {
+      print('[backgroundSync] Sync Failure (No Access Token Provided)');
+      return;
+    }
 
     showBackgroundServiceNotification(
       notificationId: tether_service_id,
@@ -98,7 +112,7 @@ void backgroundSyncJob() async {
       pluginInstance: pluginInstance,
     );
 
-    for (int i = 0; i < secondsTimeout; i++) {
+    for (int i = 0; i < secondsTimeout && accessToken != null; i++) {
       if (i % syncInterval == 0) {
         Timer(Duration(seconds: i), () async {
           try {
@@ -116,7 +130,7 @@ void backgroundSyncJob() async {
               protocol: protocol,
               homeserver: homeserver,
               accessToken: accessToken,
-              since: backgroundCache.get(Cache.backgroundLastSince),
+              since: backgroundCache.get(Cache.lastSinceKey),
             );
 
             final String lastSince = data['next_batch'];
@@ -147,7 +161,7 @@ void backgroundSyncJob() async {
               }
             });
 
-            backgroundCache.put(Cache.backgroundLastSince, lastSince);
+            backgroundCache.put(Cache.lastSinceKey, lastSince);
 
             print(
               "[AndroidAlarmService] New Last Since ${data['next_batch']}",

@@ -4,6 +4,7 @@ description: Privacy centric matrix client for everyone
 # flutter commands
 # $ flutter create --org org.tether tether
 # $ flutter run --no-fast-start
+# $ flutter pub get
 # $ flutter pub global run devtools 
 # $ flutter pub run build_runner build
 # $ flutter pub run build_runner watch 
@@ -51,6 +52,7 @@ dependencies:
   expandable: 3.0.1
   equatable: ^1.1.0
   crypt: ^3.0.0
+  convert: ^2.1.1
   steel_crypt: 1.7.1
   device_info: ^0.4.2
   redux: 4.0.0

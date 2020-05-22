@@ -279,9 +279,7 @@ class _Props extends Equatable {
           }
         },
         onManualSync: () {
-          if (store.state.syncStore.lastSince != null) {
-            store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
-          }
+          store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
         },
         onForceFullSync: () {
           store.dispatch(fetchSync(forceFull: true));
