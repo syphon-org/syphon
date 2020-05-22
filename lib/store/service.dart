@@ -4,7 +4,10 @@ import 'dart:isolate';
 import 'dart:math';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
+import 'package:Tether/store/rooms/room/model.dart';
+import 'package:Tether/store/user/selectors.dart';
 import 'package:hive/hive.dart';
 
 import 'package:Tether/global/notifications.dart';
@@ -43,6 +46,7 @@ class BackgroundSync {
     print('[BackgroundSync] Starting Background Sync Service');
     final backgroundServiceHive = await openHiveBackgroundUnsafe();
     await backgroundServiceHive.put(Cache.accessTokenKey, accessToken);
+    await backgroundServiceHive.put(Cache.lastSinceKey, lastSince);
 
     await AndroidAlarmManager.periodic(
       service_interval,
@@ -69,6 +73,35 @@ class BackgroundSync {
   }
 }
 
+// /**
+//  * Fetch Sync Isolate
+//  * includes all necessary dependencies to operate
+//  * independent of the redux store or the main application
+//  * thread
+//  */
+
+// Future<dynamic> fetchSyncIsolate({
+//   String protocol,
+//   String homeserver,
+//   String accessToken,
+//   String since,
+// }) async {
+//   final request = buildSyncRequest(
+//     protocol: protocol,
+//     homeserver: homeserver,
+//     accessToken: accessToken,
+//     fullState: false,
+//     since: since,
+//   );
+
+//   final response = await http.get(
+//     request['url'],
+//     headers: request['headers'],
+//   );
+
+//   return await json.decode(response.body);
+// }
+
 /**
  * Background Sync Job (Android Only)
  * 
@@ -79,7 +112,7 @@ class BackgroundSync {
  */
 void backgroundSyncJob() async {
   try {
-    const int syncInterval = 30;
+    const int syncInterval = 10;
     const int secondsTimeout = 60;
     final int isolateId = Isolate.current.hashCode;
 
@@ -102,11 +135,6 @@ void backgroundSyncJob() async {
 
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
 
-    if (accessToken == null) {
-      print('[backgroundSync] Sync Failure (No Access Token Provided)');
-      return;
-    }
-
     showBackgroundServiceNotification(
       notificationId: tether_service_id,
       debugContent: DateFormat('E h:mm:ss a').format(DateTime.now()),
@@ -119,18 +147,28 @@ void backgroundSyncJob() async {
           try {
             // Check isolate id and maybe see if a new one is created
             print(
-              "[AndroidAlarmService] ($isolateId) Running Fetch Sync $i timestamp=${DateTime.now()}",
+              "[AndroidAlarmService] sync started ($isolateId) ($i) timestamp=${DateTime.now()}",
             );
 
+            if (accessToken == null) {
+              print(
+                '[AndroidAlarmService] sync failed | no access token found',
+              );
+              return;
+            }
+
+            if (lastSince == null) {
+              print(
+                "[AndroidAlarmService] sync failed | no next_batch timestamp found",
+              );
+
+              return;
+            }
             /**
              * Check last since and see if any new messages arrived in the payload
              * No need to update the hive store for now, just do not save the lastSince
              * to the store and the next foreground fetchSync will update the state
              */
-
-            print(
-              "[AndroidAlarmService] sync running",
-            );
             final data = await MatrixApi.sync(
               protocol: protocol,
               homeserver: homeserver,
@@ -142,35 +180,32 @@ void backgroundSyncJob() async {
               "[AndroidAlarmService] sync completed",
             );
 
+            final newLastSince = data['next_batch'];
             final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
-            rawRooms.forEach((roomId, room) {
+            backgroundCache.put(Cache.lastSinceKey, newLastSince);
+
+            rawRooms.forEach((roomId, json) {
               /**
               *TODO: Need to handle group / bigger room chats differently than direct chats
               */
-              final List<dynamic> timelineEvents = room['timeline']['events'];
 
-              if (timelineEvents != null && timelineEvents.length > 0) {
-                final messageEvent = timelineEvents.singleWhere(
-                  (element) => element['type'] == EventTypes.MESSAGE,
-                  orElse: () => null,
+              // Filter through parsers
+              final room = Room().fromSync(
+                json: json,
+              );
+
+              if (room.messages.length == 1) {
+                final String messageSender = room.messages[0].sender;
+                final formattedSender = formatShortname(messageSender);
+
+                showMessageNotification(
+                  messageHash: Random.secure().nextInt(20000),
+                  body: '$formattedSender sent a new message.',
+                  pluginInstance: pluginInstance,
                 );
-
-                if (messageEvent != null) {
-                  final String messageSender = messageEvent['sender'];
-                  final formattedSender =
-                      messageSender.replaceFirst('@', '').split(':')[0];
-                  showMessageNotification(
-                    messageHash: Random.secure().nextInt(20000),
-                    body: '$formattedSender sent you a new message.',
-                    pluginInstance: pluginInstance,
-                  );
-                }
               }
             });
-
-            final newLastSince = data['next_batch'];
-            backgroundCache.put(Cache.lastSinceKey, newLastSince);
 
             print(
               "[AndroidAlarmService] New Last Since $newLastSince",

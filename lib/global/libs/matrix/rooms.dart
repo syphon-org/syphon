@@ -15,15 +15,17 @@ abstract class Rooms {
     String accessToken,
     String since,
     bool fullState = false,
-    String setPresence = 'unavailable',
+    String setPresence,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
-    print('[Sync REQUEST] $url $accessToken');
+    if (since == null) {
+      print('WARNING SINCE IS NULL $url $accessToken');
+    }
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
-    url += '&set_presence=$setPresence';
+    url += setPresence != null ? '&set_presence=$setPresence' : '';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -33,8 +35,6 @@ abstract class Rooms {
       url,
       headers: headers,
     );
-
-    print('[Sync RESPONSE] ${response.statusCode} ${response.body}');
 
     return await json.decode(response.body);
   }

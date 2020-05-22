@@ -95,7 +95,7 @@ class NotificationSettings extends StatelessWidget {
                       ListTile(
                         enabled: Platform.isAndroid,
                         dense: true,
-                        onTap: () => props.onToggleLocalNotifications(context),
+                        onTap: () => props.onToggleLocalNotifications(),
                         contentPadding: contentPadding,
                         title: Text(
                           'Notifications',
@@ -106,8 +106,7 @@ class NotificationSettings extends StatelessWidget {
                             value: props.notificationsEnabled,
                             onChanged: !Platform.isAndroid
                                 ? null
-                                : (value) =>
-                                    props.onToggleLocalNotifications(context),
+                                : (value) => props.onToggleLocalNotifications(),
                           ),
                         ),
                       ),
@@ -188,7 +187,6 @@ class Props {
           notificationsEnabled: store.state.settingsStore.notificationsEnabled,
           onToggleLocalNotifications: () {
             store.dispatch(toggleNotifications());
-            // TODO: init background service
           },
           onToggleRemoteNotifications: (BuildContext context) {
             try {

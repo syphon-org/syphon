@@ -14,17 +14,20 @@ import 'package:path_provider/path_provider.dart';
 FutureOr<void> saveSyncIsolate(dynamic params) async {
   print('[saveSyncIsolate] ${Isolate.current.hashCode} ${params['location']}');
 
-  Hive.init(params['location']);
+  final storageLocation = params['location'];
+  Hive.init(storageLocation);
 
-  final encryptionKey = await unlockEncryptionKey();
+  Box syncBox = await Hive.openBox(Cache.backgroundKeyUNSAFE);
 
-  final syncBox = await Hive.openBox(
-    Cache.syncKey,
-    encryptionCipher: HiveAesCipher(encryptionKey),
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-  );
+  // final encryptionKey = await unlockEncryptionKey();
 
-  print('[saveSyncIsolate] it saves to boox');
+  // final syncBox = await Hive.openBox(
+  //   Cache.syncKey,
+  //   encryptionCipher: HiveAesCipher(encryptionKey),
+  //   compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+  // );
+
+  print('[saveSyncIsolate] it saves to box');
 
   await syncBox.put(Cache.syncKey, params['sync']);
   await syncBox.close();
