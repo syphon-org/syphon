@@ -16,6 +16,14 @@ Another reason this project was so important was the ability to go from zero to 
 ## Before Hitting The Code
 - Urls are always referencing matrix mxc:// protocol resources. Though they're actually URIs, they are referenced as URLs in the app to be consistant with the protocol spec
 
+## Architecture
+### Storage
+There are three layers to storage in Tether:
+    - Remote (Matrix Homeserver)
+    - Cache (Redux + Redux Persist +  Hive)
+        * cache is encrypted at rest
+    - Cold Storage (Hive)
+
 
 ## Getting Started
 - (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]

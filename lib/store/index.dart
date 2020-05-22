@@ -5,6 +5,7 @@ import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -56,17 +57,6 @@ class AppState extends Equatable {
         roomStore,
         settingsStore,
       ];
-
-  @override
-  String toString() {
-    return '{' +
-        '\alertsStore: $alertsStore,' +
-        '\authStore: $authStore,' +
-        '\nmatrixStore: $matrixStore, ' +
-        '\nroomStore: $roomStore,' +
-        '\nsettingsStore: $settingsStore,' +
-        '\n}';
-  }
 }
 
 AppState appReducer(AppState state, action) {
@@ -94,8 +84,19 @@ AppState appReducer(AppState state, action) {
 Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
-    throttleDuration: Duration(seconds: 5),
     serializer: HiveSerializer(),
+    throttleDuration: Duration(seconds: 5),
+    shouldSave: (Store<AppState> store, dynamic action) {
+      switch (action.runtimeType) {
+        case SetSyncing:
+        case SetSynced:
+          print('[Redux Persist] Not caching');
+          return false;
+        default:
+          print('[Redux Persist] Caching');
+          return true;
+      }
+    },
   );
 
   // Finally load persisted store
@@ -103,9 +104,9 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    print('[Redux Persist Load] persist loaded successfully');
+    print('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    print('[Redux Persist Load] error $error');
+    print('[Redux Persist] error $error');
   }
 
   final Store<AppState> store = new Store<AppState>(
@@ -117,18 +118,22 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-/// Serializer for a [Uint8List] state, basically pass-through
+/**
+ * Hive Serializer
+ * 
+ * Only reliance on redux is when too save state
+ */
 class HiveSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
-    Cache.hive.put(
+    Cache.state.put(
       state.authStore.runtimeType.toString(),
       state.authStore,
     );
 
     try {
-      Cache.hive.put(
+      Cache.state.put(
         state.mediaStore.runtimeType.toString(),
         state.mediaStore,
       );
@@ -136,7 +141,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       print('[Hive Storage MediaStore] - $error');
     }
     try {
-      Cache.hive.put(
+      Cache.state.put(
         state.settingsStore.runtimeType.toString(),
         state.settingsStore,
       );
@@ -145,7 +150,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      Cache.hive.put(
+      Cache.state.put(
         state.roomStore.runtimeType.toString(),
         state.roomStore,
       );
@@ -163,13 +168,13 @@ class HiveSerializer implements StateSerializer<AppState> {
     SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
 
-    authStoreConverted = Cache.hive.get(
+    authStoreConverted = Cache.state.get(
       authStoreConverted.runtimeType.toString(),
       defaultValue: AuthStore(),
     );
 
     try {
-      mediaStoreConverted = Cache.hive.get(
+      mediaStoreConverted = Cache.state.get(
         mediaStoreConverted.runtimeType.toString(),
         defaultValue: MediaStore(),
       );
@@ -178,7 +183,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      settingsStoreConverted = Cache.hive.get(
+      settingsStoreConverted = Cache.state.get(
         settingsStoreConverted.runtimeType.toString(),
         defaultValue: SettingsStore(),
       );
@@ -187,7 +192,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      roomStoreConverted = Cache.hive.get(
+      roomStoreConverted = Cache.state.get(
         roomStoreConverted.runtimeType.toString(),
         defaultValue: RoomStore(),
       );

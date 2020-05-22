@@ -57,7 +57,8 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  @HiveField(19)
+  // TODO: not caching state events for now
+  // @HiveField(19)
   final List<Event> state;
   @HiveField(20)
   final List<Message> messages;

@@ -157,11 +157,12 @@ class HomeViewState extends State<Home> {
     return AppBar(
       automaticallyImplyLeading: false,
       brightness: Brightness.dark,
-      titleSpacing: 18.00,
+      titleSpacing: 16.00,
       title: Row(children: <Widget>[
         Container(
           margin: EdgeInsets.only(right: 8),
           child: IconButton(
+            padding: EdgeInsets.all(4),
             icon: CircleAvatar(
               backgroundColor: Colors.grey,
               child: props.currentUser.avatarUri != null

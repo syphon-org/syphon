@@ -44,7 +44,7 @@ class BackgroundSync {
     }
 
     print('[BackgroundSync] Starting Background Sync Service');
-    final backgroundServiceHive = await initHiveBackgroundServiceUnsafe();
+    final backgroundServiceHive = await openHiveBackgroundUnsafe();
     await backgroundServiceHive.put(Cache.backgroundAccessToken, accessToken);
 
     await AndroidAlarmManager.periodic(
@@ -90,7 +90,7 @@ void backgroundSyncJob() async {
     String homeserver = 'matrix.org';
     String accessToken;
 
-    Box backgroundCache = await initHiveBackgroundServiceUnsafe();
+    Box backgroundCache = await openHiveBackgroundUnsafe();
     accessToken = backgroundCache.get(Cache.backgroundAccessToken);
 
     // TODO: remove onSelect handler

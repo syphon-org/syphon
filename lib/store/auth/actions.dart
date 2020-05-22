@@ -148,9 +148,9 @@ ThunkAction<AppState> startAuthObserver() {
             print('[onSelectNotification] payload');
           },
         );
-        store.dispatch(startSyncSubscriber());
+        store.dispatch(startSyncObserver());
       } else {
-        store.dispatch(stopSyncSubscriber());
+        store.dispatch(stopSyncObserver());
         store.dispatch(SetSynced(synced: false, lastSince: null));
         store.dispatch(ResetRooms());
         store.dispatch(ResetUser());
@@ -279,6 +279,7 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      store.dispatch(stopSyncObserver());
       // submit empty auth before logging out of matrix
 
       final data = await MatrixApi.logoutUser(

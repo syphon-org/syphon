@@ -157,7 +157,7 @@ ThunkAction<AppState> initialRoomSync() {
  * only while the app is _active_ otherwise, it will be up to a background service
  * and a notification service to trigger syncs
  */
-ThunkAction<AppState> startSyncSubscriber() {
+ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
     Timer roomObserver = Timer.periodic(Duration(seconds: 5), (timer) async {
       if (store.state.roomStore.lastSince == null) {
@@ -190,7 +190,7 @@ ThunkAction<AppState> startSyncSubscriber() {
   };
 }
 
-ThunkAction<AppState> stopSyncSubscriber() {
+ThunkAction<AppState> stopSyncObserver() {
   return (Store<AppState> store) async {
     if (store.state.roomStore.roomObserver != null) {
       store.state.roomStore.roomObserver.cancel();
@@ -200,12 +200,54 @@ ThunkAction<AppState> stopSyncSubscriber() {
 }
 
 /**
- * Sync Data
+ * Sync State Data
  * 
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncData(
+ThunkAction<AppState> syncState(
+  Map roomData,
+) {
+  return (Store<AppState> store) async {
+    // init new store containers
+    final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+    final user = store.state.authStore.user;
+
+    // syncing null data happens sometimes?
+    if (roomData == null) {
+      return;
+    }
+
+    // update those that exist or add a new room
+    roomData.forEach((id, json) {
+      // use pre-existing values where available
+      Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
+
+      // Filter through parsers
+      room = room.fromSync(
+        json: json,
+        currentUser: user,
+      );
+
+      // fetch avatar if a uri was found
+      if (room.avatarUri != null) {
+        store.dispatch(fetchThumbnail(
+          mxcUri: room.avatarUri,
+        ));
+      }
+
+      store.dispatch(SetRoom(room: room));
+    });
+  };
+}
+
+/**
+ * Sync Storage Data
+ * 
+ * Helper action that will determine how to update a room
+ * from data formatted like a sync request
+ */
+ThunkAction<AppState> syncStorage(
   Map roomData,
 ) {
   return (Store<AppState> store) async {
@@ -252,7 +294,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetSyncing(syncing: true));
-      if (since == null) {
+      final isFullSync = since == null;
+      if (isFullSync) {
         print('[fetchSync] fetching full sync');
       }
 
@@ -277,7 +320,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
       // Local state updates based on changes
-      await store.dispatch(syncData(rawRooms));
+      await store.dispatch(syncState(rawRooms));
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
@@ -287,10 +330,22 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       ));
 
       // TODO: encrypt and find a way to reasonably update this
-      if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.syncKey, data);
+      if (isFullSync) {
+        Cache.sync.put(Cache.syncKey, data);
       }
-      if (!kReleaseMode && since == null) {
+
+      // Refreshing myself on list concat in dart without spread
+      // Map testing = {
+      //   "1": ["a", "b", "c"]
+      // };
+      // Map again = {
+      //   "1": ["e", "f", "g"],
+      // };
+
+      // testing.update("1", (value) => value + again["1"]);
+      // print(testing);
+
+      if (!kReleaseMode && isFullSync) {
         print('[fetchSync] full sync completed');
       }
     } catch (error) {
@@ -339,7 +394,7 @@ ThunkAction<AppState> fetchRooms() {
             roomId: room.id,
           );
 
-          store.dispatch(syncData({
+          store.dispatch(syncState({
             '${room.id}': {
               'state': {
                 'events': stateEvents,
@@ -426,7 +481,7 @@ ThunkAction<AppState> fetchDirectRooms() {
 
             // Format response like /sync request
             // Hacked together to provide isDirect data
-            await store.dispatch(syncData({
+            await store.dispatch(syncState({
               '$roomId': {
                 'state': {
                   'events': stateEvents,
@@ -476,7 +531,7 @@ ThunkAction<AppState> createRoom({
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-      await store.dispatch(stopSyncSubscriber());
+      await store.dispatch(stopSyncObserver());
 
       final request = buildCreateRoom(
         protocol: protocol,
@@ -540,7 +595,7 @@ ThunkAction<AppState> createRoom({
 
         await store.dispatch(fetchDirectRooms());
       }
-      await store.dispatch(startSyncSubscriber());
+      await store.dispatch(startSyncObserver());
 
       return newRoomId;
     } catch (error) {
@@ -772,7 +827,7 @@ ThunkAction<AppState> storeSync() {
   return (Store<AppState> store) async {
     try {
       // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
+      // final json = Cache.state.get('sync');
       return true;
     } catch (error) {
       debugPrint(error);
@@ -785,7 +840,7 @@ ThunkAction<AppState> loadSync() {
   return (Store<AppState> store) async {
     try {
       // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
+      // final json = Cache.state.get('sync');
       return true;
     } catch (error) {
       debugPrint(error);

@@ -94,7 +94,7 @@ ThunkAction<AppState> fetchMessageEvents({
         print('${message['sender']} ${message['content']}');
       });
 
-      store.dispatch(syncData(
+      store.dispatch(syncState(
         {
           '${room.id}': {
             'timeline': {
@@ -105,6 +105,9 @@ ThunkAction<AppState> fetchMessageEvents({
           },
         },
       ));
+
+      // Have an equivalent json parser for cold storage?
+      // store.dispatch(syncStorage());
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {

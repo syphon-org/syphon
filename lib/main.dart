@@ -45,7 +45,9 @@ void main() async {
   _enablePlatformOverrideForDesktop();
 
   // init cold cache (mobile only)
-  Cache.hive = await initHiveStorageUnsafe();
+  await initHive();
+  Cache.state = await openHiveState();
+  Cache.sync = await openHiveSyncUnsafe();
 
   // init state cache (hot)
   final store = await initStore();

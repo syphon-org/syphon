@@ -272,9 +272,9 @@ class _Props extends Equatable {
         onToggleSyncing: () {
           final observer = store.state.roomStore.roomObserver;
           if (observer != null && observer.isActive) {
-            store.dispatch(stopSyncSubscriber());
+            store.dispatch(stopSyncObserver());
           } else {
-            store.dispatch(startSyncSubscriber());
+            store.dispatch(startSyncObserver());
           }
         },
         onManualSync: () {
