@@ -81,10 +81,13 @@ class MatrixImageState extends State<MatrixImage> {
           if (!props.mediaCache.containsKey(finalUriData ?? widget.mxcUri)) {
             print('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
-              margin: EdgeInsets.all(8),
+              width: widget.width,
+              height: widget.height,
               child: CircularProgressIndicator(
-                strokeWidth: widget.strokeWidth,
-                valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                strokeWidth: widget.strokeWidth * 1.5,
+                valueColor: new AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).accentColor,
+                ),
                 value: null,
               ),
             );

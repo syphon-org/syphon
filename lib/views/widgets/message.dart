@@ -44,6 +44,8 @@ class MessageWidget extends StatelessWidget {
     final message = this.message;
     var textColor = Colors.white;
     double indicatorSize = 14;
+
+    var showSender = true;
     var indicatorColor = Colors.white;
     var indicatorIconColor = Colors.white;
     var bubbleColor = hashedColor(message.sender);
@@ -100,6 +102,7 @@ class MessageWidget extends StatelessWidget {
             bottomLeft: Radius.circular(4),
             bottomRight: Radius.circular(16),
           );
+          showSender = false;
         } else {
           // Message at the beginning of a sender messages block
           bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
@@ -136,7 +139,6 @@ class MessageWidget extends StatelessWidget {
 
       indicatorColor = isRead ? textColor : bubbleColor;
       indicatorIconColor = isRead ? bubbleColor : textColor;
-      indicatorSize = isRead ? 14 : 14;
 
       messageAlignment = MainAxisAlignment.end;
       messageTextAlignment = CrossAxisAlignment.end;
@@ -222,7 +224,7 @@ class MessageWidget extends StatelessWidget {
                           crossAxisAlignment: messageTextAlignment,
                           children: <Widget>[
                             Visibility(
-                              visible: !isUserSent,
+                              visible: !isUserSent && showSender,
                               child: Container(
                                 margin: EdgeInsets.only(bottom: 4),
                                 child: Text(

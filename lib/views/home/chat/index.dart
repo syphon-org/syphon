@@ -218,6 +218,7 @@ class ChatViewState extends State<ChatView> {
       child: Container(
         child: ListView(
           reverse: true,
+          padding: EdgeInsets.only(bottom: 12),
           physics: selectedMessage != null
               ? const NeverScrollableScrollPhysics()
               : null,
@@ -225,21 +226,23 @@ class ChatViewState extends State<ChatView> {
           children: [
             Visibility(
               visible: props.room.userTyping,
-              child: MessageTypingWidget(
-                theme: props.theme,
-                lastRead: props.room.lastRead,
-                selectedMessageId: this.selectedMessage != null
-                    ? this.selectedMessage.id
-                    : null,
+              child: Container(
+                child: MessageTypingWidget(
+                  theme: props.theme,
+                  lastRead: props.room.lastRead,
+                  selectedMessageId: this.selectedMessage != null
+                      ? this.selectedMessage.id
+                      : null,
+                ),
               ),
             ),
             ListView.builder(
               reverse: true,
               shrinkWrap: true,
+              padding: EdgeInsets.only(bottom: 4),
               addRepaintBoundaries: true,
               addAutomaticKeepAlives: true,
               itemCount: messages.length,
-              padding: EdgeInsets.only(bottom: 8),
               scrollDirection: Axis.vertical,
               // controller: messagesController,
               physics: const NeverScrollableScrollPhysics(),
@@ -695,9 +698,9 @@ class ChatViewState extends State<ChatView> {
                   ),
                   Container(
                     padding: EdgeInsets.only(
-                      top: 12,
                       left: 8,
                       right: 8,
+                      top: 12,
                       bottom: 12,
                     ),
                     decoration: BoxDecoration(
