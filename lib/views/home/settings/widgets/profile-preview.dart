@@ -53,7 +53,7 @@ class ProfilePreview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      props.user.displayName,
+                      props.user.displayName ?? '',
                       style: TextStyle(fontSize: 20.0),
                     ),
                     Text(

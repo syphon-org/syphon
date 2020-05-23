@@ -22,10 +22,9 @@ import 'package:path_provider/path_provider.dart';
 FutureOr<void> saveSyncIsolate(dynamic params) async {
   print('[saveSyncIsolate] ${Isolate.current.hashCode} ${params['location']}');
 
-  final storageLocation = params['location'];
-  Hive.init(storageLocation);
+  Hive.init(params['location']);
 
-  Box syncBox = await Hive.openBox(Cache.backgroundKeyUNSAFE);
+  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
 
   // final encryptionKey = await unlockEncryptionKey();
 
@@ -35,25 +34,26 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
   //   compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
   // );
 
-  print('[saveSyncIsolate] it saves to box');
-
-  await syncBox.put(Cache.syncKey, params['sync']);
+  await syncBox.put(Cache.syncData, params['sync']);
   await syncBox.close();
+
+  print('[saveSyncIsolate] successful save');
 }
 
 /** 
  *  Save Full Sync
  */
 FutureOr<dynamic> loadSyncIsolate(dynamic params) async {
-  final int isolateId = Isolate.current.hashCode;
-
-  print('[saveSyncIsolate] $isolateId');
+  print('[loadSyncIsolate] ${Isolate.current.hashCode}');
 
   Hive.init(params['location']);
-  LazyBox syncBox = await openHiveSync();
 
-  final syncData = await syncBox.get(Cache.syncKey);
+  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
+
+  final syncData = await syncBox.get(Cache.syncData);
   await syncBox.close();
+
+  print('[loadSyncIsolate] successful load');
   return syncData;
 }
 

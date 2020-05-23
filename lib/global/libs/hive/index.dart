@@ -25,6 +25,7 @@ class Cache {
   static Box state;
   static LazyBox sync;
 
+  static const group_id = 'tether';
   static const encryptionKeyLocation = 'tether@publicKey';
 
   static const syncKey = 'tether_sync';
@@ -34,6 +35,7 @@ class Cache {
   static const stateKeyUNSAFE = 'tether_cache_unsafe';
   static const backgroundKeyUNSAFE = 'tether_background_cache_unsafe';
 
+  static const syncData = 'sync_data';
   static const protocol = 'protocol';
   static const homeserver = 'homeserver';
   static const accessTokenKey = 'accessToken';
@@ -107,17 +109,21 @@ Future<List<int>> unlockEncryptionKey() async {
   var encryptionKey = await storageEngine.read(
     key: Cache.encryptionKeyLocation,
   );
+  print(
+      '[unlockEncryptionKey] loaded ${encryptionKey.runtimeType} ${encryptionKey}');
 
   // Create a encryptionKey if a serialized one is not found
   if (encryptionKey == null) {
     encryptionKey = hex.encode(Hive.generateSecureKey());
 
+    print('[unlockEncryptionKey] save ${encryptionKey.runtimeType}');
     await storageEngine.write(
       key: Cache.encryptionKeyLocation,
       value: encryptionKey,
     );
   }
-  print('[unlockEncryptionKey] $encryptionKey');
+
+  print('[unlockEncryptionKey] decode ${encryptionKey.runtimeType}');
 
   return hex.decode(encryptionKey);
 }
@@ -174,9 +180,9 @@ Future<Box> openHiveBackgroundUnsafe() async {
 Future<Box> openHiveState() async {
   try {
     final encryptionKey = await unlockEncryptionKey();
-
     return await Hive.openBox(
       Cache.stateKey,
+      crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
@@ -199,6 +205,7 @@ Future<LazyBox> openHiveSync() async {
 
     return await Hive.openLazyBox(
       Cache.syncKey,
+      crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );

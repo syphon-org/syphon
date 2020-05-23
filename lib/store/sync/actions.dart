@@ -210,7 +210,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 }
 
 /**
- * Sync Storage Data
+ * Save Cold Storage Data
  * 
  * 
     // Refreshing myself on list concat in dart without spread
@@ -249,14 +249,12 @@ ThunkAction<AppState> saveSync(
 }
 
 /**
- * Sync Storage Data
+ * Load Cold Storage Data
  * 
  * Will update the cold storage block of data
  * from the full_state /sync call
  */
-ThunkAction<AppState> loadSync(
-  Map roomData,
-) {
+ThunkAction<AppState> loadSync() {
   return (Store<AppState> store) async {
     print('[loadSync] started');
     final storageLocation = await initStorageLocation();

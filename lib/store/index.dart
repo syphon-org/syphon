@@ -96,7 +96,7 @@ Future<Store> initStore() async {
       switch (action.runtimeType) {
         case SetSyncing:
         case SetSynced:
-          print('[Redux Persist] cache miss');
+          print('[Redux Persist] cache skip');
           return false;
         default:
           print('[Redux Persist] caching');
@@ -115,7 +115,7 @@ Future<Store> initStore() async {
     print('[Redux Persist] error $error');
   }
 
-  final Store<AppState> store = new Store<AppState>(
+  final Store<AppState> store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
     middleware: [thunkMiddleware, persistor.createMiddleware()],
