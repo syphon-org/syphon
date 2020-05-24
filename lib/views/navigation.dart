@@ -67,7 +67,7 @@ class NavigationProvider {
             title: 'Search Users',
           ),
       '/profile': (BuildContext context) => ProfileView(),
-      '/notifications': (BuildContext context) => NotificationSettings(),
+      '/notifications': (BuildContext context) => NotificationSettingsView(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
       '/privacy': (BuildContext context) => PrivacyPreferences(
             title: 'Privacy',

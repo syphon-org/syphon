@@ -178,12 +178,13 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicators) {
-        print('[sendTyping] typing indicators are disabled $typing');
+        print('[sendTyping] typing indicators disabled');
         return;
       }
 
       print('[sendTyping] pushing $typing');
-      final request = buildSendTypingRequest(
+
+      final data = await MatrixApi.sendTyping(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
@@ -191,14 +192,6 @@ ThunkAction<AppState> sendTyping({
         userId: store.state.authStore.user.userId,
         typing: typing,
       );
-
-      final response = await http.put(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -258,7 +251,7 @@ ThunkAction<AppState> sendMessage({
         ),
       ));
 
-      final request = buildSendMessageRequest(
+      final data = await MatrixApi.sendMessage(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
@@ -267,13 +260,6 @@ ThunkAction<AppState> sendMessage({
         requestId: DateTime.now().millisecond.toString(),
       );
 
-      final response = await http.put(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         store.dispatch(SaveOutboxMessage(
           id: room.id,

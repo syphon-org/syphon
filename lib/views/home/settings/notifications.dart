@@ -4,6 +4,7 @@ import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,8 +13,8 @@ import 'package:redux/redux.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 
-class NotificationSettings extends StatelessWidget {
-  NotificationSettings({Key key}) : super(key: key);
+class NotificationSettingsView extends StatelessWidget {
+  NotificationSettingsView({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -168,7 +169,7 @@ class NotificationSettings extends StatelessWidget {
       );
 }
 
-class Props {
+class Props extends Equatable {
   final bool notificationsEnabled;
   final Function onToggleLocalNotifications;
   final Function onToggleRemoteNotifications;
@@ -178,6 +179,11 @@ class Props {
     @required this.onToggleLocalNotifications,
     @required this.onToggleRemoteNotifications,
   });
+
+  @override
+  List<Object> get props => [
+        notificationsEnabled,
+      ];
 
   /* effectively mapStateToProps, but includes functions */
   static Props mapStoreToProps(
@@ -227,14 +233,4 @@ class Props {
               print(error);
             }
           });
-
-  @override
-  int get hashCode => notificationsEnabled.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Props &&
-          runtimeType == other.runtimeType &&
-          notificationsEnabled == other.notificationsEnabled;
 }

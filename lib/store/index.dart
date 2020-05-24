@@ -1,18 +1,15 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/sync/reducer.dart';
 import 'package:Tether/store/sync/state.dart';
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 // Temporary State Store
 import './alerts/model.dart';
