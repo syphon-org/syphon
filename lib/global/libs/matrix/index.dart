@@ -36,5 +36,15 @@ abstract class MatrixApi {
   static final fetchNotifications = Notifications.fetchNotifications;
   static final fetchNotificationPushers =
       Notifications.fetchNotificationPushers;
-  static final saveNotificationPushers = Notifications.saveNotificationPusher;
+
+  /**
+   * Save Notification Pusher
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
+   * 
+   * This endpoint allows the creation, modification and deletion of pushers for 
+   * this user ID. The behaviour of this endpoint varies depending on the values 
+   * in the JSON body.
+   */
+  static final saveNotificationPusher = Notifications.saveNotificationPusher;
 }

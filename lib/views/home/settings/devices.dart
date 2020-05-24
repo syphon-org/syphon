@@ -8,6 +8,7 @@ import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/settings/notification-settings/actions.dart';
 import 'package:Tether/views/widgets/dialog-confirm-password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -82,6 +83,7 @@ class DeviceViewState extends State<DevicesView> {
     final store = StoreProvider.of<AppState>(context);
 
     store.dispatch(fetchDevices());
+    store.dispatch(fetchNotificationPushers());
     alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
       var color;
 
@@ -227,7 +229,7 @@ class DeviceViewState extends State<DevicesView> {
             key: scaffold,
             appBar: currentAppBar,
             body: Container(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Stack(
                 children: [
                   GridView.builder(
@@ -272,7 +274,7 @@ class DeviceViewState extends State<DevicesView> {
                           elevation: 0,
                           color: backgroundColor ?? sectionBackgroundColor,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            // padding: const EdgeInsets.all(8),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[

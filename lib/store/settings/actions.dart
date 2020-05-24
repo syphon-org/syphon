@@ -33,6 +33,11 @@ class SetRoomPrimaryColor {
   });
 }
 
+class SetPusherToken {
+  final String token;
+  SetPusherToken({this.token});
+}
+
 class SetLoading {
   final bool loading;
   SetLoading({this.loading});
@@ -73,13 +78,6 @@ class ToggleTypingIndicators {
 
 class ToggleReadReceipts {
   ToggleReadReceipts();
-}
-
-/**
- * Fetch Remote Push Notification Settings
- */
-ThunkAction<AppState> fetchPushNotificationSettings(int color) {
-  return (Store<AppState> store) async {};
 }
 
 /**

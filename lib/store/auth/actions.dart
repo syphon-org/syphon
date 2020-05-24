@@ -6,6 +6,7 @@ import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/settings/notification-settings/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
@@ -147,6 +148,9 @@ ThunkAction<AppState> startAuthObserver() {
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
             print('[onSelectNotification] payload');
+          },
+          onSaveToken: (token) {
+            store.dispatch(setPusherDeviceToken(token));
           },
         );
         store.dispatch(startSyncObserver());

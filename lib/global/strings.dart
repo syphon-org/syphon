@@ -22,6 +22,10 @@ String formatUsernameHint(String homeserver) {
 
 class StringStore {
   static const app_name = 'Tether';
+  static const app_name_long = 'Tether Messenger';
+  static const app_id = 'org.tether.tether';
+  static const default_language = 'en-US';
+
   static const start_chat_notice = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const notificationConfirmation =

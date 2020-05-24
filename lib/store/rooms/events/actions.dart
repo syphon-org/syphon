@@ -1,12 +1,8 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
-import 'package:Tether/global/libs/matrix/messages.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
@@ -124,6 +120,9 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
   return (Store<AppState> store) async {};
 }
 
+/**
+ * UNIMPLEMENTED
+ */
 ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {
     try {

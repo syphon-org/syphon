@@ -1,8 +1,4 @@
 import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/formatters.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

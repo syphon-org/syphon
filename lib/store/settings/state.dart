@@ -20,12 +20,12 @@ class SettingsStore extends Equatable {
   @HiveField(3)
   final bool smsEnabled;
   @HiveField(4)
-  final bool enterSend;
+  final bool enterSend; // TODO: enabled
 
   @HiveField(5)
-  final bool readReceipts; // on / off
+  final bool readReceipts; // TODO: enabled
   @HiveField(6)
-  final bool typingIndicators; // on / off
+  final bool typingIndicators; // TODO: enabled
   @HiveField(7)
   final bool notificationsEnabled;
   @HiveField(8)
@@ -46,6 +46,8 @@ class SettingsStore extends Equatable {
   @HiveField(13)
   final NotificationSettings notificationSettings;
 
+  final String pusherToken; // NOTE: can be device token for APNS
+
   // Temporary
   final bool loading;
 
@@ -65,6 +67,7 @@ class SettingsStore extends Equatable {
     this.devices = const [],
     this.loading = false,
     this.notificationSettings,
+    this.pusherToken,
   });
 
   @override
@@ -83,6 +86,7 @@ class SettingsStore extends Equatable {
         devices,
         loading,
         notificationSettings,
+        pusherToken,
       ];
 
   SettingsStore copyWith({
@@ -101,6 +105,7 @@ class SettingsStore extends Equatable {
     NotificationSettings notificationSettings,
     List<Device> devices,
     bool loading,
+    String pusherToken, // NOTE: device token for APNS
   }) {
     return SettingsStore(
       primaryColor: primaryColor,
@@ -120,6 +125,7 @@ class SettingsStore extends Equatable {
       notificationSettings: notificationSettings ?? this.notificationSettings,
       devices: devices ?? this.devices,
       loading: loading ?? this.loading,
+      pusherToken: pusherToken ?? this.pusherToken,
     );
   }
 }

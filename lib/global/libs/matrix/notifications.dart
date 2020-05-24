@@ -23,12 +23,12 @@ abstract class Notifications {
     // Params
     url += '?limit=$limit';
     url += from != null ? '&from=$from' : '';
-    url += limit != null ? '&limit=$limit' : '';
     url += only != null ? '&only=$only' : '';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
+    print(url);
 
     final response = await http.get(
       url,
@@ -65,15 +65,6 @@ abstract class Notifications {
   }
 
   /**
-   * Save Notification Pusher
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-   * 
-   * This endpoint allows the creation, modification and deletion of pushers for 
-   * this user ID. The behaviour of this endpoint varies depending on the values 
-   * in the JSON body.
-   */
-  /**
    * 
       {
         "lang": "en",
@@ -90,12 +81,21 @@ abstract class Notifications {
         "append": false
       }
     */
+  /**
+   * Save Notification Pusher
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
+   * 
+   * This endpoint allows the creation, modification and deletion of pushers for 
+   * this user ID. The behaviour of this endpoint varies depending on the values 
+   * in the JSON body.
+   */
   static Future<dynamic> saveNotificationPusher({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
     String pushKey, // required
-    String kind, // required
+    String kind = 'http', // required
     String appId, // required
     String appDisplayName, // required
     String deviceDisplayName, // required
@@ -112,11 +112,10 @@ abstract class Notifications {
     };
 
     Map body = {
-      "lang": lang,
+      "lang": 'en',
       "kind": kind,
       "app_display_name": appDisplayName,
       "device_display_name": deviceDisplayName,
-      "profile_tag": profileTag,
       "app_id": appId,
       "pushkey": pushKey,
       "data": {
@@ -125,6 +124,14 @@ abstract class Notifications {
       },
       "append": false
     };
+
+    if (profileTag != null) {
+      body['profile_tag'] = profileTag;
+    }
+
+    print('[MatrixApi.saveNotificationPusher] $body');
+
+    // return {'errcode': 'ya done'};
 
     final response = await http.post(
       url,
