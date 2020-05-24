@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Tether/global/algos.dart';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
@@ -26,6 +27,11 @@ class SetLoading {
 class SetBackoff {
   final int backoff;
   SetBackoff({this.backoff});
+}
+
+class SetOffline {
+  final bool offline;
+  SetOffline({this.offline});
 }
 
 class SetSyncing {
@@ -76,23 +82,30 @@ ThunkAction<AppState> startSyncObserver() {
           return;
         }
 
-        final lastUpdate = DateTime.fromMillisecondsSinceEpoch(
-          store.state.syncStore.lastUpdate,
-        );
         final backoff = store.state.syncStore.backoff;
+        final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+          store.state.syncStore.lastAttempt,
+        );
 
         if (backoff != null) {
-          final backoffLimit = DateTime.now()
-              .difference(lastUpdate)
-              .compareTo(Duration(milliseconds: 1000 * backoff));
+          final backoffs = fibonacci(backoff);
+          final backoffFactor = backoffs[backoffs.length - 1];
+          final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
+                Duration(milliseconds: 1000 * backoffFactor),
+              );
 
-          print('[Sync Observer] backoff time left $backoffLimit');
+          print(
+            '[Sync Observer] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
+          );
 
-          if (0 < backoffLimit) {
+          if (backoffLimit == 1) {
             print('[Sync Observer] forced retry timeout');
-            store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
-            return;
+            store.dispatch(fetchSync(
+              since: store.state.syncStore.lastSince,
+            ));
           }
+
+          return;
         }
 
         if (store.state.syncStore.syncing) {
@@ -177,10 +190,14 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         }
       }
 
+      final lastSince = data['next_batch'];
       final Map<String, dynamic> rawRooms = data['rooms']['join'];
+      final Map presence = data['presence'];
+
+      print('[fetchSync] presence $presence');
 
       // Local state updates based on changes
-      await store.dispatch(syncRoomState(rawRooms));
+      await store.dispatch(syncRooms(rawRooms));
 
       if (isFullSync) {
         store.dispatch(saveSync(data));
@@ -190,19 +207,23 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
-        backoff: null,
-        lastSince: data['next_batch'],
+        lastSince: lastSince,
       ));
 
       if (!kReleaseMode && isFullSync) {
         print('[fetchSync] full sync completed');
       }
     } catch (error) {
-      print('[fetchSync] error $error');
+      final message = (error.message as String);
 
-      // Fib backoff
+      if (message.contains('SocketException')) {
+        print('[fetchSync] IOException $error');
+        store.dispatch(SetOffline(offline: true));
+      }
+
       final backoff = store.state.syncStore.backoff;
-      store.dispatch(SetBackoff(backoff: (backoff - 1) + (backoff - 2)));
+      final nextBackoff = backoff != null ? backoff + 1 : 5;
+      store.dispatch(SetBackoff(backoff: nextBackoff));
     } finally {
       store.dispatch(SetSyncing(syncing: false));
     }

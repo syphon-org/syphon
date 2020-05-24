@@ -162,32 +162,57 @@ class HomeViewState extends State<Home> {
       title: Row(children: <Widget>[
         Container(
           margin: EdgeInsets.only(right: 8),
-          child: IconButton(
-            padding: EdgeInsets.all(4),
-            icon: CircleAvatar(
-              backgroundColor: Colors.grey,
-              child: props.currentUser.avatarUri != null
-                  ? ClipRRect(
+          child: Stack(
+            children: <Widget>[
+              IconButton(
+                padding: EdgeInsets.all(4),
+                icon: CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: props.currentUser.avatarUri != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            Dimensions.thumbnailSizeMax,
+                          ),
+                          child: MatrixImage(
+                            mxcUri: props.currentUser.avatarUri,
+                            thumbnail: true,
+                          ),
+                        )
+                      : Text(
+                          displayInitials(props.currentUser),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/profile');
+                },
+                tooltip: 'Profile and Settings',
+              ),
+              Visibility(
+                visible: props.offline,
+                child: Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: ClipRRect(
                       borderRadius: BorderRadius.circular(
                         Dimensions.thumbnailSizeMax,
                       ),
-                      child: MatrixImage(
-                        mxcUri: props.currentUser.avatarUri,
-                        thumbnail: true,
-                      ),
-                    )
-                  : Text(
-                      displayInitials(props.currentUser),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-            tooltip: 'Profile and Settings',
+                      child: Container(
+                        height: 16,
+                        width: 16,
+                        color: Colors.blueGrey,
+                        child: Icon(
+                          Icons.offline_bolt,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      )),
+                ),
+              ),
+            ],
           ),
         ),
         Text(
@@ -555,6 +580,7 @@ class HomeViewState extends State<Home> {
 class _Props extends Equatable {
   final Map rooms;
   final bool loadingRooms;
+  final bool offline;
   final User currentUser;
   final Map<String, ChatSetting> chatSettings;
 
@@ -564,6 +590,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.rooms,
+    @required this.offline,
     @required this.currentUser,
     @required this.loadingRooms,
     @required this.chatSettings,
@@ -575,6 +602,7 @@ class _Props extends Equatable {
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         rooms: store.state.roomStore.rooms,
         loadingRooms: store.state.roomStore.loading,
+        offline: store.state.syncStore.offline,
         currentUser: store.state.authStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onFetchSyncForced: () async {
@@ -598,6 +626,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         rooms,
+        offline,
         currentUser,
         loadingRooms,
         chatSettings,

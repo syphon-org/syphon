@@ -94,7 +94,7 @@ ThunkAction<AppState> fetchMessageEvents({
         print('${message['sender']} ${message['content']}');
       });
 
-      store.dispatch(syncRoomState(
+      store.dispatch(syncRooms(
         {
           '${room.id}': {
             'timeline': {

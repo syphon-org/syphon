@@ -1,3 +1,5 @@
+import 'package:Tether/global/algos.dart';
+
 import './actions.dart';
 import './state.dart';
 
@@ -14,13 +16,19 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
     case SetSyncing:
       return state.copyWith(
         syncing: action.syncing,
+        lastAttempt: DateTime.now().millisecondsSinceEpoch,
+      );
+    case SetOffline:
+      return state.copyWith(
+        offline: action.offline,
       );
     case SetSynced:
       return state.copyWith(
+        offline: false,
+        backoff: null,
         synced: action.synced,
         syncing: action.syncing,
         lastSince: action.lastSince,
-        backoff: action.backoff,
         lastUpdate: action.synced
             ? DateTime.now().millisecondsSinceEpoch
             : state.lastUpdate,

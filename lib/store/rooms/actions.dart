@@ -93,7 +93,7 @@ class DeleteOutboxMessage {
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncRoomState(
+ThunkAction<AppState> syncRooms(
   Map roomData,
 ) {
   return (Store<AppState> store) async {
@@ -168,7 +168,7 @@ ThunkAction<AppState> fetchRooms() {
             roomId: room.id,
           );
 
-          store.dispatch(syncRoomState({
+          store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
                 'events': stateEvents,
@@ -255,7 +255,7 @@ ThunkAction<AppState> fetchDirectRooms() {
 
             // Format response like /sync request
             // Hacked together to provide isDirect data
-            await store.dispatch(syncRoomState({
+            await store.dispatch(syncRooms({
               '$roomId': {
                 'state': {
                   'events': stateEvents,
@@ -344,7 +344,7 @@ ThunkAction<AppState> createRoom({
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,
           userId: store.state.authStore.user.userId,
-          type: AccountDataTypes.DIRECT,
+          type: AccountDataTypes.direct,
         );
 
         final body = {
@@ -513,7 +513,7 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,
-        type: AccountDataTypes.DIRECT,
+        type: AccountDataTypes.direct,
       );
 
       final saveResponse = await http.put(

@@ -9,7 +9,8 @@ part 'model.g.dart';
  * https://matrix.org/docs/spec/client_server/latest#m-room-message-msgtypes
  */
 class AccountDataTypes {
-  static const DIRECT = 'm.direct';
+  static const direct = 'm.direct';
+  static const presence = 'm.presence';
 }
 
 class EventTypes {

@@ -23,7 +23,10 @@ class SyncStore extends Equatable {
   final int backoff;
   final bool loading;
   final bool syncing;
+  final bool offline;
   final Timer syncObserver;
+
+  final int lastAttempt; // last attempt to sync
 
   static const default_interval = 5;
 
@@ -31,7 +34,9 @@ class SyncStore extends Equatable {
     this.synced = false,
     this.syncing = false,
     this.loading = false,
+    this.offline = false,
     this.lastUpdate = 0,
+    this.lastAttempt = 0,
     this.backoff,
     this.lastSince,
     this.syncObserver,
@@ -42,7 +47,10 @@ class SyncStore extends Equatable {
         loading,
         syncing,
         synced,
+        offline,
+        backoff,
         lastUpdate,
+        lastAttempt,
         lastSince,
         syncObserver,
       ];
@@ -51,16 +59,20 @@ class SyncStore extends Equatable {
     synced,
     loading,
     syncing,
+    offline,
+    backoff,
     lastUpdate,
+    lastAttempt,
     syncObserver,
     lastSince,
-    backoff,
   }) {
     return SyncStore(
       synced: synced ?? this.synced,
       loading: loading ?? this.loading,
       syncing: syncing ?? this.syncing,
+      offline: offline ?? this.offline,
       lastUpdate: lastUpdate ?? this.lastUpdate,
+      lastAttempt: lastAttempt ?? this.lastAttempt,
       lastSince: lastSince ?? this.lastSince,
       syncObserver: syncObserver ?? this.syncObserver,
       backoff: backoff ?? this.backoff,
