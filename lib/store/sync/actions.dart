@@ -191,13 +191,14 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       }
 
       final lastSince = data['next_batch'];
-      final Map<String, dynamic> rawRooms = data['rooms']['join'];
+      final Map<String, dynamic> rawJoined = data['rooms']['join'];
+      final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map presence = data['presence'];
 
       print('[fetchSync] presence $presence');
 
       // Local state updates based on changes
-      await store.dispatch(syncRooms(rawRooms));
+      await store.dispatch(syncRooms(rawJoined));
 
       if (isFullSync) {
         store.dispatch(saveSync(data));

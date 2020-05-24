@@ -166,6 +166,7 @@ ThunkAction<AppState> fetchRooms() {
             homeserver: store.state.authStore.user.homeserver,
             accessToken: store.state.authStore.user.accessToken,
             roomId: room.id,
+            // limit: 30 TODO: uncomment after pagination is working
           );
 
           store.dispatch(syncRooms({

@@ -1,5 +1,3 @@
-import 'package:Tether/global/algos.dart';
-
 import './actions.dart';
 import './state.dart';
 

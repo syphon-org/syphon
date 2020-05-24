@@ -53,7 +53,10 @@ ThunkAction<AppState> loadMessageEvents({Room room}) {
 /**
  * Fetch Message Events
  * 
- * Pulls next message events remotely from homeserverr
+ * https://matrix.org/docs/spec/client_server/latest#syncing
+ * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
+ * 
+ * Pulls next message events remote from homeserver
  */
 ThunkAction<AppState> fetchMessageEvents({
   Room room,
@@ -63,17 +66,12 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      print(
-        '[fetchMessageEvents] ${room.toHash}  ${room.prevHash} ${room.prevHash} pre-fetch',
-      );
+      print('[fetchMessageEvents] prevHash ${room.prevHash}');
+      print('[fetchMessageEvents] toHash ${room.toHash}');
+      print('[fetchMessageEvents] fromHash ${room.fromHash}');
 
-      final String from = room.toHash ?? room.fromHash ?? room.prevHash;
+      final String from = room.prevHash ?? room.toHash ?? room.fromHash;
 
-      // TODO: pulling all messages since last since, no "limit"
-      // final String to = room.fromHash != room.prevHash ? room.prevHash : null;
-
-      // Pull starting at "to" of last fetch
-      // or from the point of last fetch || /sync
       final Map messagesJson = await MatrixApi.fetchMessageEvents(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -83,24 +81,26 @@ ThunkAction<AppState> fetchMessageEvents({
         limit: limit,
       );
 
+      // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       final String toHash = messagesJson['end'];
+      // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String fromHash = messagesJson['start'];
-      final List<dynamic> messages = messagesJson['chunk'];
 
-      print('[fetchMessageEvents] $fromHash $toHash');
-      print('[fetchMessageEvents] ${messages.length}');
+      final List<dynamic> messages = messagesJson['chunk'];
 
       messages.forEach((message) {
         print('${message['sender']} ${message['content']}');
       });
 
+      print('[fetchMessageEvents] toHash $toHash');
+      print('[fetchMessageEvents] fromHash $fromHash');
+
       store.dispatch(syncRooms(
         {
           '${room.id}': {
             'timeline': {
-              'to': toHash,
-              'from': fromHash,
               'events': messages,
+              'prev_batch': toHash,
             }
           },
         },

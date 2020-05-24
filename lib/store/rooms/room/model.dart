@@ -201,8 +201,6 @@ class Room {
     }
 
     if (json['timeline'] != null) {
-      toHash = json['timeline']['to'];
-      fromHash = json['timeline']['from'];
       prevHash = json['timeline']['prev_batch'];
 
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
