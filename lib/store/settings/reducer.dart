@@ -19,6 +19,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         devices: action.devices,
       );
+    case SetPusherToken:
+      return state.copyWith(
+        pusherToken: action.token,
+      );
     case SetRoomPrimaryColor:
       final chatSettings =
           Map<String, ChatSetting>.from(state.customChatSettings ?? Map());

@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
-import 'package:Tether/global/libs/matrix/messages.dart';
-import 'package:Tether/global/libs/matrix/rooms.dart';
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
@@ -17,49 +15,29 @@ import 'package:http/http.dart' as http;
 
 final protocol = DotEnv().env['PROTOCOL'];
 
-final msgtypes = {
-  'text': 'm.text',
-  'emote': 'm.emote', // TODO: not impliemented
-  'notice': 'm.notice', // TODO: not impliemented
-  'image': 'm.image', // TODO: not impliemented
-  'file': 'm.file', // TODO: not impliemented
-  'audio': 'm.audio', // TODO: not impliemented
-  'video': 'm.video', // TODO: not impliemented
-};
+/**
+ * 
+  class MessageTypes {
+    static const TEXT = 'm.text';
+    static const EMOTE = 'm.emote';
+    static const NOTICE = 'm.notice';
+    static const IMAGE = 'm.text';
+    static const FILE = 'm.file';
+    static const AUDIO = 'm.text';
+    static const LOCATION = 'm.location';
+    static const VIDEO = 'm.video';
+  }
+ */
 
-ThunkAction<AppState> fetchMessageEvents({Room room}) {
+/**
+ * Load Message Events
+ * 
+ * Pulls next message events from cold storage 
+ */
+ThunkAction<AppState> loadMessageEvents({Room room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
-
-      final request = buildRoomMessagesRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        roomId: room.id,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final Map<String, dynamic> messagesJson = json.decode(response.body);
-      final String startTime = messagesJson['start'];
-      final String endTime = messagesJson['end'];
-      final List<dynamic> messagesChunk = messagesJson['chunk'];
-
-      // TODO: I would really love to use inheritance
-      final List<Message> messages = messagesChunk
-          .map((event) => Message.fromEvent(Event.fromJson(event)))
-          .toList();
-
-      store.dispatch(SetRoomMessages(
-        id: room.id,
-        messageEvents: messages,
-        startTime: startTime,
-        endTime: endTime,
-      ));
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {
@@ -68,53 +46,83 @@ ThunkAction<AppState> fetchMessageEvents({Room room}) {
   };
 }
 
-ThunkAction<AppState> fetchStateEvents({Room room}) {
+/**
+ * Fetch Message Events
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#syncing
+ * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
+ * 
+ * Pulls next message events remote from homeserver
+ */
+ThunkAction<AppState> fetchMessageEvents({
+  Room room,
+  int limit = 10,
+}) {
   return (Store<AppState> store) async {
     try {
-      // store.dispatch(SetRoom(room: updatedRoom.copyWith(syncing: true)));
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      final request = buildRoomStateRequest(
+      print('[fetchMessageEvents] prevHash ${room.prevHash}');
+      print('[fetchMessageEvents] toHash ${room.toHash}');
+      print('[fetchMessageEvents] fromHash ${room.fromHash}');
+
+      final String from = room.prevHash ?? room.toHash ?? room.fromHash;
+
+      final Map messagesJson = await MatrixApi.fetchMessageEvents(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
+        from: from,
         roomId: room.id,
+        limit: limit,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
+      // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
+      final String toHash = messagesJson['end'];
+      // The token the pagination starts from. If dir=b this will be the token supplied in from.
+      final String fromHash = messagesJson['start'];
 
-      final List<dynamic> rawStateEvents = json.decode(response.body);
+      final List<dynamic> messages = messagesJson['chunk'];
 
-      // Convert all of the events and save
-      final List<Event> stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+      messages.forEach((message) {
+        print('${message['sender']} ${message['content']}');
+      });
 
-      // Add State events to room and toggle syncing
-      final user = store.state.authStore.user;
+      print('[fetchMessageEvents] toHash $toHash');
+      print('[fetchMessageEvents] fromHash $fromHash');
 
-      store.dispatch(SetRoomState(
-        id: room.id,
-        state: stateEvents,
-        currentUser: user.displayName,
+      store.dispatch(syncRooms(
+        {
+          '${room.id}': {
+            'timeline': {
+              'events': messages,
+              'prev_batch': toHash,
+            }
+          },
+        },
       ));
 
-      final updatedRoom = store.state.roomStore.rooms[room.id];
-      if (updatedRoom.avatarUri != null) {
-        store.dispatch(fetchThumbnail(
-          mxcUri: updatedRoom.avatarUri,
-        ));
-      }
+      // Have an equivalent json parser for cold storage?
+      // store.dispatch(syncStorage());
     } catch (error) {
-      print('[fetchRoomState] error: ${room.id} $error');
+      print('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
   };
 }
 
+/**
+ * DEPRECATED: paginating state events can only be 
+ * done from full state /sync data
+ */
+ThunkAction<AppState> fetchStateEvents({Room room}) {
+  return (Store<AppState> store) async {};
+}
+
+/**
+ * UNIMPLEMENTED
+ */
 ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {
     try {
@@ -169,12 +177,13 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicators) {
-        print('[sendTyping] typing indicators are disabled $typing');
+        print('[sendTyping] typing indicators disabled');
         return;
       }
 
       print('[sendTyping] pushing $typing');
-      final request = buildSendTypingRequest(
+
+      final data = await MatrixApi.sendTyping(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
@@ -182,14 +191,6 @@ ThunkAction<AppState> sendTyping({
         userId: store.state.authStore.user.userId,
         typing: typing,
       );
-
-      final response = await http.put(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -228,8 +229,6 @@ ThunkAction<AppState> sendMessage({
   return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));
 
-    final roomInstance = store.state.roomStore.rooms[room.id];
-
     // if you're incredibly unlucky, and fast, you could have a problem here
     final String tempId = Random.secure().nextInt(1 << 32).toString();
 
@@ -251,7 +250,7 @@ ThunkAction<AppState> sendMessage({
         ),
       ));
 
-      final request = buildSendMessageRequest(
+      final data = await MatrixApi.sendMessage(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
@@ -260,13 +259,6 @@ ThunkAction<AppState> sendMessage({
         requestId: DateTime.now().millisecond.toString(),
       );
 
-      final response = await http.put(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         store.dispatch(SaveOutboxMessage(
           id: room.id,

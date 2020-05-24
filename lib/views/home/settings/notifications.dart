@@ -4,6 +4,8 @@ import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:Tether/store/settings/notification-settings/actions.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,8 +14,8 @@ import 'package:redux/redux.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 
-class NotificationSettings extends StatelessWidget {
-  NotificationSettings({Key key}) : super(key: key);
+class NotificationSettingsView extends StatelessWidget {
+  NotificationSettingsView({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -95,7 +97,7 @@ class NotificationSettings extends StatelessWidget {
                       ListTile(
                         enabled: Platform.isAndroid,
                         dense: true,
-                        onTap: () => props.onToggleLocalNotifications(context),
+                        onTap: () => props.onToggleLocalNotifications(),
                         contentPadding: contentPadding,
                         title: Text(
                           'Notifications',
@@ -103,11 +105,10 @@ class NotificationSettings extends StatelessWidget {
                         ),
                         trailing: Container(
                           child: Switch(
-                            value: props.notificationsEnabled,
+                            value: props.localNotificationsEnabled,
                             onChanged: !Platform.isAndroid
                                 ? null
-                                : (value) =>
-                                    props.onToggleLocalNotifications(context),
+                                : (value) => props.onToggleLocalNotifications(),
                           ),
                         ),
                       ),
@@ -150,12 +151,30 @@ class NotificationSettings extends StatelessWidget {
                         ),
                         trailing: Container(
                           child: Switch(
-                            value: props.notificationsEnabled,
+                            value: props.remoteNotificationsEnabled,
                             onChanged: !Platform.isIOS
                                 ? null
                                 : (value) => props.onToggleRemoteNotifications(
                                       context,
                                     ),
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        enabled: props.remoteNotificationsEnabled,
+                        dense: true,
+                        onTap: () => props.onTogglePusher(),
+                        contentPadding: contentPadding,
+                        title: Text(
+                          'Fetch Notifications',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        trailing: Container(
+                          child: Switch(
+                            value: props.httpPusherEnabled,
+                            onChanged: !props.remoteNotificationsEnabled
+                                ? null
+                                : (value) => props.onTogglePusher(),
                           ),
                         ),
                       ),
@@ -169,74 +188,89 @@ class NotificationSettings extends StatelessWidget {
       );
 }
 
-class Props {
-  final bool notificationsEnabled;
+class Props extends Equatable {
+  final bool httpPusherEnabled;
+  final bool localNotificationsEnabled;
+  final bool remoteNotificationsEnabled;
+
   final Function onToggleLocalNotifications;
   final Function onToggleRemoteNotifications;
+  final Function onTogglePusher;
 
   Props({
-    @required this.notificationsEnabled,
+    @required this.localNotificationsEnabled,
+    @required this.remoteNotificationsEnabled,
+    @required this.httpPusherEnabled,
     @required this.onToggleLocalNotifications,
     @required this.onToggleRemoteNotifications,
+    @required this.onTogglePusher,
   });
+
+  @override
+  List<Object> get props => [
+        localNotificationsEnabled,
+        remoteNotificationsEnabled,
+        httpPusherEnabled,
+      ];
 
   /* effectively mapStateToProps, but includes functions */
   static Props mapStoreToProps(
     Store<AppState> store,
   ) =>
       Props(
-          notificationsEnabled: store.state.settingsStore.notificationsEnabled,
-          onToggleLocalNotifications: () {
-            store.dispatch(toggleNotifications());
-            // TODO: init background service
-          },
-          onToggleRemoteNotifications: (BuildContext context) {
-            try {
-              // If the platform is iOS, we'll want to confirm they understand
-              // the native notification prompt
-              if (Platform.isIOS &&
-                  !store.state.settingsStore.notificationsEnabled) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text("Confirm Notifications"),
-                    content: Text(
-                      StringStore.notificationConfirmation,
-                    ),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text('No'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      FlatButton(
-                        child: Text('Sure'),
-                        onPressed: () {
-                          store.dispatch(toggleNotifications());
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
+        localNotificationsEnabled: Platform.isAndroid &&
+            store.state.settingsStore.notificationsEnabled,
+        remoteNotificationsEnabled:
+            Platform.isIOS && store.state.settingsStore.notificationsEnabled,
+        httpPusherEnabled:
+            store.state.settingsStore.notificationSettings != null,
+        onToggleLocalNotifications: () {
+          store.dispatch(toggleNotifications());
+        },
+        onToggleRemoteNotifications: (BuildContext context) {
+          try {
+            // If the platform is iOS, we'll want to confirm they understand
+            // the native notification prompt
+            if (Platform.isIOS &&
+                !store.state.settingsStore.notificationsEnabled) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Confirm Notifications"),
+                  content: Text(
+                    StringStore.notificationConfirmation,
                   ),
-                );
-                return;
-              }
-
-              // Otherwise, attempt the toggle
-              store.dispatch(toggleNotifications());
-            } catch (error) {
-              print(error);
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('No'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('Sure'),
+                      onPressed: () async {
+                        await store.dispatch(toggleNotifications());
+                        await store.dispatch(saveNotificationPusher());
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
+              return;
             }
-          });
 
-  @override
-  int get hashCode => notificationsEnabled.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Props &&
-          runtimeType == other.runtimeType &&
-          notificationsEnabled == other.notificationsEnabled;
+            // Otherwise, attempt the toggle
+            store.dispatch(saveNotificationPusher(erase: true));
+            store.dispatch(toggleNotifications());
+          } catch (error) {
+            print(error);
+          }
+        },
+        onTogglePusher: () async {
+          // await store.dispatch(fetchNotificationPushers());
+          store.dispatch(fetchNotifications());
+        },
+      );
 }

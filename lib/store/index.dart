@@ -1,13 +1,15 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
 import 'package:Tether/store/media/reducer.dart';
+import 'package:Tether/store/sync/actions.dart';
+import 'package:Tether/store/sync/reducer.dart';
+import 'package:Tether/store/sync/state.dart';
+import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 // Temporary State Store
 import './alerts/model.dart';
@@ -27,13 +29,46 @@ import './settings/reducer.dart';
 
 import 'package:redux_persist/redux_persist.dart';
 
+class AppState extends Equatable {
+  final bool loading;
+  final AuthStore authStore;
+  final AlertsStore alertsStore;
+  final MatrixStore matrixStore;
+  final MediaStore mediaStore;
+  final SettingsStore settingsStore;
+  final RoomStore roomStore;
+  final SyncStore syncStore;
+
+  AppState({
+    this.loading = true,
+    this.authStore = const AuthStore(),
+    this.alertsStore = const AlertsStore(),
+    this.matrixStore = const MatrixStore(),
+    this.mediaStore = const MediaStore(),
+    this.settingsStore = const SettingsStore(),
+    this.roomStore = const RoomStore(),
+    this.syncStore = const SyncStore(),
+  });
+
+  @override
+  List<Object> get props => [
+        loading,
+        alertsStore,
+        authStore,
+        matrixStore,
+        roomStore,
+        settingsStore,
+      ];
+}
+
 AppState appReducer(AppState state, action) {
   return AppState(
     loading: state.loading,
+    authStore: authReducer(state.authStore, action),
     alertsStore: alertsReducer(state.alertsStore, action),
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
-    authStore: authReducer(state.authStore, action),
+    syncStore: syncReducer(state.syncStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
   );
@@ -52,8 +87,19 @@ AppState appReducer(AppState state, action) {
 Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
-    throttleDuration: Duration(seconds: 3),
     serializer: HiveSerializer(),
+    throttleDuration: Duration(seconds: 5),
+    shouldSave: (Store<AppState> store, dynamic action) {
+      switch (action.runtimeType) {
+        case SetSyncing:
+        case SetSynced:
+          print('[Redux Persist] cache skip');
+          return false;
+        default:
+          print('[Redux Persist] caching');
+          return true;
+      }
+    },
   );
 
   // Finally load persisted store
@@ -61,12 +107,12 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    print('[Redux Persist Load] persist loaded successfully');
+    print('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    print('[Redux Persist Load] error $error');
+    print('[Redux Persist] error $error');
   }
 
-  final Store<AppState> store = new Store<AppState>(
+  final Store<AppState> store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
     middleware: [thunkMiddleware, persistor.createMiddleware()],
@@ -75,103 +121,54 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-class AppState {
-  final bool loading;
-  final AlertsStore alertsStore;
-  final AuthStore authStore;
-  final MatrixStore matrixStore;
-  final MediaStore mediaStore;
-  final SettingsStore settingsStore;
-  final RoomStore roomStore;
-
-  AppState({
-    this.loading = true,
-    this.alertsStore = const AlertsStore(),
-    this.authStore = const AuthStore(),
-    this.matrixStore = const MatrixStore(),
-    this.mediaStore = const MediaStore(),
-    this.settingsStore = const SettingsStore(),
-    this.roomStore = const RoomStore(),
-  });
-
-  // Helper function to emulate { loading: action.loading, ...appState}
-  AppState copyWith({bool loading}) => AppState(
-        loading: loading ?? this.loading,
-        alertsStore: alertsStore ?? this.alertsStore,
-        authStore: authStore ?? this.authStore,
-        mediaStore: mediaStore ?? this.mediaStore,
-        matrixStore: matrixStore ?? this.matrixStore,
-        roomStore: roomStore ?? this.roomStore,
-        settingsStore: settingsStore ?? this.settingsStore,
-      );
-
-  @override
-  int get hashCode =>
-      loading.hashCode ^
-      alertsStore.hashCode ^
-      authStore.hashCode ^
-      matrixStore.hashCode ^
-      roomStore.hashCode ^
-      settingsStore.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppState &&
-          runtimeType == other.runtimeType &&
-          loading == other.loading &&
-          alertsStore == other.alertsStore &&
-          authStore == other.authStore &&
-          matrixStore == other.matrixStore &&
-          roomStore == other.roomStore &&
-          settingsStore == other.settingsStore;
-
-  @override
-  String toString() {
-    return '{' +
-        '\alertsStore: $alertsStore,' +
-        '\authStore: $authStore,' +
-        '\nmatrixStore: $matrixStore, ' +
-        '\nroomStore: $roomStore,' +
-        '\nsettingsStore: $settingsStore,' +
-        '\n}';
-  }
-}
-
-/// Serializer for a [Uint8List] state, basically pass-through
+/**
+ * Hive Serializer
+ * 
+ * Only reliance on redux is when too save state
+ */
 class HiveSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
-    Cache.hive.put(
+    Cache.state.put(
       state.authStore.runtimeType.toString(),
       state.authStore,
     );
 
     try {
-      Cache.hive.put(
+      Cache.state.put(
+        state.syncStore.runtimeType.toString(),
+        state.syncStore,
+      );
+    } catch (error) {
+      print('[Hive Storage SyncStore] error - $error');
+    }
+
+    try {
+      Cache.state.put(
+        state.roomStore.runtimeType.toString(),
+        state.roomStore,
+      );
+    } catch (error) {
+      print('[Hive Storage RoomStore] error - $error');
+    }
+
+    try {
+      Cache.state.put(
         state.mediaStore.runtimeType.toString(),
         state.mediaStore,
       );
     } catch (error) {
       print('[Hive Storage MediaStore] - $error');
     }
+
     try {
-      Cache.hive.put(
+      Cache.state.put(
         state.settingsStore.runtimeType.toString(),
         state.settingsStore,
       );
     } catch (error) {
       print('[Hive Storage SettingsStore] error - $error');
-    }
-
-    try {
-      Cache.hive.put(
-        state.roomStore.runtimeType.toString(),
-        state.roomStore,
-      );
-    } catch (error) {
-      print('[Hive Storage RoomStore] error - $error');
     }
 
     // Disregard redux persist storage saving
@@ -180,17 +177,36 @@ class HiveSerializer implements StateSerializer<AppState> {
 
   AppState decode(Uint8List data) {
     AuthStore authStoreConverted = AuthStore();
+    SyncStore syncStoreConverted = SyncStore();
     MediaStore mediaStoreConverted = MediaStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
     RoomStore roomStoreConverted = RoomStore();
+    SettingsStore settingsStoreConverted = SettingsStore();
 
-    authStoreConverted = Cache.hive.get(
+    authStoreConverted = Cache.state.get(
       authStoreConverted.runtimeType.toString(),
       defaultValue: AuthStore(),
     );
 
     try {
-      mediaStoreConverted = Cache.hive.get(
+      syncStoreConverted = Cache.state.get(
+        syncStoreConverted.runtimeType.toString(),
+        defaultValue: SyncStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
+      roomStoreConverted = Cache.state.get(
+        roomStoreConverted.runtimeType.toString(),
+        defaultValue: RoomStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
+      mediaStoreConverted = Cache.state.get(
         mediaStoreConverted.runtimeType.toString(),
         defaultValue: MediaStore(),
       );
@@ -199,7 +215,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      settingsStoreConverted = Cache.hive.get(
+      settingsStoreConverted = Cache.state.get(
         settingsStoreConverted.runtimeType.toString(),
         defaultValue: SettingsStore(),
       );
@@ -207,21 +223,13 @@ class HiveSerializer implements StateSerializer<AppState> {
       print('[AppState.fromJson - SettingsStore] error $error');
     }
 
-    try {
-      roomStoreConverted = Cache.hive.get(
-        roomStoreConverted.runtimeType.toString(),
-        defaultValue: RoomStore(),
-      );
-    } catch (error) {
-      print('[AppState.fromJson - roomStoreConverted] error $error');
-    }
-
     return AppState(
       loading: false,
       authStore: authStoreConverted,
-      settingsStore: settingsStoreConverted,
+      syncStore: syncStoreConverted,
       roomStore: roomStoreConverted,
       mediaStore: mediaStoreConverted,
+      settingsStore: settingsStoreConverted,
     );
   }
 }

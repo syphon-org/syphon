@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter_apns/apns.dart';
+import 'package:flutter_apns/apns_connector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /**
@@ -19,10 +21,15 @@ const String channel_description =
     'Tether messaging client message and status notifications';
 
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
+PushConnector connector;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
   Function onDidReceiveLocalNotification,
   Function onSelectNotification,
+  Function onSaveToken,
+  Function onLaunch,
+  Function onResume,
+  Function onMessage,
 }) async {
 // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
@@ -47,6 +54,22 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
     onSelectNotification: onSelectNotification,
   );
 
+  if (Platform.isIOS) {
+    connector = createPushConnector();
+
+    connector.configure(
+      onLaunch: onLaunch,
+      onResume: onResume,
+      onMessage: onMessage,
+    );
+
+    connector.token.addListener(() {
+      if (onSaveToken != null) {
+        onSaveToken(connector.token.value);
+      }
+    });
+  }
+
   print('[initNotifications] successfully initialized $pluginInstance');
   return pluginInstance;
 }
@@ -62,6 +85,10 @@ Future<bool> promptNativeNotificationsRequest({
         badge: true,
         sound: true,
       );
+
+  if (Platform.isIOS && connector != null) {
+    connector.requestNotificationPermissions();
+  }
 
   // result means it's not needed, since it's iOS only
   return result == null ? true : result;

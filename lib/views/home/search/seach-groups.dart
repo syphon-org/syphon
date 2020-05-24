@@ -6,6 +6,7 @@ import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -483,7 +484,7 @@ class GroupSearchState extends State<GroupSearchView> {
       );
 }
 
-class _Props {
+class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
   final List<dynamic> searchResults;
@@ -497,6 +498,12 @@ class _Props {
     @required this.onSearch,
   });
 
+  @override
+  List<Object> get props => [
+        theme,
+        loading,
+      ];
+
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         loading: store.state.matrixStore.loading,
         theme: store.state.settingsStore.theme,
@@ -506,16 +513,4 @@ class _Props {
           store.dispatch(searchPublicRooms(searchText: text));
         },
       );
-
-  @override
-  int get hashCode => loading.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _Props &&
-          runtimeType == other.runtimeType &&
-          theme == other.theme &&
-          loading == other.loading &&
-          onSearch == other.onSearch;
 }

@@ -1,8 +1,8 @@
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
-import 'package:Tether/store/service.dart';
+import 'package:Tether/store/sync/actions.dart';
+import 'package:Tether/store/sync/background/service.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -111,7 +111,7 @@ class AdvancedScreen extends StatelessWidget {
                       );
 
                       showBackgroundServiceNotification(
-                        notificationId: tether_service_id,
+                        notificationId: BackgroundSync.service_id,
                         debugContent:
                             DateFormat('E h:mm ss a').format(DateTime.now()),
                         pluginInstance: globalNotificationPluginInstance,
@@ -120,6 +120,21 @@ class AdvancedScreen extends StatelessWidget {
                     contentPadding: contentPadding,
                     title: Text(
                       'Test Notifcations',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  maintainSize: false,
+                  visible: debug == 'true',
+                  child: ListTile(
+                    dense: true,
+                    contentPadding: contentPadding,
+                    onTap: () {
+                      props.onForceFunction();
+                    },
+                    title: Text(
+                      'Force Function',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -211,21 +226,24 @@ class _Props extends Equatable {
   final String language;
   final String lastSince;
   final User currentUser;
+
   final Function onToggleSyncing;
   final Function onManualSync;
   final Function onForceFullSync;
+  final Function onForceFunction;
 
   _Props({
     @required this.syncing,
     @required this.loading,
     @required this.roomsLoading,
     @required this.language,
-    @required this.onManualSync,
-    @required this.onForceFullSync,
-    @required this.onToggleSyncing,
     @required this.roomsObserverEnabled,
     @required this.currentUser,
     @required this.lastSince,
+    @required this.onManualSync,
+    @required this.onForceFullSync,
+    @required this.onToggleSyncing,
+    @required this.onForceFunction,
   });
 
   @override
@@ -243,29 +261,30 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        syncing: store.state.roomStore.syncing,
-        loading: store.state.roomStore.syncing || store.state.roomStore.loading,
-        roomsLoading: store.state.roomStore.loading,
+        syncing: store.state.syncStore.syncing,
+        loading: store.state.syncStore.syncing || store.state.syncStore.loading,
+        roomsLoading: store.state.syncStore.loading,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
-        lastSince: store.state.roomStore.lastSince,
-        roomsObserverEnabled: store.state.roomStore.roomObserver != null &&
-            store.state.roomStore.roomObserver.isActive,
+        lastSince: store.state.syncStore.lastSince,
+        roomsObserverEnabled: store.state.syncStore.syncObserver != null &&
+            store.state.syncStore.syncObserver.isActive,
         onToggleSyncing: () {
-          final observer = store.state.roomStore.roomObserver;
+          final observer = store.state.syncStore.syncObserver;
           if (observer != null && observer.isActive) {
-            store.dispatch(stopRoomsObserver());
+            store.dispatch(stopSyncObserver());
           } else {
-            store.dispatch(startRoomsObserver());
+            store.dispatch(startSyncObserver());
           }
         },
         onManualSync: () {
-          if (store.state.roomStore.lastSince != null) {
-            store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
-          }
+          store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
         },
         onForceFullSync: () {
           store.dispatch(fetchSync(forceFull: true));
+        },
+        onForceFunction: () {
+          store.dispatch(loadSync());
         },
       );
 }

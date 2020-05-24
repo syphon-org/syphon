@@ -1,19 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
-import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
+import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
-import 'package:Tether/store/rooms/events/actions.dart';
-import 'package:Tether/store/rooms/service.dart';
+import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -30,20 +26,10 @@ class SetLoading {
   SetLoading({this.loading});
 }
 
-class SetSyncing {
-  final bool syncing;
-  SetSyncing({this.syncing});
-}
-
 class SetSending {
   final bool sending;
   final Room room;
   SetSending({this.sending, this.room});
-}
-
-class SetRoomObserver {
-  final Timer roomObserver;
-  SetRoomObserver({this.roomObserver});
 }
 
 class SetRooms {
@@ -78,28 +64,6 @@ class ResetRooms {
   ResetRooms();
 }
 
-class SetRoomState {
-  final String id; // room id
-  final List<Event> state;
-  final String currentUser;
-
-  SetRoomState({this.id, this.state, this.currentUser});
-}
-
-class SetRoomMessages {
-  final String id; // room id
-  final String startTime;
-  final String endTime;
-  final List<Message> messageEvents;
-
-  SetRoomMessages({
-    this.id,
-    this.startTime,
-    this.endTime,
-    this.messageEvents,
-  });
-}
-
 /**
  * tempId for messages that have attempted sending but not finished
  */
@@ -123,228 +87,59 @@ class DeleteOutboxMessage {
   });
 }
 
-class SetSynced {
-  final bool synced;
-  final bool syncing;
-  final String lastSince;
-  SetSynced({this.synced, this.syncing, this.lastSince});
-}
-
 /**
- * Initial Room Sync - Custom Solution for /sync
+ * Sync State Data
  * 
- * This will only be run on log in because the matrix protocol handles
- * initial syncing terribly. It's incredibly cumbersome to load thousands of events
- * for multiple rooms all at once in order to show the user just some room names
- * and timestamps. Lazy loading isn't always supported, so it's not a solid solution
+ * Helper action that will determine how to update a room
+ * from data formatted like a sync request
  */
-ThunkAction<AppState> initialRoomSync() {
+ThunkAction<AppState> syncRooms(
+  Map roomData,
+) {
   return (Store<AppState> store) async {
-    // Start initial sync in background
-    // TODO: use an isolate for initial sync
-    store.dispatch(fetchSync());
+    // init new store containers
+    final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+    final user = store.state.authStore.user;
 
-    // Fetch All Room Ids
-    await store.dispatch(fetchRooms());
-    await store.dispatch(fetchDirectRooms());
+    // syncing null data happens sometimes?
+    if (roomData == null) {
+      return;
+    }
 
-    // Fetch Essential State and Message Events
-    final joinedRooms = store.state.roomStore.roomList;
+    // update those that exist or add a new room
+    roomData.forEach((id, json) {
+      // use pre-existing values where available
+      Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
 
-    final allFetchStates = joinedRooms.map((room) async {
-      return store.dispatch(fetchStateEvents(room: room));
-    }).toList();
-
-    final allFetchMessages = joinedRooms.map((room) async {
-      return store.dispatch(fetchMessageEvents(room: room));
-    }).toList();
-
-    // Await all the futures in no particular order
-    await Future.wait(
-      [allFetchMessages, allFetchStates].expand((x) => x).toList(),
-    );
-  };
-}
-
-/**
- * Default Room Sync Observer
- * 
- * This will be run after the initial sync. Following login or signup, users
- * will just have an observer that runs every second or so to sync with the server
- * only while the app is _active_ otherwise, it will be up to a background service
- * and a notification service to trigger syncs
- */
-ThunkAction<AppState> startRoomsObserver() {
-  return (Store<AppState> store) async {
-    Timer roomObserver = Timer.periodic(Duration(seconds: 5), (timer) async {
-      if (store.state.roomStore.lastSince == null) {
-        print('[Room Observer] skipping sync, needs full sync');
-        return;
-      }
-
-      final lastUpdate = DateTime.fromMillisecondsSinceEpoch(
-        store.state.roomStore.lastUpdate,
+      // Filter through parsers
+      room = room.fromSync(
+        json: json,
+        currentUser: user,
       );
-      final retryTimeout =
-          DateTime.now().difference(lastUpdate).compareTo(Duration(hours: 1));
 
-      if (0 < retryTimeout) {
-        print('[Room Observer] forced retry timeout');
-        store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
-        return;
+      // fetch avatar if a uri was found
+      if (room.avatarUri != null) {
+        store.dispatch(fetchThumbnail(
+          mxcUri: room.avatarUri,
+        ));
       }
 
-      if (store.state.roomStore.syncing) {
-        print('[Room Observer] still syncing');
-        return;
-      }
-
-      print('[Room Observer] running sync');
-      store.dispatch(fetchSync(since: store.state.roomStore.lastSince));
+      store.dispatch(SetRoom(room: room));
     });
-
-    store.dispatch(SetRoomObserver(roomObserver: roomObserver));
-  };
-}
-
-ThunkAction<AppState> stopRoomsObserver() {
-  return (Store<AppState> store) async {
-    if (store.state.roomStore.roomObserver != null) {
-      store.state.roomStore.roomObserver.cancel();
-      store.dispatch(SetRoomObserver(roomObserver: null));
-      stopRoomObserverService();
-    }
-  };
-}
-
-FutureOr<dynamic> fetchSyncMicro(dynamic request) async {
-  final response = await http.get(
-    request['url'],
-    headers: request['headers'],
-  );
-
-  print('[fetchSyncMicro] sync finished');
-
-  // parse sync data
-  return response.body;
-}
-
-FutureOr<dynamic> convertSyncMicro(dynamic responseBody) async {
-  print('[convertSyncMicro] converting body');
-  return await json.decode(responseBody);
-}
-
-ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetSyncing(syncing: true));
-      if (since == null) {
-        print('[fetchSync] fetching full sync');
-      }
-
-      final request = buildSyncRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        fullState: forceFull || store.state.roomStore.rooms == null,
-        since: forceFull ? null : since ?? store.state.roomStore.lastSince,
-      );
-
-      // TODO: convert to use fetchSyncIsolate and save in background
-      final responseBody = await compute(fetchSyncMicro, request);
-      final data = await compute(convertSyncMicro, responseBody);
-
-      // if (!kReleaseMode) {
-      //   print('[fetchSync] DEBUGGING **************************');
-      //   (data as Map).forEach((key, value) {
-      //     print('$key $value\n');
-      //   });
-      //   print('[fetchSync] DEBUGGING **************************');
-      // }
-
-      if (data['errcode'] != null) {
-        if (data['errcode'] == MatrixErrors.unknown_token) {
-          // TODO: signin prompt needed
-        } else {
-          throw data['error'];
-        }
-      }
-
-      final String lastSince = data['next_batch'];
-      final Map<String, dynamic> rawRooms =
-          data['rooms']['join'] ?? Map<String, Room>();
-
-      // init new store containers
-      final Map<String, Room> rooms =
-          store.state.roomStore.rooms ?? Map<String, Room>();
-
-      final user = store.state.authStore.user;
-
-      // update those that exist or add a new room
-      rawRooms.forEach((id, json) {
-        Room room;
-
-        // use pre-existing values where available
-        if (rooms.containsKey(id)) {
-          room = rooms[id].fromSync(
-            json: json,
-            currentUser: user.displayName,
-          );
-        } else {
-          room = Room(id: id).fromSync(
-            json: json,
-            currentUser: user.displayName,
-          );
-        }
-
-        // fetch avatar if a uri was found
-        if (room.avatarUri != null) {
-          store.dispatch(fetchThumbnail(
-            mxcUri: room.avatarUri,
-          ));
-        }
-
-        store.dispatch(SetRoom(room: room));
-      });
-
-      // Update synced to indicate init sync and next batch id (lastSince)
-      store.dispatch(SetSynced(
-        synced: true,
-        syncing: false,
-        lastSince: lastSince,
-      ));
-
-      // TODO: encrypt and find a way to reasonably update this
-      if (!store.state.roomStore.synced) {
-        Cache.hive.put(Cache.matrixStateBox, responseBody);
-      }
-      if (!kReleaseMode && since == null) {
-        print('[fetchSync] full sync completed');
-      }
-    } catch (error) {
-      print('[fetchSync] error $error');
-      store.dispatch(SetSyncing(syncing: false));
-    }
   };
 }
 
 ThunkAction<AppState> fetchRooms() {
   return (Store<AppState> store) async {
+    final stopwatch = Stopwatch()..start();
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildJoinedRoomsRequest(
+      final data = await MatrixApi.fetchRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
 
       if (data['errcode'] != null) {
         throw data['error'];
@@ -353,56 +148,147 @@ ThunkAction<AppState> fetchRooms() {
       // Convert joined_rooms to Room objects
       final List<dynamic> rawJoinedRooms = data['joined_rooms'];
       final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
-      store.dispatch(SetRooms(rooms: joinedRooms));
+      final fullJoinedRooms = joinedRooms.map((room) async {
+        try {
+          final stateEvents = await MatrixApi.fetchStateEvents(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            roomId: room.id,
+          );
+
+          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+            throw stateEvents['error'];
+          }
+
+          final messageEvents = await MatrixApi.fetchMessageEvents(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            roomId: room.id,
+            // limit: 30 TODO: uncomment after pagination is working
+          );
+
+          store.dispatch(syncRooms({
+            '${room.id}': {
+              'state': {
+                'events': stateEvents,
+              },
+              'timeline': {
+                'events': messageEvents['chunk'],
+              }
+            },
+          }));
+        } catch (error) {
+          print('[fetchRooms] ${room.id} $error');
+        } finally {
+          store.dispatch(UpdateRoom(id: room.id, syncing: false));
+        }
+      });
+
+      await Future.wait(fullJoinedRooms);
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct messages
       print('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
+      print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
+      stopwatch.stop();
     }
   };
 }
 
-/*
- Fetch Direct Room Ids
- - fetches id's of direct rooms 
- @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org],
- alekseyparfyonov@gmail.com: [!muTrhMUMwdJSrYlqic:matrix.org] 
-*/
+/**
+ * Fetch Direct Rooms
+ * 
+ * Fetches both state and message of direct rooms
+ * found from account_data of current authed user
+ * 
+ * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org],
+ * alekseyparfyonov@gmail.com: [!muTrhMUMwdJSrYlqic:matrix.org] 
+ */
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
+    final stopwatch = Stopwatch()..start();
     try {
-      final request = buildDirectRoomsRequest(
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-
       if (data['errcode'] != null) {
         throw data['error'];
       }
 
       // Mark specified rooms as direct chats
-      final rawDirectRooms = data as Map<String, dynamic>;
+      final directRooms = data as Map<String, dynamic>;
 
-      rawDirectRooms.forEach((userId, roomIds) {
-        store.dispatch(SetRoom(
-            room: Room(
-          id: roomIds[0],
-          direct: true,
-        )));
+      // TODO: refactor more functional
+      // Fetch room state and messages by roomId
+      directRooms.forEach((userId, roomIds) {
+        roomIds.forEach((roomId) async {
+          try {
+            final stateEvents = await MatrixApi.fetchStateEvents(
+              protocol: protocol,
+              homeserver: store.state.authStore.user.homeserver,
+              accessToken: store.state.authStore.user.accessToken,
+              roomId: roomId,
+            );
+
+            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+              throw stateEvents['error'];
+            }
+
+            final messageEvents = await MatrixApi.fetchMessageEvents(
+              protocol: protocol,
+              homeserver: store.state.authStore.user.homeserver,
+              accessToken: store.state.authStore.user.accessToken,
+              roomId: roomId,
+            );
+
+            // if (messageEvents['errcode'] != null) {
+            //   throw messageEvents['error'];
+            // }
+
+            // Format response like /sync request
+            // Hacked together to provide isDirect data
+            await store.dispatch(syncRooms({
+              '$roomId': {
+                'state': {
+                  'events': stateEvents,
+                },
+                'timeline': {
+                  'events': messageEvents['chunk'],
+                  'prev_batch': messageEvents['from'],
+                },
+                'account_data': {
+                  'events': [
+                    {
+                      "type": 'm.direct',
+                      'content': {
+                        '$userId',
+                      }
+                    }
+                  ],
+                }
+              },
+            }));
+          } catch (error) {
+            print('[fetchDirectRooms] INTERNAL $error');
+          }
+        });
       });
     } catch (error) {
-      print('[fetchDirectRooms] error: $error');
-    } finally {}
+      print('[fetchDirectRooms] $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+      print('[fetchDirectRooms] TIMESTAMP ${stopwatch.elapsed}');
+      stopwatch.stop();
+    }
   };
 }
 
@@ -420,7 +306,7 @@ ThunkAction<AppState> createRoom({
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-      await store.dispatch(stopRoomsObserver());
+      await store.dispatch(stopSyncObserver());
 
       final request = buildCreateRoom(
         protocol: protocol,
@@ -459,7 +345,7 @@ ThunkAction<AppState> createRoom({
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,
           userId: store.state.authStore.user.userId,
-          type: AccountDataTypes.DIRECT,
+          type: AccountDataTypes.direct,
         );
 
         final body = {
@@ -484,7 +370,7 @@ ThunkAction<AppState> createRoom({
 
         await store.dispatch(fetchDirectRooms());
       }
-      await store.dispatch(startRoomsObserver());
+      await store.dispatch(startSyncObserver());
 
       return newRoomId;
     } catch (error) {
@@ -595,19 +481,12 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildDirectRoomsRequest(
+      final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
       );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
 
       if (data['errcode'] != null) {
         throw data['error'];
@@ -635,7 +514,7 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,
-        type: AccountDataTypes.DIRECT,
+        type: AccountDataTypes.direct,
       );
 
       final saveResponse = await http.put(
@@ -704,43 +583,6 @@ ThunkAction<AppState> deleteRoom({Room room}) {
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
     } catch (error) {
       print('[deleteRoom] error: $error');
-    }
-  };
-}
-
-/******* DEV TOOLS BEYOND THIS POINT ********/
-
-/**
- * TODO: Explaination of this
- * 
- * LOAD != FETCH
- * 
- * Fetch -> Remote
- * Store -> Hot Cache / Local
- * Load (Hive) -> Cold Cache / Local 
- */
-ThunkAction<AppState> storeSync() {
-  return (Store<AppState> store) async {
-    try {
-      // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
-      return true;
-    } catch (error) {
-      debugPrint(error);
-      return false;
-    }
-  };
-}
-
-ThunkAction<AppState> loadSync() {
-  return (Store<AppState> store) async {
-    try {
-      // final json = await readFullSyncJson();
-      // final json = Cache.hive.get('sync');
-      return true;
-    } catch (error) {
-      debugPrint(error);
-      return false;
     }
   };
 }
@@ -824,31 +666,3 @@ ThunkAction<AppState> loadSync() {
 //     }
 //   };
 // }
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-
-  return directory.path;
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<File> get _localFile async {
-  final path = await _localPath;
-  return File('$path/matrix.json');
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<dynamic> readFullSyncJson() async {
-  try {
-    final file = await _localFile;
-    String contents = await file.readAsString();
-    return await jsonDecode(contents);
-  } catch (error) {
-    // If encountering an error, return 0.
-    print('readFullSyncJson $error');
-    return null;
-  } finally {
-    print('** Read State From Disk Successfully **');
-  }
-}

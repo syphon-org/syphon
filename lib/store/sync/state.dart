@@ -4,69 +4,78 @@ import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
 import 'package:Tether/global/libs/hive/type-ids.dart';
 
-import './room/model.dart';
-
 part 'state.g.dart';
 
-@HiveType(typeId: RoomStoreHiveId)
-class RoomStore extends Equatable {
-  final bool loading;
-  final bool syncing;
-
+@HiveType(typeId: SyncStoreHiveId)
+class SyncStore extends Equatable {
   @HiveField(0)
   final bool synced;
 
   @HiveField(3)
   final int lastUpdate; // Last timestamp for actual new info
 
-  // consider renaming to nextBatch
   @HiveField(4)
   final String lastSince; // Since we last checked for new info
 
   @HiveField(5)
-  final Map<String, Room> rooms;
+  final int interval = default_interval;
 
-  final Timer roomObserver;
+  final int backoff;
+  final bool loading;
+  final bool syncing;
+  final bool offline;
+  final Timer syncObserver;
 
-  bool get isSynced => lastUpdate != null && lastUpdate != 0;
-  List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
+  final int lastAttempt; // last attempt to sync
 
-  const RoomStore({
+  static const default_interval = 5;
+
+  const SyncStore({
     this.synced = false,
     this.syncing = false,
     this.loading = false,
+    this.offline = false,
     this.lastUpdate = 0,
+    this.lastAttempt = 0,
+    this.backoff,
     this.lastSince,
-    this.roomObserver,
-    this.rooms = const {},
+    this.syncObserver,
   });
 
   @override
   List<Object> get props => [
+        loading,
+        syncing,
         synced,
+        offline,
+        backoff,
         lastUpdate,
+        lastAttempt,
         lastSince,
-        roomObserver,
-        rooms,
+        syncObserver,
       ];
 
-  RoomStore copyWith({
+  SyncStore copyWith({
     synced,
     loading,
     syncing,
+    offline,
+    backoff,
     lastUpdate,
-    roomObserver,
+    lastAttempt,
+    syncObserver,
     lastSince,
-    rooms,
   }) {
-    return RoomStore(
+    return SyncStore(
       synced: synced ?? this.synced,
       loading: loading ?? this.loading,
       syncing: syncing ?? this.syncing,
+      offline: offline ?? this.offline,
       lastUpdate: lastUpdate ?? this.lastUpdate,
+      lastAttempt: lastAttempt ?? this.lastAttempt,
       lastSince: lastSince ?? this.lastSince,
-      roomObserver: roomObserver ?? this.roomObserver,
-      rooms: rooms ?? this.rooms,
+      syncObserver: syncObserver ?? this.syncObserver,
+      backoff: backoff ?? this.backoff,
     );
   }
 }

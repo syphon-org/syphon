@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:Tether/global/dimensions.dart';
@@ -7,6 +8,7 @@ import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/settings/notification-settings/actions.dart';
 import 'package:Tether/views/widgets/dialog-confirm-password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -27,6 +29,8 @@ class DeviceViewState extends State<DevicesView> {
   DeviceViewState({Key key}) : super();
 
   List<Device> selectedDevices;
+  StreamSubscription alertsListener;
+  final GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -77,7 +81,48 @@ class DeviceViewState extends State<DevicesView> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
+
     store.dispatch(fetchDevices());
+    store.dispatch(fetchNotificationPushers());
+    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
+      var color;
+
+      switch (alert.type) {
+        case 'warning':
+          color = Colors.red;
+          break;
+        case 'error':
+          color = Colors.red;
+          break;
+        case 'info':
+        default:
+          color = Colors.grey;
+      }
+
+      scaffold.currentState.showSnackBar(SnackBar(
+        backgroundColor: color,
+        content: Text(
+          alert.message,
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        duration: alert.duration,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            scaffold.currentState.removeCurrentSnackBar();
+          },
+        ),
+      ));
+    });
+  }
+
+  @override
+  void dispose() {
+    if (alertsListener != null) {
+      alertsListener.cancel();
+    }
+    super.dispose();
   }
 
   @protected
@@ -181,9 +226,10 @@ class DeviceViewState extends State<DevicesView> {
           }
 
           return Scaffold(
+            key: scaffold,
             appBar: currentAppBar,
             body: Container(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Stack(
                 children: [
                   GridView.builder(
@@ -228,7 +274,7 @@ class DeviceViewState extends State<DevicesView> {
                           elevation: 0,
                           color: backgroundColor ?? sectionBackgroundColor,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            // padding: const EdgeInsets.all(8),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[

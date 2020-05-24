@@ -3,12 +3,12 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/chat/details-chat.dart';
+import 'package:Tether/views/widgets/chat-input.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:Tether/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
@@ -74,8 +74,12 @@ class ChatViewState extends State<ChatView> {
   Map<String, Color> senderColors;
   bool sendable = false;
   Message selectedMessage;
+
+  double overshoot = 0;
+  bool loadMore = false;
   final editorController = TextEditingController();
   final messagesController = ScrollController();
+  final listViewController = ScrollController();
 
   @override
   void initState() {
@@ -97,13 +101,31 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
+    final store = StoreProvider.of<AppState>(context);
+    final props = _Props.mapStoreToProps(store, arguements.roomId);
+    final draft = props.room.draft;
 
-    final room = store.state.roomStore.rooms[arguements.roomId];
+    messagesController.addListener(() {
+      final extentBefore = messagesController.position.extentBefore;
+      final max = messagesController.position.maxScrollExtent;
 
-    final draft = room.draft;
+      final limit = max - extentBefore;
+      final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
+
+      if (atLimit && !loadMore) {
+        this.setState(() {
+          loadMore = true;
+        });
+        props.onLoadMoreMessages();
+      } else if (!atLimit && loadMore && !props.loading) {
+        this.setState(() {
+          loadMore = false;
+        });
+      }
+    });
+
     if (draft != null && draft.type == MessageTypes.TEXT) {
       final text = draft.body;
       this.setState(() {
@@ -124,6 +146,7 @@ class ChatViewState extends State<ChatView> {
   @override
   void dispose() {
     inputFieldNode.dispose();
+    messagesController.dispose();
     super.dispose();
     if (this.typingNotifier != null) {
       this.typingNotifier.cancel();
@@ -196,29 +219,33 @@ class ChatViewState extends State<ChatView> {
       child: Container(
         child: ListView(
           reverse: true,
+          padding: EdgeInsets.only(bottom: 12),
           physics: selectedMessage != null
               ? const NeverScrollableScrollPhysics()
               : null,
+          controller: messagesController,
           children: [
             Visibility(
               visible: props.room.userTyping,
-              child: MessageTypingWidget(
-                theme: props.theme,
-                lastRead: props.room.lastRead,
-                selectedMessageId: this.selectedMessage != null
-                    ? this.selectedMessage.id
-                    : null,
+              child: Container(
+                child: MessageTypingWidget(
+                  theme: props.theme,
+                  lastRead: props.room.lastRead,
+                  selectedMessageId: this.selectedMessage != null
+                      ? this.selectedMessage.id
+                      : null,
+                ),
               ),
             ),
             ListView.builder(
               reverse: true,
               shrinkWrap: true,
+              padding: EdgeInsets.only(bottom: 4),
               addRepaintBoundaries: true,
               addAutomaticKeepAlives: true,
               itemCount: messages.length,
-              padding: EdgeInsets.only(bottom: 8),
               scrollDirection: Axis.vertical,
-              controller: messagesController,
+              // controller: messagesController,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 final message = messages[index];
@@ -236,6 +263,7 @@ class ChatViewState extends State<ChatView> {
                     : null;
 
                 final avatarUri = props.room.users[message.sender]?.avatarUri;
+
                 return MessageWidget(
                   message: message,
                   isUserSent: isUserSent,
@@ -270,6 +298,7 @@ class ChatViewState extends State<ChatView> {
   //     ),
   //   );
   // }
+
   @protected
   onSubmitMessage(_Props props) async {
     print(editorController.text);
@@ -281,81 +310,81 @@ class ChatViewState extends State<ChatView> {
     FocusScope.of(context).unfocus();
   }
 
-  Widget buildChatInput(
-    BuildContext context,
-    _Props props,
-  ) {
-    double width = MediaQuery.of(context).size.width;
-    double messageInputWidth = width - 72;
+  // Widget buildChatInput(
+  //   BuildContext context,
+  //   _Props props,
+  // ) {
+  //   double width = MediaQuery.of(context).size.width;
+  //   double messageInputWidth = width - 72;
 
-    Color inputTextColor = const Color(BASICALLY_BLACK);
-    Color inputColorBackground = const Color(ENABLED_GREY);
-    Color inputCursorColor = Colors.blueGrey;
-    Color sendButtonColor = const Color(DISABLED_GREY);
+  //   Color inputTextColor = const Color(BASICALLY_BLACK);
+  //   Color inputColorBackground = const Color(ENABLED_GREY);
+  //   Color inputCursorColor = Colors.blueGrey;
+  //   Color sendButtonColor = const Color(DISABLED_GREY);
 
-    if (sendable) {
-      sendButtonColor = Theme.of(context).primaryColor;
-    }
+  //   if (sendable) {
+  //     sendButtonColor = Theme.of(context).primaryColor;
+  //   }
 
-    if (Theme.of(context).brightness == Brightness.dark) {
-      inputTextColor = Colors.white;
-      inputColorBackground = Colors.blueGrey;
-      inputCursorColor = Colors.white;
-    }
+  //   if (Theme.of(context).brightness == Brightness.dark) {
+  //     inputTextColor = Colors.white;
+  //     inputColorBackground = Colors.blueGrey;
+  //     inputCursorColor = Colors.white;
+  //   }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Container(
-          constraints: BoxConstraints(
-            maxWidth: messageInputWidth,
-          ),
-          child: TextField(
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            cursorColor: inputCursorColor,
-            focusNode: inputFieldNode,
-            controller: editorController,
-            onChanged: (text) => onUpdateMessage(text, props),
-            onSubmitted:
-                !sendable ? null : (text) => this.onSubmitMessage(props),
-            style: TextStyle(
-              height: 1.5,
-              color: inputTextColor,
-            ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: inputColorBackground,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-              hintText: 'Matrix message (unencrypted)',
-            ),
-          ),
-        ),
-        Container(
-          width: 48.0,
-          padding: EdgeInsets.symmetric(vertical: 4),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(48),
-            onTap: !sendable ? null : () => this.onSubmitMessage(props),
-            child: CircleAvatar(
-              backgroundColor: sendButtonColor,
-              child: Icon(
-                Icons.send,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     crossAxisAlignment: CrossAxisAlignment.end,
+  //     children: <Widget>[
+  //       Container(
+  //         constraints: BoxConstraints(
+  //           maxWidth: messageInputWidth,
+  //         ),
+  //         child: TextField(
+  //           maxLines: null,
+  //           keyboardType: TextInputType.multiline,
+  //           textInputAction: TextInputAction.newline,
+  //           cursorColor: inputCursorColor,
+  //           focusNode: inputFieldNode,
+  //           controller: editorController,
+  //           onChanged: (text) => onUpdateMessage(text, props),
+  //           onSubmitted:
+  //               !sendable ? null : (text) => this.onSubmitMessage(props),
+  //           style: TextStyle(
+  //             height: 1.5,
+  //             color: inputTextColor,
+  //           ),
+  //           decoration: InputDecoration(
+  //             filled: true,
+  //             fillColor: inputColorBackground,
+  //             contentPadding: const EdgeInsets.symmetric(
+  //               horizontal: 20.0,
+  //             ),
+  //             border: OutlineInputBorder(
+  //               borderRadius: BorderRadius.circular(24.0),
+  //             ),
+  //             hintText: 'Matrix message (unencrypted)',
+  //           ),
+  //         ),
+  //       ),
+  //       Container(
+  //         width: 48.0,
+  //         padding: EdgeInsets.symmetric(vertical: 4),
+  //         child: InkWell(
+  //           borderRadius: BorderRadius.circular(48),
+  //           onTap: !sendable ? null : () => this.onSubmitMessage(props),
+  //           child: CircleAvatar(
+  //             backgroundColor: sendButtonColor,
+  //             child: Icon(
+  //               Icons.send,
+  //               color: Colors.white,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @protected
   buildRoomAppBar({
@@ -615,50 +644,65 @@ class ChatViewState extends State<ChatView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: props.onForceFetchSync,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Disimiss keyboard if they click outside the text input
-                          inputFieldNode.unfocus();
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: Stack(
-                          children: [
-                            buildMessageList(
-                              context,
-                              props,
-                            ),
-                            Positioned(
-                              child: Visibility(
-                                visible: props.roomsLoading,
-                                child: Container(
-                                    child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    RefreshProgressIndicator(
-                                      strokeWidth:
-                                          Dimensions.defaultStrokeWidth,
-                                      valueColor:
-                                          new AlwaysStoppedAnimation<Color>(
-                                        PRIMARY_COLOR,
-                                      ),
-                                      value: null,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Disimiss keyboard if they click outside the text input
+                        inputFieldNode.unfocus();
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: Stack(
+                        children: [
+                          buildMessageList(
+                            context,
+                            props,
+                          ),
+                          Positioned(
+                            child: Visibility(
+                              visible: props.loading,
+                              child: Container(
+                                  child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  RefreshProgressIndicator(
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                      PRIMARY_COLOR,
                                     ),
-                                  ],
-                                )),
-                              ),
+                                    value: null,
+                                  ),
+                                ],
+                              )),
                             ),
-                          ],
-                        ),
+                          ),
+                          Positioned(
+                            child: Visibility(
+                              visible: props.loading,
+                              child: Container(
+                                  child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  RefreshProgressIndicator(
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                      PRIMARY_COLOR,
+                                    ),
+                                    value: null,
+                                  ),
+                                ],
+                              )),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.only(
-                      top: 12,
                       left: 8,
                       right: 8,
+                      top: 12,
                       bottom: 12,
                     ),
                     decoration: BoxDecoration(
@@ -678,9 +722,14 @@ class ChatViewState extends State<ChatView> {
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
-                      child: buildChatInput(
-                        context,
-                        props,
+                      child: ChatInput(
+                        sendable: sendable,
+                        focusNode: inputFieldNode,
+                        controller: editorController,
+                        onChangeMessage: (text) => onUpdateMessage(text, props),
+                        onSubmitMessage: () => this.onSubmitMessage(props),
+                        onSubmittedMessage: (text) =>
+                            this.onSubmitMessage(props),
                       ),
                     ),
                   ),
@@ -696,7 +745,7 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final List<Message> messages;
-  final bool roomsLoading;
+  final bool loading;
   final ThemeType theme;
   final Color roomPrimaryColor;
 
@@ -704,26 +753,31 @@ class _Props extends Equatable {
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
-  final Function onForceFetchSync;
+  final Function onLoadMoreMessages;
 
   _Props({
     @required this.room,
     @required this.theme,
     @required this.userId,
     @required this.messages,
-    @required this.roomsLoading,
+    @required this.loading,
     @required this.roomPrimaryColor,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
-    @required this.onForceFetchSync,
+    @required this.onLoadMoreMessages,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
-        roomsLoading: store.state.roomStore.loading,
+        loading: roomSelectors
+            .room(
+              id: roomId,
+              state: store.state,
+            )
+            .syncing,
         room: roomSelectors.room(
           id: roomId,
           state: store.state,
@@ -745,10 +799,6 @@ class _Props extends Equatable {
 
           return Colors.grey;
         }(),
-        onForceFetchSync: () async {
-          await store.dispatch(fetchSync());
-          return Future(() => true);
-        },
         onSaveDraftMessage: ({
           String body,
           String type,
@@ -782,6 +832,12 @@ class _Props extends Equatable {
             roomId: roomId,
           ),
         ),
+        onLoadMoreMessages: () => store.dispatch(fetchMessageEvents(
+            room: roomSelectors.room(
+          id: roomId,
+          state: store.state,
+        ))),
+
         /**
          * TODO: Room Drafts
          */
@@ -797,6 +853,6 @@ class _Props extends Equatable {
         messages,
         room,
         roomPrimaryColor,
-        roomsLoading,
+        loading,
       ];
 }

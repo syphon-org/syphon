@@ -28,7 +28,7 @@ abstract class Auth {
    *  users. Clients should pick one of these and supply it as 
    *  the type when logging in.
    */
-  static Future<dynamic> loginUser({
+  static FutureOr<dynamic> loginUser({
     String protocol,
     String homeserver,
     String type = "m.login.password",
@@ -141,6 +141,28 @@ abstract class Auth {
   }
 
   /**
+   * Logout User Everywhere
+   */
+  static Future<dynamic> logoutUserEverywhere({
+    String protocol,
+    String homeserver,
+    String accessToken,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/logout/all';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
    *  https://matrix.org/docs/spec/client_server/latest#id211 
    * 
    *  Check Username Availability
@@ -192,33 +214,4 @@ abstract class Auth {
 
     return await json.decode(response.body);
   }
-}
-
-/** 
- * GET login
- * Used to check what types of logins are available on the server
- * curl -XGET 'http://192.168.1.2:8008/_matrix/client/r0/login'
-{
-    "flows": [ 
-        {
-            "type": "m.login.password"
-        }
-    ]
-}
- */
-dynamic buildLoginTypesRequest() {
-  String url = '_matrix/client/r0/login';
-  return {'url': url};
-}
-
-/**  
- * LOGOUT EVERYWHERE
-  curl -XPOST \
-  "http://192.168.1.2:8008/_matrix/client/r0/logout/all?\
-  access_token=MDAxNGxvY2F0aW9uIGVyZS5pbwowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwMjJjaWQgdXNlcl9pZCA9IEB0ZXN0ZXIyOmVyZS5pbwowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IG8wbXZXLnFuR35IYkB2fnYKMDAyZnNpZ25hdHVyZSDXj2vPmNP2ia0mxucJMfU1Woa8UYcES0nob0eXvyVPpQo" 
- */
-dynamic buildLogoutUserAllRequest({String accessToken}) {
-  String url = '_matrix/client/r0/logout/all';
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-  return {'url': url, 'headers': headers};
 }

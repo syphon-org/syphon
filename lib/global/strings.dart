@@ -12,8 +12,7 @@ const String INTRO_LOGIN_ACTION = 'Login';
 
 const String INTRO_IMAGE_LABEL = 'Relaxed, Lounging User';
 const String INTRO_TITLE = 'Welcome to Tether';
-const String INTRO_SUBTITLE =
-    'Take back your privacy and freedom\nwithout the hassle';
+const String INTRO_SUBTITLE = 'Privacy and freedom\nwithout the hassle';
 
 String formatUsernameHint(String homeserver) {
   return homeserver.length != 0
@@ -23,6 +22,10 @@ String formatUsernameHint(String homeserver) {
 
 class StringStore {
   static const app_name = 'Tether';
+  static const app_name_long = 'Tether Messenger';
+  static const app_id = 'org.tether.tether';
+  static const default_language = 'en-US';
+
   static const start_chat_notice = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const notificationConfirmation =

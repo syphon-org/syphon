@@ -53,7 +53,7 @@ class ProfilePreview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      props.displayName,
+                      props.user.displayName ?? '',
                       style: TextStyle(fontSize: 20.0),
                     ),
                     Text(
@@ -70,18 +70,18 @@ class ProfilePreview extends StatelessWidget {
 }
 
 class _Props extends Equatable {
+  final User user;
   final String shortname;
   final String initials;
   final String username;
   final String avatarUri;
-  final String displayName;
 
   _Props({
     @required this.shortname,
     @required this.username,
     @required this.initials,
     @required this.avatarUri,
-    @required this.displayName,
+    @required this.user,
   });
 
   // Lots of null checks in case the user signed out where
@@ -90,9 +90,7 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-          displayName: store.state.authStore.user != null
-              ? store.state.authStore.user.displayName
-              : '',
+          user: store.state.authStore.user ?? const User(),
           shortname: displayShortname(
             store.state.authStore.user ?? const User(),
           ),
@@ -106,7 +104,7 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        displayName,
+        user,
         shortname,
         initials,
         username,

@@ -6,6 +6,8 @@ import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/auth/credential/model.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
+import 'package:Tether/store/settings/notification-settings/actions.dart';
+import 'package:Tether/store/sync/actions.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
@@ -22,7 +24,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 // Store
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import '../user/model.dart';
 
@@ -140,19 +141,22 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(fetchUserProfile());
 
         // Run for new authed user without a proper sync
-        if (store.state.roomStore.lastSince == null) {
-          await store.dispatch(initialRoomSync());
+        if (store.state.syncStore.lastSince == null) {
+          await store.dispatch(initialSync());
         }
 
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
             print('[onSelectNotification] payload');
           },
+          onSaveToken: (token) {
+            store.dispatch(setPusherDeviceToken(token));
+          },
         );
-        store.dispatch(startRoomsObserver());
+        store.dispatch(startSyncObserver());
       } else {
-        store.dispatch(stopRoomsObserver());
-        store.dispatch(SetSynced(synced: false, lastSince: null));
+        await store.dispatch(stopSyncObserver());
+        store.dispatch(ResetSync());
         store.dispatch(ResetRooms());
         store.dispatch(ResetUser());
       }
@@ -194,7 +198,7 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
         );
 
         device = Device(
-          deviceId: hashedDeviceId.toString(),
+          deviceId: hashedDeviceId.hash,
           displayName: 'Tim Android',
         );
       } else if (Platform.isIOS) {
@@ -248,11 +252,11 @@ ThunkAction<AppState> loginUser() {
       );
 
       if (data['errcode'] == 'M_FORBIDDEN') {
-        throw Exception('Invalid credentials, confirm and try again');
+        throw 'Invalid credentials, confirm and try again';
       }
 
       if (data['errcode'] != null) {
-        throw Exception(data['error']);
+        throw data['error'];
       }
 
       print(data);
@@ -267,7 +271,8 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error.message));
+      print(error);
+      store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -279,6 +284,7 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      store.dispatch(stopSyncObserver());
       // submit empty auth before logging out of matrix
 
       final data = await MatrixApi.logoutUser(
@@ -348,10 +354,8 @@ ThunkAction<AppState> checkUsernameAvailability() {
         username: store.state.authStore.username,
       );
 
-      print(data);
-
       if (data['errcode'] != null) {
-        throw Exception(data['error']);
+        throw data['error'];
       }
 
       store.dispatch(SetUsernameAvailability(
@@ -369,13 +373,16 @@ ThunkAction<AppState> checkUsernameAvailability() {
 ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   return (Store<AppState> store) async {
     try {
-      final List<String> completed = List<String>.from(auths['completed']);
+      final List<String> completed =
+          List<String>.from(auths['completed'] ?? []) ?? [];
 
-      await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));
+      await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
 
       if (auths['flows'] != null && auths['flows'].length > 0) {
+        // Set completed if certain flows exist
+
         final List<dynamic> stages = auths['flows'][0]['stages'];
         print('stages $stages');
 
@@ -665,14 +672,8 @@ ThunkAction<AppState> setUsername({String username}) {
 ThunkAction<AppState> setPassword({String password}) {
   return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password.trim()));
-
-    final currentPassword = store.state.authStore.password;
-    final currentConfirm = store.state.authStore.passwordConfirm;
-
     store.dispatch(SetPasswordValid(
-      valid: password != null &&
-          password.length > 0 &&
-          currentPassword == currentConfirm,
+      valid: password != null && password.length > 0,
     ));
   };
 }

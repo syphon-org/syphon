@@ -7,17 +7,17 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);
-    case SetSyncing:
-      return state.copyWith(syncing: action.syncing);
-    case SetSynced:
-      return state.copyWith(
-        synced: action.synced,
-        syncing: action.syncing,
-        lastSince: action.lastSince,
-        lastUpdate: action.synced
-            ? DateTime.now().millisecondsSinceEpoch
-            : state.lastUpdate,
-      );
+    // case SetSyncing:
+    //   return state.copyWith(syncing: action.syncing);
+    // case SetSynced:
+    //   return state.copyWith(
+    //     synced: action.synced,
+    //     syncing: action.syncing,
+    //     lastSince: action.lastSince,
+    //     lastUpdate: action.synced
+    //         ? DateTime.now().millisecondsSinceEpoch
+    //         : state.lastUpdate,
+    //   );
     case SetSending:
       final rooms = Map<String, Room>.from(state.rooms);
       rooms[action.room.id] = rooms[action.room.id].copyWith(
@@ -25,8 +25,8 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       );
       return state.copyWith(rooms: rooms);
 
-    case SetRoomObserver:
-      return state.copyWith(roomObserver: action.roomObserver);
+    // case SetRoomObserver:
+    //   return state.copyWith(roomObserver: action.roomObserver);
 
     case SetRooms:
       final Map<String, Room> rooms = Map.fromIterable(
@@ -54,23 +54,22 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       rooms.remove(action.room.id);
       return state.copyWith(rooms: rooms);
 
-    case SetRoomState:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.id] = rooms[action.id].fromStateEvents(
-        action.state,
-        currentUser: action.currentUser,
-        originDEBUG: '[SetRoomState]',
-      );
-      return state.copyWith(rooms: rooms);
+    // case SetRoomState:
+    //   final rooms = Map<String, Room>.from(state.rooms);
+    //   rooms[action.id] = rooms[action.id].fromStateEvents(
+    //     action.state,
+    //     currentUser: action.currentUser,
+    //   );
+    //   return state.copyWith(rooms: rooms);
 
-    case SetRoomMessages:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.id] = rooms[action.id].fromMessageEvents(
-        action.messageEvents,
-        startTime: action.startTime,
-        endTime: action.endTime,
-      );
-      return state.copyWith(rooms: rooms);
+    // case SetRoomMessages:
+    //   final rooms = Map<String, Room>.from(state.rooms);
+    //   rooms[action.id] = rooms[action.id].fromMessageEvents(
+    //     action.messageEvents,
+    //     startTime: action.startTime,
+    //     endTime: action.endTime,
+    //   );
+    //   return state.copyWith(rooms: rooms);
 
     case SaveOutboxMessage:
       final rooms = Map<String, Room>.from(state.rooms);

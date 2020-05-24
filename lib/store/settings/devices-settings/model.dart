@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: 9)
+@HiveType(typeId: DevicesHiveId)
 class Device extends Equatable {
   @HiveField(0)
   final String deviceId;

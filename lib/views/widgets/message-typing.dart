@@ -1,11 +1,9 @@
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /**
  * RoundedPopupMenu
@@ -13,6 +11,15 @@ import 'package:flutter/services.dart';
  * existing components app wide
  */
 class MessageTypingWidget extends StatelessWidget {
+  final bool isLastSender;
+  final bool isNextSender;
+  final bool isUserSent;
+  final int lastRead;
+  final ThemeType theme;
+  final String selectedMessageId;
+  final String avatarUri;
+  final String typer;
+
   MessageTypingWidget({
     Key key,
     this.isUserSent = false,
@@ -21,14 +28,9 @@ class MessageTypingWidget extends StatelessWidget {
     this.lastRead = 0,
     this.selectedMessageId,
     this.theme = ThemeType.LIGHT,
+    this.avatarUri,
+    this.typer,
   }) : super(key: key);
-
-  final bool isLastSender;
-  final bool isNextSender;
-  final bool isUserSent;
-  final int lastRead;
-  final ThemeType theme;
-  final String selectedMessageId;
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +40,11 @@ class MessageTypingWidget extends StatelessWidget {
     var bubbleBorder = BorderRadius.circular(16);
     var messageAlignment = MainAxisAlignment.start;
     var messageTextAlignment = CrossAxisAlignment.start;
-    var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
     var opacity = 1.0;
 
     // TODO: allow for displaying specific users typing
-    bubbleSpacing = EdgeInsets.only(left: 16);
+    var bubbleSpacing = EdgeInsets.only(top: 4, bottom: 4);
+
     bubbleBorder = BorderRadius.only(
       topLeft: Radius.circular(16),
       topRight: Radius.circular(16),
@@ -76,6 +78,39 @@ class MessageTypingWidget extends StatelessWidget {
                 mainAxisAlignment: messageAlignment,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
+                  Visibility(
+                    visible: false,
+                    maintainState: true,
+                    maintainAnimation: true,
+                    maintainSize: true,
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        right: 8,
+                      ),
+                      child: avatarUri != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                Dimensions.thumbnailSizeMax,
+                              ),
+                              child: MatrixImage(
+                                width: Dimensions.avatarSizeMessage,
+                                height: Dimensions.avatarSizeMessage,
+                                mxcUri: avatarUri,
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 14,
+                              backgroundColor: bubbleColor,
+                              child: Text(
+                                formatSenderInitials(typer ?? 'fake guy'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                    ),
+                  ),
                   Flexible(
                     fit: FlexFit.loose,
                     child: Container(

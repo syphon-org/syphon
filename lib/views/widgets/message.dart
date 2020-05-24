@@ -3,6 +3,7 @@ import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
 import 'package:Tether/global/themes.dart';
+import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,8 @@ class MessageWidget extends StatelessWidget {
     final message = this.message;
     var textColor = Colors.white;
     double indicatorSize = 14;
+
+    var showSender = true;
     var indicatorColor = Colors.white;
     var indicatorIconColor = Colors.white;
     var bubbleColor = hashedColor(message.sender);
@@ -99,6 +102,7 @@ class MessageWidget extends StatelessWidget {
             bottomLeft: Radius.circular(4),
             bottomRight: Radius.circular(16),
           );
+          showSender = false;
         } else {
           // Message at the beginning of a sender messages block
           bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
@@ -135,7 +139,6 @@ class MessageWidget extends StatelessWidget {
 
       indicatorColor = isRead ? textColor : bubbleColor;
       indicatorIconColor = isRead ? bubbleColor : textColor;
-      indicatorSize = isRead ? 14 : 14;
 
       messageAlignment = MainAxisAlignment.end;
       messageTextAlignment = CrossAxisAlignment.end;
@@ -177,10 +180,19 @@ class MessageWidget extends StatelessWidget {
                       maintainSize: !messageOnly,
                       child: Container(
                         margin: const EdgeInsets.only(
-                          right: 12,
+                          right: 8,
                         ),
                         child: avatarUri != null
-                            ? null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSizeMessage,
+                                  height: Dimensions.avatarSizeMessage,
+                                  mxcUri: avatarUri,
+                                ),
+                              )
                             : CircleAvatar(
                                 radius: 14,
                                 backgroundColor: bubbleColor,
@@ -212,7 +224,7 @@ class MessageWidget extends StatelessWidget {
                           crossAxisAlignment: messageTextAlignment,
                           children: <Widget>[
                             Visibility(
-                              visible: !isUserSent,
+                              visible: !isUserSent && showSender,
                               child: Container(
                                 margin: EdgeInsets.only(bottom: 4),
                                 child: Text(

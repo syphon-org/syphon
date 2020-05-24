@@ -46,7 +46,7 @@ class LandingSection extends StatelessWidget {
           child: Text(
             INTRO_SUBTITLE,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle2,
+            style: Theme.of(context).textTheme.subtitle1,
           ),
         ),
       ],
