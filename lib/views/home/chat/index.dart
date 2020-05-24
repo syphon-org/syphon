@@ -8,6 +8,7 @@ import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/chat/details-chat.dart';
+import 'package:Tether/views/widgets/chat-input.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:Tether/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
@@ -297,6 +298,7 @@ class ChatViewState extends State<ChatView> {
   //     ),
   //   );
   // }
+
   @protected
   onSubmitMessage(_Props props) async {
     print(editorController.text);
@@ -308,81 +310,81 @@ class ChatViewState extends State<ChatView> {
     FocusScope.of(context).unfocus();
   }
 
-  Widget buildChatInput(
-    BuildContext context,
-    _Props props,
-  ) {
-    double width = MediaQuery.of(context).size.width;
-    double messageInputWidth = width - 72;
+  // Widget buildChatInput(
+  //   BuildContext context,
+  //   _Props props,
+  // ) {
+  //   double width = MediaQuery.of(context).size.width;
+  //   double messageInputWidth = width - 72;
 
-    Color inputTextColor = const Color(BASICALLY_BLACK);
-    Color inputColorBackground = const Color(ENABLED_GREY);
-    Color inputCursorColor = Colors.blueGrey;
-    Color sendButtonColor = const Color(DISABLED_GREY);
+  //   Color inputTextColor = const Color(BASICALLY_BLACK);
+  //   Color inputColorBackground = const Color(ENABLED_GREY);
+  //   Color inputCursorColor = Colors.blueGrey;
+  //   Color sendButtonColor = const Color(DISABLED_GREY);
 
-    if (sendable) {
-      sendButtonColor = Theme.of(context).primaryColor;
-    }
+  //   if (sendable) {
+  //     sendButtonColor = Theme.of(context).primaryColor;
+  //   }
 
-    if (Theme.of(context).brightness == Brightness.dark) {
-      inputTextColor = Colors.white;
-      inputColorBackground = Colors.blueGrey;
-      inputCursorColor = Colors.white;
-    }
+  //   if (Theme.of(context).brightness == Brightness.dark) {
+  //     inputTextColor = Colors.white;
+  //     inputColorBackground = Colors.blueGrey;
+  //     inputCursorColor = Colors.white;
+  //   }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Container(
-          constraints: BoxConstraints(
-            maxWidth: messageInputWidth,
-          ),
-          child: TextField(
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            cursorColor: inputCursorColor,
-            focusNode: inputFieldNode,
-            controller: editorController,
-            onChanged: (text) => onUpdateMessage(text, props),
-            onSubmitted:
-                !sendable ? null : (text) => this.onSubmitMessage(props),
-            style: TextStyle(
-              height: 1.5,
-              color: inputTextColor,
-            ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: inputColorBackground,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-              hintText: 'Matrix message (unencrypted)',
-            ),
-          ),
-        ),
-        Container(
-          width: 48.0,
-          padding: EdgeInsets.symmetric(vertical: 4),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(48),
-            onTap: !sendable ? null : () => this.onSubmitMessage(props),
-            child: CircleAvatar(
-              backgroundColor: sendButtonColor,
-              child: Icon(
-                Icons.send,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     crossAxisAlignment: CrossAxisAlignment.end,
+  //     children: <Widget>[
+  //       Container(
+  //         constraints: BoxConstraints(
+  //           maxWidth: messageInputWidth,
+  //         ),
+  //         child: TextField(
+  //           maxLines: null,
+  //           keyboardType: TextInputType.multiline,
+  //           textInputAction: TextInputAction.newline,
+  //           cursorColor: inputCursorColor,
+  //           focusNode: inputFieldNode,
+  //           controller: editorController,
+  //           onChanged: (text) => onUpdateMessage(text, props),
+  //           onSubmitted:
+  //               !sendable ? null : (text) => this.onSubmitMessage(props),
+  //           style: TextStyle(
+  //             height: 1.5,
+  //             color: inputTextColor,
+  //           ),
+  //           decoration: InputDecoration(
+  //             filled: true,
+  //             fillColor: inputColorBackground,
+  //             contentPadding: const EdgeInsets.symmetric(
+  //               horizontal: 20.0,
+  //             ),
+  //             border: OutlineInputBorder(
+  //               borderRadius: BorderRadius.circular(24.0),
+  //             ),
+  //             hintText: 'Matrix message (unencrypted)',
+  //           ),
+  //         ),
+  //       ),
+  //       Container(
+  //         width: 48.0,
+  //         padding: EdgeInsets.symmetric(vertical: 4),
+  //         child: InkWell(
+  //           borderRadius: BorderRadius.circular(48),
+  //           onTap: !sendable ? null : () => this.onSubmitMessage(props),
+  //           child: CircleAvatar(
+  //             backgroundColor: sendButtonColor,
+  //             child: Icon(
+  //               Icons.send,
+  //               color: Colors.white,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @protected
   buildRoomAppBar({
@@ -720,9 +722,14 @@ class ChatViewState extends State<ChatView> {
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
-                      child: buildChatInput(
-                        context,
-                        props,
+                      child: ChatInput(
+                        sendable: sendable,
+                        focusNode: inputFieldNode,
+                        controller: editorController,
+                        onChangeMessage: (text) => onUpdateMessage(text, props),
+                        onSubmitMessage: () => this.onSubmitMessage(props),
+                        onSubmittedMessage: (text) =>
+                            this.onSubmitMessage(props),
                       ),
                     ),
                   ),

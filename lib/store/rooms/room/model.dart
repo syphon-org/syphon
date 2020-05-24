@@ -4,8 +4,6 @@ import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/user/selectors.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
@@ -259,6 +257,8 @@ class Room {
     bool direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
+    bool encryptionEnabled = false;
+
     List<Event> cachedStateEvents = List<Event>();
     Map<String, User> users = this.users ?? Map<String, User>();
 
@@ -294,6 +294,9 @@ class Room {
             if (avatarFile == null) {
               avatarUri = event.content['url'];
             }
+            break;
+          case 'm.room.encryption':
+            encryptionEnabled = true;
             break;
           case 'm.room.member':
             final displayName = event.content['displayname'];
@@ -335,6 +338,7 @@ class Room {
       users: users ?? this.users,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       direct: direct ?? this.direct,
+      encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       state: cachedStateEvents,
     );
   }

@@ -73,7 +73,10 @@ class LoginState extends State<Login> {
         backgroundColor: color,
         content: Text(
           alert.message,
-          style: Theme.of(context).textTheme.subtitle1,
+          style: Theme.of(context)
+              .textTheme
+              .subtitle1
+              .copyWith(color: Colors.white),
         ),
         duration: alert.duration,
         action: SnackBarAction(

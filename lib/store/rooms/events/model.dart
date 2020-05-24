@@ -13,19 +13,20 @@ class AccountDataTypes {
 }
 
 class EventTypes {
-  static const MESSAGE = 'm.room.message';
-  static const ROOM_CREATION = 'm.room.create';
-  static const ROOM_NAME = '.room.name';
-  static const ROOM_TOPIC = 'm.room.topic';
+  static const message = 'm.room.message';
+  static const creation = 'm.room.create';
+  static const name = '.room.name';
+  static const topic = 'm.room.topic';
 
   // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
   // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}
-  static const ROOM_MEMBER = 'm.room.member';
+  static const member = 'm.room.member';
 
-  static const GUEST_ACCESS = 'm.room.guest_access';
-  static const JOIN_RULES = 'm.room.join_rules';
-  static const HISTORY_VISIBILITY = 'm.room.history_visibility';
-  static const POWER_LEVELS = 'm.room.power_levels';
+  static const guestAccess = 'm.room.guest_access';
+  static const joinRules = 'm.room.join_rules';
+  static const historyVisibility = 'm.room.history_visibility';
+  static const powerLevels = 'm.room.power_levels';
+  static const encryption = 'm.room.encryption';
 }
 
 class MessageTypes {

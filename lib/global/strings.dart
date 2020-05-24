@@ -12,8 +12,7 @@ const String INTRO_LOGIN_ACTION = 'Login';
 
 const String INTRO_IMAGE_LABEL = 'Relaxed, Lounging User';
 const String INTRO_TITLE = 'Welcome to Tether';
-const String INTRO_SUBTITLE =
-    'Take back your privacy and freedom\nwithout the hassle';
+const String INTRO_SUBTITLE = 'Privacy and freedom\nwithout the hassle';
 
 String formatUsernameHint(String homeserver) {
   return homeserver.length != 0
