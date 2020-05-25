@@ -33,9 +33,9 @@ class Room {
   final bool isDraftRoom;
 
   @HiveField(11)
-  final String toHash; // end of last message fetch
+  final String endHash; // end of last message fetch
   @HiveField(10)
-  final String fromHash; // start of last messages fetch (usually prev_batch)
+  final String startHash; // start of last messages fetch (usually prev_batch)
   @HiveField(26)
   final String prevHash; // fromHash but from /sync only
 
@@ -98,8 +98,8 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.isDraftRoom = false,
-    this.fromHash,
-    this.toHash,
+    this.endHash,
+    this.startHash,
     this.prevHash,
     this.messageReads,
   });
@@ -128,8 +128,8 @@ class Room {
     outbox,
     messages,
     messageReads,
-    fromHash,
-    toHash,
+    endHash,
+    startHash,
     prevHash,
   }) {
     return Room(
@@ -154,9 +154,9 @@ class Room {
       messages: messages ?? this.messages,
       users: users ?? this.users,
       messageReads: messageReads ?? this.messageReads,
-      toHash: toHash ?? this.toHash,
-      fromHash: fromHash ?? this.fromHash,
-      prevHash: prevHash ?? this.prevHash,
+      endHash: endHash ?? this.endHash,
+      startHash: startHash ?? this.startHash,
+      prevHash: prevHash, // TODO: may always need a prev hash?
     );
   }
 
@@ -182,10 +182,9 @@ class Room {
 
   Room fromSync({
     User currentUser,
+    String lastSince,
     Map<String, dynamic> json,
   }) {
-    String toHash;
-    String fromHash;
     String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
@@ -202,6 +201,8 @@ class Room {
 
     if (json['timeline'] != null) {
       prevHash = json['timeline']['prev_batch'];
+
+      print('[fromSync] ${this.name} prev_batch $prevHash');
 
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
@@ -234,9 +235,8 @@ class Room {
         )
         .fromMessageEvents(
           timelineEvents,
-          toHash: toHash,
-          fromHash: fromHash,
           prevHash: prevHash,
+          latestHash: lastSince,
         )
         .fromEphemeralEvents(
           ephemeralEvents,
@@ -350,9 +350,8 @@ class Room {
    */
   Room fromMessageEvents(
     List<Message> messageEvents, {
-    String toHash,
-    String fromHash,
-    String prevHash,
+    String prevHash, // previously fetched hash
+    String latestHash,
   }) {
     try {
       int lastUpdate = this.lastUpdate;
@@ -393,9 +392,12 @@ class Room {
         messages: allMessages,
         outbox: outbox,
         lastUpdate: lastUpdate ?? this.lastUpdate,
-        toHash: toHash ?? this.toHash,
-        fromHash: fromHash ?? this.fromHash,
-        prevHash: prevHash ?? this.prevHash,
+        // hash of last batch of messages in timeline
+        endHash: this.endHash ?? prevHash,
+        // hash of the latest batch messages in timeline
+        startHash: latestHash ?? this.startHash,
+        // most recent previous batch from the last /sync
+        prevHash: prevHash,
       );
     } catch (error) {
       print('[fromMessageEvents] $error');

@@ -4,6 +4,7 @@ import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
+import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:flutter/foundation.dart';
@@ -100,6 +101,7 @@ ThunkAction<AppState> syncRooms(
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
     final user = store.state.authStore.user;
+    final lastSince = store.state.syncStore.lastSince;
 
     // syncing null data happens sometimes?
     if (roomData == null) {
@@ -115,6 +117,7 @@ ThunkAction<AppState> syncRooms(
       room = room.fromSync(
         json: json,
         currentUser: user,
+        lastSince: lastSince,
       );
 
       // fetch avatar if a uri was found
@@ -122,6 +125,20 @@ ThunkAction<AppState> syncRooms(
         store.dispatch(fetchThumbnail(
           mxcUri: room.avatarUri,
         ));
+      }
+
+      // fetch previous messages since last /sync if
+      // more than one batch needs to be fetched (a gap)
+      // and is not already at the end of the hash
+      // the end would be room.prevHash == room.endHash
+      if (room.prevHash != null && room.prevHash != room.endHash) {
+        store.dispatch(
+          fetchMessageEvents(
+            room: room,
+            endHash: room.endHash,
+            startHash: room.prevHash,
+          ),
+        );
       }
 
       store.dispatch(SetRoom(room: room));

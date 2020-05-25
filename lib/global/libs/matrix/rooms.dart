@@ -8,6 +8,10 @@ abstract class Rooms {
    * 
    * https://matrix.org/docs/spec/client_server/latest#id251
    * 
+   * long polling will hang the http request until any new
+   * events are found, the hang will "timeout" using the respective
+   * param where you'll need to call the sync api again to wai
+   * for new events
    */
   static Future<dynamic> sync({
     String protocol = 'https://', // http or https ( or libp2p :D )
@@ -16,16 +20,15 @@ abstract class Rooms {
     String since,
     bool fullState = false,
     String setPresence,
+    int timeout = 10000,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
-    if (since == null) {
-      print('WARNING SINCE IS NULL $url $accessToken');
-    }
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
     url += setPresence != null ? '&set_presence=$setPresence' : '';
+    url += timeout != null ? '&timeout=$timeout' : '';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
