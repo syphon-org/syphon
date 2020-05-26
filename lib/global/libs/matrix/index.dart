@@ -3,6 +3,7 @@ import 'package:Tether/global/libs/matrix/devices.dart';
 import 'package:Tether/global/libs/matrix/events.dart';
 import 'package:Tether/global/libs/matrix/notifications.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
+import 'package:Tether/global/libs/matrix/user.dart';
 
 abstract class MatrixApi {
   // Authentication
@@ -19,12 +20,29 @@ abstract class MatrixApi {
   static final syncBackground = Rooms.syncBackground;
   static final fetchRoomIds = Rooms.fetchRoomIds;
   static final fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
+  static final createRoom = Rooms.createRoom;
+  static final leaveRoom = Rooms.leaveRoom;
+  static final forgetRoom = Rooms.forgetRoom;
 
   // Events
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
   static final sendMessage = Events.sendMessage;
   static final sendTyping = Events.sendTyping;
+
+  /*** Users ***/
+
+  /**
+   * Save Account Data
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
+   * 
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static final fetchAccountData = Users.fetchAccountData;
+  static final saveAccountData = Users.saveAccountData;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;

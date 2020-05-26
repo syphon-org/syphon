@@ -314,7 +314,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            CREATE_USER_TEXT,
+                            StringStore.buttonLoginCreateQuestion,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -324,7 +324,7 @@ class LoginState extends State<Login> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              CREATE_USER_TEXT_ACTION,
+                              StringStore.buttonLoginCreateAction,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,

@@ -28,7 +28,6 @@ abstract class Notifications {
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
-    print(url);
 
     final response = await http.get(
       url,

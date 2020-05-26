@@ -25,6 +25,7 @@ class MatrixImage extends StatefulWidget {
   final BoxFit fit;
   final bool thumbnail;
   final bool disableRebuild;
+  final bool forceLoading;
 
   const MatrixImage({
     Key key,
@@ -36,6 +37,7 @@ class MatrixImage extends StatefulWidget {
     this.fit = BoxFit.fill,
     this.thumbnail = true,
     this.disableRebuild = false,
+    this.forceLoading = false,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,7 @@ class MatrixImage extends StatefulWidget {
 
 class MatrixImageState extends State<MatrixImage> {
   final bool disableRebuild;
+  final bool forceLoading;
 
   Uint8List finalUriData;
 
@@ -71,6 +74,7 @@ class MatrixImageState extends State<MatrixImage> {
   MatrixImageState({
     Key key,
     this.disableRebuild = false,
+    this.forceLoading = false,
   });
 
   @override
@@ -78,7 +82,11 @@ class MatrixImageState extends State<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
-          if (!props.mediaCache.containsKey(finalUriData ?? widget.mxcUri)) {
+          final loading =
+              !props.mediaCache.containsKey(finalUriData ?? widget.mxcUri) ||
+                  forceLoading;
+
+          if (loading) {
             print('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               width: widget.width,

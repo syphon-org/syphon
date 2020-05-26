@@ -431,6 +431,16 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                     style:
                                         Theme.of(context).textTheme.headline6,
                                   ),
+                                  Text(
+                                    props.room.id,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                  Text(
+                                    props.room.direct ? 'Direct' : 'Group',
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
                                   Visibility(
                                     visible: props.room.topic != null &&
                                         props.room.topic.length > 0,
