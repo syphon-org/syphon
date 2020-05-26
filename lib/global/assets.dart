@@ -13,6 +13,8 @@ const String SIGNUP_PASSWORD_GRAPHIC = 'assets/graphics/undraw_in_thought.svg';
 const String SIGNUP_HOMESERVER_GRAPHIC = 'assets/graphics/undraw_mention.svg';
 
 class AssetsStore {
+  static final appIcon = 'assets/icons/tether_icon.svg';
+  static final appIconPng = 'assets/icons/tether_icon.png';
   static final heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
   static final heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
 }

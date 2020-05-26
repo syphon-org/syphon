@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:Tether/global/strings.dart';
-import 'package:Tether/global/themes.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -300,9 +299,11 @@ class LoginState extends State<Login> {
                     constraints: BoxConstraints(
                       minHeight: Dimensions.inputHeight,
                     ),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 16,
+                    margin: const EdgeInsets.only(
+                      left: 8,
+                      right: 8,
+                      top: 16,
+                      bottom: 24,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
@@ -326,12 +327,15 @@ class LoginState extends State<Login> {
                             child: Text(
                               StringStore.buttonLoginCreateAction,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w100,
-                                color: Themes.invertedPrimaryColor(context),
-                                decoration: TextDecoration.underline,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white,
+                                  ),
                             ),
                           ),
                         ],

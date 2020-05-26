@@ -46,6 +46,9 @@ class SettingsStore extends Equatable {
   @HiveField(13)
   final NotificationSettings notificationSettings;
 
+  @HiveField(14)
+  final String alphaAgreement; // a timestamp of agreement for alpha TOS
+
   final String pusherToken; // NOTE: can be device token for APNS
 
   // Temporary
@@ -67,6 +70,7 @@ class SettingsStore extends Equatable {
     this.devices = const [],
     this.loading = false,
     this.notificationSettings,
+    this.alphaAgreement,
     this.pusherToken,
   });
 
@@ -86,6 +90,7 @@ class SettingsStore extends Equatable {
         devices,
         loading,
         notificationSettings,
+        alphaAgreement,
         pusherToken,
       ];
 
@@ -105,6 +110,7 @@ class SettingsStore extends Equatable {
     NotificationSettings notificationSettings,
     List<Device> devices,
     bool loading,
+    String alphaAgreement,
     String pusherToken, // NOTE: device token for APNS
   }) {
     return SettingsStore(
@@ -125,6 +131,7 @@ class SettingsStore extends Equatable {
       notificationSettings: notificationSettings ?? this.notificationSettings,
       devices: devices ?? this.devices,
       loading: loading ?? this.loading,
+      alphaAgreement: alphaAgreement ?? this.alphaAgreement,
       pusherToken: pusherToken ?? this.pusherToken,
     );
   }
