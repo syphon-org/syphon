@@ -1,3 +1,82 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:http/http.dart' as http;
+
+abstract class Users {
+  /**
+   * Fetch Account Data
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-account-data-type
+   *  
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> fetchAccountData({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String type = AccountDataTypes.direct,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final saveResponse = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+
+  /**
+   * Save Account Data
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
+   * 
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> saveAccountData({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String type = AccountDataTypes.direct,
+    Map accountData,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    // final body = {
+    //   invites[0].userId: [newRoomId]
+    // };
+
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(accountData),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+}
+
 /** 
  * GET user profile
 {
@@ -28,35 +107,6 @@ dynamic buildUserProfileRequest({
  * e.g. you need to have their access_token.
  */
 dynamic buildSaveAccountData({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String type,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/user/${userId}/account_data/${type}';
-
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
-
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
-
-/**  
- * 
- * Save Account Data
- * https://matrix.org/docs/spec/client_server/latest#id551
- * 
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildRemoveAccountData({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
   String accessToken,

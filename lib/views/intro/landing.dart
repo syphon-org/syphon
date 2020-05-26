@@ -44,9 +44,9 @@ class LandingSection extends StatelessWidget {
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
-            INTRO_SUBTITLE,
+            StringStore.intro_subtitle,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
       ],

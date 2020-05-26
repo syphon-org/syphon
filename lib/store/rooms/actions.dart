@@ -1,21 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:Tether/store/index.dart';
-import 'package:Tether/global/libs/matrix/rooms.dart';
 
 import 'room/model.dart';
 import 'events/model.dart';
@@ -183,8 +179,10 @@ ThunkAction<AppState> fetchRooms() {
             homeserver: store.state.authStore.user.homeserver,
             accessToken: store.state.authStore.user.accessToken,
             roomId: room.id,
-            // limit: 30 TODO: uncomment after pagination is working
+            limit: 20,
           );
+
+          print('[fetchRooms] ${room.id}');
 
           store.dispatch(syncRooms({
             '${room.id}': {
@@ -265,6 +263,7 @@ ThunkAction<AppState> fetchDirectRooms() {
               homeserver: store.state.authStore.user.homeserver,
               accessToken: store.state.authStore.user.accessToken,
               roomId: roomId,
+              limit: 20,
             );
 
             // if (messageEvents['errcode'] != null) {
@@ -273,6 +272,8 @@ ThunkAction<AppState> fetchDirectRooms() {
 
             // Format response like /sync request
             // Hacked together to provide isDirect data
+
+            print('[fetchDirectRooms] $roomId');
             await store.dispatch(syncRooms({
               '$roomId': {
                 'state': {
@@ -325,7 +326,7 @@ ThunkAction<AppState> createRoom({
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
-      final request = buildCreateRoom(
+      final data = await MatrixApi.createRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
@@ -334,18 +335,6 @@ ThunkAction<AppState> createRoom({
         roomAlias: alias,
         invites: invites.map((user) => user.userId).toList(),
         isDirect: isDirect,
-      );
-
-      final response = await http.post(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(
-          request['body'],
-        ),
-      );
-
-      final data = json.decode(
-        response.body,
       );
 
       final newRoomId = data['room_id'];
@@ -357,26 +346,17 @@ ThunkAction<AppState> createRoom({
       print('[createRoom] $data $newRoomId');
 
       if (isDirect) {
-        final request = buildSaveAccountData(
+        final accountData = {
+          '${invites[0].userId}': [newRoomId]
+        };
+
+        final data = await MatrixApi.saveAccountData(
           protocol: protocol,
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,
           userId: store.state.authStore.user.userId,
           type: AccountDataTypes.direct,
-        );
-
-        final body = {
-          invites[0].userId: [newRoomId]
-        };
-
-        final response = await http.put(
-          request['url'],
-          headers: request['headers'],
-          body: json.encode(body),
-        );
-
-        final data = json.decode(
-          response.body,
+          accountData: accountData,
         );
 
         print('[DIRECT Save Account Data] $data');
@@ -400,100 +380,14 @@ ThunkAction<AppState> createRoom({
 }
 
 /**
- * Delete Room
- * 
- * Both leaves and forgets room
- * 
- * TODO: make sure this is in accordance with matrix in that
- * the user can only delete if owning the room, or leave if
- * just a member
- */
-ThunkAction<AppState> removeRoom({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      // submit a leave room request
-      final leaveRequest = buildLeaveRoom(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-      );
-
-      final leaveResponse = await http.post(
-        leaveRequest['url'],
-        headers: leaveRequest['headers'],
-      );
-
-      final leaveData = json.decode(
-        leaveResponse.body,
-      );
-
-      // Remove the room locally if it's already been removed remotely
-      if (leaveData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.room_unknown) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-        } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-        }
-        throw leaveData['error'];
-      }
-      if (!kReleaseMode) {
-        print('[removeRoom|leaveData] success $leaveData');
-      }
-
-      final forgetRequest = buildForgetRoom(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-      );
-
-      final forgetResponse = await http.post(
-        forgetRequest['url'],
-        headers: forgetRequest['headers'],
-      );
-
-      final forgetData = json.decode(
-        forgetResponse.body,
-      );
-
-      if (forgetData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          // TODO: confirm this works, deletes room if it doesn't
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-        }
-        throw forgetData['error'];
-      }
-
-      if (room.direct) {
-        await store.dispatch(removeDirectRoom(room: room));
-      }
-
-      if (!kReleaseMode) {
-        print('[removeRoom|forgetData] $forgetData');
-        print('[removeRoom|forgetData] room was successfully removed');
-      }
-
-      await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-    } catch (error) {
-      print('[removeRoom] error: $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/**
- * Remove Direct Room
+ * Toggle Direct Room
  * 
  * NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
  * 
  * Fetch the direct rooms list and recalculate it without the
  * given alias
  */
-ThunkAction<AppState> removeDirectRoom({Room room}) {
+ThunkAction<AppState> toggleDirectRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -509,48 +403,124 @@ ThunkAction<AppState> removeDirectRoom({Room room}) {
         throw data['error'];
       }
 
-      final rawDirectRooms = data as Map<String, dynamic>;
+      final currentUser = store.state.authStore.user;
 
-      // Remove room id from nested Map<List<String>>
-      var filteredDirectRooms = rawDirectRooms.map((key, value) {
-        List<dynamic> directRoomIds = List.from(value as List<dynamic>);
-        if (directRoomIds.contains(room.id)) {
-          directRoomIds.remove(room.id);
-        }
-        return MapEntry(key, directRoomIds);
-      });
+      final otherUser = room.users.values.firstWhere(
+        (user) => user.userId != currentUser.userId,
+      );
+
+      Map directRoomUsers = data as Map<String, dynamic>;
+
+      if (otherUser == null) {
+        throw 'Cannot toggle room to direct without other users';
+      }
+
+      if (directRoomUsers[otherUser.userId] == null) {
+        directRoomUsers[otherUser.userId] = [room.id];
+      } else {
+        directRoomUsers = directRoomUsers.map((user, rooms) {
+          List<dynamic> updatedRooms = List.from(rooms as List<dynamic>);
+          if (updatedRooms.contains(room.id)) {
+            updatedRooms.remove(room.id);
+          }
+          return MapEntry(user, updatedRooms);
+        });
+      }
 
       // Filter out empty list entries for a user
-      filteredDirectRooms.removeWhere((key, value) {
+      directRoomUsers.removeWhere((key, value) {
         final roomIds = value as List<dynamic>;
         return roomIds.isEmpty;
       });
 
-      final saveRequest = buildSaveAccountData(
+      final saveData = await MatrixApi.saveAccountData(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,
         type: AccountDataTypes.direct,
-      );
-
-      final saveResponse = await http.put(
-        saveRequest['url'],
-        headers: saveRequest['headers'],
-        body: json.encode(filteredDirectRooms),
-      );
-
-      final saveData = json.decode(
-        saveResponse.body,
+        accountData: directRoomUsers,
       );
 
       if (saveData['errcode'] != null) {
         throw saveData['error'];
       }
 
-      print('[removeDirectRoom]');
+      store.dispatch(fetchDirectRooms());
+
+      print('[toggleDirectRoom] successfully toggled direct ${room.name}');
     } catch (error) {
-      print('[removeDirectRoom] error: $error');
+      print('[toggleDirectRoom] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Delete Room
+ * 
+ * Both leaves and forgets room
+ * 
+ * TODO: make sure this is in accordance with matrix in that
+ * the user can only delete if owning the room, or leave if
+ * just a member
+ */
+ThunkAction<AppState> removeRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      // submit a leave room request
+      final leaveData = await MatrixApi.leaveRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      // Remove the room locally if it's already been removed remotely
+      if (leaveData['errcode'] != null) {
+        if (leaveData['errcode'] == MatrixErrors.room_unknown) {
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
+        throw leaveData['error'];
+      }
+      if (!kReleaseMode) {
+        print('[removeRoom|leaveData] success $leaveData');
+      }
+
+      final forgetData = await MatrixApi.forgetRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      if (forgetData['errcode'] != null) {
+        if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+          // TODO: confirm this works, deletes room if it doesn't
+          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
+        throw forgetData['error'];
+      }
+
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room));
+      }
+
+      if (!kReleaseMode) {
+        print('[removeRoom] forgetData $forgetData');
+      }
+
+      await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      print('[removeRoom] successfully removed ${room.name}');
+    } catch (error) {
+      print('[removeRoom] error: $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
     }
   };
 }
@@ -572,20 +542,11 @@ ThunkAction<AppState> deleteRoom({Room room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final deleteRequest = buildLeaveRoom(
+      final deleteData = await MatrixApi.leaveRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
-      );
-
-      final deleteResponse = await http.delete(
-        deleteRequest['url'],
-        headers: deleteRequest['headers'],
-      );
-
-      final deleteData = json.decode(
-        deleteResponse.body,
       );
 
       if (deleteData['errcode'] != null) {

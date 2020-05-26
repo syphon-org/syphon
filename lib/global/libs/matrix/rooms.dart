@@ -119,7 +119,9 @@ abstract class Rooms {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
-    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
     final response = await http.get(
       url,
@@ -128,143 +130,161 @@ abstract class Rooms {
 
     return await json.decode(response.body);
   }
-}
 
-/**
- * Create Room - POST
- * 
- * https://matrix.org/docs/spec/client_server/latest#id286
- * 
- * This API stops a user participating in a particular room.
- * If the user was already in the room, they will no longer
- * be able to see new events in the room. If the room requires an invite to join, 
- * they will need to be re-invited before they can re-join. If the user was invited 
- * to the room, but had not joined, this call serves to reject the invite.
- */
-dynamic buildCreateRoom({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomName,
-  String roomAlias,
-  String roomTopic,
-  List<String> invites = const [],
-  String chatTypePreset = "private_chat",
-  bool isDirect = false,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/createRoom';
+  /**
+   * Create Room - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id286
+   * 
+   * This API stops a user participating in a particular room.
+   * If the user was already in the room, they will no longer
+   * be able to see new events in the room. If the room requires an invite to join, 
+   * they will need to be re-invited before they can re-join. If the user was invited 
+   * to the room, but had not joined, this call serves to reject the invite.
+   */
+  static Future<dynamic> createRoom({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomName,
+    String roomAlias,
+    String roomTopic,
+    List<String> invites = const [],
+    String chatTypePreset = "private_chat",
+    bool isDirect = false,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/createRoom';
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  Map body = {
-    "name": roomName,
-    "is_direct": isDirect,
-    "preset": chatTypePreset,
-    'invite': invites
-  };
+    Map body = {
+      "name": roomName,
+      "is_direct": isDirect,
+      "preset": chatTypePreset,
+      'invite': invites
+    };
 
-  // if (roomAlias != null) {
-  //   body['room_alias_name:'] = roomAlias;
-  // }
-  // if (roomTopic != null) {
-  //   body['topic'] = roomTopic;
-  // }
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(
+        body,
+      ),
+    );
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
-}
+    return await json.decode(
+      response.body,
+    );
+  }
 
-/**
- * Leave (or Reject) Room - POST
- * 
- * https://matrix.org/docs/spec/client_server/latest#id286
- * 
- * This API stops a user participating in a particular room.
- * If the user was already in the room, they will no longer
- * be able to see new events in the room. If the room requires an invite to join, 
- * they will need to be re-invited before they can re-join. If the user was invited 
- * to the room, but had not joined, this call serves to reject the invite.
- */
-dynamic buildLeaveRoom({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
+  /**
+   * Leave Room - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id286
+   * 
+   * This API stops a user remembering about a particular room.
+   * In general, history is a first class citizen in Matrix. 
+   * After this API is called, however, a user will no longer be able 
+   * to retrieve history for this room. If all users on a homeserver 
+   * forget a room, the room is eligible for deletion from that homeserver.
+   * If the user is currently joined to the room, they must leave the room 
+   * before calling this API.
+   */
+  static Future<dynamic> leaveRoom({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
+    final reponse = await http.post(
+      url,
+      headers: headers,
+    );
 
-/**
- * Forget Room - POST
- * 
- * https://matrix.org/docs/spec/client_server/latest#id286
- * 
- * This API stops a user remembering about a particular room.
- * In general, history is a first class citizen in Matrix. 
- * After this API is called, however, a user will no longer be able 
- * to retrieve history for this room. If all users on a homeserver 
- * forget a room, the room is eligible for deletion from that homeserver.
- * If the user is currently joined to the room, they must leave the room 
- * before calling this API.
- */
-dynamic buildForgetRoom({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
+    return await json.decode(
+      reponse.body,
+    );
+  }
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+  /**
+   * Forget Room - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id286
+   * 
+   * This API stops a user remembering about a particular room.
+   * In general, history is a first class citizen in Matrix. 
+   * After this API is called, however, a user will no longer be able 
+   * to retrieve history for this room. If all users on a homeserver 
+   * forget a room, the room is eligible for deletion from that homeserver.
+   * If the user is currently joined to the room, they must leave the room 
+   * before calling this API.
+   * 
+   * Must leave room before you can forget (The Way)
+   */
+  static Future<dynamic> forgetRoom({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-/**
- * Delete Room Alias - DELETE
- * 
- * https://matrix.org/docs/spec/client_server/latest#id277
- * 
- * Remove a mapping of room alias to room ID. Servers may choose 
- * to implement additional access control checks here, for instance
- * that room aliases can only be deleted by their creator or a 
- * server administrator.
- */
+    final reponse = await http.post(
+      url,
+      headers: headers,
+    );
 
-dynamic buildDeleteRoomAlias({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomAlias,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
+    return await json.decode(
+      reponse.body,
+    );
+  }
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+  /**
+   * Delete Room Alias - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id286
+   * 
+   * 
+   * HAS NOTHING TO DO WITH DELETING ROOMS AS YOU WOULD EXPECT
+   * 
+   * Remove a mapping of room alias to room ID. Servers may choose 
+   * to implement additional access control checks here, for instance
+   * that room aliases can only be deleted by their creator or a 
+   * server administrator.
+   *  
+   */
+  static Future<dynamic> deleteRoomAlias({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomAlias,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final reponse = await http.delete(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(
+      reponse.body,
+    );
+  }
 }
