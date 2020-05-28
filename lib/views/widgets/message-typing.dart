@@ -1,20 +1,21 @@
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/formatters.dart';
+import 'package:Tether/store/user/model.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MessageTypingWidget extends StatefulWidget {
   final bool typing;
-  final String typer;
-  final String avatarUri;
+  final List<String> usersTyping;
+  final Map<String, User> roomUsers;
   final String selectedMessageId;
 
   MessageTypingWidget({
     Key key,
-    this.typer,
     this.typing,
-    this.avatarUri,
+    this.usersTyping,
+    this.roomUsers,
     this.selectedMessageId,
   }) : super(key: key);
 
@@ -78,8 +79,8 @@ class MessageTypingState extends State<MessageTypingWidget>
     var messageTextAlignment = CrossAxisAlignment.start;
     var opacity = 1.0;
 
-    // TODO: allow for displaying specific users typing
     var bubbleSpacing = EdgeInsets.only(top: 4, bottom: 4);
+    var mostRecentTyper = User();
 
     bubbleBorder = BorderRadius.only(
       topLeft: Radius.circular(16),
@@ -91,6 +92,12 @@ class MessageTypingState extends State<MessageTypingWidget>
     if (widget.selectedMessageId != null) {
       opacity = widget.selectedMessageId != null ? 0.5 : 1.0;
     }
+
+    if (widget.usersTyping.length > 0) {
+      final usernamesTyping = widget.usersTyping;
+      mostRecentTyper = widget.roomUsers[usernamesTyping[0]];
+    }
+
     return Opacity(
       opacity: opacity,
       child: wrapAnimation(
@@ -110,7 +117,7 @@ class MessageTypingState extends State<MessageTypingWidget>
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Visibility(
-                      visible: false,
+                      visible: mostRecentTyper.avatarUri != null,
                       maintainState: true,
                       maintainAnimation: true,
                       maintainSize: true,
@@ -118,7 +125,7 @@ class MessageTypingState extends State<MessageTypingWidget>
                         margin: const EdgeInsets.only(
                           right: 8,
                         ),
-                        child: widget.avatarUri != null
+                        child: mostRecentTyper.avatarUri != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(
                                   Dimensions.thumbnailSizeMax,
@@ -126,21 +133,10 @@ class MessageTypingState extends State<MessageTypingWidget>
                                 child: MatrixImage(
                                   width: Dimensions.avatarSizeMessage,
                                   height: Dimensions.avatarSizeMessage,
-                                  mxcUri: widget.avatarUri,
+                                  mxcUri: mostRecentTyper.avatarUri,
                                 ),
                               )
-                            : CircleAvatar(
-                                radius: 14,
-                                backgroundColor: bubbleColor,
-                                child: Text(
-                                  formatSenderInitials(
-                                      widget.typer ?? 'fake guy'),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                            : null,
                       ),
                     ),
                     wrapAnimation(

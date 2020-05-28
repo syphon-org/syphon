@@ -63,8 +63,9 @@ class Room {
   @HiveField(21)
   final List<Message> outbox;
 
-  @HiveField(22)
+  // Not cached
   final bool userTyping;
+  final List<String> usersTyping;
 
   @HiveField(23)
   final int lastRead;
@@ -97,6 +98,7 @@ class Room {
     this.encryptionEnabled = false,
     this.worldReadable = false,
     this.userTyping = false,
+    this.usersTyping = const [],
     this.isDraftRoom = false,
     this.endHash,
     this.startHash,
@@ -120,6 +122,7 @@ class Room {
     guestEnabled,
     encryptionEnabled,
     userTyping,
+    usersTyping,
     isDraftRoom,
     draft,
     state,
@@ -148,6 +151,7 @@ class Room {
       guestEnabled: guestEnabled ?? this.guestEnabled,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       userTyping: userTyping ?? this.userTyping,
+      usersTyping: usersTyping ?? this.usersTyping,
       isDraftRoom: isDraftRoom ?? this.isDraftRoom,
       state: state ?? this.state,
       outbox: outbox ?? this.outbox,
@@ -240,6 +244,7 @@ class Room {
         )
         .fromEphemeralEvents(
           ephemeralEvents,
+          currentUser: currentUser,
         );
   }
 
@@ -410,9 +415,12 @@ class Room {
    * hashmap of eventIds linking them to users and timestamps
    */
   Room fromEphemeralEvents(
-    List<Event> events,
-  ) {
-    var userTyping = false;
+    List<Event> events, {
+    User currentUser,
+  }) {
+    bool userTyping = false;
+    List<String> usersTyping = this.usersTyping;
+
     int latestRead = this.lastRead;
     var messageReads = this.messageReads != null
         ? Map<String, ReadStatus>.from(this.messageReads)
@@ -422,13 +430,12 @@ class Room {
       events.forEach((event) {
         switch (event.type) {
           case 'm.typing':
-            // TODO: save which users are typing
-            // if ((event.content['user_ids'] as List<dynamic>).length > 0) {
-            //   userTyping = event.content['user_ids'][0];
-            // }
-
-            userTyping =
-                (event.content['user_ids'] as List<dynamic>).length > 0;
+            final List<dynamic> usersTypingList = event.content['user_ids'];
+            usersTyping = List<String>.from(usersTypingList);
+            usersTyping.removeWhere(
+              (user) => currentUser.userId == user,
+            );
+            userTyping = usersTyping.length > 0;
             break;
           case 'm.receipt':
             final Map<String, dynamic> receiptEventIds = event.content;
@@ -462,6 +469,7 @@ class Room {
 
     return this.copyWith(
       userTyping: userTyping,
+      usersTyping: usersTyping,
       messageReads: messageReads,
       lastRead: latestRead,
     );
