@@ -1,36 +1,72 @@
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/formatters.dart';
-import 'package:Tether/global/themes.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+class MessageTypingWidget extends StatefulWidget {
+  final bool typing;
+  final String typer;
+  final String avatarUri;
+  final String selectedMessageId;
+
+  MessageTypingWidget({
+    Key key,
+    this.typer,
+    this.typing,
+    this.avatarUri,
+    this.selectedMessageId,
+  }) : super(key: key);
+
+  @override
+  MessageTypingState createState() => MessageTypingState();
+}
 
 /**
  * RoundedPopupMenu
  * Mostly an example for myself on how to override styling or other options on
  * existing components app wide
  */
-class MessageTypingWidget extends StatelessWidget {
-  final bool isLastSender;
-  final bool isNextSender;
-  final bool isUserSent;
-  final int lastRead;
-  final ThemeType theme;
-  final String selectedMessageId;
-  final String avatarUri;
-  final String typer;
+class MessageTypingState extends State<MessageTypingWidget>
+    with TickerProviderStateMixin {
+  double fullSize = 1;
 
-  MessageTypingWidget({
-    Key key,
-    this.isUserSent = false,
-    this.isLastSender = false,
-    this.isNextSender = false,
-    this.lastRead = 0,
-    this.selectedMessageId,
-    this.theme = ThemeType.LIGHT,
-    this.avatarUri,
-    this.typer,
-  }) : super(key: key);
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @protected
+  wrapAnimation({Widget animatedWidget, int milliseconds}) {
+    return TweenAnimationBuilder(
+      tween: Tween<double>(begin: 0, end: widget.typing ? 1 : 0),
+      duration: Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      child: animatedWidget,
+      builder: (BuildContext context, double size, Widget child) {
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              fullSize = fullSize == 1 ? 0.0 : 1;
+            });
+          },
+          child: Container(
+            // height: 54 * size,
+            constraints: BoxConstraints(
+              maxWidth: Dimensions.bubbleWidthMin * size,
+              maxHeight: Dimensions.bubbleHeightMin * size,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,123 +88,120 @@ class MessageTypingWidget extends StatelessWidget {
       bottomRight: Radius.circular(16),
     );
 
-    if (selectedMessageId != null) {
-      opacity = selectedMessageId != null ? 0.5 : 1.0;
+    if (widget.selectedMessageId != null) {
+      opacity = widget.selectedMessageId != null ? 0.5 : 1.0;
     }
-
     return Opacity(
       opacity: opacity,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: Dimensions.bubbleWidthMin,
-          minHeight: Dimensions.bubbleHeightMin,
-        ),
-        child: Flex(
-          direction: Axis.vertical,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: bubbleSpacing,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-              ),
-              child: Flex(
-                direction: Axis.horizontal,
-                mainAxisAlignment: messageAlignment,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Visibility(
-                    visible: false,
-                    maintainState: true,
-                    maintainAnimation: true,
-                    maintainSize: true,
-                    child: Container(
-                      margin: const EdgeInsets.only(
-                        right: 8,
+      child: wrapAnimation(
+        milliseconds: 225,
+        animatedWidget: Container(
+          child: Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              Container(
+                margin: bubbleSpacing,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
+                child: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: messageAlignment,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Visibility(
+                      visible: false,
+                      maintainState: true,
+                      maintainAnimation: true,
+                      maintainSize: true,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                          right: 8,
+                        ),
+                        child: widget.avatarUri != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSizeMessage,
+                                  height: Dimensions.avatarSizeMessage,
+                                  mxcUri: widget.avatarUri,
+                                ),
+                              )
+                            : CircleAvatar(
+                                radius: 14,
+                                backgroundColor: bubbleColor,
+                                child: Text(
+                                  formatSenderInitials(
+                                      widget.typer ?? 'fake guy'),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                       ),
-                      child: avatarUri != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                Dimensions.thumbnailSizeMax,
-                              ),
-                              child: MatrixImage(
-                                width: Dimensions.avatarSizeMessage,
-                                height: Dimensions.avatarSizeMessage,
-                                mxcUri: avatarUri,
-                              ),
-                            )
-                          : CircleAvatar(
-                              radius: 14,
-                              backgroundColor: bubbleColor,
+                    ),
+                    wrapAnimation(
+                      milliseconds: 175,
+                      animatedWidget: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: bubbleColor,
+                          borderRadius: bubbleBorder,
+                        ),
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: messageTextAlignment,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 4),
                               child: Text(
-                                formatSenderInitials(typer ?? 'fake guy'),
+                                '·',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
+                                  fontSize: 28,
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                    ),
-                  ),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: bubbleColor,
-                        borderRadius: bubbleBorder,
-                      ),
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: messageTextAlignment,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              '·',
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 4),
+                              child: Text(
+                                '·',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              '·',
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 4),
+                              child: Text(
+                                '·',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              '·',
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

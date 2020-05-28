@@ -25,7 +25,7 @@ class LandingSection extends StatelessWidget {
         Container(
           width: widthScale,
           constraints: BoxConstraints(
-            maxHeight: 256,
+            maxHeight: 253,
             maxWidth: 320,
           ),
           child: SvgPicture.asset(

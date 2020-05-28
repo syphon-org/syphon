@@ -25,7 +25,7 @@ class Dimensions {
   static const double buttonAppBarSize = 26;
 
   // Messages
-  static const double bubbleHeightMin = 52;
+  static const double bubbleHeightMin = 54;
   static const double bubbleWidthMin = 122;
 
   // Icons

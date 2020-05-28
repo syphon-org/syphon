@@ -214,6 +214,7 @@ class ChatViewState extends State<ChatView> {
   ) {
     final messages = props.messages;
 
+    print('build message list ${props.room.userTyping}');
     return GestureDetector(
       onTap: onDismissMessageOptions,
       child: Container(
@@ -225,17 +226,10 @@ class ChatViewState extends State<ChatView> {
               : null,
           controller: messagesController,
           children: [
-            Visibility(
-              visible: props.room.userTyping,
-              child: Container(
-                child: MessageTypingWidget(
-                  theme: props.theme,
-                  lastRead: props.room.lastRead,
-                  selectedMessageId: this.selectedMessage != null
-                      ? this.selectedMessage.id
-                      : null,
-                ),
-              ),
+            MessageTypingWidget(
+              typing: props.room.userTyping,
+              selectedMessageId:
+                  this.selectedMessage != null ? this.selectedMessage.id : null,
             ),
             ListView.builder(
               reverse: true,

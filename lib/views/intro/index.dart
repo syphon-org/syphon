@@ -69,58 +69,68 @@ class IntroState extends State<Intro> {
 
     final store = StoreProvider.of<AppState>(context);
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
+    double width = MediaQuery.of(context).size.width;
 
     if (alphaAgreement == null) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) => SimpleDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        child: Container(
+          constraints: BoxConstraints(
+            minWidth: width * 0.9,
           ),
-          title: const Text("Confirm Alpha TOS Agreement"),
-          titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(24),
-              child: Image(
-                width: 98,
-                height: 98,
-                image: AssetImage(AssetsStore.appIconPng),
-              ),
+          child: SimpleDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            Text(
-              StringStore.confirmation_alpha_version_notice,
+            title: const Text(
+              "Confirm Alpha TOS Agreement",
               textAlign: TextAlign.center,
             ),
-            Text(
-              StringStore.confirmation_tether_terms_of_service,
+            titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 12,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: FlatButton(
-                    child: Text('I Agree'),
-                    onPressed: () async {
-                      await store.dispatch(acceptAgreement());
-                      Navigator.of(context).pop();
-                    },
-                  ),
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(24),
+                child: Image(
+                  width: 98,
+                  height: 98,
+                  image: AssetImage(AssetsStore.appIconPng),
                 ),
-              ],
-            )
-          ],
+              ),
+              Text(
+                StringStore.confirmation_alpha_version_notice,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                StringStore.confirmation_tether_terms_of_service,
+                style: TextStyle(fontSize: 12),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SimpleDialogOption(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: FlatButton(
+                      child: Text('I Agree'),
+                      onPressed: () async {
+                        await store.dispatch(acceptAgreement());
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       );
       // showDialog(
