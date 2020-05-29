@@ -75,119 +75,114 @@ abstract class Users {
       saveResponse.body,
     );
   }
-}
 
-/** 
- * GET user profile
-{
-    "avatar_url": "mxc://matrix.org/SDGdghriugerRg",
-    "displayname": "Alice Margatroid"
-}
- */
-dynamic buildUserProfileRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/profile/${userId}';
+  /**
+   * Update Display Name
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id260
+   *  
+   * This API sets the given user's display name.
+   *  You must have permission to set this user's display name, 
+   * e.g. you need to have their access_token.
+   */
+  static Future<dynamic> fetchUserProfile({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId';
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  return {'url': url, 'headers': headers};
-}
+    final saveResponse = await http.get(
+      url,
+      headers: headers,
+    );
 
-/**  
- * 
- * Save Account Data
- * https://matrix.org/docs/spec/client_server/latest#id551
- * 
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildSaveAccountData({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String type,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/user/${userId}/account_data/${type}';
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+  /**
+   * Update Display Name
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id260
+   *  
+   * This API sets the given user's display name.
+   *  You must have permission to set this user's display name, 
+   * e.g. you need to have their access_token.
+   */
+  static Future<dynamic> updateDisplayName({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String displayName,
+    Map accountData,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-/**
- * https://matrix.org/docs/spec/client_server/latest#id260
- *  
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildUpdateDisplayName({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String newDisplayName,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
+    Map body = {
+      "displayname": displayName,
+    };
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
 
-  Map body = {
-    "displayname": newDisplayName,
-  };
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
-}
+  /**
+   * Update Avatar Uri
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id303
+   *  
+   * This API sets the given user's avatar URL. 
+   * You must have permission to set this user's avatar URL, e.g. 
+   * you need to have their access_token.
+   */
+  static Future<dynamic> updateAvatarUri({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String avatarUri,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
 
-/**
- * https://matrix.org/docs/spec/client_server/latest#id303
- *  
- * This API sets the given user's avatar URL. 
- * You must have permission to set this user's avatar URL, e.g. 
- * you need to have their access_token.
- */
-dynamic buildUpdateAvatarUri({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String newAvatarUri, // mxc:// resource
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    Map body = {
+      "avatar_url": avatarUri, // mxc:// resource
+    };
 
-  Map body = {
-    "avatar_url": newAvatarUri, // mxc:// resource
-  };
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 }
 
 /**

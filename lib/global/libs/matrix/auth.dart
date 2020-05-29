@@ -184,17 +184,20 @@ abstract class Auth {
   }
 
   /**
+   * Update User Password
+   * 
    * https://matrix.org/docs/spec/client_server/latest#id198
    * 
-   * Change User Password
-   *  
    */
-  static FutureOr<dynamic> changePassword({
+  static FutureOr<dynamic> updatePassword({
     String protocol,
     String homeserver,
     String accessToken,
     String type = 'm.login.password',
-    String newPassword,
+    String userId,
+    String session,
+    String password,
+    String currentPassword,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
@@ -203,8 +206,21 @@ abstract class Auth {
     };
 
     Map body = {
-      'new_password': type,
+      'new_password': password,
+      'logout_devices': false,
     };
+
+    // Assign session if set
+    if (session != null) {
+      body['auth'] = {
+        'session': session,
+        'type': MatrixAuthTypes.PASSWORD,
+        'user': userId,
+        'password': currentPassword,
+      };
+    }
+
+    print('[MatrixApi.updatePassword] $body');
 
     final response = await http.post(
       url,

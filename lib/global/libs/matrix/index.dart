@@ -12,6 +12,7 @@ abstract class MatrixApi {
   static final loginUser = Auth.loginUser;
   static final logoutUser = Auth.logoutUser;
   static final registerUser = Auth.registerUser;
+  static final updatePassword = Auth.updatePassword;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
 
   // Rooms
@@ -43,6 +44,9 @@ abstract class MatrixApi {
    */
   static final fetchAccountData = Users.fetchAccountData;
   static final saveAccountData = Users.saveAccountData;
+  static final fetchUserProfile = Users.fetchUserProfile;
+  static final updateDisplayName = Users.updateDisplayName;
+  static final updateAvatarUri = Users.updateAvatarUri;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;

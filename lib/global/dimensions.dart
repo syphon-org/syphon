@@ -21,7 +21,7 @@ class Dimensions {
 
   // Buttons
   static const double buttonWidthMin = 256;
-  static const double buttonWidthMax = 384;
+  static const double buttonWidthMax = 296;
   static const double buttonAppBarSize = 26;
 
   // Messages
@@ -39,7 +39,7 @@ class Dimensions {
 
   // Inputs
   static const double inputSizeMin = 200;
-  static const double inputSizeMax = 320;
+  static const double inputSizeMax = 296;
 
   static const double inputHeight = 52;
   static const double inputWidthMin = inputSizeMin;

@@ -37,6 +37,7 @@ class LoginState extends State<Login> {
   final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
 
   StreamSubscription alertsListener;
+  bool visibility = false;
 
   LoginState({Key key});
 
@@ -233,8 +234,37 @@ class LoginState extends State<Login> {
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
-                              obscureText: true,
+                              obscureText: !visibility,
                               decoration: InputDecoration(
+                                suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    if (!passwordFocus.hasFocus) {
+                                      // Unfocus all focus nodes
+                                      passwordFocus.unfocus();
+
+                                      // Disable text field's focus node request
+                                      passwordFocus.canRequestFocus = false;
+                                    }
+
+                                    // Do your stuff
+                                    this.setState(() {
+                                      visibility = !this.visibility;
+                                    });
+
+                                    if (!passwordFocus.hasFocus) {
+                                      //Enable the text field's focus node request after some delay
+                                      Future.delayed(
+                                          Duration(milliseconds: 100), () {
+                                        passwordFocus.canRequestFocus = true;
+                                      });
+                                    }
+                                  },
+                                  child: Icon(
+                                    visibility
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
                                 contentPadding: EdgeInsets.only(
                                   left: 20,
                                   top: 32,
@@ -407,7 +437,9 @@ class _Props extends Equatable {
         }
       },
       onChangePassword: (String text) {
-        store.dispatch(setPassword(password: text));
+        store.dispatch(
+          setPassword(password: text, ignoreConfirm: true),
+        );
       },
       onIncrementTheme: () {
         store.dispatch(incrementTheme());

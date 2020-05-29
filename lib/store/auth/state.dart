@@ -28,6 +28,7 @@ class AuthStore extends Equatable {
   // Temporary Signup Params
   final String username;
   final String password;
+  final String passwordCurrent;
   final String passwordConfirm;
   final String homeserver;
   final String loginType;
@@ -45,8 +46,9 @@ class AuthStore extends Equatable {
   const AuthStore({
     this.user = const User(),
     this.authObserver,
-    this.username = 'testing_boi', // null
-    this.password = 'testing', // null
+    this.username = '', // null
+    this.password = '', // null
+    this.passwordCurrent = '', // null
     this.passwordConfirm = '',
     this.agreement = false,
     this.captcha = false,
@@ -70,6 +72,7 @@ class AuthStore extends Equatable {
     username,
     password,
     passwordConfirm,
+    passwordCurrent,
     agreement,
     homeserver,
     completed,
@@ -92,6 +95,7 @@ class AuthStore extends Equatable {
       username: username ?? this.username,
       password: password ?? this.password,
       agreement: agreement ?? this.agreement,
+      passwordCurrent: passwordCurrent ?? this.passwordCurrent,
       passwordConfirm: passwordConfirm ?? this.passwordConfirm,
       homeserver: homeserver ?? this.homeserver,
       completed: completed ?? this.completed,
@@ -116,6 +120,7 @@ class AuthStore extends Equatable {
         username,
         password,
         passwordConfirm,
+        passwordCurrent,
         agreement,
         captcha,
         homeserver,

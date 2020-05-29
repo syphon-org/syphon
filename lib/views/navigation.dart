@@ -6,6 +6,7 @@ import 'package:Tether/views/home/search/seach-groups.dart';
 import 'package:Tether/views/home/search/search-users.dart';
 import 'package:Tether/views/home/settings/chats.dart';
 import 'package:Tether/views/home/settings/devices.dart';
+import 'package:Tether/views/home/settings/password/index.dart';
 import 'package:Tether/views/home/settings/privacy.dart';
 import 'package:Tether/views/home/settings/theming.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,7 @@ class NavigationProvider {
       '/profile': (BuildContext context) => ProfileView(),
       '/notifications': (BuildContext context) => NotificationSettingsView(),
       '/advanced': (BuildContext context) => AdvancedScreen(),
+      '/password': (BuildContext context) => PasswordView(),
       '/privacy': (BuildContext context) => PrivacyPreferences(
             title: 'Privacy',
           ),

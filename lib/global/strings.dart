@@ -45,6 +45,8 @@ class StringStore {
   static const viewTitleDevices = 'Devices';
   static const viewTitleSettings = 'Settings';
 
+  static const buttonSaveGeneric = 'save';
+
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';
 

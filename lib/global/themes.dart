@@ -125,6 +125,7 @@ class Themes {
           fontSize: 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.4,
+          color: Color(accentColor),
         ),
         bodyText1: TextStyle(
           fontWeight: FontWeight.w100,
