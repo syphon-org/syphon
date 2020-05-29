@@ -25,7 +25,7 @@ class LandingSection extends StatelessWidget {
         Container(
           width: widthScale,
           constraints: BoxConstraints(
-            maxHeight: 256,
+            maxHeight: 253,
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
@@ -44,9 +44,9 @@ class LandingSection extends StatelessWidget {
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
-            INTRO_SUBTITLE,
+            StringStore.intro_subtitle,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
       ],

@@ -316,7 +316,6 @@ class ProfileViewState extends State<ProfileView> {
                                       this.setState(() {
                                         newDisplayName = name;
                                       });
-                                      print('onChangedName $name');
                                     },
                                     controller: displayNameController,
                                     decoration: InputDecoration(

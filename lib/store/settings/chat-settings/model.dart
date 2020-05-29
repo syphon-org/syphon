@@ -41,13 +41,12 @@ class ChatSetting extends Equatable {
     bool smsEnabled,
     int primaryColor,
     bool notificationsEnabled,
-  }) {
-    return ChatSetting(
-      roomId: roomId ?? this.roomId,
-      language: language ?? this.language,
-      smsEnabled: smsEnabled ?? this.smsEnabled,
-      primaryColor: primaryColor ?? this.primaryColor,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-    );
-  }
+  }) =>
+      ChatSetting(
+        roomId: roomId ?? this.roomId,
+        language: language ?? this.language,
+        smsEnabled: smsEnabled ?? this.smsEnabled,
+        primaryColor: primaryColor ?? this.primaryColor,
+        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      );
 }

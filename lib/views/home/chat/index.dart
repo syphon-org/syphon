@@ -225,17 +225,12 @@ class ChatViewState extends State<ChatView> {
               : null,
           controller: messagesController,
           children: [
-            Visibility(
-              visible: props.room.userTyping,
-              child: Container(
-                child: MessageTypingWidget(
-                  theme: props.theme,
-                  lastRead: props.room.lastRead,
-                  selectedMessageId: this.selectedMessage != null
-                      ? this.selectedMessage.id
-                      : null,
-                ),
-              ),
+            MessageTypingWidget(
+              typing: props.room.userTyping,
+              usersTyping: props.room.usersTyping,
+              roomUsers: props.room.users,
+              selectedMessageId:
+                  this.selectedMessage != null ? this.selectedMessage.id : null,
             ),
             ListView.builder(
               reverse: true,
@@ -770,81 +765,86 @@ class _Props extends Equatable {
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
-        userId: store.state.authStore.user.userId,
-        theme: store.state.settingsStore.theme,
-        loading: roomSelectors
-            .room(
-              id: roomId,
-              state: store.state,
-            )
-            .syncing,
-        room: roomSelectors.room(
+      userId: store.state.authStore.user.userId,
+      theme: store.state.settingsStore.theme,
+      loading: roomSelectors
+          .room(
+            id: roomId,
+            state: store.state,
+          )
+          .syncing,
+      room: roomSelectors.room(
+        id: roomId,
+        state: store.state,
+      ),
+      messages: latestMessages(
+        wrapOutboxMessages(
+          messages: roomSelectors.room(id: roomId, state: store.state).messages,
+          outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+        ),
+      ),
+      roomPrimaryColor: () {
+        final customChatSettings =
+            store.state.settingsStore.customChatSettings ?? Map();
+
+        if (customChatSettings[roomId] != null) {
+          return Color(customChatSettings[roomId].primaryColor);
+        }
+
+        return Colors.grey;
+      }(),
+      onSaveDraftMessage: ({
+        String body,
+        String type,
+      }) {
+        store.dispatch(saveDraft(
+          body: body,
+          type: type,
+          room: store.state.roomStore.rooms[roomId],
+        ));
+      },
+      onSendMessage: ({
+        String body,
+        String type,
+      }) async {
+        store.dispatch(sendMessage(
+          body: body,
+          room: store.state.roomStore.rooms[roomId],
+          type: type,
+        ));
+      },
+      onDeleteMessage: ({
+        Message message,
+      }) {
+        if (message != null) {
+          store.dispatch(deleteMessage(message: message));
+        }
+      },
+      onSendTyping: ({typing, roomId}) => store.dispatch(
+            sendTyping(
+              typing: typing,
+              roomId: roomId,
+            ),
+          ),
+      onLoadMoreMessages: () {
+        final room = roomSelectors.room(
           id: roomId,
           state: store.state,
-        ),
-        messages: latestMessages(
-          wrapOutboxMessages(
-            messages:
-                roomSelectors.room(id: roomId, state: store.state).messages,
-            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
-          ),
-        ),
-        roomPrimaryColor: () {
-          final customChatSettings =
-              store.state.settingsStore.customChatSettings ?? Map();
+        );
 
-          if (customChatSettings[roomId] != null) {
-            return Color(customChatSettings[roomId].primaryColor);
-          }
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          startHash: room.endHash,
+        ));
+      }
 
-          return Colors.grey;
-        }(),
-        onSaveDraftMessage: ({
-          String body,
-          String type,
-        }) {
-          store.dispatch(saveDraft(
-            body: body,
-            type: type,
-            room: store.state.roomStore.rooms[roomId],
-          ));
-        },
-        onSendMessage: ({
-          String body,
-          String type,
-        }) async {
-          store.dispatch(sendMessage(
-            body: body,
-            room: store.state.roomStore.rooms[roomId],
-            type: type,
-          ));
-        },
-        onDeleteMessage: ({
-          Message message,
-        }) {
-          if (message != null) {
-            store.dispatch(deleteMessage(message: message));
-          }
-        },
-        onSendTyping: ({typing, roomId}) => store.dispatch(
-          sendTyping(
-            typing: typing,
-            roomId: roomId,
-          ),
-        ),
-        onLoadMoreMessages: () => store.dispatch(fetchMessageEvents(
-            room: roomSelectors.room(
-          id: roomId,
-          state: store.state,
-        ))),
-
-        /**
+      /**
          * TODO: Room Drafts
          */
-        // onConvertDraftRoom: () async {
-        //   final room = store.state.roomStore.rooms[roomId];
-        //   return store.dispatch(convertDraftRoom(room: room));
-        // },
+      // onConvertDraftRoom: () async {
+      //   final room = store.state.roomStore.rooms[roomId];
+      //   return store.dispatch(convertDraftRoom(room: room));
+      // },
       );
 
   @override

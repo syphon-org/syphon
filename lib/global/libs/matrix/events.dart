@@ -41,7 +41,7 @@ abstract class Events {
     String roomId,
     String from,
     String to,
-    int limit = 10,
+    int limit = 10, // default limit by matrix
     bool desc = true, // Direction of events
   }) async {
     String url =

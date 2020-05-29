@@ -39,9 +39,13 @@ class PrivacyPreferences extends StatelessWidget {
                 icon: Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.pop(context, false),
               ),
-              title: Text(title,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w100)),
+              title: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
             ),
             body: Container(
                 child: Column(
@@ -105,6 +109,40 @@ class PrivacyPreferences extends StatelessWidget {
                           width: width, // TODO: use flex, i'm rushing
                           padding: contentPadding,
                           child: Text(
+                            'User Access',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/password');
+                          },
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Change Password',
+                          ),
+                          subtitle: Text(
+                            'Changing your password will refresh your\ncurrent session',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width, // TODO: use flex, i'm rushing
+                          padding: contentPadding,
+                          child: Text(
                             'Communication',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.subtitle2,
@@ -140,6 +178,41 @@ class PrivacyPreferences extends StatelessWidget {
                             value: props.typingIndicators,
                             onChanged: (enterSend) =>
                                 props.onToggleTypingIndicators(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  elevation: 0.5,
+                  color: sectionBackgroundColor,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width, // TODO: use flex, i'm rushing
+                          padding: contentPadding,
+                          child: Text(
+                            'Encryption Keys',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Import Keys',
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          contentPadding: contentPadding,
+                          title: Text(
+                            'Export Keys',
                           ),
                         ),
                       ],

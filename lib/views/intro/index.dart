@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:Tether/global/assets.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:Tether/store/settings/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 // Store
 import 'package:redux/redux.dart';
@@ -30,7 +35,7 @@ class IntroState extends State<Intro> {
 
   int currentStep = 0;
   bool onboarding = false;
-  String loginText = INTRO_LOGIN_TEXT;
+  String loginText = StringStore.buttonIntroExistQuestion;
   PageController pageController;
 
   final List<Widget> sections = [
@@ -46,24 +51,127 @@ class IntroState extends State<Intro> {
   @override
   void initState() {
     super.initState();
+
     pageController = PageController(
       initialPage: 0,
       keepPage: false,
       viewportFraction: 1.5,
     );
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
+
+  @protected
+  void onMounted() {
+    // init authenticated navigation
+
+    final store = StoreProvider.of<AppState>(context);
+    final alphaAgreement = store.state.settingsStore.alphaAgreement;
+    double width = MediaQuery.of(context).size.width;
+
+    if (alphaAgreement == null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: Container(
+          constraints: BoxConstraints(
+            minWidth: width * 0.9,
+          ),
+          child: SimpleDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "Confirm Alpha TOS Agreement",
+              textAlign: TextAlign.center,
+            ),
+            titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 12,
+            ),
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(24),
+                child: Image(
+                  width: 98,
+                  height: 98,
+                  image: AssetImage(AssetsStore.appIconPng),
+                ),
+              ),
+              Text(
+                StringStore.confirmation_alpha_version_notice,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                StringStore.confirmation_tether_terms_of_service,
+                style: TextStyle(fontSize: 12),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SimpleDialogOption(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: FlatButton(
+                      child: Text('I Agree'),
+                      onPressed: () async {
+                        await store.dispatch(acceptAgreement());
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+      // showDialog(
+      //   barrierDismissible: false,
+      //   context: context,
+      //   builder: (context) => AlertDialog(
+      //     title: Text("Confirm Alpha TOS Agreement"),
+      //     content: Text(
+      //       StringStore.confirmation_alpha_version_notice,
+      //     ),
+      //     actions: <Widget>[
+      //       FlatButton(
+      //         child: Text('I Agree'),
+      //         onPressed: () async {
+      //           store.dispatch(acceptAgreement());
+      //           Navigator.of(context).pop();
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // );
+    }
   }
 
   Widget buildButtonText() {
     switch (currentStep) {
       case 0:
-        return const Text('let\'s go',
-            style: TextStyle(fontSize: 20, color: Colors.white));
+        return Text(
+          'let\'s go',
+          style: Theme.of(context).textTheme.button,
+        );
       case 4:
-        return const Text('count me in',
-            style: TextStyle(fontSize: 20, color: Colors.white));
+        return Text(
+          'count me in',
+          style: Theme.of(context).textTheme.button,
+        );
       default:
-        return const Text('next',
-            style: TextStyle(fontSize: 20, color: Colors.white));
+        return Text(
+          'next',
+          style: Theme.of(context).textTheme.button,
+        );
     }
   }
 
@@ -72,7 +180,6 @@ class IntroState extends State<Intro> {
     double width = MediaQuery.of(context).size.width;
 
     final double widgetWidthScaling = width * 0.725;
-
     return Scaffold(
       body: StoreConnector<AppState, AppState>(
         converter: (Store<AppState> store) => store.state,
@@ -126,7 +233,7 @@ class IntroState extends State<Intro> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = INTRO_LOGIN_TEXT;
+                            loginText = StringStore.buttonIntroExistQuestion;
                             onboarding = false;
                           });
                         }
@@ -158,9 +265,11 @@ class IntroState extends State<Intro> {
               constraints: BoxConstraints(
                 minHeight: Dimensions.inputHeight,
               ),
-              margin: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 16,
+              margin: const EdgeInsets.only(
+                left: 8,
+                right: 8,
+                top: 16,
+                bottom: 24,
               ),
               child: onboarding
                   ? Flex(
@@ -193,25 +302,22 @@ class IntroState extends State<Intro> {
                           Text(
                             loginText,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w100,
-                            ),
+                            style: Theme.of(context).textTheme.bodyText2,
                           ),
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              INTRO_LOGIN_ACTION,
+                              StringStore.buttonIntroExistAction,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w100,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.white,
-                                decoration: TextDecoration.underline,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white,
+                                  ),
                             ),
                           ),
                         ],

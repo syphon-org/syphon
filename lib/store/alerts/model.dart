@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
+
 class Alert {
   final String type;
   final String message;
@@ -14,10 +16,12 @@ class Alert {
   });
 }
 
-class AlertsStore {
+class AlertsStore extends Equatable {
   final bool loading;
   final List<Alert> alerts;
   final StreamController<Alert> alertsObserver;
+
+  Stream<Alert> get onAlertsChanged => alertsObserver.stream;
 
   const AlertsStore({
     this.loading = false,
@@ -25,35 +29,20 @@ class AlertsStore {
     this.alerts = const [],
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        alerts,
+      ];
+
   AlertsStore copyWith({
     loading,
     alerts,
     alertsObserver,
-  }) {
-    return AlertsStore(
-      loading: loading ?? this.loading,
-      alerts: alerts ?? this.alerts,
-      alertsObserver: alertsObserver ?? this.alertsObserver,
-    );
-  }
-
-  @override
-  int get hashCode =>
-      loading.hashCode ^ alerts.hashCode ^ alertsObserver.hashCode;
-
-  Stream<Alert> get onAlertsChanged => alertsObserver.stream;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AlertsStore &&
-          runtimeType == other.runtimeType &&
-          loading == other.loading &&
-          alertsObserver == other.alertsObserver &&
-          alerts == other.alerts;
-
-  @override
-  String toString() {
-    return '{loading: $loading, alerts: $alerts}';
-  }
+  }) =>
+      AlertsStore(
+        loading: loading ?? this.loading,
+        alerts: alerts ?? this.alerts,
+        alertsObserver: alertsObserver ?? this.alertsObserver,
+      );
 }

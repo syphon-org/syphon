@@ -33,9 +33,9 @@ class Room {
   final bool isDraftRoom;
 
   @HiveField(11)
-  final String toHash; // end of last message fetch
+  final String endHash; // end of last message fetch
   @HiveField(10)
-  final String fromHash; // start of last messages fetch (usually prev_batch)
+  final String startHash; // start of last messages fetch (usually prev_batch)
   @HiveField(26)
   final String prevHash; // fromHash but from /sync only
 
@@ -63,8 +63,9 @@ class Room {
   @HiveField(21)
   final List<Message> outbox;
 
-  @HiveField(22)
+  // Not cached
   final bool userTyping;
+  final List<String> usersTyping;
 
   @HiveField(23)
   final int lastRead;
@@ -97,9 +98,10 @@ class Room {
     this.encryptionEnabled = false,
     this.worldReadable = false,
     this.userTyping = false,
+    this.usersTyping = const [],
     this.isDraftRoom = false,
-    this.fromHash,
-    this.toHash,
+    this.endHash,
+    this.startHash,
     this.prevHash,
     this.messageReads,
   });
@@ -120,6 +122,7 @@ class Room {
     guestEnabled,
     encryptionEnabled,
     userTyping,
+    usersTyping,
     isDraftRoom,
     draft,
     state,
@@ -128,8 +131,8 @@ class Room {
     outbox,
     messages,
     messageReads,
-    fromHash,
-    toHash,
+    endHash,
+    startHash,
     prevHash,
   }) {
     return Room(
@@ -148,15 +151,16 @@ class Room {
       guestEnabled: guestEnabled ?? this.guestEnabled,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       userTyping: userTyping ?? this.userTyping,
+      usersTyping: usersTyping ?? this.usersTyping,
       isDraftRoom: isDraftRoom ?? this.isDraftRoom,
       state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
       users: users ?? this.users,
       messageReads: messageReads ?? this.messageReads,
-      toHash: toHash ?? this.toHash,
-      fromHash: fromHash ?? this.fromHash,
-      prevHash: prevHash ?? this.prevHash,
+      endHash: endHash ?? this.endHash,
+      startHash: startHash ?? this.startHash,
+      prevHash: prevHash, // TODO: may always need a prev hash?
     );
   }
 
@@ -182,10 +186,9 @@ class Room {
 
   Room fromSync({
     User currentUser,
+    String lastSince,
     Map<String, dynamic> json,
   }) {
-    String toHash;
-    String fromHash;
     String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
@@ -202,6 +205,8 @@ class Room {
 
     if (json['timeline'] != null) {
       prevHash = json['timeline']['prev_batch'];
+
+      print('[fromSync] ${this.name} prev_batch $prevHash');
 
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
@@ -234,12 +239,12 @@ class Room {
         )
         .fromMessageEvents(
           timelineEvents,
-          toHash: toHash,
-          fromHash: fromHash,
           prevHash: prevHash,
+          latestHash: lastSince,
         )
         .fromEphemeralEvents(
           ephemeralEvents,
+          currentUser: currentUser,
         );
   }
 
@@ -350,9 +355,8 @@ class Room {
    */
   Room fromMessageEvents(
     List<Message> messageEvents, {
-    String toHash,
-    String fromHash,
-    String prevHash,
+    String prevHash, // previously fetched hash
+    String latestHash,
   }) {
     try {
       int lastUpdate = this.lastUpdate;
@@ -393,9 +397,12 @@ class Room {
         messages: allMessages,
         outbox: outbox,
         lastUpdate: lastUpdate ?? this.lastUpdate,
-        toHash: toHash ?? this.toHash,
-        fromHash: fromHash ?? this.fromHash,
-        prevHash: prevHash ?? this.prevHash,
+        // hash of last batch of messages in timeline
+        endHash: this.endHash ?? prevHash,
+        // hash of the latest batch messages in timeline
+        startHash: latestHash ?? this.startHash,
+        // most recent previous batch from the last /sync
+        prevHash: prevHash,
       );
     } catch (error) {
       print('[fromMessageEvents] $error');
@@ -408,9 +415,12 @@ class Room {
    * hashmap of eventIds linking them to users and timestamps
    */
   Room fromEphemeralEvents(
-    List<Event> events,
-  ) {
-    var userTyping = false;
+    List<Event> events, {
+    User currentUser,
+  }) {
+    bool userTyping = false;
+    List<String> usersTyping = this.usersTyping;
+
     int latestRead = this.lastRead;
     var messageReads = this.messageReads != null
         ? Map<String, ReadStatus>.from(this.messageReads)
@@ -420,13 +430,12 @@ class Room {
       events.forEach((event) {
         switch (event.type) {
           case 'm.typing':
-            // TODO: save which users are typing
-            // if ((event.content['user_ids'] as List<dynamic>).length > 0) {
-            //   userTyping = event.content['user_ids'][0];
-            // }
-
-            userTyping =
-                (event.content['user_ids'] as List<dynamic>).length > 0;
+            final List<dynamic> usersTypingList = event.content['user_ids'];
+            usersTyping = List<String>.from(usersTypingList);
+            usersTyping.removeWhere(
+              (user) => currentUser.userId == user,
+            );
+            userTyping = usersTyping.length > 0;
             break;
           case 'm.receipt':
             final Map<String, dynamic> receiptEventIds = event.content;
@@ -460,6 +469,7 @@ class Room {
 
     return this.copyWith(
       userTyping: userTyping,
+      usersTyping: usersTyping,
       messageReads: messageReads,
       lastRead: latestRead,
     );

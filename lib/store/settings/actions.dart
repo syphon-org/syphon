@@ -80,6 +80,10 @@ class ToggleReadReceipts {
   ToggleReadReceipts();
 }
 
+class SetTetherAgreement {
+  SetTetherAgreement();
+}
+
 /**
  * Fetch Active Devices for account
  */
@@ -219,6 +223,15 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
+  };
+}
+
+/**
+ * Send in a hex value to be used as the primary color
+ */
+ThunkAction<AppState> acceptAgreement() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetTetherAgreement());
   };
 }
 

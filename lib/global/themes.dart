@@ -125,6 +125,7 @@ class Themes {
           fontSize: 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.4,
+          color: Color(accentColor),
         ),
         bodyText1: TextStyle(
           fontWeight: FontWeight.w100,
@@ -139,6 +140,7 @@ class Themes {
         bodyText2: TextStyle(
           fontSize: 18,
           letterSpacing: 0.4,
+          fontWeight: FontWeight.w100,
         ),
         caption: TextStyle(
           fontSize: 14,
@@ -149,6 +151,7 @@ class Themes {
           fontSize: 20,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.8,
+          color: Colors.white,
         ),
       ),
     );

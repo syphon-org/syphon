@@ -36,6 +36,7 @@ class ProfilePreview extends StatelessWidget {
                               width: 52,
                               height: 52,
                               mxcUri: props.avatarUri,
+                              forceLoading: props.loading,
                             ),
                           )
                         : Text(
@@ -57,7 +58,7 @@ class ProfilePreview extends StatelessWidget {
                       style: TextStyle(fontSize: 20.0),
                     ),
                     Text(
-                      props.username,
+                      props.username ?? '',
                       style: TextStyle(fontSize: 14.0),
                     ),
                   ],
@@ -71,18 +72,30 @@ class ProfilePreview extends StatelessWidget {
 
 class _Props extends Equatable {
   final User user;
+  final bool loading;
   final String shortname;
   final String initials;
   final String username;
   final String avatarUri;
 
   _Props({
+    @required this.user,
+    @required this.loading,
     @required this.shortname,
     @required this.username,
     @required this.initials,
     @required this.avatarUri,
-    @required this.user,
   });
+
+  @override
+  List<Object> get props => [
+        user,
+        loading,
+        shortname,
+        initials,
+        username,
+        avatarUri,
+      ];
 
   // Lots of null checks in case the user signed out where
   // this widget is displaying, could probably be less coupled..
@@ -91,6 +104,7 @@ class _Props extends Equatable {
   ) =>
       _Props(
           user: store.state.authStore.user ?? const User(),
+          loading: store.state.authStore.loading,
           shortname: displayShortname(
             store.state.authStore.user ?? const User(),
           ),
@@ -101,13 +115,4 @@ class _Props extends Equatable {
           username: store.state.authStore.user != null
               ? store.state.authStore.user.userId
               : '');
-
-  @override
-  List<Object> get props => [
-        user,
-        shortname,
-        initials,
-        username,
-        avatarUri,
-      ];
 }

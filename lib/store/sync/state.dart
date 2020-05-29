@@ -17,6 +17,8 @@ class SyncStore extends Equatable {
   @HiveField(4)
   final String lastSince; // Since we last checked for new info
 
+  static const default_interval = 2;
+
   @HiveField(5)
   final int interval = default_interval;
 
@@ -27,8 +29,6 @@ class SyncStore extends Equatable {
   final Timer syncObserver;
 
   final int lastAttempt; // last attempt to sync
-
-  static const default_interval = 5;
 
   const SyncStore({
     this.synced = false,

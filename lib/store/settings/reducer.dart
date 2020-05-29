@@ -23,6 +23,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         pusherToken: action.token,
       );
+    case SetTetherAgreement:
+      return state.copyWith(
+        alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
+      );
     case SetRoomPrimaryColor:
       final chatSettings =
           Map<String, ChatSetting>.from(state.customChatSettings ?? Map());

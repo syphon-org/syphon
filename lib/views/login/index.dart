@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:Tether/global/strings.dart';
-import 'package:Tether/global/themes.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +37,7 @@ class LoginState extends State<Login> {
   final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
 
   StreamSubscription alertsListener;
+  bool visibility = false;
 
   LoginState({Key key});
 
@@ -234,8 +234,37 @@ class LoginState extends State<Login> {
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
-                              obscureText: true,
+                              obscureText: !visibility,
                               decoration: InputDecoration(
+                                suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    if (!passwordFocus.hasFocus) {
+                                      // Unfocus all focus nodes
+                                      passwordFocus.unfocus();
+
+                                      // Disable text field's focus node request
+                                      passwordFocus.canRequestFocus = false;
+                                    }
+
+                                    // Do your stuff
+                                    this.setState(() {
+                                      visibility = !this.visibility;
+                                    });
+
+                                    if (!passwordFocus.hasFocus) {
+                                      //Enable the text field's focus node request after some delay
+                                      Future.delayed(
+                                          Duration(milliseconds: 100), () {
+                                        passwordFocus.canRequestFocus = true;
+                                      });
+                                    }
+                                  },
+                                  child: Icon(
+                                    visibility
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
                                 contentPadding: EdgeInsets.only(
                                   left: 20,
                                   top: 32,
@@ -300,9 +329,11 @@ class LoginState extends State<Login> {
                     constraints: BoxConstraints(
                       minHeight: Dimensions.inputHeight,
                     ),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 16,
+                    margin: const EdgeInsets.only(
+                      left: 8,
+                      right: 8,
+                      top: 16,
+                      bottom: 24,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
@@ -314,7 +345,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            CREATE_USER_TEXT,
+                            StringStore.buttonLoginCreateQuestion,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -324,14 +355,17 @@ class LoginState extends State<Login> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              CREATE_USER_TEXT_ACTION,
+                              StringStore.buttonLoginCreateAction,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w100,
-                                color: Themes.invertedPrimaryColor(context),
-                                decoration: TextDecoration.underline,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white,
+                                  ),
                             ),
                           ),
                         ],
@@ -403,7 +437,9 @@ class _Props extends Equatable {
         }
       },
       onChangePassword: (String text) {
-        store.dispatch(setPassword(password: text));
+        store.dispatch(
+          setPassword(password: text, ignoreConfirm: true),
+        );
       },
       onIncrementTheme: () {
         store.dispatch(incrementTheme());

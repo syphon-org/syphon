@@ -152,6 +152,7 @@ void notificationSyncIsolate() async {
               // Filter through parsers
               final room = Room().fromSync(
                 json: json,
+                lastSince: newLastSince,
               );
 
               if (room.messages.length == 1) {

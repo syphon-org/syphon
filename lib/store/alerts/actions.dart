@@ -22,6 +22,11 @@ class AddAlert {
   AddAlert({this.alert});
 }
 
+class AddSuccess {
+  final Alert alert;
+  AddSuccess({this.alert});
+}
+
 class RemoveAlert {
   final Alert alert;
   RemoveAlert({this.alert});
@@ -30,8 +35,11 @@ class RemoveAlert {
 ThunkAction<AppState> testAlerts({type, message}) {
   return (Store<AppState> store) async {
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert =
-        Alert(type: 'warning', message: 'testing alert messages, hi! :D');
+
+    final alert = Alert(
+      type: 'warning',
+      message: 'testing alert messages, hi! :D',
+    );
 
     // Test adding alert from observer and store
     // TODO: consider the observer add() in the reducer

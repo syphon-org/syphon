@@ -1,143 +1,188 @@
-/** 
- * GET user profile
-{
-    "avatar_url": "mxc://matrix.org/SDGdghriugerRg",
-    "displayname": "Alice Margatroid"
-}
- */
-dynamic buildUserProfileRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/profile/${userId}';
+import 'dart:async';
+import 'dart:convert';
+import 'package:Tether/store/rooms/events/model.dart';
+import 'package:http/http.dart' as http;
 
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+abstract class Users {
+  /**
+   * Fetch Account Data
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-account-data-type
+   *  
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> fetchAccountData({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String type = AccountDataTypes.direct,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
-  return {'url': url, 'headers': headers};
-}
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-/**  
- * 
- * Save Account Data
- * https://matrix.org/docs/spec/client_server/latest#id551
- * 
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildSaveAccountData({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String type,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/user/${userId}/account_data/${type}';
+    final saveResponse = await http.get(
+      url,
+      headers: headers,
+    );
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
+  /**
+   * Save Account Data
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
+   * 
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> saveAccountData({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String type = AccountDataTypes.direct,
+    Map accountData,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
-/**  
- * 
- * Save Account Data
- * https://matrix.org/docs/spec/client_server/latest#id551
- * 
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildRemoveAccountData({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String type,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/user/${userId}/account_data/${type}';
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    // final body = {
+    //   invites[0].userId: [newRoomId]
+    // };
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
-}
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(accountData),
+    );
 
-/**
- * https://matrix.org/docs/spec/client_server/latest#id260
- *  
- * This API sets the given user's display name.
- *  You must have permission to set this user's display name, 
- * e.g. you need to have their access_token.
- */
-dynamic buildUpdateDisplayName({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String newDisplayName,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+  /**
+   * Update Display Name
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id260
+   *  
+   * This API sets the given user's display name.
+   *  You must have permission to set this user's display name, 
+   * e.g. you need to have their access_token.
+   */
+  static Future<dynamic> fetchUserProfile({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId';
 
-  Map body = {
-    "displayname": newDisplayName,
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
-}
+    final saveResponse = await http.get(
+      url,
+      headers: headers,
+    );
 
-/**
- * https://matrix.org/docs/spec/client_server/latest#id303
- *  
- * This API sets the given user's avatar URL. 
- * You must have permission to set this user's avatar URL, e.g. 
- * you need to have their access_token.
- */
-dynamic buildUpdateAvatarUri({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String userId,
-  String newAvatarUri, // mxc:// resource
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+  /**
+   * Update Display Name
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id260
+   *  
+   * This API sets the given user's display name.
+   *  You must have permission to set this user's display name, 
+   * e.g. you need to have their access_token.
+   */
+  static Future<dynamic> updateDisplayName({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String displayName,
+    Map accountData,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
 
-  Map body = {
-    "avatar_url": newAvatarUri, // mxc:// resource
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
+    Map body = {
+      "displayname": displayName,
+    };
+
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+
+  /**
+   * Update Avatar Uri
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id303
+   *  
+   * This API sets the given user's avatar URL. 
+   * You must have permission to set this user's avatar URL, e.g. 
+   * you need to have their access_token.
+   */
+  static Future<dynamic> updateAvatarUri({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    String avatarUri,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      "avatar_url": avatarUri, // mxc:// resource
+    };
+
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 }
 
 /**

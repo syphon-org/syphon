@@ -24,7 +24,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 // Store
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
 import '../user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -67,6 +66,11 @@ class SetUsernameValid {
 class SetPassword {
   final String password;
   SetPassword({this.password});
+}
+
+class SetPasswordCurrent {
+  final String password;
+  SetPasswordCurrent({this.password});
 }
 
 class SetPasswordConfirm {
@@ -315,19 +319,12 @@ ThunkAction<AppState> fetchUserProfile() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildUserProfileRequest(
+      final data = await MatrixApi.fetchUserProfile(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.currentUser.userId,
       );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
 
       store.dispatch(SetUser(
         user: store.state.authStore.currentUser.copyWith(
@@ -478,26 +475,67 @@ ThunkAction<AppState> createUser() {
   };
 }
 
+ThunkAction<AppState> updatePassword(String password) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      var data;
+      print(password);
+
+      // Call just to get interactive auths
+      final flowData = await MatrixApi.updatePassword(
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        password: password,
+      );
+
+      if (flowData['errcode'] != null) {
+        throw flowData['error'];
+      }
+
+      if (flowData['flows'] != null) {
+        await store.dispatch(setInteractiveAuths(auths: flowData));
+
+        data = await MatrixApi.updatePassword(
+          protocol: protocol,
+          homeserver: store.state.authStore.user.homeserver,
+          accessToken: store.state.authStore.user.accessToken,
+          userId: store.state.authStore.user.userId,
+          session: store.state.authStore.session,
+          password: password,
+          currentPassword: store.state.authStore.passwordCurrent,
+        );
+      }
+
+      store.dispatch(addAlert(
+        type: 'success',
+        message: 'Password updated successfully',
+      ));
+
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final request = buildUpdateDisplayName(
+      final data = await MatrixApi.updateDisplayName(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
-        newDisplayName: newDisplayName,
+        displayName: newDisplayName,
       );
-
-      final response = await http.put(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
 
       if (data['errcode'] != null) {
         throw data['error'];
@@ -581,24 +619,16 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
  */
 ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
   return (Store<AppState> store) async {
-    final avatarUriRequest = buildUpdateAvatarUri(
+    final data = await MatrixApi.updateAvatarUri(
       protocol: protocol,
       homeserver: store.state.authStore.user.homeserver,
       accessToken: store.state.authStore.user.accessToken,
       userId: store.state.authStore.user.userId,
-      newAvatarUri: mxcUri,
+      avatarUri: mxcUri,
     );
 
-    final avatarUriResponse = await http.put(
-      avatarUriRequest['url'],
-      headers: avatarUriRequest['headers'],
-      body: json.encode(avatarUriRequest['body']),
-    );
-
-    final avatarUriData = json.decode(avatarUriResponse.body);
-
-    if (avatarUriData['errcode'] != null) {
-      throw avatarUriData['error'];
+    if (data['errcode'] != null) {
+      throw data['error'];
     }
   };
 }
@@ -669,25 +699,38 @@ ThunkAction<AppState> setUsername({String username}) {
   };
 }
 
-ThunkAction<AppState> setPassword({String password}) {
+ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
   return (Store<AppState> store) {
-    store.dispatch(SetPassword(password: password.trim()));
-    store.dispatch(SetPasswordValid(
-      valid: password != null && password.length > 0,
-    ));
-  };
-}
-
-ThunkAction<AppState> setPasswordConfirm({String password}) {
-  return (Store<AppState> store) {
-    store.dispatch(SetPasswordConfirm(password: password.trim()));
+    store.dispatch(SetPassword(password: password));
 
     final currentPassword = store.state.authStore.password;
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
       valid: password != null &&
-          password.length > 0 &&
+          currentConfirm != null &&
+          password.length > 6 &&
+          (currentPassword == currentConfirm || ignoreConfirm),
+    ));
+  };
+}
+
+ThunkAction<AppState> setPasswordCurrent({String password}) {
+  return (Store<AppState> store) {
+    store.dispatch(SetPasswordCurrent(password: password));
+  };
+}
+
+ThunkAction<AppState> setPasswordConfirm({String password}) {
+  return (Store<AppState> store) {
+    store.dispatch(SetPasswordConfirm(password: password));
+
+    final currentPassword = store.state.authStore.password;
+    final currentConfirm = store.state.authStore.passwordConfirm;
+
+    store.dispatch(SetPasswordValid(
+      valid: password != null &&
+          password.length > 6 &&
           currentPassword == currentConfirm,
     ));
   };
