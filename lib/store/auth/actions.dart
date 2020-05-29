@@ -481,22 +481,21 @@ ThunkAction<AppState> updatePassword(String password) {
       store.dispatch(SetLoading(loading: true));
 
       var data;
-      print(password);
 
       // Call just to get interactive auths
-      final flowData = await MatrixApi.updatePassword(
+      data = await MatrixApi.updatePassword(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         password: password,
       );
 
-      if (flowData['errcode'] != null) {
-        throw flowData['error'];
+      if (data['errcode'] != null) {
+        throw data['error'];
       }
 
-      if (flowData['flows'] != null) {
-        await store.dispatch(setInteractiveAuths(auths: flowData));
+      if (data['flows'] != null) {
+        await store.dispatch(setInteractiveAuths(auths: data));
 
         data = await MatrixApi.updatePassword(
           protocol: protocol,
@@ -507,6 +506,10 @@ ThunkAction<AppState> updatePassword(String password) {
           password: password,
           currentPassword: store.state.authStore.passwordCurrent,
         );
+      }
+
+      if (data['errcode'] != null) {
+        throw data['error'];
       }
 
       store.dispatch(addAlert(

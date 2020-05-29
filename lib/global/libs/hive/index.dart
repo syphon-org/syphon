@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:Tether/store/keys/state.dart';
 import 'package:convert/convert.dart';
-import 'dart:typed_data';
 
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/auth/state.dart';
@@ -15,7 +15,6 @@ import 'package:Tether/store/user/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
 
 import 'package:Tether/store/media/state.dart';
 import 'package:Tether/store/settings/state.dart';
@@ -100,6 +99,7 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(RoomStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
+  Hive.registerAdapter(KeyStoreAdapter());
 }
 
 Future<List<int>> unlockEncryptionKey() async {

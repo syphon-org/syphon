@@ -109,16 +109,6 @@ class HomeViewState extends State<Home> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.supervised_user_circle),
-          iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Toggle Direct Room',
-          color: Colors.white,
-          onPressed: () {
-            print('HELP ${this.selectedRoom}');
-            props.onTESTING(this.selectedRoom);
-          },
-        ),
-        IconButton(
           icon: Icon(Icons.archive),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Archive Room',
@@ -598,7 +588,6 @@ class _Props extends Equatable {
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onFetchSyncForced;
-  final Function onTESTING;
 
   _Props({
     @required this.rooms,
@@ -609,39 +598,31 @@ class _Props extends Equatable {
     @required this.onLeaveChat,
     @required this.onDeleteChat,
     @required this.onFetchSyncForced,
-    @required this.onTESTING,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
-      rooms: store.state.roomStore.rooms,
-      loadingRooms: store.state.roomStore.loading,
-      offline: store.state.syncStore.offline,
-      currentUser: store.state.authStore.user,
-      chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
-      onFetchSyncForced: () async {
-        await store.dispatch(
-          fetchSync(since: store.state.syncStore.lastSince),
-        );
-        return Future(() => true);
-      },
-      onLeaveChat: ({Room room}) {
-        return store.dispatch(
-          removeRoom(room: room),
-        );
-      },
-      onDeleteChat: ({Room room}) {
-        return store.dispatch(
-          deleteRoom(room: room),
-        );
-      },
-      onTESTING: (room) {
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            endHash: room.prevHash,
-          ),
-        );
-      });
+        rooms: store.state.roomStore.rooms,
+        loadingRooms: store.state.roomStore.loading,
+        offline: store.state.syncStore.offline,
+        currentUser: store.state.authStore.user,
+        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        onFetchSyncForced: () async {
+          await store.dispatch(
+            fetchSync(since: store.state.syncStore.lastSince),
+          );
+          return Future(() => true);
+        },
+        onLeaveChat: ({Room room}) {
+          return store.dispatch(
+            removeRoom(room: room),
+          );
+        },
+        onDeleteChat: ({Room room}) {
+          return store.dispatch(
+            deleteRoom(room: room),
+          );
+        },
+      );
 
   @override
   List<Object> get props => [

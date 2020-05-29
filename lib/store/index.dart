@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/store/alerts/model.dart';
 import 'package:Tether/store/auth/reducer.dart';
+import 'package:Tether/store/keys/state.dart';
 import 'package:Tether/store/media/reducer.dart';
 import 'package:Tether/store/sync/actions.dart';
 import 'package:Tether/store/sync/reducer.dart';
@@ -38,6 +39,7 @@ class AppState extends Equatable {
   final SettingsStore settingsStore;
   final RoomStore roomStore;
   final SyncStore syncStore;
+  final KeyStore keyStore;
 
   AppState({
     this.loading = true,
@@ -48,6 +50,7 @@ class AppState extends Equatable {
     this.settingsStore = const SettingsStore(),
     this.roomStore = const RoomStore(),
     this.syncStore = const SyncStore(),
+    this.keyStore = const KeyStore(),
   });
 
   @override
@@ -58,6 +61,8 @@ class AppState extends Equatable {
         matrixStore,
         roomStore,
         settingsStore,
+        syncStore,
+        keyStore,
       ];
 }
 
@@ -143,6 +148,14 @@ class HiveSerializer implements StateSerializer<AppState> {
     } catch (error) {
       print('[Hive Storage SyncStore] error - $error');
     }
+    try {
+      Cache.state.put(
+        state.keyStore.runtimeType.toString(),
+        state.keyStore,
+      );
+    } catch (error) {
+      print('[Hive Storage KeyStore] error - $error');
+    }
 
     try {
       Cache.state.put(
@@ -178,6 +191,7 @@ class HiveSerializer implements StateSerializer<AppState> {
   AppState decode(Uint8List data) {
     AuthStore authStoreConverted = AuthStore();
     SyncStore syncStoreConverted = SyncStore();
+    KeyStore keyStoreConverted = KeyStore();
     MediaStore mediaStoreConverted = MediaStore();
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
@@ -194,6 +208,15 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
     } catch (error) {
       print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
+      keyStoreConverted = Cache.state.get(
+        keyStoreConverted.runtimeType.toString(),
+        defaultValue: KeyStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - keyStoreConverted] error $error');
     }
 
     try {

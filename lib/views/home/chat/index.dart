@@ -3,6 +3,7 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/keys/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
@@ -106,6 +107,12 @@ class ChatViewState extends State<ChatView> {
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStoreToProps(store, arguements.roomId);
     final draft = props.room.draft;
+
+    if (props.room.encryptionEnabled) {
+      store.dispatch(
+        fetchUserKeys(users: props.room.users),
+      );
+    }
 
     messagesController.addListener(() {
       final extentBefore = messagesController.position.extentBefore;

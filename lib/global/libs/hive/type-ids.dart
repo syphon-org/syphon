@@ -22,3 +22,4 @@ const int RoomStoreHiveId = 100;
 const int AuthStoreHiveId = 101;
 const int UsersStoreHiveId = 102;
 const int SyncStoreHiveId = 103;
+const int KeyStoreHiveId = 104;

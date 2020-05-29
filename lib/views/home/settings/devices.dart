@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:Tether/store/index.dart';
+import 'package:Tether/store/keys/actions.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
@@ -155,6 +155,15 @@ class DeviceViewState extends State<DevicesView> {
         ],
       ),
       actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.text_fields),
+          iconSize: Dimensions.buttonAppBarSize,
+          tooltip: 'TEST KEY FUNCTION GENERIC',
+          color: Colors.white,
+          onPressed: () {
+            props.onTest();
+          },
+        ),
         IconButton(
           icon: Icon(Icons.edit),
           iconSize: Dimensions.buttonAppBarSize,
@@ -357,6 +366,7 @@ class Props extends Equatable {
 
   final Function onFetchDevices;
   final Function onDeleteDevices;
+  final Function onTest;
 
   Props({
     @required this.loading,
@@ -365,6 +375,7 @@ class Props extends Equatable {
     @required this.currentDeviceId,
     @required this.onFetchDevices,
     @required this.onDeleteDevices,
+    @required this.onTest,
   });
 
   @override
@@ -382,6 +393,9 @@ class Props extends Equatable {
         devices: store.state.settingsStore.devices ?? const [],
         session: store.state.authStore.session,
         currentDeviceId: store.state.authStore.user.deviceId,
+        onTest: () {
+          store.dispatch(fetchUserKeys());
+        },
         onDeleteDevices: (
           BuildContext context,
           List<Device> devices, {

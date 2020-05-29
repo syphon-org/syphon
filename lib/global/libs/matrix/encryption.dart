@@ -14,9 +14,9 @@ abstract class Encryption {
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    String lastSince,
     int timeout = 10 * 1000, // 10 seconds
-    List<String> deviceKeys = const [],
+    String lastSince,
+    Map<String, dynamic> users = const {},
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
@@ -24,9 +24,18 @@ abstract class Encryption {
       'Authorization': 'Bearer $accessToken',
     };
 
+    Map body = {
+      "timeout": timeout,
+      'device_keys': users,
+      'token': lastSince,
+    };
+
+    print(body);
+
     final response = await http.post(
       url,
       headers: headers,
+      body: json.encode(body),
     );
 
     return await json.decode(response.body);

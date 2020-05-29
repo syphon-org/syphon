@@ -1,5 +1,6 @@
 import 'package:Tether/global/libs/matrix/auth.dart';
 import 'package:Tether/global/libs/matrix/devices.dart';
+import 'package:Tether/global/libs/matrix/encryption.dart';
 import 'package:Tether/global/libs/matrix/events.dart';
 import 'package:Tether/global/libs/matrix/notifications.dart';
 import 'package:Tether/global/libs/matrix/rooms.dart';
@@ -53,6 +54,12 @@ abstract class MatrixApi {
   static final updateDevice = Devices.updateDevice;
   static final deleteDevice = Devices.deleteDevice;
   static final deleteDevices = Devices.deleteDevices;
+
+  // Keys
+  static final fetchKeys = Encryption.fetchKeys;
+  static final fetchKeyChanges = Encryption.fetchKeyChanges;
+  static final claimKeys = Encryption.claimKeys;
+  static final uploadKeys = Encryption.uploadKeys;
 
   // Notifications
   static final fetchNotifications = Notifications.fetchNotifications;
