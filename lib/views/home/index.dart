@@ -1,7 +1,6 @@
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
 import 'package:Tether/store/sync/actions.dart';
@@ -363,51 +362,53 @@ class HomeViewState extends State<Home> {
               children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(right: 12),
-                  child: Stack(children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: primaryColor,
-                      child: room.avatarUri != null
-                          ? ClipRRect(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: primaryColor,
+                        child: room.avatarUri != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSize,
+                                  height: Dimensions.avatarSize,
+                                  mxcUri: room.avatarUri,
+                                ),
+                              )
+                            : Text(
+                                formatRoomInitials(room: room),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                      Visibility(
+                        visible: room.encryptionEnabled,
+                        child: Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                 Dimensions.thumbnailSizeMax,
                               ),
-                              child: MatrixImage(
-                                width: Dimensions.avatarSize,
-                                height: Dimensions.avatarSize,
-                                mxcUri: room.avatarUri,
-                              ),
-                            )
-                          : Text(
-                              formatRoomInitials(room: room),
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    Visibility(
-                      visible: room.encryptionEnabled,
-                      child: Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              Dimensions.thumbnailSizeMax,
-                            ),
-                            child: Container(
-                              height: 16,
-                              width: 16,
-                              color: Colors.green,
-                              child: Icon(
-                                Icons.lock,
-                                color: Colors.white,
-                                size: 10,
-                              ),
-                            )),
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                color: Colors.green,
+                                child: Icon(
+                                  Icons.lock,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                              )),
+                        ),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
                 Flexible(
                   flex: 1,

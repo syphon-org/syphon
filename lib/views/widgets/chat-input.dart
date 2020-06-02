@@ -15,6 +15,7 @@ class ChatInput extends StatelessWidget {
   final Function onChangeMessage;
   final Function onSubmitMessage;
   final Function onSubmittedMessage;
+  final Function onChangeMethod;
 
   ChatInput({
     Key key,
@@ -22,6 +23,7 @@ class ChatInput extends StatelessWidget {
     this.focusNode,
     this.controller,
     this.onChangeMessage,
+    this.onChangeMethod,
     this.onSubmitMessage,
     this.onSubmittedMessage,
   }) : super(key: key);
@@ -88,6 +90,7 @@ class ChatInput extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 4),
           child: InkWell(
             borderRadius: BorderRadius.circular(48),
+            onLongPress: onChangeMethod,
             onTap: !sendable ? null : onSubmitMessage,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,

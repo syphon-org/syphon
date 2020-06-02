@@ -42,6 +42,36 @@ abstract class Encryption {
   }
 
   /**
+   * Fetch Room Keys
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id460
+   * 
+   * Returns the current devices and identity keys for the given users.
+   */
+  static Future<dynamic> fetchRoomKeys({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    int timeout = 10 * 1000, // 10 seconds
+    String lastSince,
+    Map<String, dynamic> users = const {},
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
    * 
    * Fetch Key Changes
    * 

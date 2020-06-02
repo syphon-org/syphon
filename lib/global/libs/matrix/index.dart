@@ -27,10 +27,12 @@ abstract class MatrixApi {
   static final forgetRoom = Rooms.forgetRoom;
 
   // Events
+  static final sendEvent = Events.sendEvent;
+  static final sendTyping = Events.sendTyping;
+  static final sendMessage = Events.sendMessage;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
-  static final sendMessage = Events.sendMessage;
-  static final sendTyping = Events.sendTyping;
+  static final sendDirectToDevice = Events.sendDirectToDevice;
 
   /*** Users ***/
 

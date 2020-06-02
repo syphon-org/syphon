@@ -209,6 +209,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         synced: true,
         syncing: false,
         lastSince: lastSince,
+        backoff: null,
       ));
 
       if (!kReleaseMode && isFullSync) {

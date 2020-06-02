@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/formatters.dart';
@@ -8,11 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/**
- * RoundedPopupMenu
- * Mostly an example for myself on how to override styling or other options on
- * existing components app wide
- */
 class MessageWidget extends StatelessWidget {
   MessageWidget({
     Key key,
@@ -148,6 +144,13 @@ class MessageWidget extends StatelessWidget {
       opacity = selectedMessageId == message.id ? 1 : 0.5;
     }
 
+    String body = message.body;
+    if (message.type == EventTypes.encrypted) {
+      if (message.body.isEmpty) {
+        body = StringStore.encryptedMessageLabel;
+      }
+    }
+
     return GestureDetector(
       onLongPress: () {
         if (this.onLongPress != null) {
@@ -240,7 +243,7 @@ class MessageWidget extends StatelessWidget {
                             Container(
                               margin: EdgeInsets.only(bottom: 5),
                               child: Text(
-                                message.body.trim(),
+                                body.trim(),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: textColor,
@@ -256,6 +259,7 @@ class MessageWidget extends StatelessWidget {
                               crossAxisAlignment: messageTextAlignment,
                               children: [
                                 Container(
+                                  margin: EdgeInsets.only(right: 4),
                                   child: Text(
                                     message.failed
                                         ? 'Message failed to send'
@@ -267,6 +271,19 @@ class MessageWidget extends StatelessWidget {
                                       fontSize: 12,
                                       color: textColor,
                                       fontWeight: FontWeight.w100,
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: message.type == EventTypes.encrypted,
+                                  child: Container(
+                                    width: indicatorSize,
+                                    height: indicatorSize,
+                                    margin: EdgeInsets.only(left: 2),
+                                    child: Icon(
+                                      Icons.lock_outline,
+                                      color: Colors.white,
+                                      size: Dimensions.miniLockSize,
                                     ),
                                   ),
                                 ),

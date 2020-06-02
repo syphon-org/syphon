@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/auth/actions.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/index.dart';
-import 'package:Tether/store/keys/actions.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/strings.dart';
@@ -394,7 +394,7 @@ class Props extends Equatable {
         session: store.state.authStore.session,
         currentDeviceId: store.state.authStore.user.deviceId,
         onTest: () {
-          store.dispatch(fetchUserKeys());
+          store.dispatch(fetchDeviceKeys());
         },
         onDeleteDevices: (
           BuildContext context,

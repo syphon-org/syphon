@@ -55,4 +55,6 @@ class StringStore {
 
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
+
+  static const encryptedMessageLabel = '[Encrypted Message Content]';
 }

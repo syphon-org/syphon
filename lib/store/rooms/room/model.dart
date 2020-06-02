@@ -113,14 +113,14 @@ class Room {
     avatar,
     avatarUri,
     topic,
-    direct,
-    syncing,
-    sending,
+    bool direct,
+    bool syncing,
+    bool sending,
     lastRead,
     lastUpdate,
     totalJoinedUsers,
-    guestEnabled,
-    encryptionEnabled,
+    bool guestEnabled,
+    bool encryptionEnabled,
     userTyping,
     usersTyping,
     isDraftRoom,
@@ -206,7 +206,7 @@ class Room {
     if (json['timeline'] != null) {
       prevHash = json['timeline']['prev_batch'];
 
-      print('[fromSync] ${this.name} prev_batch $prevHash');
+      // print('[fromSync] ${this.name} prev_batch $prevHash');
 
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
@@ -260,7 +260,7 @@ class Room {
     bool direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
-    bool encryptionEnabled = false;
+    bool encryptionEnabled;
 
     List<Event> cachedStateEvents = List<Event>();
     Map<String, User> users = this.users ?? Map<String, User>();
@@ -298,9 +298,7 @@ class Room {
               avatarUri = event.content['url'];
             }
             break;
-          case 'm.room.encryption':
-            encryptionEnabled = true;
-            break;
+
           case 'm.room.member':
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
@@ -325,6 +323,13 @@ class Room {
                 avatarUri: memberAvatarUri,
               );
             }
+            break;
+          case 'm.room.encryption':
+            encryptionEnabled = true;
+            break;
+          case 'm.room.encrypted':
+            print('[m.room.encrypted] FOUND');
+            print(event.content);
             break;
           default:
             break;
@@ -366,8 +371,18 @@ class Room {
       List<Message> existingMessages = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final newMessages =
-          messages.where((event) => event.type == 'm.room.message').toList();
+      final newMessages = messages
+          .where(
+            (event) =>
+                event.type == EventTypes.message ||
+                event.type == EventTypes.encrypted,
+          )
+          .toList();
+
+      final hasEncrypted = newMessages.firstWhere(
+        (msg) => msg.type == EventTypes.encrypted,
+        orElse: () => null,
+      );
 
       // See if the newest message has a greater timestamp
       if (newMessages.isNotEmpty && lastUpdate < messages[0].timestamp) {
@@ -393,9 +408,12 @@ class Room {
       // Filter to find startTime and endTime
       final allMessages = List<Message>.from(messagesMap.values);
 
+      print('[fromMessageEvents] WHAT ${hasEncrypted != null}');
+
       return this.copyWith(
         messages: allMessages,
         outbox: outbox,
+        encryptionEnabled: hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline
         endHash: this.endHash ?? prevHash,

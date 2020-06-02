@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:Tether/store/keys/state.dart';
+import 'package:Tether/store/crypto/model.dart';
+import 'package:Tether/store/crypto/state.dart';
 import 'package:convert/convert.dart';
 
 import 'package:Tether/global/themes.dart';
@@ -92,6 +93,7 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(ReadStatusAdapter());
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DeviceAdapter());
+  Hive.registerAdapter(DeviceKeyAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(AuthStoreAdapter());
@@ -99,7 +101,7 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(RoomStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
-  Hive.registerAdapter(KeyStoreAdapter());
+  Hive.registerAdapter(CryptoStoreAdapter());
 }
 
 Future<List<int>> unlockEncryptionKey() async {

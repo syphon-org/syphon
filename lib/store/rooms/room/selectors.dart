@@ -1,3 +1,4 @@
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/events/selectors.dart';
 import 'package:Tether/store/rooms/room/model.dart';
@@ -9,15 +10,15 @@ String formatPreviewTopic(String fullTopic, {String defaultTopic}) {
       : topic;
 }
 
-String formatPreviewMessage(String message) {
-  return message.replaceAll('\n', ' ');
+String formatPreviewMessage(String body) {
+  return body.replaceAll('\n', ' ');
 }
 
 String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
 
-String formatPreview({Room room, Message recentMessage}) {
+String formatPreview({Room room}) {
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
@@ -33,9 +34,14 @@ String formatPreview({Room room, Message recentMessage}) {
   }
 
   final messages = latestMessages(room.messages);
-  final previewMessage = formatPreviewMessage(messages[0].body);
+  final recentMessage = messages[0];
+  var body = formatPreviewMessage(recentMessage.body);
 
-  return previewMessage;
+  if (body.isEmpty && recentMessage.ciphertext.isNotEmpty) {
+    body = StringStore.encryptedMessageLabel.replaceAll('[]', '');
+  }
+
+  return body;
 }
 
 String formatRoomName({Room room}) {

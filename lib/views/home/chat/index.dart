@@ -3,7 +3,7 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/keys/actions.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
@@ -78,6 +78,7 @@ class ChatViewState extends State<ChatView> {
 
   double overshoot = 0;
   bool loadMore = false;
+  String inputType = MediumType.plaintext;
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
@@ -110,8 +111,12 @@ class ChatViewState extends State<ChatView> {
 
     if (props.room.encryptionEnabled) {
       store.dispatch(
-        fetchUserKeys(users: props.room.users),
+        fetchDeviceKeys(users: props.room.users),
       );
+    }
+
+    if (props.room.messages.length < 10) {
+      props.onLoadFirstBatch();
     }
 
     messagesController.addListener(() {
@@ -209,6 +214,99 @@ class ChatViewState extends State<ChatView> {
     });
   }
 
+  @protected
+  onToggleMediumOptions(context) async {
+    double width = MediaQuery.of(context).size.height;
+    double height = MediaQuery.of(context).size.height;
+    final newInputType = await showMenu(
+      elevation: 4.0,
+      context: context,
+      position: RelativeRect.fromLTRB(
+        width,
+        // input height and padding
+        height - Dimensions.inputSizeMin,
+        0.0,
+        0.0,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      items: [
+        PopupMenuItem<String>(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(right: 8),
+                  child: CircleAvatar(
+                    backgroundColor: const Color(DISABLED_GREY),
+                    child: Stack(children: [
+                      Positioned(
+                        right: 0,
+                        bottom: -1.5,
+                        child: Icon(
+                          Icons.lock_open,
+                          size: Dimensions.miniLockSize,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Icon(
+                        Icons.send,
+                        size: Dimensions.iconSizeLite,
+                        color: Colors.white,
+                      ),
+                    ]),
+                  ),
+                ),
+                Text('Unencrypted'),
+              ],
+            ),
+          ),
+          value: MediumType.plaintext,
+        ),
+        PopupMenuItem<String>(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(right: 8),
+                  child: CircleAvatar(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    child: Stack(children: [
+                      Positioned(
+                        right: 0,
+                        bottom: -1.5,
+                        child: Icon(
+                          Icons.lock,
+                          size: Dimensions.miniLockSize,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Icon(
+                        Icons.send,
+                        size: Dimensions.iconSizeLite,
+                        color: Colors.white,
+                      ),
+                    ]),
+                  ),
+                ),
+                Text('Encrypted'),
+              ],
+            ),
+          ),
+          value: MediumType.encrypted,
+        ),
+      ],
+    );
+    print(newInputType);
+    setState(() {
+      inputType = newInputType;
+    });
+  }
+
+  @protected
   onDismissMessageOptions() {
     this.setState(() {
       selectedMessage = null;
@@ -312,82 +410,6 @@ class ChatViewState extends State<ChatView> {
     FocusScope.of(context).unfocus();
   }
 
-  // Widget buildChatInput(
-  //   BuildContext context,
-  //   _Props props,
-  // ) {
-  //   double width = MediaQuery.of(context).size.width;
-  //   double messageInputWidth = width - 72;
-
-  //   Color inputTextColor = const Color(BASICALLY_BLACK);
-  //   Color inputColorBackground = const Color(ENABLED_GREY);
-  //   Color inputCursorColor = Colors.blueGrey;
-  //   Color sendButtonColor = const Color(DISABLED_GREY);
-
-  //   if (sendable) {
-  //     sendButtonColor = Theme.of(context).primaryColor;
-  //   }
-
-  //   if (Theme.of(context).brightness == Brightness.dark) {
-  //     inputTextColor = Colors.white;
-  //     inputColorBackground = Colors.blueGrey;
-  //     inputCursorColor = Colors.white;
-  //   }
-
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     crossAxisAlignment: CrossAxisAlignment.end,
-  //     children: <Widget>[
-  //       Container(
-  //         constraints: BoxConstraints(
-  //           maxWidth: messageInputWidth,
-  //         ),
-  //         child: TextField(
-  //           maxLines: null,
-  //           keyboardType: TextInputType.multiline,
-  //           textInputAction: TextInputAction.newline,
-  //           cursorColor: inputCursorColor,
-  //           focusNode: inputFieldNode,
-  //           controller: editorController,
-  //           onChanged: (text) => onUpdateMessage(text, props),
-  //           onSubmitted:
-  //               !sendable ? null : (text) => this.onSubmitMessage(props),
-  //           style: TextStyle(
-  //             height: 1.5,
-  //             color: inputTextColor,
-  //           ),
-  //           decoration: InputDecoration(
-  //             filled: true,
-  //             fillColor: inputColorBackground,
-  //             contentPadding: const EdgeInsets.symmetric(
-  //               horizontal: 20.0,
-  //             ),
-  //             border: OutlineInputBorder(
-  //               borderRadius: BorderRadius.circular(24.0),
-  //             ),
-  //             hintText: 'Matrix message (unencrypted)',
-  //           ),
-  //         ),
-  //       ),
-  //       Container(
-  //         width: 48.0,
-  //         padding: EdgeInsets.symmetric(vertical: 4),
-  //         child: InkWell(
-  //           borderRadius: BorderRadius.circular(48),
-  //           onTap: !sendable ? null : () => this.onSubmitMessage(props),
-  //           child: CircleAvatar(
-  //             backgroundColor: sendButtonColor,
-  //             child: Icon(
-  //               Icons.send,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   @protected
   buildRoomAppBar({
     _Props props,
@@ -415,34 +437,57 @@ class ChatViewState extends State<ChatView> {
             ),
           ),
           GestureDetector(
-            child: Hero(
-              tag: "ChatAvatar",
-              child: Container(
-                padding: EdgeInsets.only(right: 8),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: props.room.avatarUri != null
-                      ? Colors.transparent
-                      : props.roomPrimaryColor,
-                  child: props.room.avatarUri != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.thumbnailSizeMax,
-                          ),
-                          child: MatrixImage(
-                            width: 52,
-                            height: 52,
-                            mxcUri: props.room.avatarUri,
-                          ),
-                        )
-                      : Text(
-                          formatRoomInitials(room: props.room),
-                          style: TextStyle(
-                            fontSize: 18,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              child: Stack(
+                children: [
+                  Hero(
+                      tag: "ChatAvatar",
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: props.roomPrimaryColor,
+                        child: props.room.avatarUri != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSize,
+                                  height: Dimensions.avatarSize,
+                                  mxcUri: props.room.avatarUri,
+                                ),
+                              )
+                            : Text(
+                                formatRoomInitials(room: props.room),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      )),
+                  Visibility(
+                    visible: props.room.encryptionEnabled,
+                    child: Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          Dimensions.thumbnailSizeMax,
+                        ),
+                        child: Container(
+                          height: 16,
+                          width: 16,
+                          color: Colors.green,
+                          child: Icon(
+                            Icons.lock,
                             color: Colors.white,
+                            size: 10,
                           ),
                         ),
-                ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             onTap: () {
@@ -620,7 +665,7 @@ class ChatViewState extends State<ChatView> {
           Color inputContainerColor = Colors.white;
 
           if (Theme.of(context).brightness == Brightness.dark) {
-            inputContainerColor = Colors.grey[850];
+            inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
           }
 
           var currentAppBar = buildRoomAppBar(
@@ -728,6 +773,7 @@ class ChatViewState extends State<ChatView> {
                         sendable: sendable,
                         focusNode: inputFieldNode,
                         controller: editorController,
+                        onChangeMethod: () => onToggleMediumOptions(context),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
                         onSubmittedMessage: (text) =>
@@ -756,6 +802,7 @@ class _Props extends Equatable {
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
   final Function onLoadMoreMessages;
+  final Function onLoadFirstBatch;
 
   _Props({
     @required this.room,
@@ -769,6 +816,7 @@ class _Props extends Equatable {
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
     @required this.onLoadMoreMessages,
+    @required this.onLoadFirstBatch,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -833,6 +881,18 @@ class _Props extends Equatable {
               roomId: roomId,
             ),
           ),
+      onLoadFirstBatch: () {
+        final room = roomSelectors.room(
+          id: roomId,
+          state: store.state,
+        );
+
+        store.dispatch(
+          fetchMessageEvents(
+            room: room,
+          ),
+        );
+      },
       onLoadMoreMessages: () {
         final room = roomSelectors.room(
           id: roomId,

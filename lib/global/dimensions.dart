@@ -32,6 +32,7 @@ class Dimensions {
   static const double iconSize = 26;
   static const double iconSizeLite = 24;
   static const double indicatorSize = 16;
+  static const double miniLockSize = 12;
 
   // Progress
   static const double progressIndicatorSize = 26;

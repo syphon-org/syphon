@@ -66,14 +66,14 @@ ThunkAction<AppState> fetchMessageEvents({
 
       final lastSince = store.state.syncStore.lastSince;
 
-      print('[fetchMessageEvents] ${room.name} [param] endHash ${endHash}');
-      print('[fetchMessageEvents] ${room.name} [param] startHash ${startHash}');
+      // print('[fetchMessageEvents] ${room.name} [param] endHash ${endHash}');
+      // print('[fetchMessageEvents] ${room.name} [param] startHash ${startHash}');
 
-      print('[fetchMessageEvents] ${room.name} endHash ${room.endHash}');
-      print('[fetchMessageEvents] ${room.name} prevHash ${room.prevHash}');
-      print('[fetchMessageEvents] ${room.name} startHash ${room.startHash}');
+      // print('[fetchMessageEvents] ${room.name} endHash ${room.endHash}');
+      // print('[fetchMessageEvents] ${room.name} prevHash ${room.prevHash}');
+      // print('[fetchMessageEvents] ${room.name} startHash ${room.startHash}');
 
-      print('[fetchMessageEvents] ${room.name} lastSince $lastSince');
+      // print('[fetchMessageEvents] ${room.name} lastSince $lastSince');
 
       // final String start = startHash ?? room.prevHash ?? room.toHash;
       // final String end = endHash ?? room.fromHash ?? lastSince;
@@ -101,17 +101,17 @@ ThunkAction<AppState> fetchMessageEvents({
         );
       });
 
-      print('[fetchMessageEvents] ${room.name} end $end');
-      print('[fetchMessageEvents] ${room.name} start $start');
+      // print('[fetchMessageEvents] ${room.name} end $end');
+      // print('[fetchMessageEvents] ${room.name} start $start');
 
       var nextPrevBatch;
 
       // If there's a gap in messages fetched, run a sync again
       // which will fetch the next batch with the same endHash
 
-      print(
-        '[fetchMessageEvents] ${room.name} shouldFetch? end != start: ${end != start},  end != endHash: ${end != endHash}',
-      );
+      // print(
+      //   '[fetchMessageEvents] ${room.name} shouldFetch? end != start: ${end != start},  end != endHash: ${end != endHash}',
+      // );
       if (end != start && end != endHash) {
         nextPrevBatch = end;
       }
@@ -275,13 +275,18 @@ ThunkAction<AppState> sendMessage({
         ),
       ));
 
+      final message = {
+        'body': body,
+        'type': type,
+      };
+
       final data = await MatrixApi.sendMessage(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        messageBody: body,
+        trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
-        requestId: DateTime.now().millisecond.toString(),
+        message: message,
       );
 
       if (data['errcode'] != null) {
