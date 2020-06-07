@@ -1,11 +1,4 @@
-const String LOGIN_TITLE = 'take back the chat';
-const String LOGIN_BUTTON_TEXT = 'login';
-const String LOGIN_TEXT_BUTTON_TEXT = 'Login';
-
 const String SELECT_USERNAME_TITLE = 'Select your usernames homeserver';
-
-const String INTRO_IMAGE_LABEL = 'Relaxed, Lounging User';
-const String INTRO_TITLE = 'Welcome to Tether';
 
 String formatUsernameHint(String homeserver) {
   return homeserver.length != 0
@@ -19,7 +12,16 @@ class StringStore {
   static const app_id = 'org.tether.tether';
   static const default_language = 'en-US';
 
-  static const intro_subtitle = 'Privacy and freedom\nwithout the hassle';
+  static const titleIntro = 'Welcome to Tether';
+  static const titleLogin = 'take back the chat';
+
+  static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
+
+  static const contentIntroOne =
+      'Tether works by using an encrypted \nand decentralized protocol \ncalled ';
+
+  static const buttonLogin = 'login';
+  static const buttonTextLogin = 'Login';
 
   static const start_chat_notice = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
@@ -57,4 +59,6 @@ class StringStore {
   static const buttonSignupFinish = 'finish';
 
   static const encryptedMessageLabel = '[Encrypted Message Content]';
+
+  static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
 }

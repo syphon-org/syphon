@@ -40,7 +40,7 @@ class ThirdSection extends StatelessWidget {
               Text(
                 'Both Matrix and Tether are developed\nopenly by organizations and people,\nnot corporations.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ],
           ),

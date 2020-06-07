@@ -40,7 +40,7 @@ class ActionSection extends StatelessWidget {
               Text(
                 'By using Tether and other Matrix clients\nwe can make private messaging \naccessible to everyone',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ],
           ),

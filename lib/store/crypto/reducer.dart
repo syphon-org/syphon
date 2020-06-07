@@ -10,6 +10,14 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         deviceKeys: action.deviceKeys,
       );
+    case SetDeviceKeysOwned:
+      return state.copyWith(
+        deviceKeysOwned: action.deviceKeysOwned,
+      );
+    case ToggleDeviceKeysExist:
+      return state.copyWith(
+        deviceKeysExist: action.existence,
+      );
     default:
       return state;
   }

@@ -328,8 +328,9 @@ class Room {
             encryptionEnabled = true;
             break;
           case 'm.room.encrypted':
-            print('[m.room.encrypted] FOUND');
-            print(event.content);
+            print(
+              '[m.room.encrypted] ${event.content}',
+            );
             break;
           default:
             break;
@@ -407,8 +408,6 @@ class Room {
 
       // Filter to find startTime and endTime
       final allMessages = List<Message>.from(messagesMap.values);
-
-      print('[fromMessageEvents] WHAT ${hasEncrypted != null}');
 
       return this.copyWith(
         messages: allMessages,

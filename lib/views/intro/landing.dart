@@ -30,13 +30,13 @@ class LandingSection extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             MOBILE_USER_GRAPHIC,
-            semanticsLabel: INTRO_IMAGE_LABEL,
+            semanticsLabel: StringStore.semanticsLabelImageIntro,
           ),
         ),
         Container(
           margin: EdgeInsets.only(bottom: 16),
           child: Text(
-            INTRO_TITLE,
+            StringStore.titleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline4,
           ),
@@ -44,7 +44,7 @@ class LandingSection extends StatelessWidget {
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
-            StringStore.intro_subtitle,
+            StringStore.subtitleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline6,
           ),

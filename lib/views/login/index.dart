@@ -158,7 +158,7 @@ class LoginState extends State<Login> {
                           FittedBox(
                             fit: BoxFit.fitWidth,
                             child: Text(
-                              LOGIN_TITLE,
+                              StringStore.titleLogin,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline4,
                             ),
@@ -316,7 +316,7 @@ class LoginState extends State<Login> {
                               ),
                             )
                           : Text(
-                              LOGIN_BUTTON_TEXT,
+                              StringStore.buttonLogin,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -333,7 +333,7 @@ class LoginState extends State<Login> {
                       left: 8,
                       right: 8,
                       top: 16,
-                      bottom: 24,
+                      bottom: 16,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
@@ -361,10 +361,8 @@ class LoginState extends State<Login> {
                                   .textTheme
                                   .bodyText2
                                   .copyWith(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.white,
+                                    color: Theme.of(context).primaryColor,
+                                    decoration: TextDecoration.underline,
                                   ),
                             ),
                           ),

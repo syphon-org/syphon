@@ -224,18 +224,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    // Static horizontal: 16, vertical: 8
-    final contentPadding = EdgeInsets.symmetric(
-      horizontal: width * 0.04,
-      vertical: 4,
-    );
-
-    final titlePadding = EdgeInsets.only(
-      left: width * 0.04,
-      right: width * 0.04,
-      top: 6,
-      bottom: 14,
-    );
+    // Confirm this is needed in chat details
+    final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
+    final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
     final ChatSettingsArguments arguments =
         ModalRoute.of(context).settings.arguments;

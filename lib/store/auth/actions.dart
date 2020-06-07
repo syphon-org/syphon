@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/auth/credential/model.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/settings/devices-settings/model.dart';
 import 'package:Tether/store/settings/notification-settings/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
@@ -140,7 +141,7 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.authStore.user;
-    final Function onAuthStateChanged = (user) async {
+    final Function onAuthStateChanged = (User user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserProfile());
 
@@ -149,6 +150,31 @@ ThunkAction<AppState> startAuthObserver() {
           await store.dispatch(initialSync());
         }
 
+        // fetch device keys and pull out key based on device id
+        final userDeviceKeys = await store.dispatch(
+          fetchDeviceKeysOwned(),
+        );
+
+        // check if key exists for this device
+        if (!userDeviceKeys.containsKey(user.deviceId)) {
+          // generate a key if none exist locally and remotely
+          if (store.state.cryptoStore.deviceKeysOwned.isEmpty) {
+            await store.dispatch(generateDeviceKey());
+          }
+
+          final deviceId = store.state.authStore.user.deviceId;
+          final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId];
+
+          // upload the key intended for this device
+          await store.dispatch(uploadDeviceKey(deviceKey: deviceKey));
+        } else {
+          // if a key exists remotely, mark that it does
+          // the user will be prompted to import in "home"
+          // if they have no local keys
+          store.dispatch(toggleDeviceKeysExist(true));
+        }
+
+        // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
             print('[onSelectNotification] payload');
@@ -157,6 +183,8 @@ ThunkAction<AppState> startAuthObserver() {
             store.dispatch(setPusherDeviceToken(token));
           },
         );
+
+        // start syncing for user
         store.dispatch(startSyncObserver());
       } else {
         await store.dispatch(stopSyncObserver());
@@ -181,7 +209,7 @@ ThunkAction<AppState> stopAuthObserver() {
   };
 }
 
-ThunkAction<AppState> generateHashedDeviceId({String salt}) {
+ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
     final defaultId = Random.secure().nextInt(1 << 31).toString();
     var device = Device(
@@ -203,11 +231,15 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
 
         device = Device(
           deviceId: hashedDeviceId.hash,
+          deviceIdPrivate: info.androidId,
           displayName: 'Tim Android',
         );
       } else if (Platform.isIOS) {
         final info = await deviceInfoPlugin.iosInfo;
         final deviceIdentifier = info.identifierForVendor;
+
+        print('[generateDeviceId] ios $deviceIdentifier');
+
         final hashedDeviceId = Crypt.sha256(
           deviceIdentifier,
           rounds: 1000,
@@ -216,6 +248,7 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
 
         device = Device(
           deviceId: hashedDeviceId.hash,
+          deviceIdPrivate: info.identifierForVendor,
           displayName: 'Tim iOS',
         );
       } else if (Platform.isMacOS) {
@@ -242,7 +275,7 @@ ThunkAction<AppState> loginUser() {
       final username = store.state.authStore.username;
 
       final Device device = await store.dispatch(
-        generateHashedDeviceId(salt: username),
+        generateDeviceId(salt: username),
       );
 
       final data = await MatrixApi.loginUser(
@@ -262,8 +295,6 @@ ThunkAction<AppState> loginUser() {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print(data);
 
       await store.dispatch(SetUser(
         user: User.fromJson(data),
@@ -419,7 +450,7 @@ ThunkAction<AppState> createUser() {
       final authType = session != null ? credential.type : loginType;
       final authValue = session != null ? credential.value : null;
 
-      final device = await store.dispatch(generateHashedDeviceId(
+      final device = await store.dispatch(generateDeviceId(
         salt: store.state.authStore.username,
       ));
 

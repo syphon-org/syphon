@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:Tether/store/rooms/events/model.dart';
@@ -52,7 +53,7 @@ class MessageDetails extends StatelessWidget {
         }
         return ListTile(
           dense: true,
-          contentPadding: contentPadding,
+          contentPadding: Dimensions.listPadding,
           title: Text(
             users[index],
             style: TextStyle(
@@ -120,7 +121,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Sent',
                     style: TextStyle(
@@ -140,7 +141,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Received',
                     style: TextStyle(
@@ -160,7 +161,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Via',
                     style: TextStyle(
@@ -180,7 +181,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'From',
                     style: TextStyle(

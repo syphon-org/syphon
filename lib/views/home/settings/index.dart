@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -28,18 +29,6 @@ class SettingsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
           final double height = MediaQuery.of(context).size.height;
 
-          // TODO: set max contstraints
-          final headerPadding = EdgeInsets.symmetric(
-            horizontal: width * 0.0575,
-            vertical: height * 0.04,
-          );
-
-          // Static horizontal: 16, vertical: 8
-          final contentPadding = EdgeInsets.symmetric(
-            horizontal: width * 0.08,
-            vertical: height * 0.005,
-          );
-
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -69,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
                     children: <Widget>[
                       InkWell(
                         child: Container(
-                          padding: headerPadding,
+                          padding: Dimensions.heroPadding,
                           child: ProfilePreview(),
                         ),
                         onTap: props.authLoading
@@ -83,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
                           children: <Widget>[
                             ListTile(
                               onTap: props.authLoading ? null : () {},
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -103,7 +92,7 @@ class SettingsScreen extends StatelessWidget {
                                       Navigator.pushNamed(
                                           context, '/notifications');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -125,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
                                       Navigator.pushNamed(
                                           context, '/chat-preferences');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.only(
                                     top: 4,
@@ -148,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
                                   : () {
                                       Navigator.pushNamed(context, '/privacy');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -170,7 +159,7 @@ class SettingsScreen extends StatelessWidget {
                                   : () {
                                       Navigator.pushNamed(context, '/theming');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -188,7 +177,7 @@ class SettingsScreen extends StatelessWidget {
                                   : () {
                                       Navigator.pushNamed(context, '/devices');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -200,27 +189,31 @@ class SettingsScreen extends StatelessWidget {
                                 style: TextStyle(fontSize: 18.0),
                               ),
                             ),
-                            ListTile(
-                              onTap: props.authLoading ? null : () {},
-                              contentPadding: contentPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.data_usage,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Storage',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
+                            // ListTile(
+                            //   onTap: props.authLoading
+                            //       ? null
+                            //       : () {
+                            //           Navigator.pushNamed(context, '/storage');
+                            //         },
+                            //   contentPadding: Dimensions.listPadding,
+                            //   leading: Container(
+                            //       padding: EdgeInsets.all(4),
+                            //       child: Icon(
+                            //         Icons.data_usage,
+                            //         size: 28,
+                            //       )),
+                            //   title: Text(
+                            //     'Storage',
+                            //     style: TextStyle(fontSize: 18.0),
+                            //   ),
+                            // ),
                             ListTile(
                               onTap: props.authLoading
                                   ? null
                                   : () {
                                       Navigator.pushNamed(context, '/advanced');
                                     },
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -236,7 +229,7 @@ class SettingsScreen extends StatelessWidget {
                               onTap: props.authLoading
                                   ? null
                                   : () => props.onLogoutUser(),
-                              contentPadding: contentPadding,
+                              contentPadding: Dimensions.listPadding,
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(

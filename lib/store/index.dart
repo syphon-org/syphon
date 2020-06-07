@@ -253,6 +253,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       loading: false,
       authStore: authStoreConverted,
       syncStore: syncStoreConverted,
+      cryptoStore: cryptoStoreConverted,
       roomStore: roomStoreConverted,
       mediaStore: mediaStoreConverted,
       settingsStore: settingsStoreConverted,

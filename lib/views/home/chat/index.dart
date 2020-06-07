@@ -102,7 +102,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  void onMounted() {
+  void onMounted() async {
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
     final store = StoreProvider.of<AppState>(context);
@@ -110,9 +110,11 @@ class ChatViewState extends State<ChatView> {
     final draft = props.room.draft;
 
     if (props.room.encryptionEnabled) {
-      store.dispatch(
+      final usersDeviceKeys = await store.dispatch(
         fetchDeviceKeys(users: props.room.users),
       );
+
+      store.dispatch(setDeviceKeys(usersDeviceKeys));
     }
 
     if (props.room.messages.length < 10) {

@@ -1,6 +1,9 @@
+import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -19,14 +22,6 @@ class PrivacyPreferences extends StatelessWidget {
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
           double height = MediaQuery.of(context).size.height;
-
-          // Static horizontal: 16, vertical: 8
-          final contentPadding = EdgeInsets.only(
-            left: width * 0.04,
-            right: width * 0.04,
-            top: 6,
-            bottom: 14,
-          );
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
@@ -47,7 +42,7 @@ class PrivacyPreferences extends StatelessWidget {
                 ),
               ),
             ),
-            body: Container(
+            body: SingleChildScrollView(
                 child: Column(
               children: <Widget>[
                 Card(
@@ -60,7 +55,7 @@ class PrivacyPreferences extends StatelessWidget {
                       children: [
                         Container(
                           width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
+                          padding: Dimensions.listPadding,
                           child: Text(
                             'App access',
                             textAlign: TextAlign.start,
@@ -69,7 +64,7 @@ class PrivacyPreferences extends StatelessWidget {
                         ),
                         ListTile(
                           onTap: null,
-                          contentPadding: contentPadding,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Screen lock',
                           ),
@@ -84,7 +79,7 @@ class PrivacyPreferences extends StatelessWidget {
                         ),
                         ListTile(
                           onTap: null,
-                          contentPadding: contentPadding,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Screen lock inactivity timeout',
                           ),
@@ -107,7 +102,7 @@ class PrivacyPreferences extends StatelessWidget {
                       children: [
                         Container(
                           width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
+                          padding: Dimensions.listPadding,
                           child: Text(
                             'User Access',
                             textAlign: TextAlign.start,
@@ -118,7 +113,7 @@ class PrivacyPreferences extends StatelessWidget {
                           onTap: () {
                             Navigator.pushNamed(context, '/password');
                           },
-                          contentPadding: contentPadding,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Change Password',
                           ),
@@ -141,7 +136,7 @@ class PrivacyPreferences extends StatelessWidget {
                       children: [
                         Container(
                           width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
+                          padding: Dimensions.listPadding,
                           child: Text(
                             'Communication',
                             textAlign: TextAlign.start,
@@ -150,7 +145,7 @@ class PrivacyPreferences extends StatelessWidget {
                         ),
                         ListTile(
                           onTap: () => props.onToggleReadReceipts(),
-                          contentPadding: contentPadding,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Read Receipts',
                           ),
@@ -166,7 +161,7 @@ class PrivacyPreferences extends StatelessWidget {
                         ),
                         ListTile(
                           onTap: () => props.onToggleTypingIndicators(),
-                          contentPadding: contentPadding,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Typing Indicators',
                           ),
@@ -194,7 +189,7 @@ class PrivacyPreferences extends StatelessWidget {
                       children: [
                         Container(
                           width: width, // TODO: use flex, i'm rushing
-                          padding: contentPadding,
+                          padding: Dimensions.listPadding,
                           child: Text(
                             'Encryption Keys',
                             textAlign: TextAlign.start,
@@ -202,15 +197,15 @@ class PrivacyPreferences extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
+                          onTap: props.onImportDeviceKey,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Import Keys',
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
-                          contentPadding: contentPadding,
+                          onTap: props.onExportDeviceKey,
+                          contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Export Keys',
                           ),
@@ -226,19 +221,29 @@ class PrivacyPreferences extends StatelessWidget {
       );
 }
 
-class Props {
+class Props extends Equatable {
   final bool typingIndicators;
   final bool readReceipts;
 
   final Function onToggleTypingIndicators;
   final Function onToggleReadReceipts;
+  final Function onExportDeviceKey;
+  final Function onImportDeviceKey;
 
   Props({
     @required this.typingIndicators,
     @required this.readReceipts,
     @required this.onToggleTypingIndicators,
     @required this.onToggleReadReceipts,
+    @required this.onExportDeviceKey,
+    @required this.onImportDeviceKey,
   });
+
+  @override
+  List<Object> get props => [
+        typingIndicators,
+        readReceipts,
+      ];
 
   static Props mapStoreToProps(Store<AppState> store) => Props(
         typingIndicators: store.state.settingsStore.typingIndicators,
@@ -249,22 +254,11 @@ class Props {
         onToggleReadReceipts: () => store.dispatch(
           toggleReadReceipts(),
         ),
+        onExportDeviceKey: () {
+          store.dispatch(exportDeviceKeysOwned());
+        },
+        onImportDeviceKey: () {
+          store.dispatch(importDeviceKeysOwned());
+        },
       );
-
-  @override
-  int get hashCode =>
-      typingIndicators.hashCode ^
-      readReceipts.hashCode ^
-      onToggleTypingIndicators.hashCode ^
-      onToggleReadReceipts.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Props &&
-          runtimeType == other.runtimeType &&
-          typingIndicators == other.typingIndicators &&
-          readReceipts == other.readReceipts &&
-          onToggleTypingIndicators == other.onToggleTypingIndicators &&
-          onToggleReadReceipts == other.onToggleReadReceipts;
 }

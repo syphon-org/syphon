@@ -41,7 +41,7 @@ class FirstSection extends StatelessWidget {
                   text: TextSpan(
                     text:
                         'Tether works by using an encrypted \nand decentralized protocol \ncalled ',
-                    style: Theme.of(context).textTheme.subtitle2,
+                    style: Theme.of(context).textTheme.subtitle1,
                     children: <TextSpan>[
                       TextSpan(
                         text: 'Matrix',

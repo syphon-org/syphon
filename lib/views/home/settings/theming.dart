@@ -1,3 +1,4 @@
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:Tether/global/colors.dart';
@@ -97,7 +98,6 @@ class Theming extends StatelessWidget {
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
-          // Static horizontal: 16, vertical: 8
           final contentPadding = EdgeInsets.only(
             left: width * 0.04,
             right: width * 0.04,
@@ -134,7 +134,7 @@ class Theming extends StatelessWidget {
                         children: [
                           Container(
                             width: width, // TODO: use flex, i'm rushing
-                            padding: contentPadding,
+                            padding: Dimensions.listPadding,
                             child: Text(
                               'App',
                               textAlign: TextAlign.start,
@@ -147,7 +147,7 @@ class Theming extends StatelessWidget {
                               onSelectColor: props.onSelectPrimaryColor,
                               originalColor: props.primaryColor,
                             ),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Primary Color',
                               style: Theme.of(context).textTheme.subtitle1,
@@ -163,7 +163,7 @@ class Theming extends StatelessWidget {
                               onSelectColor: props.onSelectAccentColor,
                               originalColor: props.accentColor,
                             ),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Accent Color',
                             ),
@@ -174,7 +174,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () => props.onIncrementTheme(),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Theme',
                             ),
@@ -184,7 +184,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Font Size',
                             ),
@@ -206,7 +206,7 @@ class Theming extends StatelessWidget {
                         children: [
                           Container(
                             width: width, // TODO: use flex, i'm rushing
-                            padding: contentPadding,
+                            padding: Dimensions.listPadding,
                             child: Text(
                               'Fonts',
                               textAlign: TextAlign.start,
@@ -215,7 +215,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Chat Title Size',
                             ),
@@ -225,7 +225,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Message Body Size',
                             ),

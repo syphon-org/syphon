@@ -2,6 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+class MatrixAlgorithms {
+  static final curve25591 = 'curve25519';
+  static final ed25519 = 'ed25519';
+  static final olmv1 = 'm.olm.v1.curve25519-aes-sha2';
+  static final megolmv1 = 'm.megolm.v1.aes-sha2';
+}
+
 abstract class Encryption {
   /**
    * Fetch Encryption Keys
@@ -137,8 +144,7 @@ abstract class Encryption {
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    Map oneTimeKeys,
-    List<String> deviceKeys,
+    Map data,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 
@@ -149,6 +155,7 @@ abstract class Encryption {
     final response = await http.post(
       url,
       headers: headers,
+      body: json.encode(data),
     );
 
     return await json.decode(response.body);

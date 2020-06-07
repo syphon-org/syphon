@@ -20,9 +20,12 @@ String formatTimestamp({int lastUpdateMillis, bool showTime = false}) {
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
 
-  if (sinceLastUpdate.inDays > 6) {
+  if (sinceLastUpdate.inDays > 365) {
+    return DateFormat(
+      showTime ? 'MMM d h:mm a' : 'MMM d yyyy',
+    ).format(timestamp);
+  } else if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
-
     return DateFormat(
       showTime ? 'MMM d h:mm a' : 'MMM d',
     ).format(timestamp);

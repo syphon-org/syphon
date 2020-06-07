@@ -32,6 +32,7 @@ There are three layers to storage in Tether:
 ## Resources
 - (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
 - (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
+- (iOS file management flutter)[https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter]
 
 ## Layouts and Styling
 - (Scrolling With Text Inputs)[https://github.com/flutter/flutter/issues/13339]

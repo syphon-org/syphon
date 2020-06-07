@@ -9,7 +9,7 @@ class User extends Equatable {
   @HiveField(0)
   final String userId;
   @HiveField(1)
-  final String deviceId;
+  final String deviceId; // current device id
   @HiveField(2)
   final String homeserver;
   @HiveField(3)

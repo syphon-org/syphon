@@ -2,6 +2,8 @@
 //   color: Colors.red,
 // ),
 
+import 'package:flutter/material.dart';
+
 class Dimensions {
   // Generic
   static const double widgetHeightMax = 1024;
@@ -45,6 +47,48 @@ class Dimensions {
   static const double inputHeight = 52;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
+
+  // Lists
+  static const heroPadding = EdgeInsets.symmetric(
+    vertical: 24,
+    horizontal: 24,
+  );
+
+  static const listPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 8,
+  );
+
+  static listPaddingDynamic({width = 500}) {
+    return EdgeInsets.only(
+      left: width * 0.04,
+      right: width * 0.04,
+      top: 6,
+      bottom: 14,
+    );
+  }
+
+  static listTitlePaddingDynamic({width = 500}) {
+    return EdgeInsets.only(
+      left: width * 0.04,
+      right: width * 0.04,
+      top: 6,
+      bottom: 14,
+    );
+  }
+
+  // Content
+  static const contentPadding = EdgeInsets.symmetric(
+    horizontal: 32,
+    vertical: 8,
+  );
+
+  static contentPaddingDynamic({width = 500}) {
+    return EdgeInsets.symmetric(
+      horizontal: width * 0.04,
+      vertical: 4,
+    );
+  }
 
   // Page Viewer
   static const double pageViewerWidthMin = 326;

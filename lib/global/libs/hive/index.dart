@@ -98,10 +98,10 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   // Custom Store Models
   Hive.registerAdapter(AuthStoreAdapter());
   Hive.registerAdapter(SyncStoreAdapter());
+  Hive.registerAdapter(CryptoStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());
-  Hive.registerAdapter(CryptoStoreAdapter());
 }
 
 Future<List<int>> unlockEncryptionKey() async {

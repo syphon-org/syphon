@@ -40,7 +40,7 @@ class SecondSection extends StatelessWidget {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: 'Matrix enables you to message others',
-                  style: Theme.of(context).textTheme.subtitle2,
+                  style: Theme.of(context).textTheme.subtitle1,
                   children: <TextSpan>[
                     TextSpan(
                       text: '\nprivately ',
@@ -50,7 +50,7 @@ class SecondSection extends StatelessWidget {
                     ),
                     TextSpan(
                       text: 'and control where the\nmessages are ',
-                      style: Theme.of(context).textTheme.subtitle2,
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                     TextSpan(
                       text: 'stored',

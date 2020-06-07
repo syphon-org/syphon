@@ -106,7 +106,9 @@ class Themes {
       // Fonts
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(
-        headline6: TextStyle(color: Colors.white),
+        headline6: TextStyle(
+          color: Colors.white,
+        ),
       ),
       textTheme: TextTheme(
         headline5: TextStyle(
@@ -127,12 +129,13 @@ class Themes {
           letterSpacing: 0.4,
           color: Color(accentColor),
         ),
-        bodyText1: TextStyle(
+        overline: TextStyle(
+          fontSize: 10,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
         ),
-        overline: TextStyle(
-          fontSize: 10,
+        bodyText1: TextStyle(
+          fontSize: 18,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
         ),

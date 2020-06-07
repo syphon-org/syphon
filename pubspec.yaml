@@ -49,10 +49,11 @@ dependencies:
     sdk: flutter
 
   # Domain / Store
-  cryptography: 1.2.1
   expandable: 3.0.1
   equatable: ^1.1.0
   crypt: ^3.0.0
+  cryptography: 1.2.1
+  canonical_json: 1.0.0
   convert: ^2.1.1
   steel_crypt: 1.7.1
   device_info: ^0.4.2
@@ -80,6 +81,7 @@ dependencies:
   # UI Only
   url_launcher: ^5.4.7
   flutter_svg: ^0.17.0
+  file_picker: 1.10.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
   webview_flutter: ^0.3.21 
