@@ -105,12 +105,12 @@ ThunkAction<AppState> generateDeviceKeyManual() {
 
       // fingerprint keypair - ed25519
       final fingerprintKeyName =
-          '${MatrixAlgorithms.ed25519}:${authUser.deviceId}';
+          '${Algorithms.ed25519}:${authUser.deviceId}';
       final fingerprintKeyPair = await ed25519.newKeyPair();
 
       // identity key pair - curve25519
       final identityKeyName =
-          '${MatrixAlgorithms.curve25591}:${authUser.deviceId}';
+          '${Algorithms.curve25591}:${authUser.deviceId}';
       final identityKeyPair = await x25519.newKeyPair();
 
       // unpadded base64 encode
@@ -126,8 +126,8 @@ ThunkAction<AppState> generateDeviceKeyManual() {
       var deviceKeys = {
         'device_keys': {
           'algorithms': [
-            MatrixAlgorithms.olmv1,
-            MatrixAlgorithms.megolmv1,
+            Algorithms.olmv1,
+            Algorithms.megolmv1,
           ],
           'device_id': authUser.deviceId,
           'keys': {

@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class MatrixAlgorithms {
-  static final curve25591 = 'curve25519';
-  static final ed25519 = 'ed25519';
-  static final olmv1 = 'm.olm.v1.curve25519-aes-sha2';
-  static final megolmv1 = 'm.megolm.v1.aes-sha2';
+class Algorithms {
+  static const signedcurve25519 = 'signed_curve25519';
+  static const curve25591 = 'curve25519';
+  static const ed25519 = 'ed25519';
+  static const olmv1 = 'm.olm.v1.curve25519-aes-sha2';
+  static const megolmv1 = 'm.megolm.v1.aes-sha2';
 }
 
 abstract class Encryption {

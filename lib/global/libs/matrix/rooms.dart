@@ -53,6 +53,7 @@ abstract class Rooms {
     String accessToken = params['accessToken'];
     String since = params['since'];
     bool fullState = params['fullState'];
+    int timeout = params['timeout'];
 
     return await sync(
       protocol: protocol,
@@ -60,6 +61,7 @@ abstract class Rooms {
       accessToken: accessToken,
       since: since,
       fullState: fullState,
+      timeout: timeout,
     );
   }
 

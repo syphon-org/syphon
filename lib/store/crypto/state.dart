@@ -8,6 +8,12 @@ part 'state.g.dart';
 
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
+  // Active olm account
+  final Account olmAccount;
+  // Serialized old account
+  @HiveField(3)
+  final String olmAccountKey;
+
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
   final Map<String, Map<String, DeviceKey>> deviceKeys;
@@ -16,27 +22,22 @@ class CryptoStore extends Equatable {
   @HiveField(1)
   final Map<String, DeviceKey> deviceKeysOwned; // key is deviceId
 
-  final Map messageKeys; //one time keys
-  final Map messageKeysOwned;
-
   @HiveField(2)
   final bool deviceKeysExist;
 
-  // Serialized old account
-  @HiveField(3)
-  final String olmAccountKey;
-
-  // Active olm account
-  final Account olmAccount;
+  final Map oneTimeKeys; //one time keys
+  final Map oneTimeKeysOwned;
+  final Map oneTimeKeysCounts; // only for owned ?
 
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
-    this.messageKeys = const {},
-    this.messageKeysOwned = const {},
+    this.oneTimeKeys = const {},
+    this.oneTimeKeysOwned = const {},
     this.deviceKeysExist = false,
+    this.oneTimeKeysCounts,
   });
 
   @override
@@ -45,9 +46,10 @@ class CryptoStore extends Equatable {
         olmAccountKey,
         deviceKeys,
         deviceKeysOwned,
-        messageKeys,
-        messageKeysOwned,
         deviceKeysExist,
+        oneTimeKeys,
+        oneTimeKeysOwned,
+        oneTimeKeysCounts
       ];
 
   CryptoStore copyWith({
@@ -55,19 +57,21 @@ class CryptoStore extends Equatable {
     olmAccountKey,
     deviceKeys,
     deviceKeysOwned,
-    messageKeys,
-    messageKeysOwned,
     deviceKeysExist,
+    oneTimeKeys,
+    oneTimeKeysOwned,
+    oneTimeKeysCounts,
   }) {
     return CryptoStore(
       olmAccount: olmAccount ?? this.olmAccount,
       olmAccountKey: olmAccountKey ?? this.olmAccountKey,
       deviceKeys: deviceKeys ?? this.deviceKeys,
       deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
-      messageKeys: messageKeys ?? this.messageKeys,
-      messageKeysOwned: messageKeysOwned ?? this.messageKeysOwned,
+      oneTimeKeys: oneTimeKeys ?? this.oneTimeKeys,
+      oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,
       deviceKeysExist:
           deviceKeysExist != null ? deviceKeysExist : this.deviceKeysExist,
+      oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
     );
   }
 }

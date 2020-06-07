@@ -64,8 +64,8 @@ class DeviceKey extends Equatable {
   toMap() {
     return {
       'algorithms': [
-        MatrixAlgorithms.olmv1,
-        MatrixAlgorithms.megolmv1,
+        Algorithms.olmv1,
+        Algorithms.megolmv1,
       ],
       'device_id': deviceId,
       'keys': keys,

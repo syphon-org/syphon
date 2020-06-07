@@ -283,7 +283,7 @@ class _Props extends Equatable {
           store.dispatch(fetchSync(forceFull: true));
         },
         onForceFunction: () {
-          store.dispatch(generateIdentityKeys());
+          store.dispatch(generateOneTimeKeys());
         },
       );
 }

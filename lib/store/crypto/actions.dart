@@ -54,6 +54,11 @@ class SetOlmAccountBackup {
   SetOlmAccountBackup({this.olmAccountKey});
 }
 
+class SetOneTimeKeysCounts {
+  var oneTimeKeysCounts;
+  SetOneTimeKeysCounts({this.oneTimeKeysCounts});
+}
+
 class ResetDeviceKeys {}
 
 /**
@@ -90,6 +95,20 @@ ThunkAction<AppState> deleteDeviceKeys() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(ResetDeviceKeys());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
+  };
+}
+
+ThunkAction<AppState> backupOlmAccount() {
+  return (Store<AppState> store) async {
+    try {
+      final deviceId = store.state.authStore.user.deviceId;
+      final olmAccount = store.state.cryptoStore.olmAccount;
+      final olmAccountKey = olmAccount.pickle(deviceId);
+      store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);
@@ -185,24 +204,22 @@ ThunkAction<AppState> generateIdentityKeys() {
       final identityKeysString = olmAccount.identity_keys();
       final identityKeys = await json.decode(identityKeysString);
       // fingerprint keypair - ed25519
-      final fingerprintKeyName =
-          '${MatrixAlgorithms.ed25519}:${authUser.deviceId}';
+      final fingerprintKeyName = '${Algorithms.ed25519}:${authUser.deviceId}';
 
       // identity key pair - curve25519
-      final identityKeyName =
-          '${MatrixAlgorithms.curve25591}:${authUser.deviceId}';
+      final identityKeyName = '${Algorithms.curve25591}:${authUser.deviceId}';
 
       // formatting json for the signature required by matrix
       var deviceIdentityKeys = {
         'device_keys': {
           'algorithms': [
-            MatrixAlgorithms.olmv1,
-            MatrixAlgorithms.megolmv1,
+            Algorithms.olmv1,
+            Algorithms.megolmv1,
           ],
           'device_id': authUser.deviceId,
           'keys': {
-            identityKeyName: identityKeys[MatrixAlgorithms.curve25591],
-            fingerprintKeyName: identityKeys[MatrixAlgorithms.ed25519],
+            identityKeyName: identityKeys[Algorithms.curve25591],
+            fingerprintKeyName: identityKeys[Algorithms.ed25519],
           },
           'user_id': authUser.userId,
         }
@@ -275,16 +292,122 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
   };
 }
 
+/**
+ * Generate One Time Keys
+ * 
+ * Returns the keys as a map
+ */
 ThunkAction<AppState> generateOneTimeKeys({DeviceKey deviceKey}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(addAlert(
-        type: 'confirmation',
-        message: 'Successfully uploaded new device key',
-      ));
+      final olmAccount = store.state.cryptoStore.olmAccount;
+      olmAccount.generate_one_time_keys(5); // synchronous
+      return json.decode(olmAccount.one_time_keys());
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);
+    }
+  };
+}
+
+ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
+  return (Store<AppState> store) async {
+    final olmAccount = store.state.cryptoStore.olmAccount;
+    final authUser = store.state.authStore.user;
+
+    final signedKeysMap = {};
+
+    // Signing Keys
+    oneTimeKeys.forEach((key, value) {
+      var oneTimeKey = {'$key': '$value'};
+      final identityKeyJsonBytes = canonicalJson.encode(oneTimeKey);
+      final identityKeyJsonString = utf8.decode(identityKeyJsonBytes);
+      final signedIdentityKey = olmAccount.sign(identityKeyJsonString);
+
+      // Update key id in new keys map only
+      final keyId = key.split(':')[0];
+      final newKey = '${Algorithms.signedcurve25519}:$keyId';
+      signedKeysMap[newKey] = {'key': value};
+
+      // appending signature for new signed key
+      signedKeysMap[newKey]['signatures'] = {
+        authUser.userId: {
+          '${Algorithms.ed25519}:${authUser.deviceId}': signedIdentityKey,
+        }
+      };
+    });
+
+    return signedKeysMap;
+  };
+}
+
+ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      SetOneTimeKeysCounts(oneTimeKeysCounts: oneTimeKeysCounts),
+    );
+
+    final olmAccount = store.state.cryptoStore.olmAccount;
+    if (olmAccount == null) {
+      return;
+    }
+
+    // TODO: not sure if we ever need unsigned keys
+    // final int curveCount = oneTimeKeysCounts[Algorithms.curve25591] ?? 0;
+
+    final int maxKeyCount = olmAccount.max_number_of_one_time_keys();
+    final int signedCurveCount =
+        oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
+
+    if ((signedCurveCount < maxKeyCount / 3)) {
+      store.dispatch(updateOneTimeKeys());
+    }
+  };
+}
+
+ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
+  return (Store<AppState> store) async {
+    try {
+      final olmAccount = store.state.cryptoStore.olmAccount;
+
+      var newOneTimeKeys = await store.dispatch(
+        generateOneTimeKeys(),
+      );
+
+      if (type == Algorithms.signedcurve25519) {
+        newOneTimeKeys = await store.dispatch(
+          signOneTimeKeys(newOneTimeKeys[Algorithms.curve25591]),
+        );
+      }
+
+      print('[updateOneTimeKeys] $newOneTimeKeys');
+
+      final payload = {
+        'one_time_keys': newOneTimeKeys,
+      };
+
+      final data = await MatrixApi.uploadKeys(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        data: payload,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final oneTimeKeysCounts = store.state.cryptoStore.oneTimeKeysCounts;
+      if (data['one_time_key_counts'][type] != oneTimeKeysCounts) {
+        store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
+      }
+
+      print('[updateOneTimeKeys] success $data');
+
+      olmAccount.mark_keys_as_published();
+      store.dispatch(backupOlmAccount());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
     }
   };
 }

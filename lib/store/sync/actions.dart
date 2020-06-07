@@ -6,6 +6,7 @@ import 'package:Tether/global/algos.dart';
 import 'package:Tether/global/libs/hive/index.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/sync/services.dart';
 
 import 'package:flutter/foundation.dart';
@@ -179,6 +180,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
         'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+        'timeout': 10000
       });
 
       if (data['errcode'] != null) {
@@ -191,6 +193,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       }
 
       final lastSince = data['next_batch'];
+      final oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map presence = data['presence'];
@@ -203,6 +206,10 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       if (isFullSync) {
         store.dispatch(saveSync(data));
       }
+
+      // Update encryption one time key count
+      print('[fetchSync] updated count $oneTimeKeyCount');
+      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
