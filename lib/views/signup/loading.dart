@@ -48,7 +48,7 @@ class Loading extends StatelessWidget {
                     child: const Image(
                       width: 100,
                       height: 100,
-                      image: AssetImage(TETHER_ICON_PNG),
+                      image: AssetImage(Assets.appIconPng),
                     ),
                   ),
                 ],

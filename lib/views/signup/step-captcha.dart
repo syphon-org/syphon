@@ -41,7 +41,7 @@ class CaptchaStep extends StatelessWidget {
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: SvgPicture.asset(
-                    AssetsStore.heroAcceptTerms,
+                    Assets.heroAcceptTerms,
                     semanticsLabel:
                         'Hand holding phone with checked terms of service input',
                   ),

@@ -46,7 +46,7 @@ class TermsStep extends StatelessWidget {
                   child: Stack(
                     children: [
                       SvgPicture.asset(
-                        AssetsStore.heroSyncFiles,
+                        Assets.heroSyncFiles,
                         semanticsLabel:
                             'A couple of documents with a checked circle on the bottom',
                       ),

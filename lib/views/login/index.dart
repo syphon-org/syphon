@@ -143,7 +143,7 @@ class LoginState extends State<Login> {
                           child: Image(
                             width: width * 0.35,
                             height: width * 0.35,
-                            image: AssetImage(TETHER_ICON_PNG),
+                            image: AssetImage(Assets.appIconPng),
                           ),
                         ),
                       ],
@@ -208,7 +208,7 @@ class LoginState extends State<Login> {
                                   highlightColor:
                                       Theme.of(context).primaryColor,
                                   icon: Icon(Icons.help_outline),
-                                  tooltip: SELECT_USERNAME_TITLE,
+                                  tooltip: Strings.tooltipSelectHomeserver,
                                   onPressed: () {
                                     Navigator.pushNamed(
                                       context,
@@ -411,7 +411,7 @@ class _Props extends Equatable {
       isLoginAttemptable: store.state.authStore.isPasswordValid &&
           store.state.authStore.isUsernameValid &&
           !store.state.authStore.loading,
-      usernameHint: formatUsernameHint(
+      usernameHint: Strings.formatUsernameHint(
         store.state.authStore.homeserver,
       ),
       onChangeUsername: (String text) {

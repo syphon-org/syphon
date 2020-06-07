@@ -98,15 +98,15 @@ class IntroState extends State<Intro> {
                 child: Image(
                   width: 98,
                   height: 98,
-                  image: AssetImage(AssetsStore.appIconPng),
+                  image: AssetImage(Assets.appIconPng),
                 ),
               ),
               Text(
-                Strings.confirmation_alpha_version_notice,
+                Strings.confirmationAlphaVersion,
                 textAlign: TextAlign.center,
               ),
               Text(
-                Strings.confirmation_tether_terms_of_service,
+                Strings.confirmationTetherTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),
               Row(
@@ -139,7 +139,7 @@ class IntroState extends State<Intro> {
       //   builder: (context) => AlertDialog(
       //     title: Text("Confirm Alpha TOS Agreement"),
       //     content: Text(
-      //       Strings.confirmation_alpha_version_notice,
+      //       Strings.confirmationAlphaVersion,
       //     ),
       //     actions: <Widget>[
       //       FlatButton(

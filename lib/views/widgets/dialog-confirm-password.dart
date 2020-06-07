@@ -57,7 +57,7 @@ class DialogConfirmPassword extends StatelessWidget {
                     left: 8,
                   ),
                   child: Text(
-                    Strings.deleteDevicesConfirmation,
+                    Strings.contentDeleteDevices,
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.caption,
                   ),

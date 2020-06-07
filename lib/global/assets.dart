@@ -1,5 +1,3 @@
-const String TETHER_ICON = 'assets/icons/tether_icon.svg';
-const String TETHER_ICON_PNG = 'assets/icons/tether_icon.png';
 const String GRAPHIC_EMPTY_MESSAGES = 'assets/graphics/undraw_not_found.svg';
 const String MOBILE_USER_GRAPHIC = 'assets/graphics/undraw_mobile_user.svg';
 const String HIDDEN_MESSENGER_GRAPHIC =
@@ -12,9 +10,9 @@ const String SIGNUP_USERNAME_GRAPHIC =
 const String SIGNUP_PASSWORD_GRAPHIC = 'assets/graphics/undraw_in_thought.svg';
 const String SIGNUP_HOMESERVER_GRAPHIC = 'assets/graphics/undraw_mention.svg';
 
-class AssetsStore {
-  static final appIcon = 'assets/icons/tether_icon.svg';
-  static final appIconPng = 'assets/icons/tether_icon.png';
-  static final heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
-  static final heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
+class Assets {
+  static const appIcon = 'assets/icons/tether_icon.svg';
+  static const appIconPng = 'assets/icons/tether_icon.png';
+  static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
+  static const heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
 }

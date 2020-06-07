@@ -38,7 +38,7 @@ String formatPreview({Room room}) {
   var body = formatPreviewMessage(recentMessage.body);
 
   if (body.isEmpty && recentMessage.ciphertext.isNotEmpty) {
-    body = Strings.encryptedMessageLabel.replaceAll('[]', '');
+    body = Strings.contentEncryptedMessage.replaceAll('[]', '');
   }
 
   return body;

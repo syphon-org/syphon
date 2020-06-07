@@ -147,7 +147,7 @@ class MessageWidget extends StatelessWidget {
     String body = message.body;
     if (message.type == EventTypes.encrypted) {
       if (message.body.isEmpty) {
-        body = Strings.encryptedMessageLabel;
+        body = Strings.contentEncryptedMessage;
       }
     }
 
