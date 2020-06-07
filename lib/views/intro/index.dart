@@ -35,7 +35,7 @@ class IntroState extends State<Intro> {
 
   int currentStep = 0;
   bool onboarding = false;
-  String loginText = StringStore.buttonIntroExistQuestion;
+  String loginText = Strings.buttonIntroExistQuestion;
   PageController pageController;
 
   final List<Widget> sections = [
@@ -102,11 +102,11 @@ class IntroState extends State<Intro> {
                 ),
               ),
               Text(
-                StringStore.confirmation_alpha_version_notice,
+                Strings.confirmation_alpha_version_notice,
                 textAlign: TextAlign.center,
               ),
               Text(
-                StringStore.confirmation_tether_terms_of_service,
+                Strings.confirmation_tether_terms_of_service,
                 style: TextStyle(fontSize: 12),
               ),
               Row(
@@ -139,7 +139,7 @@ class IntroState extends State<Intro> {
       //   builder: (context) => AlertDialog(
       //     title: Text("Confirm Alpha TOS Agreement"),
       //     content: Text(
-      //       StringStore.confirmation_alpha_version_notice,
+      //       Strings.confirmation_alpha_version_notice,
       //     ),
       //     actions: <Widget>[
       //       FlatButton(
@@ -233,7 +233,7 @@ class IntroState extends State<Intro> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = StringStore.buttonIntroExistQuestion;
+                            loginText = Strings.buttonIntroExistQuestion;
                             onboarding = false;
                           });
                         }
@@ -307,7 +307,7 @@ class IntroState extends State<Intro> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              StringStore.buttonIntroExistAction,
+                              Strings.buttonIntroExistAction,
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme

@@ -148,7 +148,7 @@ class SearchUserState extends State<SearchUserView> {
         ),
         children: <Widget>[
           Text(
-            StringStore.start_chat_notice,
+            Strings.start_chat_notice,
           ),
           Container(
             padding: EdgeInsets.only(top: 8),

@@ -98,13 +98,6 @@ class Theming extends StatelessWidget {
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
-          final contentPadding = EdgeInsets.only(
-            left: width * 0.04,
-            right: width * 0.04,
-            top: 6,
-            bottom: 14,
-          );
-
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
                   ? const Color(BASICALLY_BLACK)

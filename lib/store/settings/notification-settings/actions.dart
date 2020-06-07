@@ -132,9 +132,9 @@ ThunkAction<AppState> saveNotificationPusher({
         accessToken: store.state.authStore.user.accessToken,
         kind: erase ? null : kind,
         pushKey: pusherKey,
-        appDisplayName: StringStore.app_name_long,
-        appId: StringStore.app_id,
-        lang: StringStore.default_language,
+        appDisplayName: Strings.app_name_long,
+        appId: Strings.app_id,
+        lang: Strings.default_language,
         deviceDisplayName: currentDevice.displayName,
       );
 

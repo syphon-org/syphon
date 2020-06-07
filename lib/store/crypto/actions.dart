@@ -43,6 +43,8 @@ class ToggleDeviceKeysExist {
   ToggleDeviceKeysExist({this.existence});
 }
 
+class ResetDeviceKeys {}
+
 ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
   return (Store<AppState> store) async {
     store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
@@ -224,23 +226,24 @@ ThunkAction<AppState> uploadDeviceKey({DeviceKey deviceKey}) {
       final deviceKeyMap = {
         'device_keys': deviceKey.toMap(),
       };
+
       print(
         '[uploadDeviceKey] deviceKey ${deviceKeyMap}',
       );
 
       // upload the public device keys
-      // final data = await MatrixApi.uploadKeys(
-      //   protocol: protocol,
-      //   homeserver: store.state.authStore.homeserver,
-      //   accessToken: store.state.authStore.user.accessToken,
-      //   data: deviceKeyMap,
-      // );
+      final data = await MatrixApi.uploadKeys(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        data: deviceKeyMap,
+      );
 
-      // if (data['errcode'] != null) {
-      //   throw data['error'];
-      // }
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
 
-      // print(data);
+      print(data);
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);
@@ -254,8 +257,10 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       final directory = await getApplicationDocumentsDirectory();
 
       final currentTime = DateTime.now();
+
       final formattedTime =
           DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
+
       final fileName =
           '${directory.path}/tether_key_export_$formattedTime.json';
 
@@ -266,7 +271,9 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 
       print('[exportDeviceKeysOwned] $deviceKey');
 
-      file = await file.writeAsString(json.encode(deviceKey.toMap()));
+      file = await file.writeAsString(
+        json.encode(deviceKey.toMap(includePrivateKeys: true)),
+      );
 
       // print(data);
     } catch (error) {
@@ -279,13 +286,39 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 ThunkAction<AppState> importDeviceKeysOwned() {
   return (Store<AppState> store) async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      final List<FileSystemEntity> files = directory.listSync();
+      final authUser = store.state.authStore.user;
+      File file = await FilePicker.getFile(
+        type: FileType.custom,
+        allowedExtensions: ['.json'],
+      );
 
-      files.forEach((file) {
-        print(file);
-      });
-      File file = await FilePicker.getFile(allowedExtensions: ['.json']);
+      final deviceKeyJson = await json.decode(await file.readAsString());
+
+      final privateKeys = Map<String, String>.from(
+        deviceKeyJson['private_keys'],
+      );
+
+      final deviceKey = DeviceKey.fromJson(
+        deviceKeyJson,
+        privateKeys: privateKeys,
+      );
+
+      store.dispatch(SetDeviceKeysOwned(
+        deviceKeysOwned: {
+          authUser.deviceId: deviceKey,
+        },
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
+  };
+}
+
+ThunkAction<AppState> deleteDeviceKeys() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(ResetDeviceKeys());
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);

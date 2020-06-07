@@ -1,11 +1,17 @@
 import 'dart:typed_data';
 
+import 'package:Tether/store/crypto/model.dart';
+
 import './state.dart';
 import './actions.dart';
 
 CryptoStore cryptoReducer(
     [CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
+    case ResetDeviceKeys:
+      return state.copyWith(
+        deviceKeysOwned: Map<String, DeviceKey>(),
+      );
     case SetDeviceKeys:
       return state.copyWith(
         deviceKeys: action.deviceKeys,

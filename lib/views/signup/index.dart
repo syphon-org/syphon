@@ -36,7 +36,7 @@ class SignupView extends StatefulWidget {
 }
 
 class SignupViewState extends State<SignupView> {
-  final String title = StringStore.viewTitleSignup;
+  final String title = Strings.viewTitleSignup;
 
   int currentStep = 0;
   bool onboarding = false;
@@ -211,12 +211,12 @@ class SignupViewState extends State<SignupView> {
   Widget buildButtonText() {
     if (this.currentStep == sections.length - 1) {
       return const Text(
-        StringStore.buttonSignupFinish,
+        Strings.buttonSignupFinish,
       );
     }
 
     return const Text(
-      StringStore.buttonSignupNext,
+      Strings.buttonSignupNext,
     );
   }
 

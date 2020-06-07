@@ -36,7 +36,7 @@ class AdvancedView extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
             ),
-            body: Container(
+            body: SingleChildScrollView(
                 child: Column(
               children: <Widget>[
                 Visibility(

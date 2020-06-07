@@ -209,6 +209,9 @@ ThunkAction<AppState> stopAuthObserver() {
   };
 }
 
+/**
+ * 
+ */
 ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
     final defaultId = Random.secure().nextInt(1 << 31).toString();

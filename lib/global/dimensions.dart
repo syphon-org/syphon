@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 
 class Dimensions {
   // Generic
+  static const scrollviewPadding = EdgeInsets.only(
+    bottom: 32,
+  );
   static const double widgetHeightMax = 1024;
 
   // Media
@@ -53,9 +56,8 @@ class Dimensions {
     vertical: 24,
     horizontal: 24,
   );
-
   static const listPadding = EdgeInsets.symmetric(
-    horizontal: 16,
+    horizontal: 20,
     vertical: 8,
   );
 

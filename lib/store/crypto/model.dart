@@ -62,8 +62,8 @@ class DeviceKey extends Equatable {
     }
   }
 
-  toMap() {
-    return {
+  toMap({includePrivateKeys = false}) {
+    Map deviceKey = {
       'algorithms': [
         MatrixAlgorithms.olmv1,
         MatrixAlgorithms.megolmv1,
@@ -73,6 +73,11 @@ class DeviceKey extends Equatable {
       'signatures': signatures,
       'user_id': userId,
     };
+    if (includePrivateKeys) {
+      deviceKey['private_keys'] = privateKeys;
+    }
+
+    return deviceKey;
   }
 
   @override

@@ -216,7 +216,7 @@ class HomeViewState extends State<Home> {
           ),
         ),
         Text(
-          StringStore.app_name,
+          Strings.app_name,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w100,

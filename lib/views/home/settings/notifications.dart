@@ -234,7 +234,7 @@ class Props extends Equatable {
                 builder: (context) => AlertDialog(
                   title: Text("Confirm Notifications"),
                   content: Text(
-                    StringStore.notificationConfirmation,
+                    Strings.notificationConfirmation,
                   ),
                   actions: <Widget>[
                     FlatButton(

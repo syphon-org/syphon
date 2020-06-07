@@ -28,7 +28,7 @@ class PasswordView extends StatefulWidget {
 }
 
 class PasswordUpdateState extends State<PasswordView> {
-  final String title = StringStore.viewTitleSignup;
+  final String title = Strings.viewTitleSignup;
 
   int currentStep = 0;
   bool onboarding = false;
@@ -185,7 +185,7 @@ class PasswordUpdateState extends State<PasswordView> {
                                 ),
                                 child: !props.loading
                                     ? Text(
-                                        StringStore.buttonSaveGeneric,
+                                        Strings.buttonSaveGeneric,
                                       )
                                     : CircularProgressIndicator(
                                         strokeWidth:

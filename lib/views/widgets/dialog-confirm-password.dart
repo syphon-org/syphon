@@ -44,7 +44,7 @@ class DialogConfirmPassword extends StatelessWidget {
             bottom: 16,
           ),
           title: Text(
-            StringStore.deleteDevicesTitle,
+            Strings.titleDeleteDevices,
           ),
           children: <Widget>[
             Column(
@@ -57,7 +57,7 @@ class DialogConfirmPassword extends StatelessWidget {
                     left: 8,
                   ),
                   child: Text(
-                    StringStore.deleteDevicesConfirmation,
+                    Strings.deleteDevicesConfirmation,
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.caption,
                   ),

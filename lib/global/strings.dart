@@ -6,7 +6,7 @@ String formatUsernameHint(String homeserver) {
       : 'username:matrix.org';
 }
 
-class StringStore {
+class Strings {
   static const app_name = 'Tether';
   static const app_name_long = 'Tether Messenger';
   static const app_id = 'org.tether.tether';
@@ -39,14 +39,23 @@ class StringStore {
   static const interactiveAuthConfirmation =
       'In order to perform this action, you\'ll need to enter your password again';
 
-  static const deleteDevicesTitle = 'Confirm Removing Devices';
   static const deleteDevicesConfirmation =
       'You will have to sign in again on these devices if you remove them.';
 
+  // Titles
+  static const titleDeleteDevices = 'Confirm Removing Devices';
+
+  // View Titles
   static const viewTitleSignup = 'Signup';
   static const viewTitleDevices = 'Devices';
   static const viewTitleSettings = 'Settings';
 
+  // Content
+  static const encryptedMessageLabel = '[Encrypted Message Content]';
+  static const contentDeleteDeviceKeyWarning =
+      "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
+
+  // Buttons
   static const buttonSaveGeneric = 'save';
 
   static const buttonIntroExistQuestion = 'Already have a username?';
@@ -58,7 +67,6 @@ class StringStore {
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
 
-  static const encryptedMessageLabel = '[Encrypted Message Content]';
-
+  // Accessibility
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
 }

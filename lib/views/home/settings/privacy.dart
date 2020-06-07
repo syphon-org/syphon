@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/settings/actions.dart';
@@ -43,179 +44,191 @@ class PrivacyPreferences extends StatelessWidget {
               ),
             ),
             body: SingleChildScrollView(
+                padding: Dimensions.scrollviewPadding,
                 child: Column(
-              children: <Widget>[
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: Dimensions.listPadding,
-                          child: Text(
-                            'App access',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
+                  children: <Widget>[
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'App access',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: null,
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Screen lock',
+                              ),
+                              subtitle: Text(
+                                'Lock Tether access with native device screen lock or fingerprint',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: false,
+                                onChanged: null,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: null,
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Screen lock inactivity timeout',
+                              ),
+                              subtitle: Text(
+                                'None',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          onTap: null,
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Screen lock',
-                          ),
-                          subtitle: Text(
-                            'Lock Tether access with native device screen lock or fingerprint',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: false,
-                            onChanged: null,
-                          ),
-                        ),
-                        ListTile(
-                          onTap: null,
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Screen lock inactivity timeout',
-                          ),
-                          subtitle: Text(
-                            'None',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: Dimensions.listPadding,
-                          child: Text(
-                            'User Access',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'User Access',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/password');
+                              },
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Change Password',
+                              ),
+                              subtitle: Text(
+                                'Changing your password will refresh your\ncurrent session',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/password');
-                          },
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Change Password',
-                          ),
-                          subtitle: Text(
-                            'Changing your password will refresh your\ncurrent session',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: Dimensions.listPadding,
-                          child: Text(
-                            'Communication',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Communication',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onToggleReadReceipts(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Read Receipts',
+                              ),
+                              subtitle: Text(
+                                'If read receipts are disabled, users will not see solid read indicators for your messages.',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.readReceipts,
+                                onChanged: (enterSend) =>
+                                    props.onToggleReadReceipts(),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onToggleTypingIndicators(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Typing Indicators',
+                              ),
+                              subtitle: Text(
+                                'If typing indicators are disabled, you won\'t be able to see typing indicators from others',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.typingIndicators,
+                                onChanged: (enterSend) =>
+                                    props.onToggleTypingIndicators(),
+                              ),
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          onTap: () => props.onToggleReadReceipts(),
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Read Receipts',
-                          ),
-                          subtitle: Text(
-                            'If read receipts are disabled, users will not see solid read indicators for your messages.',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: props.readReceipts,
-                            onChanged: (enterSend) =>
-                                props.onToggleReadReceipts(),
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () => props.onToggleTypingIndicators(),
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Typing Indicators',
-                          ),
-                          subtitle: Text(
-                            'If typing indicators are disabled, you won\'t be able to see typing indicators from others',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          trailing: Switch(
-                            value: props.typingIndicators,
-                            onChanged: (enterSend) =>
-                                props.onToggleTypingIndicators(),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width, // TODO: use flex, i'm rushing
-                          padding: Dimensions.listPadding,
-                          child: Text(
-                            'Encryption Keys',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 4),
+                      elevation: 0.5,
+                      color: sectionBackgroundColor,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width, // TODO: use flex, i'm rushing
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Encryption Keys',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: props.onImportDeviceKey,
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Import Keys',
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onExportDeviceKey(context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Export Keys',
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onDeleteDeviceKey(context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Delete Keys',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          onTap: props.onImportDeviceKey,
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Import Keys',
-                          ),
-                        ),
-                        ListTile(
-                          onTap: props.onExportDeviceKey,
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Export Keys',
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            )),
+                  ],
+                )),
           );
         },
       );
@@ -229,6 +242,7 @@ class Props extends Equatable {
   final Function onToggleReadReceipts;
   final Function onExportDeviceKey;
   final Function onImportDeviceKey;
+  final Function onDeleteDeviceKey;
 
   Props({
     @required this.typingIndicators,
@@ -237,6 +251,7 @@ class Props extends Equatable {
     @required this.onToggleReadReceipts,
     @required this.onExportDeviceKey,
     @required this.onImportDeviceKey,
+    @required this.onDeleteDeviceKey,
   });
 
   @override
@@ -254,11 +269,67 @@ class Props extends Equatable {
         onToggleReadReceipts: () => store.dispatch(
           toggleReadReceipts(),
         ),
-        onExportDeviceKey: () {
-          store.dispatch(exportDeviceKeysOwned());
+        onExportDeviceKey: (BuildContext context) async {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("Confirm Exporting Keys"),
+              content: Text(Strings.contentDeleteDeviceKeyWarning),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: Text(
+                    'Export Keys',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  onPressed: () async {
+                    store.dispatch(exportDeviceKeysOwned());
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
         },
         onImportDeviceKey: () {
           store.dispatch(importDeviceKeysOwned());
+        },
+        onDeleteDeviceKey: (BuildContext context) async {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("Confirm Deleting Keys"),
+              content: Text(
+                  "Are you sure you want to delete your encryption keys for this device?"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: Text(
+                    'Delete Keys',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  onPressed: () async {
+                    await store.dispatch(deleteDeviceKeys());
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
         },
       );
 }

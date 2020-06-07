@@ -14,10 +14,7 @@ class LandingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     final widthScale = width * 0.825;
-    // TODO: convert to flex
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -30,13 +27,13 @@ class LandingSection extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             MOBILE_USER_GRAPHIC,
-            semanticsLabel: StringStore.semanticsLabelImageIntro,
+            semanticsLabel: Strings.semanticsLabelImageIntro,
           ),
         ),
         Container(
           margin: EdgeInsets.only(bottom: 16),
           child: Text(
-            StringStore.titleIntro,
+            Strings.titleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline4,
           ),
@@ -44,7 +41,7 @@ class LandingSection extends StatelessWidget {
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
-            StringStore.subtitleIntro,
+            Strings.subtitleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline6,
           ),

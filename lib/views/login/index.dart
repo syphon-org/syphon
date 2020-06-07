@@ -158,7 +158,7 @@ class LoginState extends State<Login> {
                           FittedBox(
                             fit: BoxFit.fitWidth,
                             child: Text(
-                              StringStore.titleLogin,
+                              Strings.titleLogin,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline4,
                             ),
@@ -316,7 +316,7 @@ class LoginState extends State<Login> {
                               ),
                             )
                           : Text(
-                              StringStore.buttonLogin,
+                              Strings.buttonLogin,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -345,7 +345,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            StringStore.buttonLoginCreateQuestion,
+                            Strings.buttonLoginCreateQuestion,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -355,7 +355,7 @@ class LoginState extends State<Login> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              StringStore.buttonLoginCreateAction,
+                              Strings.buttonLoginCreateAction,
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
