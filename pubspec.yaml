@@ -51,6 +51,7 @@ dependencies:
   olm: 
     git:
       url: https://gitlab.com/famedly/libraries/dart-olm
+      ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
 
   # Domain / Store
   expandable: 3.0.1
@@ -78,7 +79,7 @@ dependencies:
   intl: ^0.16.1
   http_parser: 3.1.4
   flutter_dotenv: ^2.0.3
-  flutter_apns: 1.1.0
+  flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   android_alarm_manager: 0.4.5+8
   # workmanager: ^0.2.0
 

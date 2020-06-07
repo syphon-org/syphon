@@ -2,6 +2,7 @@ import 'package:Tether/store/crypto/model.dart';
 import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
 import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 
@@ -21,7 +22,16 @@ class CryptoStore extends Equatable {
   @HiveField(2)
   final bool deviceKeysExist;
 
+  // Serialized old account
+  @HiveField(3)
+  final String olmAccountKey;
+
+  // Active olm account
+  final Account olmAccount;
+
   const CryptoStore({
+    this.olmAccount,
+    this.olmAccountKey,
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.messageKeys = const {},
@@ -31,6 +41,8 @@ class CryptoStore extends Equatable {
 
   @override
   List<Object> get props => [
+        olmAccount,
+        olmAccountKey,
         deviceKeys,
         deviceKeysOwned,
         messageKeys,
@@ -39,6 +51,8 @@ class CryptoStore extends Equatable {
       ];
 
   CryptoStore copyWith({
+    olmAccount,
+    olmAccountKey,
     deviceKeys,
     deviceKeysOwned,
     messageKeys,
@@ -46,6 +60,8 @@ class CryptoStore extends Equatable {
     deviceKeysExist,
   }) {
     return CryptoStore(
+      olmAccount: olmAccount ?? this.olmAccount,
+      olmAccountKey: olmAccountKey ?? this.olmAccountKey,
       deviceKeys: deviceKeys ?? this.deviceKeys,
       deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
       messageKeys: messageKeys ?? this.messageKeys,

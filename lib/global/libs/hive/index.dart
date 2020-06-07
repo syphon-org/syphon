@@ -94,6 +94,7 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DeviceAdapter());
   Hive.registerAdapter(DeviceKeyAdapter());
+  // Hive.registerAdapter(AccountAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(AuthStoreAdapter());

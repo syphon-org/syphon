@@ -45,7 +45,7 @@ class DeviceKey extends Equatable {
         privateKeys,
       ];
 
-  factory DeviceKey.fromJson(dynamic json, {Map<String, String> privateKeys}) {
+  factory DeviceKey.fromJson(dynamic json) {
     try {
       return DeviceKey(
         userId: json['user_id'],
@@ -54,7 +54,6 @@ class DeviceKey extends Equatable {
         keys: Map.from(json['keys']),
         signatures: Map.from(json['signatures']),
         extras: json['unsigned'] != null ? Map.from(json['unsigned']) : null,
-        privateKeys: privateKeys,
       );
     } catch (error) {
       print('[DeviceKey.fromJson] error $error');
@@ -62,8 +61,8 @@ class DeviceKey extends Equatable {
     }
   }
 
-  toMap({includePrivateKeys = false}) {
-    Map deviceKey = {
+  toMap() {
+    return {
       'algorithms': [
         MatrixAlgorithms.olmv1,
         MatrixAlgorithms.megolmv1,
@@ -73,11 +72,6 @@ class DeviceKey extends Equatable {
       'signatures': signatures,
       'user_id': userId,
     };
-    if (includePrivateKeys) {
-      deviceKey['private_keys'] = privateKeys;
-    }
-
-    return deviceKey;
   }
 
   @override

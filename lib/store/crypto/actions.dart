@@ -8,7 +8,6 @@ import 'package:Tether/store/crypto/model.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/user/model.dart';
 import 'package:canonical_json/canonical_json.dart';
-import 'package:cryptography/cryptography.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -44,40 +43,83 @@ class ToggleDeviceKeysExist {
   ToggleDeviceKeysExist({this.existence});
 }
 
+// Set currently authenticated users keys
+class SetOlmAccount {
+  var olmAccount;
+  SetOlmAccount({this.olmAccount});
+}
+
+class SetOlmAccountBackup {
+  var olmAccountKey;
+  SetOlmAccountBackup({this.olmAccountKey});
+}
+
 class ResetDeviceKeys {}
 
-ThunkAction<AppState> initOlmEncryption(User user) {
+/**
+ * Helper Actions
+ */
+ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
+  return (Store<AppState> store) async {
+    var currentKeys = Map<String, DeviceKey>.from(
+      store.state.cryptoStore.deviceKeysOwned,
+    );
+
+    deviceKeys.forEach((key, value) {
+      currentKeys.putIfAbsent(key, () => deviceKeys[key]);
+      // print('[setDeviceKeysOwned] ${currentKeys[key]}'); // TESTING ONLY
+    });
+
+    store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: currentKeys));
+  };
+}
+
+ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleDeviceKeysExist(existence: existence));
+  };
+}
+
+ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
+  };
+}
+
+ThunkAction<AppState> deleteDeviceKeys() {
   return (Store<AppState> store) async {
     try {
-      await olmClient.init();
-      olmClient.Account().create();
-      final identityKeys = olmClient.Account().identity_keys();
-      print('[initOlmEncryption] $identityKeys');
+      store.dispatch(ResetDeviceKeys());
     } catch (error) {
-      print('[initOlmEncryption] $error');
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
     }
   };
 }
 
+/**
+ * Init Key Encryption
+ */
 ThunkAction<AppState> initKeyEncryption(User user) {
   return (Store<AppState> store) async {
     // fetch device keys and pull out key based on device id
-    final ownedDeviceKeys = await store.dispatch(
-      fetchDeviceKeysOwned(),
-    );
+    final ownedDeviceKeys = (await store.dispatch(
+          fetchDeviceKeysOwned(user),
+        )) ??
+        {};
+
+    await store.dispatch(initOlmEncryption(user));
 
     // check if key exists for this device
     if (!ownedDeviceKeys.containsKey(user.deviceId)) {
       // generate a key if none exist locally and remotely
-      if (store.state.cryptoStore.deviceKeysOwned.isEmpty) {
-        await store.dispatch(generateDeviceKeyManual());
-      }
+      await store.dispatch(generateIdentityKeys());
 
       final deviceId = store.state.authStore.user.deviceId;
       final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId];
 
       // upload the key intended for this device
-      await store.dispatch(uploadDeviceKey(deviceKey: deviceKey));
+      await store.dispatch(uploadIdentityKeys(deviceKey: deviceKey));
     } else {
       // if a key exists remotely, mark that it does
       // the user will be prompted to import in "home"
@@ -86,7 +128,164 @@ ThunkAction<AppState> initKeyEncryption(User user) {
     }
 
     // append all keys uploaded remotely
-    store.dispatch(updateDeviceKeysOwned(ownedDeviceKeys));
+    store.dispatch(setDeviceKeysOwned(ownedDeviceKeys));
+  };
+}
+
+/**
+ * 
+ * Initing Olm Account
+ * 
+ * https://gitlab.matrix.org/matrix-org/olm/-/blob/master/python/olm/account.py
+ * 
+ * Uses deviceId to encrypt and serialize the account (pickle)
+ * needed to know about the python library to know what that was
+ */
+ThunkAction<AppState> initOlmEncryption(User user) {
+  return (Store<AppState> store) async {
+    try {
+      await olmClient.init();
+      final olmAccount = olmClient.Account();
+
+      final deviceId = store.state.authStore.user.deviceId;
+      final olmAccountKey = store.state.cryptoStore.olmAccountKey;
+
+      if (olmAccountKey == null) {
+        olmAccount.create();
+        final olmAccountKey = olmAccount.pickle(deviceId);
+
+        store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
+
+        store.dispatch(SetOlmAccount(olmAccount: olmAccount));
+
+        print(
+          '[initOlmEncryption] new identity keys ${olmAccount.identity_keys()}',
+        );
+      } else {
+        olmAccount.unpickle(deviceId, olmAccountKey);
+
+        store.dispatch(SetOlmAccount(olmAccount: olmAccount));
+
+        print(
+          '[initOlmEncryption] old olm ${olmAccount.identity_keys()}',
+        );
+      }
+    } catch (error) {
+      print('[initOlmEncryption] $error');
+    }
+  };
+}
+
+ThunkAction<AppState> generateIdentityKeys() {
+  return (Store<AppState> store) async {
+    try {
+      final authUser = store.state.authStore.user;
+      final olmAccount = store.state.cryptoStore.olmAccount;
+
+      final identityKeysString = olmAccount.identity_keys();
+      final identityKeys = await json.decode(identityKeysString);
+      // fingerprint keypair - ed25519
+      final fingerprintKeyName =
+          '${MatrixAlgorithms.ed25519}:${authUser.deviceId}';
+
+      // identity key pair - curve25519
+      final identityKeyName =
+          '${MatrixAlgorithms.curve25591}:${authUser.deviceId}';
+
+      // formatting json for the signature required by matrix
+      var deviceIdentityKeys = {
+        'device_keys': {
+          'algorithms': [
+            MatrixAlgorithms.olmv1,
+            MatrixAlgorithms.megolmv1,
+          ],
+          'device_id': authUser.deviceId,
+          'keys': {
+            identityKeyName: identityKeys[MatrixAlgorithms.curve25591],
+            fingerprintKeyName: identityKeys[MatrixAlgorithms.ed25519],
+          },
+          'user_id': authUser.userId,
+        }
+      };
+
+      // figerprint signature key pair generation for upload
+      final identityKeyJsonBytes = canonicalJson.encode(deviceIdentityKeys);
+      final identityKeyJsonString = utf8.decode(identityKeyJsonBytes);
+      print('[generateIdentityKeys] $identityKeyJsonString');
+      final signedIdentityKey = olmAccount.sign(identityKeyJsonString);
+      print('[generateIdentityKeys] $signedIdentityKey');
+
+      deviceIdentityKeys['device_keys']['signatures'] = {
+        authUser.userId: {
+          fingerprintKeyName: signedIdentityKey,
+        }
+      };
+
+      // cache current device key for authed user
+      final deviceKeysOwned = DeviceKey.fromJson(
+        deviceIdentityKeys['device_keys'],
+      );
+
+      store.dispatch(SetDeviceKeysOwned(
+        deviceKeysOwned: {
+          authUser.deviceId: deviceKeysOwned,
+        },
+      ));
+
+      print('[generateIdentityKeys] $deviceIdentityKeys');
+      // return the generated keys
+      return deviceIdentityKeys;
+    } catch (error) {
+      print('[generateIdentityKeys] $error');
+    }
+  };
+}
+
+ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
+  return (Store<AppState> store) async {
+    try {
+      final deviceKeyMap = {
+        'device_keys': deviceKey.toMap(),
+      };
+
+      print(
+        '[uploadDeviceKey] result ${deviceKeyMap}',
+      );
+
+      // upload the public device keys
+      final data = await MatrixApi.uploadKeys(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        data: deviceKeyMap,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(addAlert(
+        type: 'confirmation',
+        message: 'Successfully uploaded new device key',
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
+  };
+}
+
+ThunkAction<AppState> generateOneTimeKeys({DeviceKey deviceKey}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(addAlert(
+        type: 'confirmation',
+        message: 'Successfully uploaded new device key',
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
   };
 }
 
@@ -111,7 +310,7 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          // print('[fetchDeviceKeys] $userId $device');  // TESTING ONLY
+          print('[fetchDeviceKeys] $userId $device'); // TESTING ONLY
           final deviceKey = DeviceKey.fromJson(device);
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
@@ -130,166 +329,14 @@ ThunkAction<AppState> fetchDeviceKeys({
   };
 }
 
-ThunkAction<AppState> fetchDeviceKeysOwned() {
+ThunkAction<AppState> fetchDeviceKeysOwned(User user) {
   return (Store<AppState> store) async {
-    final user = store.state.authStore.user;
-    final deviceKeys = await store.dispatch(fetchDeviceKeys(users: {
-      user.userId: user,
-    }));
-    return deviceKeys[user.userId];
-  };
-}
-
-ThunkAction<AppState> updateDeviceKeysOwned(Map deviceKeys) {
-  return (Store<AppState> store) async {
-    var currentKeys = Map<String, DeviceKey>.from(
-      store.state.cryptoStore.deviceKeysOwned,
+    final deviceKeys = await store.dispatch(
+      fetchDeviceKeys(users: {
+        user.userId: user,
+      }),
     );
-
-    deviceKeys.forEach((key, value) {
-      currentKeys.putIfAbsent(key, () => deviceKeys[key]);
-      // print('[updateDeviceKeysOwned] ${currentKeys[key]}'); // TESTING ONLY
-    });
-
-    store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: currentKeys));
-  };
-}
-
-ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
-  return (Store<AppState> store) async {
-    store.dispatch(ToggleDeviceKeysExist(existence: existence));
-  };
-}
-
-ThunkAction<AppState> generateDeviceKey() {
-  return (Store<AppState> store) async {};
-}
-
-/**
- * 
- * Generating Device Keys
- * 
- * https://matrix.org/docs/spec/client_server/latest#id427
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide
- * https://pub.dev/documentation/cryptography/latest/
- * https://matrix.org/docs/spec/appendices#id7
- * https://matrix.org/docs/spec/appendices#id2
- * 
- */
-ThunkAction<AppState> generateDeviceKeyManual() {
-  return (Store<AppState> store) async {
-    try {
-      final authUser = store.state.authStore.user;
-      // final Device currentDevice = await store.dispatch(generateDeviceId());
-
-      // fingerprint keypair - ed25519
-      final fingerprintKeyName =
-          '${MatrixAlgorithms.ed25519}:${authUser.deviceId}';
-      final fingerprintKeyPair = await ed25519.newKeyPair();
-
-      // identity key pair - curve25519
-      final identityKeyName =
-          '${MatrixAlgorithms.curve25591}:${authUser.deviceId}';
-      final identityKeyPair = await x25519.newKeyPair();
-
-      // unpadded base64 encode
-      final encodedFingerprintPublicKey = base64Encode(
-        fingerprintKeyPair.publicKey.bytes,
-      ).replaceAll("=", '');
-
-      final encodedIdentityPublicKey = base64Encode(
-        identityKeyPair.publicKey.bytes,
-      ).replaceAll("=", '');
-
-      // formatting json for the signature required by matrix
-      var deviceKeys = {
-        'device_keys': {
-          'algorithms': [
-            MatrixAlgorithms.olmv1,
-            MatrixAlgorithms.megolmv1,
-          ],
-          'device_id': authUser.deviceId,
-          'keys': {
-            identityKeyName: encodedIdentityPublicKey,
-            fingerprintKeyName: encodedFingerprintPublicKey,
-          },
-          'user_id': authUser.userId,
-        }
-      };
-
-      // figerprint signature key pair generation for upload
-      final deviceKeyJsonBytes = canonicalJson.encode(deviceKeys);
-      final fingerprintSignature = await ed25519.sign(
-        deviceKeyJsonBytes,
-        fingerprintKeyPair,
-      );
-      final encodedFingerprintSignature = base64Encode(
-        fingerprintSignature.bytes,
-      ).replaceAll("=", '');
-
-      // figerprint signature key pair appended for upload
-      deviceKeys['device_keys']['signatures'] = {
-        authUser.userId: {
-          fingerprintKeyName: encodedFingerprintSignature,
-        }
-      };
-
-      // Cache the private device keys
-      final fingerprintPrivateKey =
-          await fingerprintKeyPair.privateKey.extract();
-      final identityPrivateKey = await identityKeyPair.privateKey.extract();
-
-      final Map<String, String> privateKeys = {
-        fingerprintKeyName: base64Encode(fingerprintPrivateKey),
-        identityKeyName: base64Encode(identityPrivateKey),
-      };
-
-      // converting to deviceKey model
-      final deviceKeysOwned = DeviceKey.fromJson(
-        deviceKeys['device_keys'],
-        privateKeys: privateKeys,
-      );
-
-      // cache current device, device key for authed user
-      store.dispatch(SetDeviceKeysOwned(
-        deviceKeysOwned: {
-          authUser.deviceId: deviceKeysOwned,
-        },
-      ));
-    } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-    }
-  };
-}
-
-ThunkAction<AppState> uploadDeviceKey({DeviceKey deviceKey}) {
-  return (Store<AppState> store) async {
-    try {
-      final deviceKeyMap = {
-        'device_keys': deviceKey.toMap(),
-      };
-
-      print(
-        '[uploadDeviceKey] deviceKey ${deviceKeyMap}',
-      );
-
-      // upload the public device keys
-      final data = await MatrixApi.uploadKeys(
-        protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        data: deviceKeyMap,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-
-      print(data);
-    } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
-    }
+    return deviceKeys[user.userId];
   };
 }
 
@@ -311,11 +358,12 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       final user = store.state.authStore.user;
       final deviceKey = store.state.cryptoStore.deviceKeysOwned[user.deviceId];
 
-      print('[exportDeviceKeysOwned] $deviceKey');
+      var exportData = {
+        'account_key': store.state.cryptoStore.olmAccountKey,
+        'device_keys': deviceKey.toMap(),
+      };
 
-      file = await file.writeAsString(
-        json.encode(deviceKey.toMap(includePrivateKeys: true)),
-      );
+      file = await file.writeAsString(json.encode(exportData));
 
       // print(data);
     } catch (error) {
@@ -334,39 +382,23 @@ ThunkAction<AppState> importDeviceKeysOwned() {
         allowedExtensions: ['.json'],
       );
 
-      final deviceKeyJson = await json.decode(await file.readAsString());
+      final importData = await json.decode(await file.readAsString());
 
-      final privateKeys = Map<String, String>.from(
-        deviceKeyJson['private_keys'],
+      store.dispatch(
+        SetOlmAccountBackup(
+          olmAccountKey: importData['account_key'],
+        ),
       );
 
-      final deviceKey = DeviceKey.fromJson(
-        deviceKeyJson,
-        privateKeys: privateKeys,
+      store.dispatch(
+        SetDeviceKeysOwned(
+          deviceKeysOwned: {
+            authUser.deviceId: DeviceKey.fromJson(
+              importData['device_keys'],
+            ),
+          },
+        ),
       );
-
-      store.dispatch(SetDeviceKeysOwned(
-        deviceKeysOwned: {
-          authUser.deviceId: deviceKey,
-        },
-      ));
-    } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
-    }
-  };
-}
-
-ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
-  return (Store<AppState> store) async {
-    store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
-  };
-}
-
-ThunkAction<AppState> deleteDeviceKeys() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(ResetDeviceKeys());
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);

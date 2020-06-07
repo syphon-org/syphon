@@ -8,6 +8,14 @@ import './actions.dart';
 CryptoStore cryptoReducer(
     [CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
+    case SetOlmAccount:
+      return state.copyWith(
+        olmAccount: action.olmAccount,
+      );
+    case SetOlmAccountBackup:
+      return state.copyWith(
+        olmAccountKey: action.olmAccountKey,
+      );
     case ResetDeviceKeys:
       return state.copyWith(
         deviceKeysOwned: Map<String, DeviceKey>(),

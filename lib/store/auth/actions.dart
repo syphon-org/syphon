@@ -152,7 +152,6 @@ ThunkAction<AppState> startAuthObserver() {
 
         // init encryption for E2EE
         await store.dispatch(initKeyEncryption(user));
-        await store.dispatch(initOlmEncryption(user));
 
         // init notifications
         globalNotificationPluginInstance = await initNotifications(

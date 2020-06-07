@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/global/colors.dart';
 import 'package:Tether/global/notifications.dart';
@@ -282,7 +283,7 @@ class _Props extends Equatable {
           store.dispatch(fetchSync(forceFull: true));
         },
         onForceFunction: () {
-          store.dispatch(loadSync());
+          store.dispatch(generateIdentityKeys());
         },
       );
 }

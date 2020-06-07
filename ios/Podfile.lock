@@ -136,6 +136,11 @@ PODS:
     - nanopb/encode (= 1.30905.0)
   - nanopb/decode (1.30905.0)
   - nanopb/encode (1.30905.0)
+  - OLMKit (3.1.0):
+    - OLMKit/olmc (= 3.1.0)
+    - OLMKit/olmcpp (= 3.1.0)
+  - OLMKit/olmc (3.1.0)
+  - OLMKit/olmcpp (3.1.0)
   - path_provider (0.0.1):
     - Flutter
   - PromisesObjC (1.2.8)
@@ -168,6 +173,7 @@ DEPENDENCIES:
   - flutter_plugin_android_lifecycle (from `.symlinks/plugins/flutter_plugin_android_lifecycle/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - OLMKit
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
@@ -194,6 +200,7 @@ SPEC REPOS:
     - GoogleDataTransportCCTSupport
     - GoogleUtilities
     - nanopb
+    - OLMKit
     - PromisesObjC
     - Protobuf
     - SDWebImage
@@ -261,6 +268,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 39530bc0ad980530298e9c4af8549e991fd033b1
   image_picker: 66aa71bc96850a90590a35d4c4a2907b0d823109
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
+  OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   Protobuf: 2793fcd0622a00b546c60e7cbbcc493e043e9bb9
@@ -272,6 +280,6 @@ SPEC CHECKSUMS:
   url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 
-PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+PODFILE CHECKSUM: d56506947a1346870d53fa618b6cd9cb7d68867d
 
 COCOAPODS: 1.9.1
