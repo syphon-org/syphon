@@ -150,29 +150,9 @@ ThunkAction<AppState> startAuthObserver() {
           await store.dispatch(initialSync());
         }
 
-        // fetch device keys and pull out key based on device id
-        final userDeviceKeys = await store.dispatch(
-          fetchDeviceKeysOwned(),
-        );
-
-        // check if key exists for this device
-        if (!userDeviceKeys.containsKey(user.deviceId)) {
-          // generate a key if none exist locally and remotely
-          if (store.state.cryptoStore.deviceKeysOwned.isEmpty) {
-            await store.dispatch(generateDeviceKey());
-          }
-
-          final deviceId = store.state.authStore.user.deviceId;
-          final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId];
-
-          // upload the key intended for this device
-          await store.dispatch(uploadDeviceKey(deviceKey: deviceKey));
-        } else {
-          // if a key exists remotely, mark that it does
-          // the user will be prompted to import in "home"
-          // if they have no local keys
-          store.dispatch(toggleDeviceKeysExist(true));
-        }
+        // init encryption for E2EE
+        await store.dispatch(initKeyEncryption(user));
+        await store.dispatch(initOlmEncryption(user));
 
         // init notifications
         globalNotificationPluginInstance = await initNotifications(

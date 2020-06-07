@@ -82,14 +82,14 @@ class DeviceKey extends Equatable {
 
   @override
   String toString() {
-    return '{ \n' +
-        'user_id: $userId,\n' +
-        'device_id: $deviceId,\n' +
-        'algorithms: $algorithms,\n' +
-        'keys: $keys,\n' +
-        'signatures: $signatures,\n' +
-        'extras: $extras,\n' +
-        'private_keys: $privateKeys,\n' +
-        '\n}';
+    return '{' +
+        'user_id: $userId,' +
+        'device_id: $deviceId,' +
+        'algorithms: $algorithms,' +
+        'keys: $keys,' +
+        'signatures: $signatures,' +
+        'extras: $extras,' +
+        'private_keys: $privateKeys' +
+        '}\n';
   }
 }

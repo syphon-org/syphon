@@ -2,12 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Tether/global/libs/matrix/encryption.dart';
-/**
- * 
- * E2EE
- * https://matrix.org/docs/spec/client_server/latest#id76
- */
-
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/crypto/model.dart';
@@ -21,6 +15,13 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:olm/olm.dart' as olmClient;
+
+/**
+ * 
+ * E2EE
+ * https://matrix.org/docs/spec/client_server/latest#id76
+ */
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -45,9 +46,47 @@ class ToggleDeviceKeysExist {
 
 class ResetDeviceKeys {}
 
-ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
+ThunkAction<AppState> initOlmEncryption(User user) {
   return (Store<AppState> store) async {
-    store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
+    try {
+      await olmClient.init();
+      olmClient.Account().create();
+      final identityKeys = olmClient.Account().identity_keys();
+      print('[initOlmEncryption] $identityKeys');
+    } catch (error) {
+      print('[initOlmEncryption] $error');
+    }
+  };
+}
+
+ThunkAction<AppState> initKeyEncryption(User user) {
+  return (Store<AppState> store) async {
+    // fetch device keys and pull out key based on device id
+    final ownedDeviceKeys = await store.dispatch(
+      fetchDeviceKeysOwned(),
+    );
+
+    // check if key exists for this device
+    if (!ownedDeviceKeys.containsKey(user.deviceId)) {
+      // generate a key if none exist locally and remotely
+      if (store.state.cryptoStore.deviceKeysOwned.isEmpty) {
+        await store.dispatch(generateDeviceKeyManual());
+      }
+
+      final deviceId = store.state.authStore.user.deviceId;
+      final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId];
+
+      // upload the key intended for this device
+      await store.dispatch(uploadDeviceKey(deviceKey: deviceKey));
+    } else {
+      // if a key exists remotely, mark that it does
+      // the user will be prompted to import in "home"
+      // if they have no local keys
+      store.dispatch(toggleDeviceKeysExist(true));
+    }
+
+    // append all keys uploaded remotely
+    store.dispatch(updateDeviceKeysOwned(ownedDeviceKeys));
   };
 }
 
@@ -72,7 +111,7 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          // print('[fetchDeviceKeys] $userId $device');
+          // print('[fetchDeviceKeys] $userId $device');  // TESTING ONLY
           final deviceKey = DeviceKey.fromJson(device);
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
@@ -101,9 +140,18 @@ ThunkAction<AppState> fetchDeviceKeysOwned() {
   };
 }
 
-ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeysOwned) {
+ThunkAction<AppState> updateDeviceKeysOwned(Map deviceKeys) {
   return (Store<AppState> store) async {
-    store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: deviceKeysOwned));
+    var currentKeys = Map<String, DeviceKey>.from(
+      store.state.cryptoStore.deviceKeysOwned,
+    );
+
+    deviceKeys.forEach((key, value) {
+      currentKeys.putIfAbsent(key, () => deviceKeys[key]);
+      // print('[updateDeviceKeysOwned] ${currentKeys[key]}'); // TESTING ONLY
+    });
+
+    store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: currentKeys));
   };
 }
 
@@ -111,6 +159,10 @@ ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
   return (Store<AppState> store) async {
     store.dispatch(ToggleDeviceKeysExist(existence: existence));
   };
+}
+
+ThunkAction<AppState> generateDeviceKey() {
+  return (Store<AppState> store) async {};
 }
 
 /**
@@ -124,7 +176,7 @@ ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
  * https://matrix.org/docs/spec/appendices#id2
  * 
  */
-ThunkAction<AppState> generateDeviceKey() {
+ThunkAction<AppState> generateDeviceKeyManual() {
   return (Store<AppState> store) async {
     try {
       final authUser = store.state.authStore.user;
@@ -165,14 +217,12 @@ ThunkAction<AppState> generateDeviceKey() {
         }
       };
 
-      // figerprint signature key pair generation
+      // figerprint signature key pair generation for upload
       final deviceKeyJsonBytes = canonicalJson.encode(deviceKeys);
       final fingerprintSignature = await ed25519.sign(
         deviceKeyJsonBytes,
         fingerprintKeyPair,
       );
-
-      // fingerprint signature encoding for upload
       final encodedFingerprintSignature = base64Encode(
         fingerprintSignature.bytes,
       ).replaceAll("=", '');
@@ -194,19 +244,11 @@ ThunkAction<AppState> generateDeviceKey() {
         identityKeyName: base64Encode(identityPrivateKey),
       };
 
-      // print(
-      //   '[generateDeviceKey] ${authUser.userId} ${deviceKeys['device_keys']}',
-      // );
-
       // converting to deviceKey model
       final deviceKeysOwned = DeviceKey.fromJson(
         deviceKeys['device_keys'],
         privateKeys: privateKeys,
       );
-
-      // print(
-      //   '[generateDeviceKey] deviceKeysOwned Object $deviceKeysOwned',
-      // );
 
       // cache current device, device key for authed user
       store.dispatch(SetDeviceKeysOwned(
@@ -315,6 +357,12 @@ ThunkAction<AppState> importDeviceKeysOwned() {
   };
 }
 
+ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
+  };
+}
+
 ThunkAction<AppState> deleteDeviceKeys() {
   return (Store<AppState> store) async {
     try {
@@ -322,31 +370,6 @@ ThunkAction<AppState> deleteDeviceKeys() {
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);
-    }
-  };
-}
-
-/**
- * Generate Message Keys (One Time Keys)
- * 
- * 
- * AKA Session keys
- * 
- */
-ThunkAction<AppState> generateMessageKeys() {
-  return (Store<AppState> store) async {
-    try {} catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-    }
-  };
-}
-
-ThunkAction<AppState> uploadMessageKeys({
-  List<User> users,
-}) {
-  return (Store<AppState> store) async {
-    try {} catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
     }
   };
 }
