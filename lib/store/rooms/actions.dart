@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:Tether/global/libs/matrix/encryption.dart';
 import 'package:Tether/global/libs/matrix/errors.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
+import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/media/actions.dart';
 import 'package:Tether/store/rooms/events/actions.dart';
 import 'package:Tether/store/sync/actions.dart';
@@ -453,6 +456,74 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
       print('[toggleDirectRoom] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Toggle Rom Encryption On (Only)
+ */
+ThunkAction<AppState> toggleRoomEncryption({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      if (room.encryptionEnabled) {
+        throw 'Room is already encrypted';
+      }
+
+      final event = {
+        'type': EventTypes.encryption,
+        'algorithm': Algorithms.megolmv1,
+      };
+
+      final data = await MatrixApi.sendEvent(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        event: event,
+        trxId: Random.secure().nextInt(1 << 31).toString(),
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('[toggleRoomEncryption] success $data');
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
+  };
+}
+
+ThunkAction<AppState> acceptRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await MatrixApi.joinRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+
+      Room joinedRoom = rooms.containsKey(room.id)
+          ? rooms[room.id]
+          : Room(
+              id: room.id,
+            );
+
+      store.dispatch(SetRoom(
+        room: joinedRoom.copyWith(invite: false),
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
     }
   };
 }

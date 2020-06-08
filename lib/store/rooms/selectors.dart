@@ -24,6 +24,12 @@ List<Room> sortedPrioritizedRooms(Map rooms) {
     if (!a.isDraftRoom && b.isDraftRoom) {
       return 1;
     }
+    if (a.invite && !b.invite) {
+      return -1;
+    }
+    if (!a.invite && b.invite) {
+      return 1;
+    }
     // Prioritze if a direct chat
     if (a.direct && !b.direct) {
       return -1;

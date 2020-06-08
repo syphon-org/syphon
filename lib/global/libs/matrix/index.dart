@@ -23,6 +23,7 @@ abstract class MatrixApi {
   static final fetchRoomIds = Rooms.fetchRoomIds;
   static final fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
   static final createRoom = Rooms.createRoom;
+  static final joinRoom = Rooms.joinRoom;
   static final leaveRoom = Rooms.leaveRoom;
   static final forgetRoom = Rooms.forgetRoom;
 

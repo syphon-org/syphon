@@ -121,14 +121,11 @@ abstract class Events {
     String homeserver = 'matrix.org',
     String accessToken,
     String roomId,
-    String eventType = 'm.room.message',
-    String messageType = 'm.text',
-    String requestId,
-    final messageBody,
     Map event,
+    String trxId = '0', // just a random string to denote uniqueness
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/$eventType/$requestId';
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/${event['type']}/$trxId';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

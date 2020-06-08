@@ -93,7 +93,7 @@ ThunkAction<AppState> fetchMessageEvents({
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String start = messagesJson['start'];
 
-      final List<dynamic> messages = messagesJson['chunk'];
+      final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
       messages.forEach((message) {
         print(

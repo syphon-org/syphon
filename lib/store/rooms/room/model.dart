@@ -76,6 +76,9 @@ class Room {
   @HiveField(25)
   final Map<String, User> users;
 
+  @HiveField(27)
+  final bool invite;
+
   const Room({
     this.id,
     this.name = 'New Chat',
@@ -104,6 +107,7 @@ class Room {
     this.startHash,
     this.prevHash,
     this.messageReads,
+    this.invite = false,
   });
 
   Room copyWith({
@@ -113,14 +117,14 @@ class Room {
     avatar,
     avatarUri,
     topic,
-    bool direct,
-    bool syncing,
-    bool sending,
+    direct,
+    syncing,
+    sending,
     lastRead,
     lastUpdate,
     totalJoinedUsers,
-    bool guestEnabled,
-    bool encryptionEnabled,
+    guestEnabled,
+    encryptionEnabled,
     userTyping,
     usersTyping,
     isDraftRoom,
@@ -134,6 +138,7 @@ class Room {
     endHash,
     startHash,
     prevHash,
+    invite,
   }) {
     return Room(
       id: id ?? this.id,
@@ -160,7 +165,8 @@ class Room {
       messageReads: messageReads ?? this.messageReads,
       endHash: endHash ?? this.endHash,
       startHash: startHash ?? this.startHash,
-      prevHash: prevHash, // TODO: may always need a prev hash?
+      prevHash: prevHash, // TODO: may always need a prev hash?,z
+      invite: invite ?? this.invite,
     );
   }
 
@@ -190,6 +196,7 @@ class Room {
     Map<String, dynamic> json,
   }) {
     String prevHash = this.prevHash;
+    bool invite = false;
 
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
@@ -201,6 +208,15 @@ class Room {
 
       stateEvents =
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
+    }
+    if (json['invite_state'] != null) {
+      final List<dynamic> rawStateEvents = json['invite_state']['events'];
+
+      print('[fromSync] invite_events $rawStateEvents');
+
+      stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+      invite = true;
     }
 
     if (json['timeline'] != null) {
@@ -230,6 +246,9 @@ class Room {
     }
 
     return this
+        .copyWith(
+          invite: invite,
+        )
         .fromAccountData(
           accountDataEvents,
         )
@@ -248,6 +267,35 @@ class Room {
         );
   }
 
+  /**
+   * 
+   * fromAccountData
+   * 
+   * Mostly used to assign is_direct 
+   */
+  Room fromAccountData(
+    List<Event> accountDataEvents,
+  ) {
+    dynamic isDirect;
+    try {
+      accountDataEvents.forEach((event) {
+        switch (event.type) {
+          case 'm.direct':
+            isDirect = true;
+            break;
+          default:
+            break;
+        }
+      });
+    } catch (error) {
+      print('[fromEphemeralEvents] error $error');
+    }
+
+    return this.copyWith(
+      direct: isDirect ?? this.direct,
+    );
+  }
+
   // Find details of room based on state events
   // follows spec naming priority and thumbnail downloading
   Room fromStateEvents(
@@ -257,7 +305,7 @@ class Room {
     String name;
     String avatarUri;
     String topic;
-    bool direct;
+    bool direct = this.direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
     bool encryptionEnabled;
@@ -267,8 +315,10 @@ class Room {
 
     try {
       stateEvents.forEach((event) {
-        lastUpdate =
-            event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+        final timestamp = event.timestamp ?? 0;
+        lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
+
+        print('[fromStateEvents] $event ${event.content} ${event.type}');
 
         switch (event.type) {
           case 'm.room.name':
@@ -303,19 +353,41 @@ class Room {
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
-            if (this.direct && this.users != null && this.users.length < 3) {
-              if (displayName == null && event.sender != currentUser.userId) {
-                namePriority = 0;
+            // The current users membership event
+            if (displayName == currentUser.displayName) {
+              // likely still an invite
+              // marked as direct, but not joined yet
+              direct = event.content['is_direct'];
+            }
+
+            // likely an invite room
+            // attempt to show a name from whoever sent membership events
+            // if nothing else takes priority
+            if (namePriority == 4 && event.sender != currentUser.userId) {
+              if (displayName == null) {
                 name = formatShortname(event.sender);
                 avatarUri = memberAvatarUri;
-              } else if (displayName != null &&
-                  displayName != currentUser.displayName) {
-                namePriority = 0;
+              } else {
                 name = displayName;
                 avatarUri = memberAvatarUri;
               }
             }
 
+            // what happens if you name a direct chat after the
+            // person you're sending it to? bad stuff, this tries
+            // to force the senders name on the room just in case
+            if (name == currentUser.displayName || name == currentUser.userId) {
+              namePriority = 0;
+              if (displayName == null) {
+                name = formatShortname(event.sender);
+                avatarUri = memberAvatarUri;
+              } else {
+                name = displayName;
+                avatarUri = memberAvatarUri;
+              }
+            }
+
+            // Cache user to rooms user cache if not present
             if (!users.containsKey(event.sender)) {
               users[event.sender] = User(
                 userId: event.sender,
@@ -489,35 +561,6 @@ class Room {
       usersTyping: usersTyping,
       messageReads: messageReads,
       lastRead: latestRead,
-    );
-  }
-
-  /**
-   * 
-   * fromAccountData
-   * 
-   * Mostly used to assign is_direct 
-   */
-  Room fromAccountData(
-    List<Event> accountDataEvents,
-  ) {
-    dynamic isDirect;
-    try {
-      accountDataEvents.forEach((event) {
-        switch (event.type) {
-          case 'm.direct':
-            isDirect = true;
-            break;
-          default:
-            break;
-        }
-      });
-    } catch (error) {
-      print('[fromEphemeralEvents] error $error');
-    }
-
-    return this.copyWith(
-      direct: isDirect ?? this.direct,
     );
   }
 }

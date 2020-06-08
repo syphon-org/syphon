@@ -195,6 +195,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final lastSince = data['next_batch'];
       final oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
+      final Map<String, dynamic> rawInvites = data['rooms']['invite'];
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map presence = data['presence'];
 
@@ -202,6 +203,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // Local state updates based on changes
       await store.dispatch(syncRooms(rawJoined));
+      await store.dispatch(syncRooms(rawInvites));
 
       if (isFullSync) {
         store.dispatch(saveSync(data));
