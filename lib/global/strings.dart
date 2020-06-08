@@ -18,6 +18,9 @@ class Strings {
       'Thanks for trying out Tether!\n\nPlease be aware this app is still very much in Alpha.\n\n' +
           'With that said, please read the below terms and conditions for this application and if you agree select "I Agree" to continue:\n\n';
 
+  static const confirmationAcceptInvite =
+      'If you accept this room invite, the users in the room will be made aware you\'ve accepted. Are you sure you want to accept now?';
+
   // Titles
   static const titleIntro = 'Welcome to Tether';
   static const titleLogin = 'take back the chat';

@@ -3,7 +3,9 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/crypto/actions.dart';
+import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
@@ -108,6 +110,79 @@ class ChatViewState extends State<ChatView> {
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStoreToProps(store, arguements.roomId);
     final draft = props.room.draft;
+
+    if (props.room.invite) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: SimpleDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Accept Invite?'),
+          contentPadding: Dimensions.dialogPadding,
+          children: <Widget>[
+            Container(
+              child: Text(
+                Strings.confirmationAcceptInvite,
+                textAlign: TextAlign.left,
+              ),
+              padding: Dimensions.dialogContentPadding,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SimpleDialogOption(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  child: Text(
+                    'block',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SimpleDialogOption(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      onPressed: () {
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      },
+                      child: Text(
+                        'go back',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                    ),
+                    SimpleDialogOption(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      onPressed: () {
+                        props.onAcceptInvite();
+
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        'accept',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
+      );
+    }
 
     if (props.room.encryptionEnabled) {
       final usersDeviceKeys = await store.dispatch(
@@ -218,7 +293,7 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   onToggleMediumOptions(context) async {
-    double width = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     final newInputType = await showMenu(
       elevation: 4.0,
@@ -805,6 +880,7 @@ class _Props extends Equatable {
   final Function onSaveDraftMessage;
   final Function onLoadMoreMessages;
   final Function onLoadFirstBatch;
+  final Function onAcceptInvite;
 
   _Props({
     @required this.room,
@@ -819,6 +895,7 @@ class _Props extends Equatable {
     @required this.onSaveDraftMessage,
     @required this.onLoadMoreMessages,
     @required this.onLoadFirstBatch,
+    @required this.onAcceptInvite,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -876,6 +953,11 @@ class _Props extends Equatable {
         if (message != null) {
           store.dispatch(deleteMessage(message: message));
         }
+      },
+      onAcceptInvite: () {
+        store.dispatch(acceptRoom(
+          room: Room(id: roomId),
+        ));
       },
       onSendTyping: ({typing, roomId}) => store.dispatch(
             sendTyping(

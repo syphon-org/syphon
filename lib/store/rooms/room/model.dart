@@ -196,7 +196,7 @@ class Room {
     Map<String, dynamic> json,
   }) {
     String prevHash = this.prevHash;
-    bool invite = false;
+    bool invite;
 
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
@@ -209,7 +209,9 @@ class Room {
       stateEvents =
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
     }
+
     if (json['invite_state'] != null) {
+      print('[fromSync] Its an invite!');
       final List<dynamic> rawStateEvents = json['invite_state']['events'];
 
       print('[fromSync] invite_events $rawStateEvents');

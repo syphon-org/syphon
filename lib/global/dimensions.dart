@@ -51,6 +51,18 @@ class Dimensions {
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
+  // Dialogs
+
+  static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 12,
+  );
+
+  static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
+    horizontal: 8,
+    vertical: 12,
+  );
+
   // Lists
   static const heroPadding = EdgeInsets.symmetric(
     vertical: 24,
