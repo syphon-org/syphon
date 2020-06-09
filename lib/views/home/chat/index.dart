@@ -343,7 +343,6 @@ class ChatViewState extends State<ChatView> {
               ),
             ),
           ),
-          value: MediumType.plaintext,
         ),
         PopupMenuItem<String>(
           child: GestureDetector(
@@ -386,7 +385,6 @@ class ChatViewState extends State<ChatView> {
               ),
             ),
           ),
-          value: MediumType.encryption,
         ),
       ],
     );

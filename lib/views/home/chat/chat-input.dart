@@ -1,5 +1,7 @@
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:Tether/store/rooms/events/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -42,13 +44,86 @@ class ChatInput extends StatelessWidget {
     Color sendButtonColor = const Color(DISABLED_GREY);
 
     if (sendable) {
-      sendButtonColor = Theme.of(context).primaryColor;
+      if (mediumType == MediumType.plaintext) {
+        sendButtonColor = Theme.of(context).accentColor;
+      }
+      if (mediumType == MediumType.encryption) {
+        sendButtonColor = Theme.of(context).primaryColor;
+      }
     }
 
     if (Theme.of(context).brightness == Brightness.dark) {
       inputTextColor = Colors.white;
       inputColorBackground = Colors.blueGrey;
       inputCursorColor = Colors.white;
+    }
+
+    // Default, but shouldn't be used
+    Widget sendButton = InkWell(
+      borderRadius: BorderRadius.circular(48),
+      onLongPress: onChangeMethod,
+      onTap: !sendable ? null : onSubmitMessage,
+      child: CircleAvatar(
+        backgroundColor: sendButtonColor,
+        child: Icon(
+          Icons.send,
+          color: Colors.white,
+        ),
+      ),
+    );
+
+    if (mediumType == MediumType.plaintext) {
+      sendButton = InkWell(
+        borderRadius: BorderRadius.circular(48),
+        onLongPress: onChangeMethod,
+        onTap: !sendable ? null : onSubmitMessage,
+        child: CircleAvatar(
+          backgroundColor: sendButtonColor,
+          child: Stack(children: [
+            Positioned(
+              right: 0,
+              bottom: -1.5,
+              child: Icon(
+                Icons.lock_open,
+                size: Dimensions.miniLockSize,
+                color: Colors.white,
+              ),
+            ),
+            Icon(
+              Icons.send,
+              size: Dimensions.iconSizeLite,
+              color: Colors.white,
+            ),
+          ]),
+        ),
+      );
+    }
+
+    if (mediumType == MediumType.encryption) {
+      sendButton = InkWell(
+        borderRadius: BorderRadius.circular(48),
+        onLongPress: onChangeMethod,
+        onTap: !sendable ? null : onSubmitMessage,
+        child: CircleAvatar(
+          backgroundColor: sendButtonColor,
+          child: Stack(children: [
+            Positioned(
+              right: 0,
+              bottom: -1.5,
+              child: Icon(
+                Icons.lock,
+                size: Dimensions.miniLockSize,
+                color: Colors.white,
+              ),
+            ),
+            Icon(
+              Icons.send,
+              size: Dimensions.iconSizeLite,
+              color: Colors.white,
+            ),
+          ]),
+        ),
+      );
     }
 
     return Row(
@@ -91,18 +166,7 @@ class ChatInput extends StatelessWidget {
         Container(
           width: 48.0,
           padding: EdgeInsets.symmetric(vertical: 4),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(48),
-            onLongPress: onChangeMethod,
-            onTap: !sendable ? null : onSubmitMessage,
-            child: CircleAvatar(
-              backgroundColor: sendButtonColor,
-              child: Icon(
-                Icons.send,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          child: sendButton,
         ),
       ],
     );
