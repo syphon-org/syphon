@@ -1,4 +1,5 @@
 import 'package:Tether/global/colors.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
  */
 class ChatInput extends StatelessWidget {
   final bool sendable;
+  final String mediumType;
   final FocusNode focusNode;
   final TextEditingController controller;
 
@@ -21,6 +23,7 @@ class ChatInput extends StatelessWidget {
     Key key,
     this.sendable,
     this.focusNode,
+    this.mediumType,
     this.controller,
     this.onChangeMessage,
     this.onChangeMethod,
@@ -81,7 +84,7 @@ class ChatInput extends StatelessWidget {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(24.0),
               ),
-              hintText: 'Matrix message (unencrypted)',
+              hintText: Strings.placeholderInputMatrixUnencrypted,
             ),
           ),
         ),

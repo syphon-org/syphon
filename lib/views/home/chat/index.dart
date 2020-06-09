@@ -3,15 +3,16 @@ import 'dart:io';
 
 // Store
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
 import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/model.dart';
 import 'package:Tether/global/themes.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
+import 'package:Tether/views/home/chat/chat-input.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
 import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/widgets/chat-input.dart';
+import 'package:Tether/views/home/chat/dialog-encryption.dart';
+import 'package:Tether/views/home/chat/dialog-invite.dart';
 import 'package:Tether/views/widgets/image-matrix.dart';
 import 'package:Tether/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
@@ -80,7 +81,9 @@ class ChatViewState extends State<ChatView> {
 
   double overshoot = 0;
   bool loadMore = false;
-  String inputType = MediumType.plaintext;
+  String mediumType = MediumType.plaintext;
+  String newMediumType = MediumType.plaintext;
+
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
@@ -115,73 +118,15 @@ class ChatViewState extends State<ChatView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        child: SimpleDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Accept Invite?'),
-          contentPadding: Dimensions.dialogPadding,
-          children: <Widget>[
-            Container(
-              child: Text(
-                Strings.confirmationAcceptInvite,
-                textAlign: TextAlign.left,
-              ),
-              padding: Dimensions.dialogContentPadding,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                  ),
-                  onPressed: () {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
-                  child: Text(
-                    'block',
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SimpleDialogOption(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                      onPressed: () {
-                        Navigator.popUntil(context, (route) => route.isFirst);
-                      },
-                      child: Text(
-                        'go back',
-                        style: Theme.of(context).textTheme.subtitle1,
-                      ),
-                    ),
-                    SimpleDialogOption(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      onPressed: () {
-                        props.onAcceptInvite();
-
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'accept',
-                        style: Theme.of(context).textTheme.subtitle1,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            )
-          ],
+        child: DialogInvite(
+          onAccept: props.onAcceptInvite,
         ),
       );
+    }
+    if (props.room.encryptionEnabled) {
+      this.setState(() {
+        mediumType = MediumType.encryption;
+      });
     }
 
     if (props.room.encryptionEnabled) {
@@ -285,6 +230,35 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
+  onChangeMediumType({String newMediumType, _Props props}) {
+    // noop
+    if (mediumType == newMediumType) {
+      return;
+    }
+
+    if (newMediumType == MediumType.encryption) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: DialogEncryption(
+          onAccept: () {
+            props.onToggleEncryption();
+
+            setState(() {
+              mediumType = newMediumType;
+            });
+          },
+        ),
+      );
+    } else {
+      // other mediums like sms, with no confirmation
+      setState(() {
+        mediumType = newMediumType;
+      });
+    }
+  }
+
+  @protected
   onToggleMessageOptions({Message message}) {
     this.setState(() {
       selectedMessage = message;
@@ -292,10 +266,29 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onToggleMediumOptions(context) async {
+  onDismissMessageOptions() {
+    this.setState(() {
+      selectedMessage = null;
+    });
+  }
+
+  @protected
+  onSubmitMessage(_Props props) async {
+    print(editorController.text);
+    props.onSendMessage(
+      body: editorController.text,
+      type: MessageTypes.TEXT,
+    );
+    editorController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  @protected
+  onShowMediumMenu(context, props) async {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final newInputType = await showMenu(
+
+    showMenu(
       elevation: 4.0,
       context: context,
       position: RelativeRect.fromLTRB(
@@ -310,84 +303,93 @@ class ChatViewState extends State<ChatView> {
       ),
       items: [
         PopupMenuItem<String>(
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(right: 8),
-                  child: CircleAvatar(
-                    backgroundColor: const Color(DISABLED_GREY),
-                    child: Stack(children: [
-                      Positioned(
-                        right: 0,
-                        bottom: -1.5,
-                        child: Icon(
-                          Icons.lock_open,
-                          size: Dimensions.miniLockSize,
+          child: GestureDetector(
+            onTap: () {
+              print('${MediumType.plaintext}');
+              Navigator.pop(context);
+              this.onChangeMediumType(
+                newMediumType: MediumType.plaintext,
+                props: props,
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      backgroundColor: const Color(DISABLED_GREY),
+                      child: Stack(children: [
+                        Positioned(
+                          right: 0,
+                          bottom: -1.5,
+                          child: Icon(
+                            Icons.lock_open,
+                            size: Dimensions.miniLockSize,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.send,
+                          size: Dimensions.iconSizeLite,
                           color: Colors.white,
                         ),
-                      ),
-                      Icon(
-                        Icons.send,
-                        size: Dimensions.iconSizeLite,
-                        color: Colors.white,
-                      ),
-                    ]),
+                      ]),
+                    ),
                   ),
-                ),
-                Text('Unencrypted'),
-              ],
+                  Text('Unencrypted'),
+                ],
+              ),
             ),
           ),
           value: MediumType.plaintext,
         ),
         PopupMenuItem<String>(
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(right: 8),
-                  child: CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    child: Stack(children: [
-                      Positioned(
-                        right: 0,
-                        bottom: -1.5,
-                        child: Icon(
-                          Icons.lock,
-                          size: Dimensions.miniLockSize,
+          child: GestureDetector(
+            onTap: () {
+              print('${MediumType.encryption}');
+              Navigator.pop(context);
+              this.onChangeMediumType(
+                newMediumType: MediumType.encryption,
+                props: props,
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: Stack(children: [
+                        Positioned(
+                          right: 0,
+                          bottom: -1.5,
+                          child: Icon(
+                            Icons.lock,
+                            size: Dimensions.miniLockSize,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.send,
+                          size: Dimensions.iconSizeLite,
                           color: Colors.white,
                         ),
-                      ),
-                      Icon(
-                        Icons.send,
-                        size: Dimensions.iconSizeLite,
-                        color: Colors.white,
-                      ),
-                    ]),
+                      ]),
+                    ),
                   ),
-                ),
-                Text('Encrypted'),
-              ],
+                  Text('Encrypted'),
+                ],
+              ),
             ),
           ),
-          value: MediumType.encrypted,
+          value: MediumType.encryption,
         ),
       ],
     );
-    print(newInputType);
-    setState(() {
-      inputType = newInputType;
-    });
-  }
-
-  @protected
-  onDismissMessageOptions() {
-    this.setState(() {
-      selectedMessage = null;
-    });
   }
 
   Widget buildMessageList(
@@ -475,17 +477,6 @@ class ChatViewState extends State<ChatView> {
   //     ),
   //   );
   // }
-
-  @protected
-  onSubmitMessage(_Props props) async {
-    print(editorController.text);
-    props.onSendMessage(
-      body: editorController.text,
-      type: MessageTypes.TEXT,
-    );
-    editorController.clear();
-    FocusScope.of(context).unfocus();
-  }
 
   @protected
   buildRoomAppBar({
@@ -849,8 +840,9 @@ class ChatViewState extends State<ChatView> {
                       child: ChatInput(
                         sendable: sendable,
                         focusNode: inputFieldNode,
+                        mediumType: mediumType,
                         controller: editorController,
-                        onChangeMethod: () => onToggleMediumOptions(context),
+                        onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
                         onSubmittedMessage: (text) =>
@@ -881,6 +873,7 @@ class _Props extends Equatable {
   final Function onLoadMoreMessages;
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
+  final Function onToggleEncryption;
 
   _Props({
     @required this.room,
@@ -896,6 +889,7 @@ class _Props extends Equatable {
     @required this.onLoadMoreMessages,
     @required this.onLoadFirstBatch,
     @required this.onAcceptInvite,
+    @required this.onToggleEncryption,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -975,6 +969,12 @@ class _Props extends Equatable {
           fetchMessageEvents(
             room: room,
           ),
+        );
+      },
+      onToggleEncryption: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(
+          toggleRoomEncryption(room: room),
         );
       },
       onLoadMoreMessages: () {

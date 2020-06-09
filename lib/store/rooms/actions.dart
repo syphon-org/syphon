@@ -481,6 +481,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
         event: event,
+        eventType: EventTypes.encryption,
         trxId: Random.secure().nextInt(1 << 31).toString(),
       );
 
@@ -491,7 +492,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
       print('[toggleRoomEncryption] success $data');
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      print('[toggleRoomEncryption] failure $error');
     }
   };
 }

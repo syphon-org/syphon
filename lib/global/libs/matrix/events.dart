@@ -122,24 +122,20 @@ abstract class Events {
     String accessToken,
     String roomId,
     Map event,
+    String eventType,
     String trxId = '0', // just a random string to denote uniqueness
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/${event['type']}/$trxId';
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/$eventType/$trxId';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body = {
-      "body": event['body'],
-      "msgtype": event['type'] ?? 'm.room.message',
-    };
-
     final response = await http.put(
       url,
       headers: headers,
-      body: json.encode(body),
+      body: json.encode(event),
     );
 
     return await json.decode(response.body);

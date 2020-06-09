@@ -17,9 +17,11 @@ class Strings {
   static const confirmationAlphaVersion =
       'Thanks for trying out Tether!\n\nPlease be aware this app is still very much in Alpha.\n\n' +
           'With that said, please read the below terms and conditions for this application and if you agree select "I Agree" to continue:\n\n';
-
   static const confirmationAcceptInvite =
       'If you accept this room invite, the users in the room will be made aware you\'ve accepted. Are you sure you want to accept now?';
+
+  static const confirmationEncryption =
+      'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this chat?';
 
   // Titles
   static const titleIntro = 'Welcome to Tether';
@@ -60,6 +62,14 @@ class Strings {
   static const buttonSignupFinish = 'finish';
 
   // Labels
+
+  /** 'Matrix message (unencrypted)' */
+  static const placeholderInputMatrixUnencrypted =
+      'Matrix message (unencrypted)';
+
+  /** 'Matrix message (unencrypted)' */
+  static const placeholderInputMatrixEncrypted = 'Matrix message';
+
   static String formatUsernameHint(String homeserver) {
     return homeserver.length != 0
         ? 'username:$homeserver'

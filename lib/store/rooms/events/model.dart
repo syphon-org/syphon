@@ -46,7 +46,7 @@ class MediumType {
   static const sms = 'sms';
   static const direct = 'direct';
   static const plaintext = 'plaintext';
-  static const encrypted = 'encrypted';
+  static const encryption = 'encryption';
 }
 
 @HiveType(typeId: EventHiveId)
