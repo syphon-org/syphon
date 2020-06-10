@@ -33,7 +33,7 @@ class HomeserverStep extends StatelessWidget {
           height: Dimensions.inputHeight,
           constraints:
               BoxConstraints(minWidth: 200, maxWidth: 400, minHeight: 220),
-          child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
+          child: SvgPicture.asset(Assets.heroSignupHomeserver,
               semanticsLabel: 'User hidding behind a message'),
         )),
         SizedBox(height: 24),

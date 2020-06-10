@@ -43,7 +43,7 @@ class HomeserverStep extends StatelessWidget {
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
-                  child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
+                  child: SvgPicture.asset(Assets.heroSignupHomeserver,
                       semanticsLabel: 'User hidding behind a message'),
                 ),
               ),

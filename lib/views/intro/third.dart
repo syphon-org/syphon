@@ -25,7 +25,7 @@ class ThirdSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            WORKING_TOGETHER_GRAPHIC,
+            Assets.heroIntroGroupChat,
             semanticsLabel: 'People lounging around and messaging',
           ),
         ),

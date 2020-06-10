@@ -26,7 +26,7 @@ class FirstSection extends StatelessWidget {
               maxWidth: 320,
             ),
             child: SvgPicture.asset(
-              HIDDEN_MESSENGER_GRAPHIC,
+              Assets.heroIntroHiddenMessage,
               semanticsLabel: 'User hidding behind a message',
             ),
           ),

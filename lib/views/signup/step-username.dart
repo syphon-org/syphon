@@ -95,7 +95,7 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: SvgPicture.asset(
-                    SIGNUP_USERNAME_GRAPHIC,
+                    Assets.heroSignupUsername,
                     semanticsLabel: 'Person resting on I.D. card',
                   ),
                 ),

@@ -56,7 +56,7 @@ class PasswordStepState extends State<PasswordStep> {
                       maxWidth: Dimensions.mediaSizeMax,
                     ),
                     child: SvgPicture.asset(
-                      SIGNUP_PASSWORD_GRAPHIC,
+                      Assets.heroSignupPassword,
                       semanticsLabel:
                           'User thinking up a password in a swirl of wind',
                     ),

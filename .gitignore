@@ -44,5 +44,5 @@ lib/generated_plugin_registrant.dart
 # Code Counter Extension
 *.VSCodeCounter
 
-build_hello_lib.sh
-hello_world 
+# Ignore compiled C code
+android/app/.cxx/*

@@ -26,7 +26,7 @@ class LandingSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            MOBILE_USER_GRAPHIC,
+            Assets.heroIntroMobileUser,
             semanticsLabel: Strings.semanticsLabelImageIntro,
           ),
         ),

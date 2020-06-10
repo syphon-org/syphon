@@ -26,7 +26,7 @@ class SecondSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            CONNECTION_GRAPHIC,
+            Assets.heroIntroConnection,
             semanticsLabel: 'Two people messaging privately but leisurely',
           ),
         ),

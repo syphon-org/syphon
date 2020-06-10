@@ -26,7 +26,7 @@ class ActionSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            PEOPLE_GRAPHIC,
+            Assets.heroIntroPeople,
             semanticsLabel:
                 'Two people different feeling confident and lookin\' good',
           ),

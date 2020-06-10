@@ -287,7 +287,7 @@ class HomeViewState extends State<Home> {
               maxHeight: Dimensions.mediaSizeMin,
             ),
             child: SvgPicture.asset(
-              GRAPHIC_EMPTY_MESSAGES,
+              Assets.heroChatNotFound,
               semanticsLabel: 'Tiny cute monsters hidding behind foliage',
             ),
           ),
