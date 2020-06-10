@@ -23,7 +23,7 @@ SettingsStore settingsReducer(
       return state.copyWith(
         pusherToken: action.token,
       );
-    case SetTetherAgreement:
+    case SetAppAgreement:
       return state.copyWith(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );

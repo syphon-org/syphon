@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,8 +28,7 @@ class ActionSection extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             Assets.heroIntroPeople,
-            semanticsLabel:
-                'Two people different feeling confident and lookin\' good',
+            semanticsLabel: Strings.semanticsIntroFinal,
           ),
         ),
         Container(
@@ -38,7 +38,7 @@ class ActionSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'By using Tether and other Matrix clients\nwe can make private messaging \naccessible to everyone',
+                Strings.contentIntroFinal,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.subtitle1,
               ),

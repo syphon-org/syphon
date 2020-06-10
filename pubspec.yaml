@@ -156,9 +156,9 @@ flutter:
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
    - assets/graphics/undraw_not_found.svg
-   - assets/icons/tether_icon.svg
-   - assets/icons/tether_icon.png
-   - assets/icons/tether_icon_white.png
+   - assets/icons/app_icon.svg
+   - assets/icons/app_icon.png
+   - assets/icons/app_icon_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

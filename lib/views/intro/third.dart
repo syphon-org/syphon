@@ -1,3 +1,4 @@
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,7 +39,7 @@ class ThirdSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Both Matrix and Tether are developed\nopenly by organizations and people,\nnot corporations.',
+                Strings.contentIntroThird,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.subtitle1,
               ),

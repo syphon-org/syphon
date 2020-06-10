@@ -1,4 +1,5 @@
 import 'package:Tether/global/dimensions.dart';
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -39,8 +40,7 @@ class FirstSection extends StatelessWidget {
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    text:
-                        'Tether works by using an encrypted \nand decentralized protocol \ncalled ',
+                    text: Strings.contentIntroFirstPartOne,
                     style: Theme.of(context).textTheme.subtitle1,
                     children: <TextSpan>[
                       TextSpan(

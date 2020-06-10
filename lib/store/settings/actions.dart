@@ -80,8 +80,8 @@ class ToggleReadReceipts {
   ToggleReadReceipts();
 }
 
-class SetTetherAgreement {
-  SetTetherAgreement();
+class SetAppAgreement {
+  SetAppAgreement();
 }
 
 /**
@@ -231,7 +231,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
  */
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
-    store.dispatch(SetTetherAgreement());
+    store.dispatch(SetAppAgreement());
   };
 }
 

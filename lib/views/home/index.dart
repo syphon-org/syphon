@@ -1,5 +1,4 @@
 import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/values.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';

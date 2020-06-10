@@ -1,3 +1,4 @@
+import 'package:Tether/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -39,7 +40,7 @@ class SecondSection extends StatelessWidget {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: 'Matrix enables you to message others',
+                  text: Strings.contentIntroSecondPartOne,
                   style: Theme.of(context).textTheme.subtitle1,
                   children: <TextSpan>[
                     TextSpan(
@@ -49,7 +50,7 @@ class SecondSection extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: 'and control where the\nmessages are ',
+                      text: Strings.contentIntroSecondPartTwo,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     TextSpan(

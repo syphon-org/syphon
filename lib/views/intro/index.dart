@@ -106,7 +106,7 @@ class IntroState extends State<Intro> {
                 textAlign: TextAlign.center,
               ),
               Text(
-                Strings.confirmationTetherTermsOfService,
+                Strings.confirmationAppTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),
               Row(

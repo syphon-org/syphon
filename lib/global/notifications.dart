@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:Tether/global/strings.dart';
+import 'package:Tether/global/values.dart';
 import 'package:flutter_apns/apns.dart';
 import 'package:flutter_apns/apns_connector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -10,15 +12,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  * Only need to handle local notifications on desktop and android 
  */
 // https://matrix.org/docs/spec/client_server/latest#id470
-
-const String channel_id = 'tether_notifications';
-const String channel_id_background_service = 'tether_background_notification';
-const String default_channel_title = 'Tether';
-
-const String channel_name_messages = 'Messages';
-const String channel_name_background_service = 'Background Sync';
-const String channel_description =
-    'Tether messaging client message and status notifications';
 
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
 PushConnector connector;
@@ -114,9 +107,9 @@ Future showBackgroundServiceNotification({
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    channel_id_background_service,
-    channel_name_background_service,
-    channel_description,
+    Values.channel_id_background_service,
+    Values.channel_name_background_service,
+    Values.channel_description,
     ongoing: true,
     autoCancel: false,
     showWhen: false,
@@ -131,11 +124,10 @@ Future showBackgroundServiceNotification({
     iOSPlatformChannelSpecifics,
   );
 
-  final backgroundNotificationBody = 'Background connection enabled';
   await pluginInstance.show(
     notificationId,
-    default_channel_title,
-    '$backgroundNotificationBody $debugContent',
+    Values.default_channel_title,
+    '${Strings.contentNotificationBackgroundService} $debugContent',
     platformChannelSpecifics,
   );
 }
@@ -148,9 +140,9 @@ Future showMessageNotification({
   final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    channel_id,
-    channel_name_messages,
-    channel_description,
+    Values.channel_id,
+    Values.channel_name_messages,
+    Values.channel_description,
     priority: Priority.High,
     importance: Importance.Default,
     visibility: NotificationVisibility.Private,
@@ -177,9 +169,9 @@ Future showDebugNotification({
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    channel_id,
-    channel_name_messages,
-    channel_description,
+    Values.channel_id,
+    Values.channel_name_messages,
+    Values.channel_description,
     importance: Importance.Default,
     priority: Priority.High,
   );

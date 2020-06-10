@@ -1,7 +1,7 @@
 class Assets {
   // Icons
-  static const appIcon = 'assets/icons/tether_icon.svg';
-  static const appIconPng = 'assets/icons/tether_icon.png';
+  static const appIcon = 'assets/icons/app_icon.svg';
+  static const appIconPng = 'assets/icons/app_icon.png';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
