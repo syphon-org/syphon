@@ -1,5 +1,6 @@
 import 'package:Tether/global/dimensions.dart';
 import 'package:Tether/global/strings.dart';
+import 'package:Tether/global/values.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/room/selectors.dart';
 import 'package:Tether/store/settings/chat-settings/model.dart';
@@ -216,10 +217,10 @@ class HomeViewState extends State<Home> {
           ),
         ),
         Text(
-          Strings.app_name,
+          Values.appName,
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w100,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ]),

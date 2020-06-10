@@ -114,7 +114,8 @@ class ChatViewState extends State<ChatView> {
     final props = _Props.mapStoreToProps(store, arguements.roomId);
     final draft = props.room.draft;
 
-    if (props.room.invite) {
+    // TODO: remove after the cache is updated
+    if (props.room.invite != null && props.room.invite) {
       showDialog(
         context: context,
         barrierDismissible: false,

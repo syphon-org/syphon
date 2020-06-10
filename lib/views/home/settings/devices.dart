@@ -203,7 +203,7 @@ class DeviceViewState extends State<DevicesView> {
         onPressed: () => Navigator.pop(context, false),
       ),
       title: Text(
-        Strings.viewTitleDevices,
+        Strings.titleViewDevices,
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,

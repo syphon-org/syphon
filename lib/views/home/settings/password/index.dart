@@ -28,7 +28,7 @@ class PasswordView extends StatefulWidget {
 }
 
 class PasswordUpdateState extends State<PasswordView> {
-  final String title = Strings.viewTitleSignup;
+  final String title = Strings.titleViewSignup;
 
   int currentStep = 0;
   bool onboarding = false;

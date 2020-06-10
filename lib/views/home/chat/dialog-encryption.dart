@@ -35,7 +35,7 @@ class DialogEncryption extends StatelessWidget {
                 vertical: 12,
               ),
               onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.pop(context);
               },
               child: Text(
                 'cancel',

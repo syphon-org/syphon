@@ -36,7 +36,7 @@ class SignupView extends StatefulWidget {
 }
 
 class SignupViewState extends State<SignupView> {
-  final String title = Strings.viewTitleSignup;
+  final String title = Strings.titleViewSignup;
 
   int currentStep = 0;
   bool onboarding = false;
