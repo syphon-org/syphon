@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:Tether/global/libs/matrix/encryption.dart';
 import 'package:http/http.dart' as http;
 
 abstract class Events {
@@ -60,6 +61,52 @@ abstract class Events {
     final response = await http.get(
       url,
       headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Send Encrypted Message
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+   * 
+   * Notes on requestId (considered a transactionId in Matrix)
+   * 
+   * The transaction ID for this event. 
+   * Clients should generate an ID unique across requests with the same access token; 
+   * it will be used by the server to ensure idempotency of requests. <- really a requestId
+   */
+  static Future<dynamic> sendMessageEncrypted({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String trxId,
+    String roomId,
+    String senderKey,
+    String ciphertext,
+    String sessionId,
+    String deviceId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      "algorithm": Algorithms.megolmv1, //  "m.megolm.v1.aes-sha2",
+      "sender_key": senderKey, // "<our curve25519 device key>",
+      "ciphertext": ciphertext, // "<encrypted payload>",
+      "session_id": sessionId, // "<outbound group session id>",
+      "device_id": deviceId, // "<our device ID>"
+    };
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
     );
 
     return await json.decode(response.body);

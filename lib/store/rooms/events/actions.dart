@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
+import 'package:Tether/store/alerts/actions.dart';
+import 'package:Tether/store/crypto/actions.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
@@ -10,6 +12,7 @@ import 'package:Tether/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:olm/olm.dart' as olm;
 
 import 'package:http/http.dart' as http;
 
@@ -194,6 +197,24 @@ ThunkAction<AppState> readMessages({
   };
 }
 
+ThunkAction<AppState> saveDraft({
+  final body,
+  String type = 'm.text',
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        type: type,
+        body: body,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    ));
+  };
+}
+
 ThunkAction<AppState> sendTyping({
   String roomId,
   bool typing = false,
@@ -225,21 +246,53 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
-ThunkAction<AppState> saveDraft({
-  final body,
-  String type = 'm.text',
+ThunkAction<AppState> sendMessageEncrypted({
   Room room,
+  final body,
+  String type = MessageTypes.TEXT,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(UpdateRoom(
-      id: room.id,
-      draft: Message(
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
+      print('[sendMessageEncrypted] $trxId');
+
+      final messageEvent = {
+        'body': body,
+        'type': type,
+      };
+
+      final encryptedEvent = await store.dispatch(
+        encryptEventContent(
+          roomId: room.id,
+          eventType: EventTypes.message,
+          content: messageEvent,
+        ),
+      );
+
+      print('[sendMessageEncrypted $encryptedEvent');
+
+      // TODO: encrypt and send olm sendToDevice room keys / key sharing
+      return;
+
+      // TODO: encrypt and send actual message content
+      final data = await MatrixApi.sendMessageEncrypted(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        trxId: trxId,
         roomId: room.id,
-        type: type,
-        body: body,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      ),
-    ));
+        senderKey: encryptedEvent['sender_key'],
+        ciphertext: encryptedEvent['ciphertext'],
+        sessionId: encryptedEvent['session_id'],
+        deviceId: store.state.authStore.user.deviceId,
+      );
+    } catch (error) {
+      store.dispatch(
+        addAlert(type: 'warning', message: error.message),
+      );
+    }
   };
 }
 

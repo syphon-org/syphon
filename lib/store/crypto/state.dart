@@ -14,6 +14,14 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
+  // Map<roomId, serializedSession>
+  @HiveField(4)
+  final Map<String, String> olmInboundSessions;
+
+  // Map<roomId, serializedSession>
+  @HiveField(5)
+  final Map<String, String> olmOutboundSessions;
+
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
   final Map<String, Map<String, DeviceKey>> deviceKeys;
@@ -32,6 +40,8 @@ class CryptoStore extends Equatable {
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
+    this.olmInboundSessions = const {},
+    this.olmOutboundSessions = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeys = const {},
@@ -44,6 +54,8 @@ class CryptoStore extends Equatable {
   List<Object> get props => [
         olmAccount,
         olmAccountKey,
+        olmInboundSessions,
+        olmOutboundSessions,
         deviceKeys,
         deviceKeysOwned,
         deviceKeysExist,
@@ -55,6 +67,8 @@ class CryptoStore extends Equatable {
   CryptoStore copyWith({
     olmAccount,
     olmAccountKey,
+    olmInboundSessions,
+    olmOutboundSessions,
     deviceKeys,
     deviceKeysOwned,
     deviceKeysExist,
@@ -65,6 +79,8 @@ class CryptoStore extends Equatable {
     return CryptoStore(
       olmAccount: olmAccount ?? this.olmAccount,
       olmAccountKey: olmAccountKey ?? this.olmAccountKey,
+      olmInboundSessions: olmInboundSessions ?? this.olmInboundSessions,
+      olmOutboundSessions: olmOutboundSessions ?? this.olmOutboundSessions,
       deviceKeys: deviceKeys ?? this.deviceKeys,
       deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
       oneTimeKeys: oneTimeKeys ?? this.oneTimeKeys,
