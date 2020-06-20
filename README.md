@@ -1,4 +1,4 @@
-# Tether
+# Syphon
 
 A privacy centric messenger for the people
 
