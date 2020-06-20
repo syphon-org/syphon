@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Tether/global/values.dart';
 import 'package:Tether/store/crypto/model.dart';
 import 'package:Tether/store/crypto/state.dart';
 import 'package:convert/convert.dart';
@@ -25,15 +26,16 @@ class Cache {
   static Box state;
   static LazyBox sync;
 
-  static const group_id = 'tether';
-  static const encryptionKeyLocation = 'tether@publicKey';
+  static const group_id = '${Values.appNameLabel}';
+  static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
-  static const syncKey = 'tether_sync';
-  static const stateKey = 'tether_cache';
+  static const syncKey = '${Values.appNameLabel}_sync';
+  static const stateKey = '${Values.appNameLabel}_cache';
 
-  static const syncKeyUNSAFE = 'tether_sync_unsafe';
-  static const stateKeyUNSAFE = 'tether_cache_unsafe';
-  static const backgroundKeyUNSAFE = 'tether_background_cache_unsafe';
+  static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
+  static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
+  static const backgroundKeyUNSAFE =
+      '${Values.appNameLabel}_background_cache_unsafe';
 
   static const syncData = 'sync_data';
   static const protocol = 'protocol';

@@ -64,22 +64,22 @@ void main() async {
   //  */
 
   // the main thing
-  runApp(Tether(store: store));
+  runApp(Syphon(store: store));
 }
 
-class Tether extends StatefulWidget {
+class Syphon extends StatefulWidget {
   final Store<AppState> store;
-  const Tether({Key key, this.store}) : super(key: key);
+  const Syphon({Key key, this.store}) : super(key: key);
 
   @override
-  TetherState createState() => TetherState(store: store);
+  SyphonState createState() => SyphonState(store: store);
 }
 
-class TetherState extends State<Tether> with WidgetsBindingObserver {
+class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
   final Store<AppState> store;
   Widget defaultHome = Home();
-  TetherState({this.store});
+  SyphonState({this.store});
 
   Future onSelectNotification(String payload) async {
     showDialog(

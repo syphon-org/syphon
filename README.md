@@ -1,6 +1,6 @@
 # Syphon
 
-A privacy centric messenger for the people
+A privacy centric messenger for everyone
 
 ## Why
 
@@ -18,11 +18,11 @@ Another reason this project was so important was the ability to go from zero to 
 
 ## Architecture
 ### Storage
-There are three layers to storage in Tether:
-    - Remote (Matrix Homeserver)
-    - Cache (Redux + Redux Persist +  Hive)
-        * cache is encrypted at rest
-    - Cold Storage (Hive)
+There are three layers to storage in Syphon:
+- Remote (Matrix Homeserver)
+- Cache (Redux + Redux Persist +  Hive)
+    * cache is encrypted at rest
+- Cold Storage (Hive)
 
 
 ## Getting Started

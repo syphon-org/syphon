@@ -27,9 +27,9 @@ class Themes {
     int accentColorHex,
     ThemeType themeType,
   }) {
-    int primaryColor = primaryColorHex ?? TETHERED_CYAN;
-    int accentColor = accentColorHex ?? TETHERED_CYAN;
-    int appBarColor = primaryColorHex ?? TETHERED_CYAN;
+    int primaryColor = primaryColorHex ?? SYPHON_CYAN;
+    int accentColor = accentColorHex ?? SYPHON_CYAN;
+    int appBarColor = primaryColorHex ?? SYPHON_CYAN;
     int scaffoldBackgroundColor = BACKGROUND;
     int fontColor = Colors.white.value;
 
@@ -39,16 +39,16 @@ class Themes {
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? TETHERED_CYAN;
-        accentColor = accentColorHex ?? TETHERED_CYAN;
+        primaryColor = primaryColorHex ?? SYPHON_CYAN;
+        accentColor = accentColorHex ?? SYPHON_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = null;
         fontColor = Colors.white.value;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? TETHERED_CYAN;
-        accentColor = accentColorHex ?? TETHERED_CYAN;
+        primaryColor = primaryColorHex ?? SYPHON_CYAN;
+        accentColor = accentColorHex ?? SYPHON_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = BASICALLY_BLACK;
         appBarElevation = 0.0;

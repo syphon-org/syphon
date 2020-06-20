@@ -349,8 +349,8 @@ class Props {
   });
 
   static Props mapStoreToProps(Store<AppState> store) => Props(
-        primaryColor: store.state.settingsStore.primaryColor ?? TETHERED_CYAN,
-        accentColor: store.state.settingsStore.accentColor ?? TETHERED_CYAN,
+        primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
+        accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,

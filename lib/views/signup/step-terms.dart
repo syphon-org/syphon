@@ -58,7 +58,7 @@ class TermsStep extends StatelessWidget {
                           width: 56,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(40),
-                            color: const Color(TETHERED_CYAN),
+                            color: const Color(SYPHON_CYAN),
                           ),
                           child: Container(
                             child: Icon(

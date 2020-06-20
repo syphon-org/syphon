@@ -6,7 +6,7 @@
  * 
  * these are just actions created while I was trying to
  * implement double ratchet alongside the matrix protocols
- * needs, they no longer work within tether and are just 
+ * needs, they no longer work within syphon and are just 
  * there for documentation
  */
 

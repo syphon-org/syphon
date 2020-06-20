@@ -55,8 +55,8 @@ class SettingsStore extends Equatable {
   final bool loading;
 
   const SettingsStore({
-    this.primaryColor = TETHERED_CYAN,
-    this.accentColor = TETHERED_CYAN,
+    this.primaryColor = SYPHON_CYAN,
+    this.accentColor = SYPHON_CYAN,
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.language = 'English',
