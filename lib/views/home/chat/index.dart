@@ -50,7 +50,8 @@ enum ChatOptions {
   allMedia,
   chatSettings,
   inviteFriends,
-  muteNotifications
+  muteNotifications,
+  debugging
 }
 
 class ChatViewArguements {
@@ -590,6 +591,8 @@ class ChatViewState extends State<ChatView> {
                     title: props.room.name,
                   ),
                 );
+              case ChatOptions.debugging:
+                return props.onDEBUGGING();
               default:
                 break;
             }
@@ -615,6 +618,10 @@ class ChatViewState extends State<ChatView> {
             const PopupMenuItem<ChatOptions>(
               value: ChatOptions.muteNotifications,
               child: Text('Mute Notifications'),
+            ),
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.debugging,
+              child: Text('DEBUG Send Message Keys'),
             ),
           ],
         )
@@ -873,6 +880,7 @@ class _Props extends Equatable {
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
   final Function onToggleEncryption;
+  final Function onDEBUGGING;
 
   _Props({
     @required this.room,
@@ -889,6 +897,7 @@ class _Props extends Equatable {
     @required this.onLoadFirstBatch,
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
+    @required this.onDEBUGGING,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -959,11 +968,7 @@ class _Props extends Equatable {
             ),
           ),
       onLoadFirstBatch: () {
-        final room = roomSelectors.room(
-          id: roomId,
-          state: store.state,
-        );
-
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(
           fetchMessageEvents(
             room: room,
@@ -977,25 +982,18 @@ class _Props extends Equatable {
         );
       },
       onLoadMoreMessages: () {
-        final room = roomSelectors.room(
-          id: roomId,
-          state: store.state,
-        );
-
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(fetchMessageEvents(
           room: room,
           startHash: room.endHash,
         ));
-      }
-
-      /**
-         * TODO: Room Drafts
-         */
-      // onConvertDraftRoom: () async {
-      //   final room = store.state.roomStore.rooms[roomId];
-      //   return store.dispatch(convertDraftRoom(room: room));
-      // },
-      );
+      },
+      onDEBUGGING: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(
+          sendMessageKeys(room: room),
+        );
+      });
 
   @override
   List<Object> get props => [

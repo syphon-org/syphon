@@ -77,6 +77,7 @@ abstract class Events {
    * Clients should generate an ID unique across requests with the same access token; 
    * it will be used by the server to ensure idempotency of requests. <- really a requestId
    */
+
   static Future<dynamic> sendMessageEncrypted({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -153,7 +154,7 @@ abstract class Events {
   }
 
   /**
-   * Send Message
+   * Send Event
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
    * 
@@ -199,12 +200,13 @@ abstract class Events {
    * The messages to send. A map from user ID, to a map from device ID to message body. 
    * The device ID may also be *, meaning all known devices for the user.
    */
-  static Future<dynamic> sendDirectToDevice({
+  static Future<dynamic> sendEventDirectToDevice({
+    String trxId = '0', // just a random string to denote uniqueness
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
     String eventType,
-    String trxId = '0', // just a random string to denote uniqueness
+    String userId,
     Map event,
   }) async {
     String url =
@@ -214,9 +216,11 @@ abstract class Events {
       'Authorization': 'Bearer $accessToken',
     };
 
+    // Use astrick to send to all known devices for user
     Map body = {
-      "body": event['body'],
-      "msgtype": event['type'],
+      "messages": {
+        '$userId': {'*': event}
+      }
     };
 
     final response = await http.put(

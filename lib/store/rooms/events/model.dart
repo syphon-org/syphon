@@ -17,7 +17,7 @@ class EventTypes {
   static const message = 'm.room.message';
   static const encrypted = 'm.room.encrypted';
   static const creation = 'm.room.create';
-  static const name = '.room.name';
+  static const name = 'm.room.name';
   static const topic = 'm.room.topic';
 
   // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
@@ -29,6 +29,7 @@ class EventTypes {
   static const historyVisibility = 'm.room.history_visibility';
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
+  static const roomKey = 'm.room_key';
 }
 
 class MessageTypes {

@@ -21,6 +21,9 @@ import 'package:olm/olm.dart' as olm;
  * 
  * E2EE
  * https://matrix.org/docs/spec/client_server/latest#id76
+ * 
+ * Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
+ * Outbound Key Session === Outbound Session (Algorithm.olmv1)
  */
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -60,10 +63,16 @@ class SetOneTimeKeysCounts {
   SetOneTimeKeysCounts({this.oneTimeKeysCounts});
 }
 
-class AddOutboundSession {
+class AddOutboundKeySession {
   String roomId;
   String session;
-  AddOutboundSession({this.roomId, this.session});
+  AddOutboundKeySession({this.roomId, this.session});
+}
+
+class AddOutboundMessageSession {
+  String roomId;
+  String session;
+  AddOutboundMessageSession({this.roomId, this.session});
 }
 
 class AddInboundSession {
@@ -428,57 +437,16 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
 }
 
 /**
- * 
- * Outbound Session Funcationality
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
+ * Meant only for encrypting room key events sent directly to
+ * user devices for decryption of message content
  */
-ThunkAction<AppState> createOutboundSession({String roomId}) {
-  return (Store<AppState> store) async {
-    final outboundGroupSession = olm.OutboundGroupSession();
-
-    outboundGroupSession.create();
-    outboundGroupSession.session_id();
-    outboundGroupSession.session_key();
-
-    print(outboundGroupSession);
-    store.dispatch(saveOutboundSession(
-      roomId: roomId,
-      session: outboundGroupSession.pickle(roomId),
-    ));
-
-    // send back a serialized version
-    return outboundGroupSession.pickle(roomId);
-  };
-}
-
-ThunkAction<AppState> saveOutboundSession({
+ThunkAction<AppState> encryptEventKey({
   String roomId,
-  String session,
+  String eventType = EventTypes.message,
+  Map content,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(
-      AddOutboundSession(roomId: roomId, session: session),
-    );
-  };
-}
-
-/**
- * Load or Create Outbound Megolm Sessions
- */
-ThunkAction<AppState> loadOutboundSession({String roomId}) {
-  return (Store<AppState> store) async {
-    var serializedOutboundSession =
-        store.state.cryptoStore.olmOutboundSessions[roomId];
-
-    if (serializedOutboundSession == null) {
-      serializedOutboundSession = await store.dispatch(
-        createOutboundSession(roomId: roomId),
-      );
-    }
-
-    return olm.OutboundGroupSession()
-        .unpickle(roomId, serializedOutboundSession);
+    // Load and deserialize session
   };
 }
 
@@ -495,7 +463,7 @@ ThunkAction<AppState> encryptEventContent({
   return (Store<AppState> store) async {
     // Load and deserialize session
     final olm.OutboundGroupSession outboundSession = store.dispatch(
-      loadOutboundSession(roomId: roomId),
+      loadOutboundMessageSession(roomId: roomId),
     );
 
     // Create payload for encryption per spe
@@ -512,7 +480,7 @@ ThunkAction<AppState> encryptEventContent({
     print('[encryptEventContent] $encryptedPayload');
 
     // Save the outbound session after processing content
-    await store.dispatch(saveOutboundSession(
+    await store.dispatch(saveOutboundMessageSession(
       roomId: roomId,
       session: outboundSession.pickle(roomId),
     ));
@@ -532,7 +500,102 @@ ThunkAction<AppState> encryptEventContent({
 
 /**
  * 
- * Inbound Session Funcationality
+ * Outbound Key Session Funcationality
+ * 
+ * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-an-olm-session
+ * https://matrix.org/docs/spec/client_server/latest#m-room-key
+ * https://matrix.org/docs/spec/client_server/latest#m-olm-v1-curve25519-aes-sha2
+ * https://matrix.org/docs/spec/client_server/r0.4.0#m-olm-v1-curve25519-aes-sha2
+ * 
+ */
+ThunkAction<AppState> createOutboundKeySession({
+  String roomId,
+  String identityKey,
+  String oneTimeKey,
+}) {
+  return (Store<AppState> store) async {
+    final outboundKeySession = olm.Session();
+
+    final account = store.state.cryptoStore.olmAccount;
+
+    outboundKeySession.create_outbound(account, identityKey, oneTimeKey);
+
+    store.dispatch(saveOutboundKeySession(
+      roomId: roomId,
+      session: outboundKeySession.pickle(roomId),
+    ));
+
+    // send back a serialized version
+    return outboundKeySession.pickle(roomId);
+  };
+}
+
+ThunkAction<AppState> saveOutboundKeySession({
+  String roomId,
+  String session,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      AddOutboundKeySession(roomId: roomId, session: session),
+    );
+  };
+}
+
+/**
+ * 
+ * Outbound Message Session Functionality
+ * 
+ * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
+ */
+ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
+  return (Store<AppState> store) async {
+    final outboundGroupSession = olm.OutboundGroupSession();
+
+    outboundGroupSession.create();
+    outboundGroupSession.session_id();
+    outboundGroupSession.session_key();
+
+    print(outboundGroupSession);
+    store.dispatch(saveOutboundMessageSession(
+      roomId: roomId,
+      session: outboundGroupSession.pickle(roomId),
+    ));
+
+    // send back a serialized version
+    return outboundGroupSession.pickle(roomId);
+  };
+}
+
+ThunkAction<AppState> saveOutboundMessageSession({
+  String roomId,
+  String session,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      AddOutboundMessageSession(roomId: roomId, session: session),
+    );
+  };
+}
+
+ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
+  return (Store<AppState> store) async {
+    var serializedOutboundSession =
+        store.state.cryptoStore.olmOutboundSessions[roomId];
+
+    if (serializedOutboundSession == null) {
+      serializedOutboundSession = await store.dispatch(
+        createOutboundMessageSession(roomId: roomId),
+      );
+    }
+
+    return olm.OutboundGroupSession()
+        .unpickle(roomId, serializedOutboundSession);
+  };
+}
+
+/**
+ * 
+ * Inbound Message Session Functionality
  * 
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
  */
@@ -546,7 +609,7 @@ ThunkAction<AppState> createInboundSession({
     inboundGroupSession.create(sessionKey);
     inboundGroupSession.session_id();
 
-    store.dispatch(saveOutboundSession(
+    store.dispatch(saveOutboundMessageSession(
       roomId: roomId,
       session: inboundGroupSession.pickle(roomId),
     ));

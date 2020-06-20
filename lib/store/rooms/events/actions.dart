@@ -9,10 +9,10 @@ import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
+import 'package:Tether/store/rooms/selectors.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:olm/olm.dart' as olm;
 
 import 'package:http/http.dart' as http;
 
@@ -246,6 +246,102 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
+/**
+ * Send Encrypted Keys
+ * 
+ * Specifically for sending encrypted keys using olm
+ * for later use with encrypted messages using megolm
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id454
+ * https://matrix.org/docs/spec/client_server/latest#id461
+ */
+/**
+ */
+ThunkAction<AppState> sendMessageKeys({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      // final String trxId = DateTime.now().millisecond.toString();
+
+      print('[sendMessageKeys] firing');
+
+      final sessionExists =
+          store.state.cryptoStore.olmInboundKeySessions[room.id];
+
+      if (sessionExists == null) {
+        print('[sendMessageKeys] session does not exist');
+        await store.dispatch(
+          claimOneTimeKey(room: room),
+        );
+      }
+
+      // final eventContent = {
+      //   'algorithm': Algorithms.olmv1,
+      //   'room_id': room.id,
+      //   'session_id': 'testing',
+      //   'session_key': 'testing',
+      // };
+
+      // final encryptedEventRoomKey = await store.dispatch(
+      //   encryptEventContent(
+      //     roomId: room.id,
+      //     eventType: EventTypes.roomKey,
+      //     content: eventContent,
+      //   ),
+      // );
+
+      // TODO: encrypt and send olm sendToDevice room keys / key sharing
+      return;
+    } catch (error) {
+      store.dispatch(
+        addAlert(type: 'warning', message: error.message),
+      );
+    }
+  };
+}
+
+ThunkAction<AppState> claimOneTimeKey({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final user = room.users.values.elementAt(0);
+
+      print('[claimOneTimeKey] user ${user}');
+
+      // TODO: work with more than 1 user
+      final userDevices = store.state.cryptoStore.deviceKeys[user.userId];
+
+      print(
+        '[claimOneTimeKey] deviceKeys ${store.state.cryptoStore.deviceKeys}',
+      );
+
+      userDevices.forEach((key, value) {
+        print('[claimOneTimeKey] ${key} ${value}');
+      });
+
+      // final oneTimeKeys = {
+
+      // };
+      // final data = await MatrixApi.claimKeys(
+
+      // );
+
+    } catch (error) {
+      store.dispatch(
+        addAlert(type: 'warning', message: error.message),
+      );
+    }
+  };
+}
+
+/**
+ * Send Encrypted Messages
+ * 
+ * Specifically for sending encrypted messages using megolm
+ */
 ThunkAction<AppState> sendMessageEncrypted({
   Room room,
   final body,

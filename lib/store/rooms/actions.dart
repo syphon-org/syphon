@@ -461,7 +461,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
 }
 
 /**
- * Toggle Rom Encryption On (Only)
+ * Toggle Room Encryption On (Only)
  */
 ThunkAction<AppState> toggleRoomEncryption({Room room}) {
   return (Store<AppState> store) async {
@@ -489,6 +489,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
         throw data['error'];
       }
 
+      store.dispatch(fetchDirectRooms());
       print('[toggleRoomEncryption] success $data');
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));

@@ -83,7 +83,7 @@ abstract class Encryption {
    * 
    * Fetch Key Changes
    * 
-   * https://matrix.org/docs/spec/client_server/latest#id462
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
    * 
    * Gets a list of users who have updated their device identity keys since a previous sync token.
    * 
@@ -99,7 +99,7 @@ abstract class Encryption {
     String from,
     String to,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
+    String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -116,7 +116,7 @@ abstract class Encryption {
   /**
    * Claim Keys
    * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
+   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
    * 
    * Claims one-time keys for use in pre-key messages.
    * 
@@ -133,9 +133,14 @@ abstract class Encryption {
       'Authorization': 'Bearer $accessToken',
     };
 
+    Map body = {
+      'one_time_keys': oneTimeKeys,
+    };
+
     final response = await http.post(
       url,
       headers: headers,
+      body: json.encode(body),
     );
 
     return await json.decode(response.body);

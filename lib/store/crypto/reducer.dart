@@ -32,6 +32,26 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         deviceKeysOwned: action.deviceKeysOwned,
       );
+    case AddOutboundKeySession:
+      final outboundSessions = Map<String, String>.from(
+        state.olmOutboundSessions,
+      );
+
+      outboundSessions.putIfAbsent(action.roomId, () => action.session);
+
+      return state.copyWith(
+        olmOutboundSessions: outboundSessions,
+      );
+    case AddOutboundMessageSession:
+      final outboundSessions = Map<String, String>.from(
+        state.olmOutboundSessions,
+      );
+
+      outboundSessions.putIfAbsent(action.roomId, () => action.session);
+
+      return state.copyWith(
+        olmOutboundSessions: outboundSessions,
+      );
     case ToggleDeviceKeysExist:
       return state.copyWith(
         deviceKeysExist: action.existence,

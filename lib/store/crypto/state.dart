@@ -1,3 +1,4 @@
+import 'package:Tether/global/libs/matrix/encryption.dart';
 import 'package:Tether/store/crypto/model.dart';
 import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
@@ -20,7 +21,15 @@ class CryptoStore extends Equatable {
 
   // Map<roomId, serializedSession>
   @HiveField(5)
-  final Map<String, String> olmOutboundSessions;
+  final Map<String, String> olmOutboundSessions; // megolm
+
+  // Map<roomId, serializedSession>
+  @HiveField(4)
+  final Map<String, String> olmInboundKeySessions; // olmv1
+
+  // Map<roomId, serializedSession>
+  @HiveField(6)
+  final Map<String, String> olmOutboundKeySessions; // olmv1
 
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
@@ -40,8 +49,11 @@ class CryptoStore extends Equatable {
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
-    this.olmInboundSessions = const {},
-    this.olmOutboundSessions = const {},
+    this.olmInboundSessions = const {}, // messages
+    this.olmOutboundSessions = const {}, // messages
+    this.olmInboundKeySessions = const {}, // one-time device keys
+    this.olmOutboundKeySessions = const {}, // one-time device keys
+
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeys = const {},
@@ -56,6 +68,8 @@ class CryptoStore extends Equatable {
         olmAccountKey,
         olmInboundSessions,
         olmOutboundSessions,
+        olmInboundKeySessions,
+        olmOutboundKeySessions,
         deviceKeys,
         deviceKeysOwned,
         deviceKeysExist,
@@ -69,6 +83,8 @@ class CryptoStore extends Equatable {
     olmAccountKey,
     olmInboundSessions,
     olmOutboundSessions,
+    olmInboundKeySessions,
+    olmOutboundKeySessions,
     deviceKeys,
     deviceKeysOwned,
     deviceKeysExist,
@@ -81,6 +97,10 @@ class CryptoStore extends Equatable {
       olmAccountKey: olmAccountKey ?? this.olmAccountKey,
       olmInboundSessions: olmInboundSessions ?? this.olmInboundSessions,
       olmOutboundSessions: olmOutboundSessions ?? this.olmOutboundSessions,
+      olmInboundKeySessions:
+          olmInboundKeySessions ?? this.olmInboundKeySessions,
+      olmOutboundKeySessions:
+          olmOutboundKeySessions ?? this.olmOutboundKeySessions,
       deviceKeys: deviceKeys ?? this.deviceKeys,
       deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
       oneTimeKeys: oneTimeKeys ?? this.oneTimeKeys,
