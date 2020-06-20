@@ -319,9 +319,7 @@ class SearchUserState extends State<SearchUserView> {
         child: ListView(
           children: [
             Visibility(
-              visible: searchable != null &&
-                  searchable.length > 0 &&
-                  props.searchResults.length == 0,
+              visible: searchable != null && searchable.length > 0,
               child: GestureDetector(
                 onTap: () => this.onAttemptChat(
                   props: props,

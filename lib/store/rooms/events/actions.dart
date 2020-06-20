@@ -9,7 +9,6 @@ import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
 import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/rooms/selectors.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -100,7 +99,7 @@ ThunkAction<AppState> fetchMessageEvents({
 
       messages.forEach((message) {
         print(
-          '[fetchMessageEvents]  ${message['sender']} ${message['content']}',
+          '[fetchMessageEvents]  ${message['sender']} ${message}',
         );
       });
 
@@ -141,11 +140,40 @@ ThunkAction<AppState> fetchMessageEvents({
 }
 
 /**
- * DEPRECATED: paginating state events can only be 
+ * 
+ * TODO: not sure if we need this, but just
+ * trying to finish E2EE first
+ * 
+ * state events can only be 
  * done from full state /sync data
  */
 ThunkAction<AppState> fetchStateEvents({Room room}) {
-  return (Store<AppState> store) async {};
+  return (Store<AppState> store) async {
+    try {
+      final stateEvents = await MatrixApi.fetchStateEvents(
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        roomId: room.id,
+      );
+
+      if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+        throw stateEvents['error'];
+      }
+
+      store.dispatch(syncRooms({
+        '${room.id}': {
+          'state': {
+            'events': stateEvents,
+          },
+        },
+      }));
+    } catch (error) {
+      print('[fetchRooms] ${room.id} $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
 }
 
 /**

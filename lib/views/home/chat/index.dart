@@ -276,7 +276,6 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   onSubmitMessage(_Props props) async {
-    print(editorController.text);
     props.onSendMessage(
       body: editorController.text,
       type: MessageTypes.TEXT,
@@ -307,7 +306,7 @@ class ChatViewState extends State<ChatView> {
         PopupMenuItem<String>(
           child: GestureDetector(
             onTap: () {
-              print('${MediumType.plaintext}');
+              print('[PopupMenuItem] ${MediumType.plaintext}');
               Navigator.pop(context);
               this.onChangeMediumType(
                 newMediumType: MediumType.plaintext,
@@ -349,7 +348,7 @@ class ChatViewState extends State<ChatView> {
         PopupMenuItem<String>(
           child: GestureDetector(
             onTap: () {
-              print('${MediumType.encryption}');
+              print('[PopupMenuItem] ${MediumType.encryption}');
               Navigator.pop(context);
               this.onChangeMediumType(
                 newMediumType: MediumType.encryption,

@@ -154,7 +154,7 @@ abstract class Events {
   }
 
   /**
-   * Send Event
+   * Send Event (State Only)
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
    * 
@@ -169,21 +169,25 @@ abstract class Events {
     String homeserver = 'matrix.org',
     String accessToken,
     String roomId,
-    Map event,
     String eventType,
-    String trxId = '0', // just a random string to denote uniqueness
+    String stateKey,
+    Map content,
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/$eventType/$trxId';
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/$eventType';
+
+    url += stateKey != null ? '/$stateKey' : '';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
+    print('[sendEvent] ${url} ${content}');
+
     final response = await http.put(
       url,
       headers: headers,
-      body: json.encode(event),
+      body: json.encode(content),
     );
 
     return await json.decode(response.body);

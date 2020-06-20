@@ -320,8 +320,6 @@ class Room {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
-        print('[fromStateEvents] $event ${event.content} ${event.type}');
-
         switch (event.type) {
           case 'm.room.name':
             if (namePriority > 0) {
@@ -399,6 +397,9 @@ class Room {
             }
             break;
           case 'm.room.encryption':
+            print(
+              '[m.room.encryption] ${event} ${event.content}',
+            );
             encryptionEnabled = true;
             break;
           case 'm.room.encrypted':
@@ -486,7 +487,7 @@ class Room {
       return this.copyWith(
         messages: allMessages,
         outbox: outbox,
-        encryptionEnabled: hasEncrypted != null,
+        encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline
         endHash: this.endHash ?? prevHash,

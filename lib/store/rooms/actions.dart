@@ -470,8 +470,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
         throw 'Room is already encrypted';
       }
 
-      final event = {
-        'type': EventTypes.encryption,
+      final content = {
         'algorithm': Algorithms.megolmv1,
       };
 
@@ -480,16 +479,15 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
-        event: event,
         eventType: EventTypes.encryption,
-        trxId: Random.secure().nextInt(1 << 31).toString(),
+        content: content,
       );
 
       if (data['errcode'] != null) {
         throw data['error'];
       }
 
-      store.dispatch(fetchDirectRooms());
+      store.dispatch(fetchStateEvents(room: room));
       print('[toggleRoomEncryption] success $data');
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
