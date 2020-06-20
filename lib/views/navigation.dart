@@ -2,7 +2,7 @@ import 'package:Tether/store/index.dart'; // TODO: remove need for store in view
 
 import 'package:Tether/views/home/chat/details-chat.dart';
 import 'package:Tether/views/home/chat/details-message.dart';
-import 'package:Tether/views/home/search/seach-groups.dart';
+import 'package:Tether/views/home/search/search-groups.dart';
 import 'package:Tether/views/home/search/search-users.dart';
 import 'package:Tether/views/home/settings/chats.dart';
 import 'package:Tether/views/home/settings/devices.dart';

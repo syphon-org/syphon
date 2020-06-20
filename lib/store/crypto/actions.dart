@@ -675,6 +675,8 @@ ThunkAction<AppState> importDeviceKeysOwned() {
 
       final importData = await json.decode(await file.readAsString());
 
+      print('[importDeviceKeysOwned] ${importData}');
+
       store.dispatch(
         SetOlmAccountBackup(
           olmAccountKey: importData['account_key'],

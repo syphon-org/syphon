@@ -34,9 +34,20 @@ String formatDisplayName(User user) {
 String displayInitials(User user) {
   final userId = user.userId ?? 'Unknown';
   final displayName = user.displayName ?? userId.replaceFirst('@', '');
-  final initials = displayName.contains(' ')
-      ? displayName.split(' ')[0].substring(0, 1) +
-          displayName.split(' ')[1].substring(0, 1)
-      : displayName.substring(0, 2);
-  return initials.toUpperCase();
+
+  if (displayName.length > 0) {
+    final initials = displayName.length > 1
+        ? displayName.substring(0, 2)
+        : userId.substring(0, 1);
+
+    return initials.toUpperCase();
+  }
+
+  if (userId.length > 0) {
+    final initials =
+        userId.length > 1 ? userId.substring(0, 2) : userId.substring(0, 1);
+    return initials.toUpperCase();
+  }
+
+  return 'NA';
 }

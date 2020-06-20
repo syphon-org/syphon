@@ -1,11 +1,11 @@
 /**
  * Constants that cannot be localized
- * taken as a convension from Android
+ * taken as a convention from Android
  */
 class Values {
   static const appId = 'org.tether.tether';
   static const appName = 'Syphon';
-  static const appNameLabel = 'syphon';
+  static const appNameLabel = 'tether'; // TODO: change to syphon
   static const appNameLong = 'Syphon Messenger';
 
   static const defaultLanguage = 'en-US';

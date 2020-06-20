@@ -192,13 +192,12 @@ ThunkAction<AppState> searchUsers({String searchText}) {
         throw data['error'];
       }
 
-      print('[searchUsers] success');
       final List<dynamic> rawUsers = data['results'];
+
+      print('[searchUsers] ${data['results']}');
 
       final List<User> searchResults =
           rawUsers.map((room) => User.fromJson(room)).toList();
-
-      // TODO: dispatch fetch user icons
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],

@@ -1,8 +1,8 @@
 name: Tether
-description: Privacy centric matrix client for everyone
+description: Privacy focused matrix client for everyone
 
 # flutter commands
-# $ flutter create --org org.tether tether
+# $ flutter create --org org.tether.tether
 # $ flutter run --no-fast-start
 # $ flutter pub get
 # $ flutter pub global run devtools 

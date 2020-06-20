@@ -5,6 +5,10 @@ String formatSender(String sender) {
   return sender.replaceAll('@', '').split(':')[0];
 }
 
+String formatUserId(String displayName, {String homeserver}) {
+  return '@${displayName}:${homeserver ?? 'matrix.org'}';
+}
+
 // @again_ereio:matrix.org -> ER
 String formatSenderInitials(String sender) {
   var formattedSender = formatSender(sender).toUpperCase();
