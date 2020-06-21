@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:Tether/global/libs/matrix/encryption.dart';
 import 'package:Tether/global/libs/matrix/index.dart';
 import 'package:Tether/global/libs/matrix/user.dart';
 import 'package:Tether/store/alerts/actions.dart';
 import 'package:Tether/store/crypto/actions.dart';
+import 'package:Tether/store/crypto/model.dart';
 import 'package:Tether/store/index.dart';
 import 'package:Tether/store/rooms/actions.dart';
 import 'package:Tether/store/rooms/events/model.dart';
@@ -66,19 +68,8 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
+      // last since called on /sync
       final lastSince = store.state.syncStore.lastSince;
-
-      // print('[fetchMessageEvents] ${room.name} [param] endHash ${endHash}');
-      // print('[fetchMessageEvents] ${room.name} [param] startHash ${startHash}');
-
-      // print('[fetchMessageEvents] ${room.name} endHash ${room.endHash}');
-      // print('[fetchMessageEvents] ${room.name} prevHash ${room.prevHash}');
-      // print('[fetchMessageEvents] ${room.name} startHash ${room.startHash}');
-
-      // print('[fetchMessageEvents] ${room.name} lastSince $lastSince');
-
-      // final String start = startHash ?? room.prevHash ?? room.toHash;
-      // final String end = endHash ?? room.fromHash ?? lastSince;
 
       final Map messagesJson = await MatrixApi.fetchMessageEvents(
         protocol: protocol,
@@ -94,30 +85,26 @@ ThunkAction<AppState> fetchMessageEvents({
       final String end = messagesJson['end'];
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String start = messagesJson['start'];
-
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
-
-      messages.forEach((message) {
-        print(
-          '[fetchMessageEvents]  ${message['sender']} ${message}',
-        );
-      });
 
       // print('[fetchMessageEvents] ${room.name} end $end');
       // print('[fetchMessageEvents] ${room.name} start $start');
-
-      var nextPrevBatch;
+      // messages.forEach((message) {
+      //   print(
+      //     '[fetchMessageEvents]  ${message['sender']} ${message}',
+      //   );
+      // });
 
       // If there's a gap in messages fetched, run a sync again
       // which will fetch the next batch with the same endHash
-
-      // print(
-      //   '[fetchMessageEvents] ${room.name} shouldFetch? end != start: ${end != start},  end != endHash: ${end != endHash}',
-      // );
+      // the following is probably not needed due to the
+      // inequality check for prevHash and endHash in syncRooms
+      var nextPrevBatch;
       if (end != start && end != endHash) {
         nextPrevBatch = end;
       }
 
+      // reuse the logic for syncing
       store.dispatch(syncRooms(
         {
           '${room.id}': {
@@ -128,9 +115,6 @@ ThunkAction<AppState> fetchMessageEvents({
           },
         },
       ));
-
-      // Have an equivalent json parser for cold storage?
-      // store.dispatch(syncStorage());
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {
@@ -172,38 +156,6 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
       print('[fetchRooms] ${room.id} $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
-
-/**
- * UNIMPLEMENTED
- */
-ThunkAction<AppState> fetchMemberEvents({String roomId}) {
-  return (Store<AppState> store) async {
-    try {
-      final request = buildFastRoomMembersRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        roomId: roomId,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-
-      // Convert rooms to rooms
-      print('[fetchMemberEvents] TESTING $data');
-    } catch (error) {
-      print('[fetchMemberEvents] error $error');
     }
   };
 }
@@ -265,6 +217,7 @@ ThunkAction<AppState> sendTyping({
         userId: store.state.authStore.user.userId,
         typing: typing,
       );
+
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -293,15 +246,15 @@ ThunkAction<AppState> sendMessageKeys({
       // if you're incredibly unlucky, and fast, you could have a problem here
       // final String trxId = DateTime.now().millisecond.toString();
 
-      print('[sendMessageKeys] firing');
+      print('[sendMessageKeys] start');
 
       final sessionExists =
           store.state.cryptoStore.olmInboundKeySessions[room.id];
 
       if (sessionExists == null) {
-        print('[sendMessageKeys] session does not exist');
+        print('[sendMessageKeys] init key session');
         await store.dispatch(
-          claimOneTimeKey(room: room),
+          claimOneTimeKeys(room: room),
         );
       }
 
@@ -330,36 +283,56 @@ ThunkAction<AppState> sendMessageKeys({
   };
 }
 
-ThunkAction<AppState> claimOneTimeKey({
+ThunkAction<AppState> claimOneTimeKeys({
   Room room,
 }) {
   return (Store<AppState> store) async {
     try {
-      final user = room.users.values.elementAt(0);
+      if (!room.direct) {
+        throw "Encryption currently only works for direct messaging";
+      }
 
-      print('[claimOneTimeKey] user ${user}');
+      final roomUsers = room.users.values;
+      final deviceKeys = store.state.cryptoStore.deviceKeys;
+      final currentUser = store.state.authStore.user;
 
-      // TODO: work with more than 1 user
-      final userDevices = store.state.cryptoStore.deviceKeys[user.userId];
+      print('[claimOneTimeKey] users ${roomUsers}');
+      print('[claimOneTimeKey] deviceKeys ${roomUsers}');
 
-      print(
-        '[claimOneTimeKey] deviceKeys ${store.state.cryptoStore.deviceKeys}',
-      );
+      final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
+          .map((user) => deviceKeys[user.userId].values)
+          .expand((x) => x));
 
-      userDevices.forEach((key, value) {
-        print('[claimOneTimeKey] ${key} ${value}');
+      var keyClaims = {};
+
+      roomDeviceKeys.forEach((deviceKey) {
+        // don't claim your own device one time keys
+        if (deviceKey.deviceId == currentUser.deviceId) return;
+        if (keyClaims[deviceKey.userId] == null) {
+          keyClaims[deviceKey.userId] = {};
+        }
+
+        keyClaims[deviceKey.userId][deviceKey.deviceId] =
+            Algorithms.signedcurve25519;
       });
 
-      // final oneTimeKeys = {
+      final data = await MatrixApi.claimKeys(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        oneTimeKeys: keyClaims,
+      );
 
-      // };
-      // final data = await MatrixApi.claimKeys(
-
-      // );
-
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
     } catch (error) {
       store.dispatch(
-        addAlert(type: 'warning', message: error.message),
+        addAlert(
+          type: 'warning',
+          message: error.message,
+          origin: 'claimOneTimeKeys',
+        ),
       );
     }
   };

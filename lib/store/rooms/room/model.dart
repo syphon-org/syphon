@@ -200,9 +200,10 @@ class Room {
 
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
-    List<Message> timelineEvents = [];
+    List<Message> messageEvents = [];
     List<Event> accountDataEvents = [];
 
+    // Find state only updates
     if (json['state'] != null) {
       final List<dynamic> rawStateEvents = json['state']['events'];
 
@@ -211,26 +212,34 @@ class Room {
     }
 
     if (json['invite_state'] != null) {
-      print('[fromSync] Its an invite!');
       final List<dynamic> rawStateEvents = json['invite_state']['events'];
-
-      print('[fromSync] invite_events $rawStateEvents');
 
       stateEvents =
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
       invite = true;
     }
 
+    // Find state and message updates from timeline
+    // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
       prevHash = json['timeline']['prev_batch'];
 
-      // print('[fromSync] ${this.name} prev_batch $prevHash');
-
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
-      timelineEvents = rawTimelineEvents
-          .map((event) => Message.fromEvent(Event.fromJson(event)))
-          .toList();
+      final List<Event> timelineEvents = List.from(
+        rawTimelineEvents.map((event) => Event.fromJson(event)),
+      );
+
+      messageEvents = List.from(timelineEvents
+          .where((event) =>
+              event.type == EventTypes.message ||
+              event.type == EventTypes.encrypted)
+          .map((event) => Message.fromEvent(event)));
+
+      stateEvents = List.from(stateEvents)
+        ..addAll(timelineEvents.where((event) =>
+            event.type != EventTypes.message &&
+            event.type != EventTypes.encrypted));
     }
 
     if (json['ephemeral'] != null) {
@@ -259,7 +268,7 @@ class Room {
           currentUser: currentUser,
         )
         .fromMessageEvents(
-          timelineEvents,
+          messageEvents,
           prevHash: prevHash,
           latestHash: lastSince,
         )
@@ -397,15 +406,9 @@ class Room {
             }
             break;
           case 'm.room.encryption':
-            print(
-              '[m.room.encryption] ${event} ${event.content}',
-            );
             encryptionEnabled = true;
             break;
           case 'm.room.encrypted':
-            print(
-              '[m.room.encrypted] ${event.content}',
-            );
             break;
           default:
             break;
@@ -447,13 +450,7 @@ class Room {
       List<Message> existingMessages = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final newMessages = messages
-          .where(
-            (event) =>
-                event.type == EventTypes.message ||
-                event.type == EventTypes.encrypted,
-          )
-          .toList();
+      final newMessages = messageEvents;
 
       final hasEncrypted = newMessages.firstWhere(
         (msg) => msg.type == EventTypes.encrypted,

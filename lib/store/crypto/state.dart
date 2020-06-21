@@ -42,9 +42,14 @@ class CryptoStore extends Equatable {
   @HiveField(2)
   final bool deviceKeysExist;
 
+  // Track last known uploaded key amounts
+  @HiveField(7)
+  final Map oneTimeKeysCounts;
+
+  // The following should either be
+  // regenerated or reclaimed if state is lost
   final Map oneTimeKeys; //one time keys
   final Map oneTimeKeysOwned;
-  final Map oneTimeKeysCounts; // only for owned ?
 
   const CryptoStore({
     this.olmAccount,

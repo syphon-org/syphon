@@ -194,8 +194,6 @@ ThunkAction<AppState> searchUsers({String searchText}) {
 
       final List<dynamic> rawUsers = data['results'];
 
-      print('[searchUsers] ${data['results']}');
-
       final List<User> searchResults =
           rawUsers.map((room) => User.fromJson(room)).toList();
 

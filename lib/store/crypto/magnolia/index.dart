@@ -72,17 +72,13 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 
       final user = store.state.authStore.user;
       final deviceKey = store.state.cryptoStore.deviceKeysOwned[user.deviceId];
-
-      print('[exportDeviceKeysOwned] $deviceKey');
-
+  
       file = await file.writeAsString(
         json.encode(deviceKey.toMap(),
       );
-
-      // print(data);
+ 
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      store.dispatch(addAlert(type: 'warning', message: error)); 
     }
   };
 }
@@ -190,8 +186,7 @@ ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
     );
 
     deviceKeys.forEach((key, value) {
-      currentKeys.putIfAbsent(key, () => deviceKeys[key]);
-      // print('[setDeviceKeysOwned] ${currentKeys[key]}'); // TESTING ONLY
+      currentKeys.putIfAbsent(key, () => deviceKeys[key]); 
     });
 
     store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: currentKeys));

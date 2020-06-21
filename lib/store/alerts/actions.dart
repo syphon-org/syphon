@@ -52,9 +52,10 @@ ThunkAction<AppState> testAlerts({type, message}) {
   };
 }
 
-ThunkAction<AppState> addAlert({type, message}) {
+ThunkAction<AppState> addAlert({type, message, origin}) {
   return (Store<AppState> store) async {
-    print('[addAlert] $type : $message');
+    print('[$origin] $type : $message');
+
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);
     store.dispatch(AddAlert(alert: alert));

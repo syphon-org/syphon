@@ -145,9 +145,18 @@ ThunkAction<AppState> syncRooms(
   };
 }
 
+/**
+ *  
+ *  Fetch Rooms (w/o /sync)
+ * 
+ * Takes a negligible amount of time
+ * 
+ * final stopwatch = Stopwatch()..start();
+ * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
+ * stopwatch.stop();
+ */
 ThunkAction<AppState> fetchRooms() {
   return (Store<AppState> store) async {
-    final stopwatch = Stopwatch()..start();
     try {
       store.dispatch(SetLoading(loading: true));
 
@@ -185,8 +194,6 @@ ThunkAction<AppState> fetchRooms() {
             limit: 20,
           );
 
-          print('[fetchRooms] ${room.id}');
-
           store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
@@ -210,8 +217,6 @@ ThunkAction<AppState> fetchRooms() {
       print('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
-      print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
-      stopwatch.stop();
     }
   };
 }
@@ -269,14 +274,12 @@ ThunkAction<AppState> fetchDirectRooms() {
               limit: 20,
             );
 
-            // if (messageEvents['errcode'] != null) {
-            //   throw messageEvents['error'];
-            // }
+            if (messageEvents['errcode'] != null) {
+              throw messageEvents['error'];
+            }
 
             // Format response like /sync request
             // Hacked together to provide isDirect data
-
-            print('[fetchDirectRooms] $roomId');
             await store.dispatch(syncRooms({
               '$roomId': {
                 'state': {
@@ -521,6 +524,9 @@ ThunkAction<AppState> acceptRoom({Room room}) {
       store.dispatch(SetRoom(
         room: joinedRoom.copyWith(invite: false),
       ));
+
+      await store.dispatch(fetchRooms());
+      await store.dispatch(fetchDirectRooms());
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
       print(error);

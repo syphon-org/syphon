@@ -20,7 +20,7 @@ class DeviceKey extends Equatable {
   @HiveField(5)
   final Map<String, String> extras;
 
-  // Dont send this to matrix, only for owned device keys
+  // DEPRRECATED
   @HiveField(6)
   final Map<String, String> privateKeys;
 
@@ -83,7 +83,6 @@ class DeviceKey extends Equatable {
         'keys: $keys,' +
         'signatures: $signatures,' +
         'extras: $extras,' +
-        'private_keys: $privateKeys' +
         '}\n';
   }
 }

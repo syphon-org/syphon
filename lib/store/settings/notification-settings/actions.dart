@@ -1,5 +1,4 @@
 import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/global/strings.dart';
 import 'package:Tether/global/values.dart';
 import 'package:Tether/store/settings/actions.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

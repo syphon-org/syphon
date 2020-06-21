@@ -15,6 +15,7 @@ const int NotificationSettingsHiveId = 10;
 const int PusherHiveId = 11;
 const int RuleHiveId = 12;
 const int DeviceKeyHiveId = 13;
+const int OneTimeKeyHiveId = 14;
 
 // Actual Redux State Stores
 const int MediaStoreHiveId = 0;

@@ -287,10 +287,6 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
         'device_keys': deviceKey.toMap(),
       };
 
-      print(
-        '[uploadDeviceKey] result ${deviceKeyMap}',
-      );
-
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
@@ -308,8 +304,11 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
         message: 'Successfully uploaded new device key',
       ));
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'uploadIdentityKeys',
+      ));
     }
   };
 }
@@ -326,8 +325,11 @@ ThunkAction<AppState> generateOneTimeKeys({DeviceKey deviceKey}) {
       olmAccount.generate_one_time_keys(5); // synchronous
       return json.decode(olmAccount.one_time_keys());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'generateOneTimeKeys',
+      ));
     }
   };
 }
@@ -365,6 +367,8 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
 
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
+    print('[updateOneTimeKeyCounts] updated count $oneTimeKeysCounts');
+
     store.dispatch(
       SetOneTimeKeysCounts(oneTimeKeysCounts: oneTimeKeysCounts),
     );
@@ -381,7 +385,8 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
     final int signedCurveCount =
         oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
 
-    if ((signedCurveCount < maxKeyCount / 3)) {
+    // the last check is because im scared
+    if ((signedCurveCount < maxKeyCount / 3) && signedCurveCount < 100) {
       store.dispatch(updateOneTimeKeys());
     }
   };
@@ -402,8 +407,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         );
       }
 
-      print('[updateOneTimeKeys] $newOneTimeKeys');
-
       final payload = {
         'one_time_keys': newOneTimeKeys,
       };
@@ -419,17 +422,14 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         throw data['error'];
       }
 
-      final oneTimeKeysCounts = store.state.cryptoStore.oneTimeKeysCounts;
-
-      // TODO: really shouldn't be needed
-      if (data['one_time_key_counts'][type] != oneTimeKeysCounts) {
-        store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
-      }
-
-      print('[updateOneTimeKeys] success $data');
-
+      // save account state after successful upload
       olmAccount.mark_keys_as_published();
-      store.dispatch(saveOlmAccount());
+      await store.dispatch(saveOlmAccount());
+
+      print('[updateOneTimeKeys] success $newOneTimeKeys $data');
+
+      // register new key counts
+      store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
     }
@@ -718,11 +718,12 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       };
 
       file = await file.writeAsString(json.encode(exportData));
-
-      // print(data);
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'exportDeviceKeysOwned',
+      ));
     }
   };
 }
@@ -737,8 +738,6 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       );
 
       final importData = await json.decode(await file.readAsString());
-
-      print('[importDeviceKeysOwned] ${importData}');
 
       store.dispatch(
         SetOlmAccountBackup(
@@ -756,8 +755,11 @@ ThunkAction<AppState> importDeviceKeysOwned() {
         ),
       );
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'importDeviceKeysOwned',
+      ));
     }
   };
 }

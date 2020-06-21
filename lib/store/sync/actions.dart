@@ -197,21 +197,20 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
       final Map<String, dynamic> rawInvites = data['rooms']['invite'];
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
-      final Map presence = data['presence'];
+      // TODO:  final Map presence = data['presence'];
 
-      print('[fetchSync] presence $presence');
+      print('[fetchSync] rooms $rawLeft');
 
       // Local state updates based on changes
       await store.dispatch(syncRooms(rawJoined));
       await store.dispatch(syncRooms(rawInvites));
 
+      // Update encryption one time key count
+      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
+
       if (isFullSync) {
         store.dispatch(saveSync(data));
       }
-
-      // Update encryption one time key count
-      print('[fetchSync] updated count $oneTimeKeyCount');
-      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
