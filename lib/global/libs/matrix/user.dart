@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Tether/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
 import 'package:http/http.dart' as http;
 
 abstract class Users {

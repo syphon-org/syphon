@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/behaviors.dart';
+import 'package:syphon/global/behaviors.dart';
 
 // Assets
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class Loading extends StatelessWidget {
   Loading({Key key, this.title}) : super(key: key);

@@ -1,7 +1,7 @@
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/events/selectors.dart';
-import 'package:Tether/store/rooms/room/model.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 String formatPreviewTopic(String fullTopic, {String defaultTopic}) {
   final topic = fullTopic ?? defaultTopic ?? 'No Topic Available';

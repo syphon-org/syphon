@@ -1,14 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:Tether/global/libs/hive/index.dart';
-import 'package:Tether/store/alerts/model.dart';
-import 'package:Tether/store/auth/reducer.dart';
-import 'package:Tether/store/crypto/reducer.dart';
-import 'package:Tether/store/crypto/state.dart';
-import 'package:Tether/store/media/reducer.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/sync/reducer.dart';
-import 'package:Tether/store/sync/state.dart';
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/store/alerts/model.dart';
+import 'package:syphon/store/auth/reducer.dart';
+import 'package:syphon/store/crypto/reducer.dart';
+import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/media/reducer.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/reducer.dart';
+import 'package:syphon/store/sync/state.dart';
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';

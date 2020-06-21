@@ -1,7 +1,7 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/formatters.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

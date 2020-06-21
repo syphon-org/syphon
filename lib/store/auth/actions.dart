@@ -2,20 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:Tether/global/libs/matrix/errors.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/auth/credential/model.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/settings/notification-settings/actions.dart';
-import 'package:Tether/store/sync/actions.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
 
-import 'package:Tether/global/libs/matrix/media.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/global/notifications.dart';
+import 'package:syphon/global/libs/matrix/media.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,8 +23,8 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/alerts/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import '../user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];

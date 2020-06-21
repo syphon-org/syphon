@@ -1,10 +1,10 @@
-import 'package:Tether/global/libs/matrix/auth.dart';
-import 'package:Tether/global/libs/matrix/devices.dart';
-import 'package:Tether/global/libs/matrix/encryption.dart';
-import 'package:Tether/global/libs/matrix/events.dart';
-import 'package:Tether/global/libs/matrix/notifications.dart';
-import 'package:Tether/global/libs/matrix/rooms.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/devices.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/events.dart';
+import 'package:syphon/global/libs/matrix/notifications.dart';
+import 'package:syphon/global/libs/matrix/rooms.dart';
+import 'package:syphon/global/libs/matrix/user.dart';
 
 abstract class MatrixApi {
   // Authentication

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 
 import './room/model.dart';
 

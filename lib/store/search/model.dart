@@ -1,4 +1,4 @@
-import 'package:Tether/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:equatable/equatable.dart';
 

@@ -1,4 +1,4 @@
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 import './room/model.dart';
 

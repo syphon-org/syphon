@@ -1,7 +1,7 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';

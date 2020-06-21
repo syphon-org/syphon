@@ -1,9 +1,9 @@
-import 'package:Tether/global/strings.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class ThirdSection extends StatelessWidget {
   ThirdSection({Key key, this.title}) : super(key: key);

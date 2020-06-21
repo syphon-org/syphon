@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:io';
 
 // Store
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/views/home/chat/chat-input.dart';
-import 'package:Tether/views/home/chat/details-message.dart';
-import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/home/chat/dialog-encryption.dart';
-import 'package:Tether/views/home/chat/dialog-invite.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
-import 'package:Tether/views/widgets/message-typing.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/views/home/chat/chat-input.dart';
+import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/home/chat/dialog-encryption.dart';
+import 'package:syphon/views/home/chat/dialog-invite.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,18 +24,18 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
 import 'package:redux/redux.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/events/selectors.dart';
-import 'package:Tether/store/rooms/selectors.dart' as roomSelectors;
-import 'package:Tether/store/rooms/events/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/rooms/events/actions.dart';
 
 // Global widgets
-import 'package:Tether/views/widgets/message.dart';
+import 'package:syphon/views/widgets/message.dart';
 
 // Styling
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/views/widgets/menu.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/views/widgets/menu.dart';
 
 /**
  * Resources:

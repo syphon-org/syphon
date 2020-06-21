@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/formatters.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/selectors.dart';
-import 'package:Tether/views/home/chat/index.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +17,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/store/search/actions.dart';
+import 'package:syphon/store/search/actions.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Assets

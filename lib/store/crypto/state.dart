@@ -1,8 +1,8 @@
-import 'package:Tether/global/libs/matrix/encryption.dart';
-import 'package:Tether/store/crypto/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/store/crypto/model.dart';
 import 'package:hive/hive.dart';
 import 'package:equatable/equatable.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:olm/olm.dart';
 
 part 'state.g.dart';

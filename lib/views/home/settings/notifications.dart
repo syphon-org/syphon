@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/notification-settings/actions.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

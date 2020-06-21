@@ -1,15 +1,15 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 class PrivacyPreferences extends StatelessWidget {
   PrivacyPreferences({Key key, this.title}) : super(key: key);
@@ -71,7 +71,7 @@ class PrivacyPreferences extends StatelessWidget {
                                 'Screen lock',
                               ),
                               subtitle: Text(
-                                'Lock Tether access with native device screen lock or fingerprint',
+                                'Lock ${Values.appName} access with native device screen lock or fingerprint',
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(

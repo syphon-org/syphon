@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:Tether/global/libs/matrix/encryption.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/crypto/model.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/user.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';

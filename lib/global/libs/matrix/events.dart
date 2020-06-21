@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Tether/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:http/http.dart' as http;
 
 abstract class Events {

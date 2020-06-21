@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:Tether/global/strings.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +10,17 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/behaviors.dart';
 
 // Assets
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class Login extends StatefulWidget {
   final Store<AppState> store;

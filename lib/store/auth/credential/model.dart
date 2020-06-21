@@ -1,4 +1,4 @@
-import 'package:Tether/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:equatable/equatable.dart';
 
 class Credential extends Equatable {

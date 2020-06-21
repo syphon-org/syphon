@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +11,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 // Styling Widgets
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/behaviors.dart';
 
 import './step-password.dart';
 

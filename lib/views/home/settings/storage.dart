@@ -1,6 +1,6 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/index.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

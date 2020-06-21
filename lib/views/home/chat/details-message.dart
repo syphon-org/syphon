@@ -1,9 +1,9 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/views/widgets/message.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/message.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -1,14 +1,14 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/values.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/selectors.dart';
-import 'package:Tether/global/assets.dart';
-import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,15 +18,15 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/rooms/selectors.dart';
-import 'package:Tether/global/formatters.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/global/formatters.dart';
 
 // View And Styling
-import 'package:Tether/views/widgets/menu.dart';
-import 'package:Tether/views/home/chat/index.dart';
-import 'package:Tether/global/colors.dart';
+import 'package:syphon/views/widgets/menu.dart';
+import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, help }

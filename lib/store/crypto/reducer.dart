@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:Tether/store/crypto/model.dart';
+import 'package:syphon/store/crypto/model.dart';
 
 import './state.dart';
 import './actions.dart';

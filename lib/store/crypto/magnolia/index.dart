@@ -13,12 +13,12 @@
 /*
 import 'dart:convert';
 
-import 'package:Tether/global/libs/matrix/encryption.dart';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/crypto/actions.dart';
-import 'package:Tether/store/crypto/model.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:canonical_json/canonical_json.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:redux/redux.dart';
@@ -66,7 +66,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
           DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
 
       final fileName =
-          '${directory.path}/tether_key_export_$formattedTime.json';
+          '${directory.path}/app_key_export_$formattedTime.json';
 
       var file = File(fileName);
 

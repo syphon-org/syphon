@@ -1,11 +1,11 @@
-import 'package:Tether/store/crypto/model.dart';
+import 'package:syphon/store/crypto/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 class DialogKeyInspector extends StatelessWidget {
   DialogKeyInspector({

@@ -1,5 +1,5 @@
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/model.dart';
 
 // Preauth
 

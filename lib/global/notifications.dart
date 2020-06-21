@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/global/values.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:flutter_apns/apns.dart';
 import 'package:flutter_apns/apns_connector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

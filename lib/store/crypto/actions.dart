@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Tether/global/libs/matrix/encryption.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/crypto/model.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -704,8 +704,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       final formattedTime =
           DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
 
-      final fileName =
-          '${directory.path}/tether_key_export_$formattedTime.json';
+      final fileName = '${directory.path}/app_key_export_$formattedTime.json';
 
       var file = File(fileName);
 

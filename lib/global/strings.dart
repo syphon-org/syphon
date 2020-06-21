@@ -1,4 +1,4 @@
-import 'package:Tether/global/values.dart';
+import 'package:syphon/global/values.dart';
 
 class Strings {
   // Titles

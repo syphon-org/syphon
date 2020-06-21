@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 

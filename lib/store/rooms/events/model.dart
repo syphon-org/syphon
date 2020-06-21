@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 

@@ -1,8 +1,8 @@
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
-import "package:Tether/global/themes.dart";
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/settings/notification-settings/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import "package:syphon/global/themes.dart";
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import './chat-settings/model.dart';

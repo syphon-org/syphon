@@ -1,25 +1,25 @@
 import 'dart:io';
-import 'package:Tether/global/values.dart';
-import 'package:Tether/store/crypto/model.dart';
-import 'package:Tether/store/crypto/state.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/crypto/state.dart';
 import 'package:convert/convert.dart';
 
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/auth/state.dart';
-import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/rooms/state.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/sync/state.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/auth/state.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/state.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:Tether/store/media/state.dart';
-import 'package:Tether/store/settings/state.dart';
+import 'package:syphon/store/media/state.dart';
+import 'package:syphon/store/settings/state.dart';
 
 // Global cache
 class Cache {

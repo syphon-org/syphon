@@ -1,4 +1,4 @@
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import './colors.dart';
