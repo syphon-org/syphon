@@ -34,19 +34,9 @@ abstract class MatrixApi {
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
-  static final sendEventDirectToDevice = Events.sendEventDirectToDevice;
+  static final sendEventToDevice = Events.sendEventToDevice;
 
-  /*** Users ***/
-
-  /**
-   * Save Account Data
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
-   * 
-   * Set some account_data for the client. This config is only visible
-   * to the user that set the account_data. The config will be synced 
-   * to clients in the top-level account_data.
-   */
+  // Account Data & User Management
   static final fetchAccountData = Users.fetchAccountData;
   static final saveAccountData = Users.saveAccountData;
   static final fetchUserProfile = Users.fetchUserProfile;

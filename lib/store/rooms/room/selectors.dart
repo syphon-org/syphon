@@ -26,11 +26,14 @@ String formatPreview({Room room}) {
 
   // Show topic if the user has joined a group but not sent anything (lurkin')
   if (room.messages == null || room.messages.length < 1) {
+    if (room.invite) {
+      return 'Invite to chat';
+    }
     if (room.direct) {
       return 'No messages yet';
-    } else {
-      return formatPreviewTopic(room.topic, defaultTopic: '');
     }
+
+    return formatPreviewTopic(room.topic, defaultTopic: '');
   }
 
   final messages = latestMessages(room.messages);

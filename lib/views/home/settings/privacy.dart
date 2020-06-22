@@ -307,7 +307,7 @@ class Props extends Equatable {
             builder: (context) => AlertDialog(
               title: Text("Confirm Deleting Keys"),
               content: Text(
-                  "Are you sure you want to delete your encryption keys for this device?"),
+                  "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable."),
               actions: <Widget>[
                 FlatButton(
                   child: Text('Cancel'),

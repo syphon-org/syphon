@@ -114,46 +114,6 @@ abstract class Events {
   }
 
   /**
-   * Send Message
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-   * 
-   * Notes on requestId (considered a transactionId in Matrix)
-   * 
-   * The transaction ID for this event. 
-   * Clients should generate an ID unique across requests with the same access token; 
-   * it will be used by the server to ensure idempotency of requests. <- really a requestId
-   */
-  static Future<dynamic> sendMessage({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String trxId,
-    Map message,
-  }) async {
-    String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer $accessToken',
-    };
-
-    Map body = {
-      "body": message['body'],
-      "msgtype": message['type'] ?? 'm.text',
-    };
-
-    final response = await http.put(
-      url,
-      headers: headers,
-      body: json.encode(body),
-    );
-
-    return await json.decode(response.body);
-  }
-
-  /**
    * Send Event (State Only)
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
@@ -194,6 +154,46 @@ abstract class Events {
   }
 
   /**
+   * Send Message
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+   * 
+   * Notes on requestId (considered a transactionId in Matrix)
+   * 
+   * The transaction ID for this event. 
+   * Clients should generate an ID unique across requests with the same access token; 
+   * it will be used by the server to ensure idempotency of requests. <- really a requestId
+   */
+  static Future<dynamic> sendMessage({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+    String trxId,
+    Map message,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      "body": message['body'],
+      "msgtype": message['type'] ?? 'm.text',
+    };
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
    * Send (Event) To Device
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-sendtodevice-eventtype-txnid
@@ -204,14 +204,15 @@ abstract class Events {
    * The messages to send. A map from user ID, to a map from device ID to message body. 
    * The device ID may also be *, meaning all known devices for the user.
    */
-  static Future<dynamic> sendEventDirectToDevice({
-    String trxId = '0', // just a random string to denote uniqueness
+  static Future<dynamic> sendEventToDevice({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
+    String trxId = '0', // just a random string to denote uniqueness
     String eventType,
     String userId,
-    Map event,
+    String deviceId,
+    Map content,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/sendToDevice/$eventType/$trxId';
@@ -222,9 +223,7 @@ abstract class Events {
 
     // Use astrick to send to all known devices for user
     Map body = {
-      "messages": {
-        '$userId': {'*': event}
-      }
+      "messages": {'$userId': {}}
     };
 
     final response = await http.put(

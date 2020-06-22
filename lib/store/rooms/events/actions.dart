@@ -14,6 +14,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:olm/olm.dart' as olm;
 
 import 'package:http/http.dart' as http;
 
@@ -228,111 +229,80 @@ ThunkAction<AppState> sendTyping({
 }
 
 /**
- * Send Encrypted Keys
+ * Send Session Encryption Keys
  * 
  * Specifically for sending encrypted keys using olm
  * for later use with encrypted messages using megolm
+ * sent directly to devices within the room
  * 
  * https://matrix.org/docs/spec/client_server/latest#id454
  * https://matrix.org/docs/spec/client_server/latest#id461
  */
 /**
  */
-ThunkAction<AppState> sendMessageKeys({
+ThunkAction<AppState> sendSessionKeys({
   Room room,
 }) {
   return (Store<AppState> store) async {
     try {
-      // if you're incredibly unlucky, and fast, you could have a problem here
-      // final String trxId = DateTime.now().millisecond.toString();
+      print('[sendSessionKeys] start');
 
-      print('[sendMessageKeys] start');
+      // Create payload of megolm session keys for message decryption
+      final messageSession = await store.dispatch(
+        exportMessageSession(roomId: room.id),
+      );
 
-      final sessionExists =
-          store.state.cryptoStore.olmInboundKeySessions[room.id];
+      final roomKeyEventContent = {
+        'algorithm': Algorithms.olmv1,
+        'room_id': room.id,
+        'session_id': messageSession['session_id'],
+        'session_key': messageSession['session_key'],
+      };
 
-      if (sessionExists == null) {
-        print('[sendMessageKeys] init key session');
-        await store.dispatch(
-          claimOneTimeKeys(room: room),
-        );
-      }
-
-      // final eventContent = {
-      //   'algorithm': Algorithms.olmv1,
-      //   'room_id': room.id,
-      //   'session_id': 'testing',
-      //   'session_key': 'testing',
-      // };
-
-      // final encryptedEventRoomKey = await store.dispatch(
-      //   encryptEventContent(
-      //     roomId: room.id,
-      //     eventType: EventTypes.roomKey,
-      //     content: eventContent,
-      //   ),
-      // );
+      // manage which devices to claim oneTimeKeys for
+      // here instead of within the function, because you'll
+      // need to cycle through those necessary devices here anyway
+      // for now, we're just sending the request to all the
+      // one time keys that were saved from this call
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
+      await store.dispatch(claimOneTimeKeys(room: room));
 
       // TODO: encrypt and send olm sendToDevice room keys / key sharing
-      return;
+      // For each one time key claimed
+      // send a m.room_key event directly to each device
+
+      final sendToDeviceRequests = oneTimeKeys.values.map((oneTimeKey) async {
+        try {
+          print('[sendSessionKeys] ${oneTimeKeys}');
+
+          final roomKeyEventContentEncrypted = await store.dispatch(
+            encryptKeyContent(
+              roomId: room.id,
+              deviceId: oneTimeKey.deviceId,
+              eventType: EventTypes.roomKey,
+              content: roomKeyEventContent,
+            ),
+          );
+
+          // TODO: testing only
+          return null;
+
+          final response = await MatrixApi.sendEventToDevice(
+            protocol: protocol,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver,
+            content: roomKeyEventContentEncrypted,
+          );
+        } catch (error) {
+          print('[sendSessionKeys] error $error');
+        }
+      });
+
+      // await all sendToDevice room key events to be sent to users
+      await Future.wait(sendToDeviceRequests);
     } catch (error) {
       store.dispatch(
         addAlert(type: 'warning', message: error.message),
-      );
-    }
-  };
-}
-
-ThunkAction<AppState> claimOneTimeKeys({
-  Room room,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      if (!room.direct) {
-        throw "Encryption currently only works for direct messaging";
-      }
-
-      final roomUsers = room.users.values;
-      final deviceKeys = store.state.cryptoStore.deviceKeys;
-      final currentUser = store.state.authStore.user;
-
-      print('[claimOneTimeKey] users ${roomUsers}');
-      print('[claimOneTimeKey] deviceKeys ${roomUsers}');
-
-      final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
-          .map((user) => deviceKeys[user.userId].values)
-          .expand((x) => x));
-
-      var keyClaims = {};
-
-      roomDeviceKeys.forEach((deviceKey) {
-        // don't claim your own device one time keys
-        if (deviceKey.deviceId == currentUser.deviceId) return;
-        if (keyClaims[deviceKey.userId] == null) {
-          keyClaims[deviceKey.userId] = {};
-        }
-
-        keyClaims[deviceKey.userId][deviceKey.deviceId] =
-            Algorithms.signedcurve25519;
-      });
-
-      final data = await MatrixApi.claimKeys(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        oneTimeKeys: keyClaims,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      store.dispatch(
-        addAlert(
-          type: 'warning',
-          message: error.message,
-          origin: 'claimOneTimeKeys',
-        ),
       );
     }
   };
@@ -361,7 +331,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       };
 
       final encryptedEvent = await store.dispatch(
-        encryptEventContent(
+        encryptMessageContent(
           roomId: room.id,
           eventType: EventTypes.message,
           content: messageEvent,

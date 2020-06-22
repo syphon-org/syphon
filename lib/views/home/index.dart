@@ -407,6 +407,27 @@ class HomeViewState extends State<Home> {
                               )),
                         ),
                       ),
+                      Visibility(
+                        visible: room.invite,
+                        child: Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                Dimensions.thumbnailSizeMax,
+                              ),
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                color: Colors.grey,
+                                child: Icon(
+                                  Icons.mail_outline,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                              )),
+                        ),
+                      ),
                     ],
                   ),
                 ),

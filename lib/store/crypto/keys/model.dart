@@ -34,13 +34,20 @@ class OneTimeKey extends Equatable {
   final String userId;
   @HiveField(1)
   final String deviceId;
+
+  // Map<identityKey, key>
+  @HiveField(2)
+  final Map<String, String> keys;
+
+  // Map<identityKey, signature>
   @HiveField(3)
-  final Map<String, Map<String, String>> keys;
+  final Map<String, Map<String, String>> signatures;
 
   const OneTimeKey({
     this.userId,
     this.deviceId,
     this.keys,
+    this.signatures,
   });
 
   @override
@@ -48,18 +55,6 @@ class OneTimeKey extends Equatable {
         userId,
         deviceId,
         keys,
+        signatures,
       ];
-
-  factory OneTimeKey.fromJson(dynamic json) {
-    try {
-      return OneTimeKey(
-        userId: json['user_id'],
-        deviceId: json['device_id'],
-        keys: Map.from(json['keys']),
-      );
-    } catch (error) {
-      print('[DeviceKey.fromJson] error $error');
-      return OneTimeKey();
-    }
-  }
 }

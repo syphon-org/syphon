@@ -11,4 +11,4 @@ PRODUCT_NAME = Tether
 PRODUCT_BUNDLE_IDENTIFIER = org.tether.tether
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2019 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2020 syphon.org All rights reserved.

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:convert/convert.dart';
@@ -96,6 +97,7 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DeviceAdapter());
   Hive.registerAdapter(DeviceKeyAdapter());
+  Hive.registerAdapter(OneTimeKeyAdapter());
   // Hive.registerAdapter(AccountAdapter());
 
   // Custom Store Models

@@ -8,10 +8,6 @@ import './actions.dart';
 CryptoStore cryptoReducer(
     [CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetOneTimeKeysCounts:
-      return state.copyWith(
-        oneTimeKeysCounts: action.oneTimeKeysCounts,
-      );
     case SetOlmAccount:
       return state.copyWith(
         olmAccount: action.olmAccount,
@@ -19,10 +15,6 @@ CryptoStore cryptoReducer(
     case SetOlmAccountBackup:
       return state.copyWith(
         olmAccountKey: action.olmAccountKey,
-      );
-    case ResetDeviceKeys:
-      return state.copyWith(
-        deviceKeysOwned: Map<String, DeviceKey>(),
       );
     case SetDeviceKeys:
       return state.copyWith(
@@ -32,29 +24,45 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         deviceKeysOwned: action.deviceKeysOwned,
       );
+    case SetOneTimeKeysCounts:
+      return state.copyWith(
+        oneTimeKeysCounts: action.oneTimeKeysCounts,
+      );
+    case SetOneTimeKeysClaimed:
+      return state.copyWith(
+        oneTimeKeysClaimed: action.oneTimeKeys,
+      );
     case AddOutboundKeySession:
       final outboundSessions = Map<String, String>.from(
-        state.olmOutboundSessions,
+        state.outboundKeySessions,
       );
 
-      outboundSessions.putIfAbsent(action.roomId, () => action.session);
+      outboundSessions.putIfAbsent(action.deviceId, () => action.session);
 
       return state.copyWith(
-        olmOutboundSessions: outboundSessions,
+        outboundKeySessions: outboundSessions,
       );
     case AddOutboundMessageSession:
       final outboundSessions = Map<String, String>.from(
-        state.olmOutboundSessions,
+        state.outboundMessageSessions,
       );
 
       outboundSessions.putIfAbsent(action.roomId, () => action.session);
 
       return state.copyWith(
-        olmOutboundSessions: outboundSessions,
+        outboundMessageSessions: outboundSessions,
       );
     case ToggleDeviceKeysExist:
       return state.copyWith(
         deviceKeysExist: action.existence,
+      );
+    case ResetDeviceKeys:
+      return state.copyWith(
+        deviceKeysOwned: Map<String, DeviceKey>(),
+        inboundMessageSessions: Map<String, String>(),
+        outboundMessageSessions: Map<String, String>(),
+        inboundKeySessions: Map<String, String>(), // one-time device keys
+        outboundKeySessions: Map<String, String>(), // one-time device keys
       );
     default:
       return state;
