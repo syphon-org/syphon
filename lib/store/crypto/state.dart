@@ -29,7 +29,7 @@ class CryptoStore extends Equatable {
   @HiveField(8)
   final Map<String, String> inboundKeySessions; // olmv1 - key-sharing
 
-  // Map<deviceId, serializedSession>
+  // Map<identityKey, serializedSession> - per spec
   @HiveField(6)
   final Map<String, String> outboundKeySessions; // olmv1 - key-sharing
 

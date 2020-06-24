@@ -6,6 +6,8 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/libs/matrix/user.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -270,22 +272,21 @@ ThunkAction<AppState> sendSessionKeys({
       // TODO: encrypt and send olm sendToDevice room keys / key sharing
       // For each one time key claimed
       // send a m.room_key event directly to each device
-
-      final sendToDeviceRequests = oneTimeKeys.values.map((oneTimeKey) async {
+      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
-          print('[sendSessionKeys] ${oneTimeKeys}');
-
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
-              deviceId: oneTimeKey.deviceId,
+              identityKey: oneTimeKey.keys[Algorithms.curve25591],
               eventType: EventTypes.roomKey,
               content: roomKeyEventContent,
             ),
           );
 
-          // TODO: testing only
-          return null;
+          print(
+            '[sendSessionKeys] ${oneTimeKey.deviceId} ${roomKeyEventContentEncrypted}',
+          );
 
           final response = await MatrixApi.sendEventToDevice(
             protocol: protocol,
@@ -293,6 +294,10 @@ ThunkAction<AppState> sendSessionKeys({
             homeserver: store.state.authStore.user.homeserver,
             content: roomKeyEventContentEncrypted,
           );
+
+          if (response['errcode'] != null) {
+            throw response['error'];
+          }
         } catch (error) {
           print('[sendSessionKeys] error $error');
         }
