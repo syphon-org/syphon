@@ -3,12 +3,10 @@ import 'dart:math';
 
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/matrix/user.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
-import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
@@ -16,9 +14,6 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:olm/olm.dart' as olm;
-
-import 'package:http/http.dart' as http;
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -269,19 +264,22 @@ ThunkAction<AppState> sendSessionKeys({
       final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
       await store.dispatch(claimOneTimeKeys(room: room));
 
-      // TODO: encrypt and send olm sendToDevice room keys / key sharing
       // For each one time key claimed
       // send a m.room_key event directly to each device
+
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+
+      print(
+        '[sendSessionKeys] ${devicesOneTimeKeys.length}',
+      );
+
       final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
           final deviceKey = store.state.cryptoStore
               .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
 
-          // lol
-          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
-
           // find the identityKey for the device
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
           final identityKey = deviceKey.keys[keyId];
 
           // Poorly decided to save key sessions by deviceId at first but then
@@ -291,10 +289,14 @@ ThunkAction<AppState> sendSessionKeys({
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
-              identityKey: deviceKey.deviceId, // TODO identityKey after testing
+              identityKey: identityKey, // TODO identityKey after testing
               eventType: EventTypes.roomKey,
               content: roomKeyEventContent,
             ),
+          );
+
+          print(
+            '[sendSessionKeys] $roomKeyEventContentEncrypted',
           );
 
           final response = await MatrixApi.sendEventToDevice(

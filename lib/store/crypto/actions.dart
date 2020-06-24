@@ -162,7 +162,7 @@ ThunkAction<AppState> syncDevice(Map dataToDevice) {
         print('[syncDevice] eventsToDevice.map $event');
         // TODO: convert to event first or after?
 
-        switch (event.type) {
+        switch (event['type']) {
           case EventTypes.encrypted:
             return decryptKeyContent(
               content: event['content'],
@@ -537,8 +537,13 @@ ThunkAction<AppState> claimOneTimeKeys({
           roomDeviceKeys.fold(Map.from({}), (claims, deviceKey) {
         // don't claim your own device one time keys
         if (deviceKey.deviceId == currentUser.deviceId) return claims;
+
+        // find the identityKey for the device
+        final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+        final identityKey = deviceKey.keys[keyId];
+
         // don't claim one time keys for already claimed devices
-        if (outboundKeySessions.containsKey(deviceKey.deviceId)) return claims;
+        if (outboundKeySessions.containsKey(identityKey)) return claims;
 
         if (claims[deviceKey.userId] == null) {
           claims[deviceKey.userId] = {};
@@ -573,18 +578,20 @@ ThunkAction<AppState> claimOneTimeKeys({
         throw claimKeysResponse['error'];
       }
 
-      print('[claimOneTimeKeys] claimKeysResponse $claimKeysResponse');
-
       // format oneTimeKey map from keys claimed in response
       Map<String, OneTimeKey> oneTimekeys = {};
       final oneTimeKeysClaimed = claimKeysResponse['one_time_keys'];
-      oneTimeKeysClaimed.forEach((userId, deviceOneTimeKeys) {
-        deviceOneTimeKeys.forEach((deviceId, Map oneTimeKey) {
-          final String oneTimeKeyIdentity = oneTimeKey.keys.elementAt(0);
-          final String oneTimeKeyHash = oneTimeKey.values.elementAt(0)['key'];
 
-          final Map<String, String> oneTimeKeySignature =
-              oneTimeKey[oneTimeKeyIdentity]['signatures'][userId];
+      // Must be without types for forEach
+      oneTimeKeysClaimed.forEach((userId, deviceOneTimeKeys) {
+        // Must be without types for forEach
+        deviceOneTimeKeys.forEach((deviceId, oneTimeKey) {
+          // Parsing the oneTimeKey responses into the oneTimeKey model
+          final String oneTimeKeyIdentity = oneTimeKey.keys.elementAt(0);
+          final String oneTimeKeyHash = oneTimeKey[oneTimeKeyIdentity]['key'];
+          final oneTimeKeySignature = Map<String, String>.from(
+            oneTimeKey[oneTimeKeyIdentity]['signatures'][userId],
+          );
 
           oneTimekeys[deviceId] = OneTimeKey(
             userId: userId,
@@ -606,16 +613,18 @@ ThunkAction<AppState> claimOneTimeKeys({
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
-        final deviceIdKey = '${Algorithms.curve25591}:$deviceId';
+        final keyId = '${Algorithms.curve25591}:$deviceId';
+        final identityKey = deviceKey.keys[keyId];
 
         store.dispatch(createOutboundKeySession(
           deviceId: deviceId,
-          identityKey: deviceKey.keys[deviceIdKey],
+          identityKey: identityKey,
           oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
       });
       return true;
     } catch (error) {
+      print(error);
       store.dispatch(
         addAlert(
           type: 'warning',
@@ -652,7 +661,7 @@ ThunkAction<AppState> createOutboundKeySession({
 
     outboundKeySession.create_outbound(account, identityKey, oneTimeKey);
 
-    print('[createOutboundKeySession] create outbound success');
+    print('[createOutboundKeySession] success');
 
     // sychronous
     store.dispatch(saveOutboundKeySession(
@@ -706,11 +715,16 @@ ThunkAction<AppState> loadKeySession({
 
         if (outboundKeySessionSerialized != null) {
           print(
-            '[loadKeySession] found outboundKeySessionSerialized ${identityKey}',
+            '[loadKeySession] found outboundKeySessionSerialized ${outboundKeySessionSerialized}',
           );
 
-          return olm.Session()
-            ..unpickle(identityKey, outboundKeySessionSerialized);
+          final existingKeySession = olm.Session();
+          existingKeySession.unpickle(
+            identityKey,
+            outboundKeySessionSerialized,
+          );
+
+          return existingKeySession;
         }
       } catch (error) {
         print('[loadKeySession] ${identityKey} ${error}');

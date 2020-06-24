@@ -67,6 +67,7 @@ CryptoStore cryptoReducer(
         deviceKeysExist: action.existence,
       );
     case ResetDeviceKeys:
+      print('WAOSIJNDIOAUNSD IOUNASOD UNAOSUD NIAUSND ');
       return state.copyWith(
         deviceKeysOwned: Map<String, DeviceKey>(),
         inboundMessageSessions: Map<String, String>(),
