@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:Tether/global/assets.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/actions.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,12 +10,12 @@ import 'package:flutter/scheduler.dart';
 // Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 // Styling Widgets
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/dimensions.dart';
+import 'package:syphon/global/dimensions.dart';
 
 // Local Components
 import './landing.dart';
@@ -35,7 +35,7 @@ class IntroState extends State<Intro> {
 
   int currentStep = 0;
   bool onboarding = false;
-  String loginText = StringStore.buttonIntroExistQuestion;
+  String loginText = Strings.buttonIntroExistQuestion;
   PageController pageController;
 
   final List<Widget> sections = [
@@ -98,15 +98,15 @@ class IntroState extends State<Intro> {
                 child: Image(
                   width: 98,
                   height: 98,
-                  image: AssetImage(AssetsStore.appIconPng),
+                  image: AssetImage(Assets.appIconPng),
                 ),
               ),
               Text(
-                StringStore.confirmation_alpha_version_notice,
+                Strings.confirmationAlphaVersion,
                 textAlign: TextAlign.center,
               ),
               Text(
-                StringStore.confirmation_tether_terms_of_service,
+                Strings.confirmationAppTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),
               Row(
@@ -139,7 +139,7 @@ class IntroState extends State<Intro> {
       //   builder: (context) => AlertDialog(
       //     title: Text("Confirm Alpha TOS Agreement"),
       //     content: Text(
-      //       StringStore.confirmation_alpha_version_notice,
+      //       Strings.confirmationAlphaVersion,
       //     ),
       //     actions: <Widget>[
       //       FlatButton(
@@ -233,7 +233,7 @@ class IntroState extends State<Intro> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = StringStore.buttonIntroExistQuestion;
+                            loginText = Strings.buttonIntroExistQuestion;
                             onboarding = false;
                           });
                         }
@@ -307,7 +307,7 @@ class IntroState extends State<Intro> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              StringStore.buttonIntroExistAction,
+                              Strings.buttonIntroExistAction,
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme

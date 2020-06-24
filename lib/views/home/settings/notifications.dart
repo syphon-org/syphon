@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/notification-settings/actions.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +24,6 @@ class NotificationSettingsView extends StatelessWidget {
         builder: (context, props) {
           // Static horizontal: 16, vertical: 8
           final double width = MediaQuery.of(context).size.width;
-          final double height = MediaQuery.of(context).size.height;
-          final contentPadding = EdgeInsets.symmetric(
-            horizontal: width * 0.08,
-            vertical: height * 0.01,
-          );
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
@@ -60,7 +56,7 @@ class NotificationSettingsView extends StatelessWidget {
                     child: Column(children: [
                       Container(
                         width: width, // TODO: use flex, i'm rushing
-                        padding: contentPadding,
+                        padding: Dimensions.listPadding,
                         child: Text(
                           'On-Device',
                           textAlign: TextAlign.start,
@@ -69,7 +65,7 @@ class NotificationSettingsView extends StatelessWidget {
                       ),
                       Container(
                         width: width, // TODO: use flex, i'm rushing
-                        padding: contentPadding,
+                        padding: Dimensions.listPadding,
                         child: RichText(
                           textAlign: TextAlign.left,
                           text: TextSpan(
@@ -98,7 +94,7 @@ class NotificationSettingsView extends StatelessWidget {
                         enabled: Platform.isAndroid,
                         dense: true,
                         onTap: () => props.onToggleLocalNotifications(),
-                        contentPadding: contentPadding,
+                        contentPadding: Dimensions.listPadding,
                         title: Text(
                           'Notifications',
                           style: TextStyle(fontSize: 18.0),
@@ -124,7 +120,7 @@ class NotificationSettingsView extends StatelessWidget {
                     child: Column(children: [
                       Container(
                         width: width, // TODO: use flex, i'm rushing
-                        padding: contentPadding,
+                        padding: Dimensions.listPadding,
                         child: Text(
                           'Matrix (Remote)',
                           textAlign: TextAlign.start,
@@ -133,7 +129,7 @@ class NotificationSettingsView extends StatelessWidget {
                       ),
                       Container(
                         width: width, // TODO: use flex, i'm rushing
-                        padding: contentPadding,
+                        padding: Dimensions.listPadding,
                         child: Text(
                           'Show notifications using Apple Push Notifications through Matrix',
                           textAlign: TextAlign.start,
@@ -144,7 +140,7 @@ class NotificationSettingsView extends StatelessWidget {
                         enabled: Platform.isIOS,
                         dense: true,
                         onTap: () => props.onToggleRemoteNotifications(context),
-                        contentPadding: contentPadding,
+                        contentPadding: Dimensions.listPadding,
                         title: Text(
                           'Notifications',
                           style: TextStyle(fontSize: 18.0),
@@ -164,7 +160,7 @@ class NotificationSettingsView extends StatelessWidget {
                         enabled: props.remoteNotificationsEnabled,
                         dense: true,
                         onTap: () => props.onTogglePusher(),
-                        contentPadding: contentPadding,
+                        contentPadding: Dimensions.listPadding,
                         title: Text(
                           'Fetch Notifications',
                           style: TextStyle(fontSize: 18.0),
@@ -238,7 +234,7 @@ class Props extends Equatable {
                 builder: (context) => AlertDialog(
                   title: Text("Confirm Notifications"),
                   content: Text(
-                    StringStore.notificationConfirmation,
+                    Strings.confirmationNotifications,
                   ),
                   actions: <Widget>[
                     FlatButton(

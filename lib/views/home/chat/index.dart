@@ -2,15 +2,19 @@ import 'dart:async';
 import 'dart:io';
 
 // Store
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/views/home/chat/details-message.dart';
-import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/widgets/chat-input.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
-import 'package:Tether/views/widgets/message-typing.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/views/home/chat/chat-input.dart';
+import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/home/chat/dialog-encryption.dart';
+import 'package:syphon/views/home/chat/dialog-invite.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,18 +24,18 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
 import 'package:redux/redux.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/events/selectors.dart';
-import 'package:Tether/store/rooms/selectors.dart' as roomSelectors;
-import 'package:Tether/store/rooms/events/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/rooms/events/actions.dart';
 
 // Global widgets
-import 'package:Tether/views/widgets/message.dart';
+import 'package:syphon/views/widgets/message.dart';
 
 // Styling
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/views/widgets/menu.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/views/widgets/menu.dart';
 
 /**
  * Resources:
@@ -46,7 +50,8 @@ enum ChatOptions {
   allMedia,
   chatSettings,
   inviteFriends,
-  muteNotifications
+  muteNotifications,
+  debugging
 }
 
 class ChatViewArguements {
@@ -77,6 +82,9 @@ class ChatViewState extends State<ChatView> {
 
   double overshoot = 0;
   bool loadMore = false;
+  String mediumType = MediumType.plaintext;
+  String newMediumType = MediumType.plaintext;
+
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
@@ -100,12 +108,40 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  void onMounted() {
+  void onMounted() async {
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStoreToProps(store, arguements.roomId);
     final draft = props.room.draft;
+
+    // TODO: remove after the cache is updated
+    if (props.room.invite != null && props.room.invite) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: DialogInvite(
+          onAccept: props.onAcceptInvite,
+        ),
+      );
+    }
+    if (props.room.encryptionEnabled) {
+      this.setState(() {
+        mediumType = MediumType.encryption;
+      });
+    }
+
+    if (props.room.encryptionEnabled) {
+      final usersDeviceKeys = await store.dispatch(
+        fetchDeviceKeys(users: props.room.users),
+      );
+
+      store.dispatch(setDeviceKeys(usersDeviceKeys));
+    }
+
+    if (props.room.messages.length < 10) {
+      props.onLoadFirstBatch();
+    }
 
     messagesController.addListener(() {
       final extentBefore = messagesController.position.extentBefore;
@@ -196,16 +232,163 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
+  onChangeMediumType({String newMediumType, _Props props}) {
+    // noop
+    if (mediumType == newMediumType) {
+      return;
+    }
+
+    if (newMediumType == MediumType.encryption) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: DialogEncryption(
+          onAccept: () {
+            props.onToggleEncryption();
+
+            setState(() {
+              mediumType = newMediumType;
+            });
+          },
+        ),
+      );
+    } else {
+      // other mediums like sms, with no confirmation
+      setState(() {
+        mediumType = newMediumType;
+      });
+    }
+  }
+
+  @protected
   onToggleMessageOptions({Message message}) {
     this.setState(() {
       selectedMessage = message;
     });
   }
 
+  @protected
   onDismissMessageOptions() {
     this.setState(() {
       selectedMessage = null;
     });
+  }
+
+  @protected
+  onSubmitMessage(_Props props) async {
+    props.onSendMessage(
+      body: editorController.text,
+      type: MessageTypes.TEXT,
+    );
+    editorController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  @protected
+  onShowMediumMenu(context, props) async {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    showMenu(
+      elevation: 4.0,
+      context: context,
+      position: RelativeRect.fromLTRB(
+        width,
+        // input height and padding
+        height - Dimensions.inputSizeMin,
+        0.0,
+        0.0,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      items: [
+        PopupMenuItem<String>(
+          child: GestureDetector(
+            onTap: () {
+              print('[PopupMenuItem] ${MediumType.plaintext}');
+              Navigator.pop(context);
+              this.onChangeMediumType(
+                newMediumType: MediumType.plaintext,
+                props: props,
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      backgroundColor: const Color(DISABLED_GREY),
+                      child: Stack(children: [
+                        Positioned(
+                          right: 0,
+                          bottom: -1.5,
+                          child: Icon(
+                            Icons.lock_open,
+                            size: Dimensions.miniLockSize,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.send,
+                          size: Dimensions.iconSizeLite,
+                          color: Colors.white,
+                        ),
+                      ]),
+                    ),
+                  ),
+                  Text('Unencrypted'),
+                ],
+              ),
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          child: GestureDetector(
+            onTap: () {
+              print('[PopupMenuItem] ${MediumType.encryption}');
+              Navigator.pop(context);
+              this.onChangeMediumType(
+                newMediumType: MediumType.encryption,
+                props: props,
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: Stack(children: [
+                        Positioned(
+                          right: 0,
+                          bottom: -1.5,
+                          child: Icon(
+                            Icons.lock,
+                            size: Dimensions.miniLockSize,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.send,
+                          size: Dimensions.iconSizeLite,
+                          color: Colors.white,
+                        ),
+                      ]),
+                    ),
+                  ),
+                  Text('Encrypted'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildMessageList(
@@ -295,93 +478,6 @@ class ChatViewState extends State<ChatView> {
   // }
 
   @protected
-  onSubmitMessage(_Props props) async {
-    print(editorController.text);
-    props.onSendMessage(
-      body: editorController.text,
-      type: MessageTypes.TEXT,
-    );
-    editorController.clear();
-    FocusScope.of(context).unfocus();
-  }
-
-  // Widget buildChatInput(
-  //   BuildContext context,
-  //   _Props props,
-  // ) {
-  //   double width = MediaQuery.of(context).size.width;
-  //   double messageInputWidth = width - 72;
-
-  //   Color inputTextColor = const Color(BASICALLY_BLACK);
-  //   Color inputColorBackground = const Color(ENABLED_GREY);
-  //   Color inputCursorColor = Colors.blueGrey;
-  //   Color sendButtonColor = const Color(DISABLED_GREY);
-
-  //   if (sendable) {
-  //     sendButtonColor = Theme.of(context).primaryColor;
-  //   }
-
-  //   if (Theme.of(context).brightness == Brightness.dark) {
-  //     inputTextColor = Colors.white;
-  //     inputColorBackground = Colors.blueGrey;
-  //     inputCursorColor = Colors.white;
-  //   }
-
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     crossAxisAlignment: CrossAxisAlignment.end,
-  //     children: <Widget>[
-  //       Container(
-  //         constraints: BoxConstraints(
-  //           maxWidth: messageInputWidth,
-  //         ),
-  //         child: TextField(
-  //           maxLines: null,
-  //           keyboardType: TextInputType.multiline,
-  //           textInputAction: TextInputAction.newline,
-  //           cursorColor: inputCursorColor,
-  //           focusNode: inputFieldNode,
-  //           controller: editorController,
-  //           onChanged: (text) => onUpdateMessage(text, props),
-  //           onSubmitted:
-  //               !sendable ? null : (text) => this.onSubmitMessage(props),
-  //           style: TextStyle(
-  //             height: 1.5,
-  //             color: inputTextColor,
-  //           ),
-  //           decoration: InputDecoration(
-  //             filled: true,
-  //             fillColor: inputColorBackground,
-  //             contentPadding: const EdgeInsets.symmetric(
-  //               horizontal: 20.0,
-  //             ),
-  //             border: OutlineInputBorder(
-  //               borderRadius: BorderRadius.circular(24.0),
-  //             ),
-  //             hintText: 'Matrix message (unencrypted)',
-  //           ),
-  //         ),
-  //       ),
-  //       Container(
-  //         width: 48.0,
-  //         padding: EdgeInsets.symmetric(vertical: 4),
-  //         child: InkWell(
-  //           borderRadius: BorderRadius.circular(48),
-  //           onTap: !sendable ? null : () => this.onSubmitMessage(props),
-  //           child: CircleAvatar(
-  //             backgroundColor: sendButtonColor,
-  //             child: Icon(
-  //               Icons.send,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  @protected
   buildRoomAppBar({
     _Props props,
     BuildContext context,
@@ -408,34 +504,57 @@ class ChatViewState extends State<ChatView> {
             ),
           ),
           GestureDetector(
-            child: Hero(
-              tag: "ChatAvatar",
-              child: Container(
-                padding: EdgeInsets.only(right: 8),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: props.room.avatarUri != null
-                      ? Colors.transparent
-                      : props.roomPrimaryColor,
-                  child: props.room.avatarUri != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.thumbnailSizeMax,
-                          ),
-                          child: MatrixImage(
-                            width: 52,
-                            height: 52,
-                            mxcUri: props.room.avatarUri,
-                          ),
-                        )
-                      : Text(
-                          formatRoomInitials(room: props.room),
-                          style: TextStyle(
-                            fontSize: 18,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              child: Stack(
+                children: [
+                  Hero(
+                      tag: "ChatAvatar",
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: props.roomPrimaryColor,
+                        child: props.room.avatarUri != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSize,
+                                  height: Dimensions.avatarSize,
+                                  mxcUri: props.room.avatarUri,
+                                ),
+                              )
+                            : Text(
+                                formatRoomInitials(room: props.room),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      )),
+                  Visibility(
+                    visible: props.room.encryptionEnabled,
+                    child: Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          Dimensions.thumbnailSizeMax,
+                        ),
+                        child: Container(
+                          height: 16,
+                          width: 16,
+                          color: Colors.green,
+                          child: Icon(
+                            Icons.lock,
                             color: Colors.white,
+                            size: 10,
                           ),
                         ),
-                ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             onTap: () {
@@ -471,6 +590,8 @@ class ChatViewState extends State<ChatView> {
                     title: props.room.name,
                   ),
                 );
+              case ChatOptions.debugging:
+                return props.onDEBUGGING();
               default:
                 break;
             }
@@ -496,6 +617,10 @@ class ChatViewState extends State<ChatView> {
             const PopupMenuItem<ChatOptions>(
               value: ChatOptions.muteNotifications,
               child: Text('Mute Notifications'),
+            ),
+            const PopupMenuItem<ChatOptions>(
+              value: ChatOptions.debugging,
+              child: Text('DEBUG Send Message Keys'),
             ),
           ],
         )
@@ -613,7 +738,7 @@ class ChatViewState extends State<ChatView> {
           Color inputContainerColor = Colors.white;
 
           if (Theme.of(context).brightness == Brightness.dark) {
-            inputContainerColor = Colors.grey[850];
+            inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
           }
 
           var currentAppBar = buildRoomAppBar(
@@ -720,7 +845,9 @@ class ChatViewState extends State<ChatView> {
                       child: ChatInput(
                         sendable: sendable,
                         focusNode: inputFieldNode,
+                        mediumType: mediumType,
                         controller: editorController,
+                        onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
                         onSubmittedMessage: (text) =>
@@ -749,6 +876,10 @@ class _Props extends Equatable {
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
   final Function onLoadMoreMessages;
+  final Function onLoadFirstBatch;
+  final Function onAcceptInvite;
+  final Function onToggleEncryption;
+  final Function onDEBUGGING;
 
   _Props({
     @required this.room,
@@ -762,6 +893,10 @@ class _Props extends Equatable {
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
     @required this.onLoadMoreMessages,
+    @required this.onLoadFirstBatch,
+    @required this.onAcceptInvite,
+    @required this.onToggleEncryption,
+    @required this.onDEBUGGING,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -807,9 +942,18 @@ class _Props extends Equatable {
         String body,
         String type,
       }) async {
-        store.dispatch(sendMessage(
+        final room = store.state.roomStore.rooms[roomId];
+        if (room.encryptionEnabled) {
+          return store.dispatch(sendMessageEncrypted(
+            body: body,
+            room: room,
+            type: type,
+          ));
+        }
+
+        return store.dispatch(sendMessage(
           body: body,
-          room: store.state.roomStore.rooms[roomId],
+          room: room,
           type: type,
         ));
       },
@@ -820,32 +964,44 @@ class _Props extends Equatable {
           store.dispatch(deleteMessage(message: message));
         }
       },
+      onAcceptInvite: () {
+        store.dispatch(acceptRoom(
+          room: Room(id: roomId),
+        ));
+      },
       onSendTyping: ({typing, roomId}) => store.dispatch(
             sendTyping(
               typing: typing,
               roomId: roomId,
             ),
           ),
-      onLoadMoreMessages: () {
-        final room = roomSelectors.room(
-          id: roomId,
-          state: store.state,
+      onLoadFirstBatch: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(
+          fetchMessageEvents(
+            room: room,
+          ),
         );
-
+      },
+      onToggleEncryption: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(
+          toggleRoomEncryption(room: room),
+        );
+      },
+      onLoadMoreMessages: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(fetchMessageEvents(
           room: room,
           startHash: room.endHash,
         ));
-      }
-
-      /**
-         * TODO: Room Drafts
-         */
-      // onConvertDraftRoom: () async {
-      //   final room = store.state.roomStore.rooms[roomId];
-      //   return store.dispatch(convertDraftRoom(room: room));
-      // },
-      );
+      },
+      onDEBUGGING: () {
+        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(
+          sendSessionKeys(room: room),
+        );
+      });
 
   @override
   List<Object> get props => [

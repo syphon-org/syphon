@@ -1,8 +1,8 @@
-name: Tether
-description: Privacy centric matrix client for everyone
+name: syphon
+description: Privacy focused matrix client for everyone
 
 # flutter commands
-# $ flutter create --org org.tether tether
+# $ flutter create --org org.tether.tether
 # $ flutter run --no-fast-start
 # $ flutter pub get
 # $ flutter pub global run devtools 
@@ -39,7 +39,7 @@ description: Privacy centric matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.9+1
+version: 0.0.10+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -48,10 +48,20 @@ dependencies:
   flutter:
     sdk: flutter
 
+  olm: 
+    git:
+      url: https://gitlab.com/famedly/libraries/dart-olm
+      ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
+
+  # Old Packages
+  # workmanager: ^0.2.0 # TODO
+
   # Domain / Store
   expandable: 3.0.1
   equatable: ^1.1.0
   crypt: ^3.0.0
+  cryptography: 1.2.1
+  canonical_json: 1.0.0
   convert: ^2.1.1
   steel_crypt: 1.7.1
   device_info: ^0.4.2
@@ -67,18 +77,18 @@ dependencies:
   path_provider: 1.6.0  #https://github.com/flutter/plugins/pull/1570
 
   # Services
-  http: 0.12.0+2
+  http: ^0.12.0+2
   html: ^0.13.3+3
   intl: ^0.16.1
   http_parser: 3.1.4
   flutter_dotenv: ^2.0.3
-  flutter_apns: 1.1.0
+  flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   android_alarm_manager: 0.4.5+8
-  # workmanager: ^0.2.0
-
+  
   # UI Only
   url_launcher: ^5.4.7
   flutter_svg: ^0.17.0
+  file_picker: 1.10.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
   webview_flutter: ^0.3.21 
@@ -87,16 +97,14 @@ dependencies:
   flutter_recaptcha_v2: 0.1.0
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
-  flutter_material_color_picker: ^1.0.5
-  # flutter_staggered_animations: "^0.1.2"
+  flutter_material_color_picker: ^1.0.5 
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
 
   # Converters
   dart_json_mapper: 1.3.3
-  hive_generator: 0.7.0 
-  # dart_json_mapper: ^1.5.4
+  hive_generator: 0.7.0  
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -148,9 +156,9 @@ flutter:
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
    - assets/graphics/undraw_not_found.svg
-   - assets/icons/tether_icon.svg
-   - assets/icons/tether_icon.png
-   - assets/icons/tether_icon_white.png
+   - assets/icons/app_icon.svg
+   - assets/icons/app_icon.png
+   - assets/icons/app_icon_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

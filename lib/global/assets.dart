@@ -1,20 +1,25 @@
-const String TETHER_ICON = 'assets/icons/tether_icon.svg';
-const String TETHER_ICON_PNG = 'assets/icons/tether_icon.png';
-const String GRAPHIC_EMPTY_MESSAGES = 'assets/graphics/undraw_not_found.svg';
-const String MOBILE_USER_GRAPHIC = 'assets/graphics/undraw_mobile_user.svg';
-const String HIDDEN_MESSENGER_GRAPHIC =
-    'assets/graphics/undraw_messaging_fun.svg';
-const String CONNECTION_GRAPHIC = 'assets/graphics/undraw_connection.svg';
-const String WORKING_TOGETHER_GRAPHIC = 'assets/graphics/undraw_group_chat.svg';
-const String PEOPLE_GRAPHIC = 'assets/graphics/undraw_people.svg';
-const String SIGNUP_USERNAME_GRAPHIC =
-    'assets/graphics/undraw_profile_data.svg';
-const String SIGNUP_PASSWORD_GRAPHIC = 'assets/graphics/undraw_in_thought.svg';
-const String SIGNUP_HOMESERVER_GRAPHIC = 'assets/graphics/undraw_mention.svg';
+class Assets {
+  // Icons
+  static const appIcon = 'assets/icons/app_icon.svg';
+  static const appIconPng = 'assets/icons/app_icon.png';
 
-class AssetsStore {
-  static final appIcon = 'assets/icons/tether_icon.svg';
-  static final appIconPng = 'assets/icons/tether_icon.png';
-  static final heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
-  static final heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
+  // Hero images
+  static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';
+  static const heroSyncFiles = 'assets/graphics/undraw_sync_files.svg';
+
+  // intro
+  static const heroIntroPeople = 'assets/graphics/undraw_people.svg';
+  static const heroIntroGroupChat = 'assets/graphics/undraw_group_chat.svg';
+  static const heroIntroConnection = 'assets/graphics/undraw_connection.svg';
+  static const heroIntroHiddenMessage =
+      'assets/graphics/undraw_messaging_fun.svg';
+  static const heroIntroMobileUser = 'assets/graphics/undraw_mobile_user.svg';
+
+  // signup
+  static const heroSignupUsername = 'assets/graphics/undraw_profile_data.svg';
+  static const heroSignupPassword = 'assets/graphics/undraw_people.svg';
+  static const heroSignupHomeserver = 'assets/graphics/undraw_mention.svg';
+
+  // chat
+  static const heroChatNotFound = 'assets/graphics/undraw_not_found.svg';
 }

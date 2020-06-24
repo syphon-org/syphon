@@ -1,4 +1,4 @@
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 import './room/model.dart';
 
@@ -22,6 +22,12 @@ List<Room> sortedPrioritizedRooms(Map rooms) {
       return -1;
     }
     if (!a.isDraftRoom && b.isDraftRoom) {
+      return 1;
+    }
+    if (a.invite && !b.invite) {
+      return -1;
+    }
+    if (!a.invite && b.invite) {
       return 1;
     }
     // Prioritze if a direct chat

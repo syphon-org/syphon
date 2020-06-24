@@ -1,39 +1,42 @@
 import 'dart:io';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/keys/model.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/crypto/state.dart';
 import 'package:convert/convert.dart';
-import 'dart:typed_data';
 
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/auth/state.dart';
-import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/rooms/state.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/sync/state.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/auth/state.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/state.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
 
-import 'package:Tether/store/media/state.dart';
-import 'package:Tether/store/settings/state.dart';
+import 'package:syphon/store/media/state.dart';
+import 'package:syphon/store/settings/state.dart';
 
 // Global cache
 class Cache {
   static Box state;
   static LazyBox sync;
 
-  static const group_id = 'tether';
-  static const encryptionKeyLocation = 'tether@publicKey';
+  static const group_id = '${Values.appNameLabel}';
+  static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
-  static const syncKey = 'tether_sync';
-  static const stateKey = 'tether_cache';
+  static const syncKey = '${Values.appNameLabel}_sync';
+  static const stateKey = '${Values.appNameLabel}_cache';
 
-  static const syncKeyUNSAFE = 'tether_sync_unsafe';
-  static const stateKeyUNSAFE = 'tether_cache_unsafe';
-  static const backgroundKeyUNSAFE = 'tether_background_cache_unsafe';
+  static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
+  static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
+  static const backgroundKeyUNSAFE =
+      '${Values.appNameLabel}_background_cache_unsafe';
 
   static const syncData = 'sync_data';
   static const protocol = 'protocol';
@@ -93,10 +96,14 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(ReadStatusAdapter());
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DeviceAdapter());
+  Hive.registerAdapter(DeviceKeyAdapter());
+  Hive.registerAdapter(OneTimeKeyAdapter());
+  // Hive.registerAdapter(AccountAdapter());
 
   // Custom Store Models
   Hive.registerAdapter(AuthStoreAdapter());
   Hive.registerAdapter(SyncStoreAdapter());
+  Hive.registerAdapter(CryptoStoreAdapter());
   Hive.registerAdapter(RoomStoreAdapter());
   Hive.registerAdapter(MediaStoreAdapter());
   Hive.registerAdapter(SettingsStoreAdapter());

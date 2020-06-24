@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/settings/state.dart';
-import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/store/sync/background/service.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,18 +10,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Library Implimentations
-import 'package:Tether/global/libs/hive/index.dart';
+import 'package:syphon/global/libs/hive/index.dart';
 
 // Redux - State Managment - "store" - IMPORT ONLY ONCE
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 // Navigation
-import 'package:Tether/views/navigation.dart';
-import 'package:Tether/views/intro/index.dart';
-import 'package:Tether/views/home/index.dart';
+import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/intro/index.dart';
+import 'package:syphon/views/home/index.dart';
 
 // Styling
-import 'package:Tether/global/themes.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:redux/redux.dart';
 
 /**
@@ -64,22 +64,22 @@ void main() async {
   //  */
 
   // the main thing
-  runApp(Tether(store: store));
+  runApp(Syphon(store: store));
 }
 
-class Tether extends StatefulWidget {
+class Syphon extends StatefulWidget {
   final Store<AppState> store;
-  const Tether({Key key, this.store}) : super(key: key);
+  const Syphon({Key key, this.store}) : super(key: key);
 
   @override
-  TetherState createState() => TetherState(store: store);
+  SyphonState createState() => SyphonState(store: store);
 }
 
-class TetherState extends State<Tether> with WidgetsBindingObserver {
+class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
   final Store<AppState> store;
   Widget defaultHome = Home();
-  TetherState({this.store});
+  SyphonState({this.store});
 
   Future onSelectNotification(String payload) async {
     showDialog(

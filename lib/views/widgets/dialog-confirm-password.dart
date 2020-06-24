@@ -1,14 +1,14 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 class DialogConfirmPassword extends StatelessWidget {
   DialogConfirmPassword({
@@ -44,7 +44,7 @@ class DialogConfirmPassword extends StatelessWidget {
             bottom: 16,
           ),
           title: Text(
-            StringStore.deleteDevicesTitle,
+            Strings.titleDeleteDevices,
           ),
           children: <Widget>[
             Column(
@@ -57,7 +57,7 @@ class DialogConfirmPassword extends StatelessWidget {
                     left: 8,
                   ),
                   child: Text(
-                    StringStore.deleteDevicesConfirmation,
+                    Strings.contentDeleteDevices,
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.caption,
                   ),

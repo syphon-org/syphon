@@ -1,6 +1,6 @@
 # Syphon
 
-A privacy centric messenger for the people
+A privacy centric messenger for everyone
 
 ## Why
 
@@ -18,11 +18,11 @@ Another reason this project was so important was the ability to go from zero to 
 
 ## Architecture
 ### Storage
-There are three layers to storage in Tether:
-    - Remote (Matrix Homeserver)
-    - Cache (Redux + Redux Persist +  Hive)
-        * cache is encrypted at rest
-    - Cold Storage (Hive)
+There are three layers to storage in Syphon:
+- Remote (Matrix Homeserver)
+- Cache (Redux + Redux Persist +  Hive)
+    * cache is encrypted at rest
+- Cold Storage (Hive)
 
 
 ## Getting Started
@@ -32,6 +32,7 @@ There are three layers to storage in Tether:
 ## Resources
 - (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
 - (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
+- (iOS file management flutter)[https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter]
 
 ## Layouts and Styling
 - (Scrolling With Text Inputs)[https://github.com/flutter/flutter/issues/13339]

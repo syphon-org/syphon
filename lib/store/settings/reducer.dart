@@ -1,5 +1,5 @@
-import 'package:Tether/store/settings/chat-settings/actions.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
 
 import './state.dart';
 import './actions.dart';
@@ -23,7 +23,7 @@ SettingsStore settingsReducer(
       return state.copyWith(
         pusherToken: action.token,
       );
-    case SetTetherAgreement:
+    case SetAppAgreement:
       return state.copyWith(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );

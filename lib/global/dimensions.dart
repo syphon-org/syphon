@@ -2,8 +2,13 @@
 //   color: Colors.red,
 // ),
 
+import 'package:flutter/material.dart';
+
 class Dimensions {
   // Generic
+  static const scrollviewPadding = EdgeInsets.only(
+    bottom: 32,
+  );
   static const double widgetHeightMax = 1024;
 
   // Media
@@ -32,6 +37,7 @@ class Dimensions {
   static const double iconSize = 26;
   static const double iconSizeLite = 24;
   static const double indicatorSize = 16;
+  static const double miniLockSize = 12;
 
   // Progress
   static const double progressIndicatorSize = 26;
@@ -44,6 +50,59 @@ class Dimensions {
   static const double inputHeight = 52;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
+
+  // Dialogs
+
+  static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 12,
+  );
+
+  static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
+    horizontal: 8,
+    vertical: 12,
+  );
+
+  // Lists
+  static const heroPadding = EdgeInsets.symmetric(
+    vertical: 24,
+    horizontal: 24,
+  );
+  static const listPadding = EdgeInsets.symmetric(
+    horizontal: 20,
+    vertical: 8,
+  );
+
+  static listPaddingDynamic({width = 500}) {
+    return EdgeInsets.only(
+      left: width * 0.04,
+      right: width * 0.04,
+      top: 6,
+      bottom: 14,
+    );
+  }
+
+  static listTitlePaddingDynamic({width = 500}) {
+    return EdgeInsets.only(
+      left: width * 0.04,
+      right: width * 0.04,
+      top: 6,
+      bottom: 14,
+    );
+  }
+
+  // Content
+  static const contentPadding = EdgeInsets.symmetric(
+    horizontal: 32,
+    vertical: 8,
+  );
+
+  static contentPaddingDynamic({width = 500}) {
+    return EdgeInsets.symmetric(
+      horizontal: width * 0.04,
+      vertical: 4,
+    );
+  }
 
   // Page Viewer
   static const double pageViewerWidthMin = 326;

@@ -1,9 +1,10 @@
-import 'package:Tether/global/libs/matrix/auth.dart';
-import 'package:Tether/global/libs/matrix/devices.dart';
-import 'package:Tether/global/libs/matrix/events.dart';
-import 'package:Tether/global/libs/matrix/notifications.dart';
-import 'package:Tether/global/libs/matrix/rooms.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/devices.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/events.dart';
+import 'package:syphon/global/libs/matrix/notifications.dart';
+import 'package:syphon/global/libs/matrix/rooms.dart';
+import 'package:syphon/global/libs/matrix/user.dart';
 
 abstract class MatrixApi {
   // Authentication
@@ -22,26 +23,20 @@ abstract class MatrixApi {
   static final fetchRoomIds = Rooms.fetchRoomIds;
   static final fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
   static final createRoom = Rooms.createRoom;
+  static final joinRoom = Rooms.joinRoom;
   static final leaveRoom = Rooms.leaveRoom;
   static final forgetRoom = Rooms.forgetRoom;
 
   // Events
+  static final sendEvent = Events.sendEvent;
+  static final sendTyping = Events.sendTyping;
+  static final sendMessage = Events.sendMessage;
+  static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
-  static final sendMessage = Events.sendMessage;
-  static final sendTyping = Events.sendTyping;
+  static final sendEventToDevice = Events.sendEventToDevice;
 
-  /*** Users ***/
-
-  /**
-   * Save Account Data
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
-   * 
-   * Set some account_data for the client. This config is only visible
-   * to the user that set the account_data. The config will be synced 
-   * to clients in the top-level account_data.
-   */
+  // Account Data & User Management
   static final fetchAccountData = Users.fetchAccountData;
   static final saveAccountData = Users.saveAccountData;
   static final fetchUserProfile = Users.fetchUserProfile;
@@ -53,6 +48,12 @@ abstract class MatrixApi {
   static final updateDevice = Devices.updateDevice;
   static final deleteDevice = Devices.deleteDevice;
   static final deleteDevices = Devices.deleteDevices;
+
+  // Keys
+  static final fetchKeys = Encryption.fetchKeys;
+  static final fetchKeyChanges = Encryption.fetchKeyChanges;
+  static final claimKeys = Encryption.claimKeys;
+  static final uploadKeys = Encryption.uploadKeys;
 
   // Notifications
   static final fetchNotifications = Notifications.fetchNotifications;

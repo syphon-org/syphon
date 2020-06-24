@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
@@ -8,6 +8,8 @@ part 'model.g.dart';
 class Device extends Equatable {
   @HiveField(0)
   final String deviceId;
+  @HiveField(4)
+  final String deviceIdPrivate;
   @HiveField(1)
   final String displayName;
   @HiveField(2)
@@ -17,6 +19,7 @@ class Device extends Equatable {
 
   const Device({
     this.deviceId,
+    this.deviceIdPrivate,
     this.displayName,
     this.lastSeenIp,
     this.lastSeenTs,
@@ -25,6 +28,7 @@ class Device extends Equatable {
   @override
   List<Object> get props => [
         deviceId,
+        deviceIdPrivate,
         displayName,
         lastSeenIp,
         lastSeenTs,
@@ -32,12 +36,14 @@ class Device extends Equatable {
 
   Device copyWith({
     String deviceId,
+    String deviceIdPrivate,
     String displayName,
     String lastSeenIp,
     int lastSeenTs,
   }) {
     return Device(
       deviceId: deviceId ?? this.deviceId,
+      deviceIdPrivate: deviceIdPrivate ?? this.deviceIdPrivate,
       displayName: displayName ?? this.displayName,
       lastSeenIp: lastSeenIp ?? this.lastSeenIp,
       lastSeenTs: lastSeenTs ?? this.lastSeenTs,

@@ -1,4 +1,4 @@
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
@@ -9,7 +9,7 @@ class User extends Equatable {
   @HiveField(0)
   final String userId;
   @HiveField(1)
-  final String deviceId;
+  final String deviceId; // current device id
   @HiveField(2)
   final String homeserver;
   @HiveField(3)

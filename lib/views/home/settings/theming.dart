@@ -1,6 +1,7 @@
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -97,14 +98,6 @@ class Theming extends StatelessWidget {
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
-          // Static horizontal: 16, vertical: 8
-          final contentPadding = EdgeInsets.only(
-            left: width * 0.04,
-            right: width * 0.04,
-            top: 6,
-            bottom: 14,
-          );
-
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
                   ? const Color(BASICALLY_BLACK)
@@ -134,7 +127,7 @@ class Theming extends StatelessWidget {
                         children: [
                           Container(
                             width: width, // TODO: use flex, i'm rushing
-                            padding: contentPadding,
+                            padding: Dimensions.listPadding,
                             child: Text(
                               'App',
                               textAlign: TextAlign.start,
@@ -147,7 +140,7 @@ class Theming extends StatelessWidget {
                               onSelectColor: props.onSelectPrimaryColor,
                               originalColor: props.primaryColor,
                             ),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Primary Color',
                               style: Theme.of(context).textTheme.subtitle1,
@@ -163,7 +156,7 @@ class Theming extends StatelessWidget {
                               onSelectColor: props.onSelectAccentColor,
                               originalColor: props.accentColor,
                             ),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Accent Color',
                             ),
@@ -174,7 +167,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () => props.onIncrementTheme(),
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Theme',
                             ),
@@ -184,7 +177,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Font Size',
                             ),
@@ -206,7 +199,7 @@ class Theming extends StatelessWidget {
                         children: [
                           Container(
                             width: width, // TODO: use flex, i'm rushing
-                            padding: contentPadding,
+                            padding: Dimensions.listPadding,
                             child: Text(
                               'Fonts',
                               textAlign: TextAlign.start,
@@ -215,7 +208,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Chat Title Size',
                             ),
@@ -225,7 +218,7 @@ class Theming extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {},
-                            contentPadding: contentPadding,
+                            contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Message Body Size',
                             ),
@@ -274,8 +267,8 @@ class Props {
   });
 
   static Props mapStoreToProps(Store<AppState> store) => Props(
-        primaryColor: store.state.settingsStore.primaryColor ?? TETHERED_CYAN,
-        accentColor: store.state.settingsStore.accentColor ?? TETHERED_CYAN,
+        primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
+        accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,

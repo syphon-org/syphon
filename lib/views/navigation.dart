@@ -1,34 +1,35 @@
-import 'package:Tether/store/index.dart'; // TODO: remove need for store in view dependencies
+import 'package:syphon/store/index.dart'; // TODO: remove need for store in view dependencies
 
-import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/home/chat/details-message.dart';
-import 'package:Tether/views/home/search/seach-groups.dart';
-import 'package:Tether/views/home/search/search-users.dart';
-import 'package:Tether/views/home/settings/chats.dart';
-import 'package:Tether/views/home/settings/devices.dart';
-import 'package:Tether/views/home/settings/password/index.dart';
-import 'package:Tether/views/home/settings/privacy.dart';
-import 'package:Tether/views/home/settings/theming.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/search/search-groups.dart';
+import 'package:syphon/views/home/search/search-users.dart';
+import 'package:syphon/views/home/settings/chats.dart';
+import 'package:syphon/views/home/settings/devices.dart';
+import 'package:syphon/views/home/settings/password/index.dart';
+import 'package:syphon/views/home/settings/privacy.dart';
+import 'package:syphon/views/home/settings/storage.dart';
+import 'package:syphon/views/home/settings/theming.dart';
 import 'package:flutter/material.dart';
 
 // Intro
-import 'package:Tether/views/login/index.dart';
-import 'package:Tether/views/signup/index.dart';
-import 'package:Tether/views/signup/loading.dart';
-import 'package:Tether/views/homesearch/index.dart';
-import 'package:Tether/views/intro/index.dart';
+import 'package:syphon/views/login/index.dart';
+import 'package:syphon/views/signup/index.dart';
+import 'package:syphon/views/signup/loading.dart';
+import 'package:syphon/views/homesearch/index.dart';
+import 'package:syphon/views/intro/index.dart';
 
 // Home
-import 'package:Tether/views/home/index.dart';
-import 'package:Tether/views/home/profile/index.dart';
-import 'package:Tether/views/home/settings/index.dart';
+import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/home/profile/index.dart';
+import 'package:syphon/views/home/settings/index.dart';
 
 // Messages
-import 'package:Tether/views/home/chat/index.dart';
+import 'package:syphon/views/home/chat/index.dart';
 
 // Settings
-import 'package:Tether/views/home/settings/advanced.dart';
-import 'package:Tether/views/home/settings/notifications.dart';
+import 'package:syphon/views/home/settings/advanced.dart';
+import 'package:syphon/views/home/settings/notifications.dart';
 import 'package:redux/redux.dart';
 
 class NavigationService {
@@ -69,7 +70,8 @@ class NavigationProvider {
           ),
       '/profile': (BuildContext context) => ProfileView(),
       '/notifications': (BuildContext context) => NotificationSettingsView(),
-      '/advanced': (BuildContext context) => AdvancedScreen(),
+      '/advanced': (BuildContext context) => AdvancedView(),
+      '/storage': (BuildContext context) => StorageView(),
       '/password': (BuildContext context) => PasswordView(),
       '/privacy': (BuildContext context) => PrivacyPreferences(
             title: 'Privacy',

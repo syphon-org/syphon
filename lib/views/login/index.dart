@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:Tether/global/strings.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +10,17 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/behaviors.dart';
 
 // Assets
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class Login extends StatefulWidget {
   final Store<AppState> store;
@@ -143,7 +143,7 @@ class LoginState extends State<Login> {
                           child: Image(
                             width: width * 0.35,
                             height: width * 0.35,
-                            image: AssetImage(TETHER_ICON_PNG),
+                            image: AssetImage(Assets.appIconPng),
                           ),
                         ),
                       ],
@@ -158,7 +158,7 @@ class LoginState extends State<Login> {
                           FittedBox(
                             fit: BoxFit.fitWidth,
                             child: Text(
-                              LOGIN_TITLE,
+                              Strings.titleLogin,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline4,
                             ),
@@ -208,7 +208,7 @@ class LoginState extends State<Login> {
                                   highlightColor:
                                       Theme.of(context).primaryColor,
                                   icon: Icon(Icons.help_outline),
-                                  tooltip: SELECT_USERNAME_TITLE,
+                                  tooltip: Strings.tooltipSelectHomeserver,
                                   onPressed: () {
                                     Navigator.pushNamed(
                                       context,
@@ -316,7 +316,7 @@ class LoginState extends State<Login> {
                               ),
                             )
                           : Text(
-                              LOGIN_BUTTON_TEXT,
+                              Strings.buttonLogin,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -333,7 +333,7 @@ class LoginState extends State<Login> {
                       left: 8,
                       right: 8,
                       top: 16,
-                      bottom: 24,
+                      bottom: 16,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
@@ -345,7 +345,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            StringStore.buttonLoginCreateQuestion,
+                            Strings.buttonLoginCreateQuestion,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -355,16 +355,14 @@ class LoginState extends State<Login> {
                           Container(
                             padding: const EdgeInsets.only(left: 4),
                             child: Text(
-                              StringStore.buttonLoginCreateAction,
+                              Strings.buttonLoginCreateAction,
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText2
                                   .copyWith(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.white,
+                                    color: Theme.of(context).primaryColor,
+                                    decoration: TextDecoration.underline,
                                   ),
                             ),
                           ),
@@ -413,7 +411,7 @@ class _Props extends Equatable {
       isLoginAttemptable: store.state.authStore.isPasswordValid &&
           store.state.authStore.isUsernameValid &&
           !store.state.authStore.loading,
-      usernameHint: formatUsernameHint(
+      usernameHint: Strings.formatUsernameHint(
         store.state.authStore.homeserver,
       ),
       onChangeUsername: (String text) {

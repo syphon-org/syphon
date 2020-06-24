@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
@@ -15,8 +15,9 @@ class AccountDataTypes {
 
 class EventTypes {
   static const message = 'm.room.message';
+  static const encrypted = 'm.room.encrypted';
   static const creation = 'm.room.create';
-  static const name = '.room.name';
+  static const name = 'm.room.name';
   static const topic = 'm.room.topic';
 
   // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
@@ -28,6 +29,7 @@ class EventTypes {
   static const historyVisibility = 'm.room.history_visibility';
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
+  static const roomKey = 'm.room_key';
 }
 
 class MessageTypes {
@@ -39,6 +41,13 @@ class MessageTypes {
   static const AUDIO = 'm.text';
   static const LOCATION = 'm.location';
   static const VIDEO = 'm.video';
+}
+
+class MediumType {
+  static const sms = 'sms';
+  static const direct = 'direct';
+  static const plaintext = 'plaintext';
+  static const encryption = 'encryption';
 }
 
 @HiveType(typeId: EventHiveId)
@@ -146,6 +155,15 @@ class Message {
   @HiveField(14)
   final String formattedBody;
 
+  // Encrypted Messages only
+  @HiveField(15)
+  final String ciphertext;
+  @HiveField(16)
+  final String algorithm;
+  // The Curve25519 key of the device which initiated the session originally.
+  @HiveField(17)
+  final String senderKey;
+
   /* 
   * TODO: content will not always be a string? configure parsing data
   * or more complex objects
@@ -166,6 +184,9 @@ class Message {
     this.filename,
     this.formattedBody,
     this.content,
+    this.ciphertext,
+    this.senderKey,
+    this.algorithm,
     this.syncing = false,
     this.pending = false,
     this.failed = false,
@@ -187,6 +208,9 @@ class Message {
         format: event.content['format'],
         filename: event.content['filename'],
         formattedBody: event.content['formatted_body'],
+        ciphertext: event.content['ciphertext'] ?? '',
+        algorithm: event.content['algorithm'],
+        senderKey: event.content['sender_key'],
         pending: false,
         syncing: false,
         failed: false,

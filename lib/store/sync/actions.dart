@@ -2,20 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Tether/global/algos.dart';
-import 'package:Tether/global/libs/hive/index.dart';
-import 'package:Tether/global/libs/matrix/errors.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/sync/services.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/sync/services.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -179,6 +180,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
         'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+        'timeout': 10000
       });
 
       if (data['errcode'] != null) {
@@ -191,14 +193,24 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       }
 
       final lastSince = data['next_batch'];
+      final oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
+      final Map<String, dynamic> rawInvites = data['rooms']['invite'];
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
-      final Map presence = data['presence'];
+      final Map<String, dynamic> rawToDevice = data['to_device'];
+      // TODO:  final Map presence = data['presence'];
 
-      print('[fetchSync] presence $presence');
+      print('[fetchSync] rooms $rawLeft');
 
-      // Local state updates based on changes
+      // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
+      await store.dispatch(syncRooms(rawInvites));
+
+      // Updates for device specific data (mostly room encryption)
+      await store.dispatch(syncDevice(rawToDevice));
+
+      // Update encryption one time key count
+      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
       if (isFullSync) {
         store.dispatch(saveSync(data));
@@ -209,6 +221,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         synced: true,
         syncing: false,
         lastSince: lastSince,
+        backoff: null,
       ));
 
       if (!kReleaseMode && isFullSync) {

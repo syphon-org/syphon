@@ -1,15 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/settings/actions.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/settings/notification-settings/actions.dart';
-import 'package:Tether/views/widgets/dialog-confirm-password.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/views/widgets/dialog-confirm-password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -156,6 +156,15 @@ class DeviceViewState extends State<DevicesView> {
       ),
       actions: <Widget>[
         IconButton(
+          icon: Icon(Icons.text_fields),
+          iconSize: Dimensions.buttonAppBarSize,
+          tooltip: 'TEST KEY FUNCTION GENERIC',
+          color: Colors.white,
+          onPressed: () {
+            props.onTest();
+          },
+        ),
+        IconButton(
           icon: Icon(Icons.edit),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Rename Device',
@@ -194,7 +203,7 @@ class DeviceViewState extends State<DevicesView> {
         onPressed: () => Navigator.pop(context, false),
       ),
       title: Text(
-        StringStore.viewTitleDevices,
+        Strings.titleViewDevices,
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,
@@ -357,6 +366,7 @@ class Props extends Equatable {
 
   final Function onFetchDevices;
   final Function onDeleteDevices;
+  final Function onTest;
 
   Props({
     @required this.loading,
@@ -365,6 +375,7 @@ class Props extends Equatable {
     @required this.currentDeviceId,
     @required this.onFetchDevices,
     @required this.onDeleteDevices,
+    @required this.onTest,
   });
 
   @override
@@ -382,6 +393,9 @@ class Props extends Equatable {
         devices: store.state.settingsStore.devices ?? const [],
         session: store.state.authStore.session,
         currentDeviceId: store.state.authStore.user.deviceId,
+        onTest: () {
+          store.dispatch(fetchDeviceKeys());
+        },
         onDeleteDevices: (
           BuildContext context,
           List<Device> devices, {

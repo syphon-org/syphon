@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:Tether/global/libs/hive/type-ids.dart';
-import 'package:Tether/store/auth/credential/model.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 

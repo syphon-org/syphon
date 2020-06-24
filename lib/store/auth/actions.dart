@@ -2,19 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:Tether/global/libs/matrix/errors.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/auth/credential/model.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/settings/notification-settings/actions.dart';
-import 'package:Tether/store/sync/actions.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 import 'package:device_info/device_info.dart';
 import 'package:mime/mime.dart';
 import 'package:crypt/crypt.dart';
 
-import 'package:Tether/global/libs/matrix/media.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/global/notifications.dart';
+import 'package:syphon/global/libs/matrix/media.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,8 +23,8 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/alerts/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import '../user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -140,7 +141,7 @@ ThunkAction<AppState> startAuthObserver() {
     );
 
     final user = store.state.authStore.user;
-    final Function onAuthStateChanged = (user) async {
+    final Function onAuthStateChanged = (User user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserProfile());
 
@@ -149,6 +150,10 @@ ThunkAction<AppState> startAuthObserver() {
           await store.dispatch(initialSync());
         }
 
+        // init encryption for E2EE
+        await store.dispatch(initKeyEncryption(user));
+
+        // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
             print('[onSelectNotification] payload');
@@ -157,6 +162,8 @@ ThunkAction<AppState> startAuthObserver() {
             store.dispatch(setPusherDeviceToken(token));
           },
         );
+
+        // start syncing for user
         store.dispatch(startSyncObserver());
       } else {
         await store.dispatch(stopSyncObserver());
@@ -181,7 +188,10 @@ ThunkAction<AppState> stopAuthObserver() {
   };
 }
 
-ThunkAction<AppState> generateHashedDeviceId({String salt}) {
+/**
+ * 
+ */
+ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
     final defaultId = Random.secure().nextInt(1 << 31).toString();
     var device = Device(
@@ -203,11 +213,15 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
 
         device = Device(
           deviceId: hashedDeviceId.hash,
+          deviceIdPrivate: info.androidId,
           displayName: 'Tim Android',
         );
       } else if (Platform.isIOS) {
         final info = await deviceInfoPlugin.iosInfo;
         final deviceIdentifier = info.identifierForVendor;
+
+        print('[generateDeviceId] ios $deviceIdentifier');
+
         final hashedDeviceId = Crypt.sha256(
           deviceIdentifier,
           rounds: 1000,
@@ -216,6 +230,7 @@ ThunkAction<AppState> generateHashedDeviceId({String salt}) {
 
         device = Device(
           deviceId: hashedDeviceId.hash,
+          deviceIdPrivate: info.identifierForVendor,
           displayName: 'Tim iOS',
         );
       } else if (Platform.isMacOS) {
@@ -242,7 +257,7 @@ ThunkAction<AppState> loginUser() {
       final username = store.state.authStore.username;
 
       final Device device = await store.dispatch(
-        generateHashedDeviceId(salt: username),
+        generateDeviceId(salt: username),
       );
 
       final data = await MatrixApi.loginUser(
@@ -262,8 +277,6 @@ ThunkAction<AppState> loginUser() {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print(data);
 
       await store.dispatch(SetUser(
         user: User.fromJson(data),
@@ -419,7 +432,7 @@ ThunkAction<AppState> createUser() {
       final authType = session != null ? credential.type : loginType;
       final authValue = session != null ? credential.value : null;
 
-      final device = await store.dispatch(generateHashedDeviceId(
+      final device = await store.dispatch(generateDeviceId(
         salt: store.state.authStore.username,
       ));
 
@@ -481,22 +494,21 @@ ThunkAction<AppState> updatePassword(String password) {
       store.dispatch(SetLoading(loading: true));
 
       var data;
-      print(password);
 
       // Call just to get interactive auths
-      final flowData = await MatrixApi.updatePassword(
+      data = await MatrixApi.updatePassword(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         password: password,
       );
 
-      if (flowData['errcode'] != null) {
-        throw flowData['error'];
+      if (data['errcode'] != null) {
+        throw data['error'];
       }
 
-      if (flowData['flows'] != null) {
-        await store.dispatch(setInteractiveAuths(auths: flowData));
+      if (data['flows'] != null) {
+        await store.dispatch(setInteractiveAuths(auths: data));
 
         data = await MatrixApi.updatePassword(
           protocol: protocol,
@@ -509,6 +521,10 @@ ThunkAction<AppState> updatePassword(String password) {
         );
       }
 
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
       store.dispatch(addAlert(
         type: 'success',
         message: 'Password updated successfully',
@@ -516,7 +532,11 @@ ThunkAction<AppState> updatePassword(String password) {
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'updatePassword',
+      ));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

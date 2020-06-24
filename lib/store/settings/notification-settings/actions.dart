@@ -1,10 +1,10 @@
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/settings/actions.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -132,9 +132,9 @@ ThunkAction<AppState> saveNotificationPusher({
         accessToken: store.state.authStore.user.accessToken,
         kind: erase ? null : kind,
         pushKey: pusherKey,
-        appDisplayName: StringStore.app_name_long,
-        appId: StringStore.app_id,
-        lang: StringStore.default_language,
+        appDisplayName: Values.appNameLong,
+        appId: Values.appId,
+        lang: Values.defaultLanguage,
         deviceDisplayName: currentDevice.displayName,
       );
 

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
-import 'package:Tether/global/libs/hive/index.dart';
-import 'package:Tether/store/sync/services.dart';
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/store/sync/services.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 /**

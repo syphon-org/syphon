@@ -1,13 +1,14 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/events/selectors.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/store/settings/chat-settings/actions.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/selectors.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/key-inspector/index.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,8 @@ import 'package:flutter_material_color_picker/flutter_material_color_picker.dart
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -223,18 +224,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    // Static horizontal: 16, vertical: 8
-    final contentPadding = EdgeInsets.symmetric(
-      horizontal: width * 0.04,
-      vertical: 4,
-    );
-
-    final titlePadding = EdgeInsets.only(
-      left: width * 0.04,
-      right: width * 0.04,
-      top: 6,
-      bottom: 14,
-    );
+    // Confirm this is needed in chat details
+    final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
+    final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
     final ChatSettingsArguments arguments =
         ModalRoute.of(context).settings.arguments;
@@ -468,11 +460,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
                           children: [
                             Container(
                               width: width, // TODO: use flex, i'm rushing
-                              padding: titlePadding,
+                              padding: contentPadding,
                               child: Text(
                                 'Chat Settings',
                                 textAlign: TextAlign.start,
-                                style: TextStyle(),
+                                style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
                             ListTile(
@@ -556,11 +548,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
                           children: [
                             Container(
                               width: width, // TODO: use flex, i'm rushing
-                              padding: titlePadding,
+                              padding: contentPadding,
                               child: Text(
                                 'Call Settings',
                                 textAlign: TextAlign.start,
-                                style: TextStyle(),
+                                style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
                             ListTile(
@@ -608,26 +600,18 @@ class ChatDetailsState extends State<ChatDetailsView> {
                           children: [
                             Container(
                               width: width, // TODO: use flex, i'm rushing
-                              padding: titlePadding,
+                              padding: contentPadding,
                               child: Text(
                                 'Privacy and Status',
                                 textAlign: TextAlign.start,
-                                style: TextStyle(),
+                                style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
                             ListTile(
-                              onTap: () {},
+                              onTap: () => props.onViewEncryptionKeys(context),
                               contentPadding: contentPadding,
                               title: Text(
                                 'View Encryption Key',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Export Key',
                                 style: TextStyle(fontSize: 18.0),
                               ),
                             ),
@@ -665,7 +649,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               onTap: () {},
                               contentPadding: contentPadding,
                               title: Text(
-                                'Leave group',
+                                'Leave Chat',
                                 style: TextStyle(
                                   fontSize: 18.0,
                                   color: Colors.redAccent,
@@ -694,6 +678,7 @@ class _Props extends Equatable {
   final List<Message> messages;
 
   final Function onSelectPrimaryColor;
+  final Function onViewEncryptionKeys;
 
   _Props({
     @required this.room,
@@ -701,11 +686,17 @@ class _Props extends Equatable {
     @required this.messages,
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
+    @required this.onViewEncryptionKeys,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.authStore.user.userId,
         room: roomSelectors.room(id: roomId, state: store.state),
+        onViewEncryptionKeys: (
+          BuildContext context,
+        ) {
+          showDialog(context: context, child: DialogKeyInspector());
+        },
         messages: latestMessages(
           roomSelectors.room(id: roomId, state: store.state).messages,
         ),

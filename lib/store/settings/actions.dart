@@ -1,15 +1,15 @@
-import 'package:Tether/global/libs/matrix/auth.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/alerts/actions.dart';
-import 'package:Tether/store/auth/credential/model.dart';
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/global/notifications.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/global/themes.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/global/themes.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -80,8 +80,8 @@ class ToggleReadReceipts {
   ToggleReadReceipts();
 }
 
-class SetTetherAgreement {
-  SetTetherAgreement();
+class SetAppAgreement {
+  SetAppAgreement();
 }
 
 /**
@@ -231,7 +231,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
  */
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
-    store.dispatch(SetTetherAgreement());
+    store.dispatch(SetAppAgreement());
   };
 }
 

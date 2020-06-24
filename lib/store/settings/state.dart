@@ -1,8 +1,8 @@
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/libs/hive/type-ids.dart';
-import "package:Tether/global/themes.dart";
-import 'package:Tether/store/settings/devices-settings/model.dart';
-import 'package:Tether/store/settings/notification-settings/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import "package:syphon/global/themes.dart";
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import './chat-settings/model.dart';
@@ -55,8 +55,8 @@ class SettingsStore extends Equatable {
   final bool loading;
 
   const SettingsStore({
-    this.primaryColor = TETHERED_CYAN,
-    this.accentColor = TETHERED_CYAN,
+    this.primaryColor = SYPHON_CYAN,
+    this.accentColor = SYPHON_CYAN,
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.language = 'English',

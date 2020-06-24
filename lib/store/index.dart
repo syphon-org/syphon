@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:Tether/global/libs/hive/index.dart';
-import 'package:Tether/store/alerts/model.dart';
-import 'package:Tether/store/auth/reducer.dart';
-import 'package:Tether/store/media/reducer.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/sync/reducer.dart';
-import 'package:Tether/store/sync/state.dart';
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/store/alerts/model.dart';
+import 'package:syphon/store/auth/reducer.dart';
+import 'package:syphon/store/crypto/reducer.dart';
+import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/media/reducer.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/reducer.dart';
+import 'package:syphon/store/sync/state.dart';
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -38,6 +40,7 @@ class AppState extends Equatable {
   final SettingsStore settingsStore;
   final RoomStore roomStore;
   final SyncStore syncStore;
+  final CryptoStore cryptoStore;
 
   AppState({
     this.loading = true,
@@ -48,6 +51,7 @@ class AppState extends Equatable {
     this.settingsStore = const SettingsStore(),
     this.roomStore = const RoomStore(),
     this.syncStore = const SyncStore(),
+    this.cryptoStore = const CryptoStore(),
   });
 
   @override
@@ -58,6 +62,8 @@ class AppState extends Equatable {
         matrixStore,
         roomStore,
         settingsStore,
+        syncStore,
+        cryptoStore,
       ];
 }
 
@@ -71,6 +77,7 @@ AppState appReducer(AppState state, action) {
     syncStore: syncReducer(state.syncStore, action),
     matrixStore: matrixReducer(state.matrixStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
+    cryptoStore: cryptoReducer(state.cryptoStore, action),
   );
 }
 
@@ -146,6 +153,15 @@ class HiveSerializer implements StateSerializer<AppState> {
 
     try {
       Cache.state.put(
+        state.cryptoStore.runtimeType.toString(),
+        state.cryptoStore,
+      );
+    } catch (error) {
+      print('[Hive Storage CryptoStore] error - $error');
+    }
+
+    try {
+      Cache.state.put(
         state.roomStore.runtimeType.toString(),
         state.roomStore,
       );
@@ -178,6 +194,7 @@ class HiveSerializer implements StateSerializer<AppState> {
   AppState decode(Uint8List data) {
     AuthStore authStoreConverted = AuthStore();
     SyncStore syncStoreConverted = SyncStore();
+    CryptoStore cryptoStoreConverted = CryptoStore();
     MediaStore mediaStoreConverted = MediaStore();
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
@@ -194,6 +211,15 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
     } catch (error) {
       print('[AppState.fromJson - roomStoreConverted] error $error');
+    }
+
+    try {
+      cryptoStoreConverted = Cache.state.get(
+        cryptoStoreConverted.runtimeType.toString(),
+        defaultValue: CryptoStore(),
+      );
+    } catch (error) {
+      print('[AppState.fromJson - CryptoStoreConverted] error $error');
     }
 
     try {
@@ -227,6 +253,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       loading: false,
       authStore: authStoreConverted,
       syncStore: syncStoreConverted,
+      cryptoStore: cryptoStoreConverted,
       roomStore: roomStoreConverted,
       mediaStore: mediaStoreConverted,
       settingsStore: settingsStoreConverted,

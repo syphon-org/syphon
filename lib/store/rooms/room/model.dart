@@ -1,9 +1,9 @@
 import 'dart:collection';
-import 'package:Tether/global/libs/hive/type-ids.dart';
-import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/user/selectors.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:hive/hive.dart';
 
 part 'model.g.dart';
@@ -76,6 +76,9 @@ class Room {
   @HiveField(25)
   final Map<String, User> users;
 
+  @HiveField(27)
+  final bool invite;
+
   const Room({
     this.id,
     this.name = 'New Chat',
@@ -104,6 +107,7 @@ class Room {
     this.startHash,
     this.prevHash,
     this.messageReads,
+    this.invite = false,
   });
 
   Room copyWith({
@@ -134,6 +138,7 @@ class Room {
     endHash,
     startHash,
     prevHash,
+    invite,
   }) {
     return Room(
       id: id ?? this.id,
@@ -160,7 +165,8 @@ class Room {
       messageReads: messageReads ?? this.messageReads,
       endHash: endHash ?? this.endHash,
       startHash: startHash ?? this.startHash,
-      prevHash: prevHash, // TODO: may always need a prev hash?
+      prevHash: prevHash, // TODO: may always need a prev hash?,z
+      invite: invite ?? this.invite,
     );
   }
 
@@ -190,12 +196,14 @@ class Room {
     Map<String, dynamic> json,
   }) {
     String prevHash = this.prevHash;
+    bool invite;
 
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
-    List<Message> timelineEvents = [];
+    List<Message> messageEvents = [];
     List<Event> accountDataEvents = [];
 
+    // Find state only updates
     if (json['state'] != null) {
       final List<dynamic> rawStateEvents = json['state']['events'];
 
@@ -203,16 +211,35 @@ class Room {
           rawStateEvents.map((event) => Event.fromJson(event)).toList();
     }
 
+    if (json['invite_state'] != null) {
+      final List<dynamic> rawStateEvents = json['invite_state']['events'];
+
+      stateEvents =
+          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+      invite = true;
+    }
+
+    // Find state and message updates from timeline
+    // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
       prevHash = json['timeline']['prev_batch'];
 
-      print('[fromSync] ${this.name} prev_batch $prevHash');
-
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
 
-      timelineEvents = rawTimelineEvents
-          .map((event) => Message.fromEvent(Event.fromJson(event)))
-          .toList();
+      final List<Event> timelineEvents = List.from(
+        rawTimelineEvents.map((event) => Event.fromJson(event)),
+      );
+
+      messageEvents = List.from(timelineEvents
+          .where((event) =>
+              event.type == EventTypes.message ||
+              event.type == EventTypes.encrypted)
+          .map((event) => Message.fromEvent(event)));
+
+      stateEvents = List.from(stateEvents)
+        ..addAll(timelineEvents.where((event) =>
+            event.type != EventTypes.message &&
+            event.type != EventTypes.encrypted));
     }
 
     if (json['ephemeral'] != null) {
@@ -230,6 +257,9 @@ class Room {
     }
 
     return this
+        .copyWith(
+          invite: invite,
+        )
         .fromAccountData(
           accountDataEvents,
         )
@@ -238,7 +268,7 @@ class Room {
           currentUser: currentUser,
         )
         .fromMessageEvents(
-          timelineEvents,
+          messageEvents,
           prevHash: prevHash,
           latestHash: lastSince,
         )
@@ -246,6 +276,35 @@ class Room {
           ephemeralEvents,
           currentUser: currentUser,
         );
+  }
+
+  /**
+   * 
+   * fromAccountData
+   * 
+   * Mostly used to assign is_direct 
+   */
+  Room fromAccountData(
+    List<Event> accountDataEvents,
+  ) {
+    dynamic isDirect;
+    try {
+      accountDataEvents.forEach((event) {
+        switch (event.type) {
+          case 'm.direct':
+            isDirect = true;
+            break;
+          default:
+            break;
+        }
+      });
+    } catch (error) {
+      print('[fromEphemeralEvents] error $error');
+    }
+
+    return this.copyWith(
+      direct: isDirect ?? this.direct,
+    );
   }
 
   // Find details of room based on state events
@@ -257,18 +316,18 @@ class Room {
     String name;
     String avatarUri;
     String topic;
-    bool direct;
+    bool direct = this.direct;
     int namePriority = 4;
     int lastUpdate = this.lastUpdate;
-    bool encryptionEnabled = false;
+    bool encryptionEnabled;
 
     List<Event> cachedStateEvents = List<Event>();
     Map<String, User> users = this.users ?? Map<String, User>();
 
     try {
       stateEvents.forEach((event) {
-        lastUpdate =
-            event.timestamp > lastUpdate ? event.timestamp : lastUpdate;
+        final timestamp = event.timestamp ?? 0;
+        lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
         switch (event.type) {
           case 'm.room.name':
@@ -298,26 +357,46 @@ class Room {
               avatarUri = event.content['url'];
             }
             break;
-          case 'm.room.encryption':
-            encryptionEnabled = true;
-            break;
+
           case 'm.room.member':
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
-            if (this.direct && this.users != null && this.users.length < 3) {
-              if (displayName == null && event.sender != currentUser.userId) {
-                namePriority = 0;
+            // The current users membership event
+            if (displayName == currentUser.displayName) {
+              // likely still an invite
+              // marked as direct, but not joined yet
+              direct = event.content['is_direct'];
+            }
+
+            // likely an invite room
+            // attempt to show a name from whoever sent membership events
+            // if nothing else takes priority
+            if (namePriority == 4 && event.sender != currentUser.userId) {
+              if (displayName == null) {
                 name = formatShortname(event.sender);
                 avatarUri = memberAvatarUri;
-              } else if (displayName != null &&
-                  displayName != currentUser.displayName) {
-                namePriority = 0;
+              } else {
                 name = displayName;
                 avatarUri = memberAvatarUri;
               }
             }
 
+            // what happens if you name a direct chat after the
+            // person you're sending it to? bad stuff, this tries
+            // to force the senders name on the room just in case
+            if (name == currentUser.displayName || name == currentUser.userId) {
+              namePriority = 0;
+              if (displayName == null) {
+                name = formatShortname(event.sender);
+                avatarUri = memberAvatarUri;
+              } else {
+                name = displayName;
+                avatarUri = memberAvatarUri;
+              }
+            }
+
+            // Cache user to rooms user cache if not present
             if (!users.containsKey(event.sender)) {
               users[event.sender] = User(
                 userId: event.sender,
@@ -325,6 +404,11 @@ class Room {
                 avatarUri: memberAvatarUri,
               );
             }
+            break;
+          case 'm.room.encryption':
+            encryptionEnabled = true;
+            break;
+          case 'm.room.encrypted':
             break;
           default:
             break;
@@ -366,8 +450,12 @@ class Room {
       List<Message> existingMessages = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final newMessages =
-          messages.where((event) => event.type == 'm.room.message').toList();
+      final newMessages = messageEvents;
+
+      final hasEncrypted = newMessages.firstWhere(
+        (msg) => msg.type == EventTypes.encrypted,
+        orElse: () => null,
+      );
 
       // See if the newest message has a greater timestamp
       if (newMessages.isNotEmpty && lastUpdate < messages[0].timestamp) {
@@ -396,6 +484,7 @@ class Room {
       return this.copyWith(
         messages: allMessages,
         outbox: outbox,
+        encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline
         endHash: this.endHash ?? prevHash,
@@ -472,35 +561,6 @@ class Room {
       usersTyping: usersTyping,
       messageReads: messageReads,
       lastRead: latestRead,
-    );
-  }
-
-  /**
-   * 
-   * fromAccountData
-   * 
-   * Mostly used to assign is_direct 
-   */
-  Room fromAccountData(
-    List<Event> accountDataEvents,
-  ) {
-    dynamic isDirect;
-    try {
-      accountDataEvents.forEach((event) {
-        switch (event.type) {
-          case 'm.direct':
-            isDirect = true;
-            break;
-          default:
-            break;
-        }
-      });
-    } catch (error) {
-      print('[fromEphemeralEvents] error $error');
-    }
-
-    return this.copyWith(
-      direct: isDirect ?? this.direct,
     );
   }
 }

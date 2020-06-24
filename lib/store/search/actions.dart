@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/global/libs/matrix/search.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/search.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
-import 'package:Tether/global/libs/hello-matrix/index.dart';
+import 'package:syphon/global/libs/hello-matrix/index.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -192,13 +192,10 @@ ThunkAction<AppState> searchUsers({String searchText}) {
         throw data['error'];
       }
 
-      print('[searchUsers] success');
       final List<dynamic> rawUsers = data['results'];
 
       final List<User> searchResults =
           rawUsers.map((room) => User.fromJson(room)).toList();
-
-      // TODO: dispatch fetch user icons
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],

@@ -1,4 +1,4 @@
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 // Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/user/selectors.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/selectors.dart';
 
 // Styling
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:Tether/global/dimensions.dart';
+import 'package:syphon/global/dimensions.dart';
 
 class HomeserverStep extends StatelessWidget {
   HomeserverStep({Key key}) : super(key: key);
@@ -43,7 +43,7 @@ class HomeserverStep extends StatelessWidget {
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
-                  child: SvgPicture.asset(SIGNUP_HOMESERVER_GRAPHIC,
+                  child: SvgPicture.asset(Assets.heroSignupHomeserver,
                       semanticsLabel: 'User hidding behind a message'),
                 ),
               ),

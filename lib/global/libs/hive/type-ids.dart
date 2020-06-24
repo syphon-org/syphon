@@ -14,6 +14,8 @@ const int DevicesHiveId = 9;
 const int NotificationSettingsHiveId = 10;
 const int PusherHiveId = 11;
 const int RuleHiveId = 12;
+const int DeviceKeyHiveId = 13;
+const int OneTimeKeyHiveId = 14;
 
 // Actual Redux State Stores
 const int MediaStoreHiveId = 0;
@@ -22,3 +24,4 @@ const int RoomStoreHiveId = 100;
 const int AuthStoreHiveId = 101;
 const int UsersStoreHiveId = 102;
 const int SyncStoreHiveId = 103;
+const int CryptoStoreHiveId = 104;

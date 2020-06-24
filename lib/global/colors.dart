@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const TETHERED_CYAN = 0xff34C7B5;
-const TETHERED_CYAN_ALPHA = 0xAA34C7B5;
+const SYPHON_CYAN = 0xff34C7B5;
+const SYPHON_CYAN_ALPHA = 0xAA34C7B5;
 const BESIDES_BLUE = 0xff4476CC;
 const BASICALLY_BLACK = 0xff121212;
 const ACTUALLY_BLACK = 0xff000000;
@@ -12,8 +12,8 @@ const GREY_DARK = 0xff4D5767;
 const BACKGROUND = 0xffFEFEFE;
 const GREY_DEFAULT = 0xFF9E9E9E;
 
-const PRIMARY_COLOR = const Color(TETHERED_CYAN);
-const PRIMARY_COLOR_ALPHA = const Color(TETHERED_CYAN);
+const PRIMARY_COLOR = const Color(SYPHON_CYAN);
+const PRIMARY_COLOR_ALPHA = const Color(SYPHON_CYAN);
 const BASICALLY_BLACK_COLOR = const Color(BASICALLY_BLACK);
 const ENABLED_GREY_COLOR = const Color(ENABLED_GREY);
 const DISABLED_GREY_COLOR = const Color(DISABLED_GREY);

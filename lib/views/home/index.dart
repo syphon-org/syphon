@@ -1,15 +1,14 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/events/actions.dart';
-import 'package:Tether/store/rooms/room/selectors.dart';
-import 'package:Tether/store/settings/chat-settings/model.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/selectors.dart';
-import 'package:Tether/global/assets.dart';
-import 'package:Tether/views/home/chat/details-chat.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,15 +18,15 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // Store
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/rooms/selectors.dart';
-import 'package:Tether/global/formatters.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/global/formatters.dart';
 
 // View And Styling
-import 'package:Tether/views/widgets/menu.dart';
-import 'package:Tether/views/home/chat/index.dart';
-import 'package:Tether/global/colors.dart';
+import 'package:syphon/views/widgets/menu.dart';
+import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, help }
@@ -106,16 +105,6 @@ class HomeViewState extends State<Home> {
                 title: selectedRoom.name,
               ),
             );
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.supervised_user_circle),
-          iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Toggle Direct Room',
-          color: Colors.white,
-          onPressed: () {
-            print('HELP ${this.selectedRoom}');
-            props.onTESTING(this.selectedRoom);
           },
         ),
         IconButton(
@@ -227,10 +216,10 @@ class HomeViewState extends State<Home> {
           ),
         ),
         Text(
-          StringStore.app_name,
+          Values.appName,
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w100,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ]),
@@ -298,7 +287,7 @@ class HomeViewState extends State<Home> {
               maxHeight: Dimensions.mediaSizeMin,
             ),
             child: SvgPicture.asset(
-              GRAPHIC_EMPTY_MESSAGES,
+              Assets.heroChatNotFound,
               semanticsLabel: 'Tiny cute monsters hidding behind foliage',
             ),
           ),
@@ -373,51 +362,74 @@ class HomeViewState extends State<Home> {
               children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(right: 12),
-                  child: Stack(children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: primaryColor,
-                      child: room.avatarUri != null
-                          ? ClipRRect(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: primaryColor,
+                        child: room.avatarUri != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.thumbnailSizeMax,
+                                ),
+                                child: MatrixImage(
+                                  width: Dimensions.avatarSize,
+                                  height: Dimensions.avatarSize,
+                                  mxcUri: room.avatarUri,
+                                ),
+                              )
+                            : Text(
+                                formatRoomInitials(room: room),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                      Visibility(
+                        visible: room.encryptionEnabled,
+                        child: Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                 Dimensions.thumbnailSizeMax,
                               ),
-                              child: MatrixImage(
-                                width: Dimensions.avatarSize,
-                                height: Dimensions.avatarSize,
-                                mxcUri: room.avatarUri,
-                              ),
-                            )
-                          : Text(
-                              formatRoomInitials(room: room),
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    Visibility(
-                      visible: room.encryptionEnabled,
-                      child: Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              Dimensions.thumbnailSizeMax,
-                            ),
-                            child: Container(
-                              height: 16,
-                              width: 16,
-                              color: Colors.green,
-                              child: Icon(
-                                Icons.lock,
-                                color: Colors.white,
-                                size: 10,
-                              ),
-                            )),
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                color: Colors.green,
+                                child: Icon(
+                                  Icons.lock,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                              )),
+                        ),
                       ),
-                    ),
-                  ]),
+                      Visibility(
+                        visible: room.invite,
+                        child: Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                Dimensions.thumbnailSizeMax,
+                              ),
+                              child: Container(
+                                height: 16,
+                                width: 16,
+                                color: Colors.grey,
+                                child: Icon(
+                                  Icons.mail_outline,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                              )),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Flexible(
                   flex: 1,
@@ -598,7 +610,6 @@ class _Props extends Equatable {
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onFetchSyncForced;
-  final Function onTESTING;
 
   _Props({
     @required this.rooms,
@@ -609,39 +620,31 @@ class _Props extends Equatable {
     @required this.onLeaveChat,
     @required this.onDeleteChat,
     @required this.onFetchSyncForced,
-    @required this.onTESTING,
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
-      rooms: store.state.roomStore.rooms,
-      loadingRooms: store.state.roomStore.loading,
-      offline: store.state.syncStore.offline,
-      currentUser: store.state.authStore.user,
-      chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
-      onFetchSyncForced: () async {
-        await store.dispatch(
-          fetchSync(since: store.state.syncStore.lastSince),
-        );
-        return Future(() => true);
-      },
-      onLeaveChat: ({Room room}) {
-        return store.dispatch(
-          removeRoom(room: room),
-        );
-      },
-      onDeleteChat: ({Room room}) {
-        return store.dispatch(
-          deleteRoom(room: room),
-        );
-      },
-      onTESTING: (room) {
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            endHash: room.prevHash,
-          ),
-        );
-      });
+        rooms: store.state.roomStore.rooms,
+        loadingRooms: store.state.roomStore.loading,
+        offline: store.state.syncStore.offline,
+        currentUser: store.state.authStore.user,
+        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        onFetchSyncForced: () async {
+          await store.dispatch(
+            fetchSync(since: store.state.syncStore.lastSince),
+          );
+          return Future(() => true);
+        },
+        onLeaveChat: ({Room room}) {
+          return store.dispatch(
+            removeRoom(room: room),
+          );
+        },
+        onDeleteChat: ({Room room}) {
+          return store.dispatch(
+            deleteRoom(room: room),
+          );
+        },
+      );
 
   @override
   List<Object> get props => [

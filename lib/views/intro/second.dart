@@ -1,9 +1,10 @@
+import 'package:syphon/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // Assets
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class SecondSection extends StatelessWidget {
   SecondSection({Key key, this.title}) : super(key: key);
@@ -26,7 +27,7 @@ class SecondSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            CONNECTION_GRAPHIC,
+            Assets.heroIntroConnection,
             semanticsLabel: 'Two people messaging privately but leisurely',
           ),
         ),
@@ -39,8 +40,8 @@ class SecondSection extends StatelessWidget {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: 'Matrix enables you to message others',
-                  style: Theme.of(context).textTheme.subtitle2,
+                  text: Strings.contentIntroSecondPartOne,
+                  style: Theme.of(context).textTheme.subtitle1,
                   children: <TextSpan>[
                     TextSpan(
                       text: '\nprivately ',
@@ -49,8 +50,8 @@ class SecondSection extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: 'and control where the\nmessages are ',
-                      style: Theme.of(context).textTheme.subtitle2,
+                      text: Strings.contentIntroSecondPartTwo,
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                     TextSpan(
                       text: 'stored',

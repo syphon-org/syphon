@@ -2,6 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+class Algorithms {
+  static const signedcurve25519 = 'signed_curve25519';
+  static const curve25591 = 'curve25519';
+  static const ed25519 = 'ed25519';
+  static const olmv1 = 'm.olm.v1.curve25519-aes-sha2';
+  static const megolmv1 = 'm.megolm.v1.aes-sha2';
+}
+
 abstract class Encryption {
   /**
    * Fetch Encryption Keys
@@ -14,9 +22,9 @@ abstract class Encryption {
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    String lastSince,
     int timeout = 10 * 1000, // 10 seconds
-    List<String> deviceKeys = const [],
+    String lastSince,
+    Map<String, dynamic> users = const {},
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
@@ -24,7 +32,46 @@ abstract class Encryption {
       'Authorization': 'Bearer $accessToken',
     };
 
+    Map body = {
+      "timeout": timeout,
+      'device_keys': users,
+      'token': lastSince,
+    };
+
+    print(body);
+
     final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Fetch Room Keys
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id460
+   * 
+   * Returns the current devices and identity keys for the given users.
+   */
+  static Future<dynamic> fetchRoomKeys({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    int timeout = 10 * 1000, // 10 seconds
+    String lastSince,
+    Map<String, dynamic> users = const {},
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
       url,
       headers: headers,
     );
@@ -36,7 +83,7 @@ abstract class Encryption {
    * 
    * Fetch Key Changes
    * 
-   * https://matrix.org/docs/spec/client_server/latest#id462
+   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
    * 
    * Gets a list of users who have updated their device identity keys since a previous sync token.
    * 
@@ -52,7 +99,7 @@ abstract class Encryption {
     String from,
     String to,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
+    String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -69,7 +116,7 @@ abstract class Encryption {
   /**
    * Claim Keys
    * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
+   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
    * 
    * Claims one-time keys for use in pre-key messages.
    * 
@@ -86,9 +133,14 @@ abstract class Encryption {
       'Authorization': 'Bearer $accessToken',
     };
 
+    Map body = {
+      'one_time_keys': oneTimeKeys,
+    };
+
     final response = await http.post(
       url,
       headers: headers,
+      body: json.encode(body),
     );
 
     return await json.decode(response.body);
@@ -98,8 +150,7 @@ abstract class Encryption {
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    Map oneTimeKeys,
-    List<String> deviceKeys,
+    Map data,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 
@@ -110,6 +161,7 @@ abstract class Encryption {
     final response = await http.post(
       url,
       headers: headers,
+      body: json.encode(data),
     );
 
     return await json.decode(response.body);

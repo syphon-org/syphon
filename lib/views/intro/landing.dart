@@ -1,10 +1,10 @@
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class LandingSection extends StatelessWidget {
   LandingSection({Key key, this.title}) : super(key: key);
@@ -14,10 +14,7 @@ class LandingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     final widthScale = width * 0.825;
-    // TODO: convert to flex
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -29,14 +26,14 @@ class LandingSection extends StatelessWidget {
             maxWidth: 320,
           ),
           child: SvgPicture.asset(
-            MOBILE_USER_GRAPHIC,
-            semanticsLabel: INTRO_IMAGE_LABEL,
+            Assets.heroIntroMobileUser,
+            semanticsLabel: Strings.semanticsLabelImageIntro,
           ),
         ),
         Container(
           margin: EdgeInsets.only(bottom: 16),
           child: Text(
-            INTRO_TITLE,
+            Strings.titleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline4,
           ),
@@ -44,7 +41,7 @@ class LandingSection extends StatelessWidget {
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
-            StringStore.intro_subtitle,
+            Strings.subtitleIntro,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline6,
           ),

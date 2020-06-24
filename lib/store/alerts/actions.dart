@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 import './model.dart';
 
@@ -52,9 +52,10 @@ ThunkAction<AppState> testAlerts({type, message}) {
   };
 }
 
-ThunkAction<AppState> addAlert({type, message}) {
+ThunkAction<AppState> addAlert({type, message, origin}) {
   return (Store<AppState> store) async {
-    print('[addAlert] $type : $message');
+    print('[$origin] $type : $message');
+
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);
     store.dispatch(AddAlert(alert: alert));

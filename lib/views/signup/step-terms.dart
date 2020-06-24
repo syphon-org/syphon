@@ -1,6 +1,6 @@
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/libs/matrix/auth.dart';
-import 'package:Tether/store/auth/actions.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 // Store
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 // Styling
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:Tether/global/dimensions.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TermsStep extends StatelessWidget {
@@ -46,7 +46,7 @@ class TermsStep extends StatelessWidget {
                   child: Stack(
                     children: [
                       SvgPicture.asset(
-                        AssetsStore.heroSyncFiles,
+                        Assets.heroSyncFiles,
                         semanticsLabel:
                             'A couple of documents with a checked circle on the bottom',
                       ),
@@ -58,7 +58,7 @@ class TermsStep extends StatelessWidget {
                           width: 56,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(40),
-                            color: const Color(TETHERED_CYAN),
+                            color: const Color(SYPHON_CYAN),
                           ),
                           child: Container(
                             child: Icon(

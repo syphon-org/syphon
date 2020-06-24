@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:Tether/global/libs/matrix/auth.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/views/signup/step-captcha.dart';
-import 'package:Tether/views/signup/step-terms.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/signup/step-captcha.dart';
+import 'package:syphon/views/signup/step-terms.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +14,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 // Styling Widgets
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/behaviors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import './step-username.dart';
@@ -36,7 +36,7 @@ class SignupView extends StatefulWidget {
 }
 
 class SignupViewState extends State<SignupView> {
-  final String title = StringStore.viewTitleSignup;
+  final String title = Strings.titleViewSignup;
 
   int currentStep = 0;
   bool onboarding = false;
@@ -211,12 +211,12 @@ class SignupViewState extends State<SignupView> {
   Widget buildButtonText() {
     if (this.currentStep == sections.length - 1) {
       return const Text(
-        StringStore.buttonSignupFinish,
+        Strings.buttonSignupFinish,
       );
     }
 
     return const Text(
-      StringStore.buttonSignupNext,
+      Strings.buttonSignupNext,
     );
   }
 

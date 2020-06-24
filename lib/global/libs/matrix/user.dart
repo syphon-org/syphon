@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Tether/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
 import 'package:http/http.dart' as http;
 
 abstract class Users {
@@ -199,29 +199,6 @@ dynamic buildRoomMembersRequest({
   String roomId,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/members';
-
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
-
-  return {'url': url, 'headers': headers};
-}
-
-/**
- * https://matrix.org/docs/spec/client_server/latest#id260
- * 
- * This API returns a map of MXIDs to member info objects for members of the room. 
- * The current user must be in the room for it to work, 
- * unless it is an Application Service in which case any of the AS's users must be in the room. 
- * This API is primarily for Application Services and should be faster to respond than /members 
- * as it can be implemented more efficiently on the server.
- */
-dynamic buildFastRoomMembersRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
-}) {
-  String url =
-      '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/joined_members';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

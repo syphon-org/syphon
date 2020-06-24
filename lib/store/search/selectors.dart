@@ -1,4 +1,4 @@
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 List<dynamic> homeservers(AppState state) {
   return state.matrixStore.homeservers;

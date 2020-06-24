@@ -1,15 +1,15 @@
-import 'package:Tether/store/auth/state.dart';
+import 'package:syphon/store/auth/state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:expandable/expandable.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/store/auth/actions.dart';
-import 'package:Tether/store/search/actions.dart';
-import 'package:Tether/store/search/selectors.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/search/selectors.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Assets

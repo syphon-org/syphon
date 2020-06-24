@@ -1,15 +1,22 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/global/libs/matrix/user.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/store/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/user.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/crypto/keys/model.dart';
+import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:olm/olm.dart' as olm;
 
 import 'package:http/http.dart' as http;
 
@@ -64,19 +71,8 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
+      // last since called on /sync
       final lastSince = store.state.syncStore.lastSince;
-
-      print('[fetchMessageEvents] ${room.name} [param] endHash ${endHash}');
-      print('[fetchMessageEvents] ${room.name} [param] startHash ${startHash}');
-
-      print('[fetchMessageEvents] ${room.name} endHash ${room.endHash}');
-      print('[fetchMessageEvents] ${room.name} prevHash ${room.prevHash}');
-      print('[fetchMessageEvents] ${room.name} startHash ${room.startHash}');
-
-      print('[fetchMessageEvents] ${room.name} lastSince $lastSince');
-
-      // final String start = startHash ?? room.prevHash ?? room.toHash;
-      // final String end = endHash ?? room.fromHash ?? lastSince;
 
       final Map messagesJson = await MatrixApi.fetchMessageEvents(
         protocol: protocol,
@@ -92,30 +88,26 @@ ThunkAction<AppState> fetchMessageEvents({
       final String end = messagesJson['end'];
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String start = messagesJson['start'];
+      final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      final List<dynamic> messages = messagesJson['chunk'];
-
-      messages.forEach((message) {
-        print(
-          '[fetchMessageEvents]  ${message['sender']} ${message['content']}',
-        );
-      });
-
-      print('[fetchMessageEvents] ${room.name} end $end');
-      print('[fetchMessageEvents] ${room.name} start $start');
-
-      var nextPrevBatch;
+      // print('[fetchMessageEvents] ${room.name} end $end');
+      // print('[fetchMessageEvents] ${room.name} start $start');
+      // messages.forEach((message) {
+      //   print(
+      //     '[fetchMessageEvents]  ${message['sender']} ${message}',
+      //   );
+      // });
 
       // If there's a gap in messages fetched, run a sync again
       // which will fetch the next batch with the same endHash
-
-      print(
-        '[fetchMessageEvents] ${room.name} shouldFetch? end != start: ${end != start},  end != endHash: ${end != endHash}',
-      );
+      // the following is probably not needed due to the
+      // inequality check for prevHash and endHash in syncRooms
+      var nextPrevBatch;
       if (end != start && end != endHash) {
         nextPrevBatch = end;
       }
 
+      // reuse the logic for syncing
       store.dispatch(syncRooms(
         {
           '${room.id}': {
@@ -126,9 +118,6 @@ ThunkAction<AppState> fetchMessageEvents({
           },
         },
       ));
-
-      // Have an equivalent json parser for cold storage?
-      // store.dispatch(syncStorage());
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {
@@ -138,41 +127,38 @@ ThunkAction<AppState> fetchMessageEvents({
 }
 
 /**
- * DEPRECATED: paginating state events can only be 
+ * 
+ * TODO: not sure if we need this, but just
+ * trying to finish E2EE first
+ * 
+ * state events can only be 
  * done from full state /sync data
  */
 ThunkAction<AppState> fetchStateEvents({Room room}) {
-  return (Store<AppState> store) async {};
-}
-
-/**
- * UNIMPLEMENTED
- */
-ThunkAction<AppState> fetchMemberEvents({String roomId}) {
   return (Store<AppState> store) async {
     try {
-      final request = buildFastRoomMembersRequest(
+      final stateEvents = await MatrixApi.fetchStateEvents(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        roomId: roomId,
+        roomId: room.id,
       );
 
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      final data = json.decode(response.body);
-
-      if (data['errcode'] != null) {
-        throw data['error'];
+      if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+        throw stateEvents['error'];
       }
 
-      // Convert rooms to rooms
-      print('[fetchMemberEvents] TESTING $data');
+      store.dispatch(syncRooms({
+        '${room.id}': {
+          'state': {
+            'events': stateEvents,
+          },
+        },
+      }));
     } catch (error) {
-      print('[fetchMemberEvents] error $error');
+      print('[fetchRooms] ${room.id} $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
   };
 }
@@ -191,6 +177,24 @@ ThunkAction<AppState> readMessages({
     try {} catch (error) {
       print('[readMessage] failed to send: $error');
     }
+  };
+}
+
+ThunkAction<AppState> saveDraft({
+  final body,
+  String type = 'm.text',
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        type: type,
+        body: body,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    ));
   };
 }
 
@@ -216,6 +220,7 @@ ThunkAction<AppState> sendTyping({
         userId: store.state.authStore.user.userId,
         typing: typing,
       );
+
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -225,21 +230,165 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
-ThunkAction<AppState> saveDraft({
-  final body,
-  String type = 'm.text',
+/**
+ * Send Session Encryption Keys
+ * 
+ * Specifically for sending encrypted keys using olm
+ * for later use with encrypted messages using megolm
+ * sent directly to devices within the room
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id454
+ * https://matrix.org/docs/spec/client_server/latest#id461
+ */
+/**
+ */
+ThunkAction<AppState> sendSessionKeys({
   Room room,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(UpdateRoom(
-      id: room.id,
-      draft: Message(
+    try {
+      print('[sendSessionKeys] start');
+
+      // Create payload of megolm session keys for message decryption
+      final messageSession = await store.dispatch(
+        exportMessageSession(roomId: room.id),
+      );
+
+      final roomKeyEventContent = {
+        'algorithm': Algorithms.olmv1,
+        'room_id': room.id,
+        'session_id': messageSession['session_id'],
+        'session_key': messageSession['session_key'],
+      };
+
+      // manage which devices to claim oneTimeKeys for
+      // here instead of within the function, because you'll
+      // need to cycle through those necessary devices here anyway
+      // for now, we're just sending the request to all the
+      // one time keys that were saved from this call
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
+      await store.dispatch(claimOneTimeKeys(room: room));
+
+      // TODO: encrypt and send olm sendToDevice room keys / key sharing
+      // For each one time key claimed
+      // send a m.room_key event directly to each device
+      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
+        try {
+          final deviceKey = store.state.cryptoStore
+              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+
+          // lol
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+
+          // find the identityKey for the device
+          final identityKey = deviceKey.keys[keyId];
+
+          // Poorly decided to save key sessions by deviceId at first but then
+          // realised that you may have the same identityKey for diff
+          // devices and you also don't have the device id in the
+          // toDevice event payload -__-, convert back to identity key
+          final roomKeyEventContentEncrypted = await store.dispatch(
+            encryptKeyContent(
+              roomId: room.id,
+              identityKey: deviceKey.deviceId, // TODO identityKey after testing
+              eventType: EventTypes.roomKey,
+              content: roomKeyEventContent,
+            ),
+          );
+
+          final response = await MatrixApi.sendEventToDevice(
+            protocol: protocol,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver,
+            userId: deviceKey.userId,
+            deviceId: deviceKey.deviceId,
+            content: roomKeyEventContentEncrypted,
+          );
+
+          if (response['errcode'] != null) {
+            throw response['error'];
+          }
+
+          print(
+            '[sendSessionKeys] ${oneTimeKey.deviceId} sent and completed',
+          );
+        } catch (error) {
+          print(
+            '[sendSessionKeys] ${oneTimeKey.deviceId} $error',
+          );
+        }
+      });
+
+      // await all sendToDevice room key events to be sent to users
+      await Future.wait(sendToDeviceRequests);
+    } catch (error) {
+      store.dispatch(
+        addAlert(type: 'warning', message: error.message),
+      );
+    }
+  };
+}
+
+/**
+ * Send Encrypted Messages
+ * 
+ * Specifically for sending encrypted messages using megolm
+ */
+ThunkAction<AppState> sendMessageEncrypted({
+  Room room,
+  final body,
+  String type = MessageTypes.TEXT,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
+      print('[sendMessageEncrypted] $trxId');
+
+      final messageEvent = {
+        'body': body,
+        'type': type,
+      };
+
+      final encryptedEvent = await store.dispatch(
+        encryptMessageContent(
+          roomId: room.id,
+          eventType: EventTypes.message,
+          content: messageEvent,
+        ),
+      );
+
+      print('[sendMessageEncrypted $encryptedEvent');
+
+      // TODO: encrypt and send actual message content
+      final data = await MatrixApi.sendMessageEncrypted(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        trxId: trxId,
         roomId: room.id,
-        type: type,
-        body: body,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      ),
-    ));
+        senderKey: encryptedEvent['sender_key'],
+        ciphertext: encryptedEvent['ciphertext'],
+        sessionId: encryptedEvent['session_id'],
+        deviceId: store.state.authStore.user.deviceId,
+      );
+
+      print('[sendMessageEncrypted completed $data');
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+    } catch (error) {
+      store.dispatch(
+        addAlert(
+          type: 'warning',
+          message: error.message,
+          origin: 'sendMessageEncrypted',
+        ),
+      );
+    }
   };
 }
 
@@ -275,13 +424,18 @@ ThunkAction<AppState> sendMessage({
         ),
       ));
 
+      final message = {
+        'body': body,
+        'type': type,
+      };
+
       final data = await MatrixApi.sendMessage(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        messageBody: body,
+        trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
-        requestId: DateTime.now().millisecond.toString(),
+        message: message,
       );
 
       if (data['errcode'] != null) {

@@ -1,9 +1,10 @@
-import 'package:Tether/global/dimensions.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:Tether/global/assets.dart';
+import 'package:syphon/global/assets.dart';
 
 class FirstSection extends StatelessWidget {
   FirstSection({Key key, this.title}) : super(key: key);
@@ -26,7 +27,7 @@ class FirstSection extends StatelessWidget {
               maxWidth: 320,
             ),
             child: SvgPicture.asset(
-              HIDDEN_MESSENGER_GRAPHIC,
+              Assets.heroIntroHiddenMessage,
               semanticsLabel: 'User hidding behind a message',
             ),
           ),
@@ -39,9 +40,8 @@ class FirstSection extends StatelessWidget {
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    text:
-                        'Tether works by using an encrypted \nand decentralized protocol \ncalled ',
-                    style: Theme.of(context).textTheme.subtitle2,
+                    text: Strings.contentIntroFirstPartOne,
+                    style: Theme.of(context).textTheme.subtitle1,
                     children: <TextSpan>[
                       TextSpan(
                         text: 'Matrix',

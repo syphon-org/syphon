@@ -1,5 +1,4 @@
-import 'package:Tether/global/libs/hive/type-ids.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import './colors.dart';
@@ -28,9 +27,9 @@ class Themes {
     int accentColorHex,
     ThemeType themeType,
   }) {
-    int primaryColor = primaryColorHex ?? TETHERED_CYAN;
-    int accentColor = accentColorHex ?? TETHERED_CYAN;
-    int appBarColor = primaryColorHex ?? TETHERED_CYAN;
+    int primaryColor = primaryColorHex ?? SYPHON_CYAN;
+    int accentColor = accentColorHex ?? SYPHON_CYAN;
+    int appBarColor = primaryColorHex ?? SYPHON_CYAN;
     int scaffoldBackgroundColor = BACKGROUND;
     int fontColor = Colors.white.value;
 
@@ -40,16 +39,16 @@ class Themes {
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? TETHERED_CYAN;
-        accentColor = accentColorHex ?? TETHERED_CYAN;
+        primaryColor = primaryColorHex ?? SYPHON_CYAN;
+        accentColor = accentColorHex ?? SYPHON_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = null;
         fontColor = Colors.white.value;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? TETHERED_CYAN;
-        accentColor = accentColorHex ?? TETHERED_CYAN;
+        primaryColor = primaryColorHex ?? SYPHON_CYAN;
+        accentColor = accentColorHex ?? SYPHON_CYAN;
         appBarColor = primaryColorHex ?? BASICALLY_BLACK;
         scaffoldBackgroundColor = BASICALLY_BLACK;
         appBarElevation = 0.0;
@@ -106,7 +105,9 @@ class Themes {
       // Fonts
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(
-        headline6: TextStyle(color: Colors.white),
+        headline6: TextStyle(
+          color: Colors.white,
+        ),
       ),
       textTheme: TextTheme(
         headline5: TextStyle(
@@ -127,12 +128,13 @@ class Themes {
           letterSpacing: 0.4,
           color: Color(accentColor),
         ),
-        bodyText1: TextStyle(
+        overline: TextStyle(
+          fontSize: 10,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
         ),
-        overline: TextStyle(
-          fontSize: 10,
+        bodyText1: TextStyle(
+          fontSize: 18,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
         ),

@@ -52,6 +52,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
         password: null,
         passwordConfirm: null,
         passwordCurrent: null,
+        isPasswordValid: false,
+        isUsernameValid: false,
         agreement: false,
         captcha: false,
         interactiveAuths: null,

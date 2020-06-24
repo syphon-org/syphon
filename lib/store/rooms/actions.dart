@@ -1,17 +1,20 @@
 import 'dart:async';
-import 'package:Tether/global/libs/matrix/errors.dart';
-import 'package:Tether/global/libs/matrix/index.dart';
-import 'package:Tether/store/media/actions.dart';
-import 'package:Tether/store/rooms/events/actions.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/user/model.dart';
+import 'dart:math';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/rooms/events/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 
 import 'room/model.dart';
 import 'events/model.dart';
@@ -142,9 +145,18 @@ ThunkAction<AppState> syncRooms(
   };
 }
 
+/**
+ *  
+ *  Fetch Rooms (w/o /sync)
+ * 
+ * Takes a negligible amount of time
+ * 
+ * final stopwatch = Stopwatch()..start();
+ * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
+ * stopwatch.stop();
+ */
 ThunkAction<AppState> fetchRooms() {
   return (Store<AppState> store) async {
-    final stopwatch = Stopwatch()..start();
     try {
       store.dispatch(SetLoading(loading: true));
 
@@ -182,8 +194,6 @@ ThunkAction<AppState> fetchRooms() {
             limit: 20,
           );
 
-          print('[fetchRooms] ${room.id}');
-
           store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
@@ -207,8 +217,6 @@ ThunkAction<AppState> fetchRooms() {
       print('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
-      print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
-      stopwatch.stop();
     }
   };
 }
@@ -266,14 +274,12 @@ ThunkAction<AppState> fetchDirectRooms() {
               limit: 20,
             );
 
-            // if (messageEvents['errcode'] != null) {
-            //   throw messageEvents['error'];
-            // }
+            if (messageEvents['errcode'] != null) {
+              throw messageEvents['error'];
+            }
 
             // Format response like /sync request
             // Hacked together to provide isDirect data
-
-            print('[fetchDirectRooms] $roomId');
             await store.dispatch(syncRooms({
               '$roomId': {
                 'state': {
@@ -453,6 +459,77 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
       print('[toggleDirectRoom] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Toggle Room Encryption On (Only)
+ */
+ThunkAction<AppState> toggleRoomEncryption({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      if (room.encryptionEnabled) {
+        throw 'Room is already encrypted';
+      }
+
+      final content = {
+        'algorithm': Algorithms.megolmv1,
+      };
+
+      final data = await MatrixApi.sendEvent(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        eventType: EventTypes.encryption,
+        content: content,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(fetchStateEvents(room: room));
+      print('[toggleRoomEncryption] success $data');
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print('[toggleRoomEncryption] failure $error');
+    }
+  };
+}
+
+ThunkAction<AppState> acceptRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await MatrixApi.joinRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+
+      Room joinedRoom = rooms.containsKey(room.id)
+          ? rooms[room.id]
+          : Room(
+              id: room.id,
+            );
+
+      store.dispatch(SetRoom(
+        room: joinedRoom.copyWith(invite: false),
+      ));
+
+      await store.dispatch(fetchRooms());
+      await store.dispatch(fetchDirectRooms());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
     }
   };
 }

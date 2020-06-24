@@ -53,6 +53,7 @@ abstract class Rooms {
     String accessToken = params['accessToken'];
     String since = params['since'];
     bool fullState = params['fullState'];
+    int timeout = params['timeout'];
 
     return await sync(
       protocol: protocol,
@@ -60,6 +61,7 @@ abstract class Rooms {
       accessToken: accessToken,
       since: since,
       fullState: fullState,
+      timeout: timeout,
     );
   }
 
@@ -129,6 +131,39 @@ abstract class Rooms {
     );
 
     return await json.decode(response.body);
+  }
+
+  /*
+  * Create Room - POST
+  * 
+  * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-join
+  *  
+  */
+  static Future<dynamic> joinRoom({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/join';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      // TODO: third party signed
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(
+      response.body,
+    );
   }
 
   /**

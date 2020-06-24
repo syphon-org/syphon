@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/media/actions.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

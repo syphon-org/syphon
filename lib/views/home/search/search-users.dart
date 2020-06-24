@@ -1,27 +1,25 @@
 import 'dart:async';
 
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/dimensions.dart';
-import 'package:Tether/global/strings.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/store/rooms/actions.dart';
-import 'package:Tether/store/rooms/room/model.dart';
-import 'package:Tether/store/user/model.dart';
-import 'package:Tether/store/user/selectors.dart';
-import 'package:Tether/views/home/chat/index.dart';
-import 'package:Tether/views/widgets/image-matrix.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:intl/intl.dart';
 
 import 'package:redux/redux.dart';
-import 'package:Tether/store/search/actions.dart';
+import 'package:syphon/store/search/actions.dart';
 
-import 'package:Tether/store/index.dart';
+import 'package:syphon/store/index.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Assets
@@ -58,6 +56,7 @@ class SearchUserState extends State<SearchUserView> {
 
   Timer searchTimeout;
   bool searching = false;
+  String searchable;
   String creatingRoomDisplayName;
 
   @override
@@ -133,7 +132,6 @@ class SearchUserState extends State<SearchUserView> {
   @protected
   void onSelectUser({BuildContext context, _Props props, User user}) async {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     return await showDialog(
       context: context,
@@ -148,7 +146,7 @@ class SearchUserState extends State<SearchUserView> {
         ),
         children: <Widget>[
           Text(
-            StringStore.start_chat_notice,
+            Strings.confirmationStartChat,
           ),
           Container(
             padding: EdgeInsets.only(top: 8),
@@ -201,6 +199,82 @@ class SearchUserState extends State<SearchUserView> {
     );
   }
 
+  /**
+   * 
+   * Attempt User Chat
+   * 
+   * attempt chating with a user 
+   * by the name searched
+   */
+  @protected
+  void onAttemptChat({BuildContext context, _Props props, User user}) async {
+    double width = MediaQuery.of(context).size.width;
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text('Try chatting with ${user.displayName}'),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: width * 0.05,
+          vertical: 12,
+        ),
+        children: <Widget>[
+          Text(
+            Strings.confirmationAttemptChat,
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SimpleDialogOption(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    Strings.buttonCancel,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+                SimpleDialogOption(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  onPressed: () async {
+                    this.setState(() {
+                      creatingRoomDisplayName = user.displayName;
+                    });
+                    final newRoomId = await props.onCreateRoom(user: user);
+                    Navigator.pop(context);
+                    Navigator.popAndPushNamed(
+                      context,
+                      '/home/chat',
+                      arguments: ChatViewArguements(
+                        roomId: newRoomId,
+                        title: creatingRoomDisplayName,
+                      ),
+                    );
+                  },
+                  child: Text(
+                    Strings.buttonLetsChat,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @protected
   Widget buildUserAvatar({User user}) {
     if (user.avatarUri != null) {
@@ -227,84 +301,167 @@ class SearchUserState extends State<SearchUserView> {
 
   @protected
   Widget buildUserList(BuildContext context, _Props props) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 2,
-        vertical: 4,
-      ),
-      scrollDirection: Axis.vertical,
-      itemCount: props.searchResults.length,
-      itemBuilder: (BuildContext context, int index) {
-        final user = (props.searchResults[index] as User);
-        final sectionBackgroundColor =
-            Theme.of(context).brightness == Brightness.dark
-                ? const Color(BASICALLY_BLACK)
-                : const Color(BACKGROUND);
-
-        Color avatarBackground =
-            user.avatarUri != null ? Colors.transparent : Colors.grey;
-
-        return GestureDetector(
-          onTap: () => this.onSelectUser(
-            context: context,
-            props: props,
-            user: user,
-          ),
-          child: Card(
-            color: sectionBackgroundColor,
-            elevation: 0,
-            child: Container(
-              padding: const EdgeInsets.only(
-                bottom: 8,
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: buildUserAvatar(user: user),
-                  backgroundColor: avatarBackground,
+    final sectionBackgroundColor =
+        Theme.of(context).brightness == Brightness.dark
+            ? const Color(BASICALLY_BLACK)
+            : const Color(BACKGROUND);
+    final attemptableUser = User(
+      displayName: searchable ?? '',
+      userId: searchable != null && searchable.contains(":")
+          ? searchable
+          : formatUserId(searchable ?? ''),
+    );
+    return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 2,
+          vertical: 4,
+        ),
+        child: ListView(
+          children: [
+            Visibility(
+              visible: searchable != null && searchable.length > 0,
+              child: GestureDetector(
+                onTap: () => this.onAttemptChat(
+                  props: props,
+                  context: context,
+                  user: attemptableUser,
                 ),
-                title: Text(
-                  formatDisplayName(user),
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                subtitle: Text(
-                  user.userId,
-                  style: Theme.of(context).textTheme.caption.merge(
-                        TextStyle(
-                          color: props.loading ? Color(DISABLED_GREY) : null,
+                child: Card(
+                  color: sectionBackgroundColor,
+                  elevation: 0,
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      bottom: 8,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: buildUserAvatar(user: attemptableUser),
+                        backgroundColor: Colors.grey,
+                      ),
+                      title: Text(
+                        formatDisplayName(attemptableUser),
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: Dimensions.progressIndicatorSize,
-                      height: Dimensions.progressIndicatorSize,
-                      margin: EdgeInsets.symmetric(horizontal: 8),
-                      child: creatingRoomDisplayName == user.displayName
-                          ? CircularProgressIndicator(
-                              strokeWidth: Dimensions.defaultStrokeWidth,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.grey,
+                      subtitle: Text(
+                        attemptableUser.userId,
+                        style: Theme.of(context).textTheme.caption.merge(
+                              TextStyle(
+                                color:
+                                    props.loading ? Color(DISABLED_GREY) : null,
                               ),
-                            )
-                          : Icon(
-                              Icons.send,
-                              size: Dimensions.iconSize,
                             ),
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: Dimensions.progressIndicatorSize,
+                            height: Dimensions.progressIndicatorSize,
+                            margin: EdgeInsets.symmetric(horizontal: 8),
+                            child: creatingRoomDisplayName == searchable
+                                ? CircularProgressIndicator(
+                                    strokeWidth: Dimensions.defaultStrokeWidth,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.grey,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.send,
+                                    size: Dimensions.iconSize,
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
+            ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: props.searchResults.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                final user = (props.searchResults[index] as User);
+                final sectionBackgroundColor =
+                    Theme.of(context).brightness == Brightness.dark
+                        ? const Color(BASICALLY_BLACK)
+                        : const Color(BACKGROUND);
+
+                Color avatarBackground =
+                    user.avatarUri != null ? Colors.transparent : Colors.grey;
+
+                return GestureDetector(
+                  onTap: () => this.onSelectUser(
+                    context: context,
+                    props: props,
+                    user: user,
+                  ),
+                  child: Card(
+                    color: sectionBackgroundColor,
+                    elevation: 0,
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        bottom: 8,
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: buildUserAvatar(user: user),
+                          backgroundColor: avatarBackground,
+                        ),
+                        title: Text(
+                          formatDisplayName(user),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        subtitle: Text(
+                          user.userId,
+                          style: Theme.of(context).textTheme.caption.merge(
+                                TextStyle(
+                                  color: props.loading
+                                      ? Color(DISABLED_GREY)
+                                      : null,
+                                ),
+                              ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: Dimensions.progressIndicatorSize,
+                              height: Dimensions.progressIndicatorSize,
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              child: creatingRoomDisplayName == user.displayName
+                                  ? CircularProgressIndicator(
+                                      strokeWidth:
+                                          Dimensions.defaultStrokeWidth,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.grey,
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.send,
+                                      size: Dimensions.iconSize,
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
+          ],
+        ));
   }
 
   @override
@@ -349,6 +506,7 @@ class SearchUserState extends State<SearchUserView> {
                             this.searchTimeout = null;
                           }
                           this.setState(() {
+                            searchable = text;
                             searchTimeout =
                                 new Timer(Duration(milliseconds: 400), () {
                               props.onSearch(text);

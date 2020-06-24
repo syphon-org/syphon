@@ -1,9 +1,11 @@
-import 'package:Tether/store/index.dart';
-import 'package:Tether/global/colors.dart';
-import 'package:Tether/global/notifications.dart';
-import 'package:Tether/store/sync/actions.dart';
-import 'package:Tether/store/sync/background/service.dart';
-import 'package:Tether/store/user/model.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,17 +17,14 @@ import 'package:redux/redux.dart';
 final String debug = DotEnv().env['DEBUG'];
 final String protocol = DotEnv().env['PROTOCOL'];
 
-class AdvancedScreen extends StatelessWidget {
-  AdvancedScreen({Key key}) : super(key: key);
+class AdvancedView extends StatelessWidget {
+  AdvancedView({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
-          final contentPadding =
-              EdgeInsets.symmetric(horizontal: 24, vertical: 8);
-
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -38,7 +37,7 @@ class AdvancedScreen extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
             ),
-            body: Container(
+            body: SingleChildScrollView(
                 child: Column(
               children: <Widget>[
                 Visibility(
@@ -54,7 +53,7 @@ class AdvancedScreen extends StatelessWidget {
                         lastSince: props.lastSince,
                       );
                     },
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Start Background Service',
                       style: TextStyle(fontSize: 18.0),
@@ -72,7 +71,7 @@ class AdvancedScreen extends StatelessWidget {
                         pluginInstance: globalNotificationPluginInstance,
                       );
                     },
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Stop All Services',
                       style: TextStyle(fontSize: 18.0),
@@ -84,7 +83,7 @@ class AdvancedScreen extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     onTap: () {
                       showDialog(
                         context: context,
@@ -117,7 +116,7 @@ class AdvancedScreen extends StatelessWidget {
                         pluginInstance: globalNotificationPluginInstance,
                       );
                     },
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Test Notifcations',
                       style: TextStyle(fontSize: 18.0),
@@ -129,7 +128,7 @@ class AdvancedScreen extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     onTap: () {
                       props.onForceFunction();
                     },
@@ -142,7 +141,7 @@ class AdvancedScreen extends StatelessWidget {
                 ListTile(
                   dense: true,
                   onTap: props.onToggleSyncing,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Toggle Syncing',
                     style: TextStyle(fontSize: 18.0),
@@ -166,7 +165,7 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: props.loading ? null : props.onManualSync,
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
                       style: TextStyle(
@@ -192,7 +191,7 @@ class AdvancedScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     onTap: props.loading ? null : props.onForceFullSync,
-                    contentPadding: contentPadding,
+                    contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
                       style: TextStyle(
@@ -284,7 +283,7 @@ class _Props extends Equatable {
           store.dispatch(fetchSync(forceFull: true));
         },
         onForceFunction: () {
-          store.dispatch(loadSync());
+          store.dispatch(generateOneTimeKeys());
         },
       );
 }

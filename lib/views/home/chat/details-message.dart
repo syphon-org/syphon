@@ -1,8 +1,9 @@
-import 'package:Tether/store/index.dart';
-import 'package:Tether/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:Tether/store/rooms/events/model.dart';
-import 'package:Tether/global/themes.dart';
-import 'package:Tether/views/widgets/message.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/message.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class MessageDetails extends StatelessWidget {
         }
         return ListTile(
           dense: true,
-          contentPadding: contentPadding,
+          contentPadding: Dimensions.listPadding,
           title: Text(
             users[index],
             style: TextStyle(
@@ -120,7 +121,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Sent',
                     style: TextStyle(
@@ -140,7 +141,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Received',
                     style: TextStyle(
@@ -160,7 +161,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Via',
                     style: TextStyle(
@@ -180,7 +181,7 @@ class MessageDetails extends StatelessWidget {
                 ),
                 ListTile(
                   dense: true,
-                  contentPadding: contentPadding,
+                  contentPadding: Dimensions.listPadding,
                   title: Text(
                     'From',
                     style: TextStyle(
