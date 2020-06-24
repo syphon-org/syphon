@@ -79,7 +79,6 @@ class Strings {
   // Placeholders
   static const placeholderInputMatrixUnencrypted =
       'Matrix message (unencrypted)';
-
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
   static String formatUsernameHint(String homeserver) {

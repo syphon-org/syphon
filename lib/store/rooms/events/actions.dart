@@ -362,9 +362,6 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       print('[sendMessageEncrypted $encryptedEvent');
 
-      // TODO: encrypt and send olm sendToDevice room keys / key sharing
-      return;
-
       // TODO: encrypt and send actual message content
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,
@@ -377,6 +374,12 @@ ThunkAction<AppState> sendMessageEncrypted({
         sessionId: encryptedEvent['session_id'],
         deviceId: store.state.authStore.user.deviceId,
       );
+
+      print('[sendMessageEncrypted completed $data');
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
     } catch (error) {
       store.dispatch(
         addAlert(

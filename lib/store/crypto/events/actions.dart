@@ -20,10 +20,11 @@ ThunkAction<AppState> encryptMessageContent({
   Map content,
 }) {
   return (Store<AppState> store) async {
+    print('[encryptMessageContent] $roomId $eventType $content');
+
     // Load and deserialize session
-    final olm.OutboundGroupSession outboundMessageSession = store.dispatch(
-      loadOutboundMessageSession(roomId: roomId),
-    );
+    final olm.OutboundGroupSession outboundMessageSession =
+        await store.dispatch(loadOutboundMessageSession(roomId: roomId));
 
     // Create payload for encryption per spe
     final payload = {

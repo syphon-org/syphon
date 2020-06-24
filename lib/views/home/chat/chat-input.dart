@@ -42,12 +42,18 @@ class ChatInput extends StatelessWidget {
     Color inputColorBackground = const Color(ENABLED_GREY);
     Color inputCursorColor = Colors.blueGrey;
     Color sendButtonColor = const Color(DISABLED_GREY);
+    String hintText = Strings.placeholderInputMatrixUnencrypted;
 
-    if (sendable) {
-      if (mediumType == MediumType.plaintext) {
+    if (mediumType == MediumType.plaintext) {
+      if (sendable) {
         sendButtonColor = Theme.of(context).accentColor;
       }
-      if (mediumType == MediumType.encryption) {
+    }
+
+    if (mediumType == MediumType.encryption) {
+      hintText = Strings.placeholderInputMatrixEncrypted;
+
+      if (sendable) {
         sendButtonColor = Theme.of(context).primaryColor;
       }
     }
@@ -159,7 +165,7 @@ class ChatInput extends StatelessWidget {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(24.0),
               ),
-              hintText: Strings.placeholderInputMatrixUnencrypted,
+              hintText: hintText,
             ),
           ),
         ),
