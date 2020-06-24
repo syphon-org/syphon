@@ -663,14 +663,17 @@ ThunkAction<AppState> createOutboundKeySession({
 
     print('[createOutboundKeySession] success');
 
+    // Pickle by identity
+    final serializedKeySession = outboundKeySession.pickle(identityKey);
+
     // sychronous
     store.dispatch(saveOutboundKeySession(
       identityKey: identityKey,
-      session: outboundKeySession.pickle(deviceId),
+      session: serializedKeySession,
     ));
 
     // send back a serialized version
-    return outboundKeySession.pickle(deviceId);
+    return serializedKeySession;
   };
 }
 
@@ -715,7 +718,7 @@ ThunkAction<AppState> loadKeySession({
 
         if (outboundKeySessionSerialized != null) {
           print(
-            '[loadKeySession] found outboundKeySessionSerialized ${outboundKeySessionSerialized}',
+            '[loadKeySession] identityKey ${identityKey}',
           );
 
           final existingKeySession = olm.Session();
