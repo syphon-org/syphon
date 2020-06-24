@@ -82,7 +82,7 @@ ThunkAction<AppState> encryptKeyContent({
     // All olm sessions should already be created
     // before sending a room key event to devices
     // Load and deserialize session
-    final olm.Session outboundKeySession = store.dispatch(
+    final olm.Session outboundKeySession = await store.dispatch(
       loadKeySession(identityKey: identityKey),
     );
 
@@ -102,9 +102,20 @@ ThunkAction<AppState> encryptKeyContent({
     final keys = json.decode(olmAccount.identity_keys());
 
     // Return the content to be sent or processed
+    if (encryptedPayload.type == 0) {
+      return {
+        'sender_key': keys[Algorithms.curve25591],
+        'ciphertext': {
+          'body': encryptedPayload.body,
+          'type': encryptedPayload.type,
+        },
+        'session_id': outboundKeySession.session_id()
+      };
+    }
+
     return {
       'sender_key': keys[Algorithms.curve25591],
-      'ciphertext': encryptedPayload,
+      'ciphertext': encryptedPayload.body,
       'session_id': outboundKeySession.session_id()
     };
   };

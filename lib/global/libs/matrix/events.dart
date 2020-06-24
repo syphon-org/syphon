@@ -223,7 +223,11 @@ abstract class Events {
 
     // Use astrick to send to all known devices for user
     Map body = {
-      "messages": {'$userId': {}}
+      "messages": {
+        '$userId': {
+          '$deviceId': content,
+        },
+      }
     };
 
     final response = await http.put(

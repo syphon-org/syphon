@@ -532,7 +532,11 @@ ThunkAction<AppState> updatePassword(String password) {
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'updatePassword',
+      ));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

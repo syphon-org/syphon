@@ -275,23 +275,34 @@ ThunkAction<AppState> sendSessionKeys({
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
       final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
+          final deviceKey = store.state.cryptoStore
+              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+
+          // lol
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+
+          // find the identityKey for the device
+          final identityKey = deviceKey.keys[keyId];
+
+          // Poorly decided to save key sessions by deviceId at first but then
+          // realised that you may have the same identityKey for diff
+          // devices and you also don't have the device id in the
+          // toDevice event payload -__-, convert back to identity key
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
-              identityKey: oneTimeKey.keys[Algorithms.curve25591],
+              identityKey: deviceKey.deviceId, // TODO identityKey after testing
               eventType: EventTypes.roomKey,
               content: roomKeyEventContent,
             ),
-          );
-
-          print(
-            '[sendSessionKeys] ${oneTimeKey.deviceId} ${roomKeyEventContentEncrypted}',
           );
 
           final response = await MatrixApi.sendEventToDevice(
             protocol: protocol,
             accessToken: store.state.authStore.user.accessToken,
             homeserver: store.state.authStore.user.homeserver,
+            userId: deviceKey.userId,
+            deviceId: deviceKey.deviceId,
             content: roomKeyEventContentEncrypted,
           );
 
@@ -303,7 +314,9 @@ ThunkAction<AppState> sendSessionKeys({
             '[sendSessionKeys] ${oneTimeKey.deviceId} sent and completed',
           );
         } catch (error) {
-          print('[sendSessionKeys] ${oneTimeKey.deviceId} error $error');
+          print(
+            '[sendSessionKeys] ${oneTimeKey.deviceId} $error',
+          );
         }
       });
 
@@ -366,7 +379,11 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
     } catch (error) {
       store.dispatch(
-        addAlert(type: 'warning', message: error.message),
+        addAlert(
+          type: 'warning',
+          message: error.message,
+          origin: 'sendMessageEncrypted',
+        ),
       );
     }
   };

@@ -153,11 +153,13 @@ ThunkAction<AppState> deleteDeviceKeys() {
 ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
     try {
-      print('[syncDevice] NEW $dataToDevice');
+      // Extract the new events
+      final List<dynamic> eventsToDevice = dataToDevice['events'];
+      print('[syncDevice] dataToDevice $dataToDevice');
 
-      final eventsToDevice = dataToDevice['events'];
-
+      // Parse and decrypt necessary events
       final eventToDeviceActions = eventsToDevice.map((event) async {
+        print('[syncDevice] eventsToDevice.map $event');
         // TODO: convert to event first or after?
 
         switch (event.type) {
@@ -170,13 +172,18 @@ ThunkAction<AppState> syncDevice(Map dataToDevice) {
         }
       });
 
-      final eventsToDeviceFilters = await Future.wait(eventToDeviceActions);
+      // Parse and decrypt necessary events
+      final eventsToDeviceFiltered = await Future.wait(eventToDeviceActions);
 
-      eventsToDeviceFilters.forEach((element) {
-        print('[syncDevice] eventsToDeviceFilters.forEach $element');
+      eventsToDeviceFiltered.forEach((element) {
+        print('[syncDevice] eventsToDeviceFiltered.forEach $element');
       });
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'syncDevice',
+      ));
     }
   };
 }
@@ -494,7 +501,11 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       // register new key counts
       store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'updateOneTimeKeys',
+      ));
     }
   };
 }
@@ -595,10 +606,11 @@ ThunkAction<AppState> claimOneTimeKeys({
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
+        final deviceIdKey = '${Algorithms.curve25591}:$deviceId';
 
         store.dispatch(createOutboundKeySession(
           deviceId: deviceId,
-          identityKey: deviceKey.keys['${Algorithms.curve25591}:$deviceId'],
+          identityKey: deviceKey.keys[deviceIdKey],
           oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
       });
@@ -688,6 +700,22 @@ ThunkAction<AppState> loadKeySession({
 }) {
   return (Store<AppState> store) async {
     try {
+      try {
+        var outboundKeySessionSerialized =
+            store.state.cryptoStore.outboundKeySessions[identityKey];
+
+        if (outboundKeySessionSerialized != null) {
+          print(
+            '[loadKeySession] found outboundKeySessionSerialized ${identityKey}',
+          );
+
+          return olm.Session()
+            ..unpickle(identityKey, outboundKeySessionSerialized);
+        }
+      } catch (error) {
+        print('[loadKeySession] ${identityKey} ${error}');
+      }
+
       var inboundKeySessionSerialized =
           store.state.cryptoStore.inboundKeySessions[identityKey];
 
@@ -710,21 +738,6 @@ ThunkAction<AppState> loadKeySession({
         if (inboundkeySessionMatch) {
           return inboundKeySession;
         }
-      }
-
-      try {
-        var outboundKeySessionSerialized =
-            store.state.cryptoStore.outboundKeySessions[identityKey];
-
-        if (outboundKeySessionSerialized != null) {
-          print(
-            '[loadKeySession] found outboundKeySessionSerialized ${identityKey}',
-          );
-          return olm.Session()
-            ..unpickle(identityKey, outboundKeySessionSerialized);
-        }
-      } catch (error) {
-        print('[loadKeySession] ${identityKey} ${error}');
       }
 
       // TODO: check here if the session + body actually match any other inboundKeySessions
@@ -870,7 +883,11 @@ ThunkAction<AppState> fetchDeviceKeys({
       return newDeviceKeys;
     } catch (error) {
       print('[fetchDeviceKeys] error $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'fetchDeviceKeys',
+      ));
       return const {};
     }
   };
