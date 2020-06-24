@@ -298,8 +298,12 @@ ThunkAction<AppState> sendSessionKeys({
           if (response['errcode'] != null) {
             throw response['error'];
           }
+
+          print(
+            '[sendSessionKeys] ${oneTimeKey.deviceId} sent and completed',
+          );
         } catch (error) {
-          print('[sendSessionKeys] error $error');
+          print('[sendSessionKeys] ${oneTimeKey.deviceId} error $error');
         }
       });
 

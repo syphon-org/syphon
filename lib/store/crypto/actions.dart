@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
@@ -149,10 +150,31 @@ ThunkAction<AppState> deleteDeviceKeys() {
  * Saves and converts events from /sync in regards to 
  * key sharing and other encryption events
  */
-ThunkAction<AppState> syncDevice(Map toDeviceData) {
+ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
     try {
-      print('[syncDevice] TESTING $toDeviceData');
+      print('[syncDevice] NEW $dataToDevice');
+
+      final eventsToDevice = dataToDevice['events'];
+
+      final eventToDeviceActions = eventsToDevice.map((event) async {
+        // TODO: convert to event first or after?
+
+        switch (event.type) {
+          case EventTypes.encrypted:
+            return decryptKeyContent(
+              content: event['content'],
+            );
+          default:
+            return event;
+        }
+      });
+
+      final eventsToDeviceFilters = await Future.wait(eventToDeviceActions);
+
+      eventsToDeviceFilters.forEach((element) {
+        print('[syncDevice] eventsToDeviceFilters.forEach $element');
+      });
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
     }
@@ -666,21 +688,6 @@ ThunkAction<AppState> loadKeySession({
 }) {
   return (Store<AppState> store) async {
     try {
-      var outboundKeySessionSerialized =
-          store.state.cryptoStore.outboundKeySessions[identityKey];
-
-      if (outboundKeySessionSerialized != null) {
-        print(
-          '[loadKeySession] found outboundKeySessionSerialized ${identityKey}',
-        );
-        return olm.Session()
-          ..unpickle(identityKey, outboundKeySessionSerialized);
-      }
-    } catch (error) {
-      print('[loadKeySession] ${identityKey} ${error}');
-    }
-
-    try {
       var inboundKeySessionSerialized =
           store.state.cryptoStore.inboundKeySessions[identityKey];
 
@@ -703,6 +710,21 @@ ThunkAction<AppState> loadKeySession({
         if (inboundkeySessionMatch) {
           return inboundKeySession;
         }
+      }
+
+      try {
+        var outboundKeySessionSerialized =
+            store.state.cryptoStore.outboundKeySessions[identityKey];
+
+        if (outboundKeySessionSerialized != null) {
+          print(
+            '[loadKeySession] found outboundKeySessionSerialized ${identityKey}',
+          );
+          return olm.Session()
+            ..unpickle(identityKey, outboundKeySessionSerialized);
+        }
+      } catch (error) {
+        print('[loadKeySession] ${identityKey} ${error}');
       }
 
       // TODO: check here if the session + body actually match any other inboundKeySessions

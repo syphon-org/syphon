@@ -110,19 +110,27 @@ ThunkAction<AppState> encryptKeyContent({
   };
 }
 
+/**
+ * Decrypting toDevice event content with loaded 
+ * key session (outbound | inbound) for that device
+ * 
+ * NOTE: Utilizes available one time keys pre-fetched 
+ * and claimed by the current user
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
+ */
 ThunkAction<AppState> decryptKeyContent({
-  String roomId,
-  String identityKey, // sender_key
-  String eventType = EventTypes.roomKey,
-  Map encryptedContent,
+  Map content,
 }) {
   return (Store<AppState> store) async {
-    // Extract the payload meant for this device by identity
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
     final currentDeviceKey =
         deviceKeysOwned[store.state.authStore.user.deviceId];
+
+    // Extract the payload meant for this device by identity
+    final String identityKey = content['sender_key'];
     final Map<String, String> ciphertextContent =
-        encryptedContent['ciphertext'][currentDeviceKey];
+        content['ciphertext'][currentDeviceKey];
 
     // Load and deserialize or create session
     final olm.Session keySession = store.dispatch(
