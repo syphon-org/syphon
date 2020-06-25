@@ -974,9 +974,7 @@ class _Props extends Equatable {
       },
       onDEBUGGING: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
-        store.dispatch( 
-          sendSessionKeys(room: room);
-        );
+        store.dispatch(sendSessionKeys(room: room));
       });
 
   @override
