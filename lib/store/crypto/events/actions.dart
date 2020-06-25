@@ -31,7 +31,7 @@ ThunkAction<AppState> syncDevice(Map dataToDevice) {
         switch (eventType) {
           case EventTypes.encrypted:
             return await store.dispatch(
-              decryptKeyContent(event: event),
+              decryptKeyEvent(event: event),
             );
           default:
             return event;
@@ -104,13 +104,49 @@ ThunkAction<AppState> encryptMessageContent({
     // Pull identity keys out of olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     final keys = json.decode(olmAccount.identity_keys());
+    final sessionId = outboundMessageSession.session_id();
+    print('[encryptMessageContent] ${sessionId}');
 
     // Return the content to be sent or processed
     return {
       'sender_key': keys[Algorithms.curve25591],
       'ciphertext': encryptedPayload,
-      'session_id': outboundMessageSession.session_id()
+      'session_id': sessionId,
     };
+  };
+}
+
+/**
+ * Decrypt event content with loaded inbound|outbound session for room
+ * 
+ * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
+ */
+ThunkAction<AppState> decryptMessageEvent({
+  String roomId,
+  String eventType = EventTypes.encrypted,
+  Map event,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      print('[encryptMessageContent] $roomId $eventType');
+
+      // Pull out event data
+      final Map content = event['content'];
+
+      // Load and deserialize session
+      final olm.InboundGroupSession messageSession = await store.dispatch(
+        loadMessageSession(roomId: roomId),
+      );
+
+      // Decrypt the payload with the session
+      final decryptedPayload = messageSession.decrypt(content['ciphertext']);
+
+      // Return the content to be sent or processed
+      return json.decode(decryptedPayload.plaintext);
+    } catch (error) {
+      print('[decryptMessageEvent] $error');
+      return event;
+    }
   };
 }
 
@@ -190,7 +226,7 @@ ThunkAction<AppState> encryptKeyContent({
  * 
  * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
  */
-ThunkAction<AppState> decryptKeyContent({
+ThunkAction<AppState> decryptKeyEvent({
   Map event,
 }) {
   return (Store<AppState> store) async {
@@ -201,7 +237,7 @@ ThunkAction<AppState> decryptKeyContent({
     final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
     final currentIdentityKey = deviceKey.keys[deviceKeyId];
 
-    print('[decryptKeyContent] $deviceKeyId $currentIdentityKey');
+    print('[decryptKeyEvent] $deviceKeyId $currentIdentityKey');
 
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
@@ -232,19 +268,21 @@ ThunkAction<AppState> decryptKeyContent({
  * Saving a message session key from a m.room_key event
  * 
  * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
- */
-ThunkAction<AppState> saveSessionKey({
-  Map event = const {
+ * 
+ * event = const {
     "content": {
       "algorithm": "m.megolm.v1.aes-sha2",
       "room_id": "!OXolesDwApoFSnipLA:matrix.org",
       "session_id": "MFgUVsIJtzKrl1tJdLC+yipG/uTIF5sBXd8NvvLjfQ4",
-      "session_key":
-          "AgAAAADzfWWrH9BwIuCIiNWf2leSccMW3+OvC3QPKJp0OeSe2uwTf9Dm26Cp3aiaSyTM2nPEOJlAUaVOgLUqikubqI7Aq4p0IQ9QCJ5iHsbGk7xBQ2YnCpinbyybWUYEfBBFTW7wxYp8wbKSNh+dxo6ZTH3imXruFlh+cU8nGX7oG0duLDBYFFbCCbcyq5dbSXSwvsoqRv7kyBebAV3fDb7y430OQCWgLJfvhcKKnkJPI/j0w80vnzlojR4ZTtCc1FMTB1nAcrjZfzYOcwztQbfUTMcQeuudwxIgpCRfdJzUYJbmDQ"
+      "session_key":  "<session_key_data>" 
     },
     "room_id": "!OXolesDwApoFSnipLA:matrix.org",
     "type": "m.room_key"
   },
+}
+ */
+ThunkAction<AppState> saveSessionKey({
+  Map event,
 }) {
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity

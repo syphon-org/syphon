@@ -354,8 +354,15 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       print('[sendMessageEncrypted] $trxId');
 
-      // TODO: check if should sendSessionKey here
-      //  sendSessionKeys(room: room)
+      // send the session keys if an inbound session does not exist
+      final messageSession =
+          store.state.cryptoStore.inboundMessageSessions[room.id];
+
+      if (messageSession == null) {
+        await store.dispatch(
+          sendSessionKeys(room: room),
+        );
+      }
 
       final messageEvent = {
         'body': body,

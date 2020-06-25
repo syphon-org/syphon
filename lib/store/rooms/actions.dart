@@ -4,6 +4,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -108,9 +109,32 @@ ThunkAction<AppState> syncRooms(
     }
 
     // update those that exist or add a new room
-    roomData.forEach((id, json) {
+    await Future.forEach(roomData.keys, (id) async {
+      final json = roomData[id];
       // use pre-existing values where available
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
+
+      // First past to decrypt encrypted events
+      if (room.encryptionEnabled) {
+        final timelineEvents = json['timeline']['events'];
+
+        // map through each event and decrypt if possible
+        final decryptTimelineActions = timelineEvents.map((event) async {
+          final eventType = event['type'];
+          switch (eventType) {
+            case EventTypes.encrypted:
+              return decryptMessageEvent(
+                roomId: room.id,
+                event: event,
+              );
+            default:
+              return event;
+          }
+        });
+
+        // add the decrypted events back to the
+        json['timeline']['events'] = await Future.wait(decryptTimelineActions);
+      }
 
       // Filter through parsers
       room = room.fromSync(

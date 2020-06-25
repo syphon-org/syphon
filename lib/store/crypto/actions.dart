@@ -4,11 +4,9 @@ import 'dart:io';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:canonical_json/canonical_json.dart';
@@ -792,9 +790,9 @@ ThunkAction<AppState> createInboundMessageSession({
   };
 }
 
-ThunkAction<AppState> loadInboundMessageSession(
+ThunkAction<AppState> loadMessageSession({
   String roomId,
-) {
+}) {
   return (Store<AppState> store) async {
     final inboundMessageSession =
         store.state.cryptoStore.inboundMessageSessions[roomId];
@@ -818,14 +816,25 @@ ThunkAction<AppState> loadInboundMessageSession(
 ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
   return (Store<AppState> store) async {
     final outboundGroupSession = olm.OutboundGroupSession();
+    final inboundMessageSession = olm.InboundGroupSession();
 
     outboundGroupSession.create();
-    outboundGroupSession.session_id();
-    outboundGroupSession.session_key();
+    final session = {
+      'session_id': outboundGroupSession.session_id(),
+      'session_key': outboundGroupSession.session_key(),
+    };
 
-    store.dispatch(saveOutboundMessageSession(
+    inboundMessageSession.create(session['session_key']);
+
+    store.dispatch(AddOutboundMessageSession(
       roomId: roomId,
       session: outboundGroupSession.pickle(roomId),
+    ));
+
+    store.dispatch(AddInboundMessageSession(
+      roomId: roomId,
+      session: inboundMessageSession.pickle(roomId),
+      messageIndex: inboundMessageSession.first_known_index(),
     ));
 
     // send back a serialized version
