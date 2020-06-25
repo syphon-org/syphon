@@ -128,7 +128,7 @@ ThunkAction<AppState> decryptMessageEvent({
 }) {
   return (Store<AppState> store) async {
     try {
-      print('[encryptMessageContent] $roomId $eventType');
+      print('[decryptMessageEvent] $roomId $eventType');
 
       // Pull out event data
       final Map content = event['content'];
@@ -142,7 +142,9 @@ ThunkAction<AppState> decryptMessageEvent({
       final decryptedPayload = messageSession.decrypt(content['ciphertext']);
 
       // Return the content to be sent or processed
-      return json.decode(decryptedPayload.plaintext);
+      event['content'] = json.decode(decryptedPayload.plaintext)['content'];
+
+      return event;
     } catch (error) {
       print('[decryptMessageEvent] $error');
       return event;

@@ -109,23 +109,22 @@ ThunkAction<AppState> syncRooms(
     }
 
     // update those that exist or add a new room
-    await Future.forEach(roomData.keys, (id) async {
+    return await Future.forEach(roomData.keys, (id) async {
       final json = roomData[id];
       // use pre-existing values where available
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
-        final timelineEvents = json['timeline']['events'];
+        final List<dynamic> timelineEvents = json['timeline']['events'];
 
         // map through each event and decrypt if possible
         final decryptTimelineActions = timelineEvents.map((event) async {
           final eventType = event['type'];
           switch (eventType) {
             case EventTypes.encrypted:
-              return decryptMessageEvent(
-                roomId: room.id,
-                event: event,
+              return await store.dispatch(
+                decryptMessageEvent(roomId: room.id, event: event),
               );
             default:
               return event;
@@ -133,7 +132,15 @@ ThunkAction<AppState> syncRooms(
         });
 
         // add the decrypted events back to the
-        json['timeline']['events'] = await Future.wait(decryptTimelineActions);
+        final decryptedTimelineEvents = await Future.wait(
+          decryptTimelineActions,
+        );
+
+        decryptedTimelineEvents.forEach((element) {
+          print('[syncRooms] ${element}');
+        });
+
+        json['timeline']['events'] = decryptedTimelineEvents;
       }
 
       // Filter through parsers
@@ -218,7 +225,7 @@ ThunkAction<AppState> fetchRooms() {
             limit: 20,
           );
 
-          store.dispatch(syncRooms({
+          await store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
                 'events': stateEvents,

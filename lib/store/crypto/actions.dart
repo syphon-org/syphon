@@ -888,7 +888,10 @@ ThunkAction<AppState> exportMessageSession({String roomId}) {
 
 /**
  * 
- * Fetch Keys
+ * Fetch Device Keys
+ * 
+ * fetches the keys uploaded to the matrix homeserver
+ * by other users
  */
 ThunkAction<AppState> fetchDeviceKeys({
   Map<String, User> users,
@@ -906,12 +909,11 @@ ThunkAction<AppState> fetchDeviceKeys({
       );
 
       final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
-
       Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          print('[fetchDeviceKeys] $userId $device'); // TESTING ONLY
+          // print('[fetchDeviceKeys] $userId $device'); // TESTING ONLY
           final deviceKey = DeviceKey.fromJson(device);
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
@@ -923,7 +925,6 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       return newDeviceKeys;
     } catch (error) {
-      print('[fetchDeviceKeys] error $error');
       store.dispatch(addAlert(
         type: 'warning',
         message: error,

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -103,16 +102,16 @@ ThunkAction<AppState> fetchMessageEvents({
       }
 
       // reuse the logic for syncing
-      store.dispatch(syncRooms(
-        {
+      await store.dispatch(
+        syncRooms({
           '${room.id}': {
             'timeline': {
               'events': messages,
               'prev_batch': nextPrevBatch,
             }
           },
-        },
-      ));
+        }),
+      );
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {
@@ -143,7 +142,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
         throw stateEvents['error'];
       }
 
-      store.dispatch(syncRooms({
+      await store.dispatch(syncRooms({
         '${room.id}': {
           'state': {
             'events': stateEvents,

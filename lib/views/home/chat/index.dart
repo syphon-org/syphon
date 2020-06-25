@@ -796,25 +796,6 @@ class ChatViewState extends State<ChatView> {
                               )),
                             ),
                           ),
-                          Positioned(
-                            child: Visibility(
-                              visible: props.loading,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -903,12 +884,7 @@ class _Props extends Equatable {
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
       userId: store.state.authStore.user.userId,
       theme: store.state.settingsStore.theme,
-      loading: roomSelectors
-          .room(
-            id: roomId,
-            state: store.state,
-          )
-          .syncing,
+      loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(
         id: roomId,
         state: store.state,
