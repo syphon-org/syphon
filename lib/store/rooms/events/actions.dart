@@ -244,13 +244,16 @@ ThunkAction<AppState> sendSessionKeys({
     try {
       print('[sendSessionKeys] start');
 
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
         exportMessageSession(roomId: room.id),
       );
 
       final roomKeyEventContent = {
-        'algorithm': Algorithms.olmv1,
+        'algorithm': Algorithms.megolmv1,
         'room_id': room.id,
         'session_id': messageSession['session_id'],
         'session_key': messageSession['session_key'],
@@ -305,7 +308,9 @@ ThunkAction<AppState> sendSessionKeys({
             homeserver: store.state.authStore.user.homeserver,
             userId: deviceKey.userId,
             deviceId: deviceKey.deviceId,
+            eventType: EventTypes.encrypted,
             content: roomKeyEventContentEncrypted,
+            trxId: trxId,
           );
 
           if (response['errcode'] != null) {
@@ -348,6 +353,9 @@ ThunkAction<AppState> sendMessageEncrypted({
       final String trxId = DateTime.now().millisecond.toString();
 
       print('[sendMessageEncrypted] $trxId');
+
+      // TODO: check if should sendSessionKey here
+      //  sendSessionKeys(room: room)
 
       final messageEvent = {
         'body': body,

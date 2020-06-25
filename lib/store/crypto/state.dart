@@ -7,7 +7,7 @@ import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 
-// Next Hive Field Number: 10
+// Next Hive Field Number: 11
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
   // Active olm account
@@ -24,6 +24,10 @@ class CryptoStore extends Equatable {
   // Map<roomId, serializedSession>
   @HiveField(5)
   final Map<String, String> outboundMessageSessions; // megolm - messages
+
+  // Map<roomId, index(int)>
+  @HiveField(10)
+  final Map<String, int> messageSessionIndex; // megolm - messages
 
   // Map<deviceId, serializedSession>
   @HiveField(8)
@@ -64,7 +68,7 @@ class CryptoStore extends Equatable {
     this.outboundMessageSessions = const {}, // messages
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
-
+    this.messageSessionIndex = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
@@ -81,6 +85,7 @@ class CryptoStore extends Equatable {
         outboundMessageSessions,
         inboundKeySessions,
         outboundKeySessions,
+        messageSessionIndex,
         deviceKeys,
         deviceKeysOwned,
         deviceKeysExist,
@@ -96,6 +101,7 @@ class CryptoStore extends Equatable {
     outboundMessageSessions,
     inboundKeySessions,
     outboundKeySessions,
+    messageSessionIndex,
     deviceKeys,
     deviceKeysOwned,
     deviceKeysExist,
@@ -110,6 +116,7 @@ class CryptoStore extends Equatable {
           inboundMessageSessions ?? this.inboundMessageSessions,
       outboundMessageSessions:
           outboundMessageSessions ?? this.outboundMessageSessions,
+      messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
       inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
       outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
       deviceKeys: deviceKeys ?? this.deviceKeys,

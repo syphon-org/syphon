@@ -4,6 +4,7 @@ import 'dart:io';
 // Store
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/global/themes.dart';
@@ -620,7 +621,7 @@ class ChatViewState extends State<ChatView> {
             ),
             const PopupMenuItem<ChatOptions>(
               value: ChatOptions.debugging,
-              child: Text('DEBUG Send Message Keys'),
+              child: Text('DEBUG'),
             ),
           ],
         )
@@ -999,7 +1000,7 @@ class _Props extends Equatable {
       onDEBUGGING: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(
-          sendSessionKeys(room: room),
+          saveSessionKey(),
         );
       });
 

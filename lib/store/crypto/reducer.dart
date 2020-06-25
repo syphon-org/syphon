@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:syphon/store/crypto/model.dart';
 
 import './state.dart';
@@ -62,12 +60,27 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
       );
+    case AddInboundMessageSession:
+      final inboundMessageSessions = Map<String, String>.from(
+        state.inboundMessageSessions ?? {},
+      );
+      final messageSessionIndex = Map<String, int>.from(
+        state.messageSessionIndex ?? {},
+      );
+
+      inboundMessageSessions.putIfAbsent(action.roomId, () => action.session);
+      messageSessionIndex[action.roomId] = action.messageIndex;
+
+      return state.copyWith(
+        inboundMessageSessions: inboundMessageSessions,
+        messageSessionIndex: messageSessionIndex,
+      );
+
     case ToggleDeviceKeysExist:
       return state.copyWith(
         deviceKeysExist: action.existence,
       );
     case ResetDeviceKeys:
-      print('WAOSIJNDIOAUNSD IOUNASOD UNAOSUD NIAUSND ');
       return state.copyWith(
         deviceKeysOwned: Map<String, DeviceKey>(),
         inboundMessageSessions: Map<String, String>(),

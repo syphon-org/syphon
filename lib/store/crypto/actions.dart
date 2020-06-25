@@ -89,6 +89,17 @@ class AddOutboundMessageSession {
   AddOutboundMessageSession({this.roomId, this.session});
 }
 
+class AddInboundMessageSession {
+  String roomId;
+  String session;
+  int messageIndex;
+  AddInboundMessageSession({
+    this.roomId,
+    this.session,
+    this.messageIndex,
+  });
+}
+
 class DEBUGSetOutboundMessageSessionMap {
   String nothing;
   DEBUGSetOutboundMessageSessionMap({this.nothing});
@@ -145,48 +156,12 @@ ThunkAction<AppState> deleteDeviceKeys() {
 }
 
 /**
- * Sync Device
+ * Pretty Print JSON
  * 
- * Saves and converts events from /sync in regards to 
- * key sharing and other encryption events
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    final prettyString = encoder.convert(event);
+    prettyString.split('\n').forEach((element) => print(element));
  */
-ThunkAction<AppState> syncDevice(Map dataToDevice) {
-  return (Store<AppState> store) async {
-    try {
-      // Extract the new events
-      final List<dynamic> eventsToDevice = dataToDevice['events'];
-      print('[syncDevice] dataToDevice $dataToDevice');
-
-      // Parse and decrypt necessary events
-      final eventToDeviceActions = eventsToDevice.map((event) async {
-        print('[syncDevice] eventsToDevice.map $event');
-        // TODO: convert to event first or after?
-
-        switch (event['type']) {
-          case EventTypes.encrypted:
-            return decryptKeyContent(
-              content: event['content'],
-            );
-          default:
-            return event;
-        }
-      });
-
-      // Parse and decrypt necessary events
-      final eventsToDeviceFiltered = await Future.wait(eventToDeviceActions);
-
-      eventsToDeviceFiltered.forEach((element) {
-        print('[syncDevice] eventsToDeviceFiltered.forEach $element');
-      });
-    } catch (error) {
-      store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
-        origin: 'syncDevice',
-      ));
-    }
-  };
-}
 
 /**
  * Init Key Encryption
@@ -639,7 +614,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
 /**
  * 
- * Outbound Key Session Funcationality (sychronous)
+ * Outbound Key Session Funcationality (synchronous)
  * 
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-an-olm-session
  * https://matrix.org/docs/spec/client_server/latest#m-room-key
@@ -707,7 +682,7 @@ ThunkAction<AppState> saveInboundKeySession({
  */
 ThunkAction<AppState> loadKeySession({
   String identityKey, // sender_key
-  String type,
+  int type,
   String body,
 }) {
   return (Store<AppState> store) async {
@@ -758,12 +733,12 @@ ThunkAction<AppState> loadKeySession({
       }
 
       // TODO: check here if the session + body actually match any other inboundKeySessions
-      if (int.parse(type) == 0) {
+      if (type == 0) {
         final newKeySession = olm.Session();
         final account = store.state.cryptoStore.olmAccount;
 
         print(
-          '[loadKeySession] type ${type}: creating new inboundKeySession ${identityKey},${body}',
+          '[loadKeySession] type creating new inboundKeySession ${identityKey},${body}',
         );
 
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
@@ -791,6 +766,46 @@ ThunkAction<AppState> loadKeySession({
     }
 
     return null;
+  };
+}
+
+/**
+ * Inbound Message Session
+ * 
+ * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
+ */
+ThunkAction<AppState> createInboundMessageSession({
+  String roomId,
+  String sessionKey,
+}) {
+  return (Store<AppState> store) async {
+    final inboundMessageSession = olm.InboundGroupSession();
+
+    inboundMessageSession.create(sessionKey);
+    final messageIndex = inboundMessageSession.first_known_index();
+
+    store.dispatch(AddInboundMessageSession(
+      roomId: roomId,
+      session: inboundMessageSession.pickle(roomId),
+      messageIndex: messageIndex,
+    ));
+  };
+}
+
+ThunkAction<AppState> loadInboundMessageSession(
+  String roomId,
+) {
+  return (Store<AppState> store) async {
+    final inboundMessageSession =
+        store.state.cryptoStore.inboundMessageSessions[roomId];
+
+    if (inboundMessageSession == null) {
+      throw 'Unable to find inbound message session for decryption';
+    }
+
+    final session = olm.InboundGroupSession();
+    session.unpickle(roomId, inboundMessageSession);
+    return session;
   };
 }
 
