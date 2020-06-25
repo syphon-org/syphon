@@ -376,8 +376,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         ),
       );
 
-      print('[sendMessageEncrypted $encryptedEvent');
-
       // TODO: encrypt and send actual message content
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,

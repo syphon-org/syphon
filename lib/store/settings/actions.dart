@@ -2,6 +2,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/global/notifications.dart';

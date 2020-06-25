@@ -798,6 +798,7 @@ ThunkAction<AppState> loadMessageSession({
         store.state.cryptoStore.inboundMessageSessions[roomId];
 
     if (inboundMessageSession == null) {
+      // TODO: remove, should only be checking inbounds
       throw 'Unable to find inbound message session for decryption';
     }
 

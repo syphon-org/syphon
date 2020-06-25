@@ -128,8 +128,6 @@ ThunkAction<AppState> decryptMessageEvent({
 }) {
   return (Store<AppState> store) async {
     try {
-      print('[decryptMessageEvent] $roomId $eventType');
-
       // Pull out event data
       final Map content = event['content'];
 

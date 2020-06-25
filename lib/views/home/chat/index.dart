@@ -349,7 +349,6 @@ class ChatViewState extends State<ChatView> {
         PopupMenuItem<String>(
           child: GestureDetector(
             onTap: () {
-              print('[PopupMenuItem] ${MediumType.encryption}');
               Navigator.pop(context);
               this.onChangeMediumType(
                 newMediumType: MediumType.encryption,
@@ -975,8 +974,8 @@ class _Props extends Equatable {
       },
       onDEBUGGING: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
-        store.dispatch(
-          saveSessionKey(),
+        store.dispatch( 
+          sendSessionKeys(room: room);
         );
       });
 
