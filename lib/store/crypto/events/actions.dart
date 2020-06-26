@@ -131,6 +131,11 @@ ThunkAction<AppState> decryptMessageEvent({
       // Pull out event data
       final Map content = event['content'];
 
+      // return already decrypted events
+      if (content['ciphertext'] == null) {
+        return event;
+      }
+
       // Load and deserialize session
       final olm.InboundGroupSession messageSession = await store.dispatch(
         loadMessageSession(roomId: roomId),
