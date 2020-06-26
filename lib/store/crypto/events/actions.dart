@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -9,61 +10,6 @@ import 'package:canonical_json/canonical_json.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:olm/olm.dart' as olm;
-
-/**
- * Sync Device
- * 
- * Saves and converts events from /sync in regards to 
- * key sharing and other encryption events
- * 
- * TODO: combine these actions on the first pass
- */
-ThunkAction<AppState> syncDevice(Map dataToDevice) {
-  return (Store<AppState> store) async {
-    try {
-      // Extract the new events
-      final List<dynamic> eventsToDevice = dataToDevice['events'];
-
-      // Parse and decrypt necessary events
-      final eventToDeviceActions = eventsToDevice.map((event) async {
-        final eventType = event['type'];
-
-        switch (eventType) {
-          case EventTypes.encrypted:
-            return await store.dispatch(
-              decryptKeyEvent(event: event),
-            );
-          default:
-            return event;
-        }
-      });
-
-      // Parse and decrypt necessary events
-      final eventsFiltered = await Future.wait(eventToDeviceActions);
-
-      // Parse and save necessary data from decrypted events
-      final eventsFilteredActions = eventsFiltered.map((event) async {
-        final eventType = event['type'];
-        switch (eventType) {
-          case EventTypes.roomKey:
-            return await store.dispatch(
-              saveSessionKey(event: event),
-            );
-          default:
-            return event;
-        }
-      });
-
-      await Future.wait(eventsFilteredActions);
-    } catch (error) {
-      store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
-        origin: 'syncDevice',
-      ));
-    }
-  };
-}
 
 /**
  * Encrypt event content with loaded outbound session for room
@@ -80,9 +26,11 @@ ThunkAction<AppState> encryptMessageContent({
 
     // Load and deserialize session
     final olm.OutboundGroupSession outboundMessageSession =
-        await store.dispatch(loadOutboundMessageSession(roomId: roomId));
+        await store.dispatch(
+      loadOutboundMessageSession(roomId: roomId),
+    );
 
-    // Create payload for encryption per spe
+    // Create payload for encryption per spec
     final payload = {
       'type': eventType,
       'content': content,
@@ -136,9 +84,13 @@ ThunkAction<AppState> decryptMessageEvent({
         return event;
       }
 
+      printJson(event);
       // Load and deserialize session
       final olm.InboundGroupSession messageSession = await store.dispatch(
-        loadMessageSession(roomId: roomId),
+        loadMessageSession(
+          roomId: roomId,
+          identityKey: content['sender_key'],
+        ),
       );
 
       // Decrypt the payload with the session
@@ -235,10 +187,10 @@ ThunkAction<AppState> decryptKeyEvent({
   Map event,
 }) {
   return (Store<AppState> store) async {
-    final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
+    // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
+    final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
     final deviceKey = deviceKeysOwned[deviceId];
-
     final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
     final currentIdentityKey = deviceKey.keys[deviceKeyId];
 
@@ -246,6 +198,8 @@ ThunkAction<AppState> decryptKeyEvent({
 
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
+
+    // Extract fields to start the session
     final String identityKey = content['sender_key'];
     final ciphertextContent = content['ciphertext'][currentIdentityKey];
 
@@ -274,6 +228,8 @@ ThunkAction<AppState> decryptKeyEvent({
  * 
  * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
  * 
+ * The room_id, together with the sender_key of the m.room_key_ event before it was decrypted, and the session_id, uniquely identify a Megolm session
+ * 
  * event = const {
     "content": {
       "algorithm": "m.megolm.v1.aes-sha2",
@@ -288,6 +244,7 @@ ThunkAction<AppState> decryptKeyEvent({
  */
 ThunkAction<AppState> saveSessionKey({
   Map event,
+  String identityKey,
 }) {
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity
@@ -298,8 +255,60 @@ ThunkAction<AppState> saveSessionKey({
     await store.dispatch(
       createInboundMessageSession(
         roomId: roomId,
+        identityKey: identityKey,
         sessionKey: content['session_key'],
       ),
     );
+  };
+}
+
+/**
+ * Sync Device
+ *  
+ * Saves and converts events from /sync in regards to 
+ * key sharing and other encryption events
+ *  
+ */
+ThunkAction<AppState> syncDevice(Map dataToDevice) {
+  return (Store<AppState> store) async {
+    try {
+      // Extract the new events
+      final List<dynamic> eventsToDevice = dataToDevice['events'];
+
+      // Parse and decrypt necessary events
+      final eventToDeviceActions = eventsToDevice.map((event) async {
+        final eventType = event['type'];
+
+        switch (eventType) {
+          case EventTypes.encrypted:
+            final decryptedEvent = await store.dispatch(
+              decryptKeyEvent(event: event),
+            );
+
+            if (decryptedEvent['type'] == EventTypes.roomKey) {
+              await store.dispatch(
+                saveSessionKey(
+                  event: decryptedEvent,
+                  identityKey: event['content']['sender_key'],
+                ),
+              );
+              return decryptedEvent;
+            }
+
+            return event;
+          default:
+            return event;
+        }
+      });
+
+      // Parse and decrypt necessary events
+      await Future.wait(eventToDeviceActions);
+    } catch (error) {
+      store.dispatch(addAlert(
+        type: 'warning',
+        message: error,
+        origin: 'syncDevice',
+      ));
+    }
   };
 }

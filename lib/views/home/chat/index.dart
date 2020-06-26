@@ -4,7 +4,6 @@ import 'dart:io';
 // Store
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/global/themes.dart';
@@ -974,7 +973,10 @@ class _Props extends Equatable {
       },
       onDEBUGGING: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
-        store.dispatch(sendSessionKeys(room: room));
+        store.dispatch(
+          sendSessionKeys(room: room),
+          // cheatCode(room: room),
+        );
       });
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -355,9 +356,10 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // send the session keys if an inbound session does not exist
       final messageSession =
-          store.state.cryptoStore.inboundMessageSessions[room.id];
+          store.state.cryptoStore.outboundMessageSessions[room.id];
 
       if (messageSession == null) {
+        print('[sendMessageEncrypted] $messageSession');
         await store.dispatch(
           sendSessionKeys(room: room),
         );

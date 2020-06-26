@@ -61,17 +61,31 @@ CryptoStore cryptoReducer(
         outboundMessageSessions: outboundMessageSessions,
       );
     case AddInboundMessageSession:
-      final inboundMessageSessions = Map<String, String>.from(
-        state.inboundMessageSessions ?? {},
-      );
-      final messageSessionIndex = Map<String, int>.from(
-        state.messageSessionIndex ?? {},
+      final inboundMessageSessions =
+          Map<String, String>.from(state.inboundMessageSessions);
+
+      final messageSessionIndex =
+          Map<String, int>.from(state.messageSessionIndex);
+
+      var messageSessionsInbound = Map<String, Map<String, String>>.from(
+          state.messageSessionsInbound ?? {});
+
+      messageSessionsInbound.putIfAbsent(
+        action.roomId,
+        () => Map<String, String>(),
       );
 
-      inboundMessageSessions.putIfAbsent(action.roomId, () => action.session);
+      // Add new inbound message session by roomId + identity
+      final Map<String, String> messageSessionInboundNew = {
+        action.identityKey: action.session
+      };
+      messageSessionsInbound[action.roomId].addAll(messageSessionInboundNew);
+
+      // Add new index
       messageSessionIndex[action.roomId] = action.messageIndex;
 
       return state.copyWith(
+        messageSessionsInbound: messageSessionsInbound,
         inboundMessageSessions: inboundMessageSessions,
         messageSessionIndex: messageSessionIndex,
       );
@@ -82,11 +96,7 @@ CryptoStore cryptoReducer(
       );
     case ResetDeviceKeys:
       return state.copyWith(
-        deviceKeysOwned: Map<String, DeviceKey>(),
-        inboundMessageSessions: Map<String, String>(),
         outboundMessageSessions: Map<String, String>(),
-        inboundKeySessions: Map<String, String>(), // one-time device keys
-        outboundKeySessions: Map<String, String>(), // one-time device keys
       );
     default:
       return state;

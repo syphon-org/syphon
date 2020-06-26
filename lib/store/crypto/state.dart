@@ -7,7 +7,7 @@ import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 
-// Next Hive Field Number: 11
+// Next Hive Field Number: 12
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
   // Active olm account
@@ -17,25 +17,29 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
-  // Map<roomId, serializedSession>
+  // DEPRECATED Map<roomId, serializedSession> // megolm - messages
   @HiveField(4)
-  final Map<String, String> inboundMessageSessions; // megolm - messages
+  final Map<String, String> inboundMessageSessions;
 
-  // Map<roomId, serializedSession>
+  // Map<roomId, serializedSession> // megolm - messages
   @HiveField(5)
-  final Map<String, String> outboundMessageSessions; // megolm - messages
+  final Map<String, String> outboundMessageSessions;
 
-  // Map<roomId, index(int)>
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages
+  @HiveField(11)
+  final Map<String, Map<String, String>> messageSessionsInbound;
+
+  // Map<roomId, index(int)> // megolm - messages
   @HiveField(10)
-  final Map<String, int> messageSessionIndex; // megolm - messages
+  final Map<String, int> messageSessionIndex;
 
-  // Map<deviceId, serializedSession>
+  // Map<identityKey, serializedSession> // olmv1 - key-sharing
   @HiveField(8)
-  final Map<String, String> inboundKeySessions; // olmv1 - key-sharing
+  final Map<String, String> inboundKeySessions;
 
-  // Map<identityKey, serializedSession> - per spec
+  // Map<identityKey, serializedSession>  // olmv1 - key-sharing
   @HiveField(6)
-  final Map<String, String> outboundKeySessions; // olmv1 - key-sharing
+  final Map<String, String> outboundKeySessions;
 
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
@@ -64,8 +68,9 @@ class CryptoStore extends Equatable {
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
-    this.inboundMessageSessions = const {}, // messages
-    this.outboundMessageSessions = const {}, // messages
+    this.messageSessionsInbound = const {}, // messages
+    this.inboundMessageSessions = const {}, // messages // DEPRECATED
+    this.outboundMessageSessions = const {}, // messages //
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
     this.messageSessionIndex = const {},
@@ -97,6 +102,7 @@ class CryptoStore extends Equatable {
   CryptoStore copyWith({
     olmAccount,
     olmAccountKey,
+    messageSessionsInbound,
     inboundMessageSessions,
     outboundMessageSessions,
     inboundKeySessions,
@@ -112,10 +118,15 @@ class CryptoStore extends Equatable {
     return CryptoStore(
       olmAccount: olmAccount ?? this.olmAccount,
       olmAccountKey: olmAccountKey ?? this.olmAccountKey,
-      inboundMessageSessions:
-          inboundMessageSessions ?? this.inboundMessageSessions,
+      messageSessionsInbound:
+          messageSessionsInbound ?? this.messageSessionsInbound,
       outboundMessageSessions:
           outboundMessageSessions ?? this.outboundMessageSessions,
+
+      // DEPCREATED
+      inboundMessageSessions:
+          inboundMessageSessions ?? this.inboundMessageSessions,
+
       messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
       inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
       outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
