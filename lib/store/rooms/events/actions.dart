@@ -278,10 +278,9 @@ ThunkAction<AppState> sendSessionKeys({
 
       final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
+          // find the identityKey for the device
           final deviceKey = store.state.cryptoStore
               .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
-
-          // find the identityKey for the device
           final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
           final identityKey = deviceKey.keys[keyId];
 

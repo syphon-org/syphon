@@ -975,7 +975,6 @@ class _Props extends Equatable {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(
           sendSessionKeys(room: room),
-          // cheatCode(room: room),
         );
       });
 
