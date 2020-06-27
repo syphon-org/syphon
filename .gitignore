@@ -46,3 +46,4 @@ lib/generated_plugin_registrant.dart
 
 # Ignore compiled C code
 android/app/.cxx/*
+.hidden*

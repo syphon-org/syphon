@@ -39,6 +39,7 @@ class Strings {
 
   static const contentNotificationBackgroundService =
       'Background connection enabled';
+
   // Buttons
   static const buttonLogin = 'login';
   static const buttonTextLogin = 'Login';

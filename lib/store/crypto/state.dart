@@ -7,7 +7,7 @@ import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 
-// Next Hive Field Number: 11
+// Next Hive Field Number: 12
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
   // Active olm account
@@ -17,25 +17,25 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
-  // Map<roomId, serializedSession>
-  @HiveField(4)
-  final Map<String, String> inboundMessageSessions; // megolm - messages
-
-  // Map<roomId, serializedSession>
+  // Map<roomId, serializedSession> // megolm - messages
   @HiveField(5)
-  final Map<String, String> outboundMessageSessions; // megolm - messages
+  final Map<String, String> outboundMessageSessions;
 
-  // Map<roomId, index(int)>
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages
+  @HiveField(11)
+  final Map<String, Map<String, String>> inboundMessageSessions;
+
+  // Map<roomId, index(int)> // megolm - message index
   @HiveField(10)
-  final Map<String, int> messageSessionIndex; // megolm - messages
+  final Map<String, int> messageSessionIndex;
 
-  // Map<deviceId, serializedSession>
+  // Map<identityKey, serializedSession> // olmv1 - key-sharing
   @HiveField(8)
-  final Map<String, String> inboundKeySessions; // olmv1 - key-sharing
+  final Map<String, String> inboundKeySessions;
 
-  // Map<identityKey, serializedSession> - per spec
+  // Map<identityKey, serializedSession>  // olmv1 - key-sharing
   @HiveField(6)
-  final Map<String, String> outboundKeySessions; // olmv1 - key-sharing
+  final Map<String, String> outboundKeySessions;
 
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
@@ -56,8 +56,7 @@ class CryptoStore extends Equatable {
   final Map<String, OneTimeKey> oneTimeKeysClaimed; // claimed
 
   // @HiveField(?) TODO: consider saving generated keys?
-  // I think the private key for the
-  // one time key is saved in olm?
+  // the private key for one time keys is saved in olm?
   // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
   final Map oneTimeKeysOwned;
 
@@ -65,7 +64,7 @@ class CryptoStore extends Equatable {
     this.olmAccount,
     this.olmAccountKey,
     this.inboundMessageSessions = const {}, // messages
-    this.outboundMessageSessions = const {}, // messages
+    this.outboundMessageSessions = const {}, // messages //
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
     this.messageSessionIndex = const {},

@@ -183,6 +183,7 @@ class LoginState extends State<Login> {
                               maxWidth: Dimensions.inputWidthMax,
                             ),
                             child: TextField(
+                              maxLines: 1,
                               controller: usernameController,
                               onSubmitted: handleSubmitted,
                               onChanged: (username) {

@@ -587,7 +587,6 @@ class HomeViewState extends State<Home> {
                   heroTag: 'fab1',
                   child: Icon(
                     Icons.search,
-                    // Icons.widgets,
                     color: Colors.white,
                   ),
                   tooltip: 'Search Groups',

@@ -39,6 +39,18 @@ void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
+
+  bool isInRelease = true;
+
+  assert(() {
+    isInRelease = false;
+    return true;
+  }());
+
+  if (isInRelease) {
+    debugPrint = (String message, {int wrapWidth}) {};
+  }
+
   _enablePlatformOverrideForDesktop();
 
   // init cold cache (mobile only)
@@ -52,16 +64,13 @@ void main() async {
 
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
-    print('[main] background service started $backgroundSyncStatus');
+    debugPrint('[main] background service started $backgroundSyncStatus');
   }
 
-  // /**
   //  * DESKTOP ONLY
-  // if (Platform.isMacOS) {
-  //   print(await WindowUtils.getWindowSize());
-  //   await WindowUtils.setSize(Size(720, 720));
-  // }
-  //  */
+  if (Platform.isMacOS) {
+    // await WindowUtils.setSize(Size(720, 720));
+  }
 
   // the main thing
   runApp(Syphon(store: store));
@@ -110,12 +119,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       onMounted();
     });
   }
-
-  // INFO: Used to check when the app is backgrounded
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   print('state = $state');
-  // }
 
   @override
   void deactivate() {
