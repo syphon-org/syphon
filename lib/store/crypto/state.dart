@@ -17,19 +17,15 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
-  // DEPRECATED Map<roomId, serializedSession> // megolm - messages
-  @HiveField(4)
-  final Map<String, String> inboundMessageSessions;
-
   // Map<roomId, serializedSession> // megolm - messages
   @HiveField(5)
   final Map<String, String> outboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages
   @HiveField(11)
-  final Map<String, Map<String, String>> messageSessionsInbound;
+  final Map<String, Map<String, String>> inboundMessageSessions;
 
-  // Map<roomId, index(int)> // megolm - messages
+  // Map<roomId, index(int)> // megolm - message index
   @HiveField(10)
   final Map<String, int> messageSessionIndex;
 
@@ -60,16 +56,14 @@ class CryptoStore extends Equatable {
   final Map<String, OneTimeKey> oneTimeKeysClaimed; // claimed
 
   // @HiveField(?) TODO: consider saving generated keys?
-  // I think the private key for the
-  // one time key is saved in olm?
+  // the private key for one time keys is saved in olm?
   // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
   final Map oneTimeKeysOwned;
 
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
-    this.messageSessionsInbound = const {}, // messages
-    this.inboundMessageSessions = const {}, // messages // DEPRECATED
+    this.inboundMessageSessions = const {}, // messages
     this.outboundMessageSessions = const {}, // messages //
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
@@ -102,7 +96,6 @@ class CryptoStore extends Equatable {
   CryptoStore copyWith({
     olmAccount,
     olmAccountKey,
-    messageSessionsInbound,
     inboundMessageSessions,
     outboundMessageSessions,
     inboundKeySessions,
@@ -118,15 +111,10 @@ class CryptoStore extends Equatable {
     return CryptoStore(
       olmAccount: olmAccount ?? this.olmAccount,
       olmAccountKey: olmAccountKey ?? this.olmAccountKey,
-      messageSessionsInbound:
-          messageSessionsInbound ?? this.messageSessionsInbound,
-      outboundMessageSessions:
-          outboundMessageSessions ?? this.outboundMessageSessions,
-
-      // DEPCREATED
       inboundMessageSessions:
           inboundMessageSessions ?? this.inboundMessageSessions,
-
+      outboundMessageSessions:
+          outboundMessageSessions ?? this.outboundMessageSessions,
       messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
       inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
       outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,

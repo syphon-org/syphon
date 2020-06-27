@@ -109,30 +109,6 @@ class DEBUGSetOutboundMessageSessionMap {
 class ResetDeviceKeys {}
 
 /**
- * 
- */
-ThunkAction<AppState> cheatCode({Room room}) {
-  return (Store<AppState> store) async {
-    try {
-      // Get current user device identity key
-      final deviceId = store.state.authStore.user.deviceId;
-      final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
-      final deviceKey = deviceKeysOwned[deviceId];
-      final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
-      final identityKey = deviceKey.keys[deviceKeyId];
-
-      // existing session
-      final session = store.state.cryptoStore.inboundMessageSessions[room.id];
-
-      printJson(store.state.cryptoStore.outboundMessageSessions);
-      store.dispatch(ResetDeviceKeys());
-    } catch (error) {
-      print('[cheatCode] $error');
-    }
-  };
-}
-
-/**
  * Helper Actions
  */
 ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
@@ -597,8 +573,8 @@ ThunkAction<AppState> claimOneTimeKeys({
         });
       });
 
-      // synchronous cache of one time keys
-      store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
+      // cache of one time keys
+      await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
 
       // create sessions from new one time keys per device id
       oneTimekeys.forEach((deviceId, oneTimeKey) {
@@ -692,11 +668,7 @@ ThunkAction<AppState> saveInboundKeySession({
   };
 }
 
-/**
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
- */
-ThunkAction<AppState> loadKeySession({
+ThunkAction<AppState> loadOutboundKeySession({
   int type,
   String body,
   String identityKey, // sender_key
@@ -708,28 +680,41 @@ ThunkAction<AppState> loadKeySession({
 
       if (outboundKeySessionSerialized != null) {
         print(
-          '[loadKeySession] identityKey ${identityKey}',
+          '[loadOutboundKeySession] identityKey ${identityKey}',
         );
 
-        final existingKeySession = olm.Session();
-        existingKeySession.unpickle(
+        final session = olm.Session();
+        session.unpickle(
           identityKey,
           outboundKeySessionSerialized,
         );
 
-        return existingKeySession;
+        return session;
       }
     } catch (error) {
-      print('[loadKeySession] outbound not found');
+      print('[loadOutboundKeySession] outbound not found');
+      return null;
     }
+  };
+}
 
+/**
+ * 
+ * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
+ */
+ThunkAction<AppState> loadInboundKeySession({
+  int type,
+  String body,
+  String identityKey, // sender_key
+}) {
+  return (Store<AppState> store) async {
     try {
       var inboundKeySessionSerialized =
           store.state.cryptoStore.inboundKeySessions[identityKey];
 
       if (inboundKeySessionSerialized != null) {
         print(
-          '[loadKeySession] found inboundKeySessionSerialized ${identityKey}',
+          '[loadInboundKeySession] found inbound key session ${identityKey}',
         );
 
         final inboundKeySession = olm.Session()
@@ -740,7 +725,7 @@ ThunkAction<AppState> loadKeySession({
             inboundKeySession.matches_inbound_from(identityKey, body);
 
         print(
-          '[loadKeySession] found session matches existing ${inboundkeySessionMatch}',
+          '[loadInboundKeySession] found session matches existing ${inboundkeySessionMatch}',
         );
 
         if (inboundkeySessionMatch) {
@@ -748,41 +733,40 @@ ThunkAction<AppState> loadKeySession({
         }
       }
     } catch (error) {
-      print('[loadKeySession] inbound not found');
+      print('[loadInboundKeySession] inbound not found');
     }
 
     try {
-      // TODO: check here if the session + body actually match any other inboundKeySessions
       if (type == 0) {
         final newKeySession = olm.Session();
         final account = store.state.cryptoStore.olmAccount;
 
         print(
-          '[loadKeySession] type creating new inboundKeySession ${identityKey},${body}',
+          '[loadInboundKeySession] creating session with identity $identityKey',
         );
 
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
         newKeySession.create_inbound_from(account, identityKey, body);
 
-        print(
-          '[loadKeySession] created session successfully',
-        );
-
-        // that the same one-time-key from the sender cannot be reused.
+        // // // that the same one-time-key from the sender cannot be reused.
         account.remove_one_time_keys(newKeySession);
 
-        // Save sessions as needed
+        // // Save sessions as needed
         await store.dispatch(saveOlmAccount());
         await store.dispatch(saveInboundKeySession(
           session: newKeySession.pickle(identityKey),
           identityKey: identityKey,
         ));
 
+        print(
+          '[loadInboundKeySession] created session successfully',
+        );
+
         // Return new key session
         return newKeySession;
       }
     } catch (error) {
-      print('[loadKeySession] outbound not found');
+      print('[loadInboundKeySession] inbound not found');
     }
 
     return null;
@@ -820,10 +804,9 @@ ThunkAction<AppState> loadMessageSession({
 }) {
   return (Store<AppState> store) async {
     final messageSessions =
-        store.state.cryptoStore.messageSessionsInbound[roomId];
+        store.state.cryptoStore.inboundMessageSessions[roomId];
 
     if (!messageSessions.containsKey(identityKey)) {
-      // TODO: remove, should only be checking inbounds
       throw 'Unable to find inbound message session for decryption';
     }
 

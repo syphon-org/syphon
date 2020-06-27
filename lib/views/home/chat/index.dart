@@ -43,7 +43,6 @@ import 'package:syphon/views/widgets/menu.dart';
  * https://stackoverflow.com/questions/50400529/how-to-update-flutter-textfields-height-and-width
  * https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter
  * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
- * 
  */
 enum ChatOptions {
   search,
@@ -51,7 +50,6 @@ enum ChatOptions {
   chatSettings,
   inviteFriends,
   muteNotifications,
-  debugging
 }
 
 class ChatViewArguements {
@@ -306,7 +304,6 @@ class ChatViewState extends State<ChatView> {
         PopupMenuItem<String>(
           child: GestureDetector(
             onTap: () {
-              print('[PopupMenuItem] ${MediumType.plaintext}');
               Navigator.pop(context);
               this.onChangeMediumType(
                 newMediumType: MediumType.plaintext,
@@ -422,7 +419,6 @@ class ChatViewState extends State<ChatView> {
               addAutomaticKeepAlives: true,
               itemCount: messages.length,
               scrollDirection: Axis.vertical,
-              // controller: messagesController,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 final message = messages[index];
@@ -459,22 +455,6 @@ class ChatViewState extends State<ChatView> {
       ),
     );
   }
-
-  /**
-     * TODO: Room Drafts
-     */
-  // if (props.room.isDraftRoom) {
-  //   final convertedRoomId = await props.onConvertDraftRoom();
-  //   final arguements =
-  //       ModalRoute.of(context).settings.arguments as ChatViewArguements;
-  //   Navigator.of(context).pushReplacementNamed(
-  //     '/home/chat',
-  //     arguments: ChatViewArguements(
-  //       roomId: convertedRoomId.id,
-  //       title: arguements.title,
-  //     ),
-  //   );
-  // }
 
   @protected
   buildRoomAppBar({
@@ -577,6 +557,19 @@ class ChatViewState extends State<ChatView> {
         ],
       ),
       actions: <Widget>[
+        Visibility(
+          maintainSize: false,
+          visible: debug == 'true',
+          child: IconButton(
+            icon: Icon(Icons.gamepad),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Debug Room Function',
+            color: Colors.white,
+            onPressed: () {
+              props.onCheatCode();
+            },
+          ),
+        ),
         RoundedPopupMenu<ChatOptions>(
           onSelected: (ChatOptions result) {
             switch (result) {
@@ -589,8 +582,6 @@ class ChatViewState extends State<ChatView> {
                     title: props.room.name,
                   ),
                 );
-              case ChatOptions.debugging:
-                return props.onDEBUGGING();
               default:
                 break;
             }
@@ -616,10 +607,6 @@ class ChatViewState extends State<ChatView> {
             const PopupMenuItem<ChatOptions>(
               value: ChatOptions.muteNotifications,
               child: Text('Mute Notifications'),
-            ),
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.debugging,
-              child: Text('DEBUG'),
             ),
           ],
         )
@@ -709,7 +696,7 @@ class ChatViewState extends State<ChatView> {
         IconButton(
           icon: Icon(Icons.share),
           iconSize: 24.0,
-          tooltip: 'Search Chats',
+          tooltip: 'Share Chats',
           color: Colors.white,
           onPressed: () {},
         ),
@@ -859,7 +846,7 @@ class _Props extends Equatable {
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
   final Function onToggleEncryption;
-  final Function onDEBUGGING;
+  final Function onCheatCode;
 
   _Props({
     @required this.room,
@@ -876,7 +863,7 @@ class _Props extends Equatable {
     @required this.onLoadFirstBatch,
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
-    @required this.onDEBUGGING,
+    @required this.onCheatCode,
   });
 
   static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
@@ -971,11 +958,8 @@ class _Props extends Equatable {
           startHash: room.endHash,
         ));
       },
-      onDEBUGGING: () {
+      onCheatCode: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
-        store.dispatch(
-          sendSessionKeys(room: room),
-        );
       });
 
   @override

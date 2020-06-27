@@ -117,7 +117,7 @@ ThunkAction<AppState> decryptMessageEvent({
  */
 ThunkAction<AppState> encryptKeyContent({
   String roomId,
-  String identityKey,
+  String identityKey, // recipient
   String eventType = EventTypes.roomKey,
   Map content,
 }) {
@@ -133,7 +133,7 @@ ThunkAction<AppState> encryptKeyContent({
     // before sending a room key event to devices
     // Load and deserialize session
     final olm.Session outboundKeySession = await store.dispatch(
-      loadKeySession(identityKey: identityKey),
+      loadOutboundKeySession(identityKey: identityKey),
     );
 
     // Canoncially encode the json for encryption
@@ -192,21 +192,22 @@ ThunkAction<AppState> decryptKeyEvent({
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
     final deviceKey = deviceKeysOwned[deviceId];
     final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
-    final currentIdentityKey = deviceKey.keys[deviceKeyId];
-
-    print('[decryptKeyEvent] $deviceKeyId $currentIdentityKey');
+    final identityKeyOwned = deviceKey.keys[deviceKeyId];
 
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
+    final identityKeySender = content['sender_key'];
+    final ciphertextContent = content['ciphertext'][identityKeyOwned];
 
-    // Extract fields to start the session
-    final String identityKey = content['sender_key'];
-    final ciphertextContent = content['ciphertext'][currentIdentityKey];
+    // see who youre talking with
+    // print(
+    //   '[decryptKeyEvent] owned $identityKeyOwned sender $identityKeySender',
+    // );
 
     // Load and deserialize or create session
     final olm.Session keySession = await store.dispatch(
-      loadKeySession(
-        identityKey: identityKey,
+      loadInboundKeySession(
+        identityKey: identityKeySender,
         type: ciphertextContent['type'],
         body: ciphertextContent['body'],
       ),
@@ -248,61 +249,54 @@ ThunkAction<AppState> saveSessionKey({
 }) {
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity
-    final String roomId = event['room_id'];
     final Map content = event['content'];
+    final String roomId = event['room_id'];
+    final String sessionKey = content['session_key'];
 
     // Load and deserialize or create session
     await store.dispatch(
       createInboundMessageSession(
         roomId: roomId,
         identityKey: identityKey,
-        sessionKey: content['session_key'],
+        sessionKey: sessionKey,
       ),
     );
   };
 }
 
-/**
- * Sync Device
- *  
- * Saves and converts events from /sync in regards to 
- * key sharing and other encryption events
- *  
- */
 ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
     try {
       // Extract the new events
-      final List<dynamic> eventsToDevice = dataToDevice['events'];
+      final List<dynamic> events = dataToDevice['events'];
 
       // Parse and decrypt necessary events
-      final eventToDeviceActions = eventsToDevice.map((event) async {
-        final eventType = event['type'];
+      await Future.wait(
+        events.map((event) async {
+          final eventType = event['type'];
+          final identityKeySender = event['content']['sender_key'];
 
-        switch (eventType) {
-          case EventTypes.encrypted:
-            final decryptedEvent = await store.dispatch(
-              decryptKeyEvent(event: event),
-            );
-
-            if (decryptedEvent['type'] == EventTypes.roomKey) {
-              await store.dispatch(
-                saveSessionKey(
-                  event: decryptedEvent,
-                  identityKey: event['content']['sender_key'],
-                ),
+          switch (eventType) {
+            case EventTypes.encrypted:
+              final eventDecrypted = await store.dispatch(
+                decryptKeyEvent(event: event),
               );
-              return decryptedEvent;
-            }
 
-            return event;
-          default:
-            return event;
-        }
-      });
-
-      // Parse and decrypt necessary events
-      await Future.wait(eventToDeviceActions);
+              if (EventTypes.roomKey == eventDecrypted['type']) {
+                return await store.dispatch(
+                  saveSessionKey(
+                    event: eventDecrypted,
+                    identityKey: identityKeySender,
+                  ),
+                );
+              }
+              break;
+            default:
+              // TODO: handle other to device events
+              break;
+          }
+        }),
+      );
     } catch (error) {
       store.dispatch(addAlert(
         type: 'warning',

@@ -212,6 +212,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // Update encryption one time key count
       store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
+      // TODO: cold storage cache the full sync in encrypted file
       if (isFullSync) {
         store.dispatch(saveSync(data));
       }

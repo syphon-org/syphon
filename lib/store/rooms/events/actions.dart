@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -264,17 +263,14 @@ ThunkAction<AppState> sendSessionKeys({
       // need to cycle through those necessary devices here anyway
       // for now, we're just sending the request to all the
       // one time keys that were saved from this call
-      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
+      // global mutatable, this is real bad
       await store.dispatch(claimOneTimeKeys(room: room));
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
 
       // For each one time key claimed
       // send a m.room_key event directly to each device
 
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
-
-      print(
-        '[sendSessionKeys] ${devicesOneTimeKeys.length}',
-      );
 
       final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
@@ -291,14 +287,10 @@ ThunkAction<AppState> sendSessionKeys({
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
-              identityKey: identityKey, // TODO identityKey after testing
+              identityKey: identityKey,
               eventType: EventTypes.roomKey,
               content: roomKeyEventContent,
             ),
-          );
-
-          print(
-            '[sendSessionKeys] $roomKeyEventContentEncrypted',
           );
 
           final response = await MatrixApi.sendEventToDevice(
@@ -315,10 +307,6 @@ ThunkAction<AppState> sendSessionKeys({
           if (response['errcode'] != null) {
             throw response['error'];
           }
-
-          print(
-            '[sendSessionKeys] ${oneTimeKey.deviceId} sent and completed',
-          );
         } catch (error) {
           print(
             '[sendSessionKeys] ${oneTimeKey.deviceId} $error',
@@ -348,20 +336,15 @@ ThunkAction<AppState> sendMessageEncrypted({
 }) {
   return (Store<AppState> store) async {
     try {
-      // if you're incredibly unlucky, and fast, you could have a problem here
+      // if you're incredibly fast, you could have a problem here
       final String trxId = DateTime.now().millisecond.toString();
 
-      print('[sendMessageEncrypted] $trxId');
-
       // send the session keys if an inbound session does not exist
-      final messageSession =
-          store.state.cryptoStore.outboundMessageSessions[room.id];
+      final keySession = store.state.cryptoStore.outboundKeySessions[room.id];
 
-      if (messageSession == null) {
-        print('[sendMessageEncrypted] $messageSession');
-        await store.dispatch(
-          sendSessionKeys(room: room),
-        );
+      // send the key session if one hasn't been sent or created
+      if (keySession == null) {
+        await store.dispatch(sendSessionKeys(room: room));
       }
 
       final messageEvent = {
@@ -369,6 +352,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         'type': type,
       };
 
+      // Encrypt the message event
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
           roomId: room.id,
@@ -377,7 +361,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         ),
       );
 
-      // TODO: encrypt and send actual message content
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -389,8 +372,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         sessionId: encryptedEvent['session_id'],
         deviceId: store.state.authStore.user.deviceId,
       );
-
-      print('[sendMessageEncrypted completed $data');
 
       if (data['errcode'] != null) {
         throw data['error'];

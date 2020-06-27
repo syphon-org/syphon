@@ -77,7 +77,7 @@ Future<dynamic> initStorageLocation() async {
       print('Caching is not supported on this platform');
     }
   } catch (error) {
-    print('[initStorageLocation] storage location failure - $error');
+    print('[initStorageLocation] $error');
   }
   return storageLocation.path;
 }
