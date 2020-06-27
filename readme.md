@@ -1,29 +1,24 @@
-# Syphon
-
-A privacy centric messenger for everyone
+# Sypho
+A privacy centric matrix messenger for everyone
 
 ## Why
-
 
 ## Todo
 - SVG Icons
 - Finish .env selection
 - Loader screen with animations
 
-## From Scatch 
-Another reason this project was so important was the ability to go from zero to usable open-source cross-platform app as soon as possible. The more accessible a platform is, the easier it is for people to create alternatives to tools that may be prohibited, discouraged, or just daunting. 
-
 ## Before Hitting The Code
 - Urls are always referencing matrix mxc:// protocol resources. Though they're actually URIs, they are referenced as URLs in the app to be consistant with the protocol spec
 
 ## Architecture
+
 ### Storage
 There are three layers to storage in Syphon:
 - Remote (Matrix Homeserver)
 - Cache (Redux + Redux Persist +  Hive)
     * cache is encrypted at rest
-- Cold Storage (Hive)
-
+- Cold Storage (Hive
 
 ## Getting Started
 - (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]
