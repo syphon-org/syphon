@@ -147,9 +147,6 @@ class ChatInput extends StatelessWidget {
             cursorColor: inputCursorColor,
             focusNode: focusNode,
             controller: controller,
-            // onChanged: (text) => onUpdateMessage(text, props),
-            // onSubmitted:
-            //     !sendable ? null : (text) => this.onSubmitMessage(props),
             onChanged: onChangeMessage != null ? onChangeMessage : null,
             onSubmitted: !sendable ? null : onSubmittedMessage,
             style: TextStyle(

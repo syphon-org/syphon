@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
@@ -133,7 +135,7 @@ class ResetAuthStore {}
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
     if (store.state.authStore.authObserver != null) {
-      throw 'Cannot call startAuthObserver with an existing instance!';
+      throw 'Cannot call startAuthObserver with an existing instance';
     }
 
     store.dispatch(
@@ -156,7 +158,7 @@ ThunkAction<AppState> startAuthObserver() {
         // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
-            print('[onSelectNotification] payload');
+            debugPrint('[onSelectNotification] payload');
           },
           onSaveToken: (token) {
             store.dispatch(setPusherDeviceToken(token));
@@ -196,7 +198,7 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
     final defaultId = Random.secure().nextInt(1 << 31).toString();
     var device = Device(
       deviceId: defaultId,
-      displayName: 'Default Tim Client',
+      displayName: Values.appDisplayName,
     );
 
     try {
@@ -214,13 +216,11 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
         device = Device(
           deviceId: hashedDeviceId.hash,
           deviceIdPrivate: info.androidId,
-          displayName: 'Tim Android',
+          displayName: Values.appDisplayName,
         );
       } else if (Platform.isIOS) {
         final info = await deviceInfoPlugin.iosInfo;
         final deviceIdentifier = info.identifierForVendor;
-
-        print('[generateDeviceId] ios $deviceIdentifier');
 
         final hashedDeviceId = Crypt.sha256(
           deviceIdentifier,
@@ -231,12 +231,12 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
         device = Device(
           deviceId: hashedDeviceId.hash,
           deviceIdPrivate: info.identifierForVendor,
-          displayName: 'Tim iOS',
+          displayName: Values.appDisplayName,
         );
       } else if (Platform.isMacOS) {
         device = Device(
           deviceId: defaultId,
-          displayName: 'Tim Desktop',
+          displayName: Values.appDisplayName,
         );
       }
       return device;

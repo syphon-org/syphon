@@ -55,7 +55,7 @@ class NotificationSettingsView extends StatelessWidget {
                     padding: EdgeInsets.only(top: 12),
                     child: Column(children: [
                       Container(
-                        width: width, // TODO: use flex, i'm rushing
+                        width: width,
                         padding: Dimensions.listPadding,
                         child: Text(
                           'On-Device',
@@ -64,7 +64,7 @@ class NotificationSettingsView extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        width: width, // TODO: use flex, i'm rushing
+                        width: width,
                         padding: Dimensions.listPadding,
                         child: RichText(
                           textAlign: TextAlign.left,
@@ -119,7 +119,7 @@ class NotificationSettingsView extends StatelessWidget {
                     padding: EdgeInsets.only(top: 12),
                     child: Column(children: [
                       Container(
-                        width: width, // TODO: use flex, i'm rushing
+                        width: width,
                         padding: Dimensions.listPadding,
                         child: Text(
                           'Matrix (Remote)',
@@ -128,7 +128,7 @@ class NotificationSettingsView extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        width: width, // TODO: use flex, i'm rushing
+                        width: width,
                         padding: Dimensions.listPadding,
                         child: Text(
                           'Show notifications using Apple Push Notifications through Matrix',

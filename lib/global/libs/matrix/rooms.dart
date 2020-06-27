@@ -138,6 +138,7 @@ abstract class Rooms {
   * 
   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-join
   *  
+  * TODO: third party authentication work is needed
   */
   static Future<dynamic> joinRoom({
     String protocol = 'https://',
@@ -151,9 +152,7 @@ abstract class Rooms {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body = {
-      // TODO: third party signed
-    };
+    Map body = {};
 
     final response = await http.post(
       url,

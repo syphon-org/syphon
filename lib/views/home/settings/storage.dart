@@ -38,7 +38,7 @@ class StorageView extends StatelessWidget {
                 child: Column(
               children: <Widget>[
                 Container(
-                  width: width, // TODO: use flex, i'm rushing
+                  width: width,
                   padding: Dimensions.listPadding,
                   child: Text(
                     'Backups',

@@ -280,7 +280,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                 child: Container(
                   padding: EdgeInsets.only(top: height * 0.05),
                   color: props.roomPrimaryColor,
-                  width: width, // TODO: use flex, i'm rushing
+                  width: width,
                   child: OverflowBox(
                     minHeight: 64,
                     maxHeight: height * 0.25,
@@ -328,7 +328,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: titlePadding,
                             // decoration: BoxDecoration(
                             //   border: Border.all(width: 1, color: Colors.white),
@@ -401,7 +401,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: titlePadding,
                               // decoration: BoxDecoration(
                               //   border: Border.all(width: 1, color: Colors.white),
@@ -459,7 +459,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: contentPadding,
                               child: Text(
                                 'Chat Settings',
@@ -547,7 +547,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: contentPadding,
                               child: Text(
                                 'Call Settings',
@@ -599,7 +599,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: contentPadding,
                               child: Text(
                                 'Privacy and Status',
