@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/matrix/user.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
-import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
@@ -16,9 +13,6 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:olm/olm.dart' as olm;
-
-import 'package:http/http.dart' as http;
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -108,16 +102,16 @@ ThunkAction<AppState> fetchMessageEvents({
       }
 
       // reuse the logic for syncing
-      store.dispatch(syncRooms(
-        {
+      await store.dispatch(
+        syncRooms({
           '${room.id}': {
             'timeline': {
               'events': messages,
               'prev_batch': nextPrevBatch,
             }
           },
-        },
-      ));
+        }),
+      );
     } catch (error) {
       print('[fetchMessageEvents] error $error');
     } finally {
@@ -148,7 +142,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
         throw stateEvents['error'];
       }
 
-      store.dispatch(syncRooms({
+      await store.dispatch(syncRooms({
         '${room.id}': {
           'state': {
             'events': stateEvents,
@@ -249,13 +243,16 @@ ThunkAction<AppState> sendSessionKeys({
     try {
       print('[sendSessionKeys] start');
 
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
         exportMessageSession(roomId: room.id),
       );
 
       final roomKeyEventContent = {
-        'algorithm': Algorithms.olmv1,
+        'algorithm': Algorithms.megolmv1,
         'room_id': room.id,
         'session_id': messageSession['session_id'],
         'session_key': messageSession['session_key'],
@@ -266,22 +263,21 @@ ThunkAction<AppState> sendSessionKeys({
       // need to cycle through those necessary devices here anyway
       // for now, we're just sending the request to all the
       // one time keys that were saved from this call
-      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
+      // global mutatable, this is real bad
       await store.dispatch(claimOneTimeKeys(room: room));
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
 
-      // TODO: encrypt and send olm sendToDevice room keys / key sharing
       // For each one time key claimed
       // send a m.room_key event directly to each device
+
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+
       final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
+          // find the identityKey for the device
           final deviceKey = store.state.cryptoStore
               .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
-
-          // lol
           final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
-
-          // find the identityKey for the device
           final identityKey = deviceKey.keys[keyId];
 
           // Poorly decided to save key sessions by deviceId at first but then
@@ -291,7 +287,7 @@ ThunkAction<AppState> sendSessionKeys({
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
-              identityKey: deviceKey.deviceId, // TODO identityKey after testing
+              identityKey: identityKey,
               eventType: EventTypes.roomKey,
               content: roomKeyEventContent,
             ),
@@ -303,16 +299,14 @@ ThunkAction<AppState> sendSessionKeys({
             homeserver: store.state.authStore.user.homeserver,
             userId: deviceKey.userId,
             deviceId: deviceKey.deviceId,
+            eventType: EventTypes.encrypted,
             content: roomKeyEventContentEncrypted,
+            trxId: trxId,
           );
 
           if (response['errcode'] != null) {
             throw response['error'];
           }
-
-          print(
-            '[sendSessionKeys] ${oneTimeKey.deviceId} sent and completed',
-          );
         } catch (error) {
           print(
             '[sendSessionKeys] ${oneTimeKey.deviceId} $error',
@@ -342,16 +336,23 @@ ThunkAction<AppState> sendMessageEncrypted({
 }) {
   return (Store<AppState> store) async {
     try {
-      // if you're incredibly unlucky, and fast, you could have a problem here
+      // if you're incredibly fast, you could have a problem here
       final String trxId = DateTime.now().millisecond.toString();
 
-      print('[sendMessageEncrypted] $trxId');
+      // send the session keys if an inbound session does not exist
+      final keySession = store.state.cryptoStore.outboundKeySessions[room.id];
+
+      // send the key session if one hasn't been sent or created
+      if (keySession == null) {
+        await store.dispatch(sendSessionKeys(room: room));
+      }
 
       final messageEvent = {
         'body': body,
         'type': type,
       };
 
+      // Encrypt the message event
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
           roomId: room.id,
@@ -360,9 +361,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         ),
       );
 
-      print('[sendMessageEncrypted $encryptedEvent');
-
-      // TODO: encrypt and send actual message content
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -374,8 +372,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         sessionId: encryptedEvent['session_id'],
         deviceId: store.state.authStore.user.deviceId,
       );
-
-      print('[sendMessageEncrypted completed $data');
 
       if (data['errcode'] != null) {
         throw data['error'];

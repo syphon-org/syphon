@@ -1,4 +1,6 @@
 // @again_ereio:matrix.org -> ER
+import 'dart:convert';
+
 List<int> fibonacci(int n) {
   if (n == 0) {
     return [0];
@@ -9,4 +11,10 @@ List<int> fibonacci(int n) {
   final series = fibonacci(n - 1);
   series.add(series[series.length - 1] + series[series.length - 2]);
   return series;
+}
+
+void printJson(Map jsonMap) {
+  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+  String prettyEvent = encoder.convert(jsonMap);
+  print(prettyEvent);
 }

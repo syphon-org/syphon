@@ -28,9 +28,8 @@ class Strings {
 
   static const contentIntroSecondPartOne =
       'Matrix enables you to message others';
-
-  static const contentIntroSecondPartTwo =
-      'and control where the\nmessages are ';
+  static const contentIntroSecondPartBold = '\nprivately and control ';
+  static const contentIntroSecondPartTwo = 'where the\nmessages are stored';
 
   static const contentIntroThird =
       'Both Matrix and ${Values.appName} are developed\nopenly by organizations and people,\nnot corporations';
@@ -40,6 +39,7 @@ class Strings {
 
   static const contentNotificationBackgroundService =
       'Background connection enabled';
+
   // Buttons
   static const buttonLogin = 'login';
   static const buttonTextLogin = 'Login';

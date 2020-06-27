@@ -44,7 +44,7 @@ class SecondSection extends StatelessWidget {
                   style: Theme.of(context).textTheme.subtitle1,
                   children: <TextSpan>[
                     TextSpan(
-                      text: '\nprivately ',
+                      text: Strings.contentIntroSecondPartBold,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
@@ -52,12 +52,6 @@ class SecondSection extends StatelessWidget {
                     TextSpan(
                       text: Strings.contentIntroSecondPartTwo,
                       style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                    TextSpan(
-                      text: 'stored',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
                   ],
                 ),

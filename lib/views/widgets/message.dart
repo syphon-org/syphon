@@ -258,6 +258,20 @@ class MessageWidget extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: messageTextAlignment,
                               children: [
+                                Visibility(
+                                  visible: !isUserSent &&
+                                      message.type == EventTypes.encrypted,
+                                  child: Container(
+                                    width: indicatorSize,
+                                    height: indicatorSize,
+                                    margin: EdgeInsets.only(right: 4),
+                                    child: Icon(
+                                      Icons.lock,
+                                      color: Colors.white,
+                                      size: Dimensions.miniLockSize,
+                                    ),
+                                  ),
+                                ),
                                 Container(
                                   margin: EdgeInsets.only(right: 4),
                                   child: Text(
@@ -275,13 +289,14 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: message.type == EventTypes.encrypted,
+                                  visible: isUserSent &&
+                                      message.type == EventTypes.encrypted,
                                   child: Container(
                                     width: indicatorSize,
                                     height: indicatorSize,
                                     margin: EdgeInsets.only(left: 2),
                                     child: Icon(
-                                      Icons.lock_outline,
+                                      Icons.lock,
                                       color: Colors.white,
                                       size: Dimensions.miniLockSize,
                                     ),

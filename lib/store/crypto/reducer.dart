@@ -1,7 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:syphon/store/crypto/model.dart';
-
 import './state.dart';
 import './actions.dart';
 
@@ -62,18 +58,42 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
       );
+    case AddInboundMessageSession:
+      final messageSessionIndex =
+          Map<String, int>.from(state.messageSessionIndex);
+
+      final inboundMessageSessions = Map<String, Map<String, String>>.from(
+          state.inboundMessageSessions ?? {});
+
+      inboundMessageSessions.putIfAbsent(
+        action.roomId,
+        () => Map<String, String>(),
+      );
+
+      // Add new inbound message session by roomId + identity
+      final Map<String, String> messageSessionInboundNew = {
+        action.identityKey: action.session
+      };
+      inboundMessageSessions[action.roomId].addAll(messageSessionInboundNew);
+
+      // Add new index
+      messageSessionIndex[action.roomId] = action.messageIndex;
+
+      return state.copyWith(
+        inboundMessageSessions: inboundMessageSessions,
+        messageSessionIndex: messageSessionIndex,
+      );
+
     case ToggleDeviceKeysExist:
       return state.copyWith(
         deviceKeysExist: action.existence,
       );
     case ResetDeviceKeys:
       return state.copyWith(
-        deviceKeysOwned: Map<String, DeviceKey>(),
-        inboundMessageSessions: Map<String, String>(),
-        outboundMessageSessions: Map<String, String>(),
-        inboundKeySessions: Map<String, String>(), // one-time device keys
-        outboundKeySessions: Map<String, String>(), // one-time device keys
+        outboundMessageSessions: Map<String, Map<String, String>>(),
+        inboundMessageSessions: Map<String, Map<String, String>>(),
       );
+
     default:
       return state;
   }

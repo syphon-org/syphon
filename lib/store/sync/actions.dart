@@ -7,6 +7,7 @@ import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/sync/services.dart';
 
 import 'package:flutter/foundation.dart';
@@ -198,9 +199,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final Map<String, dynamic> rawInvites = data['rooms']['invite'];
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map<String, dynamic> rawToDevice = data['to_device'];
-      // TODO:  final Map presence = data['presence'];
-
-      print('[fetchSync] rooms $rawLeft');
+      // TODO: final Map presence = data['presence'];
+      // TODO: print('[fetchSync] rooms $rawLeft');
 
       // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
@@ -212,6 +212,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // Update encryption one time key count
       store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
+      // TODO: cold storage cache the full sync in encrypted file
       if (isFullSync) {
         store.dispatch(saveSync(data));
       }
