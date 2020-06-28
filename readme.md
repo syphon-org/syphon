@@ -5,7 +5,7 @@ A privacy centric matrix chat client
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
 
-Matrix has the potential, and in several ways already is, a peer-to-peer chat protcol that will allow people to communicate but move or transfer their data at will. Most popular proprietary chat clients, do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, 
+Matrix has the potential, and in several ways already is, a peer-to-peer chat protcol that will allow people to communicate but move or transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, 
 
 then **branding and user experience** should be the number one priority outside the implicit one of privacy and security. 
 
