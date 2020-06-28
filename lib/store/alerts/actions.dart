@@ -44,7 +44,7 @@ ThunkAction<AppState> startAlertsObserver() {
   };
 }
 
-ThunkAction<AppState> addAlert({type, message, origin}) {
+ThunkAction<AppState> addAlert({type, message, origin = 'Unknown'}) {
   return (Store<AppState> store) async {
     print('[$origin] $type : $message');
 

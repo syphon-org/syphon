@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -37,13 +38,15 @@ class UpdateHomeservers {
 
 // sets the "since" variable for pagination
 class SetSearchResults {
-  String since;
-  int totalResults;
-  bool hasMore;
+  final String since;
+  final int totalResults;
+  final bool hasMore;
+  final String searchText;
   final List<dynamic> searchResults;
 
   SetSearchResults({
     this.searchResults,
+    this.searchText,
     this.totalResults,
     this.hasMore,
     this.since,
@@ -102,7 +105,6 @@ ThunkAction<AppState> fetchHomeservers() {
     store.dispatch(SetLoading(loading: true));
     final response = await http.get(HOMESERVER_SEARCH_SERVICE);
     final List<dynamic> homeservers = await json.decode(response.body);
-    print('[HomeSearch] searching $homeservers');
 
     store.dispatch(SetHomeservers(homeservers: homeservers));
     store.dispatch(SetLoading(loading: false));
@@ -117,7 +119,9 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
             homeserver['hostname'].contains(searchText) ||
             homeserver['description'].contains(searchText))
         .toList();
+
     store.dispatch(SetSearchResults(
+      searchText: searchText,
       searchResults: searchResults,
     ));
   };
@@ -152,7 +156,9 @@ ThunkAction<AppState> searchPublicRooms({String searchText}) {
         totalResults: data['total_room_count_estimate'],
       ));
     } catch (error) {
-      print('[searchPublicRooms] $error');
+      store.dispatch(
+        addAlert(type: 'warning', message: 'Failed to search rooms'),
+      );
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

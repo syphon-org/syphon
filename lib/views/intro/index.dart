@@ -133,25 +133,6 @@ class IntroState extends State<Intro> {
           ),
         ),
       );
-      // showDialog(
-      //   barrierDismissible: false,
-      //   context: context,
-      //   builder: (context) => AlertDialog(
-      //     title: Text("Confirm Alpha TOS Agreement"),
-      //     content: Text(
-      //       Strings.confirmationAlphaVersion,
-      //     ),
-      //     actions: <Widget>[
-      //       FlatButton(
-      //         child: Text('I Agree'),
-      //         onPressed: () async {
-      //           store.dispatch(acceptAgreement());
-      //           Navigator.of(context).pop();
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // );
     }
   }
 
@@ -178,8 +159,8 @@ class IntroState extends State<Intro> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     final double widgetWidthScaling = width * 0.725;
+
     return Scaffold(
       body: StoreConnector<AppState, AppState>(
         converter: (Store<AppState> store) => store.state,

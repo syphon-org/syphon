@@ -5,7 +5,9 @@ SearchStore matrixReducer(
     [SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
-      return state.copyWith(loading: action.loading);
+      return state.copyWith(
+        loading: action.loading,
+      );
     case SetHomeservers:
       return state.copyWith(
         homeservers: action.homeservers,
@@ -19,6 +21,7 @@ SearchStore matrixReducer(
     case SetSearchResults:
       return state.copyWith(
         since: action.since,
+        searchText: action.searchText,
         searchResults: action.searchResults,
         totalResults: action.totalResults,
       );

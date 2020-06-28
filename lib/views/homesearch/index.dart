@@ -104,6 +104,7 @@ class HomeSearchState extends State<HomeSearch> {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
+          print(props.homeservers.length);
           return Scaffold(
             appBar: AppBar(
               brightness: Brightness.dark,
@@ -136,8 +137,11 @@ class HomeSearchState extends State<HomeSearch> {
                     maintainState: true,
                     child: TextField(
                       focusNode: searchInputFocusNode,
+                      onSubmitted: (text) {
+                        props.onSearch(text);
+                      },
                       onChanged: (text) {
-                        props.onSearch(text: text);
+                        props.onSearch(text);
                       },
                       cursorColor: Colors.white,
                       style: TextStyle(
@@ -196,7 +200,7 @@ class HomeSearchState extends State<HomeSearch> {
 
                       return GestureDetector(
                         onTap: () {
-                          props.onSelect(homeserver);
+                          props.onSelect(homeserver: homeserver);
                           Navigator.pop(context);
                         },
                         child: Padding(
@@ -304,6 +308,55 @@ class HomeSearchState extends State<HomeSearch> {
                       );
                     },
                   ),
+                  Visibility(
+                    visible: props.searchText != null &&
+                        props.searchText.isNotEmpty &&
+                        props.homeservers.isEmpty,
+                    child: GestureDetector(
+                      onTap: () {
+                        final homeserver = {
+                          'hostname': props.searchText,
+                        };
+                        props.onSelect(homeserver: homeserver);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                          left: 8,
+                          top: 16,
+                          bottom: 16,
+                          right: 8,
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Text(
+                              props.searchText
+                                  .toString()
+                                  .substring(
+                                      0,
+                                      props.searchText.length < 2
+                                          ? props.searchText.length
+                                          : 2)
+                                  .toUpperCase(),
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            backgroundColor: Colors.grey,
+                          ),
+                          title: Text(
+                            props.searchText,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
+                          subtitle: Text(
+                            'Try logging in with this server',
+                            style: Theme.of(context).textTheme.caption.merge(
+                                  TextStyle(fontStyle: FontStyle.italic),
+                                ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     child: Visibility(
                       visible: props.loading,
@@ -355,9 +408,11 @@ class _Props extends Equatable {
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
         loading: store.state.searchStore.loading,
-        searchText: store.state.searchStore.searchText,
-        homeservers: store.state.searchStore.homeservers,
-        onSelect: (homeserver) {
+        searchText: store.state.searchStore.searchText ?? '',
+        homeservers: store.state.searchStore.searchText != null
+            ? store.state.searchStore.searchResults
+            : store.state.searchStore.homeservers,
+        onSelect: ({homeserver}) {
           store.dispatch(selectHomeserver(homeserver: homeserver));
         },
         onSearch: (text) {
