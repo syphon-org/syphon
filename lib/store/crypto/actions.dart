@@ -125,7 +125,6 @@ ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
 
     deviceKeys.forEach((key, value) {
       currentKeys.putIfAbsent(key, () => deviceKeys[key]);
-      // print('[setDeviceKeysOwned] ${currentKeys[key]}'); // TESTING ONLY
     });
 
     store.dispatch(SetDeviceKeysOwned(deviceKeysOwned: currentKeys));
@@ -229,7 +228,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      print('[initOlmEncryption] $error');
+      debugPrint('[initOlmEncryption] $error');
     }
   };
 }
@@ -404,8 +403,6 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
 
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
-    print('[updateOneTimeKeyCounts] updated count $oneTimeKeysCounts');
-
     store.dispatch(
       SetOneTimeKeysCounts(oneTimeKeysCounts: oneTimeKeysCounts),
     );
@@ -459,8 +456,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
       await store.dispatch(saveOlmAccount());
-
-      print('[updateOneTimeKeys] success $newOneTimeKeys $data');
 
       // register new key counts
       store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
@@ -521,13 +516,11 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        print(
+        debugPrint(
           '[claimOneTimeKeys] all key sharing sessions per device are ready',
         );
         return true;
       }
-
-      print('[claimOneTimeKeys] claimKeysPayload $claimKeysPayload');
 
       // claim one time keys from matrix server
       final Map claimKeysResponse = await MatrixApi.claimKeys(
@@ -588,7 +581,6 @@ ThunkAction<AppState> claimOneTimeKeys({
       });
       return true;
     } catch (error) {
-      print(error);
       store.dispatch(
         addAlert(
           type: 'warning',
@@ -621,11 +613,7 @@ ThunkAction<AppState> createOutboundKeySession({
 
     final account = store.state.cryptoStore.olmAccount;
 
-    print('[createOutboundKeySession] $deviceId, $identityKey, $oneTimeKey');
-
     outboundKeySession.create_outbound(account, identityKey, oneTimeKey);
-
-    print('[createOutboundKeySession] success');
 
     // Pickle by identity
     final serializedKeySession = outboundKeySession.pickle(identityKey);
@@ -675,11 +663,8 @@ ThunkAction<AppState> loadOutboundKeySession({
       var outboundKeySessionSerialized =
           store.state.cryptoStore.outboundKeySessions[identityKey];
 
+      // Deserialize outbound key session with device identity key
       if (outboundKeySessionSerialized != null) {
-        print(
-          '[loadOutboundKeySession] identityKey ${identityKey}',
-        );
-
         final session = olm.Session();
         session.unpickle(
           identityKey,
@@ -689,7 +674,7 @@ ThunkAction<AppState> loadOutboundKeySession({
         return session;
       }
     } catch (error) {
-      print('[loadOutboundKeySession] outbound not found');
+      debugPrint('[loadOutboundKeySession] $error');
       return null;
     }
   };
@@ -710,10 +695,6 @@ ThunkAction<AppState> loadInboundKeySession({
           store.state.cryptoStore.inboundKeySessions[identityKey];
 
       if (inboundKeySessionSerialized != null) {
-        print(
-          '[loadInboundKeySession] found inbound key session ${identityKey}',
-        );
-
         final inboundKeySession = olm.Session()
           ..unpickle(identityKey, inboundKeySessionSerialized);
 
@@ -721,26 +702,18 @@ ThunkAction<AppState> loadInboundKeySession({
         final inboundkeySessionMatch =
             inboundKeySession.matches_inbound_from(identityKey, body);
 
-        print(
-          '[loadInboundKeySession] found session matches existing ${inboundkeySessionMatch}',
-        );
-
         if (inboundkeySessionMatch) {
           return inboundKeySession;
         }
       }
     } catch (error) {
-      print('[loadInboundKeySession] inbound not found');
+      debugPrint('[loadInboundKeySession] $error');
     }
 
     try {
       if (type == 0) {
         final newKeySession = olm.Session();
         final account = store.state.cryptoStore.olmAccount;
-
-        print(
-          '[loadInboundKeySession] creating session with identity $identityKey',
-        );
 
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
         newKeySession.create_inbound_from(account, identityKey, body);
@@ -755,15 +728,11 @@ ThunkAction<AppState> loadInboundKeySession({
           identityKey: identityKey,
         ));
 
-        print(
-          '[loadInboundKeySession] created session successfully',
-        );
-
         // Return new key session
         return newKeySession;
       }
     } catch (error) {
-      print('[loadInboundKeySession] inbound not found');
+      debugPrint('[loadInboundKeySession] $error');
     }
 
     return null;
@@ -821,7 +790,6 @@ ThunkAction<AppState> loadMessageSession({
  */
 ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
   return (Store<AppState> store) async {
-    print('[createOutboundMessageSession] started');
     // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
@@ -879,8 +847,6 @@ ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
     var outboundMessageSessionSerialized =
         store.state.cryptoStore.outboundMessageSessions[roomId];
 
-    print(outboundMessageSessionSerialized);
-
     if (outboundMessageSessionSerialized == null) {
       outboundMessageSessionSerialized = await store.dispatch(
         createOutboundMessageSession(roomId: roomId),
@@ -934,7 +900,6 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          // print('[fetchDeviceKeys] $userId $device'); // TESTING ONLY
           final deviceKey = DeviceKey.fromJson(device);
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/store/index.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
@@ -55,7 +56,7 @@ ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
         data: mediaData,
       ));
     } catch (error) {
-      print('[fetchThumbnail] error: ${mxcUri} $error');
+      debugPrint('[fetchThumbnail] error: ${mxcUri} $error');
     }
   };
 }

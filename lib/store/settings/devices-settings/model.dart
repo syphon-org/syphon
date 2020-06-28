@@ -59,7 +59,6 @@ class Device extends Equatable {
         lastSeenTs: json['last_seen_ts'],
       );
     } catch (error) {
-      print('[Device.fromJson] error $error');
       return Device();
     }
   }

@@ -61,14 +61,14 @@ class PasswordUpdateState extends State<PasswordView> {
   void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
 
-    // Init change listener
-    subscription = store.onChange.listen((state) {
-      print('[PasswordUpdate] ${state.authStore.passwordCurrent}');
+    // TODO: not sure what this was fore
+    // subscription = store.onChange.listen((state) {
+    //   print('[PasswordUpdate] ${state.authStore.passwordCurrent}');
 
-      // if (state.authStore.user.accessToken != null) {
-      //   print('access token ${accessToken}');
-      // }
-    });
+    //   if (state.authStore.user.accessToken != null) {
+    //   print('access token ${accessToken}');
+    //   }
+    // });
   }
 
   @override

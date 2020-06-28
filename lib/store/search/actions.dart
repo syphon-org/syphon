@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -195,7 +196,7 @@ ThunkAction<AppState> searchUsers({String searchText}) {
         totalResults: searchResults.length,
       ));
     } catch (error) {
-      print('[searchPublicRooms] $error');
+      debugPrint('[searchPublicRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

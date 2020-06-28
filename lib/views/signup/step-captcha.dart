@@ -81,7 +81,8 @@ class CaptchaStep extends StatelessWidget {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                print('TODO: navigate to captcha explination');
+                                debugPrint(
+                                    'TODO: navigate to captcha explination');
                               },
                               child: Container(
                                 height: 20,
@@ -139,7 +140,6 @@ class _Props extends Equatable {
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
         onCompleteCaptcha: (String token) {
-          print('[onCompleteCaptcha] $token');
           store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

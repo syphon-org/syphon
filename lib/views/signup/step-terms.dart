@@ -107,7 +107,7 @@ class TermsStep extends StatelessWidget {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                print(
+                                debugPrint(
                                   'TODO: navigate to terms of service explination',
                                 );
                               },
@@ -223,7 +223,6 @@ class _Props extends Equatable {
         }
       },
       onViewTermsOfService: () async {
-        print(store.state.authStore.credential.params);
         final termsOfServiceUrl = store.state.authStore.credential.termsUrl;
         if (await canLaunch(termsOfServiceUrl)) {
           await launch(termsOfServiceUrl);

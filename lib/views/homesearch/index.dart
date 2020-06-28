@@ -104,7 +104,6 @@ class HomeSearchState extends State<HomeSearch> {
         converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
-          print(props.homeservers.length);
           return Scaffold(
             appBar: AppBar(
               brightness: Brightness.dark,

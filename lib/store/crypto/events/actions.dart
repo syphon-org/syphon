@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -22,8 +23,6 @@ ThunkAction<AppState> encryptMessageContent({
   Map content,
 }) {
   return (Store<AppState> store) async {
-    print('[encryptMessageContent] $roomId $eventType $content');
-
     // Load and deserialize session
     final olm.OutboundGroupSession outboundMessageSession =
         await store.dispatch(
@@ -41,8 +40,6 @@ ThunkAction<AppState> encryptMessageContent({
     final encodedPayload = canonicalJson.encode(payload);
     final serializedPayload = utf8.decode(encodedPayload);
     final encryptedPayload = outboundMessageSession.encrypt(serializedPayload);
-    print('[encryptMessageContent] $encryptedPayload');
-
     // Save the outbound session after processing content
     await store.dispatch(saveOutboundMessageSession(
       roomId: roomId,
@@ -53,7 +50,6 @@ ThunkAction<AppState> encryptMessageContent({
     final olmAccount = store.state.cryptoStore.olmAccount;
     final keys = json.decode(olmAccount.identity_keys());
     final sessionId = outboundMessageSession.session_id();
-    print('[encryptMessageContent] ${sessionId}');
 
     // Return the content to be sent or processed
     return {
@@ -84,7 +80,6 @@ ThunkAction<AppState> decryptMessageEvent({
         return event;
       }
 
-      printJson(event);
       // Load and deserialize session
       final olm.InboundGroupSession messageSession = await store.dispatch(
         loadMessageSession(
@@ -101,7 +96,7 @@ ThunkAction<AppState> decryptMessageEvent({
 
       return event;
     } catch (error) {
-      print('[decryptMessageEvent] $error');
+      debugPrint('[decryptMessageEvent] $error');
       return event;
     }
   };
@@ -198,11 +193,6 @@ ThunkAction<AppState> decryptKeyEvent({
     final Map content = event['content'];
     final identityKeySender = content['sender_key'];
     final ciphertextContent = content['ciphertext'][identityKeyOwned];
-
-    // see who youre talking with
-    // print(
-    //   '[decryptKeyEvent] owned $identityKeyOwned sender $identityKeySender',
-    // );
 
     // Load and deserialize or create session
     final olm.Session keySession = await store.dispatch(

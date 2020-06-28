@@ -87,7 +87,7 @@ class MatrixImageState extends State<MatrixImage> {
                   forceLoading;
 
           if (loading) {
-            print('[MatrixImage] cache miss ${widget.mxcUri}');
+            debugPrint('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               width: widget.width,
               height: widget.height,
@@ -99,9 +99,11 @@ class MatrixImageState extends State<MatrixImage> {
                 value: null,
               ),
             );
+          } else {
+            // uncomment to confirm cache hits - very noisy
+            // print('[MatrixImage] cache hit ${widget.mxcUri}');
           }
 
-          // print('[MatrixImage] cache hit ${widget.mxcUri}');
           return Image(
             width: widget.width,
             height: widget.height,

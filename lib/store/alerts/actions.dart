@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -46,7 +47,7 @@ ThunkAction<AppState> startAlertsObserver() {
 
 ThunkAction<AppState> addAlert({type, message, origin = 'Unknown'}) {
   return (Store<AppState> store) async {
-    print('[$origin] $type : $message');
+    debugPrint('[$origin] $type : $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);

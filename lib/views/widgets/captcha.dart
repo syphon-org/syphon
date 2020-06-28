@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
+import 'package:syphon/global/values.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /**
@@ -52,7 +53,9 @@ class CaptchaState extends State<Captcha> {
   @protected
   void onMounted() {
     recaptchaV2Controller.show();
-    print('[captcha wrapper] ${this.publickey}');
+
+    // Confirm public key is correct
+    // debugPrint('[captcha wrapper] ${this.publickey}');
   }
 
   @override
@@ -68,12 +71,9 @@ class CaptchaState extends State<Captcha> {
   });
 
   // Matrix Public Key
-  // 6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb
-  // TODO: just build the captcha yourself
   @override
   Widget build(BuildContext context) {
-    final captchaUrl =
-        'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=${this.publickey}';
+    final captchaUrl = '${Values.captchaUrl}${this.publickey}';
 
     return Container(
       child: WebView(
@@ -88,7 +88,6 @@ class CaptchaState extends State<Captcha> {
               if (token.contains("verify")) {
                 token = token.substring(7);
               }
-              print('[Captcha] success $token');
               if (this.onVerified != null) {
                 this.onVerified(token);
               }

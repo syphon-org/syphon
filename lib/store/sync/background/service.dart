@@ -26,14 +26,11 @@ class BackgroundSync {
     String accessToken,
     String lastSince,
   }) async {
+    // android only background sync
     if (!Platform.isAndroid) {
-      print(
-        '[BackgroundSync] Failed initialization due to non-android platform :(',
-      );
       return;
     }
 
-    print('[BackgroundSync] Starting Background Sync Service');
     final backgroundServiceHive = await openHiveBackgroundUnsafe();
 
     await backgroundServiceHive.put(Cache.protocol, protocol);
@@ -49,18 +46,13 @@ class BackgroundSync {
       exact: true,
       wakeup: true,
     );
-
-    print('[BackgroundSync] Successfully Initialized');
   }
 
   static void stop() async {
     try {
-      final successfullyCanceled = await AndroidAlarmManager.cancel(service_id);
-      print(
-        '[BackgroundSync] Successfully Stopped $service_id $successfullyCanceled',
-      );
+      await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      print('[BackgroundSync] Failed To Stop $error');
+      // print('[BackgroundSync] Failed To Stop $error');
     }
   }
 }

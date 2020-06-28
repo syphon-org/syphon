@@ -187,8 +187,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
-          // TODO: signin prompt needed
-          print('[fetchSync] invalid token - prompt info on offline mode');
+          // TODO: signin prompt needed here
         } else {
           throw data['error'];
         }
@@ -247,19 +246,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
 /**
  * Save Cold Storage Data
- * 
- * 
-    // Refreshing myself on list concat in dart without spread
-    // Map testing = {
-    //   "1": ["a", "b", "c"]
-    // };
-    // Map again = {
-    //   "1": ["e", "f", "g"],
-    // };
-
-    // testing.update("1", (value) => value + again["1"]);
-    // print(testing);
-    
+ *   
  * Will update the cold storage block of data
  * from the full_state /sync call
  */
@@ -271,14 +258,14 @@ ThunkAction<AppState> saveSync(
     Cache.sync.close();
     final storageLocation = await initStorageLocation();
 
-    print('[saveSync] started $storageLocation');
+    debugPrint('[saveSync] started $storageLocation');
 
     compute(saveSyncIsolate, {
       'location': storageLocation,
       'sync': syncData,
     });
 
-    print('[saveSync] completed');
+    debugPrint('[saveSync] completed');
 
     Cache.sync = await openHiveSync();
   };
@@ -292,14 +279,13 @@ ThunkAction<AppState> saveSync(
  */
 ThunkAction<AppState> loadSync() {
   return (Store<AppState> store) async {
-    print('[loadSync] started');
     final storageLocation = await initStorageLocation();
 
     final syncData = await compute(loadSyncIsolate, {
       'location': storageLocation,
     });
 
-    print('[loadSync] $syncData');
+    debugPrint('[loadSync] $syncData');
   };
 }
 
@@ -324,9 +310,9 @@ Future<dynamic> readFullSyncJson() async {
     return await jsonDecode(contents);
   } catch (error) {
     // If encountering an error, return 0.
-    print('readFullSyncJson $error');
+    debugPrint('[readFullSyncJson] $error');
     return null;
   } finally {
-    print('** Read State From Disk Successfully **');
+    debugPrint('** Read State From Disk Successfully **');
   }
 }

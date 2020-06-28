@@ -62,7 +62,6 @@ class Rule extends Equatable {
         actions: json['actions'],
       );
     } catch (error) {
-      print('[Rule.fromJson] $error');
       return Rule(
         id: json['rule_id'],
       );

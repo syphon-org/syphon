@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -17,20 +18,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 final protocol = DotEnv().env['PROTOCOL'];
 
 /**
- * 
-  class MessageTypes {
-    static const TEXT = 'm.text';
-    static const EMOTE = 'm.emote';
-    static const NOTICE = 'm.notice';
-    static const IMAGE = 'm.text';
-    static const FILE = 'm.file';
-    static const AUDIO = 'm.text';
-    static const LOCATION = 'm.location';
-    static const VIDEO = 'm.video';
-  }
- */
-
-/**
  * Load Message Events
  * 
  * Pulls next message events from cold storage 
@@ -40,7 +27,7 @@ ThunkAction<AppState> loadMessageEvents({Room room}) {
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
     } catch (error) {
-      print('[fetchMessageEvents] error $error');
+      debugPrint('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -84,14 +71,6 @@ ThunkAction<AppState> fetchMessageEvents({
       final String start = messagesJson['start'];
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      // print('[fetchMessageEvents] ${room.name} end $end');
-      // print('[fetchMessageEvents] ${room.name} start $start');
-      // messages.forEach((message) {
-      //   print(
-      //     '[fetchMessageEvents]  ${message['sender']} ${message}',
-      //   );
-      // });
-
       // If there's a gap in messages fetched, run a sync again
       // which will fetch the next batch with the same endHash
       // the following is probably not needed due to the
@@ -113,7 +92,7 @@ ThunkAction<AppState> fetchMessageEvents({
         }),
       );
     } catch (error) {
-      print('[fetchMessageEvents] error $error');
+      debugPrint('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -121,9 +100,8 @@ ThunkAction<AppState> fetchMessageEvents({
 }
 
 /**
- * 
- * TODO: not sure if we need this, but just
- * trying to finish E2EE first
+ *  
+ * Fetch State Events (Unused for now)
  * 
  * state events can only be 
  * done from full state /sync data
@@ -150,7 +128,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
         },
       }));
     } catch (error) {
-      print('[fetchRooms] ${room.id} $error');
+      debugPrint('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -158,9 +136,11 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
 }
 
 /**
+ * 
+ * Read Message Marker
  * https://matrix-client.matrix.org/_matrix/client/r0/rooms/!ajJxpUAIJjYYTzvsHo%3Amatrix.org/read_markers
+ * 
  * {"m.fully_read":"$15870915721387891MHmpg:matrix.org","m.read":"$15870915721387891MHmpg:matrix.org","m.hidden":false}
- * TODO: 
  */
 ThunkAction<AppState> readMessages({
   Room room,
@@ -169,7 +149,7 @@ ThunkAction<AppState> readMessages({
 }) {
   return (Store<AppState> store) async {
     try {} catch (error) {
-      print('[readMessage] failed to send: $error');
+      debugPrint('[readMessage] failed to send: $error');
     }
   };
 }
@@ -200,11 +180,9 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicators) {
-        print('[sendTyping] typing indicators disabled');
+        debugPrint('[sendTyping] typing indicators disabled');
         return;
       }
-
-      print('[sendTyping] pushing $typing');
 
       final data = await MatrixApi.sendTyping(
         protocol: protocol,
@@ -219,7 +197,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      print('[toggleTyping] $error');
+      debugPrint('[toggleTyping] $error');
     }
   };
 }
@@ -241,8 +219,6 @@ ThunkAction<AppState> sendSessionKeys({
 }) {
   return (Store<AppState> store) async {
     try {
-      print('[sendSessionKeys] start');
-
       // if you're incredibly unlucky, and fast, you could have a problem here
       final String trxId = DateTime.now().millisecond.toString();
 
@@ -308,9 +284,7 @@ ThunkAction<AppState> sendSessionKeys({
             throw response['error'];
           }
         } catch (error) {
-          print(
-            '[sendSessionKeys] ${oneTimeKey.deviceId} $error',
-          );
+          debugPrint('[sendSessionKeys] $error');
         }
       });
 
@@ -403,8 +377,6 @@ ThunkAction<AppState> sendMessage({
     final String tempId = Random.secure().nextInt(1 << 32).toString();
 
     try {
-      print('[sendMessage] ${type} ${body}');
-
       // Save unsent message to outbox
       store.dispatch(SaveOutboxMessage(
         id: room.id,
@@ -472,7 +444,7 @@ ThunkAction<AppState> sendMessage({
 
       return true;
     } catch (error) {
-      print('[sendMessage] failed to send: $error');
+      debugPrint('[sendMessage] $error');
       return false;
     } finally {
       store.dispatch(SetSending(room: room, sending: false));
@@ -490,12 +462,11 @@ ThunkAction<AppState> deleteMessage({
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
-        print("Deleting Message");
         store.dispatch(DeleteOutboxMessage(message: message));
         return;
       }
     } catch (error) {
-      print('[deleteMessage] failed to delete $error');
+      debugPrint('[deleteMessage] $error');
     }
   };
 }

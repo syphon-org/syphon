@@ -109,7 +109,6 @@ class ProfileViewState extends State<ProfileView> {
                 this.setState(() {
                   newAvatarFile = image;
                 });
-                print('onChangeAvatar $newAvatarFile');
                 Navigator.pop(context);
               },
               leading: Container(
@@ -134,7 +133,6 @@ class ProfileViewState extends State<ProfileView> {
                 this.setState(() {
                   newAvatarFile = image;
                 });
-                print('onChangeAvatar $newAvatarFile');
                 Navigator.pop(context);
               },
               leading: Container(

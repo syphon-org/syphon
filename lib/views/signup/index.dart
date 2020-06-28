@@ -73,12 +73,9 @@ class SignupViewState extends State<SignupView> {
 
     // Init change listener
     subscription = store.onChange.listen((state) {
-      print('[signup store onChange] ${state.authStore.creating}');
-
       // TODO: if creating and it worked
       if (state.authStore.interactiveAuths.isNotEmpty &&
           this.sections.length < 4) {
-        print('Testing section increase');
         sections.add(CaptchaStep());
         sections.add(TermsStep());
         setState(() {
@@ -92,7 +89,6 @@ class SignupViewState extends State<SignupView> {
 
       if (state.authStore.user.accessToken != null) {
         final String currentRoute = ModalRoute.of(context).settings.name;
-        print('Subscription is working $currentRoute');
         if (currentRoute != '/home' && !naving) {
           setState(() {
             naving = true;

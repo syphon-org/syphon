@@ -419,7 +419,6 @@ class _Props extends Equatable {
         // If user enters full username, make sure to set homeserver
         if (text.contains(':')) {
           final alias = text.trim().split(':');
-          print('${alias[0]}(:)${alias[1]}');
           store.dispatch(setUsername(
             username: alias[0],
           ));

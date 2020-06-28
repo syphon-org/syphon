@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -25,10 +26,8 @@ ThunkAction<AppState> fetchNotifications() {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('[fetchNotificationPushers] $data');
     } catch (error) {
-      print('[fetchNotificationPushers] $error');
+      debugPrint('[fetchNotificationPushers] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -52,10 +51,8 @@ ThunkAction<AppState> fetchNotificationPushers() {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('[fetchNotificationPushers] $data');
     } catch (error) {
-      print('[fetchNotificationPushers] $error');
+      debugPrint('[fetchNotificationPushers] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -75,10 +72,8 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('[fetchNotificationPusherRules] $data');
     } catch (error) {
-      print('[fetchNotificationPusherRules] $error');
+      debugPrint('[fetchNotificationPusherRules] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -98,9 +93,8 @@ ThunkAction<AppState> setPusherDeviceToken(String token) {
     try {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetPusherToken(token: token));
-      print('[setPusherDeviceToken] $token');
     } catch (error) {
-      print('[setPusherDeviceToken] $error');
+      debugPrint('[setPusherDeviceToken] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -141,10 +135,8 @@ ThunkAction<AppState> saveNotificationPusher({
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('[fetchNotificationPushers] $data');
     } catch (error) {
-      print('[fetchNotificationPushers] $error');
+      debugPrint('[saveNotificationPusher] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

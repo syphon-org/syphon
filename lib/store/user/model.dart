@@ -67,7 +67,6 @@ class User extends Equatable {
         avatarUri: json['avatar_url'] as String,
       );
     } catch (error) {
-      print('[User.fromJson] $error');
       return User();
     }
   }

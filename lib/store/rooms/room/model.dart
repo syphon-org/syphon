@@ -182,7 +182,6 @@ class Room {
 
   factory Room.fromJson(Map<String, dynamic> json) {
     try {
-      print(json);
       return Room(
         id: json['room_id'],
         name: json['name'],
@@ -196,7 +195,6 @@ class Room {
         syncing: false,
       );
     } catch (error) {
-      print('[Room.fromJson] error $error');
       return Room();
     }
   }
@@ -310,9 +308,7 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromEphemeralEvents] error $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       direct: isDirect ?? this.direct,
@@ -429,9 +425,7 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromStateEvents] error $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       name: name ?? this.name ?? 'New Room',
@@ -509,7 +503,6 @@ class Room {
         prevHash: prevHash,
       );
     } catch (error) {
-      print('[fromMessageEvents] $error');
       return this;
     }
   }
@@ -567,9 +560,7 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromEphemeralEvents] $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       userTyping: userTyping,

@@ -216,7 +216,6 @@ class Message {
         failed: false,
       );
     } catch (error) {
-      print('[Message.fromEvent] error ${event.id} ${event.type},');
       return Message(
         id: event.id,
         userId: event.userId,

@@ -49,7 +49,7 @@ class MessageDetails extends StatelessWidget {
             userTimestamps[users[index]],
           );
         } catch (error) {
-          print('[buildUserReadList] $error');
+          debugPrint('[buildUserReadList] $error');
         }
         return ListTile(
           dense: true,

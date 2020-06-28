@@ -261,7 +261,7 @@ class Props extends Equatable {
             store.dispatch(saveNotificationPusher(erase: true));
             store.dispatch(toggleNotifications());
           } catch (error) {
-            print(error);
+            debugPrint('[onToggleRemoteNotifications] $error');
           }
         },
         onTogglePusher: () async {
