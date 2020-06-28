@@ -60,11 +60,13 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: not caching state events for now
+  // TODO: removed until state timeline work can be done
   // @HiveField(19)
-  final List<Event> state;
+  // final List<Event> state;
+
   @HiveField(20)
   final List<Message> messages;
+
   @HiveField(21)
   final List<Message> outbox;
 
@@ -96,7 +98,6 @@ class Room {
     this.sending = false,
     this.draft,
     this.users,
-    this.state = const [],
     this.outbox = const [],
     this.messages = const [],
     this.lastRead = 0,
@@ -114,6 +115,7 @@ class Room {
     this.prevHash,
     this.messageReads,
     this.invite = false,
+    // this.state = const [],
   });
 
   Room copyWith({
@@ -136,7 +138,6 @@ class Room {
     usersTyping,
     isDraftRoom,
     draft,
-    state,
     users,
     events,
     outbox,
@@ -146,6 +147,7 @@ class Room {
     startHash,
     prevHash,
     invite,
+    // state,
   }) {
     return Room(
       id: id ?? this.id,
@@ -166,7 +168,6 @@ class Room {
       userTyping: userTyping ?? this.userTyping,
       usersTyping: usersTyping ?? this.usersTyping,
       isDraftRoom: isDraftRoom ?? this.isDraftRoom,
-      state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
       users: users ?? this.users,
@@ -175,6 +176,7 @@ class Room {
       startHash: startHash ?? this.startHash,
       prevHash: prevHash, // TODO: may always need a prev hash?,z
       invite: invite ?? this.invite,
+      // state: state ?? this.state,
     );
   }
 
@@ -317,8 +319,11 @@ class Room {
     );
   }
 
-  // Find details of room based on state events
-  // follows spec naming priority and thumbnail downloading
+  /**
+   * 
+   * Find details of room based on state events
+   * follows spec naming priority and thumbnail downloading
+   */
   Room fromStateEvents(
     List<Event> stateEvents, {
     User currentUser,
@@ -436,7 +441,7 @@ class Room {
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       direct: direct ?? this.direct,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
-      state: cachedStateEvents,
+      namePriority: namePriority,
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
@@ -288,14 +289,14 @@ class HomeViewState extends State<Home> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: 'Tiny cute monsters hidding behind foliage',
+              semanticsLabel: Strings.semanticsLabelHomeEmpty,
             ),
           ),
           Container(
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                'Seems there\'s no messages yet',
+                'there\'s no messages yet',
                 style: Theme.of(context).textTheme.headline6,
               ))
         ],

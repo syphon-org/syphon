@@ -98,4 +98,6 @@ class Strings {
   static const semanticsIntroFinal =
       'Two people different feeling confident and lookin\' good';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
+  static const semanticsLabelHomeEmpty =
+      'Tiny cute monsters hidding behind foliage';
 }
