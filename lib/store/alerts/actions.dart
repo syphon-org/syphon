@@ -32,23 +32,15 @@ class RemoveAlert {
   RemoveAlert({this.alert});
 }
 
-ThunkAction<AppState> testAlerts({type, message}) {
+ThunkAction<AppState> startAlertsObserver() {
   return (Store<AppState> store) async {
-    final alertsObserver = store.state.alertsStore.alertsObserver;
+    if (store.state.alertsStore.alertsObserver != null) {
+      throw 'Cannot call startAlertsObserver with an existing instance';
+    }
 
-    final alert = Alert(
-      type: 'warning',
-      message: 'testing alert messages, hi! :D',
+    store.dispatch(
+      SetAlertsObserver(alertsObserver: StreamController<Alert>.broadcast()),
     );
-
-    // Test adding alert from observer and store
-    // TODO: consider the observer add() in the reducer
-    store.dispatch(AddAlert(alert: alert));
-    alertsObserver.add(alert);
-
-    Timer(Duration(milliseconds: 1000), () {
-      store.dispatch(RemoveAlert(alert: alert));
-    });
   };
 }
 
@@ -60,18 +52,6 @@ ThunkAction<AppState> addAlert({type, message, origin}) {
     final alert = new Alert(type: type, message: message);
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
-  };
-}
-
-ThunkAction<AppState> startAlertsObserver() {
-  return (Store<AppState> store) async {
-    if (store.state.alertsStore.alertsObserver != null) {
-      throw 'Cannot call startAlertsObserver with an existing instance';
-    }
-
-    store.dispatch(
-      SetAlertsObserver(alertsObserver: StreamController<Alert>.broadcast()),
-    );
   };
 }
 

@@ -3,18 +3,21 @@ import 'dart:io';
 
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:flutter_apns/apns.dart';
-import 'package:flutter_apns/apns_connector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /**
  * Notifications are handled by APNS when running in iOS
  * Only need to handle local notifications on desktop and android 
+ *  https://matrix.org/docs/spec/client_server/latest#id470
  */
-// https://matrix.org/docs/spec/client_server/latest#id470
+
+// TODO: extract apns and re-enable
+// import 'package:flutter_apns/apns.dart';
+// import 'package:flutter_apns/apns_connector.dart';
+
+// PushConnector connector;
 
 FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
-PushConnector connector;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
   Function onDidReceiveLocalNotification,
@@ -48,6 +51,7 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   );
 
   if (Platform.isIOS) {
+    /** TODO: extract ios only apns and reenable
     connector = createPushConnector();
 
     connector.configure(
@@ -61,6 +65,7 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
         onSaveToken(connector.token.value);
       }
     });
+     */
   }
 
   print('[initNotifications] successfully initialized $pluginInstance');
@@ -79,9 +84,11 @@ Future<bool> promptNativeNotificationsRequest({
         sound: true,
       );
 
+  /** TODO: extract ios only apns and reenable
   if (Platform.isIOS && connector != null) {
     connector.requestNotificationPermissions();
-  }
+  } 
+   */
 
   // result means it's not needed, since it's iOS only
   return result == null ? true : result;
@@ -189,11 +196,6 @@ Future showDebugNotification({
     platformChannelSpecifics,
   );
   // });
-}
-
-// TODO: impliement this? can you disable natively after enabling?
-Future<bool> disableNotifications() {
-  return Future.value(false);
 }
 
 void dismissAllNotifications({

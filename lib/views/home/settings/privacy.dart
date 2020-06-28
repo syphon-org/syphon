@@ -56,7 +56,7 @@ class PrivacyPreferences extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
                                 'App access',
@@ -103,7 +103,7 @@ class PrivacyPreferences extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
                                 'User Access',
@@ -137,7 +137,7 @@ class PrivacyPreferences extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
                                 'Communication',
@@ -190,7 +190,7 @@ class PrivacyPreferences extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              width: width, // TODO: use flex, i'm rushing
+                              width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
                                 'Encryption Keys',

@@ -5,8 +5,9 @@
 class Values {
   static const appId = 'org.tether.tether';
   static const appName = 'Syphon';
-  static const appNameLabel = 'tether'; // TODO: change to syphon
+  static const appNameLabel = 'syphon';
   static const appNameLong = 'Syphon Messenger';
+  static const appDisplayName = 'Syphon Client';
 
   static const defaultLanguage = 'en-US';
 

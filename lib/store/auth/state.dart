@@ -18,7 +18,6 @@ class AuthStore extends Equatable {
   Stream<User> get onAuthStateChanged =>
       authObserver != null ? authObserver.stream : null;
 
-  // TODO: this is lazy
   // Interactive Auth Data
   final String session;
   final Credential credential;

@@ -1,6 +1,13 @@
+/**
+ * 
+ * 
+ *  
+ * TODO: not sure if we ever need unsigned keys 
+ */
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -209,24 +216,18 @@ ThunkAction<AppState> initOlmEncryption(User user) {
       final deviceId = store.state.authStore.user.deviceId;
       final olmAccountKey = store.state.cryptoStore.olmAccountKey;
 
+      // create new olm account since none exists
       if (olmAccountKey == null) {
         olmAccount.create();
         final olmAccountKey = olmAccount.pickle(deviceId);
 
         store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
-
-        print(
-          '[initOlmEncryption] new identity keys ${olmAccount.identity_keys()}',
-        );
       } else {
+        // deserialize stored account since one exists
         olmAccount.unpickle(deviceId, olmAccountKey);
 
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
-
-        print(
-          '[initOlmEncryption] old olm ${olmAccount.identity_keys()}',
-        );
       }
     } catch (error) {
       print('[initOlmEncryption] $error');
@@ -288,9 +289,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // figerprint signature key pair generation for upload
       final identityKeyJsonBytes = canonicalJson.encode(deviceIdentityKeys);
       final identityKeyJsonString = utf8.decode(identityKeyJsonBytes);
-      print('[generateIdentityKeys] $identityKeyJsonString');
       final signedIdentityKey = olmAccount.sign(identityKeyJsonString);
-      print('[generateIdentityKeys] $signedIdentityKey');
 
       deviceIdentityKeys['device_keys']['signatures'] = {
         authUser.userId: {
@@ -309,11 +308,12 @@ ThunkAction<AppState> generateIdentityKeys() {
         },
       ));
 
-      print('[generateIdentityKeys] $deviceIdentityKeys');
+      debugPrint('[generateIdentityKeys] $deviceIdentityKeys');
       // return the generated keys
       return deviceIdentityKeys;
     } catch (error) {
-      print('[generateIdentityKeys] $error');
+      debugPrint('[generateIdentityKeys] $error');
+      return null;
     }
   };
 }
@@ -403,8 +403,6 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
   };
 }
 
-// TODO: not sure if we ever need unsigned keys
-// final int curveCount = oneTimeKeysCounts[Algorithms.curve25591] ?? 0;
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
     print('[updateOneTimeKeyCounts] updated count $oneTimeKeysCounts');

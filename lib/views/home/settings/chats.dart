@@ -140,7 +140,7 @@ class ChatPreferences extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
                               'Chats',
@@ -213,7 +213,7 @@ class ChatPreferences extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
                               'Media',
@@ -250,7 +250,7 @@ class ChatPreferences extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
                               'Media auto-download',

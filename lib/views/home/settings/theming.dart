@@ -126,7 +126,7 @@ class Theming extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
                               'App',
@@ -198,7 +198,7 @@ class Theming extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            width: width, // TODO: use flex, i'm rushing
+                            width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
                               'Fonts',
