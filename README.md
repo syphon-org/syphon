@@ -1,5 +1,3 @@
-# Syphon
-
 # syphon
 
 A privacy centric matrix chat client
