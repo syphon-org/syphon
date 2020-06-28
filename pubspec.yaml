@@ -82,7 +82,7 @@ dependencies:
   intl: ^0.16.1
   http_parser: 3.1.4
   flutter_dotenv: ^2.0.3
-  flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
+  # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   android_alarm_manager: 0.4.5+8
   
   # UI Only
@@ -131,10 +131,10 @@ flutter:
   fonts:
     - family: Rubik
       fonts:
-        - asset: fonts/Rubik-Regular.ttf
-        - asset: fonts/Rubik-Medium.ttf
+        - asset: assets/fonts/Rubik-Regular.ttf
+        - asset: assets/fonts/Rubik-Medium.ttf
           weight: 400
-        - asset: fonts/Rubik-Light.ttf
+        - asset: assets/fonts/Rubik-Light.ttf
           weight: 400
 
   # To add assets to your application, add an assets section, like this:
