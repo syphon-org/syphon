@@ -80,7 +80,7 @@ ThunkAction<AppState> startSyncObserver() {
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
-          print('[Sync Observer] skipping sync, needs full sync');
+          debugPrint('[Sync Observer] skipping sync, needs full sync');
           return;
         }
 
@@ -96,12 +96,12 @@ ThunkAction<AppState> startSyncObserver() {
                 Duration(milliseconds: 1000 * backoffFactor),
               );
 
-          print(
+          debugPrint(
             '[Sync Observer] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
           );
 
           if (backoffLimit == 1) {
-            print('[Sync Observer] forced retry timeout');
+            debugPrint('[Sync Observer] forced retry timeout');
             store.dispatch(fetchSync(
               since: store.state.syncStore.lastSince,
             ));
@@ -110,12 +110,13 @@ ThunkAction<AppState> startSyncObserver() {
           return;
         }
 
+        // still syncing
         if (store.state.syncStore.syncing) {
-          print('[Sync Observer] still syncing');
+          debugPrint('[Sync Observer] still syncing');
           return;
         }
 
-        print('[Sync Observer] running sync');
+        debugPrint('[Sync Observer] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -171,7 +172,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
       if (isFullSync) {
-        print('[fetchSync] fetching full sync');
+        debugPrint('[fetchSync] fetching full sync');
       }
 
       // Matrix Sync to homeserver
@@ -200,7 +201,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map<String, dynamic> rawToDevice = data['to_device'];
       // TODO: final Map presence = data['presence'];
-      // TODO: print('[fetchSync] rooms $rawLeft');
 
       // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
@@ -213,9 +213,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
       // TODO: cold storage cache the full sync in encrypted file
-      if (isFullSync) {
-        store.dispatch(saveSync(data));
-      }
+      // if (isFullSync) {
+      //   store.dispatch(saveSync(data));
+      // }
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
@@ -226,13 +226,13 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       ));
 
       if (!kReleaseMode && isFullSync) {
-        print('[fetchSync] full sync completed');
+        debugPrint('[fetchSync] full sync completed');
       }
     } catch (error) {
       final message = (error.message as String);
 
       if (message.contains('SocketException')) {
-        print('[fetchSync] IOException $error');
+        debugPrint('[fetchSync] IOException $error');
         store.dispatch(SetOffline(offline: true));
       }
 

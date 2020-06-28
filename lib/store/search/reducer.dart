@@ -1,8 +1,8 @@
 import './model.dart';
 import './actions.dart';
 
-MatrixStore matrixReducer(
-    [MatrixStore state = const MatrixStore(), dynamic action]) {
+SearchStore matrixReducer(
+    [SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);

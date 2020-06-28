@@ -84,7 +84,7 @@ class IntroState extends State<Intro> {
               borderRadius: BorderRadius.circular(16),
             ),
             title: const Text(
-              "Confirm Alpha TOS Agreement",
+              "Confirm Open Alpha Terms Of Service",
               textAlign: TextAlign.center,
             ),
             titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),

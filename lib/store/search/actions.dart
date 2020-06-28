@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/search.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:html/parser.dart';
@@ -76,7 +76,7 @@ Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
 
 ThunkAction<AppState> fetchHomeserverIcons() {
   return (Store<AppState> store) async {
-    final homeservers = store.state.matrixStore.homeservers;
+    final homeservers = store.state.searchStore.homeservers;
 
     homeservers.forEach((homeserver) async {
       final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
@@ -101,7 +101,8 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     final response = await http.get(HOMESERVER_SEARCH_SERVICE);
-    final List<dynamic> homeservers = json.decode(response.body);
+    final List<dynamic> homeservers = await json.decode(response.body);
+    print('[HomeSearch] searching $homeservers');
 
     store.dispatch(SetHomeservers(homeservers: homeservers));
     store.dispatch(SetLoading(loading: false));
@@ -111,7 +112,7 @@ ThunkAction<AppState> fetchHomeservers() {
 
 ThunkAction<AppState> searchHomeservers({String searchText}) {
   return (Store<AppState> store) async {
-    List<dynamic> searchResults = store.state.matrixStore.homeservers
+    List<dynamic> searchResults = store.state.searchStore.homeservers
         .where((homeserver) =>
             homeserver['hostname'].contains(searchText) ||
             homeserver['description'].contains(searchText))
@@ -122,28 +123,21 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
   };
 }
 
-/**
- *  TODO: filter is different from a search
- *  search requires remote access
+/** 
+ *  Search Rooms (Remote)
  */
 ThunkAction<AppState> searchPublicRooms({String searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-      final request = buildPublicRoomSearch(
+
+      final data = await MatrixApi.searchRooms(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
       );
 
-      final response = await http.post(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -151,8 +145,6 @@ ThunkAction<AppState> searchPublicRooms({String searchText}) {
       final List<dynamic> rawPublicRooms = data['chunk'];
       final List<Room> convertedRooms =
           rawPublicRooms.map((room) => Room.fromJson(room)).toList();
-
-      print('[searchPublicRooms] conversion successful');
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],
@@ -174,20 +166,14 @@ ThunkAction<AppState> searchUsers({String searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-      final request = buildUserSearch(
+
+      final data = await MatrixApi.searchUsers(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
       );
 
-      final response = await http.post(
-        request['url'],
-        headers: request['headers'],
-        body: json.encode(request['body']),
-      );
-
-      final data = json.decode(response.body);
       if (data['errcode'] != null) {
         throw data['error'];
       }

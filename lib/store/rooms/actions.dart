@@ -136,10 +136,7 @@ ThunkAction<AppState> syncRooms(
           decryptTimelineActions,
         );
 
-        decryptedTimelineEvents.forEach((element) {
-          print('[syncRooms] ${element}');
-        });
-
+        // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = decryptedTimelineEvents;
       }
 
@@ -530,6 +527,53 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
   };
 }
 
+/**
+ * Join Room (by id)
+ * 
+ * Not sure if this process is / will be any different
+ * than accepting an invite
+ */
+ThunkAction<AppState> joinRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await MatrixApi.joinRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+
+      Room joinedRoom = rooms.containsKey(room.id)
+          ? rooms[room.id]
+          : Room(
+              id: room.id,
+            );
+
+      store.dispatch(SetRoom(
+        room: joinedRoom.copyWith(invite: false),
+      ));
+
+      await store.dispatch(fetchRooms());
+      await store.dispatch(fetchDirectRooms());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+      print(error);
+    }
+  };
+}
+
+/**
+ * Accept Room (by id, from invite
+ * 
+ * Not sure if this process is / will be any different
+ * than joining a room
+ */
 ThunkAction<AppState> acceptRoom({Room room}) {
   return (Store<AppState> store) async {
     try {

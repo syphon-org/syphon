@@ -35,7 +35,7 @@ class AppState extends Equatable {
   final bool loading;
   final AuthStore authStore;
   final AlertsStore alertsStore;
-  final MatrixStore matrixStore;
+  final SearchStore searchStore;
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
@@ -46,7 +46,7 @@ class AppState extends Equatable {
     this.loading = true,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
-    this.matrixStore = const MatrixStore(),
+    this.searchStore = const SearchStore(),
     this.mediaStore = const MediaStore(),
     this.settingsStore = const SettingsStore(),
     this.roomStore = const RoomStore(),
@@ -59,7 +59,7 @@ class AppState extends Equatable {
         loading,
         alertsStore,
         authStore,
-        matrixStore,
+        searchStore,
         roomStore,
         settingsStore,
         syncStore,
@@ -75,7 +75,7 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
-    matrixStore: matrixReducer(state.matrixStore, action),
+    searchStore: matrixReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
   );

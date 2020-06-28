@@ -76,7 +76,7 @@ class SearchUserState extends State<SearchUserView> {
       this.onToggleSearch(context: context);
     }
 
-    final searchResults = store.state.matrixStore.searchResults;
+    final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
     if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
@@ -607,9 +607,9 @@ class _Props extends Equatable {
   });
 
   static _Props mapStoreToProps(Store<AppState> store) => _Props(
-        loading: store.state.matrixStore.loading,
+        loading: store.state.searchStore.loading,
         theme: store.state.settingsStore.theme,
-        searchResults: store.state.matrixStore.searchResults,
+        searchResults: store.state.searchStore.searchResults,
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },

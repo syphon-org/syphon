@@ -31,11 +31,16 @@ There are three layers to storage in Syphon:
 - utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a bound ground thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
 - no third party notification provider will ever be used
 
-### resources
+### assets
 - [Paid Icon](https://thenounproject.com/search/?q=polygon&i=2596282)
 - [iOS icons](https://github.com/smallmuou/ios-icon-generator)
+
+### helpful references
 - [iOS file management flutter](https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter)
 - [Scrolling With Text Inputs](https://github.com/flutter/flutter/issues/13339)
+- [multi-line text field](https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter)
+- [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
+
 
 ## from those who made it possible
 lub youu

@@ -53,10 +53,7 @@ class NavigationProvider {
     return <String, WidgetBuilder>{
       '/intro': (BuildContext context) => Intro(),
       '/login': (BuildContext context) => Login(),
-      '/search_home': (BuildContext context) => HomeSearch(
-            title: 'Find Your Homeserver',
-            store: store,
-          ),
+      '/search_home': (BuildContext context) => HomeSearch(),
       '/signup': (BuildContext context) => SignupView(),
       '/home': (BuildContext context) => Home(),
       '/home/chat': (BuildContext context) => ChatView(),
