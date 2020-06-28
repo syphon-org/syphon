@@ -1,6 +1,6 @@
 # syphon
 
-A privacy centric matrix chat client
+A privacy centric matrix client
 
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
