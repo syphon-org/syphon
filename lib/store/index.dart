@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
@@ -100,10 +101,10 @@ Future<Store> initStore() async {
       switch (action.runtimeType) {
         case SetSyncing:
         case SetSynced:
-          print('[Redux Persist] cache skip');
+          debugPrint('[Redux Persist] cache skip');
           return false;
         default:
-          print('[Redux Persist] caching');
+          debugPrint('[Redux Persist] caching');
           return true;
       }
     },
@@ -114,9 +115,9 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    print('[Redux Persist] persist loaded successfully');
+    debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    print('[Redux Persist] error $error');
+    debugPrint('[Redux Persist] error $error');
   }
 
   final Store<AppState> store = Store<AppState>(

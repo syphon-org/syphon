@@ -108,9 +108,6 @@ abstract class Devices {
       streamedResponse,
     );
 
-    print('${response.statusCode}');
-    print('${json.decode(response.body)}');
-
     return await json.decode(response.body);
   }
 

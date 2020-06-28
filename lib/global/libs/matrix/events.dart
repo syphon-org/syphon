@@ -142,8 +142,6 @@ abstract class Events {
       'Authorization': 'Bearer $accessToken',
     };
 
-    print('[sendEvent] ${url} ${content}');
-
     final response = await http.put(
       url,
       headers: headers,
