@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIFileSharingEnabled</key>
-	<string>YES</string>
+	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
 	<key>UILaunchStoryboardName</key>
