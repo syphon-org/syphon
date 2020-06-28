@@ -23,14 +23,14 @@ There are three layers to storage in Syphon:
 - Cold Storage (Hive)
 
 ## getting started
-- (Redux Tutorial)[https://www.netguru.com/codestories/-implement-redux-with-flutter-app]
-- (Redux Examples)[https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/lib/selectors/selectors.dart]
+- [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
+- [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/lib/selectors/selectors.dart)
 
 ## resources
-- (Paid Icon)[https://thenounproject.com/search/?q=polygon&i=2596282]
-- (iOS icons)[https://github.com/smallmuou/ios-icon-generator]
-- (iOS file management flutter)[https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter]
-- (Scrolling With Text Inputs)[https://github.com/flutter/flutter/issues/13339]
+- [Paid Icon](https://thenounproject.com/search/?q=polygon&i=2596282)
+- [iOS icons](https://github.com/smallmuou/ios-icon-generator)
+- [iOS file management flutter](https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter)
+- [Scrolling With Text Inputs](https://github.com/flutter/flutter/issues/13339)
 
 ## from those who made it possible
 lub youu
