@@ -80,7 +80,7 @@ class MatrixImageState extends State<MatrixImage> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final loading =
               !props.mediaCache.containsKey(finalUriData ?? widget.mxcUri) ||
@@ -125,7 +125,7 @@ class _Props extends Equatable {
     @required this.mediaCache,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         fetching: false,
         mediaCache:
             store.state.mediaStore.mediaCache ?? Map<String, Uint8List>(),

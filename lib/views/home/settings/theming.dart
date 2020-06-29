@@ -94,7 +94,7 @@ class Theming extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
@@ -266,7 +266,7 @@ class Props {
     @required this.onToggleEnterSend,
   });
 
-  static Props mapStoreToProps(Store<AppState> store) => Props(
+  static Props mapStateToProps(Store<AppState> store) => Props(
         primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
         accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
         themeType: store.state.settingsStore.theme.toString(),

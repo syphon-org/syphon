@@ -23,7 +23,7 @@ class AdvancedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           return Scaffold(
             appBar: AppBar(
@@ -136,6 +136,17 @@ class AdvancedView extends StatelessWidget {
                       'Force Function',
                       style: TextStyle(fontSize: 18.0),
                     ),
+                  ),
+                ),
+                ListTile(
+                  dense: true,
+                  onTap: () {
+                    Navigator.pushNamed(context, '/licenses');
+                  },
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Open Source Licenses',
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
                 ListTile(
@@ -255,8 +266,7 @@ class _Props extends Equatable {
         roomsObserverEnabled,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static _Props mapStoreToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(

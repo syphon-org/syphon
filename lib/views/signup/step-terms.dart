@@ -23,7 +23,7 @@ class TermsStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         double width = MediaQuery.of(context).size.width;
         return Container(
@@ -204,7 +204,7 @@ class _Props extends Equatable {
     @required this.onViewTermsOfService,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
       homeserver:
           store.state.authStore.homeserver.substring(0, 1).toUpperCase() +
               store.state.authStore.homeserver.substring(1),
@@ -223,12 +223,14 @@ class _Props extends Equatable {
         }
       },
       onViewTermsOfService: () async {
-        final termsOfServiceUrl = store.state.authStore.credential.termsUrl;
-        if (await canLaunch(termsOfServiceUrl)) {
-          await launch(termsOfServiceUrl);
-        } else {
-          throw 'Could not launch $termsOfServiceUrl';
-        }
+        try {
+          final termsOfServiceUrl = store.state.authStore.credential.termsUrl;
+          if (await canLaunch(termsOfServiceUrl)) {
+            await launch(termsOfServiceUrl);
+          } else {
+            throw 'Could not launch $termsOfServiceUrl';
+          }
+        } catch (error) {}
       });
 
   @override

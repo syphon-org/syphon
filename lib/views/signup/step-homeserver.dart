@@ -21,7 +21,7 @@ class HomeserverStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         double width = MediaQuery.of(context).size.width;
         double height = MediaQuery.of(context).size.height;
@@ -121,7 +121,7 @@ class _Props extends Equatable {
     @required this.onChangeHomeserver,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         homeserver: store.state.authStore.homeserver,
         onChangeHomeserver: (String text) {
           store.dispatch(setHomeserver(homeserver: text.trim()));

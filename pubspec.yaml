@@ -82,8 +82,8 @@ dependencies:
   intl: ^0.16.1
   http_parser: 3.1.4
   flutter_dotenv: ^2.0.3
-  # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   android_alarm_manager: 0.4.5+8
+  # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   
   # UI Only
   url_launcher: ^5.4.7

@@ -101,7 +101,7 @@ class HomeSearchState extends State<HomeSearch> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
           return Scaffold(
@@ -405,7 +405,7 @@ class _Props extends Equatable {
         homeservers,
       ];
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.searchStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null

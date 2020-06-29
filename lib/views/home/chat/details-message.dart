@@ -78,7 +78,7 @@ class MessageDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStoreToProps(
+        converter: (Store<AppState> store) => Props.mapStateToProps(
           store,
           (ModalRoute.of(context).settings.arguments as MessageDetailArguments)
               .roomId,
@@ -226,8 +226,7 @@ class Props extends Equatable {
     @required this.messageReads,
   });
 
-  /* effectively mapStateToProps, but includes functions */
-  static Props mapStoreToProps(
+  static Props mapStateToProps(
     Store<AppState> store,
     String roomId,
   ) =>

@@ -242,7 +242,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(
+      converter: (Store<AppState> store) => _Props.mapStateToProps(
         store,
         arguments.roomId,
       ),
@@ -689,7 +689,7 @@ class _Props extends Equatable {
     @required this.onViewEncryptionKeys,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         userId: store.state.authStore.user.userId,
         room: roomSelectors.room(id: roomId, state: store.state),
         onViewEncryptionKeys: (

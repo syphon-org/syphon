@@ -1,3 +1,4 @@
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart'; // TODO: remove need for store in view dependencies
 
 import 'package:syphon/views/home/chat/details-chat.dart';
@@ -6,6 +7,7 @@ import 'package:syphon/views/home/search/search-groups.dart';
 import 'package:syphon/views/home/search/search-users.dart';
 import 'package:syphon/views/home/settings/chats.dart';
 import 'package:syphon/views/home/settings/devices.dart';
+import 'package:syphon/views/home/settings/licenses.dart';
 import 'package:syphon/views/home/settings/password/index.dart';
 import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
@@ -46,8 +48,6 @@ class NavigationService {
   }
 }
 
-// https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter
-// TODO: consistant transition styles
 class NavigationProvider {
   static getRoutes(Store<AppState> store) {
     return <String, WidgetBuilder>{
@@ -70,6 +70,9 @@ class NavigationProvider {
       '/advanced': (BuildContext context) => AdvancedView(),
       '/storage': (BuildContext context) => StorageView(),
       '/password': (BuildContext context) => PasswordView(),
+      '/licenses': (BuildContext context) => LicensePage(
+            applicationName: Values.appName,
+          ),
       '/privacy': (BuildContext context) => PrivacyPreferences(
             title: 'Privacy',
           ),

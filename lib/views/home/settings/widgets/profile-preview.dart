@@ -16,7 +16,7 @@ class ProfilePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           return Container(
             child: Row(
@@ -99,7 +99,7 @@ class _Props extends Equatable {
 
   // Lots of null checks in case the user signed out where
   // this widget is displaying, could probably be less coupled..
-  static _Props mapStoreToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(

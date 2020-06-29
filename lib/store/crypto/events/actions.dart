@@ -90,11 +90,12 @@ ThunkAction<AppState> decryptMessageEvent({
 
       // Decrypt the payload with the session
       final decryptedPayload = messageSession.decrypt(content['ciphertext']);
+      final bodyScrubbed = decryptedPayload.plaintext
+          .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
+          .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
 
       // Return the content to be sent or processed
-      event['content'] = json.decode(decryptedPayload.plaintext)['content'];
-
-      return event;
+      event['content'] = json.decode(bodyScrubbed)['content'];
     } catch (error) {
       debugPrint('[decryptMessageEvent] $error');
       return event;

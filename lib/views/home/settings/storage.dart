@@ -17,7 +17,7 @@ class StorageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
           final double height = MediaQuery.of(context).size.height;
@@ -95,8 +95,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  /* effectively mapStateToProps, but includes functions */
-  static _Props mapStoreToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(

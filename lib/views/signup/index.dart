@@ -219,7 +219,7 @@ class SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
           double height = MediaQuery.of(context).size.height;
@@ -399,7 +399,7 @@ class _Props extends Equatable {
     @required this.onResetCredential,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         completed: store.state.authStore.completed,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,

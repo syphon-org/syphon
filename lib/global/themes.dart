@@ -131,8 +131,8 @@ class Themes {
         ),
         bodyText1: TextStyle(
           fontSize: 18,
-          fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
+          fontWeight: FontWeight.w100,
         ),
         bodyText2: TextStyle(
           fontSize: 18,
