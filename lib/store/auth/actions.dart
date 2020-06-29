@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
@@ -397,7 +398,9 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
           (stage) => !completed.contains(stage),
         );
 
+        print('[currentStage check] ${currentStage.length > 0}');
         if (currentStage.length > 0) {
+          print('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -457,12 +460,13 @@ ThunkAction<AppState> createUser() {
         final completed = store.state.authStore.completed;
 
         final bool hasCompleted = flows.reduce((hasCompleted, flow) {
-          return hasCompleted ||
+          return (hasCompleted is bool && hasCompleted) ||
               (flow['stages'] as List<dynamic>).every(
                 (stage) => completed.contains(stage),
               );
         });
 
+        // return false most likely
         return hasCompleted;
       }
 
@@ -700,8 +704,12 @@ ThunkAction<AppState> selectHomeserver({dynamic homeserver}) {
 ThunkAction<AppState> setHomeserver({String homeserver}) {
   return (Store<AppState> store) {
     store.dispatch(
-        SetHomeserverValid(valid: homeserver != null && homeserver.length > 0));
-    store.dispatch(SetHomeserver(homeserver: homeserver.trim()));
+      SetHomeserverValid(valid: homeserver != null && homeserver.length > 0),
+    );
+
+    store.dispatch(
+      SetHomeserver(homeserver: homeserver.trim()),
+    );
   };
 }
 

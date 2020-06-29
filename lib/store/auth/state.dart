@@ -59,7 +59,7 @@ class AuthStore extends Equatable {
     this.isUsernameValid = false,
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
-    this.isHomeserverValid = false,
+    this.isHomeserverValid = true,
     this.credential,
     this.creating = false,
     this.loading = false,

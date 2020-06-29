@@ -29,10 +29,14 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
 
     case UpdateRoom:
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.id] = rooms[action.id].copyWith(
-        draft: action.draft,
-        syncing: action.syncing,
-      );
+
+      if (rooms[action.id] != null) {
+        rooms[action.id] = rooms[action.id].copyWith(
+          draft: action.draft,
+          syncing: action.syncing,
+        );
+      }
+
       return state.copyWith(rooms: rooms);
 
     case RemoveRoom:

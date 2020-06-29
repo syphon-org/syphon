@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -32,6 +33,16 @@ class PasswordStepState extends State<PasswordStep> {
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
+
+  @protected
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    passwordController.text = store.state.authStore.password;
+    confirmController.text = store.state.authStore.passwordConfirm;
   }
 
   @override
@@ -108,8 +119,8 @@ class PasswordStepState extends State<PasswordStep> {
                         FocusScope.of(context).requestFocus(confirmFocusNode);
                       },
                       onEditingComplete: () {
-                        props.onChangePassword(props.password);
                         passwordFocusNode.unfocus();
+                        props.onChangePassword(props.password);
                       },
                       decoration: InputDecoration(
                         suffixIcon: GestureDetector(
@@ -169,7 +180,7 @@ class PasswordStepState extends State<PasswordStep> {
                     child: TextField(
                       controller: confirmController,
                       focusNode: confirmFocusNode,
-                      obscureText: true,
+                      obscureText: !visibility,
                       onChanged: (text) {
                         props.onChangePasswordConfirm(text);
                       },

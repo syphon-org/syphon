@@ -109,10 +109,18 @@ class CaptchaStep extends StatelessWidget {
                   minHeight: 94,
                   maxHeight: 220,
                 ),
-                child: Captcha(
-                  // TODO: confirm user wants to load captcha
-                  publicKey: props.publicKey,
-                  onVerified: (token) => props.onCompleteCaptcha(token),
+                child: SingleChildScrollView(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minWidth: Dimensions.inputWidthMin,
+                      maxWidth: Dimensions.inputWidthMax,
+                      maxHeight: 500,
+                    ),
+                    child: Captcha(
+                      publicKey: props.publicKey,
+                      onVerified: (token) => props.onCompleteCaptcha(token),
+                    ),
+                  ),
                 ),
               ),
             ],
