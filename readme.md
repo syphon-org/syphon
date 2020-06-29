@@ -1,10 +1,12 @@
 # syphon
 
 A privacy centric matrix client
-
+ 
 
 ![license](https://img.shields.io/github/license/syphon-org/syphon)
 ![release date](https://img.shields.io/github/release-date/syphon-org/syphon)
+
+<a href='https://play.google.com/store/apps/details?id=org.tether.tether'><img  height="80px" style="max-width:100%;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' /></a>
  
 ![Login Screenshot](assets/screenshots/01-android-tiny.png) 
 ![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
