@@ -73,7 +73,6 @@ class SignupViewState extends State<SignupView> {
 
     // Init change listener
     subscription = store.onChange.listen((state) {
-      // TODO: if creating and it worked
       if (state.authStore.interactiveAuths.isNotEmpty &&
           this.sections.length < 4) {
         sections.add(CaptchaStep());
@@ -121,10 +120,6 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
-  /**
-   * TODO: convert to using interactive auth flows
-   * to know what step is what action
-   */
   @protected
   Function onCheckStepValidity(_Props props) {
     switch (this.currentStep) {
@@ -204,15 +199,17 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
-  Widget buildButtonText() {
+  Widget buildButtonText({BuildContext context}) {
     if (this.currentStep == sections.length - 1) {
-      return const Text(
+      return Text(
         Strings.buttonSignupFinish,
+        style: Theme.of(context).textTheme.button,
       );
     }
 
-    return const Text(
+    return Text(
       Strings.buttonSignupNext,
+      style: Theme.of(context).textTheme.button,
     );
   }
 
@@ -291,7 +288,6 @@ class SignupViewState extends State<SignupView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              // EXAMPLE OF WIDGET PROPORTIONAL SCALING
                               width: width * 0.725,
                               margin: EdgeInsets.only(top: height * 0.01),
                               height: Dimensions.inputHeight,
@@ -308,7 +304,7 @@ class SignupViewState extends State<SignupView> {
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
                                 child: !props.creating
-                                    ? buildButtonText()
+                                    ? buildButtonText(context: context)
                                     : CircularProgressIndicator(
                                         strokeWidth:
                                             Dimensions.defaultStrokeWidthLite,

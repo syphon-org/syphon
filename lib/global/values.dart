@@ -36,16 +36,5 @@ class Values {
 
   static const openSourceLibraries = [
     {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
   ];
 }
