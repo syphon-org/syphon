@@ -118,31 +118,33 @@ class HomeViewState extends State<Home> {
         ),
         Visibility(
           visible: true,
-          child: true
-              ? IconButton(
-                  icon: Icon(Icons.delete_outline),
-                  iconSize: Dimensions.buttonAppBarSize,
-                  tooltip: 'Leave Chat',
-                  color: Colors.white,
-                  onPressed: () async {
-                    await props.onLeaveChat(room: this.selectedRoom);
-                    this.setState(() {
-                      selectedRoom = null;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: Icon(Icons.do_not_disturb_alt),
-                  iconSize: Dimensions.buttonAppBarSize,
-                  tooltip: 'Delete Chat',
-                  color: Colors.white,
-                  onPressed: () async {
-                    await props.onDeleteChat(room: this.selectedRoom);
-                    this.setState(() {
-                      selectedRoom = null;
-                    });
-                  },
-                ),
+          child: IconButton(
+            icon: Icon(Icons.do_not_disturb_alt),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Leave Chat',
+            color: Colors.white,
+            onPressed: () async {
+              await props.onLeaveChat(room: this.selectedRoom);
+              this.setState(() {
+                selectedRoom = null;
+              });
+            },
+          ),
+        ),
+        Visibility(
+          visible: this.selectedRoom.direct,
+          child: IconButton(
+            icon: Icon(Icons.delete_outline),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Delete Chat',
+            color: Colors.white,
+            onPressed: () async {
+              await props.onDeleteChat(room: this.selectedRoom);
+              this.setState(() {
+                selectedRoom = null;
+              });
+            },
+          ),
         ),
         IconButton(
           icon: Icon(Icons.select_all),

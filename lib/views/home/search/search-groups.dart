@@ -367,8 +367,9 @@ class GroupSearchState extends State<GroupSearchView> {
                                       size: Dimensions.iconSize,
                                     ),
                                     iconSize: Dimensions.iconSize,
-                                    onPressed: () {
-                                      props.onJoin(room: room);
+                                    onPressed: () async {
+                                      await props.onJoin(room: room);
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ],
