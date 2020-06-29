@@ -212,6 +212,7 @@ class SignupViewState extends State<SignupView> {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;

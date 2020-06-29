@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -32,8 +33,14 @@ class PasswordStepState extends State<PasswordStep> {
   @override
   void initState() {
     super.initState();
-    final store = StoreProvider.of<AppState>(context);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
+  }
 
+  @protected
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
     passwordController.text = store.state.authStore.password;
     confirmController.text = store.state.authStore.passwordConfirm;
   }
