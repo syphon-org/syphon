@@ -108,8 +108,8 @@ class PasswordStepState extends State<PasswordStep> {
                         FocusScope.of(context).requestFocus(confirmFocusNode);
                       },
                       onEditingComplete: () {
-                        props.onChangePassword(props.password);
                         passwordFocusNode.unfocus();
+                        props.onChangePassword(props.password);
                       },
                       decoration: InputDecoration(
                         suffixIcon: GestureDetector(
@@ -169,7 +169,7 @@ class PasswordStepState extends State<PasswordStep> {
                     child: TextField(
                       controller: confirmController,
                       focusNode: confirmFocusNode,
-                      obscureText: true,
+                      obscureText: !visibility,
                       onChanged: (text) {
                         props.onChangePasswordConfirm(text);
                       },

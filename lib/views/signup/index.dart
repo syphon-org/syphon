@@ -45,7 +45,7 @@ class SignupViewState extends State<SignupView> {
   StreamSubscription subscription;
   PageController pageController;
 
-  var sections = [
+  List<Widget> sections = [
     HomeserverStep(),
     UsernameStep(),
     PasswordStep(),
@@ -58,7 +58,7 @@ class SignupViewState extends State<SignupView> {
     super.initState();
     pageController = PageController(
       initialPage: 0,
-      keepPage: false,
+      keepPage: true,
       viewportFraction: 1.5,
     );
 
@@ -72,18 +72,17 @@ class SignupViewState extends State<SignupView> {
     final store = StoreProvider.of<AppState>(context);
 
     // Init change listener
-    subscription = store.onChange.listen((state) {
+    subscription = store.onChange.listen((state) async {
       if (state.authStore.interactiveAuths.isNotEmpty &&
           this.sections.length < 4) {
-        sections.add(CaptchaStep());
-        sections.add(TermsStep());
+        final newSections = List<Widget>.from(sections);
+
+        newSections.add(CaptchaStep());
+        newSections.add(TermsStep());
+
         setState(() {
-          currentStep = this.currentStep + 1;
+          sections = newSections;
         });
-        pageController.nextPage(
-          duration: nextAnimationDuration,
-          curve: Curves.ease,
-        );
       }
 
       if (state.authStore.user.accessToken != null) {
@@ -121,15 +120,15 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  Function onCheckStepValidity(_Props props) {
+  Function onCheckStepValidity(_Props props, PageController controller) {
+    print(
+      '[onCheckStepValidity] new value',
+    );
     switch (this.currentStep) {
       case 0:
         return props.isHomeserverValid
             ? () {
-                setState(() {
-                  currentStep = this.currentStep + 1;
-                });
-                pageController.nextPage(
+                controller.nextPage(
                   duration: nextAnimationDuration,
                   curve: Curves.ease,
                 );
@@ -138,10 +137,7 @@ class SignupViewState extends State<SignupView> {
       case 1:
         return props.isUsernameValid && props.isUsernameAvailable
             ? () {
-                setState(() {
-                  currentStep = this.currentStep + 1;
-                });
-                pageController.nextPage(
+                controller.nextPage(
                   duration: nextAnimationDuration,
                   curve: Curves.ease,
                 );
@@ -151,16 +147,20 @@ class SignupViewState extends State<SignupView> {
         return !props.isPasswordValid
             ? null
             : () async {
-                final result = await props.onCreateUser();
-                if (!result && props.interactiveAuths.isNotEmpty) {
-                  setState(() {
-                    currentStep = this.currentStep + 1;
-                  });
-                  pageController.nextPage(
-                    duration: nextAnimationDuration,
-                    curve: Curves.ease,
-                  );
+                if (sections.length < 4) {
+                  final result = await props.onCreateUser();
+                  if (!result) {
+                    return await controller.nextPage(
+                      duration: nextAnimationDuration,
+                      curve: Curves.ease,
+                    );
+                  }
                 }
+
+                return await controller.nextPage(
+                  duration: nextAnimationDuration,
+                  curve: Curves.ease,
+                );
               };
       case 3:
         return !props.captcha
@@ -171,10 +171,7 @@ class SignupViewState extends State<SignupView> {
                   result = await props.onCreateUser();
                 }
                 if (!result) {
-                  setState(() {
-                    currentStep = this.currentStep + 1;
-                  });
-                  pageController.nextPage(
+                  controller.nextPage(
                     duration: nextAnimationDuration,
                     curve: Curves.ease,
                   );
@@ -215,7 +212,6 @@ class SignupViewState extends State<SignupView> {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-        distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
@@ -296,9 +292,14 @@ class SignupViewState extends State<SignupView> {
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),
                               child: FlatButton(
+                                key: Key(sections.length.toString() +
+                                    this.currentStep.toString()),
                                 disabledColor: Colors.grey,
                                 disabledTextColor: Colors.grey[300],
-                                onPressed: onCheckStepValidity(props),
+                                onPressed: onCheckStepValidity(
+                                  props,
+                                  this.pageController,
+                                ),
                                 color: Theme.of(context).primaryColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30.0),
@@ -429,8 +430,8 @@ class _Props extends Equatable {
         homeserver,
         isHomeserverValid,
         creating,
-        interactiveAuths,
         captcha,
-        agreement
+        agreement,
+        interactiveAuths,
       ];
 }

@@ -46,7 +46,7 @@ ThunkAction<AppState> fetchMessageEvents({
   Room room,
   String endHash,
   String startHash,
-  int limit = 20, // TODO: bump to 30
+  int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {

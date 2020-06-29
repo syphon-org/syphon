@@ -44,7 +44,7 @@ abstract class Auth {
       "identifier": {"type": "m.id.user", "user": username},
       'password': password,
       'device_id': deviceId,
-      "initial_device_display_name": "$username's $deviceName Client",
+      "initial_device_display_name": "$username's $deviceName",
     };
 
     final response = await http.post(
@@ -110,7 +110,7 @@ abstract class Auth {
     }
 
     if (deviceId != null) {
-      body['initial_device_display_name'] = "$username's $deviceName Client";
+      body['initial_device_display_name'] = "$username's $deviceName";
     }
 
     final response = await http.post(
