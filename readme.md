@@ -12,6 +12,7 @@ A privacy centric matrix client
 ![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
 ![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png)
 
+> iOS will be in review shortly, and desktop builds coming soon
 
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
