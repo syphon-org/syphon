@@ -2,9 +2,14 @@
 
 A privacy centric matrix client
 
+
+![license](https://img.shields.io/github/license/syphon-org/syphon)
+![release date](https://img.shields.io/github/release-date/syphon-org/syphon)
+ 
 ![Login Screenshot](assets/screenshots/01-android-tiny.png) 
-![Login Screenshot](assets/screenshots/03-android-tiny.png) 
-![Login Screenshot](assets/screenshots/05-android-tiny.png)
+![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
+![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png)
+
 
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
