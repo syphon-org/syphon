@@ -2,7 +2,9 @@
 
 A privacy centric matrix client
 
-
+![Login Screenshot](assets/screenshots/01-android-tiny.png) 
+![Login Screenshot](assets/screenshots/03-android-tiny.png) 
+![Login Screenshot](assets/screenshots/05-android-tiny.png)
 
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
