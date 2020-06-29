@@ -17,13 +17,11 @@ A privacy centric matrix client
 ## why
 We need to decentralize the web, but also provide a means of freedom within that system. 
 
-Matrix has the potential, and in several ways already is, a peer-to-peer chat protcol that will allow people to communicate but move or transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then
+Matrix has the potential, and in several ways already is, a peer-to-peer chat protocol that will allow people to communicate but move or transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then
 
 **branding and user experience** should be the number one priority outside the implicit one of privacy and security. 
 
 Syphon aims to be built on the foundations of privacy, branding, and user experience in an effort to pull others away from proprietary chat and messenger clients to  standard.
-
-You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people to contributing, the easier it will be to create and maintain tools to piviot others from products that can or do exploit the user.
 
 ## main long term goals
 - [ ] peer-to-peer messaging through a locally running server on the client
@@ -32,6 +30,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - [ ] cli client using ncurses and the same redux store contained here (common)
 
 ## getting started
+You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people to contributing, the easier it will be to create and maintain tools to pivot others from products that can or do exploit the user.
 
 ### state management
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
