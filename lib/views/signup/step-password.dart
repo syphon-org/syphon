@@ -32,6 +32,10 @@ class PasswordStepState extends State<PasswordStep> {
   @override
   void initState() {
     super.initState();
+    final store = StoreProvider.of<AppState>(context);
+
+    passwordController.text = store.state.authStore.password;
+    confirmController.text = store.state.authStore.passwordConfirm;
   }
 
   @override
