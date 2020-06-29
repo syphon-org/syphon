@@ -108,7 +108,7 @@ class ChatPreferences extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
@@ -169,7 +169,7 @@ class ChatPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => props.onToggleEnterSend(),
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Show Membership Events',
@@ -179,9 +179,8 @@ class ChatPreferences extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Switch(
-                              value: props.enterSend,
-                              onChanged: (enterSend) =>
-                                  props.onToggleEnterSend(),
+                              value: false,
+                              onChanged: (showMembershipEvents) {},
                             ),
                           ),
                           ListTile(
@@ -222,11 +221,8 @@ class ChatPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
-                              context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.primaryColor,
-                            ),
+                            onTap: () {},
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'View all uploaded Media',
@@ -259,11 +255,8 @@ class ChatPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
-                              context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.primaryColor,
-                            ),
+                            onTap: () {},
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'When using mobile data',
@@ -275,11 +268,8 @@ class ChatPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
-                              context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.primaryColor,
-                            ),
+                            onTap: () {},
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'When using Wi-Fi',
@@ -291,11 +281,8 @@ class ChatPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
-                              context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.primaryColor,
-                            ),
+                            onTap: () {},
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'When Roaming',
@@ -348,7 +335,7 @@ class Props {
     @required this.onToggleMembershipEvents,
   });
 
-  static Props mapStoreToProps(Store<AppState> store) => Props(
+  static Props mapStateToProps(Store<AppState> store) => Props(
         primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
         accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
         themeType: store.state.settingsStore.theme.toString(),

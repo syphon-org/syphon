@@ -73,12 +73,8 @@ class SignupViewState extends State<SignupView> {
 
     // Init change listener
     subscription = store.onChange.listen((state) {
-      print('[signup store onChange] ${state.authStore.creating}');
-
-      // TODO: if creating and it worked
       if (state.authStore.interactiveAuths.isNotEmpty &&
           this.sections.length < 4) {
-        print('Testing section increase');
         sections.add(CaptchaStep());
         sections.add(TermsStep());
         setState(() {
@@ -92,7 +88,6 @@ class SignupViewState extends State<SignupView> {
 
       if (state.authStore.user.accessToken != null) {
         final String currentRoute = ModalRoute.of(context).settings.name;
-        print('Subscription is working $currentRoute');
         if (currentRoute != '/home' && !naving) {
           setState(() {
             naving = true;
@@ -125,10 +120,6 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
-  /**
-   * TODO: convert to using interactive auth flows
-   * to know what step is what action
-   */
   @protected
   Function onCheckStepValidity(_Props props) {
     switch (this.currentStep) {
@@ -208,22 +199,24 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
-  Widget buildButtonText() {
+  Widget buildButtonText({BuildContext context}) {
     if (this.currentStep == sections.length - 1) {
-      return const Text(
+      return Text(
         Strings.buttonSignupFinish,
+        style: Theme.of(context).textTheme.button,
       );
     }
 
-    return const Text(
+    return Text(
       Strings.buttonSignupNext,
+      style: Theme.of(context).textTheme.button,
     );
   }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
           double height = MediaQuery.of(context).size.height;
@@ -295,7 +288,6 @@ class SignupViewState extends State<SignupView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              // EXAMPLE OF WIDGET PROPORTIONAL SCALING
                               width: width * 0.725,
                               margin: EdgeInsets.only(top: height * 0.01),
                               height: Dimensions.inputHeight,
@@ -312,7 +304,7 @@ class SignupViewState extends State<SignupView> {
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
                                 child: !props.creating
-                                    ? buildButtonText()
+                                    ? buildButtonText(context: context)
                                     : CircularProgressIndicator(
                                         strokeWidth:
                                             Dimensions.defaultStrokeWidthLite,
@@ -403,7 +395,7 @@ class _Props extends Equatable {
     @required this.onResetCredential,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         completed: store.state.authStore.completed,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,

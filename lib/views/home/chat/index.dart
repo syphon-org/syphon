@@ -37,13 +37,6 @@ import 'package:syphon/views/widgets/message.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/views/widgets/menu.dart';
 
-/**
- * Resources:
- * https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter
- * https://stackoverflow.com/questions/50400529/how-to-update-flutter-textfields-height-and-width
- * https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter
- * https://medium.com/nonstopio/make-the-list-auto-scrollable-when-you-add-the-new-message-in-chat-messages-functionality-in-19e457a838a7
- */
 enum ChatOptions {
   search,
   allMedia,
@@ -110,7 +103,7 @@ class ChatViewState extends State<ChatView> {
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
     final store = StoreProvider.of<AppState>(context);
-    final props = _Props.mapStoreToProps(store, arguements.roomId);
+    final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
 
     // TODO: remove after the cache is updated
@@ -237,24 +230,37 @@ class ChatViewState extends State<ChatView> {
     }
 
     if (newMediumType == MediumType.encryption) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        child: DialogEncryption(
-          onAccept: () {
-            props.onToggleEncryption();
+      // if the room has not enabled encryption
+      // confirm with the user first before
+      // attempting it
+      if (!props.room.encryptionEnabled) {
+        return showDialog(
+          context: context,
+          barrierDismissible: false,
+          child: DialogEncryption(
+            onAccept: () {
+              props.onToggleEncryption();
 
-            setState(() {
-              mediumType = newMediumType;
-            });
-          },
-        ),
-      );
-    } else {
-      // other mediums like sms, with no confirmation
+              setState(() {
+                mediumType = newMediumType;
+              });
+            },
+          ),
+        );
+      }
+
+      // Otherwise, only toggle the medium type
       setState(() {
         mediumType = newMediumType;
       });
+    } else {
+      // allow other mediums for messages
+      // unless they've encrypted the room
+      if (!props.room.encryptionEnabled) {
+        setState(() {
+          mediumType = newMediumType;
+        });
+      }
     }
   }
 
@@ -283,7 +289,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onShowMediumMenu(context, props) async {
+  onShowMediumMenu(context, _Props props) async {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -302,6 +308,7 @@ class ChatViewState extends State<ChatView> {
       ),
       items: [
         PopupMenuItem<String>(
+          enabled: !props.room.encryptionEnabled,
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -343,6 +350,7 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
         PopupMenuItem<String>(
+          enabled: props.room.direct,
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -707,7 +715,7 @@ class ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(
+        converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
@@ -866,7 +874,7 @@ class _Props extends Equatable {
     @required this.onCheatCode,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
       userId: store.state.authStore.user.userId,
       theme: store.state.settingsStore.theme,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,

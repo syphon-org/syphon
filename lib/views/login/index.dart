@@ -113,7 +113,7 @@ class LoginState extends State<Login> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (store) => _Props.mapStoreToProps(store),
+      converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
         key: loginScaffold,
         body: ScrollConfiguration(
@@ -405,7 +405,7 @@ class _Props extends Equatable {
     @required this.onLoginUser,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
       loading: store.state.authStore.loading,
       username: store.state.authStore.username,
       password: store.state.authStore.password,
@@ -419,7 +419,6 @@ class _Props extends Equatable {
         // If user enters full username, make sure to set homeserver
         if (text.contains(':')) {
           final alias = text.trim().split(':');
-          print('${alias[0]}(:)${alias[1]}');
           store.dispatch(setUsername(
             username: alias[0],
           ));

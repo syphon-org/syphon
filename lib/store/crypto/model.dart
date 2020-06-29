@@ -56,7 +56,6 @@ class DeviceKey extends Equatable {
         extras: json['unsigned'] != null ? Map.from(json['unsigned']) : null,
       );
     } catch (error) {
-      print('[DeviceKey.fromJson] error $error');
       return DeviceKey();
     }
   }

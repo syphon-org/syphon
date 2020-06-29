@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
@@ -35,7 +36,7 @@ class AppState extends Equatable {
   final bool loading;
   final AuthStore authStore;
   final AlertsStore alertsStore;
-  final MatrixStore matrixStore;
+  final SearchStore searchStore;
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
@@ -46,7 +47,7 @@ class AppState extends Equatable {
     this.loading = true,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
-    this.matrixStore = const MatrixStore(),
+    this.searchStore = const SearchStore(),
     this.mediaStore = const MediaStore(),
     this.settingsStore = const SettingsStore(),
     this.roomStore = const RoomStore(),
@@ -59,7 +60,7 @@ class AppState extends Equatable {
         loading,
         alertsStore,
         authStore,
-        matrixStore,
+        searchStore,
         roomStore,
         settingsStore,
         syncStore,
@@ -75,7 +76,7 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
-    matrixStore: matrixReducer(state.matrixStore, action),
+    searchStore: matrixReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
   );
@@ -100,10 +101,10 @@ Future<Store> initStore() async {
       switch (action.runtimeType) {
         case SetSyncing:
         case SetSynced:
-          print('[Redux Persist] cache skip');
+          debugPrint('[Redux Persist] cache skip');
           return false;
         default:
-          print('[Redux Persist] caching');
+          debugPrint('[Redux Persist] caching');
           return true;
       }
     },
@@ -114,9 +115,9 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    print('[Redux Persist] persist loaded successfully');
+    debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    print('[Redux Persist] error $error');
+    debugPrint('[Redux Persist] error $error');
   }
 
   final Store<AppState> store = Store<AppState>(
@@ -148,7 +149,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.syncStore,
       );
     } catch (error) {
-      print('[Hive Storage SyncStore] error - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -157,7 +158,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.cryptoStore,
       );
     } catch (error) {
-      print('[Hive Storage CryptoStore] error - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -166,7 +167,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.roomStore,
       );
     } catch (error) {
-      print('[Hive Storage RoomStore] error - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -175,7 +176,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.mediaStore,
       );
     } catch (error) {
-      print('[Hive Storage MediaStore] - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -184,7 +185,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.settingsStore,
       );
     } catch (error) {
-      print('[Hive Storage SettingsStore] error - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     // Disregard redux persist storage saving
@@ -210,7 +211,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: SyncStore(),
       );
     } catch (error) {
-      print('[AppState.fromJson - roomStoreConverted] error $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -219,7 +220,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: CryptoStore(),
       );
     } catch (error) {
-      print('[AppState.fromJson - CryptoStoreConverted] error $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -228,7 +229,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: RoomStore(),
       );
     } catch (error) {
-      print('[AppState.fromJson - roomStoreConverted] error $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -237,7 +238,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: MediaStore(),
       );
     } catch (error) {
-      print('[AppState.fromJson - MediaStore] error - $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     try {
@@ -246,7 +247,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: SettingsStore(),
       );
     } catch (error) {
-      print('[AppState.fromJson - SettingsStore] error $error');
+      debugPrint('[Hive Storage] $error');
     }
 
     return AppState(

@@ -20,7 +20,7 @@ class NotificationSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           // Static horizontal: 16, vertical: 8
           final double width = MediaQuery.of(context).size.width;
@@ -209,8 +209,7 @@ class Props extends Equatable {
         httpPusherEnabled,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static Props mapStoreToProps(
+  static Props mapStateToProps(
     Store<AppState> store,
   ) =>
       Props(
@@ -261,7 +260,7 @@ class Props extends Equatable {
             store.dispatch(saveNotificationPusher(erase: true));
             store.dispatch(toggleNotifications());
           } catch (error) {
-            print(error);
+            debugPrint('[onToggleRemoteNotifications] $error');
           }
         },
         onTogglePusher: () async {

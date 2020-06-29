@@ -108,9 +108,6 @@ abstract class Devices {
       streamedResponse,
     );
 
-    print('${response.statusCode}');
-    print('${json.decode(response.body)}');
-
     return await json.decode(response.body);
   }
 
@@ -149,16 +146,11 @@ abstract class Devices {
       };
     }
 
-    print('$body');
-
     final response = await http.post(
       url,
       headers: headers,
       body: json.encode(body),
     );
-
-    print('${response.statusCode}');
-    print('${json.decode(response.body)}');
 
     return await json.decode(response.body);
   }

@@ -220,8 +220,6 @@ abstract class Auth {
       };
     }
 
-    print('[MatrixApi.updatePassword] $body');
-
     final response = await http.post(
       url,
       headers: headers,

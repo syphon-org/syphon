@@ -21,4 +21,20 @@ class Values {
   static const channel_name_background_service = 'Background Sync';
   static const channel_description =
       '${appName} messaging client message and status notifications';
+
+  static const captchaUrl =
+      'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=';
+
+  static const captchaMatrixPublicKey =
+      '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
+
+  static const supportEmail =
+      'syphon.org@protonmail.com'; //'support@syphon.org';
+
+  static const openHelpUrl =
+      'mailto:$supportEmail?subject=Syphon%20App%20Help&body=Leave%20your%20feedback%20or%20question%20here';
+
+  static const openSourceLibraries = [
+    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
+  ];
 }

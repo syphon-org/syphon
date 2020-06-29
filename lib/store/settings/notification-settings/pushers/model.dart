@@ -48,7 +48,6 @@ class Pusher extends Equatable {
         appDisplayName: json['app_display_name'],
       );
     } catch (error) {
-      print('[Device.fromJson] error $error');
       return Pusher(
         key: json['pushkey'],
       );

@@ -1,9 +1,9 @@
 import 'package:syphon/store/index.dart';
 
 List<dynamic> homeservers(AppState state) {
-  return state.matrixStore.homeservers;
+  return state.searchStore.homeservers;
 }
 
 List<dynamic> searchResults(AppState state) {
-  return state.matrixStore.searchResults;
+  return state.searchStore.searchResults;
 }

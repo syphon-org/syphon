@@ -4,6 +4,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/events.dart';
 import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';
+import 'package:syphon/global/libs/matrix/search.dart';
 import 'package:syphon/global/libs/matrix/user.dart';
 
 abstract class MatrixApi {
@@ -15,6 +16,10 @@ abstract class MatrixApi {
   static final registerUser = Auth.registerUser;
   static final updatePassword = Auth.updatePassword;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
+
+  // Search
+  static final searchRooms = Search.searchRooms;
+  static final searchUsers = Search.searchUsers;
 
   // Rooms
   static final sync = Rooms.sync;

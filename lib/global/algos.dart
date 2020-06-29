@@ -17,3 +17,11 @@ void printJson(Map jsonMap) {
   String prettyEvent = encoder.convert(jsonMap);
   print(prettyEvent);
 }
+
+/**
+ * Clock functions in code
+ * 
+ * final stopwatch = Stopwatch()..start();
+ * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
+ * stopwatch.stop();
+ */

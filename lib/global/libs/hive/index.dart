@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
@@ -54,8 +55,6 @@ Future<void> initHive() async {
   // Init storage location
   final storageLocation = await initStorageLocation();
 
-  print('[initHive] $storageLocation');
-
   // Init configuration
   await initHiveConfiguration(storageLocation);
 }
@@ -74,16 +73,15 @@ Future<dynamic> initStorageLocation() async {
             ),
           );
     } else {
-      print('Caching is not supported on this platform');
+      debugPrint('Caching is not supported on this platform');
     }
   } catch (error) {
-    print('[initStorageLocation] $error');
+    debugPrint('[initStorageLocation] $error');
   }
   return storageLocation.path;
 }
 
 Future<void> initHiveConfiguration(String storageLocationPath) async {
-  print('[initHiveConfiguration] $storageLocationPath');
   // Init hive cache
   Hive.init(storageLocationPath);
 
@@ -116,21 +114,15 @@ Future<List<int>> unlockEncryptionKey() async {
   var encryptionKey = await storageEngine.read(
     key: Cache.encryptionKeyLocation,
   );
-  print(
-      '[unlockEncryptionKey] loaded ${encryptionKey.runtimeType} ${encryptionKey}');
-
   // Create a encryptionKey if a serialized one is not found
   if (encryptionKey == null) {
     encryptionKey = hex.encode(Hive.generateSecureKey());
 
-    print('[unlockEncryptionKey] save ${encryptionKey.runtimeType}');
     await storageEngine.write(
       key: Cache.encryptionKeyLocation,
       value: encryptionKey,
     );
   }
-
-  print('[unlockEncryptionKey] decode ${encryptionKey.runtimeType}');
 
   return hex.decode(encryptionKey);
 }
@@ -171,7 +163,7 @@ Future<Box> openHiveBackgroundUnsafe() async {
   try {
     storageLocation = await getApplicationDocumentsDirectory();
   } catch (error) {
-    print('[openHiveBackgroundUnsafe] Storage Failure $error');
+    debugPrint('[openHiveBackgroundUnsafe] Storage Failure $error');
   }
 
   // Init hive cache + adapters
@@ -194,7 +186,7 @@ Future<Box> openHiveState() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    print('[openHiveState] open failure: $error');
+    debugPrint('[openHiveState] open failure: $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -217,7 +209,7 @@ Future<LazyBox> openHiveSync() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    print('[openHiveState] failure $error');
+    debugPrint('[openHiveState] failure $error');
     return await Hive.openLazyBox(
       Cache.syncKeyUNSAFE,
     );

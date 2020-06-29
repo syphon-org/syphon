@@ -215,7 +215,7 @@ class DeviceViewState extends State<DevicesView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
@@ -384,8 +384,7 @@ class Props extends Equatable {
         devices,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static Props mapStoreToProps(
+  static Props mapStateToProps(
     Store<AppState> store,
   ) =>
       Props(

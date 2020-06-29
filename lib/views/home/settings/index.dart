@@ -24,7 +24,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
           final double height = MediaQuery.of(context).size.height;
@@ -189,24 +189,6 @@ class SettingsScreen extends StatelessWidget {
                                 style: TextStyle(fontSize: 18.0),
                               ),
                             ),
-                            // ListTile(
-                            //   onTap: props.authLoading
-                            //       ? null
-                            //       : () {
-                            //           Navigator.pushNamed(context, '/storage');
-                            //         },
-                            //   contentPadding: Dimensions.listPadding,
-                            //   leading: Container(
-                            //       padding: EdgeInsets.all(4),
-                            //       child: Icon(
-                            //         Icons.data_usage,
-                            //         size: 28,
-                            //       )),
-                            //   title: Text(
-                            //     'Storage',
-                            //     style: TextStyle(fontSize: 18.0),
-                            //   ),
-                            // ),
                             ListTile(
                               onTap: props.authLoading
                                   ? null
@@ -290,8 +272,7 @@ class _Props extends Equatable {
         notificationsEnabled,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static _Props mapStoreToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(

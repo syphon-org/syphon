@@ -38,8 +38,6 @@ abstract class Encryption {
       'token': lastSince,
     };
 
-    print(body);
-
     final response = await http.post(
       url,
       headers: headers,

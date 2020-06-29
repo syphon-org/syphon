@@ -20,7 +20,7 @@ class DialogKeyInspector extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         double width = MediaQuery.of(context).size.width;
 
@@ -86,8 +86,7 @@ class _Props extends Equatable {
         chatDeviceKeys,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static _Props mapStoreToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(

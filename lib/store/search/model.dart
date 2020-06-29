@@ -1,10 +1,6 @@
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:equatable/equatable.dart';
 
-// TODO: rename to searchStore
-@jsonSerializable
-class MatrixStore extends Equatable {
+class SearchStore extends Equatable {
   final bool loading;
   final String since;
   final int totalResults;
@@ -13,34 +9,15 @@ class MatrixStore extends Equatable {
   final List<dynamic> searchResults;
   final List<dynamic> homeservers;
 
-  const MatrixStore({
-    this.loading = false,
+  const SearchStore({
     this.since,
     this.totalResults = 0,
+    this.loading = false,
     this.homeservers = const [],
     this.searchResults = const [],
     this.searchText,
     this.hasMore,
   });
-
-  MatrixStore copyWith({
-    loading,
-    since,
-    totalResults,
-    homeservers,
-    searchResults,
-    searchText,
-    hasMore,
-  }) =>
-      MatrixStore(
-        since: since,
-        loading: loading ?? this.loading,
-        totalResults: totalResults ?? this.totalResults,
-        homeservers: homeservers ?? this.homeservers,
-        searchResults: searchResults ?? this.searchResults,
-        searchText: searchText ?? this.searchText,
-        hasMore: hasMore ?? this.hasMore,
-      );
 
   @override
   List<Object> get props => [
@@ -52,4 +29,23 @@ class MatrixStore extends Equatable {
         searchText,
         hasMore,
       ];
+
+  SearchStore copyWith({
+    loading,
+    since,
+    totalResults,
+    homeservers,
+    searchResults,
+    searchText,
+    hasMore,
+  }) =>
+      SearchStore(
+        since: since,
+        loading: loading ?? this.loading,
+        totalResults: totalResults ?? this.totalResults,
+        homeservers: homeservers ?? this.homeservers,
+        searchResults: searchResults ?? this.searchResults,
+        searchText: searchText ?? this.searchText,
+        hasMore: hasMore ?? this.hasMore,
+      );
 }

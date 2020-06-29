@@ -128,8 +128,6 @@ abstract class Notifications {
       body['profile_tag'] = profileTag;
     }
 
-    print('[MatrixApi.saveNotificationPusher] $body');
-
     // return {'errcode': 'ya done'};
 
     final response = await http.post(

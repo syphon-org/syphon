@@ -20,7 +20,7 @@ import 'package:path_provider/path_provider.dart';
  *  https://github.com/hivedb/hive/issues/122
  */
 FutureOr<void> saveSyncIsolate(dynamic params) async {
-  print('[saveSyncIsolate] ${Isolate.current.hashCode} ${params['location']}');
+  // print('[saveSyncIsolate] ${Isolate.current.hashCode} ${params['location']}');
 
   Hive.init(params['location']);
 
@@ -37,15 +37,13 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
   await syncBox.put(Cache.syncData, params['sync']);
   await syncBox.close();
 
-  print('[saveSyncIsolate] successful save');
+  // print('[saveSyncIsolate] successful save');
 }
 
 /** 
  *  Save Full Sync
  */
 FutureOr<dynamic> loadSyncIsolate(dynamic params) async {
-  print('[loadSyncIsolate] ${Isolate.current.hashCode}');
-
   Hive.init(params['location']);
 
   Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
@@ -53,7 +51,6 @@ FutureOr<dynamic> loadSyncIsolate(dynamic params) async {
   final syncData = await syncBox.get(Cache.syncData);
   await syncBox.close();
 
-  print('[loadSyncIsolate] successful load');
   return syncData;
 }
 
@@ -72,7 +69,7 @@ void notificationSyncIsolate() async {
     try {
       storageLocation = await getApplicationDocumentsDirectory();
     } catch (error) {
-      print('[initHiveStorage] storage location failure - $error');
+      // print('[initHiveStorage] storage location failure - $error');
     }
 
     // Init hive cache + adapters
@@ -98,10 +95,6 @@ void notificationSyncIsolate() async {
         Timer(Duration(seconds: i), () async {
           try {
             // Check isolate id and maybe see if a new one is created
-            print(
-              "[notificationSyncIsolate] sync started (${Isolate.current.hashCode}) ($i) timestamp=${DateTime.now()}",
-            );
-
             final String protocol = backgroundCache.get(
               Cache.protocol,
             );
@@ -119,9 +112,6 @@ void notificationSyncIsolate() async {
             );
 
             if (accessToken == null || lastSince == null) {
-              print(
-                '[notificationSyncIsolate] sync failed | ${accessToken == null ? 'accessToken' : 'lastSince'} must be present to sync',
-              );
               return;
             }
 
@@ -141,9 +131,6 @@ void notificationSyncIsolate() async {
             final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
             backgroundCache.put(Cache.lastSinceKey, newLastSince);
-            print(
-              "[notificationSyncIsolate] sync updated since $newLastSince",
-            );
 
             /**
               *TODO: Need to handle group / bigger room chats differently than direct chats
@@ -166,15 +153,13 @@ void notificationSyncIsolate() async {
                 );
               }
             });
-
-            print("[notificationSyncIsolate] sync completed");
           } catch (error) {
-            print('[notificationSyncIsolate] sync failed $error');
+            // print('[notificationSyncIsolate] sync failed $error');
           }
         });
       }
     }
   } catch (error) {
-    print('[notificationSyncIsolate] init failed $error');
+    // print('[notificationSyncIsolate] init failed $error');
   }
 }

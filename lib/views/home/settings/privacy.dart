@@ -19,7 +19,7 @@ class PrivacyPreferences extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
           double height = MediaQuery.of(context).size.height;
@@ -260,7 +260,7 @@ class Props extends Equatable {
         readReceipts,
       ];
 
-  static Props mapStoreToProps(Store<AppState> store) => Props(
+  static Props mapStateToProps(Store<AppState> store) => Props(
         typingIndicators: store.state.settingsStore.typingIndicators,
         readReceipts: store.state.settingsStore.readReceipts,
         onToggleTypingIndicators: () => store.dispatch(

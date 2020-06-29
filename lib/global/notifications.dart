@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -68,7 +69,7 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
      */
   }
 
-  print('[initNotifications] successfully initialized $pluginInstance');
+  debugPrint('[initNotifications] successfully initialized $pluginInstance');
   return pluginInstance;
 }
 

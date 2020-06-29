@@ -10,9 +10,13 @@ class Strings {
   static const titleViewSignup = 'Signup';
   static const titleViewDevices = 'Devices';
   static const titleViewSettings = 'Settings';
+  static const titleHomeserverSearch = 'Find Your Homeserver';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
+
+  // Placeholders
+  static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Content
   static const contentDeleteDevices =
@@ -94,4 +98,6 @@ class Strings {
   static const semanticsIntroFinal =
       'Two people different feeling confident and lookin\' good';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
+  static const semanticsLabelHomeEmpty =
+      'Tiny cute monsters hidding behind foliage';
 }

@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 /**
  * https://matrix.org/docs/spec/client_server/latest#id295
  * 10.5.3   GET /_matrix/client/r0/publicRooms
@@ -11,52 +16,59 @@
  *  'total_room_count_estimate': 17960
  * }
  */
-dynamic buildPublicRoomSearch({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String searchText,
-  String since,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  Map body = {
-    "limit": 20,
-    "filter": {
-      "generic_search_term": searchText,
-    },
-  };
+class Search {
+  static FutureOr<dynamic> searchUsers({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String searchText,
+    String since,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
+    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  if (since != null) {
-    body['since'] = since;
+    Map body = {
+      "limit": 10,
+      "search_term": searchText,
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return json.decode(response.body);
   }
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
-}
+  static FutureOr<dynamic> searchRooms({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String searchText,
+    String since,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
+    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-dynamic buildUserSearch({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String searchText,
-  String since,
-}) {
-  String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
-  Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map body = {
+      "limit": 20,
+      "filter": {
+        "generic_search_term": searchText,
+      },
+    };
 
-  Map body = {
-    "limit": 10,
-    "search_term": searchText,
-  };
+    if (since != null) {
+      body['since'] = since;
+    }
 
-  return {
-    'url': url,
-    'headers': headers,
-    'body': body,
-  };
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return json.decode(response.body);
+  }
 }

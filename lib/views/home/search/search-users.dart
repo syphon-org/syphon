@@ -76,7 +76,7 @@ class SearchUserState extends State<SearchUserView> {
       this.onToggleSearch(context: context);
     }
 
-    final searchResults = store.state.matrixStore.searchResults;
+    final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
     if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
@@ -467,7 +467,7 @@ class SearchUserState extends State<SearchUserView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
 
@@ -606,10 +606,10 @@ class _Props extends Equatable {
     @required this.onCreateRoom,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
-        loading: store.state.matrixStore.loading,
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
+        loading: store.state.searchStore.loading,
         theme: store.state.settingsStore.theme,
-        searchResults: store.state.matrixStore.searchResults,
+        searchResults: store.state.searchStore.searchResults,
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },

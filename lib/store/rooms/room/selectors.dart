@@ -1,5 +1,4 @@
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 

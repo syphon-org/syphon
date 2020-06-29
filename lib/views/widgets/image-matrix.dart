@@ -80,14 +80,14 @@ class MatrixImageState extends State<MatrixImage> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final loading =
               !props.mediaCache.containsKey(finalUriData ?? widget.mxcUri) ||
                   forceLoading;
 
           if (loading) {
-            print('[MatrixImage] cache miss ${widget.mxcUri}');
+            debugPrint('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               width: widget.width,
               height: widget.height,
@@ -99,9 +99,11 @@ class MatrixImageState extends State<MatrixImage> {
                 value: null,
               ),
             );
+          } else {
+            // uncomment to confirm cache hits - very noisy
+            // print('[MatrixImage] cache hit ${widget.mxcUri}');
           }
 
-          // print('[MatrixImage] cache hit ${widget.mxcUri}');
           return Image(
             width: widget.width,
             height: widget.height,
@@ -123,7 +125,7 @@ class _Props extends Equatable {
     @required this.mediaCache,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         fetching: false,
         mediaCache:
             store.state.mediaStore.mediaCache ?? Map<String, Uint8List>(),

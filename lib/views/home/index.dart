@@ -1,4 +1,5 @@
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
@@ -28,8 +29,9 @@ import 'package:syphon/views/widgets/menu.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-enum Options { newGroup, markAllRead, inviteFriends, settings, help }
+enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
 class Home extends StatefulWidget {
   const Home({Key key}) : super(key: key);
@@ -116,31 +118,33 @@ class HomeViewState extends State<Home> {
         ),
         Visibility(
           visible: true,
-          child: true
-              ? IconButton(
-                  icon: Icon(Icons.delete_outline),
-                  iconSize: Dimensions.buttonAppBarSize,
-                  tooltip: 'Leave Chat',
-                  color: Colors.white,
-                  onPressed: () async {
-                    await props.onLeaveChat(room: this.selectedRoom);
-                    this.setState(() {
-                      selectedRoom = null;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: Icon(Icons.do_not_disturb_alt),
-                  iconSize: Dimensions.buttonAppBarSize,
-                  tooltip: 'Delete Chat',
-                  color: Colors.white,
-                  onPressed: () async {
-                    await props.onDeleteChat(room: this.selectedRoom);
-                    this.setState(() {
-                      selectedRoom = null;
-                    });
-                  },
-                ),
+          child: IconButton(
+            icon: Icon(Icons.do_not_disturb_alt),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Leave Chat',
+            color: Colors.white,
+            onPressed: () async {
+              await props.onLeaveChat(room: this.selectedRoom);
+              this.setState(() {
+                selectedRoom = null;
+              });
+            },
+          ),
+        ),
+        Visibility(
+          visible: this.selectedRoom.direct,
+          child: IconButton(
+            icon: Icon(Icons.delete_outline),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Delete Chat',
+            color: Colors.white,
+            onPressed: () async {
+              await props.onDeleteChat(room: this.selectedRoom);
+              this.setState(() {
+                selectedRoom = null;
+              });
+            },
+          ),
         ),
         IconButton(
           icon: Icon(Icons.select_all),
@@ -236,11 +240,14 @@ class HomeViewState extends State<Home> {
           icon: Icon(Icons.more_vert, color: Colors.white),
           onSelected: (Options result) {
             switch (result) {
+              case Options.newGroup:
+                // TODO: allow users to create and edit groups
+                break;
               case Options.settings:
                 Navigator.pushNamed(context, '/settings');
                 break;
-              case Options.newGroup:
-                Navigator.pushNamed(context, '/home/groups/search');
+              case Options.help:
+                props.onSelectHelp();
                 break;
               default:
                 break;
@@ -249,14 +256,17 @@ class HomeViewState extends State<Home> {
           itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
             const PopupMenuItem<Options>(
               value: Options.newGroup,
+              enabled: false,
               child: Text('New Group'),
             ),
             const PopupMenuItem<Options>(
               value: Options.markAllRead,
+              enabled: false,
               child: Text('Mark All Read'),
             ),
             const PopupMenuItem<Options>(
               value: Options.inviteFriends,
+              enabled: false,
               child: Text('Invite Friends'),
             ),
             const PopupMenuItem<Options>(
@@ -288,14 +298,14 @@ class HomeViewState extends State<Home> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: 'Tiny cute monsters hidding behind foliage',
+              semanticsLabel: Strings.semanticsLabelHomeEmpty,
             ),
           ),
           Container(
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                'Seems there\'s no messages yet',
+                'there\'s no messages yet',
                 style: Theme.of(context).textTheme.headline6,
               ))
         ],
@@ -481,7 +491,7 @@ class HomeViewState extends State<Home> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           var currentAppBar = buildAppBar(
             props: props,
@@ -609,6 +619,7 @@ class _Props extends Equatable {
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onFetchSyncForced;
+  final Function onSelectHelp;
 
   _Props({
     @required this.rooms,
@@ -619,9 +630,10 @@ class _Props extends Equatable {
     @required this.onLeaveChat,
     @required this.onDeleteChat,
     @required this.onFetchSyncForced,
+    @required this.onSelectHelp,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         rooms: store.state.roomStore.rooms,
         loadingRooms: store.state.roomStore.loading,
         offline: store.state.syncStore.offline,
@@ -642,6 +654,15 @@ class _Props extends Equatable {
           return store.dispatch(
             deleteRoom(room: room),
           );
+        },
+        onSelectHelp: () async {
+          try {
+            if (await canLaunch(Values.openHelpUrl)) {
+              await launch(Values.openHelpUrl);
+            } else {
+              throw 'Could not launch ${Values.openHelpUrl}';
+            }
+          } catch (error) {}
         },
       );
 

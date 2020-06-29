@@ -61,14 +61,14 @@ class PasswordUpdateState extends State<PasswordView> {
   void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
 
-    // Init change listener
-    subscription = store.onChange.listen((state) {
-      print('[PasswordUpdate] ${state.authStore.passwordCurrent}');
+    // TODO: not sure what this was fore
+    // subscription = store.onChange.listen((state) {
+    //   print('[PasswordUpdate] ${state.authStore.passwordCurrent}');
 
-      // if (state.authStore.user.accessToken != null) {
-      //   print('access token ${accessToken}');
-      // }
-    });
+    //   if (state.authStore.user.accessToken != null) {
+    //   print('access token ${accessToken}');
+    //   }
+    // });
   }
 
   @override
@@ -97,7 +97,7 @@ class PasswordUpdateState extends State<PasswordView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
           double height = MediaQuery.of(context).size.height;
@@ -241,7 +241,7 @@ class _Props extends Equatable {
     @required this.onSavePassword,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         isPasswordValid: store.state.authStore.isPasswordValid &&
             store.state.authStore.passwordCurrent != null &&

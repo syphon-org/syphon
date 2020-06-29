@@ -23,7 +23,7 @@ class DialogConfirmPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
       distinct: true,
-      converter: (Store<AppState> store) => Props.mapStoreToProps(store),
+      converter: (Store<AppState> store) => Props.mapStateToProps(store),
       builder: (context, props) {
         double width = MediaQuery.of(context).size.width;
 
@@ -159,8 +159,7 @@ class Props extends Equatable {
         devices,
       ];
 
-  /* effectively mapStateToProps, but includes functions */
-  static Props mapStoreToProps(
+  static Props mapStateToProps(
     Store<AppState> store,
   ) =>
       Props(

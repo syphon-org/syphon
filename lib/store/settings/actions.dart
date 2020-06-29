@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -109,7 +110,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      print('[fetchRooms] error: $error');
+      debugPrint('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -134,7 +135,7 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
         throw data['error'];
       }
     } catch (error) {
-      print('[updateDevice] error: $error');
+      debugPrint('[updateDevice] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(fetchDevices());
@@ -169,15 +170,16 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
         throw data['error'];
       }
 
+      // If a flow exists, more authentication is needed before
+      // attempting to delete again
       if (data['flows'] != null) {
-        print('[deleteDevice] need interactive auths $data');
         return store.dispatch(setInteractiveAuths(auths: data));
       }
 
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      print('[deleteDevice] error: $error');
+      debugPrint('[deleteDevice] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -212,14 +214,13 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
       }
 
       if (data['flows'] != null) {
-        print('[deleteDevice] need interactive auths $data');
         return store.dispatch(setInteractiveAuths(auths: data));
       }
 
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      print('[deleteDevice(s)] error: $error');
+      debugPrint('[deleteDevice(s)] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));

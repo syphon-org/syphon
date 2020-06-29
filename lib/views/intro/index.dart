@@ -84,7 +84,7 @@ class IntroState extends State<Intro> {
               borderRadius: BorderRadius.circular(16),
             ),
             title: const Text(
-              "Confirm Alpha TOS Agreement",
+              "Confirm Open Alpha Terms Of Service",
               textAlign: TextAlign.center,
             ),
             titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
@@ -133,25 +133,6 @@ class IntroState extends State<Intro> {
           ),
         ),
       );
-      // showDialog(
-      //   barrierDismissible: false,
-      //   context: context,
-      //   builder: (context) => AlertDialog(
-      //     title: Text("Confirm Alpha TOS Agreement"),
-      //     content: Text(
-      //       Strings.confirmationAlphaVersion,
-      //     ),
-      //     actions: <Widget>[
-      //       FlatButton(
-      //         child: Text('I Agree'),
-      //         onPressed: () async {
-      //           store.dispatch(acceptAgreement());
-      //           Navigator.of(context).pop();
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // );
     }
   }
 
@@ -178,8 +159,8 @@ class IntroState extends State<Intro> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     final double widgetWidthScaling = width * 0.725;
+
     return Scaffold(
       body: StoreConnector<AppState, AppState>(
         converter: (Store<AppState> store) => store.state,

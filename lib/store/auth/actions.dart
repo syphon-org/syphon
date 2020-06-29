@@ -241,9 +241,7 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
       }
       return device;
     } catch (error) {
-      print(
-        '[loginUser] failed to parse unique secure device identifier $error',
-      );
+      debugPrint('[loginUser] $error');
       return device;
     }
   };
@@ -288,7 +286,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      print(error);
+      debugPrint('[loginUser] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -346,7 +344,7 @@ ThunkAction<AppState> fetchUserProfile() {
         ),
       ));
     } catch (error) {
-      print('[fetchUserProfile] $error');
+      debugPrint('[fetchUserProfile] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -372,7 +370,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
         availability: data['available'],
       ));
     } catch (error) {
-      print('[checkUsernameAvailability] $error');
+      debugPrint('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -392,10 +390,9 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
 
       if (auths['flows'] != null && auths['flows'].length > 0) {
         // Set completed if certain flows exist
-
         final List<dynamic> stages = auths['flows'][0]['stages'];
-        print('stages $stages');
 
+        // Find next stage that needs to be completed
         final currentStage = stages.firstWhere(
           (stage) => !completed.contains(stage),
         );
@@ -411,7 +408,7 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
       }
     } catch (error) {
       store.dispatch(SetSession(session: null));
-      print('[setInteractiveAuth] $error');
+      debugPrint('[setInteractiveAuth] $error');
     }
   };
 }
@@ -448,8 +445,6 @@ ThunkAction<AppState> createUser() {
         deviceName: device.displayName,
       );
 
-      print('[createUser] $data');
-
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -462,7 +457,6 @@ ThunkAction<AppState> createUser() {
         final completed = store.state.authStore.completed;
 
         final bool hasCompleted = flows.reduce((hasCompleted, flow) {
-          print('[creatUser] flow $flow');
           return hasCompleted ||
               (flow['stages'] as List<dynamic>).every(
                 (stage) => completed.contains(stage),
@@ -479,7 +473,7 @@ ThunkAction<AppState> createUser() {
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      print('[createUser] $error');
+      debugPrint('[createUser] $error');
       return false;
     } finally {
       store.dispatch(SetCreating(creating: false));
@@ -678,7 +672,7 @@ ThunkAction<AppState> updateCredential({
         ),
       ));
     } catch (error) {
-      print('[updateCredential] $error');
+      debugPrint('[updateCredential] $error');
     }
   };
 }

@@ -136,10 +136,7 @@ ThunkAction<AppState> syncRooms(
           decryptTimelineActions,
         );
 
-        decryptedTimelineEvents.forEach((element) {
-          print('[syncRooms] ${element}');
-        });
-
+        // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = decryptedTimelineEvents;
       }
 
@@ -178,13 +175,10 @@ ThunkAction<AppState> syncRooms(
 
 /**
  *  
- *  Fetch Rooms (w/o /sync)
+ * Fetch Rooms (w/o /sync)
  * 
  * Takes a negligible amount of time
- * 
- * final stopwatch = Stopwatch()..start();
- * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
- * stopwatch.stop();
+ *  
  */
 ThunkAction<AppState> fetchRooms() {
   return (Store<AppState> store) async {
@@ -236,7 +230,7 @@ ThunkAction<AppState> fetchRooms() {
             },
           }));
         } catch (error) {
-          print('[fetchRooms] ${room.id} $error');
+          debugPrint('[fetchRooms] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
@@ -244,8 +238,8 @@ ThunkAction<AppState> fetchRooms() {
 
       await Future.wait(fullJoinedRooms);
     } catch (error) {
-      // WARNING: Silent error, throws error if they have no direct messages
-      print('[fetchRooms] error: $error');
+      // WARNING: Silent error, throws error if they have no direct message
+      debugPrint('[fetchRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -263,10 +257,7 @@ ThunkAction<AppState> fetchRooms() {
  */
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
-    final stopwatch = Stopwatch()..start();
     try {
-      store.dispatch(SetLoading(loading: true));
-
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -333,25 +324,28 @@ ThunkAction<AppState> fetchDirectRooms() {
               },
             }));
           } catch (error) {
-            print('[fetchDirectRooms] INTERNAL $error');
+            debugPrint('[fetchDirectRooms] $error');
           }
         });
       });
     } catch (error) {
-      print('[fetchDirectRooms] $error');
+      debugPrint('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
-      print('[fetchDirectRooms] TIMESTAMP ${stopwatch.elapsed}');
-      stopwatch.stop();
     }
   };
 }
 
 /**
  * Create Room 
+ * 
+ * stop / start the /sync session for this to run,
+ * otherwise it will appear like the room does
+ * not exist for the seconds between the response from
+ * matrix and caching in the app
  */
 ThunkAction<AppState> createRoom({
-  String name = 'New Chat',
+  String name = 'Chat',
   String alias,
   String topic,
   String avatarUri,
@@ -380,8 +374,6 @@ ThunkAction<AppState> createRoom({
         throw data['error'];
       }
 
-      print('[createRoom] $data $newRoomId');
-
       if (isDirect) {
         final accountData = {
           '${invites[0].userId}': [newRoomId]
@@ -396,8 +388,6 @@ ThunkAction<AppState> createRoom({
           accountData: accountData,
         );
 
-        print('[DIRECT Save Account Data] $data');
-
         if (data['errcode'] != null) {
           throw data['error'];
         }
@@ -408,7 +398,7 @@ ThunkAction<AppState> createRoom({
 
       return newRoomId;
     } catch (error) {
-      print('[createRoom] error: $error');
+      debugPrint('[createRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -484,10 +474,8 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
       }
 
       store.dispatch(fetchDirectRooms());
-
-      print('[toggleDirectRoom] successfully toggled direct ${room.name}');
     } catch (error) {
-      print('[toggleDirectRoom] error: $error');
+      debugPrint('[toggleDirectRoom] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -522,14 +510,59 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
       }
 
       store.dispatch(fetchStateEvents(room: room));
-      print('[toggleRoomEncryption] success $data');
     } catch (error) {
+      debugPrint('[toggleRoomEncryption] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
-      print('[toggleRoomEncryption] failure $error');
     }
   };
 }
 
+/**
+ * Join Room (by id)
+ * 
+ * Not sure if this process is / will be any different
+ * than accepting an invite
+ */
+ThunkAction<AppState> joinRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await MatrixApi.joinRoom(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+
+      Room joinedRoom = rooms.containsKey(room.id)
+          ? rooms[room.id]
+          : Room(
+              id: room.id,
+            );
+
+      store.dispatch(SetRoom(
+        room: joinedRoom.copyWith(invite: false),
+      ));
+
+      await store.dispatch(fetchRooms());
+      await store.dispatch(fetchDirectRooms());
+    } catch (error) {
+      store.dispatch(addAlert(type: 'warning', message: error));
+    }
+  };
+}
+
+/**
+ * Accept Room (by id, from invite
+ * 
+ * Not sure if this process is / will be any different
+ * than joining a room
+ */
 ThunkAction<AppState> acceptRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
@@ -560,7 +593,6 @@ ThunkAction<AppState> acceptRoom({Room room}) {
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
       store.dispatch(addAlert(type: 'warning', message: error));
-      print(error);
     }
   };
 }
@@ -597,7 +629,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
         throw leaveData['error'];
       }
       if (!kReleaseMode) {
-        print('[removeRoom|leaveData] success $leaveData');
+        debugPrint('[removeRoom|leaveData] success $leaveData');
       }
 
       final forgetData = await MatrixApi.forgetRoom(
@@ -619,14 +651,9 @@ ThunkAction<AppState> removeRoom({Room room}) {
         await store.dispatch(toggleDirectRoom(room: room));
       }
 
-      if (!kReleaseMode) {
-        print('[removeRoom] forgetData $forgetData');
-      }
-
       await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-      print('[removeRoom] successfully removed ${room.name}');
     } catch (error) {
-      print('[removeRoom] error: $error');
+      debugPrint('[removeRoom] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -661,14 +688,9 @@ ThunkAction<AppState> deleteRoom({Room room}) {
         throw deleteData['error'];
       }
 
-      if (!kReleaseMode) {
-        print('[deleteRoom] $deleteData');
-        print('[deleteRoom] room was successfully deleted');
-      }
-
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
     } catch (error) {
-      print('[deleteRoom] error: $error');
+      debugPrint('[deleteRoom] $error');
     }
   };
 }
@@ -708,7 +730,6 @@ ThunkAction<AppState> deleteRoom({Room room}) {
 //       await store.dispatch(SetRoom(room: draftRoom));
 //       return draftRoom;
 //     } catch (error) {
-//       print('[createDraftRoom] error: $error');
 //       return null;
 //     }
 //   };
@@ -747,7 +768,6 @@ ThunkAction<AppState> deleteRoom({Room room}) {
 //         name: room.name,
 //       );
 //     } catch (error) {
-//       print('[createRoom] error: $error');
 //       return null;
 //     }
 //   };

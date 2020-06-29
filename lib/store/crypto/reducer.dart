@@ -89,11 +89,7 @@ CryptoStore cryptoReducer(
         deviceKeysExist: action.existence,
       );
     case ResetDeviceKeys:
-      return state.copyWith(
-        outboundMessageSessions: Map<String, Map<String, String>>(),
-        inboundMessageSessions: Map<String, Map<String, String>>(),
-      );
-
+      return CryptoStore();
     default:
       return state;
   }

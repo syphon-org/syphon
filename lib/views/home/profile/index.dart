@@ -109,7 +109,6 @@ class ProfileViewState extends State<ProfileView> {
                 this.setState(() {
                   newAvatarFile = image;
                 });
-                print('onChangeAvatar $newAvatarFile');
                 Navigator.pop(context);
               },
               leading: Container(
@@ -134,7 +133,6 @@ class ProfileViewState extends State<ProfileView> {
                 this.setState(() {
                   newAvatarFile = image;
                 });
-                print('onChangeAvatar $newAvatarFile');
                 Navigator.pop(context);
               },
               leading: Container(
@@ -178,7 +176,7 @@ class ProfileViewState extends State<ProfileView> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStoreToProps(store),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final double imageSize = width * 0.28;
         final currentAvatar = props.user.avatarUri;
@@ -450,7 +448,7 @@ class _Props extends Equatable {
     @required this.onSaveProfile,
   });
 
-  static _Props mapStoreToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
         loading: store.state.authStore.loading,
         onSaveProfile: ({

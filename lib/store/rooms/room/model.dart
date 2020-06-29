@@ -8,12 +8,17 @@ import 'package:hive/hive.dart';
 
 part 'model.g.dart';
 
+// Next Hive Field 27
 @HiveType(typeId: RoomHiveId)
 class Room {
   @HiveField(0)
   final String id;
   @HiveField(1)
   final String name;
+
+  @HiveField(28)
+  final int namePriority;
+
   @HiveField(2)
   final String alias;
   @HiveField(3)
@@ -55,11 +60,13 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: not caching state events for now
+  // TODO: removed until state timeline work can be done
   // @HiveField(19)
-  final List<Event> state;
+  // final List<Event> state;
+
   @HiveField(20)
   final List<Message> messages;
+
   @HiveField(21)
   final List<Message> outbox;
 
@@ -81,7 +88,7 @@ class Room {
 
   const Room({
     this.id,
-    this.name = 'New Chat',
+    this.name = 'Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,
@@ -91,11 +98,11 @@ class Room {
     this.sending = false,
     this.draft,
     this.users,
-    this.state = const [],
     this.outbox = const [],
     this.messages = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
+    this.namePriority = 4,
     this.totalJoinedUsers = 0,
     this.guestEnabled = false,
     this.encryptionEnabled = false,
@@ -108,6 +115,7 @@ class Room {
     this.prevHash,
     this.messageReads,
     this.invite = false,
+    // this.state = const [],
   });
 
   Room copyWith({
@@ -122,6 +130,7 @@ class Room {
     sending,
     lastRead,
     lastUpdate,
+    namePriority,
     totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
@@ -129,7 +138,6 @@ class Room {
     usersTyping,
     isDraftRoom,
     draft,
-    state,
     users,
     events,
     outbox,
@@ -139,6 +147,7 @@ class Room {
     startHash,
     prevHash,
     invite,
+    // state,
   }) {
     return Room(
       id: id ?? this.id,
@@ -152,13 +161,13 @@ class Room {
       syncing: syncing ?? this.syncing,
       lastRead: lastRead ?? this.lastRead,
       lastUpdate: lastUpdate ?? this.lastUpdate,
+      namePriority: namePriority ?? this.namePriority,
       totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
       guestEnabled: guestEnabled ?? this.guestEnabled,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       userTyping: userTyping ?? this.userTyping,
       usersTyping: usersTyping ?? this.usersTyping,
       isDraftRoom: isDraftRoom ?? this.isDraftRoom,
-      state: state ?? this.state,
       outbox: outbox ?? this.outbox,
       messages: messages ?? this.messages,
       users: users ?? this.users,
@@ -167,6 +176,7 @@ class Room {
       startHash: startHash ?? this.startHash,
       prevHash: prevHash, // TODO: may always need a prev hash?,z
       invite: invite ?? this.invite,
+      // state: state ?? this.state,
     );
   }
 
@@ -178,14 +188,13 @@ class Room {
         alias: json['canonical_alias'],
         homeserver: (json['room_id'] as String).split(':')[1],
         topic: json['topic'],
-        avatarUri: json['url'], // mxc uri
+        avatarUri: json['avatar_url'],
         totalJoinedUsers: json['num_joined_members'],
         guestEnabled: json['guest_can_join'],
         worldReadable: json['world_readable'],
         syncing: false,
       );
     } catch (error) {
-      print('[Room.fromJson] error $error');
       return Room();
     }
   }
@@ -230,16 +239,17 @@ class Room {
         rawTimelineEvents.map((event) => Event.fromJson(event)),
       );
 
-      messageEvents = List.from(timelineEvents
-          .where((event) =>
-              event.type == EventTypes.message ||
-              event.type == EventTypes.encrypted)
-          .map((event) => Message.fromEvent(event)));
+      // TODO: make this more functional, need to split into two lists on type
+      for (int i = 0; i < timelineEvents.length; i++) {
+        final event = timelineEvents[i];
 
-      stateEvents = List.from(stateEvents)
-        ..addAll(timelineEvents.where((event) =>
-            event.type != EventTypes.message &&
-            event.type != EventTypes.encrypted));
+        if (event.type == EventTypes.message ||
+            event.type == EventTypes.encrypted) {
+          messageEvents.add(Message.fromEvent(event));
+        } else {
+          stateEvents.add(event);
+        }
+      }
     }
 
     if (json['ephemeral'] != null) {
@@ -298,17 +308,18 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromEphemeralEvents] error $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       direct: isDirect ?? this.direct,
     );
   }
 
-  // Find details of room based on state events
-  // follows spec naming priority and thumbnail downloading
+  /**
+   * 
+   * Find details of room based on state events
+   * follows spec naming priority and thumbnail downloading
+   */
   Room fromStateEvents(
     List<Event> stateEvents, {
     User currentUser,
@@ -316,10 +327,10 @@ class Room {
     String name;
     String avatarUri;
     String topic;
-    bool direct = this.direct;
-    int namePriority = 4;
-    int lastUpdate = this.lastUpdate;
     bool encryptionEnabled;
+    bool direct = this.direct;
+    int lastUpdate = this.lastUpdate;
+    int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
     List<Event> cachedStateEvents = List<Event>();
     Map<String, User> users = this.users ?? Map<String, User>();
@@ -414,9 +425,7 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromStateEvents] error $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       name: name ?? this.name ?? 'New Room',
@@ -426,7 +435,7 @@ class Room {
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       direct: direct ?? this.direct,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
-      state: cachedStateEvents,
+      namePriority: namePriority,
     );
   }
 
@@ -494,7 +503,6 @@ class Room {
         prevHash: prevHash,
       );
     } catch (error) {
-      print('[fromMessageEvents] $error');
       return this;
     }
   }
@@ -552,9 +560,7 @@ class Room {
             break;
         }
       });
-    } catch (error) {
-      print('[fromEphemeralEvents] $error');
-    }
+    } catch (error) {}
 
     return this.copyWith(
       userTyping: userTyping,
