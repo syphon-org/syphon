@@ -5,6 +5,7 @@ A privacy centric matrix client
 
 ![license](https://img.shields.io/github/license/syphon-org/syphon)
 ![release date](https://img.shields.io/github/release-date/syphon-org/syphon)
+![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total)
 
 <a href='https://play.google.com/store/apps/details?id=org.tether.tether'><img  height="80px" style="max-width:100%;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' /></a>
  
