@@ -104,6 +104,7 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangePassword(text);
                       },
                       onSubmitted: (String value) {
+                        FocusScope.of(context).unfocus();
                         FocusScope.of(context).requestFocus(confirmFocusNode);
                       },
                       onEditingComplete: () {
