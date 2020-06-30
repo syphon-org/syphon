@@ -24,13 +24,13 @@ Syphon will always be a not for profit, community driven application.
 
 
 ## main long term goals
-- [ ] peer-to-peer messaging through a locally running server on the client
+- [ ] peer-to-peer messaging through a locally run server on the client
 - [ ] allow transfering data from one homeserver to another, or from local to remote servers
 - [ ] desktop clients meet parity with mobile
 - [ ] cli client using ncurses and the same redux store contained here (common)
 
 ## getting started
-You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people to contributing, the easier it will be to create and maintain tools to pivot others from products that can or do exploit the user.
+You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people contributing, the easier it will be to create and maintain tools to pivot others from products that exploit the user.
 
 ### state management
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
@@ -43,7 +43,7 @@ There are three layers to storage in Syphon:
 - Cold Storage (Hive)
 
 ### native notifications (android only)
-- utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a bound ground thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
+- utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
 - no third party notification provider will ever be used
 
 ### assets
@@ -59,8 +59,8 @@ There are three layers to storage in Syphon:
 
 
 ## contributing
-- email contact@syphon.org if you'd like to get involved. There's a lot to do.
-- donations are welcome, but won't play any roll in me continuing to work on this for as long as I'm able. Syphon will always be a non-profit, community driven application not owned or sold by a corporation.
+- email contact@syphon.org if you'd like to get involved. there's a lot to do.
+- donations are welcome, but won't play any role in me continuing to work on this for as long as I'm able. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 
 ## from those who made it possible
 lub youu
