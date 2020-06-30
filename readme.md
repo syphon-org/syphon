@@ -15,13 +15,13 @@ A privacy centric matrix client
 > iOS will be in review shortly, and desktop builds coming soon
 
 ## why
-We need to decentralize the web, but also provide a means of freedom within that system. 
-
-Matrix has the potential, and in several ways already is, a peer-to-peer chat protocol that will allow people to communicate but move or transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then
-
-**branding and user experience** should be the number one priority outside the implicit one of privacy and security. 
 
 Syphon aims to be built on the foundations of privacy, branding, and user experience in an effort to pull others away from proprietary chat and messenger clients to  standard.
+
+We need to decentralize the web, but also provide a means of freedom within that system. Matrix has the potential, and in several ways already is, a peer-to-peer chat protocol that will allow people to communicate and transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then **branding and user experience** should be the number one priority outside the implicit one of privacy and security. I hope that contributing and maintaining Syphon will help kick start this process and help those in need.
+
+Syphon will always be a non-profit, community driven application. Donations are welcome, but won't play any roll in me continuing to work on this for as long as I'm able.
+
 
 ## main long term goals
 - [ ] peer-to-peer messaging through a locally running server on the client
@@ -57,6 +57,10 @@ There are three layers to storage in Syphon:
 - [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
 - [changing transition styles](https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter)
 
+
+## contributing
+- email contact@syphon.org if you'd like to get involved. There's a lot to do.
+- donations are welcome, but won't play any roll in me continuing to work on this for as long as I'm able. Syphon will always be a non-profit, community driven application not owned or sold by a corporation.
 
 ## from those who made it possible
 lub youu
