@@ -20,7 +20,7 @@ Syphon aims to be built on the foundations of privacy, branding, and user experi
 
 We need to decentralize the web, but also provide a means of freedom within that system. Matrix has the potential, and in several ways already is, a peer-to-peer chat protocol that will allow people to communicate and transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then **branding and user experience** should be the number one priority outside the implicit one of privacy and security. I hope that contributing and maintaining Syphon will help kick start this process and help those in need.
 
-Syphon will always be a non-profit, community driven application, though donations are welcome 😃
+Syphon will always be a non-profit, community driven application.
 
 
 ## main long term goals
