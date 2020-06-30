@@ -21,7 +21,8 @@ class Theming extends StatelessWidget {
   onShowColorPicker({
     onSelectColor,
     context,
-    int originalColor,
+    int resetColor,
+    int currentColor,
   }) async {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -43,7 +44,7 @@ class Theming extends StatelessWidget {
               maxHeight: height * 0.25,
             ),
             child: MaterialColorPicker(
-              selectedColor: Colors.red,
+              selectedColor: Color(currentColor),
               onColorChange: (Color color) {
                 onSelectColor(color.value);
               },
@@ -58,7 +59,7 @@ class Theming extends StatelessWidget {
                   vertical: 8,
                 ),
                 onPressed: () {
-                  onSelectColor(null);
+                  onSelectColor(resetColor);
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -138,7 +139,8 @@ class Theming extends StatelessWidget {
                             onTap: () => onShowColorPicker(
                               context: context,
                               onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.primaryColor,
+                              currentColor: props.primaryColor,
+                              resetColor: SYPHON_CYAN,
                             ),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -154,7 +156,8 @@ class Theming extends StatelessWidget {
                             onTap: () => onShowColorPicker(
                               context: context,
                               onSelectColor: props.onSelectAccentColor,
-                              originalColor: props.accentColor,
+                              currentColor: props.accentColor,
+                              resetColor: SYPHON_CYAN,
                             ),
                             contentPadding: Dimensions.listPadding,
                             title: Text(

@@ -114,7 +114,12 @@ class HomeViewState extends State<Home> {
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Archive Room',
           color: Colors.white,
-          onPressed: () {},
+          onPressed: () async {
+            await props.onArchiveRoom(room: this.selectedRoom);
+            this.setState(() {
+              selectedRoom = null;
+            });
+          },
         ),
         Visibility(
           visible: true,
@@ -522,7 +527,7 @@ class HomeViewState extends State<Home> {
                           GestureDetector(
                             onTap: this.onDismissMessageOptions,
                             child: buildChatList(
-                              sortedPrioritizedRooms(props.rooms),
+                              props.rooms,
                               context,
                               props,
                             ),
@@ -610,16 +615,17 @@ class HomeViewState extends State<Home> {
 }
 
 class _Props extends Equatable {
-  final Map rooms;
-  final bool loadingRooms;
+  final List<Room> rooms;
   final bool offline;
   final User currentUser;
+  final bool loadingRooms;
   final Map<String, ChatSetting> chatSettings;
 
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onFetchSyncForced;
   final Function onSelectHelp;
+  final Function onArchiveRoom;
 
   _Props({
     @required this.rooms,
@@ -631,14 +637,21 @@ class _Props extends Equatable {
     @required this.onDeleteChat,
     @required this.onFetchSyncForced,
     @required this.onSelectHelp,
+    @required this.onArchiveRoom,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        rooms: store.state.roomStore.rooms,
+        rooms: availableRooms(
+          sortedPrioritizedRooms(store.state.roomStore.rooms),
+          hidden: store.state.roomStore.roomsHidden,
+        ),
         loadingRooms: store.state.roomStore.loading,
         offline: store.state.syncStore.offline,
         currentUser: store.state.authStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        onArchiveRoom: ({Room room}) async {
+          store.dispatch(archiveRoom(room: room));
+        },
         onFetchSyncForced: () async {
           await store.dispatch(
             fetchSync(since: store.state.syncStore.lastSince),

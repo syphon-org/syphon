@@ -114,8 +114,8 @@ class SettingsStore extends Equatable {
     String pusherToken, // NOTE: device token for APNS
   }) {
     return SettingsStore(
-      primaryColor: primaryColor,
-      accentColor: accentColor,
+      primaryColor: primaryColor ?? this.primaryColor,
+      accentColor: accentColor ?? this.accentColor,
       brightness: brightness ?? this.brightness,
       theme: theme ?? this.theme,
       language: language ?? this.language,

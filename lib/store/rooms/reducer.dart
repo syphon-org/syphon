@@ -64,6 +64,10 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       rooms[message.roomId] = room.copyWith(outbox: outbox);
       return state.copyWith(rooms: rooms);
 
+    case AddArchive:
+      final List<String> roomsHiddenNew = List.from(state.roomsHidden ?? []);
+      roomsHiddenNew.add(action.roomId);
+      return state.copyWith(roomsHidden: roomsHiddenNew);
     case ResetRooms:
       return RoomStore();
     default:

@@ -26,6 +26,8 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Uploading a profile photo for the user</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -45,6 +47,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
 </dict>

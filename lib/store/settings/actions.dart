@@ -155,11 +155,11 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
       final currentCredential =
           store.state.authStore.credential ?? Credential();
 
-      final data = await MatrixApi.deleteDevice(
+      final data = await MatrixApi.deleteDevices(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        deviceId: deviceId,
+        deviceIds: [deviceId],
         session: store.state.authStore.session,
         userId: store.state.authStore.user.userId,
         authType: MatrixAuthTypes.PASSWORD,

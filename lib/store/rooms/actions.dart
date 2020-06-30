@@ -88,6 +88,14 @@ class DeleteOutboxMessage {
   });
 }
 
+class AddArchive {
+  final String roomId;
+
+  AddArchive({
+    this.roomId,
+  });
+}
+
 /**
  * Sync State Data
  * 
@@ -473,7 +481,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
         throw saveData['error'];
       }
 
-      store.dispatch(fetchDirectRooms());
+      await store.dispatch(fetchDirectRooms());
     } catch (error) {
       debugPrint('[toggleDirectRoom] error: $error');
     } finally {
@@ -628,9 +636,6 @@ ThunkAction<AppState> removeRoom({Room room}) {
         }
         throw leaveData['error'];
       }
-      if (!kReleaseMode) {
-        debugPrint('[removeRoom|leaveData] success $leaveData');
-      }
 
       final forgetData = await MatrixApi.forgetRoom(
         protocol: protocol,
@@ -652,8 +657,9 @@ ThunkAction<AppState> removeRoom({Room room}) {
       }
 
       await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      store.dispatch(SetLoading(loading: false));
     } catch (error) {
-      debugPrint('[removeRoom] error: $error');
+      debugPrint('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -689,6 +695,21 @@ ThunkAction<AppState> deleteRoom({Room room}) {
       }
 
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
+    } catch (error) {
+      debugPrint('[deleteRoom] $error');
+    }
+  };
+}
+
+/**
+ * 
+ * This is not real but done just so I can take screenshots
+ * in iOS
+ */
+ThunkAction<AppState> archiveRoom({Room room}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(AddArchive(roomId: room.id));
     } catch (error) {
       debugPrint('[deleteRoom] $error');
     }
