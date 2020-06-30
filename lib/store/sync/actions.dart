@@ -228,7 +228,12 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         debugPrint('[fetchSync] full sync completed');
       }
     } catch (error) {
-      final message = (error.message as String);
+      String message = '';
+
+      try {
+        // try to understand the error message
+        message = (error.message as String);
+      } catch (error) {}
 
       if (message.contains('SocketException')) {
         debugPrint('[fetchSync] IOException $error');

@@ -2,6 +2,10 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+List<Room> availableRooms(List<Room> rooms, {List<String> hidden = const []}) {
+  return List.from(rooms.where((room) => !hidden.contains(room.id)));
+}
+
 String formatPreviewTopic(String fullTopic, {String defaultTopic}) {
   final topic = fullTopic ?? defaultTopic ?? 'No Topic Available';
   return topic.length > 100

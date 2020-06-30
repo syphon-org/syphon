@@ -26,47 +26,54 @@ class RoomStore extends Equatable {
   @HiveField(5)
   final Map<String, Room> rooms;
 
+  // TODO: actually archive
+  final List<String> roomsHidden;
+
   final Timer roomObserver;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
   List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
 
   const RoomStore({
+    this.rooms = const {},
     this.synced = false,
     this.syncing = false,
     this.loading = false,
     this.lastUpdate = 0,
     this.lastSince,
     this.roomObserver,
-    this.rooms = const {},
+    this.roomsHidden = const [],
   });
 
   @override
   List<Object> get props => [
+        rooms,
         synced,
         lastUpdate,
         lastSince,
         roomObserver,
-        rooms,
+        roomsHidden,
       ];
 
   RoomStore copyWith({
+    rooms,
     synced,
     loading,
     syncing,
     lastUpdate,
-    roomObserver,
     lastSince,
-    rooms,
+    roomObserver,
+    roomsHidden,
   }) {
     return RoomStore(
+      rooms: rooms ?? this.rooms,
       synced: synced ?? this.synced,
       loading: loading ?? this.loading,
       syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       lastSince: lastSince ?? this.lastSince,
       roomObserver: roomObserver ?? this.roomObserver,
-      rooms: rooms ?? this.rooms,
+      roomsHidden: roomsHidden ?? this.roomsHidden,
     );
   }
 }

@@ -96,6 +96,7 @@ ThunkAction<AppState> decryptMessageEvent({
 
       // Return the content to be sent or processed
       event['content'] = json.decode(bodyScrubbed)['content'];
+      return event;
     } catch (error) {
       debugPrint('[decryptMessageEvent] $error');
       return event;
