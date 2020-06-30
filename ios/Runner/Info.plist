@@ -26,7 +26,7 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
+	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Uploading a profile photo for the user</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
