@@ -7,12 +7,12 @@ A privacy centric matrix client
 <!-- ![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total) -->
 
 <a href='https://play.google.com/store/apps/details?id=org.tether.tether'><img  height="80px" style="max-width:100%;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' /></a>
+> iOS will be in review shortly, and desktop builds coming soon
  
 ![Login Screenshot](assets/screenshots/01-android-tiny.png) 
 ![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
 ![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png)
 
-> iOS will be in review shortly, and desktop builds coming soon
 
 ## why
 
