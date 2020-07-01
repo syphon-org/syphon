@@ -1,6 +1,6 @@
 # syphon
 
-A privacy centric matrix client
+A privacy centric matrix client - now in open alpha*
  
 ![license](https://img.shields.io/github/license/syphon-org/syphon?)
 ![release date](https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases)
