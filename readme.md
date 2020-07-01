@@ -2,16 +2,24 @@
 
 A privacy centric matrix client - now in open alpha*
  
-![license](https://img.shields.io/github/license/syphon-org/syphon?)
-![release date](https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases)
-<!-- ![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total) -->
-
-<a href='https://play.google.com/store/apps/details?id=org.tether.tether'><img  height="80px" style="max-width:100%;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' /></a>
-> iOS will be in review shortly, and desktop builds coming soon
+![license](https://img.shields.io/github/license/syphon-org/syphon?color)
+![release date](https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color)
+![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total)
  
-![Login Screenshot](assets/screenshots/01-android-tiny.png) 
-![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
-![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png)
+ <div style="justify-start:center;display:flex;align-items:center;"> 
+ </div>
+<a href='https://play.google.com/store/apps/details?id=org.tether.tether'>
+    <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
+</a>
+<a href='https://apps.apple.com/us/app/syphon/id1496285352'>
+    <img height="56"  alt='Download on the App Store'src='assets/external/download_on_the_app_store.svg' />
+</a>
+
+> Google Play and App Store are US/Canada only, F-Droid build coming soon will be available everywhere
+
+![Login screenshot](assets/screenshots/01-android-tiny.png) 
+![End To End Chat screenshot](assets/screenshots/03-android-tiny.png) 
+![Expanded Home screenshot](assets/screenshots/05-android-tiny.png) 
 
 
 ## why
