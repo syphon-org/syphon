@@ -15,7 +15,7 @@ A privacy centric matrix client
     <img height="56"  alt='Download on the App Store'src='assets/external/download_on_the_app_store.svg' />
 </a>
 
-> google play and app store are US/Canada only, f-droid build coming soon will be available everywhere
+> Google Play and App Store are US/Canada only, F-Droid build coming soon will be available everywhere
 
 ## why
 
