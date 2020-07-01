@@ -17,9 +17,9 @@ A privacy centric matrix client - now in open alpha*
 
 > Google Play and App Store are US/Canada only, F-Droid build coming soon will be available everywhere
 
-![Login Screenshot](assets/screenshots/01-android-tiny.png) 
-![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
-![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png) 
+![Login screenshot](assets/screenshots/01-android-tiny.png) 
+![End To End Chat screenshot](assets/screenshots/03-android-tiny.png) 
+![Expanded Home screenshot](assets/screenshots/05-android-tiny.png) 
 
 
 ## why
