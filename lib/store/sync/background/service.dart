@@ -25,6 +25,7 @@ class BackgroundSync {
     String homeserver,
     String accessToken,
     String lastSince,
+    String currentUser,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) {
@@ -37,6 +38,7 @@ class BackgroundSync {
     await backgroundServiceHive.put(Cache.homeserver, homeserver);
     await backgroundServiceHive.put(Cache.accessTokenKey, accessToken);
     await backgroundServiceHive.put(Cache.lastSinceKey, lastSince);
+    await backgroundServiceHive.put(Cache.currentUser, currentUser);
 
     await AndroidAlarmManager.periodic(
       service_duration,

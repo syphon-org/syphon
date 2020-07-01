@@ -117,18 +117,6 @@ class SearchUserState extends State<SearchUserView> {
     }
   }
 
-  /**
-   *  
-   * // TODO: Room Drafts
-     Navigator.popAndPushNamed(
-        context,
-        '/home/chat',
-        arguments: ChatViewArguements(
-          roomId: newRoom.id,
-          title: newRoom.name,
-        ),
-      );
-   */
   @protected
   void onSelectUser({BuildContext context, _Props props, User user}) async {
     double width = MediaQuery.of(context).size.width;
@@ -247,21 +235,24 @@ class SearchUserState extends State<SearchUserView> {
                     horizontal: 24,
                     vertical: 12,
                   ),
-                  onPressed: () async {
-                    this.setState(() {
-                      creatingRoomDisplayName = user.displayName;
-                    });
-                    final newRoomId = await props.onCreateRoom(user: user);
-                    Navigator.pop(context);
-                    Navigator.popAndPushNamed(
-                      context,
-                      '/home/chat',
-                      arguments: ChatViewArguements(
-                        roomId: newRoomId,
-                        title: creatingRoomDisplayName,
-                      ),
-                    );
-                  },
+                  onPressed: creatingRoomDisplayName != null
+                      ? null
+                      : () async {
+                          this.setState(() {
+                            creatingRoomDisplayName = user.displayName;
+                          });
+                          final newRoomId =
+                              await props.onCreateRoom(user: user);
+                          Navigator.pop(context);
+                          Navigator.popAndPushNamed(
+                            context,
+                            '/home/chat',
+                            arguments: ChatViewArguements(
+                              roomId: newRoomId,
+                              title: creatingRoomDisplayName,
+                            ),
+                          );
+                        },
                   child: Text(
                     Strings.buttonLetsChat,
                     style: Theme.of(context).textTheme.subtitle1,
@@ -305,12 +296,23 @@ class SearchUserState extends State<SearchUserView> {
         Theme.of(context).brightness == Brightness.dark
             ? const Color(BASICALLY_BLACK)
             : const Color(BACKGROUND);
+
+    final searchText = searchable ?? '';
+
     final attemptableUser = User(
-      displayName: searchable ?? '',
+      displayName: searchText,
       userId: searchable != null && searchable.contains(":")
           ? searchable
-          : formatUserId(searchable ?? ''),
+          : formatUserId(searchText),
     );
+
+    final foundResult = props.searchResults.indexWhere(
+      (result) => result.userId.contains(searchText),
+    );
+
+    final showManualUser =
+        searchable != null && searchable.length > 0 && foundResult < 0;
+
     return Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 2,
@@ -319,7 +321,7 @@ class SearchUserState extends State<SearchUserView> {
         child: ListView(
           children: [
             Visibility(
-              visible: searchable != null && searchable.length > 0,
+              visible: showManualUser,
               child: GestureDetector(
                 onTap: () => this.onAttemptChat(
                   props: props,
@@ -508,7 +510,7 @@ class SearchUserState extends State<SearchUserView> {
                           this.setState(() {
                             searchable = text;
                             searchTimeout =
-                                new Timer(Duration(milliseconds: 400), () {
+                                Timer(Duration(milliseconds: 400), () {
                               props.onSearch(text);
                             });
                           });
@@ -609,7 +611,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.searchStore.loading,
         theme: store.state.settingsStore.theme,
-        searchResults: store.state.searchStore.searchResults,
+        searchResults: store.state.searchStore.searchResults ?? [],
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },

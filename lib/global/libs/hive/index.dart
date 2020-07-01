@@ -44,6 +44,7 @@ class Cache {
   static const homeserver = 'homeserver';
   static const accessTokenKey = 'accessToken';
   static const lastSinceKey = 'lastSince';
+  static const currentUser = 'currentUser';
 }
 
 /**

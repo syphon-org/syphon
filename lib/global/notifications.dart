@@ -132,10 +132,13 @@ Future showBackgroundServiceNotification({
     iOSPlatformChannelSpecifics,
   );
 
+  var backgroundNotificationContent =
+      '${Strings.contentNotificationBackgroundService}';
+
   await pluginInstance.show(
     notificationId,
     Values.default_channel_title,
-    '${Strings.contentNotificationBackgroundService} $debugContent',
+    backgroundNotificationContent,
     platformChannelSpecifics,
   );
 }

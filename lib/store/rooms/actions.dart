@@ -697,14 +697,15 @@ ThunkAction<AppState> deleteRoom({Room room}) {
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
     } catch (error) {
       debugPrint('[deleteRoom] $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
     }
   };
 }
 
 /**
  * 
- * This is not real but done just so I can take screenshots
- * in iOS
+ * Client side temporary hiding only
  */
 ThunkAction<AppState> archiveRoom({Room room}) {
   return (Store<AppState> store) async {

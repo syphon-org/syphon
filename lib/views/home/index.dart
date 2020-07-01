@@ -72,7 +72,7 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildRoomOptionsBar({BuildContext context, _Props props}) {
+  Widget buildAppBarRoomOptions({BuildContext context, _Props props}) {
     return AppBar(
       brightness: Brightness.dark, // TOOD: this should inherit from theme
       backgroundColor: Colors.grey[500],
@@ -504,7 +504,7 @@ class HomeViewState extends State<Home> {
           );
 
           if (this.selectedRoom != null) {
-            currentAppBar = buildRoomOptionsBar(
+            currentAppBar = buildAppBarRoomOptions(
               props: props,
               context: context,
             );

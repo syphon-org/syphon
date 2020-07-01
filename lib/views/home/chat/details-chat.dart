@@ -1,4 +1,5 @@
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -677,6 +678,7 @@ class _Props extends Equatable {
   final Color roomPrimaryColor;
   final List<Message> messages;
 
+  final Function onLeaveChat;
   final Function onSelectPrimaryColor;
   final Function onViewEncryptionKeys;
 
@@ -684,6 +686,7 @@ class _Props extends Equatable {
     @required this.room,
     @required this.userId,
     @required this.messages,
+    @required this.onLeaveChat,
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
     @required this.onViewEncryptionKeys,
@@ -700,6 +703,9 @@ class _Props extends Equatable {
         messages: latestMessages(
           roomSelectors.room(id: roomId, state: store.state).messages,
         ),
+        onLeaveChat: () async {
+          await store.dispatch(removeRoom(room: Room(id: roomId)));
+        },
         roomPrimaryColor: () {
           final customChatSettings =
               store.state.settingsStore.customChatSettings ??
