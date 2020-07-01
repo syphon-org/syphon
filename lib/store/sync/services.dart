@@ -130,6 +130,7 @@ void notificationSyncIsolate() async {
               homeserver: homeserver,
               accessToken: accessToken,
               since: lastSince,
+              timeout: sync_interval * 1000,
             );
 
             final newLastSince = data['next_batch'];
