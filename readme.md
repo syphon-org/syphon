@@ -44,7 +44,7 @@ There are three layers to storage in Syphon:
 
 ### native notifications (android only)
 - utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
-- no third party notification provider will ever be used
+- no third party notification provider will ever be used outside Apples APNS for iOS only
 
 ### assets
 - [paid icon](https://thenounproject.com/search/?q=polygon&i=2596282)
