@@ -1,18 +1,26 @@
 # syphon
 
-A privacy centric matrix client
+A privacy centric matrix client - now in open alpha*
  
-![license](https://img.shields.io/github/license/syphon-org/syphon?)
-![release date](https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases)
-<!-- ![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total) -->
-
-<a href='https://play.google.com/store/apps/details?id=org.tether.tether'><img  height="80px" style="max-width:100%;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' /></a>
+![license](https://img.shields.io/github/license/syphon-org/syphon?color)
+![release date](https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color)
+![alpha downloads](https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.13-alpha/total)
  
-![Login Screenshot](assets/screenshots/01-android-tiny.png) 
-![End To End Chat Screenshot](assets/screenshots/03-android-tiny.png) 
-![Expanded Home Screenshot](assets/screenshots/05-android-tiny.png)
+ <div style="justify-start:center;display:flex;align-items:center;"> 
+ </div>
+<a href='https://play.google.com/store/apps/details?id=org.tether.tether'>
+    <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
+</a>
+<a href='https://apps.apple.com/us/app/syphon/id1496285352'>
+    <img height="56"  alt='Download on the App Store'src='assets/external/download_on_the_app_store.svg' />
+</a>
 
-> iOS will be in review shortly, and desktop builds coming soon
+> Google Play and App Store are US/Canada only, F-Droid build coming soon will be available everywhere
+
+![Login screenshot](assets/screenshots/01-android-tiny.png) 
+![End To End Chat screenshot](assets/screenshots/03-android-tiny.png) 
+![Expanded Home screenshot](assets/screenshots/05-android-tiny.png) 
+
 
 ## why
 
@@ -20,17 +28,17 @@ Syphon aims to be built on the foundations of privacy, branding, and user experi
 
 We need to decentralize the web, but also provide a means of freedom within that system. Matrix has the potential, and in several ways already is, a peer-to-peer chat protocol that will allow people to communicate and transfer their data at will. Most popular proprietary chat clients do not adhere to a publically available protocol. If the goal for this protocol is adoption to instant messaging communication the way of email, and a network effect is required for this paradigm shift, then **branding and user experience** should be the number one priority outside the implicit one of privacy and security. I hope that contributing and maintaining Syphon will help kick start this process and help those in need.
 
-Syphon will always be a non-profit, community driven application.
+Syphon will always be a not for profit, community driven application.
 
 
 ## main long term goals
-- [ ] peer-to-peer messaging through a locally running server on the client
+- [ ] peer-to-peer messaging through a locally run server on the client
 - [ ] allow transfering data from one homeserver to another, or from local to remote servers
 - [ ] desktop clients meet parity with mobile
 - [ ] cli client using ncurses and the same redux store contained here (common)
 
 ## getting started
-You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people to contributing, the easier it will be to create and maintain tools to pivot others from products that can or do exploit the user.
+You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster we can get people contributing, the easier it will be to create and maintain tools to pivot others from products that exploit the user.
 
 ### state management
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
@@ -43,8 +51,8 @@ There are three layers to storage in Syphon:
 - Cold Storage (Hive)
 
 ### native notifications (android only)
-- utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a bound ground thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
-- no third party notification provider will ever be used
+- utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
+- no third party notification provider will ever be used outside Apples APNS for iOS only
 
 ### assets
 - [paid icon](https://thenounproject.com/search/?q=polygon&i=2596282)
@@ -59,8 +67,8 @@ There are three layers to storage in Syphon:
 
 
 ## contributing
-- email contact@syphon.org if you'd like to get involved. There's a lot to do.
-- donations are welcome, but won't play any roll in me continuing to work on this for as long as I'm able. Syphon will always be a non-profit, community driven application not owned or sold by a corporation.
+- email contact@syphon.org if you'd like to get involved. there's a lot to do.
+- donations are welcome, but won't play any role in me continuing to work on this for as long as I'm able. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 
 ## from those who made it possible
 lub youu
