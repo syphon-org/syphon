@@ -1,0 +1,6 @@
+Please be aware this app is Open Alpha and is still very experimental
+
+Syphon aims to be built on the foundations of privacy, branding, and user experience 
+in an effort to pull others away from proprietary chat clients to the matrix protocol.
+
+Syphon will always be a not for profit, community driven application.
