@@ -47,7 +47,8 @@ Syphon will always be a not for profit, community driven application.
 
 ## features
 - no analytics. period.
-- no proprietary third party services, even for notifications
+- no proprietary third party services
+    - iOS will have APNS support, but will be made clear to the user
 - all data is AES-256 encrypted at rest
 - E2EE for direct chats using [Olm/Megolm](https://gitlab.matrix.org/matrix-org/olm)
     - group chats will be supported in the coming weeks
