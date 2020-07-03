@@ -23,8 +23,8 @@ a privacy centric matrix client - now in open alpha*
 <p align='center'>
 <img src="https://img.shields.io/github/license/syphon-org/syphon?color=teal"/>
 <img src="https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color=teal"/>
-<img src="https://img.shields.io/github/downloads/syphon-org/syphon/v0.0.14-alpha/total?color=teal"/> 
-<img src="https://img.shields.io/github/commits-since/syphon-org/syphon/v0.0.14-alpha?color=teal"/>
+<img src="https://img.shields.io/github/downloads/syphon-org/syphon/total?color=teal"/> 
+<img src="https://img.shields.io/github/commits-since/syphon-org/syphon/v0.0.16-alpha?color=teal"/>
 </p>
 
 <p align='center'> 
@@ -41,7 +41,7 @@ a privacy centric matrix client - now in open alpha*
 
 We need to decentralize the web, but also provide a means of freedom within that system. Matrix has the potential to be a standardized peer-to-peer chat protocol, [and in a way already is,](https://matrix.org/blog/2020/06/02/introducing-p-2-p-matrix) that will allow people to communicate and transfer their data at will. Email has been standardized this way for a long time, as you can always email someone regardless of their provider. Most popular proprietary chat clients do not adhere to a publically available protocol and have too much control over users data.
 
-Additionally, if the goal for Matrix is adoption to make instant messaging communication go the way of email, a network effect is required for this paradigm shift. Syphon makes the bet that the best way to attract new users is through exceptional branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
+Additionally, if the goal for Matrix is adoption to make instant messaging communication go the way of email, a network effect is required for this paradigm shift. Syphon makes the bet that the best way to attract new users is through strong branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
 
 Syphon will always be a not for profit, community driven application.
 
@@ -55,10 +55,10 @@ Syphon will always be a not for profit, community driven application.
 - customize themes and colors throughout the app
 
 ## goals
-- [ ] peer-to-peer messaging through a locally run server on the client
-- [ ] allow transfering data from one homeserver to another, or from local to remote servers
 - [ ] desktop clients meet parity with mobile
-- [ ] customizable widgets for certain elements of the app
+- [ ] screen lock and pin protected cache features
+- [ ] P2P messaging through a locally run server on the client
+- [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
 - [ ] cli client using ncurses and the same redux store contained here (common)
 
 ## getting started
@@ -70,9 +70,8 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/)
 
 ### storage
-There are three layers to storage in Syphon:
-- State (Redux + Redux Persist +  Hive)
-    * state cache is encrypted at rest
+- State (redux)
+- State Cache (redux_persist + Hive) 
 - Cold Storage (Hive)
 
 ### local notifications (android only)
