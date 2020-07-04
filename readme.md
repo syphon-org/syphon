@@ -65,6 +65,12 @@ Syphon will always be a not for profit, community driven application.
 ## getting started
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
+### environment
+- you'll need several tools in order to build   
+    - flutter
+    - android studio
+    - cmake version 3.10.2 [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) or [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
+
 ### state management
 - [Redux vs. Bloc with implimentations](https://github.com/ereio/state)
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
