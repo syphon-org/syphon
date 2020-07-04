@@ -43,6 +43,7 @@ lib/generated_plugin_registrant.dart
 
 # Code Counter Extension
 *.VSCodeCounter
+local.properties
 
 # Ignore compiled C code
 android/app/.cxx/*
