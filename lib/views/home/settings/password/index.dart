@@ -16,6 +16,7 @@ import 'package:syphon/store/index.dart';
 // Styling Widgets
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 import './step-password.dart';
 
@@ -60,15 +61,6 @@ class PasswordUpdateState extends State<PasswordView> {
   @protected
   void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
-
-    // TODO: not sure what this was fore
-    // subscription = store.onChange.listen((state) {
-    //   print('[PasswordUpdate] ${state.authStore.passwordCurrent}');
-
-    //   if (state.authStore.user.accessToken != null) {
-    //   print('access token ${accessToken}');
-    //   }
-    // });
   }
 
   @override
@@ -80,18 +72,6 @@ class PasswordUpdateState extends State<PasswordView> {
   @protected
   void onBackStep(BuildContext context) {
     Navigator.pop(context, false);
-  }
-
-  @protected
-  Function onCheckStepValidity(_Props props) {
-    return !props.isPasswordValid
-        ? null
-        : () async {
-            final result = await props.onSavePassword();
-            if (result) {
-              Navigator.pop(context);
-            }
-          };
   }
 
   @override
@@ -130,7 +110,7 @@ class PasswordUpdateState extends State<PasswordView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Flexible(
-                        flex: 8,
+                        flex: 9,
                         fit: FlexFit.tight,
                         child: Flex(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -141,7 +121,7 @@ class PasswordUpdateState extends State<PasswordView> {
                               width: width,
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
-                                maxHeight: Dimensions.widgetHeightMax * 0.6,
+                                maxHeight: Dimensions.widgetHeightMax * 0.5,
                               ),
                               child: PageView(
                                 pageSnapping: true,
@@ -162,57 +142,32 @@ class PasswordUpdateState extends State<PasswordView> {
                         ),
                       ),
                       Flexible(
-                        flex: 1,
+                        flex: 2,
                         child: Flex(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
                               width: width * 0.66,
-                              margin: EdgeInsets.only(top: height * 0.01),
                               height: Dimensions.inputHeight,
                               constraints: BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),
-                              child: FlatButton(
-                                disabledColor: Colors.grey,
-                                disabledTextColor: Colors.grey[300],
-                                onPressed: onCheckStepValidity(props),
-                                color: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                child: !props.loading
-                                    ? Text(
-                                        Strings.buttonSaveGeneric,
-                                      )
-                                    : CircularProgressIndicator(
-                                        strokeWidth:
-                                            Dimensions.defaultStrokeWidthLite,
-                                        backgroundColor: Colors.white,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          Colors.grey,
-                                        ),
-                                      ),
+                              child: ButtonSolid(
+                                text: Strings.buttonSaveGeneric,
+                                loading: props.loading,
+                                disabled:
+                                    !props.isPasswordValid || props.loading,
+                                onPressed: () async {
+                                  final result = await props.onSavePassword();
+                                  if (result) {
+                                    Navigator.pop(context);
+                                  }
+                                },
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 20,
-                        ),
-                        constraints: BoxConstraints(
-                          minHeight: 45,
-                        ),
-                        child: Flex(
-                          direction: Axis.horizontal,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [],
                         ),
                       ),
                     ],
@@ -229,15 +184,12 @@ class _Props extends Equatable {
   final bool loading;
   final bool isPasswordValid;
   final Map interactiveAuths;
-
-  final Function onAddAlert;
   final Function onSavePassword;
 
   _Props({
     @required this.loading,
     @required this.isPasswordValid,
     @required this.interactiveAuths,
-    @required this.onAddAlert,
     @required this.onSavePassword,
   });
 

@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -353,52 +355,21 @@ class ProfileViewState extends State<ProfileView> {
                                       minWidth: Dimensions.buttonWidthMin,
                                       maxWidth: Dimensions.buttonWidthMax,
                                     ),
-                                    child: FlatButton(
-                                      disabledColor: Colors.grey,
-                                      onPressed: !props.loading
-                                          ? () async {
-                                              final bool successful =
-                                                  await props.onSaveProfile(
-                                                newUserId: null,
-                                                newAvatarFile:
-                                                    this.newAvatarFile,
-                                                newDisplayName:
-                                                    this.newDisplayName,
-                                              );
-                                              if (successful) {
-                                                Navigator.pop(context);
-                                              }
-                                            }
-                                          : null,
-                                      color: Theme.of(context).primaryColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          30.0,
-                                        ),
-                                      ),
-                                      child: props.loading
-                                          ? Container(
-                                              constraints: BoxConstraints(
-                                                maxHeight: 28,
-                                                maxWidth: 28,
-                                              ),
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: Dimensions
-                                                    .defaultStrokeWidth,
-                                                backgroundColor: Colors.white,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                        Color>(
-                                                  Colors.grey,
-                                                ),
-                                              ),
-                                            )
-                                          : Text(
-                                              'save',
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Colors.white),
-                                            ),
+                                    child: ButtonSolid(
+                                      text: Strings.buttonSaveGeneric,
+                                      loading: props.loading,
+                                      disabled: props.loading,
+                                      onPressed: () async {
+                                        final bool successful =
+                                            await props.onSaveProfile(
+                                          newUserId: null,
+                                          newAvatarFile: this.newAvatarFile,
+                                          newDisplayName: this.newDisplayName,
+                                        );
+                                        if (successful) {
+                                          Navigator.pop(context);
+                                        }
+                                      },
                                     ),
                                   ),
                                   Container(

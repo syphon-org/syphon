@@ -14,6 +14,7 @@ import 'package:syphon/store/index.dart';
 
 // Styling Widgets
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:syphon/global/dimensions.dart';
 
@@ -136,23 +137,14 @@ class IntroState extends State<Intro> {
     }
   }
 
-  Widget buildButtonText() {
+  String buildButtonString() {
     switch (currentStep) {
       case 0:
-        return Text(
-          'let\'s go',
-          style: Theme.of(context).textTheme.button,
-        );
+        return 'let\'s go';
       case 4:
-        return Text(
-          'count me in',
-          style: Theme.of(context).textTheme.button,
-        );
+        return 'count me in';
       default:
-        return Text(
-          'next',
-          style: Theme.of(context).textTheme.button,
-        );
+        return 'next';
     }
   }
 
@@ -204,7 +196,8 @@ class IntroState extends State<Intro> {
                       minWidth: Dimensions.buttonWidthMin,
                       maxWidth: Dimensions.buttonWidthMax,
                     ),
-                    child: FlatButton(
+                    child: ButtonSolid(
+                      text: buildButtonString(),
                       onPressed: () {
                         if (currentStep == 0) {
                           setState(() {
@@ -231,11 +224,6 @@ class IntroState extends State<Intro> {
                           curve: Curves.ease,
                         );
                       },
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0),
-                      ),
-                      child: buildButtonText(),
                     ),
                   ),
                 ],

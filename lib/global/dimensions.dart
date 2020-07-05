@@ -51,6 +51,11 @@ class Dimensions {
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
+  static const EdgeInsets inputPadding = EdgeInsets.only(
+    left: 20,
+    bottom: 32,
+  );
+
   // Dialogs
 
   static const EdgeInsets dialogPadding = EdgeInsets.symmetric(

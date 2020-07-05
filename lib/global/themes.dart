@@ -97,7 +97,6 @@ class Themes {
           ),
         ),
       ),
-
       // Fonts
       fontFamily: 'Rubik',
       primaryTextTheme: TextTheme(
@@ -143,12 +142,6 @@ class Themes {
           fontSize: 14,
           fontWeight: FontWeight.w100,
           letterSpacing: 0.4,
-        ),
-        button: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.8,
-          color: Colors.white,
         ),
       ),
     );

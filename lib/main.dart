@@ -155,7 +155,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
-            debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
               themeType: settings.theme,
               primaryColorHex: settings.primaryColor,
