@@ -317,9 +317,11 @@ class SignupViewState extends State<SignupView> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 20,
+                        margin: const EdgeInsets.only(
+                          left: 8,
+                          right: 8,
+                          top: 16,
+                          bottom: 24,
                         ),
                         constraints: BoxConstraints(
                           minHeight: 45,

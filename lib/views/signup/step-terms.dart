@@ -33,15 +33,15 @@ class TermsStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Flexible(
-                flex: 4,
+                flex: 6,
                 child: Container(
                   width: width * 0.75,
+                  constraints: BoxConstraints(
+                    maxHeight: Dimensions.mediaSize,
+                    maxWidth: Dimensions.mediaSize,
+                  ),
                   padding: EdgeInsets.only(
                     bottom: 24,
-                  ),
-                  constraints: BoxConstraints(
-                    maxHeight: Dimensions.mediaSizeMax + 24,
-                    maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: Stack(
                     children: [
@@ -128,57 +128,61 @@ class TermsStep extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: width * 0.8,
-                constraints: BoxConstraints(
-                  minWidth: Dimensions.inputWidthMin,
-                  maxWidth: Dimensions.inputWidthMax,
-                  minHeight: 94,
-                  maxHeight: 160,
-                ),
-                child: Row(
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  direction: Axis.vertical,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
+                  children: [
                     Container(
-                      padding: EdgeInsets.only(
-                        top: 8,
-                        left: 8,
-                        right: 8,
-                        bottom: 8,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          props.onToggleAgreement();
-                        },
-                        child: Icon(
-                          props.agreement
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        props.onViewTermsOfService();
-                      },
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text: 'Agree to ${props.homeserver} ',
-                          style: Theme.of(context).textTheme.subtitle1,
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'terms of service',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  .copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    decorationStyle: TextDecorationStyle.solid,
-                                  ),
+                      width: width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(
+                              top: 8,
+                              left: 8,
+                              right: 8,
+                              bottom: 8,
                             ),
-                          ],
-                        ),
+                            child: GestureDetector(
+                              onTap: () {
+                                props.onToggleAgreement();
+                              },
+                              child: Icon(
+                                props.agreement
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              props.onViewTermsOfService();
+                            },
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                text: 'Agree to ${props.homeserver} ',
+                                style: Theme.of(context).textTheme.subtitle1,
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: 'terms of service',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1
+                                        .copyWith(
+                                          fontWeight: FontWeight.w400,
+                                          decorationStyle:
+                                              TextDecorationStyle.solid,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

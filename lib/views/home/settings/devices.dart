@@ -9,7 +9,7 @@ import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:syphon/views/widgets/dialog-confirm-password.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -12,6 +12,7 @@ class Dimensions {
   static const double widgetHeightMax = 1024;
 
   // Media
+  static const double mediaSize = 264;
   static const double mediaSizeMin = 208;
   static const double mediaSizeMax = 320;
 

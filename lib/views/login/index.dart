@@ -301,7 +301,7 @@ class LoginState extends State<Login> {
                       left: 8,
                       right: 8,
                       top: 16,
-                      bottom: 16,
+                      bottom: 24,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,
