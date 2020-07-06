@@ -617,7 +617,6 @@ class _Props extends Equatable {
         },
         onCreateUserChat: ({User user}) async {
           return store.dispatch(createRoom(
-            avatarUri: user.avatarUri,
             invites: <User>[user],
             isDirect: true,
           ));
