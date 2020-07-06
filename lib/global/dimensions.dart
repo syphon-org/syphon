@@ -12,6 +12,7 @@ class Dimensions {
   static const double widgetHeightMax = 1024;
 
   // Media
+  static const double mediaSize = 264;
   static const double mediaSizeMin = 208;
   static const double mediaSizeMax = 320;
 
@@ -50,6 +51,11 @@ class Dimensions {
   static const double inputHeight = 52;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
+
+  static const EdgeInsets inputPadding = EdgeInsets.only(
+    left: 20,
+    bottom: 32,
+  );
 
   // Dialogs
 

@@ -1,5 +1,8 @@
+import 'package:flutter/scheduler.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/captcha.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -14,10 +17,21 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 
-class CaptchaStep extends StatelessWidget {
-  CaptchaStep({Key key}) : super(key: key);
+class CaptchaStep extends StatefulWidget {
+  const CaptchaStep({Key key}) : super(key: key);
+
+  CaptchaStepState createState() => CaptchaStepState();
+}
+
+class CaptchaStepState extends State<CaptchaStep> {
   final focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -33,7 +47,7 @@ class CaptchaStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Flexible(
-                flex: 4,
+                flex: 6,
                 child: Container(
                   width: width * 0.75,
                   constraints: BoxConstraints(
@@ -82,7 +96,8 @@ class CaptchaStep extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 debugPrint(
-                                    'TODO: navigate to captcha explination');
+                                  'TODO: navigate to captcha explination',
+                                );
                               },
                               child: Container(
                                 height: 20,
@@ -101,26 +116,22 @@ class CaptchaStep extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: width * 0.8,
-                constraints: BoxConstraints(
-                  minWidth: Dimensions.inputWidthMin,
-                  maxWidth: Dimensions.inputWidthMax,
-                  minHeight: 94,
-                  maxHeight: 220,
-                ),
-                child: SingleChildScrollView(
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                      maxHeight: 500,
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ButtonText(
+                      text: props.completed ? 'Confirmed' : 'Lood Captcha',
+                      color: props.completed ? Color(0xff49c489) : null,
+                      loading: props.loading,
+                      disabled: props.completed,
+                      onPressed: () => props.onShowCaptcha(
+                        context,
+                      ),
                     ),
-                    child: Captcha(
-                      publicKey: props.publicKey,
-                      onVerified: (token) => props.onCompleteCaptcha(token),
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -130,35 +141,38 @@ class CaptchaStep extends StatelessWidget {
 }
 
 class _Props extends Equatable {
+  final bool loading;
   final bool completed;
-  final String publicKey;
 
-  final Function onCompleteCaptcha;
+  final Function onShowCaptcha;
 
   _Props({
+    @required this.loading,
     @required this.completed,
-    @required this.publicKey,
-    @required this.onCompleteCaptcha,
+    @required this.onShowCaptcha,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
-        publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-              [MatrixAuthTypes.RECAPTCHA]['public_key'];
-        }(),
-        onCompleteCaptcha: (String token) {
-          store.dispatch(updateCredential(
-            type: MatrixAuthTypes.RECAPTCHA,
-            value: token.toString(),
-          ));
-          store.dispatch(toggleCaptcha(completed: true));
+        onShowCaptcha: (
+          BuildContext context,
+        ) async {
+          final authSession = store.state.authStore.session;
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return DialogCaptcha(
+                key: Key(authSession),
+                onConfirm: () {},
+              );
+            },
+          );
         },
       );
 
   @override
   List<Object> get props => [
         completed,
-        publicKey,
       ];
 }

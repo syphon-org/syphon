@@ -1,5 +1,11 @@
 import 'package:syphon/global/values.dart';
 
+/**
+ * Will be converted to
+ * i18n json soon, but a "String" 
+ * class below is just a stub for this
+ * for now
+ */
 class Strings {
   // Titles
   static const titleIntro = 'Welcome to ${Values.appName}';
@@ -11,6 +17,7 @@ class Strings {
   static const titleViewDevices = 'Devices';
   static const titleViewSettings = 'Settings';
   static const titleHomeserverSearch = 'Find Your Homeserver';
+  static const titleDialogCaptcha = 'Complete Captcha';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';

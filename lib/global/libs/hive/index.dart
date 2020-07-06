@@ -180,6 +180,7 @@ Future<Box> openHiveBackgroundUnsafe() async {
 Future<Box> openHiveState() async {
   try {
     final encryptionKey = await unlockEncryptionKey();
+
     return await Hive.openBox(
       Cache.stateKey,
       crashRecovery: false,
