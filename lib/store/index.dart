@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
@@ -47,11 +48,11 @@ class AppState extends Equatable {
     this.loading = true,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
-    this.searchStore = const SearchStore(),
-    this.mediaStore = const MediaStore(),
-    this.settingsStore = const SettingsStore(),
-    this.roomStore = const RoomStore(),
     this.syncStore = const SyncStore(),
+    this.roomStore = const RoomStore(),
+    this.mediaStore = const MediaStore(),
+    this.searchStore = const SearchStore(),
+    this.settingsStore = const SettingsStore(),
     this.cryptoStore = const CryptoStore(),
   });
 
@@ -60,10 +61,11 @@ class AppState extends Equatable {
         loading,
         alertsStore,
         authStore,
-        searchStore,
-        roomStore,
-        settingsStore,
         syncStore,
+        roomStore,
+        mediaStore,
+        searchStore,
+        settingsStore,
         cryptoStore,
       ];
 }
@@ -94,9 +96,10 @@ AppState appReducer(AppState state, action) {
  */
 Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
+    debug: true,
     storage: MemoryStorage(),
     serializer: HiveSerializer(),
-    throttleDuration: Duration(seconds: 5),
+    throttleDuration: Duration(seconds: 10),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:
@@ -148,24 +151,17 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.syncStore.runtimeType.toString(),
         state.syncStore,
       );
+      debugPrint('[Hive Storage] caching syncStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
 
     try {
-      Cache.state.put(
-        state.cryptoStore.runtimeType.toString(),
-        state.cryptoStore,
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.state.put(
+      Cache.stateRooms.put(
         state.roomStore.runtimeType.toString(),
         state.roomStore,
       );
+      debugPrint('[Hive Storage] caching roomStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -175,6 +171,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.mediaStore.runtimeType.toString(),
         state.mediaStore,
       );
+      debugPrint('[Hive Storage] caching mediaStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -184,6 +181,17 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.settingsStore.runtimeType.toString(),
         state.settingsStore,
       );
+      debugPrint('[Hive Storage] caching settingsStore');
+    } catch (error) {
+      debugPrint('[Hive Storage] $error');
+    }
+
+    try {
+      Cache.state.put(
+        state.cryptoStore.runtimeType.toString(),
+        state.cryptoStore,
+      );
+      debugPrint('[Hive Storage] caching cryptoStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -224,7 +232,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      roomStoreConverted = Cache.state.get(
+      roomStoreConverted = Cache.stateRooms.get(
         roomStoreConverted.runtimeType.toString(),
         defaultValue: RoomStore(),
       );

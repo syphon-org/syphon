@@ -18,12 +18,16 @@ class Strings {
   static const titleViewSettings = 'Settings';
   static const titleHomeserverSearch = 'Find Your Homeserver';
   static const titleDialogCaptcha = 'Complete Captcha';
+  static const titleProfile = 'Set up Your Profile';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
 
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
+
+  // Labels
+  static const labelRoomNameDefault = 'New Chat';
 
   // Content
   static const contentDeleteDevices =

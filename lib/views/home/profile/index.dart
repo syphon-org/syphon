@@ -35,7 +35,7 @@ class ProfileViewState extends State<ProfileView> {
   String newUserId;
   final displayNameController = TextEditingController();
   final userIdController = TextEditingController();
-  final String title = 'Set up Your Profile';
+  final String title = Strings.titleProfile;
 
   @override
   void initState() {

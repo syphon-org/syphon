@@ -219,12 +219,15 @@ ThunkAction<AppState> fetchRooms() {
             throw stateEvents['error'];
           }
 
-          final messageEvents = await MatrixApi.fetchMessageEvents(
-            protocol: protocol,
-            homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken,
-            roomId: room.id,
-            limit: 20,
+          final messageEvents = await compute(
+            MatrixApi.fetchMessageEventsMapped,
+            {
+              "protocol": protocol,
+              "homeserver": store.state.authStore.user.homeserver,
+              "accessToken": store.state.authStore.user.accessToken,
+              "roomId": room.id,
+              "limit": 20,
+            },
           );
 
           await store.dispatch(syncRooms({
@@ -296,12 +299,15 @@ ThunkAction<AppState> fetchDirectRooms() {
               throw stateEvents['error'];
             }
 
-            final messageEvents = await MatrixApi.fetchMessageEvents(
-              protocol: protocol,
-              homeserver: store.state.authStore.user.homeserver,
-              accessToken: store.state.authStore.user.accessToken,
-              roomId: roomId,
-              limit: 20,
+            final messageEvents = await compute(
+              MatrixApi.fetchMessageEventsMapped,
+              {
+                "protocol": protocol,
+                "homeserver": store.state.authStore.user.homeserver,
+                "accessToken": store.state.authStore.user.accessToken,
+                "roomId": roomId,
+                "limit": 20,
+              },
             );
 
             if (messageEvents['errcode'] != null) {
@@ -353,7 +359,7 @@ ThunkAction<AppState> fetchDirectRooms() {
  * matrix and caching in the app
  */
 ThunkAction<AppState> createRoom({
-  String name = 'Chat',
+  String name,
   String alias,
   String topic,
   String avatarUri,

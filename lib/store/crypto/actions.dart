@@ -772,7 +772,7 @@ ThunkAction<AppState> loadMessageSession({
     final messageSessions =
         store.state.cryptoStore.inboundMessageSessions[roomId];
 
-    if (!messageSessions.containsKey(identityKey)) {
+    if (messageSessions == null || !messageSessions.containsKey(identityKey)) {
       throw 'Unable to find inbound message session for decryption';
     }
 

@@ -26,6 +26,8 @@ import 'package:syphon/store/settings/state.dart';
 // Global cache
 class Cache {
   static Box state;
+  static Box stateRooms;
+  static Box stateMedia;
   static LazyBox sync;
 
   static const group_id = '${Values.appNameLabel}';
@@ -33,6 +35,7 @@ class Cache {
 
   static const syncKey = '${Values.appNameLabel}_sync';
   static const stateKey = '${Values.appNameLabel}_cache';
+  static const stateRoomKey = '${Values.appNameLabel}_cache_2';
 
   static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
   static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
@@ -175,6 +178,8 @@ Future<Box> openHiveBackgroundUnsafe() async {
 /**
  * Open Hive State
  * 
+ * Separating the rest of state from room data to 
+ * improve performance
  * Initializes encrypted storage for caching current state
  */
 Future<Box> openHiveState() async {
@@ -183,6 +188,29 @@ Future<Box> openHiveState() async {
 
     return await Hive.openBox(
       Cache.stateKey,
+      crashRecovery: false,
+      encryptionCipher: HiveAesCipher(encryptionKey),
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+    );
+  } catch (error) {
+    debugPrint('[openHiveState] open failure: $error');
+    return await Hive.openBox(
+      Cache.stateKeyUNSAFE,
+    );
+  }
+}
+
+/**
+ * Open Hive State
+ * 
+ * Initializes encrypted storage for caching current state
+ */
+Future<Box> openHiveStateRooms() async {
+  try {
+    final encryptionKey = await unlockEncryptionKey();
+
+    return await Hive.openBox(
+      Cache.stateRoomKey,
       crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
