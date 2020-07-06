@@ -18,6 +18,7 @@ class Strings {
   static const titleViewSettings = 'Settings';
   static const titleHomeserverSearch = 'Find Your Homeserver';
   static const titleDialogCaptcha = 'Complete Captcha';
+  static const titleProfile = 'Set up Your Profile';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
@@ -25,13 +26,16 @@ class Strings {
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
+  // Labels
+  static const labelRoomNameDefault = 'New Chat';
+
   // Content
   static const contentDeleteDevices =
       'You will have to sign in again on these devices if you remove them.';
 
   static const contentDeleteDeviceKeyWarning =
       "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
-  static const contentEncryptedMessage = '[Encrypted Message Content]';
+  static const contentEncryptedMessage = 'Encrypted Message';
 
   // intro
   static const contentIntroFirstPartOne =

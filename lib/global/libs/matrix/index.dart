@@ -39,6 +39,7 @@ abstract class MatrixApi {
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
+  static final fetchMessageEventsMapped = Events.fetchMessageEventsMapped;
   static final sendEventToDevice = Events.sendEventToDevice;
 
   // Account Data & User Management

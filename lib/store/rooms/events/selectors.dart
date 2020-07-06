@@ -2,7 +2,7 @@ import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 List<Message> latestMessages(List<Message> messages) {
-  final sortedList = messages;
+  final sortedList = messages ?? const [];
 
   // sort descending
   messages.sort((a, b) {

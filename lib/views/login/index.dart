@@ -161,7 +161,12 @@ class LoginState extends State<Login> {
                             child: Text(
                               Strings.titleLogin,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline4,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  .copyWith(
+                                    color: Colors.white,
+                                  ),
                             ),
                           ),
                         ]),

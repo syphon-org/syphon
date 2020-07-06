@@ -67,6 +67,24 @@ abstract class Events {
   }
 
   /**
+   * Sync (Background Isolate) (main functionality)
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#id251 
+   */
+  static Future<dynamic> fetchMessageEventsMapped(Map params) async {
+    return await fetchMessageEvents(
+      protocol: params['protocol'],
+      homeserver: params['homeserver'],
+      accessToken: params['accessToken'],
+      roomId: params['roomId'],
+      to: params['to'],
+      from: params['from'],
+      limit: params['limit'],
+      desc: params['desc'] ?? true,
+    );
+  }
+
+  /**
    * Send Encrypted Message
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid

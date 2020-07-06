@@ -163,7 +163,7 @@ class SearchUserState extends State<SearchUserView> {
                     this.setState(() {
                       creatingRoomDisplayName = user.displayName;
                     });
-                    final newRoomId = await props.onCreateRoom(user: user);
+                    final newRoomId = await props.onCreateUserChat(user: user);
                     Navigator.pop(context);
                     Navigator.popAndPushNamed(
                       context,
@@ -242,7 +242,7 @@ class SearchUserState extends State<SearchUserView> {
                             creatingRoomDisplayName = user.displayName;
                           });
                           final newRoomId =
-                              await props.onCreateRoom(user: user);
+                              await props.onCreateUserChat(user: user);
                           Navigator.pop(context);
                           Navigator.popAndPushNamed(
                             context,
@@ -343,10 +343,7 @@ class SearchUserState extends State<SearchUserView> {
                       title: Text(
                         formatDisplayName(attemptableUser),
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        style: Theme.of(context).textTheme.bodyText1,
                       ),
                       subtitle: Text(
                         attemptableUser.userId,
@@ -598,14 +595,14 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
-  final Function onCreateRoom;
+  final Function onCreateUserChat;
 
   _Props({
     @required this.theme,
     @required this.loading,
     @required this.searchResults,
     @required this.onSearch,
-    @required this.onCreateRoom,
+    @required this.onCreateUserChat,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -615,10 +612,8 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateRoom: ({User user}) async {
+        onCreateUserChat: ({User user}) async {
           return store.dispatch(createRoom(
-            name: user.displayName,
-            avatarUri: user.avatarUri,
             invites: <User>[user],
             isDirect: true,
           ));

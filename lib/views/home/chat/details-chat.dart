@@ -9,6 +9,7 @@ import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/key-inspector/index.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -85,88 +86,17 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
   @protected
   onShowColorPicker({
-    Function onSelectColor,
     context,
     int originalColor,
+    Function onSelectColor,
   }) async {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return await showDialog(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text('Primary Color'),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: width * 0.02,
-          vertical: 12,
-        ),
-        children: <Widget>[
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: width * 0.8,
-              maxHeight: height * 0.25,
-            ),
-            child: MaterialColorPicker(
-              selectedColor: Colors.red,
-              onColorChange: (Color color) {
-                onSelectColor(color.value);
-              },
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SimpleDialogOption(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
-                onPressed: () {
-                  onSelectColor(null);
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'reset',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'cancel',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ),
-                  SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'save',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          )
-        ],
-      ),
-    );
+        context: context,
+        builder: (BuildContext context) => DialogColorPicker(
+              title: 'Select Chat Color',
+              currentColor: originalColor,
+              onSelectColor: onSelectColor,
+            ));
   }
 
   @protected
@@ -410,7 +340,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               child: Text(
                                 'About',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.bodyText1,
+                                style: Theme.of(context).textTheme.subtitle1,
                               ),
                             ),
                             Container(
