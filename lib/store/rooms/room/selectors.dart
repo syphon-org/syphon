@@ -1,4 +1,5 @@
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -43,7 +44,7 @@ String formatPreview({Room room}) {
   final recentMessage = messages[0];
   var body = formatPreviewMessage(recentMessage.body);
 
-  if (body == Strings.contentEncryptedMessage) {
+  if (recentMessage.type == EventTypes.encrypted && body.isEmpty) {
     body = Strings.contentEncryptedMessage.replaceAll('[]', '');
   }
 

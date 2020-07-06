@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 class Theming extends StatelessWidget {
   Theming({Key key, this.title}) : super(key: key);
@@ -15,81 +16,6 @@ class Theming extends StatelessWidget {
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
-  }
-
-  @protected
-  onShowColorPicker({
-    onSelectColor,
-    context,
-    int resetColor,
-    int currentColor,
-  }) async {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return await showDialog(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text('Primary Color'),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: width * 0.02,
-          vertical: 12,
-        ),
-        children: <Widget>[
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: width * 0.8,
-              maxHeight: height * 0.25,
-            ),
-            child: MaterialColorPicker(
-              selectedColor: Color(currentColor),
-              onColorChange: (Color color) {
-                onSelectColor(color.value);
-              },
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SimpleDialogOption(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                onPressed: () {
-                  onSelectColor(resetColor);
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'reset',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'save',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          )
-        ],
-      ),
-    );
   }
 
   @override
@@ -136,11 +62,15 @@ class Theming extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
+                            onTap: () => showDialog(
                               context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              currentColor: props.primaryColor,
-                              resetColor: SYPHON_CYAN,
+                              builder: (BuildContext context) =>
+                                  DialogColorPicker(
+                                title: 'Select Primary Color',
+                                resetColor: SYPHON_CYAN,
+                                currentColor: props.primaryColor,
+                                onSelectColor: props.onSelectPrimaryColor,
+                              ),
                             ),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -153,11 +83,15 @@ class Theming extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onShowColorPicker(
+                            onTap: () => showDialog(
                               context: context,
-                              onSelectColor: props.onSelectAccentColor,
-                              currentColor: props.accentColor,
-                              resetColor: SYPHON_CYAN,
+                              builder: (BuildContext context) =>
+                                  DialogColorPicker(
+                                title: 'Select Accent Color',
+                                resetColor: SYPHON_CYAN,
+                                currentColor: props.primaryColor,
+                                onSelectColor: props.onSelectAccentColor,
+                              ),
                             ),
                             contentPadding: Dimensions.listPadding,
                             title: Text(

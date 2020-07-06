@@ -39,8 +39,9 @@ class Cache {
 
   static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
   static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
+
   static const backgroundKeyUNSAFE =
-      '${Values.appNameLabel}_background_cache_unsafe';
+      '${Values.appNameLabel}_background_cache_unsafe_alt';
 
   static const syncData = 'sync_data';
   static const protocol = 'protocol';

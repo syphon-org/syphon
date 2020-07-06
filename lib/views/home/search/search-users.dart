@@ -343,10 +343,7 @@ class SearchUserState extends State<SearchUserView> {
                       title: Text(
                         formatDisplayName(attemptableUser),
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        style: Theme.of(context).textTheme.bodyText1,
                       ),
                       subtitle: Text(
                         attemptableUser.userId,

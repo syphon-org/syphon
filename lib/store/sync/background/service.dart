@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:flutter/material.dart';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/sync/services.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
@@ -10,7 +11,7 @@ import 'package:android_alarm_manager/android_alarm_manager.dart';
  * static class for managing service through app lifecycle
  */
 class BackgroundSync {
-  static const service_id = 255;
+  static const service_id = 254;
   static const service_interval = 55;
   static const service_duration = Duration(seconds: service_interval);
 
@@ -54,7 +55,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      // print('[BackgroundSync] Failed To Stop $error');
+      debugPrint('[BackgroundSync] Failed To Stop $error');
     }
   }
 }

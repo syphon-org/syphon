@@ -35,7 +35,7 @@ class Strings {
 
   static const contentDeleteDeviceKeyWarning =
       "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
-  static const contentEncryptedMessage = '[Encrypted Message Content]';
+  static const contentEncryptedMessage = 'Encrypted Message';
 
   // intro
   static const contentIntroFirstPartOne =

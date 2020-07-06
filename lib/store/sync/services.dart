@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:math';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -11,7 +10,6 @@ import 'package:hive/hive.dart';
 
 import 'package:syphon/global/notifications.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 /** 

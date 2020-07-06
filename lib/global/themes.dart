@@ -129,9 +129,9 @@ class Themes {
           letterSpacing: 0.4,
         ),
         bodyText1: TextStyle(
-          fontSize: 18,
+          fontSize: 20,
           letterSpacing: 0.4,
-          fontWeight: FontWeight.w100,
+          fontWeight: FontWeight.w400,
         ),
         bodyText2: TextStyle(
           fontSize: 18,
