@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/rooms/events/model.dart';
@@ -332,9 +333,9 @@ class Room {
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    List<Event> cachedStateEvents = List<Event>();
     Map<String, User> users = this.users ?? Map<String, User>();
 
+    // room state event filter
     try {
       stateEvents.forEach((event) {
         final timestamp = event.timestamp ?? 0;
@@ -373,11 +374,13 @@ class Room {
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
-            // The current users membership event
-            if (displayName == currentUser.displayName) {
-              // likely still an invite
-              // marked as direct, but not joined yet
-              direct = event.content['is_direct'];
+            // Cache user to rooms user cache if not present
+            if (!users.containsKey(event.sender)) {
+              users[event.sender] = User(
+                userId: event.sender,
+                displayName: displayName,
+                avatarUri: memberAvatarUri,
+              );
             }
 
             // likely an invite room
@@ -393,28 +396,13 @@ class Room {
               }
             }
 
-            // what happens if you name a direct chat after the
-            // person you're sending it to? bad stuff, this tries
-            // to force the senders name on the room just in case
-            if (name == currentUser.displayName || name == currentUser.userId) {
-              namePriority = 0;
-              if (displayName == null) {
-                name = formatShortname(event.sender);
-                avatarUri = memberAvatarUri;
-              } else {
-                name = displayName;
-                avatarUri = memberAvatarUri;
-              }
+            // Current user membership event
+            if (displayName == currentUser.displayName) {
+              // likely still an invite
+              // marked as direct, but not joined yet
+              direct = event.content['is_direct'];
             }
 
-            // Cache user to rooms user cache if not present
-            if (!users.containsKey(event.sender)) {
-              users[event.sender] = User(
-                userId: event.sender,
-                displayName: displayName,
-                avatarUri: memberAvatarUri,
-              );
-            }
             break;
           case 'm.room.encryption':
             encryptionEnabled = true;
@@ -427,8 +415,34 @@ class Room {
       });
     } catch (error) {}
 
+    // direct room naming check
+    try {
+      final badRoomName =
+          name == currentUser.displayName || name == currentUser.userId;
+
+      // what happens if you name a direct chat after the
+      // person you're sending it to? bad stuff, this tries
+      // to force the senders name on the room just in case
+      if (namePriority != 0 && users.isNotEmpty && (direct || badRoomName)) {
+        namePriority = 0;
+
+        // Filter out number of non current users to show preview of total and who
+        final nonCurrentUsers = users.values
+            .where((user) => user.displayName != currentUser.displayName);
+        final hasMultipleUsers =
+            nonCurrentUsers.isNotEmpty && nonCurrentUsers.length > 1;
+        final shownUser = users.values.elementAt(0);
+
+        // set name and avi to first non user or that + total others
+        name = hasMultipleUsers
+            ? '${shownUser.displayName} and ${users.values.length - 1}'
+            : shownUser.displayName;
+        avatarUri = shownUser.avatarUri;
+      }
+    } catch (error) {}
+
     return this.copyWith(
-      name: name ?? this.name ?? 'New Room',
+      name: name ?? this.name ?? Strings.labelRoomNameDefault,
       avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
       users: users ?? this.users,
@@ -454,30 +468,25 @@ class Room {
     try {
       int lastUpdate = this.lastUpdate;
 
-      List<Message> messages = messageEvents ?? [];
+      List<Message> newMessages = messageEvents ?? [];
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
       List<Message> existingMessages = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final newMessages = messageEvents;
-
       final hasEncrypted = newMessages.firstWhere(
         (msg) => msg.type == EventTypes.encrypted,
         orElse: () => null,
       );
 
       // See if the newest message has a greater timestamp
-      if (newMessages.isNotEmpty && lastUpdate < messages[0].timestamp) {
-        lastUpdate = messages[0].timestamp;
+      if (newMessages.isNotEmpty && lastUpdate < newMessages[0].timestamp) {
+        lastUpdate = newMessages[0].timestamp;
       }
 
       // Combine current and existing messages on unique ids
+      existingMessages.addAll(newMessages);
       final messagesMap = HashMap.fromIterable(
-        [existingMessages, newMessages].expand(
-          (sublist) => sublist.map(
-            (event) => event,
-          ),
-        ),
+        existingMessages,
         key: (message) => message.id,
         value: (message) => message,
       );
@@ -491,8 +500,8 @@ class Room {
       final allMessages = List<Message>.from(messagesMap.values);
 
       return this.copyWith(
-        messages: allMessages,
         outbox: outbox,
+        messages: allMessages,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline

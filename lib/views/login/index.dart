@@ -13,6 +13,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -160,7 +161,12 @@ class LoginState extends State<Login> {
                             child: Text(
                               Strings.titleLogin,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline4,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  .copyWith(
+                                    color: Colors.white,
+                                  ),
                             ),
                           ),
                         ]),
@@ -201,10 +207,7 @@ class LoginState extends State<Login> {
                               decoration: InputDecoration(
                                 labelText: 'username',
                                 hintText: props.usernameHint,
-                                contentPadding: EdgeInsets.only(
-                                  left: 20,
-                                  top: 32,
-                                ),
+                                contentPadding: Dimensions.inputPadding,
                                 suffixIcon: IconButton(
                                   highlightColor:
                                       Theme.of(context).primaryColor,
@@ -235,6 +238,7 @@ class LoginState extends State<Login> {
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
+                              textAlign: TextAlign.left,
                               obscureText: !visibility,
                               decoration: InputDecoration(
                                 suffixIcon: GestureDetector(
@@ -266,11 +270,7 @@ class LoginState extends State<Login> {
                                         : Icons.visibility_off,
                                   ),
                                 ),
-                                contentPadding: EdgeInsets.only(
-                                  left: 20,
-                                  top: 32,
-                                  bottom: 32,
-                                ),
+                                contentPadding: Dimensions.inputPadding,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
@@ -290,39 +290,11 @@ class LoginState extends State<Login> {
                       minWidth: 256,
                       maxWidth: 336,
                     ),
-                    child: FlatButton(
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.grey[300],
-                      onPressed: props.isLoginAttemptable
-                          ? () {
-                              props.onLoginUser();
-                            }
-                          : null,
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28.0),
-                      ),
-                      child: props.loading
-                          ? Container(
-                              constraints: BoxConstraints(
-                                maxHeight: 28,
-                                maxWidth: 28,
-                              ),
-                              child: CircularProgressIndicator(
-                                strokeWidth: Dimensions.defaultStrokeWidth,
-                                backgroundColor: Colors.white,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.grey,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              Strings.buttonLogin,
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
-                            ),
+                    child: ButtonSolid(
+                      text: Strings.buttonLogin,
+                      loading: props.loading,
+                      disabled: !props.isLoginAttemptable,
+                      onPressed: () => props.onLoginUser(),
                     ),
                   ),
                   Container(
@@ -334,7 +306,7 @@ class LoginState extends State<Login> {
                       left: 8,
                       right: 8,
                       top: 16,
-                      bottom: 16,
+                      bottom: 24,
                     ),
                     child: TouchableOpacity(
                       activeOpacity: 0.4,

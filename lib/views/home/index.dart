@@ -2,6 +2,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -72,7 +73,7 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildRoomOptionsBar({BuildContext context, _Props props}) {
+  Widget buildAppBarRoomOptions({BuildContext context, _Props props}) {
     return AppBar(
       brightness: Brightness.dark, // TOOD: this should inherit from theme
       backgroundColor: Colors.grey[500],
@@ -322,7 +323,9 @@ class HomeViewState extends State<Home> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
+        final messages = room.messages;
         final roomSettings = props.chatSettings[room.id] ?? null;
+        final roomPreview = formatPreview(room: room);
 
         var primaryColor =
             room.avatarUri != null ? Colors.transparent : Colors.grey;
@@ -341,7 +344,16 @@ class HomeViewState extends State<Home> {
           }
         }
 
-        if (room.messages == null || room.messages.length < 1) {
+        // show draft inidicator if it's an empty room
+        if (messages == null || messages.length < 1) {
+          fontStyle = FontStyle.italic;
+        }
+
+        // it has undecrypted message contained within
+        if (messages != null &&
+            messages.length > 0 &&
+            messages[0].type == EventTypes.encrypted &&
+            messages[0].body.isEmpty) {
           fontStyle = FontStyle.italic;
         }
 
@@ -460,10 +472,8 @@ class HomeViewState extends State<Home> {
                         children: <Widget>[
                           Text(
                             formatRoomName(room: room),
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyText1,
                           ),
                           Text(
                             formatTimestamp(
@@ -475,7 +485,7 @@ class HomeViewState extends State<Home> {
                         ],
                       ),
                       Text(
-                        formatPreview(room: room),
+                        roomPreview,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.caption.merge(
@@ -504,7 +514,7 @@ class HomeViewState extends State<Home> {
           );
 
           if (this.selectedRoom != null) {
-            currentAppBar = buildRoomOptionsBar(
+            currentAppBar = buildAppBarRoomOptions(
               props: props,
               context: context,
             );

@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -303,6 +304,27 @@ ThunkAction<AppState> toggleNotifications() {
       pluginInstance: globalNotificationPluginInstance,
     )) {
       store.dispatch(ToggleNotifications());
+      final enabled = store.state.settingsStore.notificationsEnabled;
+      if (enabled) {
+        await BackgroundSync.init();
+        BackgroundSync.start(
+          protocol: protocol,
+          homeserver: store.state.authStore.user.homeserver,
+          accessToken: store.state.authStore.user.accessToken,
+          lastSince: store.state.syncStore.lastSince,
+          currentUser: store.state.authStore.user.userId,
+        );
+
+        showBackgroundServiceNotification(
+          notificationId: BackgroundSync.service_id,
+          pluginInstance: globalNotificationPluginInstance,
+        );
+      } else {
+        BackgroundSync.stop();
+        dismissAllNotifications(
+          pluginInstance: globalNotificationPluginInstance,
+        );
+      }
     }
   };
 }

@@ -40,14 +40,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
 
-  bool isInRelease = true;
-
-  assert(() {
-    isInRelease = false;
-    return true;
-  }());
-
-  if (isInRelease) {
+  //
+  if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
   }
 
@@ -56,8 +50,9 @@ void main() async {
   // init cold cache (mobile only)
   await initHive();
 
-  Cache.state = await openHiveState();
   Cache.sync = await openHiveSync();
+  Cache.state = await openHiveState();
+  Cache.stateRooms = await openHiveStateRooms();
 
   // init state cache (hot)
   final store = await initStore();
@@ -155,7 +150,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
-            debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
               themeType: settings.theme,
               primaryColorHex: settings.primaryColor,

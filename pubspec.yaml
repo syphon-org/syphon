@@ -60,10 +60,8 @@ dependencies:
   expandable: 3.0.1
   equatable: ^1.1.0
   crypt: ^3.0.0
-  cryptography: 1.2.1
   canonical_json: 1.0.0
   convert: ^2.1.1
-  steel_crypt: 1.7.1
   device_info: ^0.4.2
   redux: 4.0.0
   redux_thunk: 0.3.0
@@ -75,6 +73,8 @@ dependencies:
   flutter_secure_storage: 3.3.1+1 
   mime: ^0.9.6
   path_provider: 1.6.0  #https://github.com/flutter/plugins/pull/1570
+  # steel_crypt: 1.7.1
+  # cryptography: 1.2.1
 
   # Services
   http: ^0.12.0+2
@@ -103,7 +103,8 @@ dependencies:
   # window_utils: 1.0.2
 
   # Converters
-  dart_json_mapper: 1.3.3
+  # json_serializable: 3.3.0
+  # dart_json_mapper: 1.3.3
   hive_generator: 0.7.0  
 
   # The following adds the Cupertino Icons font to your application.

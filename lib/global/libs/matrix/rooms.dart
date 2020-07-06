@@ -194,11 +194,14 @@ abstract class Rooms {
     };
 
     Map body = {
-      "name": roomName,
       "is_direct": isDirect,
       "preset": chatTypePreset,
       'invite': invites
     };
+
+    if (roomName != null) {
+      body['name'] = roomName;
+    }
 
     final response = await http.post(
       url,

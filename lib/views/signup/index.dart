@@ -20,6 +20,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/behaviors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 import './step-username.dart';
 import './step-password.dart';
@@ -210,6 +211,14 @@ class SignupViewState extends State<SignupView> {
     );
   }
 
+  String buildButtonString() {
+    if (this.currentStep == sections.length - 1) {
+      return Strings.buttonSignupFinish;
+    }
+
+    return Strings.buttonSignupNext;
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -292,39 +301,27 @@ class SignupViewState extends State<SignupView> {
                                 minWidth: Dimensions.buttonWidthMin,
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),
-                              child: FlatButton(
+                              child: ButtonSolid(
                                 key: Key(sections.length.toString() +
                                     this.currentStep.toString()),
-                                disabledColor: Colors.grey,
-                                disabledTextColor: Colors.grey[300],
+                                text: buildButtonString(),
+                                loading: props.creating,
+                                disabled: props.creating,
                                 onPressed: onCheckStepValidity(
                                   props,
                                   this.pageController,
                                 ),
-                                color: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                child: !props.creating
-                                    ? buildButtonText(context: context)
-                                    : CircularProgressIndicator(
-                                        strokeWidth:
-                                            Dimensions.defaultStrokeWidthLite,
-                                        backgroundColor: Colors.white,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          Colors.grey,
-                                        ),
-                                      ),
                               ),
                             ),
                           ],
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 20,
+                        margin: const EdgeInsets.only(
+                          left: 8,
+                          right: 8,
+                          top: 16,
+                          bottom: 24,
                         ),
                         constraints: BoxConstraints(
                           minHeight: 45,

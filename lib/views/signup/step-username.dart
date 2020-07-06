@@ -33,12 +33,12 @@ class UsernameStepState extends State<UsernameStep> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      runInitTasks();
+      onMounted();
     });
   }
 
   @protected
-  void runInitTasks() {
+  void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     usernameController.text = trimmedUserId(
       userId: store.state.authStore.username,
@@ -129,17 +129,18 @@ class UsernameStepState extends State<UsernameStep> {
                     controller: usernameController,
                     onChanged: (username) {
                       // // Trim new username
+                      final formattedUsername = username.trim();
                       usernameController.value = TextEditingValue(
-                        text: username.trim(),
+                        text: formattedUsername,
                         selection: TextSelection.fromPosition(
                           TextPosition(
-                            offset: username.trim().length,
+                            offset: formattedUsername.length,
                           ),
                         ),
                       );
 
                       // Set new username
-                      props.onSetUsername(username: username);
+                      props.onSetUsername(username: formattedUsername);
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {

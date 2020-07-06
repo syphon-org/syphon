@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:math';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -11,7 +10,6 @@ import 'package:hive/hive.dart';
 
 import 'package:syphon/global/notifications.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 /** 
@@ -69,7 +67,7 @@ void notificationSyncIsolate() async {
     try {
       storageLocation = await getApplicationDocumentsDirectory();
     } catch (error) {
-      // print('[initHiveStorage] storage location failure - $error');
+      print('[initHiveStorage] storage location failure - $error');
     }
 
     // Init hive cache + adapters
@@ -78,9 +76,9 @@ void notificationSyncIsolate() async {
 
     // Init notifiations for background service and new messages/events
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
+
     showBackgroundServiceNotification(
       notificationId: BackgroundSync.service_id,
-      debugContent: DateFormat('E h:mm:ss a').format(DateTime.now()),
       pluginInstance: pluginInstance,
     );
 
@@ -90,6 +88,7 @@ void notificationSyncIsolate() async {
     const service_interval = BackgroundSync.service_interval;
     const sync_interval = SyncStore.default_interval;
 
+    print('[notificationSyncIsolate] begin');
     for (int i = 0; i < service_interval; i++) {
       if (i % sync_interval == 0) {
         Timer(Duration(seconds: i), () async {
@@ -111,6 +110,10 @@ void notificationSyncIsolate() async {
               Cache.lastSinceKey,
             );
 
+            final String currentUser = backgroundCache.get(
+              Cache.currentUser,
+            );
+
             if (accessToken == null || lastSince == null) {
               return;
             }
@@ -125,6 +128,7 @@ void notificationSyncIsolate() async {
               homeserver: homeserver,
               accessToken: accessToken,
               since: lastSince,
+              timeout: sync_interval * 1000,
             );
 
             final newLastSince = data['next_batch'];
@@ -146,20 +150,38 @@ void notificationSyncIsolate() async {
                 final String messageSender = room.messages[0].sender;
                 final formattedSender = formatShortname(messageSender);
 
-                showMessageNotification(
-                  messageHash: Random.secure().nextInt(20000),
-                  body: '$formattedSender sent a new message.',
-                  pluginInstance: pluginInstance,
-                );
+                if (!formattedSender.contains(currentUser)) {
+                  if (room.direct) {
+                    return showMessageNotification(
+                      messageHash: Random.secure().nextInt(20000),
+                      body: '$formattedSender sent a new message.',
+                      pluginInstance: pluginInstance,
+                    );
+                  }
+
+                  if (room.invite) {
+                    return showMessageNotification(
+                      messageHash: Random.secure().nextInt(20000),
+                      body: '$formattedSender invited you to chat',
+                      pluginInstance: pluginInstance,
+                    );
+                  }
+
+                  return showMessageNotification(
+                    messageHash: Random.secure().nextInt(20000),
+                    body: '$formattedSender sent a new message in ${room.name}',
+                    pluginInstance: pluginInstance,
+                  );
+                }
               }
             });
           } catch (error) {
-            // print('[notificationSyncIsolate] sync failed $error');
+            print('[notificationSyncIsolate] sync failed $error');
           }
         });
       }
     }
   } catch (error) {
-    // print('[notificationSyncIsolate] init failed $error');
+    print('[notificationSyncIsolate] init failed $error');
   }
 }

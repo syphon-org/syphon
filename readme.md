@@ -65,21 +65,42 @@ Syphon will always be a not for profit, community driven application.
 ## getting started
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
-### state management
-- [Redux vs. Bloc with implimentations](https://github.com/ereio/state)
-- [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
-- [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/)
+### environment
+- you'll to do several things to setup the environment for Syphon
+    - install flutter
+    - install android studio
+    - install cmake version 3.10.2 - (for olm/megolm)
+        - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
+        - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
+    - install libs needed for cmake
+        - macos
+            - ```brew install ninja```
+        - linux
+            - ```sudo apt install ninja-build```
+    - clone repo and init submodules
+        - ```git submodule update --init --recursive```
+    - run the following prebuild commands
+        - ```flutter pub get```
+        - ```flutter pub run build_runner build```
 
-### storage
+### store
 - State (redux)
 - State Cache (redux_persist + Hive) 
 - Cold Storage (Hive)
+
+### state
+- [Redux vs. Bloc](https://github.com/ereio/state)
+- [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
+- [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/)
+
+### cold storage
+- [Hive](https://github.com/hivedb/hive)
 
 ### local notifications (android only)
 - utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
 - no third party notification provider will ever be used outside Apples APNS for iOS only
 
-### quarks
+### quirks
 - fastlane is not used, it's there for f-droid
 
 ### assets

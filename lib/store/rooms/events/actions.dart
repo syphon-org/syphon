@@ -1,7 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -56,15 +56,17 @@ ThunkAction<AppState> fetchMessageEvents({
       // last since called on /sync
       final lastSince = store.state.syncStore.lastSince;
 
-      final Map messagesJson = await MatrixApi.fetchMessageEvents(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        to: endHash,
-        from: startHash ?? lastSince,
-        roomId: room.id,
-        limit: limit,
-      );
+      debugPrint('[fetchMessageEvents] ${room.id}');
+
+      final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
+        "protocol": protocol,
+        "homeserver": store.state.authStore.user.homeserver,
+        "accessToken": store.state.authStore.user.accessToken,
+        "roomId": room.id,
+        "to": endHash,
+        "from": startHash ?? lastSince,
+        "limit": limit,
+      });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       final String end = messagesJson['end'];
