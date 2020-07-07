@@ -32,6 +32,10 @@ a privacy centric matrix client - now in open alpha*
     <img src="assets/screenshots/03-android-tiny.png"/>
     <img src="assets/screenshots/05-android-tiny.png"/> 
 </p>
+
+<p align='center'>
+ Syphon is still in alpha and <b>do not recommend</b> using it where proven and independently verified security is required.
+</p>
 <br>
 
 ## why
