@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/settings/state.dart';

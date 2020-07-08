@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:hive/hive.dart';
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/ripper/index.dart';
@@ -134,14 +136,6 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-class HiveStorage implements StorageEngine {
-  /// Save state ([data] could be null)
-  Future<void> save(Uint8List data) {}
-
-  /// Load state (can return null)
-  Future<Uint8List> load() {}
-}
-
 /**
  * Hive Serializer
  * 
@@ -150,148 +144,14 @@ class HiveStorage implements StorageEngine {
 class HiveSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
-    // Fail whole conversion if user fails
-    Cache.state.put(
-      state.authStore.runtimeType.toString(),
-      state.authStore,
-    );
-
-    try {
-      Cache.state.put(
-        state.syncStore.runtimeType.toString(),
-        state.syncStore,
-      );
-      debugPrint('[Hive Storage] caching syncStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.stateRooms.put(
-        state.roomStore.runtimeType.toString(),
-        state.roomStore,
-      );
-      debugPrint('[Hive Storage] caching roomStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      debugPrint('[Hive Storage] caching mediaStore');
-
-      debugPrint(
-        '[Hive Storage] entiries ${state.mediaStore.mediaCache.length}',
-      );
-      compute(Ripper.cacheStoreMedia, state.mediaStore);
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    // try {
-    //   Cache.state.put(
-    //     state.mediaStore.runtimeType.toString(),
-    //     state.mediaStore,
-    //   );
-    //   debugPrint('[Hive Storage] caching mediaStore');
-    // } catch (error) {
-    //   debugPrint('[Hive Storage] $error');
-    // }
-
-    try {
-      // NOTE: cannot do this unfortunately
-      // SettingsStoreAdapter().write(writer, state.settingsStore);
-      Cache.state.put(
-        state.settingsStore.runtimeType.toString(),
-        state.settingsStore,
-      );
-      debugPrint('[Hive Storage] caching settingsStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.state.put(
-        state.cryptoStore.runtimeType.toString(),
-        state.cryptoStore,
-      );
-      debugPrint('[Hive Storage] caching cryptoStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
+    // Run an async cache inside Ripper
+    Ripper.cacheStore(state);
 
     // Disregard redux persist storage saving
     return null;
   }
 
   AppState decode(Uint8List data) {
-    AuthStore authStoreConverted = AuthStore();
-    SyncStore syncStoreConverted = SyncStore();
-    CryptoStore cryptoStoreConverted = CryptoStore();
-    MediaStore mediaStoreConverted = MediaStore();
-    RoomStore roomStoreConverted = RoomStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
-
-    authStoreConverted = Cache.state.get(
-      authStoreConverted.runtimeType.toString(),
-      defaultValue: AuthStore(),
-    );
-
-    try {
-      syncStoreConverted = Cache.state.get(
-        syncStoreConverted.runtimeType.toString(),
-        defaultValue: SyncStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      cryptoStoreConverted = Cache.state.get(
-        cryptoStoreConverted.runtimeType.toString(),
-        defaultValue: CryptoStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      roomStoreConverted = Cache.stateRooms.get(
-        roomStoreConverted.runtimeType.toString(),
-        defaultValue: RoomStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      mediaStoreConverted = Cache.stateCache.get(
-        mediaStoreConverted.runtimeType.toString(),
-        defaultValue: MediaStore(),
-      );
-      debugPrint(
-        '[Hive Storage] loaded ${mediaStoreConverted.mediaCache.length}',
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      settingsStoreConverted = Cache.state.get(
-        settingsStoreConverted.runtimeType.toString(),
-        defaultValue: SettingsStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    return AppState(
-      loading: false,
-      authStore: authStoreConverted,
-      syncStore: syncStoreConverted,
-      cryptoStore: cryptoStoreConverted,
-      roomStore: roomStoreConverted,
-      mediaStore: mediaStoreConverted,
-      settingsStore: settingsStoreConverted,
-    );
+    return Ripper.loadStore();
   }
 }

@@ -73,6 +73,7 @@ dependencies:
   flutter_secure_storage: 3.3.1+1 
   mime: ^0.9.6
   path_provider: 1.6.0  #https://github.com/flutter/plugins/pull/1570
+  crypto: ^2.1.5
   # steel_crypt: 1.7.1
   # cryptography: 1.2.1
 
@@ -83,6 +84,7 @@ dependencies:
   http_parser: 3.1.4
   flutter_dotenv: ^2.0.3
   android_alarm_manager: 0.4.5+8
+  flutter_isolate: 1.0.0+14
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   
   # UI Only
