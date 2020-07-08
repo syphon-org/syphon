@@ -22,17 +22,17 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
 
   Hive.init(params['location']);
 
-  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
+  Box syncBox = await Hive.openBox(Cache.keySyncUnsafe);
 
   // final encryptionKey = await unlockEncryptionKey();
 
   // final syncBox = await Hive.openBox(
-  //   Cache.syncKey,
+  //   Cache.keySync,
   //   encryptionCipher: HiveAesCipher(encryptionKey),
   //   compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
   // );
 
-  await syncBox.put(Cache.syncData, params['sync']);
+  await syncBox.put(Cache.fieldFullSync, params['sync']);
   await syncBox.close();
 
   // print('[saveSyncIsolate] successful save');
@@ -44,9 +44,9 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
 FutureOr<dynamic> loadSyncIsolate(dynamic params) async {
   Hive.init(params['location']);
 
-  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
+  Box syncBox = await Hive.openBox(Cache.keySyncUnsafe);
 
-  final syncData = await syncBox.get(Cache.syncData);
+  final syncData = await syncBox.get(Cache.fieldFullSync);
   await syncBox.close();
 
   return syncData;
@@ -72,7 +72,7 @@ void notificationSyncIsolate() async {
 
     // Init hive cache + adapters
     Hive.init(storageLocation.path);
-    Box backgroundCache = await Hive.openBox(Cache.backgroundKeyUNSAFE);
+    Box backgroundCache = await Hive.openBox(Cache.keyBackgroundSyncUnsafe);
 
     // Init notifiations for background service and new messages/events
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
@@ -95,23 +95,23 @@ void notificationSyncIsolate() async {
           try {
             // Check isolate id and maybe see if a new one is created
             final String protocol = backgroundCache.get(
-              Cache.protocol,
+              Cache.fieldProtocol,
             );
 
             final String homeserver = backgroundCache.get(
-              Cache.homeserver,
+              Cache.fieldHomeserver,
             );
 
             final String accessToken = backgroundCache.get(
-              Cache.accessTokenKey,
+              Cache.fieldAccessToken,
             );
 
             final String lastSince = backgroundCache.get(
-              Cache.lastSinceKey,
+              Cache.fieldLastSince,
             );
 
             final String currentUser = backgroundCache.get(
-              Cache.currentUser,
+              Cache.fieldCurrentUser,
             );
 
             if (accessToken == null || lastSince == null) {
@@ -134,7 +134,7 @@ void notificationSyncIsolate() async {
             final newLastSince = data['next_batch'];
             final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
-            backgroundCache.put(Cache.lastSinceKey, newLastSince);
+            backgroundCache.put(Cache.fieldLastSince, newLastSince);
 
             /**
               *TODO: Need to handle group / bigger room chats differently than direct chats

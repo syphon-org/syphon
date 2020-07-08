@@ -35,11 +35,11 @@ class BackgroundSync {
 
     final backgroundServiceHive = await openHiveBackgroundUnsafe();
 
-    await backgroundServiceHive.put(Cache.protocol, protocol);
-    await backgroundServiceHive.put(Cache.homeserver, homeserver);
-    await backgroundServiceHive.put(Cache.accessTokenKey, accessToken);
-    await backgroundServiceHive.put(Cache.lastSinceKey, lastSince);
-    await backgroundServiceHive.put(Cache.currentUser, currentUser);
+    await backgroundServiceHive.put(Cache.fieldProtocol, protocol);
+    await backgroundServiceHive.put(Cache.fieldHomeserver, homeserver);
+    await backgroundServiceHive.put(Cache.fieldAccessToken, accessToken);
+    await backgroundServiceHive.put(Cache.fieldLastSince, lastSince);
+    await backgroundServiceHive.put(Cache.fieldCurrentUser, currentUser);
 
     await AndroidAlarmManager.periodic(
       service_duration,

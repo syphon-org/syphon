@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/global/libs/ripper/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/reducer.dart';
@@ -17,13 +19,13 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Temporary State Store
 import './alerts/model.dart';
-import './search/model.dart';
 
 // Persisted State Stores
 import './media/state.dart';
 import './rooms/state.dart';
 import './settings/state.dart';
 import './auth/state.dart';
+import './search/state.dart';
 
 // Reducers for Stores
 import './alerts/reducer.dart';
@@ -78,7 +80,7 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
-    searchStore: matrixReducer(state.searchStore, action),
+    searchStore: searchReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
   );
@@ -132,6 +134,14 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
+class HiveStorage implements StorageEngine {
+  /// Save state ([data] could be null)
+  Future<void> save(Uint8List data) {}
+
+  /// Load state (can return null)
+  Future<Uint8List> load() {}
+}
+
 /**
  * Hive Serializer
  * 
@@ -167,16 +177,29 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      Cache.state.put(
-        state.mediaStore.runtimeType.toString(),
-        state.mediaStore,
-      );
       debugPrint('[Hive Storage] caching mediaStore');
+
+      debugPrint(
+        '[Hive Storage] entiries ${state.mediaStore.mediaCache.length}',
+      );
+      compute(Ripper.cacheStoreMedia, state.mediaStore);
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
 
+    // try {
+    //   Cache.state.put(
+    //     state.mediaStore.runtimeType.toString(),
+    //     state.mediaStore,
+    //   );
+    //   debugPrint('[Hive Storage] caching mediaStore');
+    // } catch (error) {
+    //   debugPrint('[Hive Storage] $error');
+    // }
+
     try {
+      // NOTE: cannot do this unfortunately
+      // SettingsStoreAdapter().write(writer, state.settingsStore);
       Cache.state.put(
         state.settingsStore.runtimeType.toString(),
         state.settingsStore,
@@ -241,9 +264,12 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      mediaStoreConverted = Cache.state.get(
+      mediaStoreConverted = Cache.stateCache.get(
         mediaStoreConverted.runtimeType.toString(),
         defaultValue: MediaStore(),
+      );
+      debugPrint(
+        '[Hive Storage] loaded ${mediaStoreConverted.mediaCache.length}',
       );
     } catch (error) {
       debugPrint('[Hive Storage] $error');

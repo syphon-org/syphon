@@ -8,9 +8,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
+    
+ 
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="io.flutter.app.FlutterApplication" 
         android:label="Syphon"
         android:icon="@mipmap/ic_launcher">
         <service

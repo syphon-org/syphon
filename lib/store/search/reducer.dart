@@ -1,7 +1,7 @@
-import './model.dart';
+import 'state.dart';
 import './actions.dart';
 
-SearchStore matrixReducer(
+SearchStore searchReducer(
     [SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:

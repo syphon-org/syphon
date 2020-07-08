@@ -47,6 +47,11 @@ void main() async {
 
   _enablePlatformOverrideForDesktop();
 
+  if (Platform.isAndroid) {
+    final backgroundSyncStatus = await BackgroundSync.init();
+    debugPrint('[main] background service started $backgroundSyncStatus');
+  }
+
   // init cold cache (mobile only)
   await initHive();
 
@@ -56,11 +61,6 @@ void main() async {
 
   // init state cache (hot)
   final store = await initStore();
-
-  if (Platform.isAndroid) {
-    final backgroundSyncStatus = await BackgroundSync.init();
-    debugPrint('[main] background service started $backgroundSyncStatus');
-  }
 
   //  * DESKTOP ONLY
   if (Platform.isMacOS) {

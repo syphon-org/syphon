@@ -27,28 +27,29 @@ import 'package:syphon/store/settings/state.dart';
 class Cache {
   static Box state;
   static Box stateRooms;
-  static Box stateMedia;
+  static Box stateCache;
   static LazyBox sync;
 
-  static const group_id = '${Values.appNameLabel}';
   static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
-  static const syncKey = '${Values.appNameLabel}_sync';
-  static const stateKey = '${Values.appNameLabel}_cache';
-  static const stateRoomKey = '${Values.appNameLabel}_cache_2';
+  // encrypted hive box keys
+  static const keySync = '${Values.appNameLabel}_sync';
+  static const keyState = '${Values.appNameLabel}_cache';
+  static const keyStateRooms = '${Values.appNameLabel}_cache_2';
 
-  static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
-  static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
-
-  static const backgroundKeyUNSAFE =
+  // unencrypted hive box keys
+  static const keySyncUnsafe = '${Values.appNameLabel}_sync_unsafe';
+  static const keyStateUnsafe = '${Values.appNameLabel}_cache_unsafe';
+  static const keyBackgroundSyncUnsafe =
       '${Values.appNameLabel}_background_cache_unsafe_alt';
 
-  static const syncData = 'sync_data';
-  static const protocol = 'protocol';
-  static const homeserver = 'homeserver';
-  static const accessTokenKey = 'accessToken';
-  static const lastSinceKey = 'lastSince';
-  static const currentUser = 'currentUser';
+  // Field keys for box items
+  static const fieldFullSync = 'sync_data';
+  static const fieldProtocol = 'protocol';
+  static const fieldHomeserver = 'homeserver';
+  static const fieldAccessToken = 'accessToken';
+  static const fieldLastSince = 'lastSince';
+  static const fieldCurrentUser = 'currentUser';
 }
 
 /**
@@ -137,30 +138,6 @@ Future<List<int>> unlockEncryptionKey() async {
  * 
  * For testing purposes only - should be encrypting hive
  */
-Future<Box> openHiveStateUnsafe() async {
-  return await Hive.openBox(
-    Cache.stateKeyUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
-}
-
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
-Future<LazyBox> openHiveSyncUnsafe() async {
-  return await Hive.openLazyBox(
-    Cache.syncKeyUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
-}
-
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
 Future<Box> openHiveBackgroundUnsafe() async {
   var storageLocation;
 
@@ -173,7 +150,7 @@ Future<Box> openHiveBackgroundUnsafe() async {
 
   // Init hive cache + adapters
   Hive.init(storageLocation.path);
-  return await Hive.openBox(Cache.backgroundKeyUNSAFE);
+  return await Hive.openBox(Cache.keyBackgroundSyncUnsafe);
 }
 
 /**
@@ -188,7 +165,7 @@ Future<Box> openHiveState() async {
     final encryptionKey = await unlockEncryptionKey();
 
     return await Hive.openBox(
-      Cache.stateKey,
+      Cache.keyState,
       crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
@@ -196,7 +173,7 @@ Future<Box> openHiveState() async {
   } catch (error) {
     debugPrint('[openHiveState] open failure: $error');
     return await Hive.openBox(
-      Cache.stateKeyUNSAFE,
+      Cache.keyStateUnsafe,
     );
   }
 }
@@ -211,7 +188,7 @@ Future<Box> openHiveStateRooms() async {
     final encryptionKey = await unlockEncryptionKey();
 
     return await Hive.openBox(
-      Cache.stateRoomKey,
+      Cache.keyStateRooms,
       crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
@@ -219,7 +196,7 @@ Future<Box> openHiveStateRooms() async {
   } catch (error) {
     debugPrint('[openHiveState] open failure: $error');
     return await Hive.openBox(
-      Cache.stateKeyUNSAFE,
+      Cache.keyStateUnsafe,
     );
   }
 }
@@ -234,7 +211,7 @@ Future<LazyBox> openHiveSync() async {
     final encryptionKey = await unlockEncryptionKey();
 
     return await Hive.openLazyBox(
-      Cache.syncKey,
+      Cache.keySync,
       crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
@@ -242,7 +219,7 @@ Future<LazyBox> openHiveSync() async {
   } catch (error) {
     debugPrint('[openHiveState] failure $error');
     return await Hive.openLazyBox(
-      Cache.syncKeyUNSAFE,
+      Cache.keySyncUnsafe,
     );
   }
 }
