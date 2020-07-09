@@ -27,8 +27,8 @@ class ButtonText extends StatelessWidget {
         child: this.loading
             ? Container(
                 constraints: BoxConstraints(
-                  maxHeight: 28,
-                  maxWidth: 28,
+                  maxHeight: 24,
+                  maxWidth: 24,
                 ),
                 child: CircularProgressIndicator(
                   strokeWidth: Dimensions.defaultStrokeWidth,

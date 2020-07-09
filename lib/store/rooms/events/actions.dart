@@ -283,6 +283,8 @@ ThunkAction<AppState> sendSessionKeys({
             trxId: trxId,
           );
 
+          debugPrint('[sendSessionKeys] success $response');
+
           if (response['errcode'] != null) {
             throw response['error'];
           }
@@ -354,6 +356,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
     } catch (error) {
+      debugPrint(error);
       store.dispatch(
         addAlert(
           type: 'warning',

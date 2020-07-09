@@ -11,7 +11,6 @@ part 'state.g.dart';
 @HiveType(typeId: RoomStoreHiveId)
 class RoomStore extends Equatable {
   final bool loading;
-  final bool syncing;
 
   @HiveField(0)
   final bool synced;
@@ -37,7 +36,6 @@ class RoomStore extends Equatable {
   const RoomStore({
     this.rooms = const {},
     this.synced = false,
-    this.syncing = false,
     this.loading = false,
     this.lastUpdate = 0,
     this.lastSince,
@@ -59,7 +57,6 @@ class RoomStore extends Equatable {
     rooms,
     synced,
     loading,
-    syncing,
     lastUpdate,
     lastSince,
     roomObserver,
@@ -69,7 +66,6 @@ class RoomStore extends Equatable {
       rooms: rooms ?? this.rooms,
       synced: synced ?? this.synced,
       loading: loading ?? this.loading,
-      syncing: syncing ?? this.syncing,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       lastSince: lastSince ?? this.lastSince,
       roomObserver: roomObserver ?? this.roomObserver,

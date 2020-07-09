@@ -87,7 +87,8 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: Colors.blueGrey,
+                    padding: EdgeInsets.all(2),
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     child: CircularProgressIndicator(
                       strokeWidth: Dimensions.defaultStrokeWidthLite,
                     ),

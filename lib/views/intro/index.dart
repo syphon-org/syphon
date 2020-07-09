@@ -107,6 +107,20 @@ class IntroState extends State<Intro> {
                 textAlign: TextAlign.center,
               ),
               Text(
+                Strings.confirmationAlphaWarning,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              Text(
+                Strings.confirmationAlphaWarningAlt,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              Text(
+                Strings.confirmationConclusion,
+                textAlign: TextAlign.center,
+              ),
+              Text(
                 Strings.confirmationAppTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),

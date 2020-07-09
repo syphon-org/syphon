@@ -174,7 +174,8 @@ class HomeViewState extends State<Home> {
         AvatarAppBar(
           user: props.currentUser,
           offline: props.offline,
-          syncing: props.syncing && props.offline,
+          // show syncing if offline and refresh or initial sync
+          syncing: (props.syncing && props.offline) || props.loadingRooms,
           tooltip: 'Profile and Settings',
           onPressed: () {
             Navigator.pushNamed(context, '/profile');
@@ -628,12 +629,12 @@ class _Props extends Equatable {
         },
         onLeaveChat: ({Room room}) {
           return store.dispatch(
-            removeRoom(room: room),
+            leaveRoom(room: room),
           );
         },
         onDeleteChat: ({Room room}) {
           return store.dispatch(
-            deleteRoom(room: room),
+            removeRoom(room: room),
           );
         },
         onSelectHelp: () async {

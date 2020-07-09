@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -389,25 +388,18 @@ ThunkAction<AppState> createRoom({
       }
 
       if (isDirect) {
-        final accountData = {
-          '${invites[0].userId}': [newRoomId]
-        };
-
-        final data = await MatrixApi.saveAccountData(
-          protocol: protocol,
-          accessToken: store.state.authStore.user.accessToken,
-          homeserver: store.state.authStore.user.homeserver,
-          userId: store.state.authStore.user.userId,
-          type: AccountDataTypes.direct,
-          accountData: accountData,
+        final directUser = invites[0];
+        final newRoom = Room(
+          id: newRoomId,
+          direct: true,
+          users: {directUser.userId: directUser},
         );
 
-        if (data['errcode'] != null) {
-          throw data['error'];
-        }
-
+        await store.dispatch(toggleDirectRoom(room: newRoom));
+        await store.dispatch(toggleRoomEncryption(room: newRoom));
         await store.dispatch(fetchDirectRooms());
       }
+
       await store.dispatch(startSyncObserver());
 
       return newRoomId;
@@ -456,15 +448,24 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
         throw 'Cannot toggle room to direct without other users';
       }
 
-      if (directRoomUsers[otherUser.userId] == null) {
+      final usersDirectRooms = directRoomUsers[otherUser.userId];
+
+      if (usersDirectRooms == null) {
         directRoomUsers[otherUser.userId] = [room.id];
       } else {
-        directRoomUsers = directRoomUsers.map((user, rooms) {
+        directRoomUsers = directRoomUsers.map((userId, rooms) {
           List<dynamic> updatedRooms = List.from(rooms as List<dynamic>);
-          if (updatedRooms.contains(room.id)) {
-            updatedRooms.remove(room.id);
+
+          // toggle only if were looking at the otherUser
+          if (userId == otherUser.userId) {
+            if (updatedRooms.contains(room.id)) {
+              updatedRooms.remove(room.id);
+            } else {
+              updatedRooms.add(room.id);
+            }
           }
-          return MapEntry(user, updatedRooms);
+
+          return MapEntry(userId, updatedRooms);
         });
       }
 
@@ -473,6 +474,8 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
         final roomIds = value as List<dynamic>;
         return roomIds.isEmpty;
       });
+
+      print('[toggleDirectRoom] ${directRoomUsers}');
 
       final saveData = await MatrixApi.saveAccountData(
         protocol: protocol,
@@ -612,7 +615,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
 }
 
 /**
- * Delete Room
+ * Remove Room
  * 
  * Both leaves and forgets room
  * 
@@ -673,7 +676,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
 }
 
 /**
- * Delete Room
+ * Leave Room
  * 
  * NOTE: https://github.com/vector-im/riot-web/issues/722
  * NOTE: https://github.com/vector-im/riot-web/issues/6978
@@ -684,7 +687,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
  * the user can only delete if owning the room, or leave if
  * just a member
  */
-ThunkAction<AppState> deleteRoom({Room room}) {
+ThunkAction<AppState> leaveRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -700,9 +703,13 @@ ThunkAction<AppState> deleteRoom({Room room}) {
         throw deleteData['error'];
       }
 
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room));
+      }
+
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
     } catch (error) {
-      debugPrint('[deleteRoom] $error');
+      debugPrint('[leaveRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -718,7 +725,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
     try {
       store.dispatch(AddArchive(roomId: room.id));
     } catch (error) {
-      debugPrint('[deleteRoom] $error');
+      debugPrint('[archiveRoom] $error');
     }
   };
 }

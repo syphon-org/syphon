@@ -82,9 +82,19 @@ class Strings {
       'Your device will prompt you to turn on notifications for ${Values.appName}.\n\nDo you want to turn on message notifications?';
   static const confirmationInteractiveAuth =
       'In order to perform this action, you\'ll need to enter your password again';
+
   static const confirmationAlphaVersion =
-      'Thanks for trying out ${Values.appName}!\n\nPlease be aware this app is still very much in Alpha.\n\n' +
-          'With that said, please read the below terms and conditions for this application and if you agree select "I Agree" to continue:\n\n';
+      'Thanks for trying out ${Values.appName}!\n\nPlease be aware this app is still very much in Alpha.\n';
+
+  static const confirmationAlphaWarning =
+      'Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n';
+
+  static const confirmationAlphaWarningAlt =
+      'You may lose data using this application as features and bugs are worked out.\n';
+
+  static const confirmationConclusion =
+      'With that said, please read the below terms and conditions for this application and if you agree select "I Agree" to continue:\n\n';
+
   static const confirmationAcceptInvite =
       'If you accept this room invite, the users in the room will be made aware you\'ve accepted. Are you sure you want to accept now?';
 
