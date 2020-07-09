@@ -14,7 +14,7 @@ import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:syphon/views/widgets/message-typing.dart';
+import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,11 +31,11 @@ import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/store/rooms/events/actions.dart';
 
 // Global widgets
-import 'package:syphon/views/widgets/message.dart';
+import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
 import 'package:syphon/global/colors.dart';
-import 'package:syphon/views/widgets/menu.dart';
+import 'package:syphon/views/widgets/menu-rounded.dart';
 
 enum ChatOptions {
   search,
