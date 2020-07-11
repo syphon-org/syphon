@@ -91,8 +91,8 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub run build_runner build```
 
 ## building
-- ios and android should be normal for a 
-- linux
+- ios and android should follow normal flutter building instructions
+- linux:
 
 1. add dependency overrides before running ```flutter pub get```
 
