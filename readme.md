@@ -1,4 +1,3 @@
-
 <br>
 
 <p align='center'>
@@ -90,6 +89,37 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
     - run the following prebuild commands
         - ```flutter pub get```
         - ```flutter pub run build_runner build```
+
+## building
+- ios and android should be normal for a 
+- linux
+
+1. add dependency overrides before running ```flutter pub get```
+
+```yml
+dependency_overrides:
+    dartx: ^0.3.0
+    characters: ^0.3.0
+``` 
+
+2. run ```flutter pub run build_runner build``` to generate the hive mappings for state caches
+3. comment out whats necessary to make the dependences appear like below
+```yml
+dev_dependencies:
+  build_runner: ^1.0.0
+  # flutter_test:
+  #   sdk: flutter
+  # hive_generator: 0.7.0
+
+dependency_overrides:
+  # dartx: ^0.3.0
+  # characters: ^0.3.0
+```
+4. run ```flutter build linux && flutter build bundle```
+5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
+6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+
+
 
 ### store
 - State (redux)
