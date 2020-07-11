@@ -50,12 +50,16 @@ void main() async {
   // init cold cache (mobile only)
   await initHive();
 
-  Cache.sync = await openHiveSync();
-  Cache.state = await openHiveState();
-  Cache.stateRooms = await openHiveStateRooms();
+  if(Platform.isAndroid || Platform.isIOS){
+    Cache.sync = await openHiveSync();
+    Cache.state = await openHiveState();
+    Cache.stateRooms = await openHiveStateRooms();
+  }
 
-  // init state cache (hot)
-  final store = await initStore();
+  if(Platform.isLinux || Platform.isWindows || Platform.isLinux){
+    Cache.state = await openHiveStateUnsafe();
+    Cache.stateRooms = await openHiveStateRoomsUnsafe();
+  }
 
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
@@ -66,6 +70,10 @@ void main() async {
   if (Platform.isMacOS) {
     // await WindowUtils.setSize(Size(720, 720));
   }
+
+
+  // init state cache (hot)
+  final store = await initStore();
 
   // the main thing
   runApp(Syphon(store: store));

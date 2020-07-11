@@ -39,6 +39,7 @@ class Cache {
 
   static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
   static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
+  static const stateKeyRoomsUNSAFE ='${Values.appNameLabel}_cache_rooms_unsafe';
 
   static const backgroundKeyUNSAFE =
       '${Values.appNameLabel}_background_cache_unsafe_alt';
@@ -70,20 +71,32 @@ Future<dynamic> initStorageLocation() async {
   try {
     if (Platform.isIOS || Platform.isAndroid) {
       storageLocation = await getApplicationDocumentsDirectory();
-    } else if (Platform.isMacOS) {
+      return storageLocation.path;
+    }
+    
+    if (Platform.isMacOS) {
       storageLocation = await File('cache').create().then(
             (value) => value.writeAsString(
               '{}',
               flush: true,
             ),
           );
-    } else {
-      debugPrint('Caching is not supported on this platform');
-    }
+
+      return storageLocation.path;
+    } 
+
+    if (Platform.isLinux) {
+      storageLocation = await getApplicationDocumentsDirectory();
+      print(storageLocation.path);
+      return storageLocation.path;
+    } 
+     
+    debugPrint('[initStorageLocation] no cache support'); 
+    return null;
   } catch (error) {
     debugPrint('[initStorageLocation] $error');
+    return null;
   }
-  return storageLocation.path;
 }
 
 Future<void> initHiveConfiguration(String storageLocationPath) async {
@@ -137,9 +150,22 @@ Future<List<int>> unlockEncryptionKey() async {
  * 
  * For testing purposes only - should be encrypting hive
  */
-Future<Box> openHiveStateUnsafe() async {
+Future<Box> openHiveStateRoomsUnsafe() async {
   return await Hive.openBox(
     Cache.stateKeyUNSAFE,
+    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
+  );
+}
+
+
+/**
+ * openHiveState UNSAFE
+ * 
+ * For testing purposes only - should be encrypting hive
+ */
+Future<Box> openHiveStateUnsafe() async {
+  return await Hive.openBox(
+    Cache.stateKeyRoomsUNSAFE,
     compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
   );
 }
