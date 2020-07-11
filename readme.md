@@ -1,4 +1,3 @@
-
 <br>
 
 <p align='center'>
@@ -14,7 +13,10 @@ a privacy centric matrix client - now in open alpha*
         <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
     </a>
     <a href='https://apps.apple.com/us/app/syphon/id1496285352'>
-        <img height="56"  alt='Download on the App Store'src='assets/external/download_on_the_app_store.svg'/>
+        <img height="56" alt='Download on the App Store' style="padding-right:8px;" src='assets/external/download_on_the_app_store.svg'/>
+    </a>
+    <a href='https://f-droid.org/packages/org.tether.tether/'>
+        <img height="56" src="assets/external/get-it-on-fdroid.png">
     </a>
 </p>
 
@@ -34,7 +36,8 @@ a privacy centric matrix client - now in open alpha*
 </p>
 
 <p align='center'>
- Syphon is still in alpha and we <b>do not recommend</b> using it where proven and independently verified security is required.
+ Syphon is still in alpha and we <b>do not recommend</b><br> 
+ using it where proven and independently verified security is required.
 </p>
 <br>
 
@@ -86,6 +89,37 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
     - run the following prebuild commands
         - ```flutter pub get```
         - ```flutter pub run build_runner build```
+
+## building
+- ios and android should follow normal flutter building instructions
+- linux:
+
+1. add dependency overrides before running ```flutter pub get```
+
+```yml
+dependency_overrides:
+    dartx: ^0.3.0
+    characters: ^0.3.0
+``` 
+
+2. run ```flutter pub run build_runner build``` to generate the hive mappings for state caches
+3. comment out whats necessary to make the dependences appear like below
+```yml
+dev_dependencies:
+  build_runner: ^1.0.0
+  # flutter_test:
+  #   sdk: flutter
+  # hive_generator: 0.7.0
+
+dependency_overrides:
+  # dartx: ^0.3.0
+  # characters: ^0.3.0
+```
+4. run ```flutter build linux && flutter build bundle```
+5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
+6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+
+
 
 ### store
 - State (redux)
