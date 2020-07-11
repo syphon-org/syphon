@@ -628,6 +628,10 @@ ThunkAction<AppState> removeRoom({Room room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room));
+      }
+
       // submit a leave room request
       final leaveData = await MatrixApi.leaveRoom(
         protocol: protocol,
@@ -661,10 +665,6 @@ ThunkAction<AppState> removeRoom({Room room}) {
         throw forgetData['error'];
       }
 
-      if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room));
-      }
-
       await store.dispatch(RemoveRoom(room: Room(id: room.id)));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
@@ -692,6 +692,10 @@ ThunkAction<AppState> leaveRoom({Room room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room));
+      }
+
       final deleteData = await MatrixApi.leaveRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -702,11 +706,6 @@ ThunkAction<AppState> leaveRoom({Room room}) {
       if (deleteData['errcode'] != null) {
         throw deleteData['error'];
       }
-
-      if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room));
-      }
-
       store.dispatch(RemoveRoom(room: Room(id: room.id)));
     } catch (error) {
       debugPrint('[leaveRoom] $error');
