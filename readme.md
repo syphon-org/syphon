@@ -37,7 +37,8 @@ a privacy centric matrix client - now in open alpha*
 </p>
 
 <p align='center'>
- Syphon is still in alpha and we <b>do not recommend</b> using it where proven and independently verified security is required.
+ Syphon is still in alpha and we <b>do not recommend</b><br> 
+ using it where proven and independently verified security is required.
 </p>
 <br>
 
