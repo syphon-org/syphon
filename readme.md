@@ -94,6 +94,9 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - ios and android should follow normal flutter building instructions
 - linux:
 
+0. various flutter desktop embedding config changes
+    - ```flutter channel dev```
+    - ```flutter config --enable-linux-desktop```
 1. add dependency overrides before running ```flutter pub get```
 
 ```yml

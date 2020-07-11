@@ -5,8 +5,10 @@
 import FlutterMacOS
 import Foundation
 
-import window_utils
+import path_provider_macos
+import url_launcher_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  WindowUtils.register(with: registry.registrar(forPlugin: "WindowUtils"))
+  PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
+  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
 }
