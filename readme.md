@@ -116,7 +116,11 @@ dependency_overrides:
   # dartx: ^0.3.0
   # characters: ^0.3.0
 ```
-4. run ```flutter build linux```
+4. run ```flutter build linux && flutter build bundle```
+5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
+6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+
+
 
 ### store
 - State (redux)
