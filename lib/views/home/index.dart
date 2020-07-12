@@ -359,6 +359,15 @@ class HomeViewState extends State<Home> {
                                   width: Dimensions.avatarSize,
                                   height: Dimensions.avatarSize,
                                   mxcUri: room.avatarUri,
+                                  fallbackColor: primaryColor,
+                                  fallback: Text(
+                                    formatRoomInitials(room: room),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             : Text(

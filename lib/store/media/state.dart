@@ -13,20 +13,27 @@ class MediaStore extends Equatable {
   @HiveField(1)
   final Map<String, Uint8List> mediaCache;
 
+  // Map<mxcUri, status>
+  @HiveField(2)
+  final Map<String, String> mediaChecks;
+
   static const hiveBox = 'MediaStore';
 
   const MediaStore({
     this.fetching = false,
     this.mediaCache = const {},
+    this.mediaChecks = const {},
   });
 
   MediaStore copyWith({
     fetching,
     mediaCache,
+    mediaChecks,
   }) {
     return MediaStore(
       fetching: fetching ?? this.fetching,
       mediaCache: mediaCache ?? this.mediaCache,
+      mediaChecks: mediaChecks ?? this.mediaChecks,
     );
   }
 
@@ -34,5 +41,6 @@ class MediaStore extends Equatable {
   List<Object> get props => [
         fetching,
         mediaCache,
+        mediaChecks,
       ];
 }

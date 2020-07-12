@@ -14,7 +14,6 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -399,54 +398,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ),
                             ),
                             ListTile(
-                              dense: true,
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Mute conversation',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              trailing: Container(
-                                child: Switch(
-                                  value: false,
-                                  onChanged: (value) {
-                                    // TODO: also prevent updates from pushing the chat up in home
-                                    // TODO: prevent notification if room id exists in this setting
-                                  },
-                                ),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Notification Sound',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  'Default (Argon)',
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Vibrate',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  'Default',
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ),
-                            ),
-                            ListTile(
                               onTap: () => onShowColorPicker(
                                 context: context,
                                 onSelectColor: props.onSelectPrimaryColor,
@@ -458,10 +409,30 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 style: TextStyle(fontSize: 18.0),
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.only(right: 6),
+                                padding: EdgeInsets.only(right: 16),
                                 child: CircleAvatar(
                                   radius: 16,
                                   backgroundColor: props.roomPrimaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              dense: true,
+                              enabled: !props.loading,
+                              onTap: () {
+                                props.onToggleDirectRoom();
+                              },
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Toggle Direct Room',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                child: Switch(
+                                  value: props.room.direct,
+                                  onChanged: (value) {
+                                    props.onToggleDirectRoom();
+                                  },
                                 ),
                               ),
                             ),
@@ -481,7 +452,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               width: width,
                               padding: contentPadding,
                               child: Text(
-                                'Call Settings',
+                                'Notifications Settings',
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -506,13 +477,28 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               onTap: () {},
                               contentPadding: contentPadding,
                               title: Text(
-                                'Notification Sound',
+                                'Vibrate',
                                 style: TextStyle(fontSize: 18.0),
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   'Default',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {},
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Notification Sound',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default (Argon)',
                                   style: TextStyle(fontSize: 18.0),
                                 ),
                               ),
@@ -546,14 +532,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 style: TextStyle(fontSize: 18.0),
                               ),
                             ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Generate New Key',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -565,17 +543,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       child: Container(
                         child: Column(
                           children: [
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Delete All Messages',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.redAccent,
-                                ),
-                              ),
-                            ),
                             ListTile(
                               onTap: () {},
                               contentPadding: contentPadding,
@@ -605,56 +572,64 @@ class ChatDetailsState extends State<ChatDetailsView> {
 class _Props extends Equatable {
   final Room room;
   final String userId;
+  final bool loading;
   final Color roomPrimaryColor;
   final List<Message> messages;
 
   final Function onLeaveChat;
   final Function onSelectPrimaryColor;
+  final Function onToggleDirectRoom;
   final Function onViewEncryptionKeys;
 
   _Props({
     @required this.room,
     @required this.userId,
+    @required this.loading,
     @required this.messages,
     @required this.onLeaveChat,
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
+    @required this.onToggleDirectRoom,
     @required this.onViewEncryptionKeys,
   });
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-        userId: store.state.authStore.user.userId,
-        room: roomSelectors.room(id: roomId, state: store.state),
-        onViewEncryptionKeys: (
-          BuildContext context,
-        ) {
-          showDialog(context: context, child: DialogKeyInspector());
-        },
-        messages: latestMessages(
-          roomSelectors.room(id: roomId, state: store.state).messages,
-        ),
-        onLeaveChat: () async {
-          await store.dispatch(removeRoom(room: Room(id: roomId)));
-        },
-        roomPrimaryColor: () {
-          final customChatSettings =
-              store.state.settingsStore.customChatSettings ??
-                  Map<String, ChatSetting>();
+      userId: store.state.authStore.user.userId,
+      room: roomSelectors.room(id: roomId, state: store.state),
+      loading: store.state.roomStore.loading,
+      onViewEncryptionKeys: (
+        BuildContext context,
+      ) {
+        showDialog(context: context, child: DialogKeyInspector());
+      },
+      messages: latestMessages(
+        roomSelectors.room(id: roomId, state: store.state).messages,
+      ),
+      onLeaveChat: () async {
+        await store.dispatch(removeRoom(room: Room(id: roomId)));
+      },
+      roomPrimaryColor: () {
+        final customChatSettings =
+            store.state.settingsStore.customChatSettings ??
+                Map<String, ChatSetting>();
 
-          if (customChatSettings[roomId] != null) {
-            return customChatSettings[roomId].primaryColor != null
-                ? Color(customChatSettings[roomId].primaryColor)
-                : Colors.grey;
-          }
+        if (customChatSettings[roomId] != null) {
+          return customChatSettings[roomId].primaryColor != null
+              ? Color(customChatSettings[roomId].primaryColor)
+              : Colors.grey;
+        }
 
-          return Colors.grey;
-        }(),
-        onSelectPrimaryColor: (color) {
-          store.dispatch(
-            updateRoomPrimaryColor(roomId: roomId, color: color),
-          );
-        },
-      );
+        return Colors.grey;
+      }(),
+      onSelectPrimaryColor: (color) {
+        store.dispatch(
+          updateRoomPrimaryColor(roomId: roomId, color: color),
+        );
+      },
+      onToggleDirectRoom: () {
+        final room = roomSelectors.room(id: roomId, state: store.state);
+        store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
+      });
 
   @override
   List<Object> get props => [

@@ -194,6 +194,13 @@ class MessageWidget extends StatelessWidget {
                                   width: Dimensions.avatarSizeMessage,
                                   height: Dimensions.avatarSizeMessage,
                                   mxcUri: avatarUri,
+                                  fallback: Text(
+                                    formatSenderInitials(message.sender),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             : CircleAvatar(

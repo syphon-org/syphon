@@ -509,6 +509,13 @@ class ChatViewState extends State<ChatView> {
                                   width: Dimensions.avatarSize,
                                   height: Dimensions.avatarSize,
                                   mxcUri: props.room.avatarUri,
+                                  fallback: Text(
+                                    formatRoomInitials(room: props.room),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             : Text(

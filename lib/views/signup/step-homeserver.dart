@@ -71,6 +71,8 @@ class HomeserverStep extends StatelessWidget {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextField(
+                    autocorrect: false,
+                    enableSuggestions: false,
                     controller: TextEditingController.fromValue(
                       TextEditingValue(
                         text: props.homeserver,

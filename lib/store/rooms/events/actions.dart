@@ -104,7 +104,7 @@ ThunkAction<AppState> fetchMessageEvents({
 
 /**
  *  
- * Fetch State Events (Unused for now)
+ * Fetch State Events
  * 
  * state events can only be 
  * done from full state /sync data

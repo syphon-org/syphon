@@ -13,6 +13,13 @@ MediaStore mediaReducer(
         mediaCache: mediaCache,
       );
       break;
+    case UpdateMediaChecks:
+      final mediaChecks = Map<String, String>.from(state.mediaChecks);
+      mediaChecks[action.mxcUri] = action.status;
+      return state.copyWith(
+        mediaChecks: mediaChecks,
+      );
+      break;
     default:
       return state;
   }

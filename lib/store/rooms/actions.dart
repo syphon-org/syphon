@@ -395,7 +395,7 @@ ThunkAction<AppState> createRoom({
           users: {directUser.userId: directUser},
         );
 
-        await store.dispatch(toggleDirectRoom(room: newRoom));
+        await store.dispatch(toggleDirectRoom(room: newRoom, enabled: true));
         await store.dispatch(toggleRoomEncryption(room: newRoom));
         await store.dispatch(fetchDirectRooms());
       }
@@ -420,7 +420,7 @@ ThunkAction<AppState> createRoom({
  * Fetch the direct rooms list and recalculate it without the
  * given alias
  */
-ThunkAction<AppState> toggleDirectRoom({Room room}) {
+ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -448,32 +448,39 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
         throw 'Cannot toggle room to direct without other users';
       }
 
-      final usersDirectRooms = directRoomUsers[otherUser.userId];
+      final usersDirectRooms = directRoomUsers[otherUser.userId] ?? [];
 
-      if (usersDirectRooms == null) {
+      if (usersDirectRooms.isEmpty && enabled) {
         directRoomUsers[otherUser.userId] = [room.id];
-      } else {
-        directRoomUsers = directRoomUsers.map((userId, rooms) {
-          List<dynamic> updatedRooms = List.from(rooms as List<dynamic>);
-
-          // toggle only if were looking at the otherUser
-          if (userId == otherUser.userId) {
-            if (updatedRooms.contains(room.id)) {
-              updatedRooms.remove(room.id);
-            } else {
-              updatedRooms.add(room.id);
-            }
-          }
-
-          return MapEntry(userId, updatedRooms);
-        });
       }
+
+      directRoomUsers = directRoomUsers.map((userId, rooms) {
+        List<dynamic> updatedRooms = List.from(rooms as List<dynamic>);
+
+        if (userId != otherUser.userId) {
+          return MapEntry(userId, updatedRooms);
+        }
+
+        // toggle only if were looking at the otherUser
+        if (enabled) {
+          updatedRooms.add(room.id);
+        } else {
+          updatedRooms.remove(room.id);
+        }
+
+        return MapEntry(userId, updatedRooms);
+      });
 
       // Filter out empty list entries for a user
       directRoomUsers.removeWhere((key, value) {
         final roomIds = value as List<dynamic>;
         return roomIds.isEmpty;
       });
+
+      if (!enabled) {
+        print('removing all users from ${otherUser.userId}');
+        directRoomUsers[otherUser.userId] = null;
+      }
 
       print('[toggleDirectRoom] ${directRoomUsers}');
 
@@ -492,7 +499,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room}) {
 
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      debugPrint('[toggleDirectRoom] error: $error');
+      debugPrint('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -629,7 +636,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room));
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 
       // submit a leave room request
@@ -693,7 +700,7 @@ ThunkAction<AppState> leaveRoom({Room room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room));
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 
       final deleteData = await MatrixApi.leaveRoom(
@@ -704,6 +711,9 @@ ThunkAction<AppState> leaveRoom({Room room}) {
       );
 
       if (deleteData['errcode'] != null) {
+        if (deleteData['errcode'] == MatrixErrors.room_unknown) {
+          store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
         throw deleteData['error'];
       }
       store.dispatch(RemoveRoom(room: Room(id: room.id)));

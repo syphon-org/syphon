@@ -2,6 +2,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/devices.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/events.dart';
+import 'package:syphon/global/libs/matrix/media.dart';
 import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';
 import 'package:syphon/global/libs/matrix/search.dart';
@@ -48,6 +49,9 @@ abstract class MatrixApi {
   static final fetchUserProfile = Users.fetchUserProfile;
   static final updateDisplayName = Users.updateDisplayName;
   static final updateAvatarUri = Users.updateAvatarUri;
+
+  // Media
+  static final fetchThumbnail = Media.fetchThumbnail;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;
