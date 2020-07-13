@@ -26,6 +26,7 @@ class Dimensions {
   static const double avatarHeroSize = 120;
 
   // Buttons
+  static const double buttonHeightMin = 56;
   static const double buttonWidthMin = 256;
   static const double buttonWidthMax = 296;
   static const double buttonAppBarSize = 26;

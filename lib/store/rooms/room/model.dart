@@ -510,7 +510,7 @@ class Room {
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline
-        endHash: endHash ?? this.endHash,
+        endHash: endHash ?? this.endHash ?? prevHash,
         // hash of the latest batch messages in timeline
         startHash: startHash ?? this.startHash,
         // most recent previous batch from the last /sync
