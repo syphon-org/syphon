@@ -6,7 +6,6 @@ import './room/model.dart';
 RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
-      print('SetLoading ${action.loading}');
       return state.copyWith(loading: action.loading);
     case SetSending:
       final rooms = Map<String, Room>.from(state.rooms);

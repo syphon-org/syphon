@@ -980,6 +980,11 @@ class _Props extends Equatable {
       },
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+
+        debugPrint(
+          '\n[onLoadMoreMessages] passing\n  start: ${room.startHash} \n   end:${room.endHash}\n',
+        );
+
         store.dispatch(fetchMessageEvents(
           room: room,
           startHash: room.endHash,

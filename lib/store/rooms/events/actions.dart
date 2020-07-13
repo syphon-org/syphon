@@ -54,18 +54,13 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      // last since called on /sync
-      final lastSince = store.state.syncStore.lastSince;
-
-      debugPrint('[fetchMessageEvents] ${room.id}');
-
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
         "protocol": protocol,
         "homeserver": store.state.authStore.user.homeserver,
         "accessToken": store.state.authStore.user.accessToken,
         "roomId": room.id,
         "to": endHash,
-        "from": startHash ?? lastSince,
+        "from": startHash,
         "limit": limit,
       });
 
@@ -79,8 +74,10 @@ ThunkAction<AppState> fetchMessageEvents({
       // which will fetch the next batch with the same endHash
       // the following is probably not needed due to the
       // inequality check for prevHash and endHash in syncRooms
+      // NOTE: nextPrevBatch by end hash is just to load more
+      // should be refactored
       var nextPrevBatch;
-      if (end != start && end != endHash) {
+      if ((end != start && end != endHash)) {
         nextPrevBatch = end;
       }
 
@@ -90,6 +87,7 @@ ThunkAction<AppState> fetchMessageEvents({
           '${room.id}': {
             'timeline': {
               'events': messages,
+              'end_batch': end,
               'prev_batch': nextPrevBatch,
             }
           },

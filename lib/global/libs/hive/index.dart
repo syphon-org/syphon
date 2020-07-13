@@ -39,7 +39,8 @@ class Cache {
 
   static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
   static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
-  static const stateKeyRoomsUNSAFE ='${Values.appNameLabel}_cache_rooms_unsafe';
+  static const stateKeyRoomsUNSAFE =
+      '${Values.appNameLabel}_cache_rooms_unsafe';
 
   static const backgroundKeyUNSAFE =
       '${Values.appNameLabel}_background_cache_unsafe_alt';
@@ -73,7 +74,7 @@ Future<dynamic> initStorageLocation() async {
       storageLocation = await getApplicationDocumentsDirectory();
       return storageLocation.path;
     }
-    
+
     if (Platform.isMacOS) {
       storageLocation = await File('cache').create().then(
             (value) => value.writeAsString(
@@ -83,15 +84,14 @@ Future<dynamic> initStorageLocation() async {
           );
 
       return storageLocation.path;
-    } 
+    }
 
     if (Platform.isLinux) {
       storageLocation = await getApplicationDocumentsDirectory();
-      print(storageLocation.path);
       return storageLocation.path;
-    } 
-     
-    debugPrint('[initStorageLocation] no cache support'); 
+    }
+
+    debugPrint('[initStorageLocation] no cache support');
     return null;
   } catch (error) {
     debugPrint('[initStorageLocation] $error');
@@ -156,7 +156,6 @@ Future<Box> openHiveStateRoomsUnsafe() async {
     compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
   );
 }
-
 
 /**
  * openHiveState UNSAFE

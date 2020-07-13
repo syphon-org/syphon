@@ -165,15 +165,16 @@ ThunkAction<AppState> syncRooms(
       // more than one batch needs to be fetched (a gap)
       // and is not already at the end of the hash
       // the end would be room.prevHash == room.endHash
-      if (room.prevHash != null && room.prevHash != room.endHash) {
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            endHash: room.endHash,
-            startHash: room.prevHash,
-          ),
-        );
-      }
+      // TODO: make this work with an explicit call
+      // if (room.prevHash != null && room.prevHash != room.endHash) {
+      //   store.dispatch(
+      //     fetchMessageEvents(
+      //       room: room,
+      //       endHash: room.endHash,
+      //       startHash: room.prevHash,
+      //     ),
+      //   );
+      // }
 
       store.dispatch(SetRoom(room: room));
     });
