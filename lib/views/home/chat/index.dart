@@ -813,7 +813,9 @@ class ChatViewState extends State<ChatView> {
                               maintainSize: false,
                               maintainAnimation: false,
                               maintainState: false,
-                              visible: props.room.messages.length < 8,
+                              visible:
+                                  props.room.endHash == props.room.prevHash ||
+                                      props.room.endHash == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
