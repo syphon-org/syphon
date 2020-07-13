@@ -151,11 +151,18 @@ dependency_overrides:
 - [multi-line text field](https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter)
 - [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
 - [changing transition styles](https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter)
+- [animations](https://flutter.dev/docs/development/ui/animations)
+- adding a border without needing ctrl-p
+```dart
+decoration: BoxDecoration(
+   border: Border.all(width: 1, color: Colors.white),
+),
+```
 
 
 ## contributing
 - email contact@syphon.org if you'd like to get involved. there's a lot to do.
-- donations are welcome, but won't play any role in me continuing to work on this for as long as I'm able. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
+- donations are welcome, but not required. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 
 ## from those who made it possible
 lub youu

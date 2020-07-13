@@ -374,6 +374,8 @@ class Room {
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
+            direct = direct ?? event.content['is_direct'];
+
             // Cache user to rooms user cache if not present
             if (!users.containsKey(event.sender)) {
               users[event.sender] = User(
@@ -394,13 +396,6 @@ class Room {
                 name = displayName;
                 avatarUri = memberAvatarUri;
               }
-            }
-
-            // Current user membership event
-            if (displayName == currentUser.displayName) {
-              // likely still an invite
-              // marked as direct, but not joined yet
-              direct = event.content['is_direct'];
             }
 
             break;
@@ -427,11 +422,17 @@ class Room {
         namePriority = 0;
 
         // Filter out number of non current users to show preview of total and who
-        final nonCurrentUsers = users.values
-            .where((user) => user.displayName != currentUser.displayName);
+
+        final nonCurrentUsers = users.values.where(
+          (user) =>
+              user.displayName != currentUser.displayName &&
+              user.userId != currentUser.userId,
+        );
+
         final hasMultipleUsers =
             nonCurrentUsers.isNotEmpty && nonCurrentUsers.length > 1;
         final shownUser = users.values.elementAt(0);
+        print('room ${users.values}');
 
         // set name and avi to first non user or that + total others
         name = hasMultipleUsers

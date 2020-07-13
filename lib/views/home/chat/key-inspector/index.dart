@@ -6,6 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 class DialogKeyInspector extends StatelessWidget {
   DialogKeyInspector({
@@ -87,10 +88,19 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(
-    Store<AppState> store,
-  ) =>
+    Store<AppState> store, {
+    Room room,
+  }) =>
       _Props(
         loading: false,
-        chatDeviceKeys: store.state.cryptoStore.deviceKeys,
+        chatDeviceKeys:
+            store.state.cryptoStore.deviceKeys.map((userId, devices) {
+          // Only return entries in this room
+          if (!room.users.containsKey(userId)) {
+            return null;
+          }
+
+          return MapEntry(userId, devices);
+        }),
       );
 }

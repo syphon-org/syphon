@@ -7,9 +7,9 @@ import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -26,9 +26,8 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/global/formatters.dart';
 
 // View And Styling
-import 'package:syphon/views/widgets/menu.dart';
+import 'package:syphon/views/widgets/menu-rounded.dart';
 import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/global/colors.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -170,60 +169,15 @@ class HomeViewState extends State<Home> {
       brightness: Brightness.dark,
       titleSpacing: 16.00,
       title: Row(children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(right: 8),
-          child: Stack(
-            children: <Widget>[
-              IconButton(
-                padding: EdgeInsets.all(4),
-                icon: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: props.currentUser.avatarUri != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.thumbnailSizeMax,
-                          ),
-                          child: MatrixImage(
-                            mxcUri: props.currentUser.avatarUri,
-                            thumbnail: true,
-                          ),
-                        )
-                      : Text(
-                          displayInitials(props.currentUser),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/profile');
-                },
-                tooltip: 'Profile and Settings',
-              ),
-              Visibility(
-                visible: props.offline,
-                child: Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.thumbnailSizeMax,
-                      ),
-                      child: Container(
-                        height: 16,
-                        width: 16,
-                        color: Colors.blueGrey,
-                        child: Icon(
-                          Icons.offline_bolt,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      )),
-                ),
-              ),
-            ],
-          ),
+        AvatarAppBar(
+          user: props.currentUser,
+          offline: props.offline,
+          // show syncing if offline and refresh or initial sync
+          syncing: (props.syncing && props.offline) || props.loadingRooms,
+          tooltip: 'Profile and Settings',
+          onPressed: () {
+            Navigator.pushNamed(context, '/profile');
+          },
         ),
         Text(
           Values.appName,
@@ -403,6 +357,15 @@ class HomeViewState extends State<Home> {
                                   width: Dimensions.avatarSize,
                                   height: Dimensions.avatarSize,
                                   mxcUri: room.avatarUri,
+                                  fallbackColor: primaryColor,
+                                  fallback: Text(
+                                    formatRoomInitials(room: room),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             : Text(
@@ -542,25 +505,27 @@ class HomeViewState extends State<Home> {
                               props,
                             ),
                           ),
-                          Positioned(
-                            child: Visibility(
-                              visible: props.loadingRooms,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
-                            ),
-                          ),
+                          // TODO: decide if /sync indicator
+                          // should just be on current user avatar
+                          // Positioned(
+                          //   child: Visibility(
+                          //     visible: props.loadingRooms,
+                          //     child: Container(
+                          //         child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: <Widget>[
+                          //         RefreshProgressIndicator(
+                          //           strokeWidth: Dimensions.defaultStrokeWidth,
+                          //           valueColor:
+                          //               new AlwaysStoppedAnimation<Color>(
+                          //             PRIMARY_COLOR,
+                          //           ),
+                          //           value: null,
+                          //         ),
+                          //       ],
+                          //     )),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -601,12 +566,39 @@ class HomeViewState extends State<Home> {
                 ),
                 FloatingActionButton(
                   heroTag: 'fab3',
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
                   tooltip: 'Direct Message',
                   onPressed: () => onNavigateToDraft(context),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    padding: EdgeInsets.only(left: 4),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // Super hack
+                        Positioned(
+                            top: 8,
+                            left: -4,
+                            // TODO: clip the edges and
+                            // increase the icon size
+                            child: ClipRRect(
+                              clipBehavior: Clip.hardEdge,
+                              borderRadius: BorderRadius.circular(
+                                1,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                            )),
+                        Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 FloatingActionButton(
                   heroTag: 'fab1',
@@ -627,8 +619,9 @@ class HomeViewState extends State<Home> {
 class _Props extends Equatable {
   final List<Room> rooms;
   final bool offline;
-  final User currentUser;
+  final bool syncing;
   final bool loadingRooms;
+  final User currentUser;
   final Map<String, ChatSetting> chatSettings;
 
   final Function onLeaveChat;
@@ -640,6 +633,7 @@ class _Props extends Equatable {
   _Props({
     @required this.rooms,
     @required this.offline,
+    @required this.syncing,
     @required this.currentUser,
     @required this.loadingRooms,
     @required this.chatSettings,
@@ -657,6 +651,7 @@ class _Props extends Equatable {
         ),
         loadingRooms: store.state.roomStore.loading,
         offline: store.state.syncStore.offline,
+        syncing: store.state.syncStore.syncing,
         currentUser: store.state.authStore.user,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onArchiveRoom: ({Room room}) async {
@@ -670,12 +665,12 @@ class _Props extends Equatable {
         },
         onLeaveChat: ({Room room}) {
           return store.dispatch(
-            removeRoom(room: room),
+            leaveRoom(room: room),
           );
         },
         onDeleteChat: ({Room room}) {
           return store.dispatch(
-            deleteRoom(room: room),
+            removeRoom(room: room),
           );
         },
         onSelectHelp: () async {

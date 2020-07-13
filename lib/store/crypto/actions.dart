@@ -478,10 +478,6 @@ ThunkAction<AppState> claimOneTimeKeys({
 }) {
   return (Store<AppState> store) async {
     try {
-      if (!room.direct) {
-        throw "Encryption currently only works for direct messaging";
-      }
-
       final roomUsers = room.users.values;
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
@@ -581,10 +577,11 @@ ThunkAction<AppState> claimOneTimeKeys({
       });
       return true;
     } catch (error) {
+      debugPrint(error);
       store.dispatch(
         addAlert(
           type: 'warning',
-          message: error.message,
+          message: error,
           origin: 'claimOneTimeKeys',
         ),
       );

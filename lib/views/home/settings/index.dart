@@ -26,9 +26,6 @@ class SettingsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final double width = MediaQuery.of(context).size.width;
-          final double height = MediaQuery.of(context).size.height;
-
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -276,7 +273,7 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        loading: store.state.roomStore.syncing || store.state.roomStore.loading,
+        loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
         onLogoutUser: () {

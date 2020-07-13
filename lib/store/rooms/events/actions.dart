@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -104,7 +105,7 @@ ThunkAction<AppState> fetchMessageEvents({
 
 /**
  *  
- * Fetch State Events (Unused for now)
+ * Fetch State Events
  * 
  * state events can only be 
  * done from full state /sync data
@@ -294,6 +295,7 @@ ThunkAction<AppState> sendSessionKeys({
       // await all sendToDevice room key events to be sent to users
       await Future.wait(sendToDeviceRequests);
     } catch (error) {
+      debugPrint(error);
       store.dispatch(
         addAlert(type: 'warning', message: error.message),
       );
@@ -320,6 +322,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       final keySession = store.state.cryptoStore.outboundKeySessions[room.id];
 
       // send the key session if one hasn't been sent or created
+
       if (keySession == null) {
         await store.dispatch(sendSessionKeys(room: room));
       }
@@ -354,6 +357,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
     } catch (error) {
+      debugPrint(error);
       store.dispatch(
         addAlert(
           type: 'warning',

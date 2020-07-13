@@ -9,6 +9,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -119,70 +120,27 @@ class SearchUserState extends State<SearchUserView> {
 
   @protected
   void onSelectUser({BuildContext context, _Props props, User user}) async {
-    double width = MediaQuery.of(context).size.width;
-
     return await showDialog(
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text('Chat with ${user.displayName}'),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: width * 0.05,
-          vertical: 12,
-        ),
-        children: <Widget>[
-          Text(
-            Strings.confirmationStartChat,
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'cancel',
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  onPressed: () async {
-                    this.setState(() {
-                      creatingRoomDisplayName = user.displayName;
-                    });
-                    final newRoomId = await props.onCreateUserChat(user: user);
-                    Navigator.pop(context);
-                    Navigator.popAndPushNamed(
-                      context,
-                      '/home/chat',
-                      arguments: ChatViewArguements(
-                        roomId: newRoomId,
-                        title: creatingRoomDisplayName,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'lets chat',
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-              ],
+      builder: (BuildContext context) => DialogStartChat(
+        user: user,
+        title: 'Chat with ${user.displayName}',
+        content: Strings.confirmationStartChat,
+        onStartChat: () async {
+          this.setState(() {
+            creatingRoomDisplayName = user.displayName;
+          });
+          final newRoomId = await props.onCreateUserChat(user: user);
+          Navigator.pop(context);
+          Navigator.popAndPushNamed(
+            context,
+            '/home/chat',
+            arguments: ChatViewArguements(
+              roomId: newRoomId,
+              title: user.displayName,
             ),
-          )
-        ],
+          );
+        },
       ),
     );
   }
@@ -196,72 +154,27 @@ class SearchUserState extends State<SearchUserView> {
    */
   @protected
   void onAttemptChat({BuildContext context, _Props props, User user}) async {
-    double width = MediaQuery.of(context).size.width;
     return await showDialog(
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text('Try chatting with ${user.displayName}'),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: width * 0.05,
-          vertical: 12,
-        ),
-        children: <Widget>[
-          Text(
-            Strings.confirmationAttemptChat,
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    Strings.buttonCancel,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-                SimpleDialogOption(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  onPressed: creatingRoomDisplayName != null
-                      ? null
-                      : () async {
-                          this.setState(() {
-                            creatingRoomDisplayName = user.displayName;
-                          });
-                          final newRoomId =
-                              await props.onCreateUserChat(user: user);
-                          Navigator.pop(context);
-                          Navigator.popAndPushNamed(
-                            context,
-                            '/home/chat',
-                            arguments: ChatViewArguements(
-                              roomId: newRoomId,
-                              title: creatingRoomDisplayName,
-                            ),
-                          );
-                        },
-                  child: Text(
-                    Strings.buttonLetsChat,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-              ],
+      builder: (BuildContext context) => DialogStartChat(
+        user: user,
+        title: 'Try chatting with ${user.displayName}',
+        content: Strings.confirmationAttemptChat,
+        onStartChat: () async {
+          this.setState(() {
+            creatingRoomDisplayName = user.displayName;
+          });
+          final newRoomId = await props.onCreateUserChat(user: user);
+          Navigator.pop(context);
+          Navigator.popAndPushNamed(
+            context,
+            '/home/chat',
+            arguments: ChatViewArguements(
+              roomId: newRoomId,
+              title: user.displayName,
             ),
-          )
-        ],
+          );
+        },
       ),
     );
   }
@@ -336,6 +249,7 @@ class SearchUserState extends State<SearchUserView> {
                       bottom: 8,
                     ),
                     child: ListTile(
+                      enabled: creatingRoomDisplayName != searchable,
                       leading: CircleAvatar(
                         child: buildUserAvatar(user: attemptableUser),
                         backgroundColor: Colors.grey,
@@ -361,17 +275,10 @@ class SearchUserState extends State<SearchUserView> {
                             width: Dimensions.progressIndicatorSize,
                             height: Dimensions.progressIndicatorSize,
                             margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: creatingRoomDisplayName == searchable
-                                ? CircularProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.grey,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.send,
-                                    size: Dimensions.iconSize,
-                                  ),
+                            child: Icon(
+                              Icons.send,
+                              size: Dimensions.iconSize,
+                            ),
                           ),
                         ],
                       ),
@@ -409,6 +316,7 @@ class SearchUserState extends State<SearchUserView> {
                         bottom: 8,
                       ),
                       child: ListTile(
+                        enabled: creatingRoomDisplayName != user.displayName,
                         leading: CircleAvatar(
                           child: buildUserAvatar(user: user),
                           backgroundColor: avatarBackground,
@@ -438,18 +346,10 @@ class SearchUserState extends State<SearchUserView> {
                               width: Dimensions.progressIndicatorSize,
                               height: Dimensions.progressIndicatorSize,
                               margin: EdgeInsets.symmetric(horizontal: 8),
-                              child: creatingRoomDisplayName == user.displayName
-                                  ? CircularProgressIndicator(
-                                      strokeWidth:
-                                          Dimensions.defaultStrokeWidth,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.grey,
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.send,
-                                      size: Dimensions.iconSize,
-                                    ),
+                              child: Icon(
+                                Icons.send,
+                                size: Dimensions.iconSize,
+                              ),
                             ),
                           ],
                         ),
@@ -592,6 +492,7 @@ class SearchUserState extends State<SearchUserView> {
 class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
+  final bool creatingRoom;
   final List<dynamic> searchResults;
 
   final Function onSearch;
@@ -600,22 +501,24 @@ class _Props extends Equatable {
   _Props({
     @required this.theme,
     @required this.loading,
+    @required this.creatingRoom,
     @required this.searchResults,
     @required this.onSearch,
     @required this.onCreateUserChat,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.searchStore.loading,
         theme: store.state.settingsStore.theme,
+        loading: store.state.searchStore.loading,
+        creatingRoom: store.state.roomStore.loading,
         searchResults: store.state.searchStore.searchResults ?? [],
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
         onCreateUserChat: ({User user}) async {
           return store.dispatch(createRoom(
-            invites: <User>[user],
             isDirect: true,
+            invites: <User>[user],
           ));
         },
       );
@@ -624,6 +527,7 @@ class _Props extends Equatable {
   List<Object> get props => [
         loading,
         theme,
+        creatingRoom,
         searchResults,
       ];
 }

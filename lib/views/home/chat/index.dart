@@ -14,7 +14,7 @@ import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:syphon/views/widgets/message-typing.dart';
+import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,11 +31,11 @@ import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/store/rooms/events/actions.dart';
 
 // Global widgets
-import 'package:syphon/views/widgets/message.dart';
+import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
 import 'package:syphon/global/colors.dart';
-import 'package:syphon/views/widgets/menu.dart';
+import 'package:syphon/views/widgets/menu-rounded.dart';
 
 enum ChatOptions {
   search,
@@ -74,7 +74,6 @@ class ChatViewState extends State<ChatView> {
   double overshoot = 0;
   bool loadMore = false;
   String mediumType = MediumType.plaintext;
-  String newMediumType = MediumType.plaintext;
 
   final editorController = TextEditingController();
   final messagesController = ScrollController();
@@ -142,11 +141,13 @@ class ChatViewState extends State<ChatView> {
       final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
 
       if (atLimit && !loadMore) {
+        print('[messagesController.addListener] loading set to true');
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
       } else if (!atLimit && loadMore && !props.loading) {
+        print('[messagesController.addListener] loading set to false');
         this.setState(() {
           loadMore = false;
         });
@@ -167,6 +168,16 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
       );
+    }
+  }
+
+  // equivalent of componentDidUpdate
+  @protected
+  onDidChange(_Props props) {
+    if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
+      this.setState(() {
+        mediumType = MediumType.encryption;
+      });
     }
   }
 
@@ -509,6 +520,13 @@ class ChatViewState extends State<ChatView> {
                                   width: Dimensions.avatarSize,
                                   height: Dimensions.avatarSize,
                                   mxcUri: props.room.avatarUri,
+                                  fallback: Text(
+                                    formatRoomInitials(room: props.room),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               )
                             : Text(
@@ -720,6 +738,7 @@ class ChatViewState extends State<ChatView> {
           (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
         ),
+        onDidChange: onDidChange,
         builder: (context, props) {
           double height = MediaQuery.of(context).size.height;
           final closedInputPadding = !inputFieldNode.hasFocus &&

@@ -1,36 +1,70 @@
-import 'dart:typed_data';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-import 'package:flutter/services.dart';
+/**
+ * Media queries for matrix
+ * 
+ * Testing out using a "params map"
+ * as the default to allow calling from
+ * a non-ui thread
+ */
+class Media {
+  static Future<dynamic> fetchThumbnail(Map params) async {
+    String protocol = params['protocol'];
+    String homeserver = params['homeserver'];
+    String accessToken = params['accessToken'];
+    String serverName = params['serverName'];
+    String mediaUri = params['mediaUri'];
 
-dynamic buildThumbnailRequest({
-  String protocol = 'https://',
-  String homeserver = 'matrix.org',
-  String accessToken,
-  String serverName,
-  String mediaUri,
-  int size = 52,
-  String method = 'crop',
-}) {
-  List<String> mediaUriParts = mediaUri.split('/');
+    return await fetchThumbnailUnmapped(
+      protocol: protocol,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      serverName: serverName,
+      mediaUri: mediaUri,
+      method: params['method'] ?? 'crop',
+      size: params['size'] ?? 52,
+    );
+  }
 
-  // Parce the mxc uri for the server location and id
-  String mediaId = mediaUriParts[mediaUriParts.length - 1];
-  String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
+  static Future<dynamic> fetchThumbnailUnmapped({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String serverName,
+    String mediaUri,
+    String method = 'crop',
+    int size = 52,
+  }) async {
+    List<String> mediaUriParts = mediaUri.split('/');
 
-  String url =
-      '$protocol$homeserver/_matrix/media/r0/thumbnail/${mediaServer ?? homeserver}/$mediaId';
+    // Parce the mxc uri for the server location and id
+    String mediaId = mediaUriParts[mediaUriParts.length - 1];
+    String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
-  // Params
-  url += '?height=${size}&width=${size}&method=${method}';
+    String url =
+        '$protocol$homeserver/_matrix/media/r0/thumbnail/${mediaServer ?? homeserver}/$mediaId';
 
-  Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-  };
+    // Params
+    url += '?height=${size}&width=${size}&method=${method}';
 
-  return {
-    'url': url,
-    'headers': headers,
-  };
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    if (response.headers['content-type'] == 'application/json') {
+      final errorData = await json.decode(response.body);
+      throw errorData['error'];
+    }
+
+    return {"bodyBytes": response.bodyBytes};
+  }
 }
 
 dynamic buildMediaDownloadRequest({

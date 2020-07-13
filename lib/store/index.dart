@@ -96,10 +96,9 @@ AppState appReducer(AppState state, action) {
  */
 Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
-    debug: true,
     storage: MemoryStorage(),
     serializer: HiveSerializer(),
-    throttleDuration: Duration(seconds: 10),
+    throttleDuration: Duration(seconds: 6),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:

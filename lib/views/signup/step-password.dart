@@ -108,6 +108,8 @@ class PasswordStepState extends State<PasswordStep> {
                       maxWidth: Dimensions.inputWidthMax,
                     ),
                     child: TextField(
+                      autocorrect: false,
+                      enableSuggestions: false,
                       controller: passwordController,
                       focusNode: passwordFocusNode,
                       obscureText: !visibility,
@@ -178,6 +180,10 @@ class PasswordStepState extends State<PasswordStep> {
                       maxWidth: Dimensions.inputWidthMax,
                     ),
                     child: TextField(
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      smartQuotesType: SmartQuotesType.disabled,
+                      smartDashesType: SmartDashesType.disabled,
                       controller: confirmController,
                       focusNode: confirmFocusNode,
                       obscureText: !visibility,

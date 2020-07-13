@@ -26,6 +26,8 @@ class MatrixImage extends StatefulWidget {
   final bool thumbnail;
   final bool disableRebuild;
   final bool forceLoading;
+  final Widget fallback;
+  final Color fallbackColor;
 
   const MatrixImage({
     Key key,
@@ -38,6 +40,8 @@ class MatrixImage extends StatefulWidget {
     this.thumbnail = true,
     this.disableRebuild = false,
     this.forceLoading = false,
+    this.fallbackColor = Colors.grey,
+    this.fallback,
   }) : super(key: key);
 
   @override
@@ -66,6 +70,9 @@ class MatrixImageState extends State<MatrixImage> {
     if (!mediaCache.containsKey(widget.mxcUri)) {
       store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
     }
+
+    // Created in attempts to reduce framerate drop in chat details
+    // not sure this actually works as it still drops on scroll
     if (this.disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
       finalUriData = mediaCache[widget.mxcUri];
     }
@@ -73,8 +80,8 @@ class MatrixImageState extends State<MatrixImage> {
 
   MatrixImageState({
     Key key,
-    this.disableRebuild = false,
     this.forceLoading = false,
+    this.disableRebuild = false,
   });
 
   @override
@@ -82,12 +89,24 @@ class MatrixImageState extends State<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
+          final failed = props.mediaChecks[widget.mxcUri] != null &&
+              props.mediaChecks[widget.mxcUri] == 'failed';
           final loading =
-              !props.mediaCache.containsKey(finalUriData ?? widget.mxcUri) ||
-                  forceLoading;
+              forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
+
+          if (failed) {
+            return CircleAvatar(
+              radius: 24,
+              backgroundColor: widget.fallbackColor,
+              child: widget.fallback ??
+                  Icon(
+                    Icons.photo,
+                    color: Colors.white,
+                  ),
+            );
+          }
 
           if (loading) {
-            debugPrint('[MatrixImage] cache miss ${widget.mxcUri}');
             return Container(
               width: widget.width,
               height: widget.height,
@@ -99,9 +118,6 @@ class MatrixImageState extends State<MatrixImage> {
                 value: null,
               ),
             );
-          } else {
-            // uncomment to confirm cache hits - very noisy
-            // print('[MatrixImage] cache hit ${widget.mxcUri}');
           }
 
           return Image(
@@ -109,7 +125,7 @@ class MatrixImageState extends State<MatrixImage> {
             height: widget.height,
             fit: widget.fit,
             image: MemoryImage(
-              finalUriData ?? props.mediaCache[widget.mxcUri],
+              props.mediaCache[widget.mxcUri] ?? finalUriData,
             ),
           );
         },
@@ -119,16 +135,20 @@ class MatrixImageState extends State<MatrixImage> {
 class _Props extends Equatable {
   final bool fetching;
   final Map<String, Uint8List> mediaCache;
+  final Map<String, String> mediaChecks;
 
   _Props({
     @required this.fetching,
     @required this.mediaCache,
+    @required this.mediaChecks,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         fetching: false,
         mediaCache:
             store.state.mediaStore.mediaCache ?? Map<String, Uint8List>(),
+        mediaChecks:
+            store.state.mediaStore.mediaChecks ?? Map<String, String>(),
       );
 
   @override

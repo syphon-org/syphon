@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:http/http.dart' as http;
+import 'package:syphon/store/rooms/events/model.dart';
 
 abstract class Events {
   /**

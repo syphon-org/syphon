@@ -1,16 +1,24 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/index.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-import 'package:syphon/global/libs/matrix/media.dart';
-import 'package:http/http.dart' as http;
-
 final protocol = DotEnv().env['PROTOCOL'];
+
+class UpdateMediaChecks {
+  final String mxcUri;
+  final String status;
+
+  UpdateMediaChecks({
+    this.mxcUri,
+    this.status,
+  });
+}
 
 class UpdateMediaCache {
   final String mxcUri;
@@ -26,37 +34,42 @@ ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
+      final mediaChecks = store.state.mediaStore.mediaChecks;
 
       // No op if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
-      final request = buildThumbnailRequest(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.currentUser.homeserver,
-        mediaUri: mxcUri,
-      );
-
-      final response = await http.get(
-        request['url'],
-        headers: request['headers'],
-      );
-
-      if (response.headers['content-type'] == 'application/json') {
-        final errorData = json.decode(response.body);
-        throw errorData['errcode'];
+      // No op if already fetching or failed
+      if (mediaChecks.containsKey(mxcUri) &&
+          (mediaChecks[mxcUri] == 'checking' ||
+              mediaChecks[mxcUri] == 'failure') &&
+          !force) {
+        return;
       }
 
-      final mediaData = response.bodyBytes;
+      store.dispatch(UpdateMediaChecks(mxcUri: mxcUri, status: 'checking'));
+
+      final data = await compute(
+        MatrixApi.fetchThumbnail,
+        {
+          'protocol': protocol,
+          'accessToken': store.state.authStore.user.accessToken,
+          'homeserver': store.state.authStore.currentUser.homeserver,
+          'mediaUri': mxcUri,
+        },
+      );
+
+      final bodyBytes = data['bodyBytes'];
 
       store.dispatch(UpdateMediaCache(
         mxcUri: mxcUri,
-        data: mediaData,
+        data: bodyBytes,
       ));
     } catch (error) {
-      debugPrint('[fetchThumbnail] error: ${mxcUri} $error');
+      debugPrint('[fetchThumbnail] $mxcUri $error');
+      store.dispatch(UpdateMediaChecks(mxcUri: mxcUri, status: 'failure'));
     }
   };
 }

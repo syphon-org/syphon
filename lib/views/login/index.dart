@@ -190,6 +190,8 @@ class LoginState extends State<Login> {
                             ),
                             child: TextField(
                               maxLines: 1,
+                              autocorrect: false,
+                              enableSuggestions: false,
                               controller: usernameController,
                               onSubmitted: handleSubmitted,
                               onChanged: (username) {
@@ -238,6 +240,10 @@ class LoginState extends State<Login> {
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
+                              autocorrect: false,
+                              enableSuggestions: false,
+                              smartQuotesType: SmartQuotesType.disabled,
+                              smartDashesType: SmartDashesType.disabled,
                               textAlign: TextAlign.left,
                               obscureText: !visibility,
                               decoration: InputDecoration(
