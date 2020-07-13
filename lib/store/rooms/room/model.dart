@@ -205,6 +205,7 @@ class Room {
     String lastSince,
     Map<String, dynamic> json,
   }) {
+    String endHash;
     String prevHash = this.prevHash;
     bool invite;
 
@@ -232,6 +233,7 @@ class Room {
     // Find state and message updates from timeline
     // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
+      endHash = json['timeline']['end_batch'];
       prevHash = json['timeline']['prev_batch'];
 
       final List<dynamic> rawTimelineEvents = json['timeline']['events'];
@@ -280,8 +282,9 @@ class Room {
         )
         .fromMessageEvents(
           messageEvents,
+          endHash: endHash,
           prevHash: prevHash,
-          latestHash: lastSince,
+          startHash: lastSince,
         )
         .fromEphemeralEvents(
           ephemeralEvents,
@@ -463,8 +466,9 @@ class Room {
    */
   Room fromMessageEvents(
     List<Message> messageEvents, {
+    String endHash, // oldest hash in timeline
     String prevHash, // previously fetched hash
-    String latestHash,
+    String startHash,
   }) {
     try {
       int lastUpdate = this.lastUpdate;
@@ -506,9 +510,9 @@ class Room {
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // hash of last batch of messages in timeline
-        endHash: this.endHash ?? prevHash,
+        endHash: endHash ?? this.endHash ?? prevHash,
         // hash of the latest batch messages in timeline
-        startHash: latestHash ?? this.startHash,
+        startHash: startHash ?? this.startHash,
         // most recent previous batch from the last /sync
         prevHash: prevHash,
       );

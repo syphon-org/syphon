@@ -83,7 +83,6 @@ class CaptchaState extends State<Captcha> {
           JavascriptChannel(
             name: 'RecaptchaFlutterChannel',
             onMessageReceived: (JavascriptMessage receiver) {
-              // print(receiver.message);
               String token = receiver.message;
               if (token.contains("verify")) {
                 token = token.substring(7);

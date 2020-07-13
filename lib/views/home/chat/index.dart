@@ -808,6 +808,32 @@ class ChatViewState extends State<ChatView> {
                               )),
                             ),
                           ),
+                          Positioned(
+                            child: Visibility(
+                              maintainSize: false,
+                              maintainAnimation: false,
+                              maintainState: false,
+                              visible: props.room.messages.length < 8,
+                              child: GestureDetector(
+                                onTap: () => props.onLoadMoreMessages(),
+                                child: Container(
+                                  height: Dimensions.buttonHeightMin,
+                                  color: Theme.of(context).secondaryHeaderColor,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        'Load more messages',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -969,6 +995,7 @@ class _Props extends Equatable {
         store.dispatch(
           fetchMessageEvents(
             room: room,
+            startHash: room.startHash,
           ),
         );
       },
@@ -980,6 +1007,7 @@ class _Props extends Equatable {
       },
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+
         store.dispatch(fetchMessageEvents(
           room: room,
           startHash: room.endHash,

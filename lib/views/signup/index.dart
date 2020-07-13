@@ -122,9 +122,6 @@ class SignupViewState extends State<SignupView> {
 
   @protected
   Function onCheckStepValidity(_Props props, PageController controller) {
-    print(
-      '[onCheckStepValidity] new value',
-    );
     switch (this.currentStep) {
       case 0:
         return props.isHomeserverValid
