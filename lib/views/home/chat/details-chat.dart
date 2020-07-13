@@ -637,5 +637,6 @@ class _Props extends Equatable {
         userId,
         messages,
         roomPrimaryColor,
+        loading,
       ];
 }

@@ -507,25 +507,27 @@ class HomeViewState extends State<Home> {
                               props,
                             ),
                           ),
-                          Positioned(
-                            child: Visibility(
-                              visible: props.loadingRooms,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
-                            ),
-                          ),
+                          // TODO: decide if /sync indicator
+                          // should just be on current user avatar
+                          // Positioned(
+                          //   child: Visibility(
+                          //     visible: props.loadingRooms,
+                          //     child: Container(
+                          //         child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: <Widget>[
+                          //         RefreshProgressIndicator(
+                          //           strokeWidth: Dimensions.defaultStrokeWidth,
+                          //           valueColor:
+                          //               new AlwaysStoppedAnimation<Color>(
+                          //             PRIMARY_COLOR,
+                          //           ),
+                          //           value: null,
+                          //         ),
+                          //       ],
+                          //     )),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -566,12 +568,39 @@ class HomeViewState extends State<Home> {
                 ),
                 FloatingActionButton(
                   heroTag: 'fab3',
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
                   tooltip: 'Direct Message',
                   onPressed: () => onNavigateToDraft(context),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    padding: EdgeInsets.only(left: 4),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // Super hack
+                        Positioned(
+                            top: 8,
+                            left: -4,
+                            // TODO: clip the edges and
+                            // increase the icon size
+                            child: ClipRRect(
+                              clipBehavior: Clip.hardEdge,
+                              borderRadius: BorderRadius.circular(
+                                1,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                            )),
+                        Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 FloatingActionButton(
                   heroTag: 'fab1',

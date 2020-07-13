@@ -241,10 +241,10 @@ class HiveSerializer implements StateSerializer<AppState> {
     }
 
     try {
-      // mediaStoreConverted = Cache.state.get(
-      //   mediaStoreConverted.runtimeType.toString(),
-      //   defaultValue: MediaStore(),
-      // );
+      mediaStoreConverted = Cache.state.get(
+        mediaStoreConverted.runtimeType.toString(),
+        defaultValue: MediaStore(),
+      );
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }

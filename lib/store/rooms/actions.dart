@@ -425,6 +425,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      // Pull remote direct room data
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -436,36 +437,35 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
         throw data['error'];
       }
 
+      // Find the other user in the direct room
       final currentUser = store.state.authStore.user;
-
       final otherUser = room.users.values.firstWhere(
         (user) => user.userId != currentUser.userId,
       );
-
-      Map directRoomUsers = data as Map<String, dynamic>;
-
       if (otherUser == null) {
         throw 'Cannot toggle room to direct without other users';
       }
 
+      // Pull the direct room for that specific user
+      Map directRoomUsers = data as Map<String, dynamic>;
       final usersDirectRooms = directRoomUsers[otherUser.userId] ?? [];
 
       if (usersDirectRooms.isEmpty && enabled) {
         directRoomUsers[otherUser.userId] = [room.id];
       }
 
+      // Toggle the direct room data based on user actions
       directRoomUsers = directRoomUsers.map((userId, rooms) {
-        List<dynamic> updatedRooms = List.from(rooms as List<dynamic>);
+        List<dynamic> updatedRooms = List.from(rooms ?? []);
 
         if (userId != otherUser.userId) {
           return MapEntry(userId, updatedRooms);
         }
 
-        // toggle only if were looking at the otherUser
         if (enabled) {
           updatedRooms.add(room.id);
         } else {
-          updatedRooms.remove(room.id);
+          updatedRooms.removeWhere((roomId) => roomId == room.id);
         }
 
         return MapEntry(userId, updatedRooms);
@@ -476,13 +476,6 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
         final roomIds = value as List<dynamic>;
         return roomIds.isEmpty;
       });
-
-      if (!enabled) {
-        print('removing all users from ${otherUser.userId}');
-        directRoomUsers[otherUser.userId] = null;
-      }
-
-      print('[toggleDirectRoom] ${directRoomUsers}');
 
       final saveData = await MatrixApi.saveAccountData(
         protocol: protocol,
@@ -497,6 +490,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
         throw saveData['error'];
       }
 
+      await store.dispatch(SetRoom(room: room.copyWith(direct: enabled)));
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
       debugPrint('[toggleDirectRoom] $error');
