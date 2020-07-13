@@ -151,6 +151,13 @@ dependency_overrides:
 - [multi-line text field](https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter)
 - [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
 - [changing transition styles](https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter)
+- [animations](https://flutter.dev/docs/development/ui/animations)
+- adding a border without needing ctrl-p
+```dart
+decoration: BoxDecoration(
+   border: Border.all(width: 1, color: Colors.white),
+),
+```
 
 
 ## contributing

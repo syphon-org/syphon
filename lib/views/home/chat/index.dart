@@ -74,7 +74,6 @@ class ChatViewState extends State<ChatView> {
   double overshoot = 0;
   bool loadMore = false;
   String mediumType = MediumType.plaintext;
-  String newMediumType = MediumType.plaintext;
 
   final editorController = TextEditingController();
   final messagesController = ScrollController();
@@ -142,11 +141,13 @@ class ChatViewState extends State<ChatView> {
       final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
 
       if (atLimit && !loadMore) {
+        print('[messagesController.addListener] loading set to true');
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
       } else if (!atLimit && loadMore && !props.loading) {
+        print('[messagesController.addListener] loading set to false');
         this.setState(() {
           loadMore = false;
         });
@@ -167,6 +168,16 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
       );
+    }
+  }
+
+  // equivalent of componentDidUpdate
+  @protected
+  onDidChange(_Props props) {
+    if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
+      this.setState(() {
+        mediumType = MediumType.encryption;
+      });
     }
   }
 
@@ -727,6 +738,7 @@ class ChatViewState extends State<ChatView> {
           (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
         ),
+        onDidChange: onDidChange,
         builder: (context, props) {
           double height = MediaQuery.of(context).size.height;
           final closedInputPadding = !inputFieldNode.hasFocus &&

@@ -40,7 +40,6 @@ class ChatDetailsView extends StatefulWidget {
   ChatDetailsState createState() => ChatDetailsState();
 }
 
-// https://flutter.dev/docs/development/ui/animations
 class ChatDetailsState extends State<ChatDetailsView> {
   ChatDetailsState({Key key}) : super();
 
@@ -260,9 +259,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
                           Container(
                             width: width,
                             padding: titlePadding,
-                            // decoration: BoxDecoration(
-                            //   border: Border.all(width: 1, color: Colors.white),
-                            // ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

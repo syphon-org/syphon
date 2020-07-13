@@ -397,7 +397,6 @@ ThunkAction<AppState> createRoom({
 
         await store.dispatch(toggleDirectRoom(room: newRoom, enabled: true));
         await store.dispatch(toggleRoomEncryption(room: newRoom));
-        await store.dispatch(fetchDirectRooms());
       }
 
       await store.dispatch(startSyncObserver());
@@ -442,6 +441,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       final otherUser = room.users.values.firstWhere(
         (user) => user.userId != currentUser.userId,
       );
+
       if (otherUser == null) {
         throw 'Cannot toggle room to direct without other users';
       }
@@ -473,7 +473,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 
       // Filter out empty list entries for a user
       directRoomUsers.removeWhere((key, value) {
-        final roomIds = value as List<dynamic>;
+        final roomIds = value ?? [];
         return roomIds.isEmpty;
       });
 
@@ -527,7 +527,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
         throw data['error'];
       }
 
-      store.dispatch(fetchStateEvents(room: room));
+      await store.dispatch(fetchStateEvents(room: room));
     } catch (error) {
       debugPrint('[toggleRoomEncryption] $error');
       store.dispatch(addAlert(type: 'warning', message: error));
@@ -619,19 +619,11 @@ ThunkAction<AppState> acceptRoom({Room room}) {
  * Remove Room
  * 
  * Both leaves and forgets room
- * 
- * TODO: make sure this is in accordance with matrix in that
- * the user can only delete if owning the room, or leave if
- * just a member
  */
 ThunkAction<AppState> removeRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
-
-      if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-      }
 
       // submit a leave room request
       final leaveData = await MatrixApi.leaveRoom(
@@ -648,6 +640,10 @@ ThunkAction<AppState> removeRoom({Room room}) {
         } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
           await store.dispatch(RemoveRoom(room: Room(id: room.id)));
         }
+
+        if (room.direct) {
+          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+        }
         throw leaveData['error'];
       }
 
@@ -660,12 +656,21 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       if (forgetData['errcode'] != null) {
         if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          // TODO: confirm this works, deletes room if it doesn't
           await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        }
+        if (room.direct) {
+          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+        }
+
+        if (room.direct) {
+          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
         }
         throw forgetData['error'];
       }
 
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+      }
       await store.dispatch(RemoveRoom(room: Room(id: room.id)));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {

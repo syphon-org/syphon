@@ -9,7 +9,6 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
@@ -250,6 +249,7 @@ class SearchUserState extends State<SearchUserView> {
                       bottom: 8,
                     ),
                     child: ListTile(
+                      enabled: creatingRoomDisplayName != searchable,
                       leading: CircleAvatar(
                         child: buildUserAvatar(user: attemptableUser),
                         backgroundColor: Colors.grey,
@@ -275,17 +275,10 @@ class SearchUserState extends State<SearchUserView> {
                             width: Dimensions.progressIndicatorSize,
                             height: Dimensions.progressIndicatorSize,
                             margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: creatingRoomDisplayName == searchable
-                                ? CircularProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.grey,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.send,
-                                    size: Dimensions.iconSize,
-                                  ),
+                            child: Icon(
+                              Icons.send,
+                              size: Dimensions.iconSize,
+                            ),
                           ),
                         ],
                       ),
@@ -323,6 +316,7 @@ class SearchUserState extends State<SearchUserView> {
                         bottom: 8,
                       ),
                       child: ListTile(
+                        enabled: creatingRoomDisplayName != user.displayName,
                         leading: CircleAvatar(
                           child: buildUserAvatar(user: user),
                           backgroundColor: avatarBackground,
@@ -352,18 +346,10 @@ class SearchUserState extends State<SearchUserView> {
                               width: Dimensions.progressIndicatorSize,
                               height: Dimensions.progressIndicatorSize,
                               margin: EdgeInsets.symmetric(horizontal: 8),
-                              child: creatingRoomDisplayName == user.displayName
-                                  ? CircularProgressIndicator(
-                                      strokeWidth:
-                                          Dimensions.defaultStrokeWidth,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.grey,
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.send,
-                                      size: Dimensions.iconSize,
-                                    ),
+                              child: Icon(
+                                Icons.send,
+                                size: Dimensions.iconSize,
+                              ),
                             ),
                           ],
                         ),
