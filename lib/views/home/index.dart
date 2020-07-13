@@ -7,7 +7,6 @@ import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
@@ -29,7 +28,6 @@ import 'package:syphon/global/formatters.dart';
 // View And Styling
 import 'package:syphon/views/widgets/menu-rounded.dart';
 import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/global/colors.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:url_launcher/url_launcher.dart';
 

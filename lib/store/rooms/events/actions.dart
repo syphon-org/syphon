@@ -231,8 +231,6 @@ ThunkAction<AppState> sendSessionKeys({
         exportMessageSession(roomId: room.id),
       );
 
-      debugPrint('[sendSessionKeys] exported ${messageSession['session_id']}');
-
       final roomKeyEventContent = {
         'algorithm': Algorithms.megolmv1,
         'room_id': room.id,
