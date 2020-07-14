@@ -72,7 +72,11 @@ class IntroState extends State<Intro> {
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
     double width = MediaQuery.of(context).size.width;
 
-    if (alphaAgreement == null) {
+    if (alphaAgreement == null || true) {
+      final termsTitle = Platform.isIOS
+          ? Strings.titleDialogTerms
+          : Strings.titleDialogTermsAlpha;
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -84,8 +88,8 @@ class IntroState extends State<Intro> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: const Text(
-              "Confirm Open Alpha Terms Of Service",
+            title: Text(
+              termsTitle,
               textAlign: TextAlign.center,
             ),
             titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
@@ -102,19 +106,25 @@ class IntroState extends State<Intro> {
                   image: AssetImage(Assets.appIconPng),
                 ),
               ),
-              Text(
-                Strings.confirmationAlphaVersion,
-                textAlign: TextAlign.center,
+              Visibility(
+                visible: !Platform.isIOS,
+                child: Text(
+                  Strings.confirmationAlphaVersion,
+                  textAlign: TextAlign.center,
+                ),
               ),
-              Text(
-                Strings.confirmationAlphaWarning,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Visibility(
+                visible: !Platform.isIOS,
+                child: Text(
+                  Strings.confirmationAlphaWarning,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.w100),
+                ),
               ),
               Text(
                 Strings.confirmationAlphaWarningAlt,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(fontWeight: FontWeight.w300),
               ),
               Text(
                 Strings.confirmationConclusion,

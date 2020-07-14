@@ -50,13 +50,13 @@ void main() async {
   // init cold cache (mobile only)
   await initHive();
 
-  if(Platform.isAndroid || Platform.isIOS){
+  if (Platform.isAndroid || Platform.isIOS) {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
     Cache.stateRooms = await openHiveStateRooms();
   }
 
-  if(Platform.isLinux || Platform.isWindows || Platform.isLinux){
+  if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
     Cache.state = await openHiveStateUnsafe();
     Cache.stateRooms = await openHiveStateRoomsUnsafe();
   }
@@ -70,7 +70,6 @@ void main() async {
   if (Platform.isMacOS) {
     // await WindowUtils.setSize(Size(720, 720));
   }
-
 
   // init state cache (hot)
   final store = await initStore();
@@ -158,6 +157,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
               themeType: settings.theme,
               primaryColorHex: settings.primaryColor,
