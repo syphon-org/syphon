@@ -27,6 +27,9 @@ a privacy centric matrix client - now in open alpha*
 <img src="https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color=teal"/>
 <img src="https://img.shields.io/github/downloads/syphon-org/syphon/total?color=teal"/> 
 <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/v0.0.16-alpha?color=teal"/>
+<a href="https://matrix.to/#/#syphon:matrix.org">
+    <img src="https://img.shields.io/matrix/syphon:matrix.org?color=teal"/>
+</a>
 </p>
 
 <p align='center'> 
