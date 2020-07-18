@@ -727,7 +727,10 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
 
 ThunkAction<AppState> setEmail({String email}) {
   return (Store<AppState> store) {
-    store.dispatch(SetEmailValid(valid: email != null && email.length > 0));
+    final validEmail = RegExp(Values.emailRegex).hasMatch(email);
+    store.dispatch(SetEmailValid(
+      valid: email != null && email.length > 0 && validEmail,
+    ));
     store.dispatch(SetEmail(email: email));
   };
 }

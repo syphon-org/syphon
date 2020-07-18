@@ -35,70 +35,15 @@ class LoginState extends State<Login> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
-
-  StreamSubscription alertsListener;
   bool visibility = false;
 
   LoginState({Key key});
-
-  @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
-  @protected
-  void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
-    // Init alerts listener
-    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
-      var color;
-
-      switch (alert.type) {
-        case 'warning':
-          color = Colors.red;
-          break;
-        case 'error':
-          color = Colors.red;
-          break;
-        case 'info':
-        default:
-          color = Colors.grey;
-      }
-
-      loginScaffold.currentState.showSnackBar(SnackBar(
-        backgroundColor: color,
-        content: Text(
-          alert.message,
-          style: Theme.of(context)
-              .textTheme
-              .subtitle1
-              .copyWith(color: Colors.white),
-        ),
-        duration: alert.duration,
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            loginScaffold.currentState.removeCurrentSnackBar();
-          },
-        ),
-      ));
-    });
-  }
 
   @override
   void dispose() {
     usernameController.dispose();
     passwordController.dispose();
     passwordFocus.dispose();
-    if (alertsListener != null) {
-      alertsListener.cancel();
-    }
     super.dispose();
   }
 
@@ -112,7 +57,6 @@ class LoginState extends State<Login> {
       distinct: true,
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
-        key: loginScaffold,
         body: ScrollConfiguration(
           behavior: DefaultScrollBehavior(),
           child: SingleChildScrollView(

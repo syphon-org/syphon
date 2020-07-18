@@ -34,7 +34,7 @@ import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/widgets/menu-rounded.dart';
 
 enum ChatOptions {
@@ -141,13 +141,13 @@ class ChatViewState extends State<ChatView> {
       final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
 
       if (atLimit && !loadMore) {
-        print('[messagesController.addListener] loading set to true');
+        debugPrint('[messagesController.addListener] loading set to true');
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
       } else if (!atLimit && loadMore && !props.loading) {
-        print('[messagesController.addListener] loading set to false');
+        debugPrint('[messagesController.addListener] loading set to false');
         this.setState(() {
           loadMore = false;
         });
