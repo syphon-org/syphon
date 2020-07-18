@@ -15,6 +15,7 @@ class MatrixAuthTypes {
   static const TOKEN = 'm.login.token';
   static const TERMS = 'm.login.terms';
   static const DUMMY = 'm.login.dummy';
+  static const EMAIL = 'm.login.email.identity';
 }
 
 abstract class Auth {

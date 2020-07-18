@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/**
+ * British localization because
+ * google monopolized the namespaces
+ */
 class Colours {
   static const cyanSyphon = 0xff34C7B5;
   static const cyanSyphonAlpha = 0xAA34C7B5;

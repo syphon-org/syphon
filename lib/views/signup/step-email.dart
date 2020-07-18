@@ -92,21 +92,62 @@ class EmailStepState extends State<EmailStep> {
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: SvgPicture.asset(
-                    Assets.heroSignupUsername,
+                    Assets.heroSignupEmail,
                     semanticsLabel: 'Person resting on I.D. card',
                   ),
                 ),
               ),
               Flexible(
-                flex: 1,
+                flex: 2,
                 child: Flex(
                   direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      'Create a username',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+                    Container(
+                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      child: Text(
+                        'This homeserver requires an email\n for account creation.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                    ),
+                    Container(
+                      child: Stack(
+                        overflow: Overflow.visible,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 24,
+                            ),
+                            child: Text(
+                              'Enter an email address',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                debugPrint(
+                                  'TODO: navigate to captcha explination',
+                                );
+                              },
+                              child: Container(
+                                height: 20,
+                                width: 20,
+                                child: Icon(
+                                  Icons.info_outline,
+                                  color: Theme.of(context).accentColor,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

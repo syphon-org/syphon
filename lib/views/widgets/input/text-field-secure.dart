@@ -17,6 +17,7 @@ class TextFieldSecure extends StatelessWidget {
     this.suffix,
     this.focusNode,
     this.controller,
+    this.maxLines = 1,
     this.valid = true,
     this.disabled = false,
     this.obscureText = false,
@@ -31,6 +32,7 @@ class TextFieldSecure extends StatelessWidget {
   final bool disabled;
   final bool obscureText;
   final bool disableSpacing;
+  final int maxLines;
   final Widget suffix; // include actions
   final String label;
   final TextAlign textAlign;
@@ -45,11 +47,12 @@ class TextFieldSecure extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         child: TextField(
+          maxLines: maxLines,
+          focusNode: focusNode,
           controller: controller,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           onEditingComplete: onEditingComplete,
-          focusNode: focusNode,
           autocorrect: false,
           enableSuggestions: false,
           inputFormatters: !disableSpacing

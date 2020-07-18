@@ -102,10 +102,6 @@ class LoginState extends State<Login> {
     super.dispose();
   }
 
-  void handleSubmitted(String value) {
-    FocusScope.of(context).requestFocus(passwordFocus);
-  }
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -193,7 +189,10 @@ class LoginState extends State<Login> {
                               autocorrect: false,
                               enableSuggestions: false,
                               controller: usernameController,
-                              onSubmitted: handleSubmitted,
+                              onSubmitted: (text) {
+                                FocusScope.of(context)
+                                    .requestFocus(passwordFocus);
+                              },
                               onChanged: (username) {
                                 // Trim value for UI
                                 usernameController.value = TextEditingValue(
@@ -247,6 +246,7 @@ class LoginState extends State<Login> {
                               textAlign: TextAlign.left,
                               obscureText: !visibility,
                               decoration: InputDecoration(
+                                labelText: 'password',
                                 suffixIcon: GestureDetector(
                                   onTap: () {
                                     if (!passwordFocus.hasFocus) {
@@ -280,7 +280,6 @@ class LoginState extends State<Login> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
-                                labelText: 'password',
                               ),
                             ),
                           ),

@@ -25,8 +25,9 @@ class PasswordStepState extends State<PasswordStep> {
   PasswordStepState({Key key});
 
   bool visibility = false;
-  FocusNode passwordFocusNode = FocusNode();
+
   FocusNode confirmFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
 
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
@@ -50,6 +51,15 @@ class PasswordStepState extends State<PasswordStep> {
     final store = StoreProvider.of<AppState>(context);
     passwordController.text = store.state.authStore.password;
     confirmController.text = store.state.authStore.passwordConfirm;
+  }
+
+  @override
+  void dispose() {
+    confirmFocusNode.dispose();
+    passwordFocusNode.dispose();
+    passwordController.dispose();
+    confirmController.dispose();
+    super.dispose();
   }
 
   @override
@@ -117,12 +127,10 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangePassword(text);
                       },
                       onSubmitted: (String value) {
-                        FocusScope.of(context).unfocus();
                         FocusScope.of(context).requestFocus(confirmFocusNode);
                       },
                       onEditingComplete: () {
-                        passwordFocusNode.unfocus();
-                        props.onChangePassword(props.password);
+                        FocusScope.of(context).requestFocus(confirmFocusNode);
                       },
                       suffix: GestureDetector(
                         onTap: () {
@@ -168,9 +176,11 @@ class PasswordStepState extends State<PasswordStep> {
                       onChanged: (text) {
                         props.onChangePasswordConfirm(text);
                       },
-                      onEditingComplete: () {
-                        props.onChangePasswordConfirm(props.password);
+                      onSubmitted: (String value) {
                         confirmFocusNode.unfocus();
+                      },
+                      onEditingComplete: () {
+                        props.onChangePasswordConfirm(props.passwordConfirm);
                       },
                       suffix: Visibility(
                         visible: props.isPasswordValid,
