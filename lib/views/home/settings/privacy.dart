@@ -22,12 +22,11 @@ class PrivacyPreferences extends StatelessWidget {
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(

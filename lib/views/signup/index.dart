@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/signup/step-captcha.dart';
@@ -27,7 +28,7 @@ import './step-password.dart';
 import './step-homeserver.dart';
 
 final Duration nextAnimationDuration = Duration(
-  milliseconds: 350,
+  milliseconds: Values.animationDurationDefault,
 );
 
 class SignupView extends StatefulWidget {
@@ -62,10 +63,12 @@ class SignupViewState extends State<SignupView> {
       keepPage: true,
       viewportFraction: 1.5,
     );
+  }
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

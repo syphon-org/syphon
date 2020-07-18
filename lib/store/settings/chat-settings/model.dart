@@ -22,7 +22,7 @@ class ChatSetting extends Equatable {
     this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
-    this.primaryColor = GREY_DEFAULT,
+    this.primaryColor = Colours.greyDefault,
     this.notificationsEnabled = false,
   });
 

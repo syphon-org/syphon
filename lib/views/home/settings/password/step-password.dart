@@ -12,6 +12,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class PasswordStep extends StatefulWidget {
   const PasswordStep({Key key}) : super(key: key);
@@ -98,10 +99,12 @@ class PasswordStepState extends State<PasswordStep> {
                       minWidth: Dimensions.inputWidthMin,
                       maxWidth: Dimensions.inputWidthMax,
                     ),
-                    child: TextField(
-                      controller: currentController,
-                      focusNode: currentFocusNode,
+                    child: TextFieldSecure(
+                      label: 'Current Password',
                       obscureText: false,
+                      valid: props.isPasswordValid,
+                      focusNode: currentFocusNode,
+                      controller: currentController,
                       onChanged: (text) {
                         props.onChangeCurrentPassword(text);
                       },
@@ -112,17 +115,6 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangeCurrentPassword(props.password);
                         passwordFocusNode.unfocus();
                       },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: props.isPasswordValid
-                              ? BorderSide(
-                                  color: Theme.of(context).primaryColor,
-                                )
-                              : BorderSide(),
-                          borderRadius: BorderRadius.circular(34.0),
-                        ),
-                        labelText: 'Current Password',
-                      ),
                     ),
                   ),
                 ),
@@ -139,9 +131,11 @@ class PasswordStepState extends State<PasswordStep> {
                       minWidth: Dimensions.inputWidthMin,
                       maxWidth: Dimensions.inputWidthMax,
                     ),
-                    child: TextField(
-                      controller: passwordController,
+                    child: TextFieldSecure(
+                      label: 'New Password',
                       focusNode: passwordFocusNode,
+                      controller: passwordController,
+                      valid: props.isPasswordValid,
                       obscureText: !visibility,
                       onChanged: (text) {
                         props.onChangePassword(text);
@@ -153,52 +147,36 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangePassword(props.password);
                         passwordFocusNode.unfocus();
                       },
-                      decoration: InputDecoration(
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            if (!passwordFocusNode.hasFocus) {
-                              // Unfocus all focus nodes
-                              passwordFocusNode.unfocus();
+                      suffix: GestureDetector(
+                        onTap: () {
+                          if (!passwordFocusNode.hasFocus) {
+                            // Unfocus all focus nodes
+                            passwordFocusNode.unfocus();
 
-                              // Disable text field's focus node request
-                              passwordFocusNode.canRequestFocus = false;
-                            }
+                            // Disable text field's focus node request
+                            passwordFocusNode.canRequestFocus = false;
+                          }
 
-                            // Do your stuff
-                            this.setState(() {
-                              visibility = !this.visibility;
+                          // Do your stuff
+                          this.setState(() {
+                            visibility = !this.visibility;
+                          });
+
+                          if (!passwordFocusNode.hasFocus) {
+                            //Enable the text field's focus node request after some delay
+                            Future.delayed(Duration(milliseconds: 100), () {
+                              passwordFocusNode.canRequestFocus = true;
                             });
-
-                            if (!passwordFocusNode.hasFocus) {
-                              //Enable the text field's focus node request after some delay
-                              Future.delayed(Duration(milliseconds: 100), () {
-                                passwordFocusNode.canRequestFocus = true;
-                              });
-                            }
-                          },
-                          child: Icon(
-                            visibility
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
+                          }
+                        },
+                        child: Icon(
+                          visibility ? Icons.visibility : Icons.visibility_off,
                         ),
-                        border: OutlineInputBorder(
-                          borderSide: props.isPasswordValid
-                              ? BorderSide(
-                                  color: Theme.of(context).primaryColor,
-                                )
-                              : BorderSide(),
-                          borderRadius: BorderRadius.circular(34.0),
-                        ),
-                        labelText: 'New Password',
                       ),
                     ),
                   ),
                 ),
-                Container(
-                    padding: EdgeInsets.symmetric(
-                  vertical: 8,
-                )),
+                Container(padding: EdgeInsets.symmetric(vertical: 8)),
                 Flexible(
                   flex: 1,
                   child: Container(
@@ -208,10 +186,11 @@ class PasswordStepState extends State<PasswordStep> {
                       minWidth: Dimensions.inputWidthMin,
                       maxWidth: Dimensions.inputWidthMax,
                     ),
-                    child: TextField(
-                      controller: confirmController,
-                      focusNode: confirmFocusNode,
+                    child: TextFieldSecure(
+                      label: 'Confirm New Password',
                       obscureText: true,
+                      focusNode: confirmFocusNode,
+                      controller: confirmController,
                       onChanged: (text) {
                         props.onChangePasswordConfirm(text);
                       },
@@ -219,27 +198,21 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangePasswordConfirm(props.password);
                         confirmFocusNode.unfocus();
                       },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(34.0),
-                        ),
-                        labelText: 'Confirm New Password',
-                        suffixIcon: Visibility(
-                          visible: props.isPasswordValid,
+                      suffix: Visibility(
+                        visible: props.isPasswordValid,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          margin: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
                           child: Container(
-                            width: 12,
-                            height: 12,
-                            margin: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all((6)),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.white,
-                              ),
+                            padding: EdgeInsets.all((6)),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
                             ),
                           ),
                         ),

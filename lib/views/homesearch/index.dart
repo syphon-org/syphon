@@ -365,11 +365,11 @@ class HomeSearchState extends State<HomeSearch> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               RefreshProgressIndicator(
+                                value: null,
                                 strokeWidth: Dimensions.defaultStrokeWidth,
                                 valueColor: new AlwaysStoppedAnimation<Color>(
-                                  PRIMARY_COLOR,
+                                  Theme.of(context).primaryColor,
                                 ),
-                                value: null,
                               ),
                             ],
                           )),

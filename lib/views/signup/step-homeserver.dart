@@ -13,17 +13,36 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
-class HomeserverStep extends StatelessWidget {
-  HomeserverStep({Key key}) : super(key: key);
-  final focusNode = FocusNode();
+class HomeserverStep extends StatefulWidget {
+  const HomeserverStep({Key key}) : super(key: key);
+
+  HomeserverStepState createState() => HomeserverStepState();
+}
+
+class HomeserverStepState extends State<HomeserverStep> {
+  HomeserverStepState({Key key});
+
+  final homeserverController = TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
+  }
+
+  @protected
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    homeserverController.text = store.state.authStore.homeserver;
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        double width = MediaQuery.of(context).size.width;
         double height = MediaQuery.of(context).size.height;
 
         return Container(
@@ -38,13 +57,15 @@ class HomeserverStep extends StatelessWidget {
               Flexible(
                 flex: 2,
                 child: Container(
-                  width: width * 0.75,
+                  width: Dimensions.contentWidth(context),
                   constraints: BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
-                  child: SvgPicture.asset(Assets.heroSignupHomeserver,
-                      semanticsLabel: 'User hidding behind a message'),
+                  child: SvgPicture.asset(
+                    Assets.heroSignupHomeserver,
+                    semanticsLabel: 'User hidding behind a message',
+                  ),
                 ),
               ),
               Flexible(
@@ -64,46 +85,32 @@ class HomeserverStep extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Container(
-                  width: width * 0.8,
+                  width: Dimensions.contentWidthWide(context),
                   height: Dimensions.inputHeight,
                   constraints: BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
-                  child: TextField(
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    controller: TextEditingController.fromValue(
-                      TextEditingValue(
-                        text: props.homeserver,
-                        selection: TextSelection(
-                          baseOffset: props.homeserver.length,
-                          extentOffset: props.homeserver.length,
-                        ),
-                      ),
-                    ),
+                  child: TextFieldSecure(
+                    label: 'Homeserver',
+                    disableSpacing: true,
+                    controller: homeserverController,
                     onChanged: (text) {
-                      props.onChangeHomeserver(text.trim());
+                      props.onChangeHomeserver(text);
                     },
                     onEditingComplete: () {
                       props.onChangeHomeserver(props.homeserver);
                       FocusScope.of(context).unfocus();
                     },
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                          icon: Icon(Icons.search),
-                          tooltip: 'Find your homeserver',
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/search_home',
-                            );
-                          }),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(34.0),
-                      ),
-                      labelText: 'homeserver',
-                    ),
+                    suffix: IconButton(
+                        icon: Icon(Icons.search),
+                        tooltip: 'Find your homeserver',
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/search_home',
+                          );
+                        }),
                   ),
                 ),
               ),

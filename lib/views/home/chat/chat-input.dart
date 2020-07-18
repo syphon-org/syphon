@@ -38,10 +38,10 @@ class ChatInput extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double messageInputWidth = width - 72;
 
-    Color inputTextColor = const Color(BASICALLY_BLACK);
-    Color inputColorBackground = const Color(ENABLED_GREY);
+    Color inputTextColor = const Color(Colours.blackDefault);
+    Color inputColorBackground = const Color(Colours.greyEnabled);
     Color inputCursorColor = Colors.blueGrey;
-    Color sendButtonColor = const Color(DISABLED_GREY);
+    Color sendButtonColor = const Color(Colours.greyDisabled);
     String hintText = Strings.placeholderInputMatrixUnencrypted;
 
     if (mediumType == MediumType.plaintext) {

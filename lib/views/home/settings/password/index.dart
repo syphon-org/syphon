@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -20,7 +21,9 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 import './step-password.dart';
 
-final Duration nextAnimationDuration = Duration(milliseconds: 350);
+final Duration nextAnimationDuration = Duration(
+  milliseconds: Values.animationDurationDefault,
+);
 
 class PasswordView extends StatefulWidget {
   const PasswordView({Key key}) : super(key: key);

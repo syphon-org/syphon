@@ -36,4 +36,8 @@ class Values {
   static const openSourceLibraries = [
     {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
   ];
+
+  static const homeserverDefault = 'matrix.org';
+
+  static const animationDurationDefault = 350; // millis
 }

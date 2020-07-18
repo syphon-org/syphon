@@ -27,8 +27,8 @@ class Theming extends StatelessWidget {
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(
@@ -67,7 +67,7 @@ class Theming extends StatelessWidget {
                               builder: (BuildContext context) =>
                                   DialogColorPicker(
                                 title: 'Select Primary Color',
-                                resetColor: SYPHON_CYAN,
+                                resetColor: Colours.cyanSyphon,
                                 currentColor: props.primaryColor,
                                 onSelectColor: props.onSelectPrimaryColor,
                               ),
@@ -88,7 +88,7 @@ class Theming extends StatelessWidget {
                               builder: (BuildContext context) =>
                                   DialogColorPicker(
                                 title: 'Select Accent Color',
-                                resetColor: SYPHON_CYAN,
+                                resetColor: Colours.cyanSyphon,
                                 currentColor: props.primaryColor,
                                 onSelectColor: props.onSelectAccentColor,
                               ),
@@ -204,8 +204,10 @@ class Props {
   });
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
-        accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
+        primaryColor:
+            store.state.settingsStore.primaryColor ?? Colours.cyanSyphon,
+        accentColor:
+            store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,

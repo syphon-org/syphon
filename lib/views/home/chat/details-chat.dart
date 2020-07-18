@@ -162,12 +162,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
     final sectionBackgroundColor =
         Theme.of(context).brightness == Brightness.dark
-            ? const Color(BASICALLY_BLACK)
-            : const Color(BACKGROUND);
+            ? const Color(Colours.blackDefault)
+            : const Color(Colours.whiteDefault);
 
     final mainBackgroundColor = Theme.of(context).brightness == Brightness.dark
         ? null
-        : const Color(DISABLED_GREY);
+        : const Color(Colours.greyDisabled);
 
     return StoreConnector<AppState, _Props>(
       distinct: true,

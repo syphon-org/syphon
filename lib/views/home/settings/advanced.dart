@@ -160,7 +160,7 @@ class AdvancedView extends StatelessWidget {
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
                     style: TextStyle(
-                      color: props.loading ? Color(DISABLED_GREY) : null,
+                      color: props.loading ? Color(Colours.greyDisabled) : null,
                     ),
                   ),
                   trailing: Container(
@@ -181,13 +181,15 @@ class AdvancedView extends StatelessWidget {
                       'Manual Sync',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
                       style: TextStyle(
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
@@ -207,7 +209,8 @@ class AdvancedView extends StatelessWidget {
                       'Force Full Sync',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     subtitle: Text(

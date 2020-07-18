@@ -27,8 +27,8 @@ class NotificationSettingsView extends StatelessWidget {
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(

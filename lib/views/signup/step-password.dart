@@ -13,6 +13,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class PasswordStep extends StatefulWidget {
   const PasswordStep({Key key}) : super(key: key);
@@ -30,12 +31,18 @@ class PasswordStepState extends State<PasswordStep> {
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   SchedulerBinding.instance.addPostFrameCallback((_) {
+  //     onMounted();
+  //   });
+  // }
+
   @override
-  void initState() {
-    super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -101,17 +108,10 @@ class PasswordStepState extends State<PasswordStep> {
                 Flexible(
                   flex: 1,
                   child: Container(
-                    width: width * 0.8,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                    ),
-                    child: TextField(
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      controller: passwordController,
+                    child: TextFieldSecure(
+                      label: 'Password',
                       focusNode: passwordFocusNode,
+                      controller: passwordController,
                       obscureText: !visibility,
                       onChanged: (text) {
                         props.onChangePassword(text);
@@ -124,44 +124,31 @@ class PasswordStepState extends State<PasswordStep> {
                         passwordFocusNode.unfocus();
                         props.onChangePassword(props.password);
                       },
-                      decoration: InputDecoration(
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            if (!passwordFocusNode.hasFocus) {
-                              // Unfocus all focus nodes
-                              passwordFocusNode.unfocus();
+                      suffix: GestureDetector(
+                        onTap: () {
+                          if (!passwordFocusNode.hasFocus) {
+                            // Unfocus all focus nodes
+                            passwordFocusNode.unfocus();
 
-                              // Disable text field's focus node request
-                              passwordFocusNode.canRequestFocus = false;
-                            }
+                            // Disable text field's focus node request
+                            passwordFocusNode.canRequestFocus = false;
+                          }
 
-                            // Do your stuff
-                            this.setState(() {
-                              visibility = !this.visibility;
+                          // Do your stuff
+                          this.setState(() {
+                            visibility = !this.visibility;
+                          });
+
+                          if (!passwordFocusNode.hasFocus) {
+                            //Enable the text field's focus node request after some delay
+                            Future.delayed(Duration(milliseconds: 100), () {
+                              passwordFocusNode.canRequestFocus = true;
                             });
-
-                            if (!passwordFocusNode.hasFocus) {
-                              //Enable the text field's focus node request after some delay
-                              Future.delayed(Duration(milliseconds: 100), () {
-                                passwordFocusNode.canRequestFocus = true;
-                              });
-                            }
-                          },
-                          child: Icon(
-                            visibility
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
+                          }
+                        },
+                        child: Icon(
+                          visibility ? Icons.visibility : Icons.visibility_off,
                         ),
-                        border: OutlineInputBorder(
-                          borderSide: props.isPasswordValid
-                              ? BorderSide(
-                                  color: Theme.of(context).primaryColor,
-                                )
-                              : BorderSide(),
-                          borderRadius: BorderRadius.circular(34.0),
-                        ),
-                        labelText: 'Password',
                       ),
                     ),
                   ),
@@ -173,19 +160,10 @@ class PasswordStepState extends State<PasswordStep> {
                 Flexible(
                   flex: 1,
                   child: Container(
-                    width: width * 0.8,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                    ),
-                    child: TextField(
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      smartQuotesType: SmartQuotesType.disabled,
-                      smartDashesType: SmartDashesType.disabled,
-                      controller: confirmController,
+                    child: TextFieldSecure(
+                      label: 'Confirm Password',
                       focusNode: confirmFocusNode,
+                      controller: confirmController,
                       obscureText: !visibility,
                       onChanged: (text) {
                         props.onChangePasswordConfirm(text);
@@ -194,27 +172,21 @@ class PasswordStepState extends State<PasswordStep> {
                         props.onChangePasswordConfirm(props.password);
                         confirmFocusNode.unfocus();
                       },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(34.0),
-                        ),
-                        labelText: 'Confirm Password',
-                        suffixIcon: Visibility(
-                          visible: props.isPasswordValid,
+                      suffix: Visibility(
+                        visible: props.isPasswordValid,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          margin: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
                           child: Container(
-                            width: 12,
-                            height: 12,
-                            margin: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all((6)),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.white,
-                              ),
+                            padding: EdgeInsets.all((6)),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
                             ),
                           ),
                         ),

@@ -1,45 +1,41 @@
 import 'package:flutter/material.dart';
 
-const SYPHON_CYAN = 0xff34C7B5;
-const SYPHON_CYAN_ALPHA = 0xAA34C7B5;
-const BESIDES_BLUE = 0xff4476CC;
-const BASICALLY_BLACK = 0xff121212;
-const ACTUALLY_BLACK = 0xff000000;
-const ENABLED_GREY = 0xffFAFAFA;
-const DISABLED_GREY = 0xffD8D8D8;
-const GREY_BUBBLE = 0xffEEEEEE;
-const GREY_DARK = 0xff4D5767;
-const BACKGROUND = 0xffFEFEFE;
-const GREY_DEFAULT = 0xFF9E9E9E;
+class Colours {
+  static const cyanSyphon = 0xff34C7B5;
+  static const cyanSyphonAlpha = 0xAA34C7B5;
 
-const PRIMARY_COLOR = const Color(SYPHON_CYAN);
-const PRIMARY_COLOR_ALPHA = const Color(SYPHON_CYAN);
-const BASICALLY_BLACK_COLOR = const Color(BASICALLY_BLACK);
-const ENABLED_GREY_COLOR = const Color(ENABLED_GREY);
-const DISABLED_GREY_COLOR = const Color(DISABLED_GREY);
-const BACKGROUND_COLOR = const Color(BACKGROUND);
-const GREY_DARK_COLOR = const Color(GREY_DARK);
+  static const blueBubbly = 0xff4476CC;
 
-// Material colors at shades of 700
-const DEFAULT_RED = 0xFFC62828;
-const DEFAULT_ORANGE = 0xFFF57C00;
-const DEFAULT_PURPLE = 0xFF7B1FA2;
-const DEFAULT_GREEN = 0xFF388E3C;
-const DEFAULT_MAGENTA = 0xFFC2185B;
-const DEFAULT_TEAL = 0xFF00796B;
-const DEFAULT_BLUE = 0xFF1976D2;
+  static const greyEnabled = 0xffFAFAFA;
+  static const greyDisabled = 0xffD8D8D8;
+  static const greyDark = 0xff4D5767;
+  static const greyBubble = 0xffEEEEEE;
 
-const CHAT_COLORS = [
-  Color(DEFAULT_RED),
-  Color(DEFAULT_ORANGE),
-  Color(DEFAULT_PURPLE),
-  Color(DEFAULT_TEAL),
-  Color(DEFAULT_MAGENTA),
-  Color(DEFAULT_GREEN),
-  Color(DEFAULT_BLUE),
-];
+  static const blackDefault = 0xff121212;
+  static const greyDefault = 0xFF9E9E9E;
+  static const whiteDefault = 0xffFEFEFE;
+
+  // Material colors at shades of 700
+  static const chatRed = 0xFFC62828;
+  static const chatOrange = 0xFFF57C00;
+  static const chatPurple = 0xFF7B1FA2;
+  static const chatGreen = 0xFF388E3C;
+  static const chatMagenta = 0xFFC2185B;
+  static const chatTeal = 0xFF00796B;
+  static const chatBlue = 0xFF1976D2;
+
+  static const chatColors = [
+    Color(Colours.chatRed),
+    Color(Colours.chatOrange),
+    Color(Colours.chatPurple),
+    Color(Colours.chatTeal),
+    Color(Colours.chatMagenta),
+    Color(Colours.chatGreen),
+    Color(Colours.chatBlue),
+  ];
+}
 
 Color hashedColor(String hashable) {
   int hash = hashable.codeUnits.reduce((value, element) => value + element);
-  return CHAT_COLORS[hash % CHAT_COLORS.length];
+  return Colours.chatColors[hash % Colours.chatColors.length];
 }

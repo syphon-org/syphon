@@ -87,6 +87,16 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class SetEmail {
+  final String email;
+  SetEmail({this.email});
+}
+
+class SetEmailValid {
+  final bool valid;
+  SetEmailValid({this.valid});
+}
+
 class SetAgreement {
   final bool agreement;
   SetAgreement({this.agreement});
@@ -410,7 +420,6 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
         }
       }
     } catch (error) {
-      store.dispatch(SetSession(session: null));
       debugPrint('[setInteractiveAuth] $error');
     }
   };
@@ -459,7 +468,10 @@ ThunkAction<AppState> createUser() {
             store.state.authStore.interactiveAuths['flows'];
         final completed = store.state.authStore.completed;
 
+        debugPrint('[createUser] $flows');
+
         final bool hasCompleted = flows.reduce((hasCompleted, flow) {
+          debugPrint('[createUser] $hasCompleted $flow');
           return (hasCompleted is bool && hasCompleted) ||
               (flow['stages'] as List<dynamic>).every(
                 (stage) => completed.contains(stage),
@@ -710,6 +722,13 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
     store.dispatch(
       SetHomeserver(homeserver: homeserver.trim()),
     );
+  };
+}
+
+ThunkAction<AppState> setEmail({String email}) {
+  return (Store<AppState> store) {
+    store.dispatch(SetEmailValid(valid: email != null && email.length > 0));
+    store.dispatch(SetEmail(email: email));
   };
 }
 

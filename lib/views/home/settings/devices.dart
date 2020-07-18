@@ -219,8 +219,8 @@ class DeviceViewState extends State<DevicesView> {
         builder: (context, props) {
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           var currentAppBar = buildAppBar(
             props: props,
@@ -342,7 +342,7 @@ class DeviceViewState extends State<DevicesView> {
                           RefreshProgressIndicator(
                             strokeWidth: Dimensions.defaultStrokeWidth,
                             valueColor: new AlwaysStoppedAnimation<Color>(
-                              PRIMARY_COLOR,
+                              Theme.of(context).primaryColor,
                             ),
                             value: null,
                           ),

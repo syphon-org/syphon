@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:equatable/equatable.dart';
@@ -25,6 +26,7 @@ class AuthStore extends Equatable {
   final Map<String, dynamic> interactiveAuths;
 
   // Temporary Signup Params
+  final String email;
   final String username;
   final String password;
   final String passwordCurrent;
@@ -37,6 +39,7 @@ class AuthStore extends Equatable {
   // Temporary state propertie
   final bool loading;
   final bool creating;
+  final bool isEmailValid;
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
@@ -45,6 +48,7 @@ class AuthStore extends Equatable {
   const AuthStore({
     this.user = const User(),
     this.authObserver,
+    this.email = '',
     this.username = '', // null
     this.password = '', // null
     this.passwordCurrent = '', // null
@@ -53,9 +57,10 @@ class AuthStore extends Equatable {
     this.captcha = false,
     this.session,
     this.completed = const [],
-    this.homeserver = 'matrix.org',
+    this.homeserver = Values.homeserverDefault,
     this.loginType = 'm.login.dummy',
     this.interactiveAuths = const {},
+    this.isEmailValid = false,
     this.isUsernameValid = false,
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
@@ -67,6 +72,7 @@ class AuthStore extends Equatable {
 
   AuthStore copyWith({
     user,
+    email,
     loading,
     username,
     password,
@@ -89,6 +95,7 @@ class AuthStore extends Equatable {
   }) {
     return AuthStore(
       user: user ?? this.user,
+      email: email ?? this.email,
       loading: loading ?? this.loading,
       authObserver: authObserver ?? this.authObserver,
       username: username ?? this.username,
@@ -100,6 +107,7 @@ class AuthStore extends Equatable {
       completed: completed ?? this.completed,
       captcha: captcha ?? this.captcha,
       session: session ?? this.session,
+      isEmailValid: isEmailValid ?? this.isEmailValid,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
       isUsernameAvailable: isUsernameAvailable != null
           ? isUsernameAvailable
@@ -126,6 +134,7 @@ class AuthStore extends Equatable {
         completed,
         session,
         loginType,
+        isEmailValid,
         isUsernameValid,
         isPasswordValid,
         isHomeserverValid,

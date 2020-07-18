@@ -5,7 +5,6 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 // Store
 import 'package:redux/redux.dart';
@@ -18,14 +17,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
-class UsernameStep extends StatefulWidget {
-  const UsernameStep({Key key}) : super(key: key);
+class EmailStep extends StatefulWidget {
+  const EmailStep({Key key}) : super(key: key);
 
-  UsernameStepState createState() => UsernameStepState();
+  EmailStepState createState() => EmailStepState();
 }
 
-class UsernameStepState extends State<UsernameStep> {
-  UsernameStepState({Key key});
+class EmailStepState extends State<EmailStep> {
+  EmailStepState({Key key});
 
   Timer typingTimeout;
   final usernameController = TextEditingController();
@@ -39,7 +38,6 @@ class UsernameStepState extends State<UsernameStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    print('[onMounted] ${store.state.authStore.username}');
     usernameController.text = trimmedUserId(
       userId: store.state.authStore.username,
     );
@@ -61,7 +59,7 @@ class UsernameStepState extends State<UsernameStep> {
         );
 
         if (!props.loading && this.typingTimeout == null) {
-          if (props.isUsernameAvailable) {
+          if (props.isEmailValid) {
             suffixWidget = Icon(
               Icons.check,
               color: Colors.white,
@@ -123,17 +121,16 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label:
-                        props.isUsernameValid ? props.fullUserId : "Username",
+                    label: "Email",
                     disableSpacing: true,
-                    valid: props.isUsernameValid,
+                    valid: props.isEmailValid,
                     controller: usernameController,
                     onSubmitted: (_) {
                       FocusScope.of(context).unfocus();
                     },
                     onEditingComplete: () {
-                      props.onSetUsername();
-                      props.onCheckUsernameAvailability();
+                      props.onSetEmail();
+                      props.onCheckEmailAvailable();
                       FocusScope.of(context).unfocus();
                     },
                     onChanged: (username) {
@@ -149,7 +146,7 @@ class UsernameStepState extends State<UsernameStep> {
                       );
 
                       // Set new username
-                      props.onSetUsername(username: formattedUsername);
+                      props.onSetEmail(username: formattedUsername);
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
@@ -163,7 +160,7 @@ class UsernameStepState extends State<UsernameStep> {
                       typingTimeout = Timer(
                         Duration(milliseconds: 1000),
                         () {
-                          props.onCheckUsernameAvailability();
+                          props.onCheckEmailAvailable();
                           this.setState(() {
                             typingTimeout = null;
                           });
@@ -171,7 +168,7 @@ class UsernameStepState extends State<UsernameStep> {
                       );
                     },
                     suffix: Visibility(
-                      visible: props.isUsernameValid,
+                      visible: props.isEmailValid,
                       child: Container(
                         width: 12,
                         height: 12,
@@ -196,54 +193,41 @@ class UsernameStepState extends State<UsernameStep> {
 }
 
 class _Props extends Equatable {
-  final String username;
-  final String fullUserId;
-  final bool isUsernameValid;
-  final bool isUsernameAvailable;
   final bool loading;
+  final String email;
+  final bool isEmailValid;
 
-  final Function onSetUsername;
-  final Function onCheckUsernameAvailability;
+  final Function onSetEmail;
+  final Function onCheckEmailAvailable;
 
   _Props({
-    @required this.username,
-    @required this.fullUserId,
-    @required this.isUsernameValid,
-    @required this.isUsernameAvailable,
+    @required this.email,
+    @required this.isEmailValid,
     @required this.loading,
-    @required this.onSetUsername,
-    @required this.onCheckUsernameAvailability,
+    @required this.onSetEmail,
+    @required this.onCheckEmailAvailable,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        username: store.state.authStore.username,
-        fullUserId: userAlias(
-          username: store.state.authStore.username,
-          homeserver: store.state.authStore.homeserver,
-        ),
-        isUsernameValid: store.state.authStore.isUsernameValid,
-        isUsernameAvailable: store.state.authStore.isUsernameAvailable,
+        email: store.state.authStore.username,
+        isEmailValid: store.state.authStore.isEmailValid,
         loading: store.state.authStore.loading,
-        onCheckUsernameAvailability: () {
-          store.dispatch(checkUsernameAvailability());
-        },
-        onSetUsername: ({String username}) {
-          if (username != null) {
-            store.dispatch(setUsername(username: username));
-          } else {
-            store.dispatch(
-              setUsername(username: store.state.authStore.username),
-            );
+        onSetEmail: ({String email}) {
+          if (email != null) {
+            return store.dispatch(setEmail(email: email));
           }
+
+          return store.dispatch(setEmail(email: store.state.authStore.email));
+        },
+        onCheckEmailAvailable: () {
+          // store.dispatch(checkUsernameAvailability());
         },
       );
 
   @override
   List<Object> get props => [
-        username,
-        fullUserId,
-        isUsernameValid,
-        isUsernameAvailable,
+        email,
         loading,
+        isEmailValid,
       ];
 }

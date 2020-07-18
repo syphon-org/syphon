@@ -27,10 +27,10 @@ class Themes {
     int accentColorHex,
     ThemeType themeType,
   }) {
-    int primaryColor = primaryColorHex ?? SYPHON_CYAN;
-    int accentColor = accentColorHex ?? SYPHON_CYAN;
-    int appBarColor = primaryColorHex ?? SYPHON_CYAN;
-    int scaffoldBackgroundColor = BACKGROUND;
+    int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
+    int accentColor = accentColorHex ?? Colours.cyanSyphon;
+    int appBarColor = primaryColorHex ?? Colours.cyanSyphon;
+    int scaffoldBackgroundColor = Colours.whiteDefault;
 
     var brightness = Brightness.light;
     var appBarElevation;
@@ -38,17 +38,17 @@ class Themes {
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? SYPHON_CYAN;
-        accentColor = accentColorHex ?? SYPHON_CYAN;
-        appBarColor = primaryColorHex ?? BASICALLY_BLACK;
+        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
+        accentColor = accentColorHex ?? Colours.cyanSyphon;
+        appBarColor = primaryColorHex ?? Colours.blackDefault;
         scaffoldBackgroundColor = null;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
-        primaryColor = primaryColorHex ?? SYPHON_CYAN;
-        accentColor = accentColorHex ?? SYPHON_CYAN;
-        appBarColor = primaryColorHex ?? BASICALLY_BLACK;
-        scaffoldBackgroundColor = BASICALLY_BLACK;
+        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
+        accentColor = accentColorHex ?? Colours.cyanSyphon;
+        appBarColor = primaryColorHex ?? Colours.blackDefault;
+        scaffoldBackgroundColor = Colours.blackDefault;
         appBarElevation = 0.0;
         break;
       case ThemeType.LIGHT:

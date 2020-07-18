@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -248,7 +249,9 @@ class IntroState extends State<Intro> {
                         }
 
                         pageController.nextPage(
-                          duration: Duration(milliseconds: 350),
+                          duration: Duration(
+                            milliseconds: Values.animationDurationDefault,
+                          ),
                           curve: Curves.ease,
                         );
                       },

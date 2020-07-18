@@ -505,7 +505,7 @@ class GroupSearchState extends State<GroupSearchView> {
                               RefreshProgressIndicator(
                                 strokeWidth: Dimensions.defaultStrokeWidth,
                                 valueColor: new AlwaysStoppedAnimation<Color>(
-                                  PRIMARY_COLOR,
+                                  Theme.of(context).primaryColor,
                                 ),
                                 value: null,
                               ),

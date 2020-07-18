@@ -335,7 +335,7 @@ class ChatViewState extends State<ChatView> {
                   Container(
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
-                      backgroundColor: const Color(DISABLED_GREY),
+                      backgroundColor: const Color(Colours.greyDisabled),
                       child: Stack(children: [
                         Positioned(
                           right: 0,
@@ -800,7 +800,7 @@ class ChatViewState extends State<ChatView> {
                                     strokeWidth: Dimensions.defaultStrokeWidth,
                                     valueColor:
                                         new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
+                                      Theme.of(context).primaryColor,
                                     ),
                                     value: null,
                                   ),
