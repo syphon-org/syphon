@@ -464,22 +464,18 @@ ThunkAction<AppState> createUser() {
       if (data['flows'] != null) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
-        final List<dynamic> flows =
-            store.state.authStore.interactiveAuths['flows'];
+        final List<dynamic> stages =
+            store.state.authStore.interactiveAuths['flows'][0]['stages'];
         final completed = store.state.authStore.completed;
 
-        debugPrint('[createUser] $flows');
+        debugPrint('[createUser] $stages $completed');
 
-        final bool hasCompleted = flows.reduce((hasCompleted, flow) {
-          debugPrint('[createUser] $hasCompleted $flow');
-          return (hasCompleted is bool && hasCompleted) ||
-              (flow['stages'] as List<dynamic>).every(
-                (stage) => completed.contains(stage),
-              );
+        // Compare the completed stages to the flow stages provided
+        final bool completedAll = stages.fold(true, (hasCompleted, stage) {
+          return hasCompleted && completed.contains(stage);
         });
 
-        // return false most likely
-        return hasCompleted;
+        return completedAll;
       }
 
       store.dispatch(SetUser(
@@ -728,6 +724,9 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
 ThunkAction<AppState> setEmail({String email}) {
   return (Store<AppState> store) {
     final validEmail = RegExp(Values.emailRegex).hasMatch(email);
+
+    debugPrint('$email $validEmail');
+
     store.dispatch(SetEmailValid(
       valid: email != null && email.length > 0 && validEmail,
     ));

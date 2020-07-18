@@ -27,7 +27,7 @@ class EmailStepState extends State<EmailStep> {
   EmailStepState({Key key});
 
   Timer typingTimeout;
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -38,7 +38,7 @@ class EmailStepState extends State<EmailStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    usernameController.text = trimmedUserId(
+    emailController.text = trimmedUserId(
       userId: store.state.authStore.username,
     );
   }
@@ -165,29 +165,27 @@ class EmailStepState extends State<EmailStep> {
                     label: "Email",
                     disableSpacing: true,
                     valid: props.isEmailValid,
-                    controller: usernameController,
+                    controller: emailController,
                     onSubmitted: (_) {
                       FocusScope.of(context).unfocus();
                     },
                     onEditingComplete: () {
-                      props.onSetEmail();
                       props.onCheckEmailAvailable();
                       FocusScope.of(context).unfocus();
                     },
-                    onChanged: (username) {
+                    onChanged: (email) {
                       // // Trim new username
-                      final formattedUsername = username.trim();
-                      usernameController.value = TextEditingValue(
-                        text: formattedUsername,
+                      emailController.value = TextEditingValue(
+                        text: email,
                         selection: TextSelection.fromPosition(
                           TextPosition(
-                            offset: formattedUsername.length,
+                            offset: email.length,
                           ),
                         ),
                       );
 
                       // Set new username
-                      props.onSetEmail(username: formattedUsername);
+                      props.onSetEmail(email: email);
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {

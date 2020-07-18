@@ -84,6 +84,7 @@ class SignupViewState extends State<SignupView> {
         var newStages = [];
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
+          newStages = List.from(newStages.reversed);
         } catch (error) {
           debugPrint('Failed to parse stages');
         }
