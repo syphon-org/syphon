@@ -250,7 +250,7 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        email: store.state.authStore.username,
+        email: store.state.authStore.email,
         isEmailValid: store.state.authStore.isEmailValid,
         loading: store.state.authStore.loading,
         onSetEmail: ({String email}) {

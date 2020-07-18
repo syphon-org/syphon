@@ -81,10 +81,29 @@ class SignupViewState extends State<SignupView> {
           this.sections.length < 4) {
         final newSections = List<Widget>.from(sections);
 
-        print(state.authStore.interactiveAuths);
-        newSections.add(EmailStep());
-        newSections.add(CaptchaStep());
-        newSections.add(TermsStep());
+        var newStages = [];
+        try {
+          newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
+        } catch (error) {
+          debugPrint('Failed to parse stages');
+        }
+
+        // dynamically add stages based on homeserver requirements
+        newStages.forEach((stage) {
+          switch (stage) {
+            case MatrixAuthTypes.EMAIL:
+              newSections.add(EmailStep());
+              break;
+            case MatrixAuthTypes.RECAPTCHA:
+              newSections.add(CaptchaStep());
+              break;
+            case MatrixAuthTypes.TERMS:
+              newSections.add(TermsStep());
+              break;
+            default:
+              break;
+          }
+        });
 
         setState(() {
           sections = newSections;
