@@ -106,6 +106,10 @@ class IntroState extends State<Intro> {
                   image: AssetImage(Assets.appIconPng),
                 ),
               ),
+              Text(
+                Strings.confirmationThanks,
+                textAlign: TextAlign.center,
+              ),
               Visibility(
                 visible: !Platform.isIOS,
                 child: Text(

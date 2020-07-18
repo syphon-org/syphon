@@ -85,8 +85,11 @@ class Strings {
   static const confirmationInteractiveAuth =
       'In order to perform this action, you\'ll need to enter your password again';
 
+  static const confirmationThanks =
+      'Thanks for trying out ${Values.appName}!\n\n';
+
   static const confirmationAlphaVersion =
-      'Thanks for trying out ${Values.appName}!\n\nPlease be aware this app is still very much in Alpha.\n';
+      'Please be aware this app is still very much in Alpha.\n';
 
   static const confirmationAlphaWarning =
       'Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n';
