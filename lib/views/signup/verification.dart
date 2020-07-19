@@ -196,18 +196,19 @@ class VerificationViewState extends State<VerificationView>
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),
                                 child: ButtonSolid(
-                                    text: 'resend verification',
-                                    loading: this.sending || props.loading,
-                                    disabled: this.sending || props.loading,
-                                    onPressed: () {
-                                      print('sending ${this.sendAttempt}');
-                                      props.onResendVerification(
-                                        sendAttempt: this.sendAttempt + 1,
-                                      );
-                                      this.setState(() {
-                                        sendAttempt = this.sendAttempt + 1;
-                                      });
-                                    }),
+                                  text: 'resend email',
+                                  loading: this.sending || props.loading,
+                                  disabled: this.sending || props.loading,
+                                  onPressed: () {
+                                    print('sending ${this.sendAttempt}');
+                                    props.onResendVerification(
+                                      sendAttempt: this.sendAttempt + 1,
+                                    );
+                                    this.setState(() {
+                                      sendAttempt = this.sendAttempt + 1;
+                                    });
+                                  },
+                                ),
                               ),
                               Container(
                                 width: Dimensions.contentWidth(context),
@@ -218,15 +219,14 @@ class VerificationViewState extends State<VerificationView>
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),
                                 child: ButtonText(
-                                  text: '',
-                                  loading: false,
-                                  disabled: true,
-                                  onPressed: () {
-                                    print('oops');
-                                    // Navigator.popUntil(
-                                    //   context,
-                                    //   (route) => route.isFirst,
-                                    // );
+                                  text: 'check verification',
+                                  disabled: this.sending || props.loading,
+                                  onPressed: () async {
+                                    final result = await props.onCreateUser(
+                                        enableErrors: true);
+                                    this.setState(() {
+                                      success = result;
+                                    });
                                   },
                                 ),
                               ),
