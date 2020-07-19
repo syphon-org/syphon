@@ -171,6 +171,7 @@ class SignupViewState extends State<SignupView> {
   @protected
   Function onCompleteStep(_Props props, PageController controller) {
     final currentSection = this.sections[this.currentStep];
+    final lastStep = (this.sections.length - 1) == this.currentStep;
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () {
@@ -206,7 +207,7 @@ class SignupViewState extends State<SignupView> {
         return () async {
           var result = false;
           if (!props.completed.contains(MatrixAuthTypes.RECAPTCHA)) {
-            result = await props.onCreateUser();
+            result = await props.onCreateUser(enableErrors: lastStep);
           }
           if (!result) {
             controller.nextPage(
@@ -219,7 +220,7 @@ class SignupViewState extends State<SignupView> {
         return () async {
           var result = false;
           if (!props.completed.contains(MatrixAuthTypes.TERMS)) {
-            result = await props.onCreateUser();
+            result = await props.onCreateUser(enableErrors: lastStep);
           }
           if (!result) {
             return controller.nextPage(
@@ -240,13 +241,24 @@ class SignupViewState extends State<SignupView> {
         return () async {
           var result = false;
           final validEmail = await props.onSubmitEmail();
+
+          // don't run anything if email is already in use
           if (!validEmail) {
             return false;
           }
+
+          // try using email signup without verification
           if (!props.completed.contains(MatrixAuthTypes.EMAIL)) {
-            result = await props.onCreateUser();
+            result = await props.onCreateUser(enableErrors: lastStep);
           }
+
+          // otherwise, send to the verification holding page
           if (!result) {
+            if (lastStep) {
+              return Navigator.pushNamed(context, '/verification');
+            }
+
+            // or continue if not the last step
             controller.nextPage(
               duration: nextAnimationDuration,
               curve: Curves.ease,
@@ -355,7 +367,7 @@ class SignupViewState extends State<SignupView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              width: width * 0.725,
+                              width: Dimensions.contentWidth(context),
                               margin: EdgeInsets.only(top: height * 0.01),
                               height: Dimensions.inputHeight,
                               constraints: BoxConstraints(
@@ -436,6 +448,7 @@ class _Props extends Equatable {
   final bool captcha;
   final bool agreement;
   final bool loading;
+  final bool verificationNeeded;
 
   final List<String> completed;
 
@@ -460,6 +473,7 @@ class _Props extends Equatable {
     @required this.captcha,
     @required this.agreement,
     @required this.loading,
+    @required this.verificationNeeded,
     @required this.interactiveAuths,
     @required this.completed,
     @required this.onCreateUser,
@@ -483,6 +497,7 @@ class _Props extends Equatable {
         agreement: store.state.authStore.agreement,
         loading: store.state.authStore.loading,
         interactiveAuths: store.state.authStore.interactiveAuths,
+        verificationNeeded: store.state.authStore.verificationNeeded,
         onSubmitEmail: () async {
           return await store.dispatch(submitEmail());
         },
@@ -491,8 +506,8 @@ class _Props extends Equatable {
             type: MatrixAuthTypes.DUMMY,
           ));
         },
-        onCreateUser: () async {
-          return await store.dispatch(createUser());
+        onCreateUser: ({bool enableErrors}) async {
+          return await store.dispatch(createUser(enableErrors: enableErrors));
         },
       );
 
@@ -513,5 +528,6 @@ class _Props extends Equatable {
         agreement,
         loading,
         interactiveAuths,
+        verificationNeeded,
       ];
 }

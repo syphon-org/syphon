@@ -46,9 +46,15 @@ class ButtonText extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.w100,
                       letterSpacing: 0.8,
-                      color: color != null
-                          ? color
-                          : Theme.of(context).primaryColor,
+                      color: () {
+                        if (disabled) {
+                          return Colors.grey[300];
+                        }
+                        if (color != null) {
+                          return color;
+                        }
+                        return Theme.of(context).primaryColor;
+                      }(),
                     ),
                   )),
       );

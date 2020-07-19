@@ -21,6 +21,8 @@ class Strings {
   static const titleDialogTerms = "Confirm Terms Of Service";
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
+  static const titleDialogEmailVerifiedRequirement =
+      'Email verification requirement';
   static const titleProfile = 'Set up Your Profile';
 
   // Subtitles
@@ -77,6 +79,9 @@ class Strings {
 
   static const contentEmailRequirement =
       'This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information';
+
+  static const contentEmailVerifiedRequirement =
+      'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
 
   // Confirmations
   static const confirmationStartChat = 'Even if you don\'t send a message, ' +

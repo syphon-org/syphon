@@ -20,6 +20,8 @@ class Assets {
   static const heroSignupPassword = 'assets/graphics/undraw_in_thought.svg';
   static const heroSignupHomeserver = 'assets/graphics/undraw_mention.svg';
   static const heroSignupEmail = 'assets/graphics/undraw_message_sent.svg';
+  static const heroSignupVerificationView =
+      'assets/graphics/undraw_new_message.svg';
 
   // chat
   static const heroChatNotFound = 'assets/graphics/undraw_not_found.svg';

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -435,7 +434,7 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
-ThunkAction<AppState> submitEmail() {
+ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -443,7 +442,8 @@ ThunkAction<AppState> submitEmail() {
       final emailSubmitted = store.state.authStore.email;
       final currentCredential = store.state.authStore.credential;
 
-      if (currentCredential.params.containsValue(emailSubmitted)) {
+      if (currentCredential.params.containsValue(emailSubmitted) &&
+          sendAttempt < 2) {
         return true;
       }
 
@@ -452,11 +452,11 @@ ThunkAction<AppState> submitEmail() {
         homeserver: store.state.authStore.homeserver,
         email: store.state.authStore.email,
         clientSecret: Values.clientSecretMatrix,
-        sendAttempt: 2,
+        sendAttempt: sendAttempt,
       );
 
       print(data);
-
+      print(sendAttempt);
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -506,7 +506,7 @@ ThunkAction<AppState> submitEmail() {
  * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.email.identity","threepid_creds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"},"threepidCreds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"}},"inhibit_login":true}
  * 
  */
-ThunkAction<AppState> createUser() {
+ThunkAction<AppState> createUser({enableErrors = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -536,11 +536,13 @@ ThunkAction<AppState> createUser() {
         deviceName: device.displayName,
       );
 
+      debugPrint('[createUser] $data');
+
       if (data['errcode'] != null) {
-        if (data['errcode' == MatrixErrors.not_authorized] &&
+        if (data['errcode'] == MatrixErrors.not_authorized &&
             credential.type == MatrixAuthTypes.EMAIL) {
           store.dispatch(SetVerificationNeeded(needed: true));
-          throw 'Verification needed before completing signup';
+          return false;
         }
         throw data['error'];
       }
@@ -570,6 +572,9 @@ ThunkAction<AppState> createUser() {
       return true;
     } catch (error) {
       debugPrint('[createUser] error $error');
+      if (enableErrors) {
+        store.dispatch(addAlert(message: 'Failed to signup', error: error));
+      }
       return false;
     } finally {
       store.dispatch(SetCreating(creating: false));
