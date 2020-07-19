@@ -367,13 +367,6 @@ class SignupViewState extends State<SignupView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              width: Dimensions.contentWidth(context),
-                              margin: EdgeInsets.only(top: height * 0.01),
-                              height: Dimensions.inputHeight,
-                              constraints: BoxConstraints(
-                                minWidth: Dimensions.buttonWidthMin,
-                                maxWidth: Dimensions.buttonWidthMax,
-                              ),
                               child: ButtonSolid(
                                 text: buildButtonString(),
                                 loading: props.creating,
@@ -391,29 +384,34 @@ class SignupViewState extends State<SignupView> {
                           ],
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                          left: 8,
-                          right: 8,
-                          top: 16,
-                          bottom: 24,
-                        ),
-                        constraints: BoxConstraints(
-                          minHeight: 45,
-                        ),
+                      Flexible(
+                        flex: 1,
                         child: Flex(
-                          direction: Axis.horizontal,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SmoothPageIndicator(
-                              controller: pageController, // PageController
-                              count: sections.length,
-                              effect: WormEffect(
-                                spacing: 16,
-                                dotHeight: 12,
-                                dotWidth: 12,
-                                activeDotColor: Theme.of(context).primaryColor,
-                              ), // your preferred effect
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            Container(
+                              constraints: BoxConstraints(
+                                minHeight: Dimensions.buttonHeightMin,
+                              ),
+                              child: Flex(
+                                direction: Axis.horizontal,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SmoothPageIndicator(
+                                    controller:
+                                        pageController, // PageController
+                                    count: sections.length,
+                                    effect: WormEffect(
+                                      spacing: 16,
+                                      dotHeight: 12,
+                                      dotWidth: 12,
+                                      activeDotColor:
+                                          Theme.of(context).primaryColor,
+                                    ), // your preferred effect
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

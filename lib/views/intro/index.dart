@@ -219,12 +219,6 @@ class IntroState extends State<Intro> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Container(
-                    width: widgetWidthScaling,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.buttonWidthMin,
-                      maxWidth: Dimensions.buttonWidthMax,
-                    ),
                     child: ButtonSolid(
                       text: buildButtonString(),
                       onPressed: () {
@@ -260,69 +254,73 @@ class IntroState extends State<Intro> {
                 ],
               ),
             ),
-            Container(
-              height: Dimensions.inputHeight,
-              constraints: BoxConstraints(
-                minHeight: Dimensions.inputHeight,
-              ),
-              margin: const EdgeInsets.only(
-                left: 8,
-                right: 8,
-                top: 16,
-                bottom: 24,
-              ),
-              child: onboarding
-                  ? Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SmoothPageIndicator(
-                          controller: pageController, // PageController
-                          count: sections.length,
-                          effect: WormEffect(
-                            spacing: 16,
-                            dotHeight: 12,
-                            dotWidth: 12,
-                            paintStyle: PaintingStyle.fill,
-                            strokeWidth: 12,
-                            activeDotColor: Theme.of(context).primaryColor,
-                          ), // your preferred effect
-                        ),
-                      ],
-                    )
-                  : TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/login',
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            loginText,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText2,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Text(
-                              Strings.buttonIntroExistAction,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.white,
+            Flexible(
+              flex: 1,
+              child: Flex(
+                mainAxisAlignment: MainAxisAlignment.center,
+                direction: Axis.vertical,
+                children: <Widget>[
+                  Container(
+                    height: Dimensions.inputHeight,
+                    constraints: BoxConstraints(
+                      minHeight: Dimensions.inputHeight,
+                    ),
+                    child: onboarding
+                        ? Flex(
+                            direction: Axis.horizontal,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SmoothPageIndicator(
+                                controller: pageController, // PageController
+                                count: sections.length,
+                                effect: WormEffect(
+                                  spacing: 16,
+                                  dotHeight: 12,
+                                  dotWidth: 12,
+                                  paintStyle: PaintingStyle.fill,
+                                  strokeWidth: 12,
+                                  activeDotColor:
+                                      Theme.of(context).primaryColor,
+                                ), // your preferred effect
+                              ),
+                            ],
+                          )
+                        : TouchableOpacity(
+                            activeOpacity: 0.4,
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/login',
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  loginText,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyText2,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: Text(
+                                    Strings.buttonIntroExistAction,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        .copyWith(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.white,
+                                        ),
                                   ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

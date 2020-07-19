@@ -51,7 +51,6 @@ class LoginState extends State<Login> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final double defaultWidgetScaling = width * 0.725;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -134,7 +133,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            width: defaultWidgetScaling,
+                            width: Dimensions.contentWidth(context),
                             height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -170,7 +169,7 @@ class LoginState extends State<Login> {
                             ),
                           ),
                           Container(
-                            width: defaultWidgetScaling,
+                            width: Dimensions.contentWidth(context),
                             height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -221,15 +220,7 @@ class LoginState extends State<Login> {
                         ]),
                   ),
                   Container(
-                    width: defaultWidgetScaling,
-                    height: Dimensions.inputHeight,
-                    margin: const EdgeInsets.only(
-                      top: 24,
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 256,
-                      maxWidth: 336,
-                    ),
+                    margin: const EdgeInsets.only(top: 24),
                     child: ButtonSolid(
                       text: Strings.buttonLogin,
                       loading: props.loading,
