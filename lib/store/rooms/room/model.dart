@@ -435,7 +435,6 @@ class Room {
         final hasMultipleUsers =
             nonCurrentUsers.isNotEmpty && nonCurrentUsers.length > 1;
         final shownUser = users.values.elementAt(0);
-        print('room ${users.values}');
 
         // set name and avi to first non user or that + total others
         name = hasMultipleUsers

@@ -130,9 +130,10 @@ class LoginState extends State<Login> {
                               maxWidth: Dimensions.inputWidthMax,
                             ),
                             child: TextFieldSecure(
-                              label: 'username',
-                              hint: props.usernameHint,
                               maxLines: 1,
+                              label: 'username',
+                              disableSpacing: true,
+                              hint: props.usernameHint,
                               controller: usernameController,
                               onSubmitted: (text) {
                                 FocusScope.of(context)
@@ -164,51 +165,41 @@ class LoginState extends State<Login> {
                               minWidth: Dimensions.inputWidthMin,
                               maxWidth: Dimensions.inputWidthMax,
                             ),
-                            child: TextField(
+                            child: TextFieldSecure(
+                              label: 'password',
                               focusNode: passwordFocus,
+                              obscureText: !visibility,
+                              textAlign: TextAlign.left,
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
-                              autocorrect: false,
-                              enableSuggestions: false,
-                              smartQuotesType: SmartQuotesType.disabled,
-                              smartDashesType: SmartDashesType.disabled,
-                              textAlign: TextAlign.left,
-                              obscureText: !visibility,
-                              decoration: InputDecoration(
-                                labelText: 'password',
-                                suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    if (!passwordFocus.hasFocus) {
-                                      // Unfocus all focus nodes
-                                      passwordFocus.unfocus();
+                              suffix: GestureDetector(
+                                onTap: () {
+                                  if (!passwordFocus.hasFocus) {
+                                    // Unfocus all focus nodes
+                                    passwordFocus.unfocus();
 
-                                      // Disable text field's focus node request
-                                      passwordFocus.canRequestFocus = false;
-                                    }
+                                    // Disable text field's focus node request
+                                    passwordFocus.canRequestFocus = false;
+                                  }
 
-                                    // Do your stuff
-                                    this.setState(() {
-                                      visibility = !this.visibility;
+                                  // Do your stuff
+                                  this.setState(() {
+                                    visibility = !this.visibility;
+                                  });
+
+                                  if (!passwordFocus.hasFocus) {
+                                    //Enable the text field's focus node request after some delay
+                                    Future.delayed(Duration(milliseconds: 100),
+                                        () {
+                                      passwordFocus.canRequestFocus = true;
                                     });
-
-                                    if (!passwordFocus.hasFocus) {
-                                      //Enable the text field's focus node request after some delay
-                                      Future.delayed(
-                                          Duration(milliseconds: 100), () {
-                                        passwordFocus.canRequestFocus = true;
-                                      });
-                                    }
-                                  },
-                                  child: Icon(
-                                    visibility
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
-                                contentPadding: Dimensions.inputPadding,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
+                                  }
+                                },
+                                child: Icon(
+                                  visibility
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
                               ),
                             ),

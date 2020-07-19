@@ -21,8 +21,7 @@ class Strings {
   static const titleDialogTerms = "Confirm Terms Of Service";
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
-  static const titleDialogEmailVerifiedRequirement =
-      'Email verification requirement';
+  static const titleDialogEmailVerifiedRequirement = 'Email verification';
   static const titleProfile = 'Set up Your Profile';
 
   // Subtitles

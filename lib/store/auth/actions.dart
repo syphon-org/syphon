@@ -165,6 +165,7 @@ ThunkAction<AppState> startAuthObserver() {
 
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
+      debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserProfile());
 
@@ -323,6 +324,10 @@ ThunkAction<AppState> logoutUser() {
       store.dispatch(stopSyncObserver());
       // submit empty auth before logging out of matrix
 
+      if (store.state.authStore.user.homeserver == null) {
+        throw Exception('Unavailable user data');
+      }
+
       final data = await MatrixApi.logoutUser(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -419,7 +424,7 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
         );
 
         if (currentStage.length > 0) {
-          print('[SetCredential] $currentStage');
+          debugPrint('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -455,8 +460,6 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         sendAttempt: sendAttempt,
       );
 
-      print(data);
-      print(sendAttempt);
       if (data['errcode'] != null) {
         throw data['error'];
       }
@@ -536,8 +539,6 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         deviceName: device.displayName,
       );
 
-      debugPrint('[createUser] $data');
-
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.not_authorized &&
             credential.type == MatrixAuthTypes.EMAIL) {
@@ -554,8 +555,6 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
             store.state.authStore.interactiveAuths['flows'][0]['stages'];
         final completed = store.state.authStore.completed;
 
-        debugPrint('[createUser] $stages $completed');
-
         // Compare the completed stages to the flow stages provided
         final bool completedAll = stages.fold(true, (hasCompleted, stage) {
           return hasCompleted && completed.contains(stage);
@@ -564,9 +563,11 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         return completedAll;
       }
 
-      store.dispatch(SetUser(
-        user: User.fromJson(data),
-      ));
+      store.dispatch(SetUser(user: User.fromJson(data)));
+
+      store.state.authStore.authObserver.add(
+        store.state.authStore.user,
+      );
 
       store.dispatch(ResetOnboarding());
       return true;

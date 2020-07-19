@@ -157,7 +157,7 @@ class VerificationViewState extends State<VerificationView>
                                               title: Strings
                                                   .titleDialogEmailVerifiedRequirement,
                                               content: Strings
-                                                  .contentEmailRequirement,
+                                                  .contentEmailVerifiedRequirement,
                                               onConfirm: () {
                                                 Navigator.pop(context);
                                               },
@@ -200,7 +200,6 @@ class VerificationViewState extends State<VerificationView>
                                   loading: this.sending || props.loading,
                                   disabled: this.sending || props.loading,
                                   onPressed: () {
-                                    print('sending ${this.sendAttempt}');
                                     props.onResendVerification(
                                       sendAttempt: this.sendAttempt + 1,
                                     );
