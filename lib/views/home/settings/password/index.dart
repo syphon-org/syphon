@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -20,7 +21,9 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 import './step-password.dart';
 
-final Duration nextAnimationDuration = Duration(milliseconds: 350);
+final Duration nextAnimationDuration = Duration(
+  milliseconds: Values.animationDurationDefault,
+);
 
 class PasswordView extends StatefulWidget {
   const PasswordView({Key key}) : super(key: key);
@@ -69,11 +72,6 @@ class PasswordUpdateState extends State<PasswordView> {
     super.deactivate();
   }
 
-  @protected
-  void onBackStep(BuildContext context) {
-    Navigator.pop(context, false);
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -83,7 +81,6 @@ class PasswordUpdateState extends State<PasswordView> {
           double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
-            extendBodyBehindAppBar: true,
             appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
@@ -93,10 +90,11 @@ class PasswordUpdateState extends State<PasswordView> {
                   color: Theme.of(context).primaryColor,
                 ),
                 onPressed: () {
-                  onBackStep(context);
+                  Navigator.pop(context, false);
                 },
               ),
             ),
+            extendBodyBehindAppBar: true,
             body: ScrollConfiguration(
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(

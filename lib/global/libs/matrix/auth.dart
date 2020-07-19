@@ -15,6 +15,7 @@ class MatrixAuthTypes {
   static const TOKEN = 'm.login.token';
   static const TERMS = 'm.login.terms';
   static const DUMMY = 'm.login.dummy';
+  static const EMAIL = 'm.login.email.identity';
 }
 
 abstract class Auth {
@@ -60,6 +61,35 @@ abstract class Auth {
    * 
    * inhibit_login automatically logs in the user after creation 
    */
+  static FutureOr<dynamic> registerEmail({
+    String protocol,
+    String homeserver,
+    String clientSecret,
+    String email,
+    int sendAttempt = 1,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+
+    Map body = {
+      "email": email,
+      "client_secret": clientSecret,
+      "send_attempt": sendAttempt,
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Register New User
+   * 
+   * inhibit_login automatically logs in the user after creation 
+   */
   static FutureOr<dynamic> registerUser({
     String protocol,
     String homeserver,
@@ -68,6 +98,7 @@ abstract class Auth {
     String session,
     String authType = MatrixAuthTypes.DUMMY,
     String authValue,
+    Map authParams,
     String deviceId,
     String deviceName,
   }) async {
@@ -96,6 +127,21 @@ abstract class Auth {
         body = {
           'auth': {
             'type': MatrixAuthTypes.TERMS,
+          }
+        };
+        break;
+      case MatrixAuthTypes.EMAIL:
+        body = {
+          'auth': {
+            'type': MatrixAuthTypes.EMAIL,
+            "threepid_creds": {
+              "sid": authParams['sid'],
+              "client_secret": authParams['client_secret'],
+            },
+            "threepidCreds": {
+              "sid": authParams['sid'],
+              "client_secret": authParams['client_secret'],
+            }
           }
         };
         break;

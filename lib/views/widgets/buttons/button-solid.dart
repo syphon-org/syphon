@@ -19,38 +19,46 @@ class ButtonSolid extends StatelessWidget {
   final Function onPressed;
 
   @override
-  Widget build(BuildContext context) => FlatButton(
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.grey[300],
-        onPressed: disabled ? null : this.onPressed,
-        color: Theme.of(context).primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28.0),
+  Widget build(BuildContext context) => Container(
+        width: Dimensions.contentWidth(context),
+        height: Dimensions.inputHeight,
+        constraints: BoxConstraints(
+          minWidth: Dimensions.buttonWidthMin,
+          maxWidth: Dimensions.buttonWidthMax,
         ),
-        child: this.loading
-            ? Container(
-                constraints: BoxConstraints(
-                  maxHeight: 28,
-                  maxWidth: 28,
-                ),
-                child: CircularProgressIndicator(
-                  strokeWidth: Dimensions.defaultStrokeWidth,
-                  backgroundColor: Colors.white,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.grey,
+        child: FlatButton(
+          disabledColor: Colors.grey,
+          disabledTextColor: Colors.grey[300],
+          onPressed: disabled ? null : this.onPressed,
+          color: Theme.of(context).primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28.0),
+          ),
+          child: this.loading
+              ? Container(
+                  constraints: BoxConstraints(
+                    maxHeight: 28,
+                    maxWidth: 28,
                   ),
-                ),
-              )
-            : (textWidget != null
-                ? textWidget
-                : Text(
-                    this.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w100,
-                      letterSpacing: 0.8,
-                      color: Colors.white,
+                  child: CircularProgressIndicator(
+                    strokeWidth: Dimensions.defaultStrokeWidth,
+                    backgroundColor: Colors.white,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.grey,
                     ),
-                  )),
+                  ),
+                )
+              : (textWidget != null
+                  ? textWidget
+                  : Text(
+                      this.text,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w100,
+                        letterSpacing: 0.8,
+                        color: Colors.white,
+                      ),
+                    )),
+        ),
       );
 }

@@ -5,7 +5,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
@@ -29,8 +29,6 @@ class DeviceViewState extends State<DevicesView> {
   DeviceViewState({Key key}) : super();
 
   List<Device> selectedDevices;
-  StreamSubscription alertsListener;
-  final GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -84,45 +82,6 @@ class DeviceViewState extends State<DevicesView> {
 
     store.dispatch(fetchDevices());
     store.dispatch(fetchNotificationPushers());
-    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
-      var color;
-
-      switch (alert.type) {
-        case 'warning':
-          color = Colors.red;
-          break;
-        case 'error':
-          color = Colors.red;
-          break;
-        case 'info':
-        default:
-          color = Colors.grey;
-      }
-
-      scaffold.currentState.showSnackBar(SnackBar(
-        backgroundColor: color,
-        content: Text(
-          alert.message,
-          style: Theme.of(context).textTheme.subtitle1,
-        ),
-        duration: alert.duration,
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            scaffold.currentState.removeCurrentSnackBar();
-          },
-        ),
-      ));
-    });
-  }
-
-  @override
-  void dispose() {
-    if (alertsListener != null) {
-      alertsListener.cancel();
-    }
-    super.dispose();
   }
 
   @protected
@@ -219,8 +178,8 @@ class DeviceViewState extends State<DevicesView> {
         builder: (context, props) {
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           var currentAppBar = buildAppBar(
             props: props,
@@ -235,7 +194,6 @@ class DeviceViewState extends State<DevicesView> {
           }
 
           return Scaffold(
-            key: scaffold,
             appBar: currentAppBar,
             body: Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -342,7 +300,7 @@ class DeviceViewState extends State<DevicesView> {
                           RefreshProgressIndicator(
                             strokeWidth: Dimensions.defaultStrokeWidth,
                             valueColor: new AlwaysStoppedAnimation<Color>(
-                              PRIMARY_COLOR,
+                              Theme.of(context).primaryColor,
                             ),
                             value: null,
                           ),

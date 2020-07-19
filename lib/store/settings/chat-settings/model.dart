@@ -1,4 +1,4 @@
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
@@ -22,7 +22,7 @@ class ChatSetting extends Equatable {
     this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
-    this.primaryColor = GREY_DEFAULT,
+    this.primaryColor = Colours.greyDefault,
     this.notificationsEnabled = false,
   });
 

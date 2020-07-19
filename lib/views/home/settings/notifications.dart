@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -27,8 +27,8 @@ class NotificationSettingsView extends StatelessWidget {
 
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(

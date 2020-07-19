@@ -3,7 +3,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -162,12 +162,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
     final sectionBackgroundColor =
         Theme.of(context).brightness == Brightness.dark
-            ? const Color(BASICALLY_BLACK)
-            : const Color(BACKGROUND);
+            ? const Color(Colours.blackDefault)
+            : const Color(Colours.whiteDefault);
 
     final mainBackgroundColor = Theme.of(context).brightness == Brightness.dark
         ? null
-        : const Color(DISABLED_GREY);
+        : const Color(Colours.greyDisabled);
 
     return StoreConnector<AppState, _Props>(
       distinct: true,

@@ -293,25 +293,31 @@ abstract class Events {
    * 
    * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
    */
-  static Future<dynamic> sendReadReceipt({
+  static Future<dynamic> sendReadMarkers({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
     String roomId,
-    String receiptType,
     String messageId,
+    String lastRead,
+    bool readAll = true,
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/receipt/$receiptType/$messageId';
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
+    Map body = {
+      'm.fully_read': readAll ? messageId : lastRead,
+      'm.read': messageId,
+    };
+
     final response = await http.post(
       url,
       headers: headers,
-      body: json.encode({}),
+      body: json.encode(body),
     );
 
     return await json.decode(response.body);

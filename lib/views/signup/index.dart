@@ -2,14 +2,15 @@ import 'dart:async';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/signup/step-captcha.dart';
+import 'package:syphon/views/signup/step-email.dart';
 import 'package:syphon/views/signup/step-terms.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -27,7 +28,7 @@ import './step-password.dart';
 import './step-homeserver.dart';
 
 final Duration nextAnimationDuration = Duration(
-  milliseconds: 350,
+  milliseconds: Values.animationDurationDefault,
 );
 
 class SignupView extends StatefulWidget {
@@ -62,10 +63,12 @@ class SignupViewState extends State<SignupView> {
       keepPage: true,
       viewportFraction: 1.5,
     );
+  }
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -78,8 +81,29 @@ class SignupViewState extends State<SignupView> {
           this.sections.length < 4) {
         final newSections = List<Widget>.from(sections);
 
-        newSections.add(CaptchaStep());
-        newSections.add(TermsStep());
+        var newStages = [];
+        try {
+          newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
+        } catch (error) {
+          debugPrint('Failed to parse stages');
+        }
+
+        // dynamically add stages based on homeserver requirements
+        newStages.forEach((stage) {
+          switch (stage) {
+            case MatrixAuthTypes.EMAIL:
+              newSections.add(EmailStep());
+              break;
+            case MatrixAuthTypes.RECAPTCHA:
+              newSections.add(CaptchaStep());
+              break;
+            case MatrixAuthTypes.TERMS:
+              newSections.add(TermsStep());
+              break;
+            default:
+              break;
+          }
+        });
 
         setState(() {
           sections = newSections;
@@ -121,74 +145,126 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  Function onCheckStepValidity(_Props props, PageController controller) {
-    switch (this.currentStep) {
-      case 0:
-        return props.isHomeserverValid
-            ? () {
-                controller.nextPage(
-                  duration: nextAnimationDuration,
-                  curve: Curves.ease,
-                );
-              }
-            : null;
-      case 1:
-        return props.isUsernameValid && props.isUsernameAvailable
-            ? () {
-                controller.nextPage(
-                  duration: nextAnimationDuration,
-                  curve: Curves.ease,
-                );
-              }
-            : null;
-      case 2:
-        return !props.isPasswordValid
-            ? null
-            : () async {
-                if (sections.length < 4) {
-                  final result = await props.onCreateUser();
-                  if (!result) {
-                    return await controller.nextPage(
-                      duration: nextAnimationDuration,
-                      curve: Curves.ease,
-                    );
-                  }
-                }
+  bool onCheckStepValid(_Props props, PageController controller) {
+    final currentSection = this.sections[this.currentStep];
 
-                return await controller.nextPage(
-                  duration: nextAnimationDuration,
-                  curve: Curves.ease,
-                );
-              };
-      case 3:
-        return !props.captcha
-            ? null
-            : () async {
-                var result = false;
-                if (!props.completed.contains(MatrixAuthTypes.RECAPTCHA)) {
-                  result = await props.onCreateUser();
-                }
-                if (!result) {
-                  controller.nextPage(
-                    duration: nextAnimationDuration,
-                    curve: Curves.ease,
-                  );
-                }
-              };
-      case 4:
-        return !props.agreement
-            ? null
-            : () async {
-                final result = await props.onCreateUser();
+    switch (currentSection.runtimeType) {
+      case HomeserverStep:
+        return props.isHomeserverValid;
+      case UsernameStep:
+        return props.isUsernameValid &&
+            props.isUsernameAvailable &&
+            !props.loading;
+      case PasswordStep:
+        return props.isPasswordValid;
+      case EmailStep:
+        return props.isEmailValid;
+      case CaptchaStep:
+        return props.captcha;
+      case TermsStep:
+        return props.agreement;
+      default:
+        return null;
+    }
+  }
 
-                // If the user has a completed auth flow for matrix, reset to
-                // proper auth type to attempt a real account creation
-                // for matrix and try again
-                if (result && props.user.accessToken == null) {
-                  await props.onResetCredential();
-                  props.onCreateUser();
-                }
-              };
+  @protected
+  Function onCompleteStep(_Props props, PageController controller) {
+    final currentSection = this.sections[this.currentStep];
+    final lastStep = (this.sections.length - 1) == this.currentStep;
+    switch (currentSection.runtimeType) {
+      case HomeserverStep:
+        return () {
+          controller.nextPage(
+            duration: nextAnimationDuration,
+            curve: Curves.ease,
+          );
+        };
+      case UsernameStep:
+        return () {
+          controller.nextPage(
+            duration: nextAnimationDuration,
+            curve: Curves.ease,
+          );
+        };
+      case PasswordStep:
+        return () async {
+          if (sections.length < 4) {
+            final result = await props.onCreateUser();
+
+            // If signup is completed here, just wait for auth redirect
+            if (result) {
+              return;
+            }
+          }
+
+          return await controller.nextPage(
+            duration: nextAnimationDuration,
+            curve: Curves.ease,
+          );
+        };
+      case CaptchaStep:
+        return () async {
+          var result = false;
+          if (!props.completed.contains(MatrixAuthTypes.RECAPTCHA)) {
+            result = await props.onCreateUser(enableErrors: lastStep);
+          }
+          if (!result) {
+            controller.nextPage(
+              duration: nextAnimationDuration,
+              curve: Curves.ease,
+            );
+          }
+        };
+      case TermsStep:
+        return () async {
+          var result = false;
+          if (!props.completed.contains(MatrixAuthTypes.TERMS)) {
+            result = await props.onCreateUser(enableErrors: lastStep);
+          }
+          if (!result) {
+            return controller.nextPage(
+              duration: nextAnimationDuration,
+              curve: Curves.ease,
+            );
+          }
+
+          // If the user has a completed auth flow for matrix.org, reset to
+          // proper auth type to attempt a real account creation
+          // for matrix and try again
+          if (result && props.user.accessToken == null) {
+            await props.onResetCredential();
+            props.onCreateUser();
+          }
+        };
+      case EmailStep:
+        return () async {
+          var result = false;
+          final validEmail = await props.onSubmitEmail();
+
+          // don't run anything if email is already in use
+          if (!validEmail) {
+            return false;
+          }
+
+          // try using email signup without verification
+          if (!props.completed.contains(MatrixAuthTypes.EMAIL)) {
+            result = await props.onCreateUser(enableErrors: lastStep);
+          }
+
+          // otherwise, send to the verification holding page
+          if (!result) {
+            if (lastStep) {
+              return Navigator.pushNamed(context, '/verification');
+            }
+
+            // or continue if not the last step
+            controller.nextPage(
+              duration: nextAnimationDuration,
+              curve: Curves.ease,
+            );
+          }
+        };
       default:
         return null;
     }
@@ -291,20 +367,15 @@ class SignupViewState extends State<SignupView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              width: width * 0.725,
-                              margin: EdgeInsets.only(top: height * 0.01),
-                              height: Dimensions.inputHeight,
-                              constraints: BoxConstraints(
-                                minWidth: Dimensions.buttonWidthMin,
-                                maxWidth: Dimensions.buttonWidthMax,
-                              ),
                               child: ButtonSolid(
-                                key: Key(sections.length.toString() +
-                                    this.currentStep.toString()),
                                 text: buildButtonString(),
                                 loading: props.creating,
-                                disabled: props.creating,
-                                onPressed: onCheckStepValidity(
+                                disabled: props.creating ||
+                                    !onCheckStepValid(
+                                      props,
+                                      this.pageController,
+                                    ),
+                                onPressed: onCompleteStep(
                                   props,
                                   this.pageController,
                                 ),
@@ -313,29 +384,34 @@ class SignupViewState extends State<SignupView> {
                           ],
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                          left: 8,
-                          right: 8,
-                          top: 16,
-                          bottom: 24,
-                        ),
-                        constraints: BoxConstraints(
-                          minHeight: 45,
-                        ),
+                      Flexible(
+                        flex: 1,
                         child: Flex(
-                          direction: Axis.horizontal,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SmoothPageIndicator(
-                              controller: pageController, // PageController
-                              count: sections.length,
-                              effect: WormEffect(
-                                spacing: 16,
-                                dotHeight: 12,
-                                dotWidth: 12,
-                                activeDotColor: Theme.of(context).primaryColor,
-                              ), // your preferred effect
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            Container(
+                              constraints: BoxConstraints(
+                                minHeight: Dimensions.buttonHeightMin,
+                              ),
+                              child: Flex(
+                                direction: Axis.horizontal,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SmoothPageIndicator(
+                                    controller:
+                                        pageController, // PageController
+                                    count: sections.length,
+                                    effect: WormEffect(
+                                      spacing: 16,
+                                      dotHeight: 12,
+                                      dotWidth: 12,
+                                      activeDotColor:
+                                          Theme.of(context).primaryColor,
+                                    ), // your preferred effect
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -352,6 +428,10 @@ class SignupViewState extends State<SignupView> {
 
 class _Props extends Equatable {
   final User user;
+
+  final String homeserver;
+  final bool isHomeserverValid;
+
   final String username;
   final bool isUsernameValid;
   final bool isUsernameAvailable;
@@ -359,74 +439,93 @@ class _Props extends Equatable {
   final String password;
   final bool isPasswordValid;
 
-  final String homeserver;
-  final bool isHomeserverValid;
+  final String email;
+  final bool isEmailValid;
 
   final bool creating;
   final bool captcha;
   final bool agreement;
+  final bool loading;
+  final bool verificationNeeded;
 
   final List<String> completed;
 
   final Map interactiveAuths;
 
   final Function onCreateUser;
+  final Function onSubmitEmail;
   final Function onResetCredential;
 
   _Props({
     @required this.user,
+    @required this.homeserver,
+    @required this.isHomeserverValid,
     @required this.username,
     @required this.isUsernameValid,
     @required this.isUsernameAvailable,
     @required this.password,
     @required this.isPasswordValid,
-    @required this.homeserver,
-    @required this.isHomeserverValid,
+    @required this.email,
+    @required this.isEmailValid,
     @required this.creating,
     @required this.captcha,
     @required this.agreement,
+    @required this.loading,
+    @required this.verificationNeeded,
     @required this.interactiveAuths,
     @required this.completed,
     @required this.onCreateUser,
+    @required this.onSubmitEmail,
     @required this.onResetCredential,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         completed: store.state.authStore.completed,
+        homeserver: store.state.authStore.homeserver,
+        isHomeserverValid: store.state.authStore.isHomeserverValid,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,
         password: store.state.authStore.password,
         isPasswordValid: store.state.authStore.isPasswordValid,
-        homeserver: store.state.authStore.homeserver,
-        isHomeserverValid: store.state.authStore.isHomeserverValid,
+        email: store.state.authStore.email,
+        isEmailValid: store.state.authStore.isEmailValid,
         creating: store.state.authStore.creating,
         captcha: store.state.authStore.captcha,
         agreement: store.state.authStore.agreement,
+        loading: store.state.authStore.loading,
         interactiveAuths: store.state.authStore.interactiveAuths,
+        verificationNeeded: store.state.authStore.verificationNeeded,
+        onSubmitEmail: () async {
+          return await store.dispatch(submitEmail());
+        },
         onResetCredential: () async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.DUMMY,
           ));
         },
-        onCreateUser: () async {
-          return await store.dispatch(createUser());
+        onCreateUser: ({bool enableErrors}) async {
+          return await store.dispatch(createUser(enableErrors: enableErrors));
         },
       );
 
   @override
   List<Object> get props => [
         user,
+        homeserver,
+        isHomeserverValid,
         username,
         isUsernameValid,
         isUsernameAvailable,
         password,
         isPasswordValid,
-        homeserver,
-        isHomeserverValid,
+        email,
+        isEmailValid,
         creating,
         captcha,
         agreement,
+        loading,
         interactiveAuths,
+        verificationNeeded,
       ];
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
@@ -207,8 +207,8 @@ class SearchUserState extends State<SearchUserView> {
   Widget buildUserList(BuildContext context, _Props props) {
     final sectionBackgroundColor =
         Theme.of(context).brightness == Brightness.dark
-            ? const Color(BASICALLY_BLACK)
-            : const Color(BACKGROUND);
+            ? const Color(Colours.blackDefault)
+            : const Color(Colours.whiteDefault);
 
     final searchText = searchable ?? '';
 
@@ -263,8 +263,9 @@ class SearchUserState extends State<SearchUserView> {
                         attemptableUser.userId,
                         style: Theme.of(context).textTheme.caption.merge(
                               TextStyle(
-                                color:
-                                    props.loading ? Color(DISABLED_GREY) : null,
+                                color: props.loading
+                                    ? Color(Colours.greyDisabled)
+                                    : null,
                               ),
                             ),
                       ),
@@ -296,8 +297,8 @@ class SearchUserState extends State<SearchUserView> {
                 final user = (props.searchResults[index] as User);
                 final sectionBackgroundColor =
                     Theme.of(context).brightness == Brightness.dark
-                        ? const Color(BASICALLY_BLACK)
-                        : const Color(BACKGROUND);
+                        ? const Color(Colours.blackDefault)
+                        : const Color(Colours.whiteDefault);
 
                 Color avatarBackground =
                     user.avatarUri != null ? Colors.transparent : Colors.grey;
@@ -334,7 +335,7 @@ class SearchUserState extends State<SearchUserView> {
                           style: Theme.of(context).textTheme.caption.merge(
                                 TextStyle(
                                   color: props.loading
-                                      ? Color(DISABLED_GREY)
+                                      ? Color(Colours.greyDisabled)
                                       : null,
                                 ),
                               ),
@@ -473,7 +474,7 @@ class SearchUserState extends State<SearchUserView> {
                               RefreshProgressIndicator(
                                 strokeWidth: Dimensions.defaultStrokeWidth,
                                 valueColor: new AlwaysStoppedAnimation<Color>(
-                                  PRIMARY_COLOR,
+                                  Theme.of(context).primaryColor,
                                 ),
                                 value: null,
                               ),

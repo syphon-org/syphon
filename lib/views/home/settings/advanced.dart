@@ -1,7 +1,7 @@
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
@@ -160,7 +160,7 @@ class AdvancedView extends StatelessWidget {
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
                     style: TextStyle(
-                      color: props.loading ? Color(DISABLED_GREY) : null,
+                      color: props.loading ? Color(Colours.greyDisabled) : null,
                     ),
                   ),
                   trailing: Container(
@@ -181,13 +181,15 @@ class AdvancedView extends StatelessWidget {
                       'Manual Sync',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
                       style: TextStyle(
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
@@ -207,7 +209,8 @@ class AdvancedView extends StatelessWidget {
                       'Force Full Sync',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: props.loading ? Color(DISABLED_GREY) : null,
+                        color:
+                            props.loading ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     subtitle: Text(

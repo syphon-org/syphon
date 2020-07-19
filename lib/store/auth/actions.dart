@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
@@ -87,6 +87,21 @@ class SetPasswordValid {
   SetPasswordValid({this.valid});
 }
 
+class SetEmail {
+  final String email;
+  SetEmail({this.email});
+}
+
+class SetEmailValid {
+  final bool valid;
+  SetEmailValid({this.valid});
+}
+
+class SetEmailAvailability {
+  final bool available;
+  SetEmailAvailability({this.available});
+}
+
 class SetAgreement {
   final bool agreement;
   SetAgreement({this.agreement});
@@ -122,6 +137,11 @@ class SetCredential {
   SetCredential({this.credential});
 }
 
+class SetVerificationNeeded {
+  final bool needed;
+  SetVerificationNeeded({this.needed});
+}
+
 class SetInteractiveAuths {
   final Map interactiveAuths;
   SetInteractiveAuths({this.interactiveAuths});
@@ -145,6 +165,7 @@ ThunkAction<AppState> startAuthObserver() {
 
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
+      debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserProfile());
 
@@ -303,6 +324,10 @@ ThunkAction<AppState> logoutUser() {
       store.dispatch(stopSyncObserver());
       // submit empty auth before logging out of matrix
 
+      if (store.state.authStore.user.homeserver == null) {
+        throw Exception('Unavailable user data');
+      }
+
       final data = await MatrixApi.logoutUser(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -385,8 +410,8 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
       final List<String> completed =
           List<String>.from(auths['completed'] ?? []) ?? [];
 
-      await store.dispatch(SetCompleted(completed: completed));
       await store.dispatch(SetSession(session: auths['session']));
+      await store.dispatch(SetCompleted(completed: completed));
       await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
 
       if (auths['flows'] != null && auths['flows'].length > 0) {
@@ -398,9 +423,8 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
           (stage) => !completed.contains(stage),
         );
 
-        print('[currentStage check] ${currentStage.length > 0}');
         if (currentStage.length > 0) {
-          print('[SetCredential] $currentStage');
+          debugPrint('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -410,8 +434,55 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
         }
       }
     } catch (error) {
-      store.dispatch(SetSession(session: null));
       debugPrint('[setInteractiveAuth] $error');
+    }
+  };
+}
+
+ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final emailSubmitted = store.state.authStore.email;
+      final currentCredential = store.state.authStore.credential;
+
+      if (currentCredential.params.containsValue(emailSubmitted) &&
+          sendAttempt < 2) {
+        return true;
+      }
+
+      final data = await MatrixApi.registerEmail(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        email: store.state.authStore.email,
+        clientSecret: Values.clientSecretMatrix,
+        sendAttempt: sendAttempt,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(
+        SetCredential(
+          credential: currentCredential.copyWith(
+            params: {
+              'sid': data['sid'],
+              'client_secret': Values.clientSecretMatrix,
+              'email_submitted': store.state.authStore.email
+            },
+          ),
+        ),
+      );
+      return true;
+    } catch (error) {
+      debugPrint('[submitEmail] $error');
+      store.dispatch(SetEmailValid(valid: false));
+      store.dispatch(SetEmailAvailability(available: false));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
     }
   };
 }
@@ -419,8 +490,26 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
 /**
  * 
  * https://matrix.org/docs/spec/client_server/latest#id204
+ * 
+ * 
+ * Email Request (?)
+ * https://matrix-client.matrix.org/_matrix/client/r0/register/email/requestToken
+ * 
+ * Request Token + SID
+ * {"email":"syphon+testing@ere.io","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN","send_attempt":1,"next_link":"https://app.element.io/#/register?client_secret=MDWVwN79p5xIz7bgazVXvO8aabbVD0LN&hs_url=https%3A%2F%2Fmatrix-client.matrix.org&is_url=https%3A%2F%2Fvector.im&session_id=yGElwHyWRFHwVkChpyWIJqMO"}
+ * 
+ * Response Token + SID
+ * {"sid": "UTWiabjnSXWWTAPs"}
+ * 
+ * 
+ * Send Terms (?)
+ * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.terms"},"inhibit_login":true}
+ * 
+ * Send Email Auth (?)
+ * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.email.identity","threepid_creds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"},"threepidCreds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"}},"inhibit_login":true}
+ * 
  */
-ThunkAction<AppState> createUser() {
+ThunkAction<AppState> createUser({enableErrors = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -431,6 +520,7 @@ ThunkAction<AppState> createUser() {
       final session = store.state.authStore.session;
       final authType = session != null ? credential.type : loginType;
       final authValue = session != null ? credential.value : null;
+      final authParams = session != null ? credential.params : null;
 
       final device = await store.dispatch(generateDeviceId(
         salt: store.state.authStore.username,
@@ -444,40 +534,48 @@ ThunkAction<AppState> createUser() {
         session: store.state.authStore.session,
         authType: authType,
         authValue: authValue,
+        authParams: authParams,
         deviceId: device.deviceId,
         deviceName: device.displayName,
       );
 
       if (data['errcode'] != null) {
+        if (data['errcode'] == MatrixErrors.not_authorized &&
+            credential.type == MatrixAuthTypes.EMAIL) {
+          store.dispatch(SetVerificationNeeded(needed: true));
+          return false;
+        }
         throw data['error'];
       }
 
       if (data['flows'] != null) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
-        final List<dynamic> flows =
-            store.state.authStore.interactiveAuths['flows'];
+        final List<dynamic> stages =
+            store.state.authStore.interactiveAuths['flows'][0]['stages'];
         final completed = store.state.authStore.completed;
 
-        final bool hasCompleted = flows.reduce((hasCompleted, flow) {
-          return (hasCompleted is bool && hasCompleted) ||
-              (flow['stages'] as List<dynamic>).every(
-                (stage) => completed.contains(stage),
-              );
+        // Compare the completed stages to the flow stages provided
+        final bool completedAll = stages.fold(true, (hasCompleted, stage) {
+          return hasCompleted && completed.contains(stage);
         });
 
-        // return false most likely
-        return hasCompleted;
+        return completedAll;
       }
 
-      store.dispatch(SetUser(
-        user: User.fromJson(data),
-      ));
+      store.dispatch(SetUser(user: User.fromJson(data)));
+
+      store.state.authStore.authObserver.add(
+        store.state.authStore.user,
+      );
 
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      debugPrint('[createUser] $error');
+      debugPrint('[createUser] error $error');
+      if (enableErrors) {
+        store.dispatch(addAlert(message: 'Failed to signup', error: error));
+      }
       return false;
     } finally {
       store.dispatch(SetCreating(creating: false));
@@ -658,7 +756,7 @@ ThunkAction<AppState> setLoading(bool loading) {
 }
 
 /**
- * Fetch Active Devices for account
+ * Update current interactive auth attempt
  */
 ThunkAction<AppState> updateCredential({
   String type,
@@ -710,6 +808,20 @@ ThunkAction<AppState> setHomeserver({String homeserver}) {
     store.dispatch(
       SetHomeserver(homeserver: homeserver.trim()),
     );
+  };
+}
+
+ThunkAction<AppState> setEmail({String email}) {
+  return (Store<AppState> store) {
+    final validEmail = RegExp(Values.emailRegex).hasMatch(email);
+
+    debugPrint('$email $validEmail');
+
+    store.dispatch(SetEmailValid(
+      valid: email != null && email.length > 0 && validEmail,
+    ));
+    store.dispatch(SetEmail(email: email));
+    store.dispatch(SetEmailAvailability(available: true));
   };
 }
 

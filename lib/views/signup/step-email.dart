@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 // Store
 import 'package:redux/redux.dart';
@@ -16,19 +16,20 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
-class UsernameStep extends StatefulWidget {
-  const UsernameStep({Key key}) : super(key: key);
+class EmailStep extends StatefulWidget {
+  const EmailStep({Key key}) : super(key: key);
 
-  UsernameStepState createState() => UsernameStepState();
+  EmailStepState createState() => EmailStepState();
 }
 
-class UsernameStepState extends State<UsernameStep> {
-  UsernameStepState({Key key});
+class EmailStepState extends State<EmailStep> {
+  EmailStepState({Key key});
 
   Timer typingTimeout;
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -39,9 +40,7 @@ class UsernameStepState extends State<UsernameStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    usernameController.text = trimmedUserId(
-      userId: store.state.authStore.username,
-    );
+    emailController.text = store.state.authStore.email;
   }
 
   @override
@@ -60,7 +59,7 @@ class UsernameStepState extends State<UsernameStep> {
         );
 
         if (!props.loading && this.typingTimeout == null) {
-          if (props.isUsernameAvailable) {
+          if (props.isEmailValid && props.isEmailAvailable) {
             suffixWidget = Icon(
               Icons.check,
               color: Colors.white,
@@ -93,21 +92,83 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
                   child: SvgPicture.asset(
-                    Assets.heroSignupUsername,
-                    semanticsLabel: 'Person resting on I.D. card',
+                    Assets.heroSignupEmail,
+                    semanticsLabel: 'Person resting on checked letter',
                   ),
                 ),
               ),
               Flexible(
-                flex: 1,
+                flex: 2,
                 child: Flex(
                   direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      'Create a username',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+                    Container(
+                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      child: Text(
+                        'This homeserver requires an email\n for account creation.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                    ),
+                    Container(
+                      child: Stack(
+                        overflow: Overflow.visible,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 24,
+                            ),
+                            child: Text(
+                              'Enter an email address',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline5,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      DialogExplaination(
+                                    title: Strings.titleDialogEmailRequirement,
+                                    content: Strings.contentEmailRequirement,
+                                    onConfirm: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 20,
+                                width: 20,
+                                child: Icon(
+                                  Icons.info_outline,
+                                  color: Theme.of(context).accentColor,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: !props.isEmailAvailable,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text(
+                          '* Email is already in use by another user',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.caption.copyWith(
+                                color: Colors.red,
+                              ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -122,22 +183,19 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label:
-                        props.isUsernameValid ? props.fullUserId : "Username",
+                    label: "Email",
                     disableSpacing: true,
-                    valid: props.isUsernameValid,
-                    controller: usernameController,
+                    valid: props.isEmailValid,
+                    controller: emailController,
                     onSubmitted: (_) {
                       FocusScope.of(context).unfocus();
                     },
                     onEditingComplete: () {
-                      props.onSetUsername();
-                      props.onCheckUsernameAvailability();
                       FocusScope.of(context).unfocus();
                     },
-                    onChanged: (username) {
+                    onChanged: (email) {
                       // Set new username
-                      props.onSetUsername(username: username);
+                      props.onSetEmail(email: email);
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
@@ -151,7 +209,6 @@ class UsernameStepState extends State<UsernameStep> {
                       typingTimeout = Timer(
                         Duration(milliseconds: 1000),
                         () {
-                          props.onCheckUsernameAvailability();
                           this.setState(() {
                             typingTimeout = null;
                           });
@@ -159,7 +216,7 @@ class UsernameStepState extends State<UsernameStep> {
                       );
                     },
                     suffix: Visibility(
-                      visible: props.isUsernameValid,
+                      visible: props.isEmailValid || !props.isEmailAvailable,
                       child: Container(
                         width: 12,
                         height: 12,
@@ -184,54 +241,44 @@ class UsernameStepState extends State<UsernameStep> {
 }
 
 class _Props extends Equatable {
-  final String username;
-  final String fullUserId;
-  final bool isUsernameValid;
-  final bool isUsernameAvailable;
   final bool loading;
+  final String email;
+  final bool isEmailValid;
+  final bool isEmailAvailable;
 
-  final Function onSetUsername;
-  final Function onCheckUsernameAvailability;
+  final Function onSetEmail;
 
   _Props({
-    @required this.username,
-    @required this.fullUserId,
-    @required this.isUsernameValid,
-    @required this.isUsernameAvailable,
+    @required this.email,
+    @required this.isEmailValid,
+    @required this.isEmailAvailable,
     @required this.loading,
-    @required this.onSetUsername,
-    @required this.onCheckUsernameAvailability,
+    @required this.onSetEmail,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        username: store.state.authStore.username,
-        fullUserId: userAlias(
-          username: store.state.authStore.username,
-          homeserver: store.state.authStore.homeserver,
-        ),
-        isUsernameValid: store.state.authStore.isUsernameValid,
-        isUsernameAvailable: store.state.authStore.isUsernameAvailable,
+        email: store.state.authStore.email,
+        isEmailValid: store.state.authStore.isEmailValid,
+        isEmailAvailable: store.state.authStore.isEmailAvailable,
         loading: store.state.authStore.loading,
-        onCheckUsernameAvailability: () {
-          store.dispatch(checkUsernameAvailability());
-        },
-        onSetUsername: ({String username}) {
-          if (username != null) {
-            store.dispatch(setUsername(username: username));
-          } else {
-            store.dispatch(
-              setUsername(username: store.state.authStore.username),
-            );
+        onSetEmail: ({String email}) {
+          if (email != null) {
+            store.dispatch(updateCredential(
+              type: MatrixAuthTypes.EMAIL,
+              value: email,
+            ));
+            return store.dispatch(setEmail(email: email));
           }
+
+          return store.dispatch(setEmail(email: store.state.authStore.email));
         },
       );
 
   @override
   List<Object> get props => [
-        username,
-        fullUserId,
-        isUsernameValid,
-        isUsernameAvailable,
+        email,
         loading,
+        isEmailValid,
+        isEmailAvailable,
       ];
 }

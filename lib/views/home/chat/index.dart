@@ -34,7 +34,7 @@ import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/widgets/menu-rounded.dart';
 
 enum ChatOptions {
@@ -91,10 +91,12 @@ class ChatViewState extends State<ChatView> {
         });
       }
     });
+  }
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -104,6 +106,10 @@ class ChatViewState extends State<ChatView> {
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
+
+    if (store.state.settingsStore.readReceipts) {
+      props.onSendReadReceipts();
+    }
 
     // TODO: remove after the cache is updated
     if (props.room.invite != null && props.room.invite) {
@@ -141,13 +147,13 @@ class ChatViewState extends State<ChatView> {
       final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
 
       if (atLimit && !loadMore) {
-        print('[messagesController.addListener] loading set to true');
+        debugPrint('[messagesController.addListener] loading set to true');
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
       } else if (!atLimit && loadMore && !props.loading) {
-        print('[messagesController.addListener] loading set to false');
+        debugPrint('[messagesController.addListener] loading set to false');
         this.setState(() {
           loadMore = false;
         });
@@ -335,7 +341,7 @@ class ChatViewState extends State<ChatView> {
                   Container(
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
-                      backgroundColor: const Color(DISABLED_GREY),
+                      backgroundColor: const Color(Colours.greyDisabled),
                       child: Stack(children: [
                         Positioned(
                           right: 0,
@@ -800,7 +806,7 @@ class ChatViewState extends State<ChatView> {
                                     strokeWidth: Dimensions.defaultStrokeWidth,
                                     valueColor:
                                         new AlwaysStoppedAnimation<Color>(
-                                      PRIMARY_COLOR,
+                                      Theme.of(context).primaryColor,
                                     ),
                                     value: null,
                                   ),
@@ -902,6 +908,7 @@ class _Props extends Equatable {
   final Function onAcceptInvite;
   final Function onToggleEncryption;
   final Function onCheatCode;
+  final Function onSendReadReceipts;
 
   _Props({
     @required this.room,
@@ -919,6 +926,7 @@ class _Props extends Equatable {
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
     @required this.onCheatCode,
+    @required this.onSendReadReceipts,
   });
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
@@ -990,6 +998,14 @@ class _Props extends Equatable {
             sendTyping(
               typing: typing,
               roomId: roomId,
+            ),
+          ),
+      onSendReadReceipts: () => store.dispatch(
+            sendReadReceipts(
+              room: Room(id: roomId),
+              message: latestMessages(
+                roomSelectors.room(id: roomId, state: store.state).messages,
+              ).elementAt(0),
             ),
           ),
       onLoadFirstBatch: () {

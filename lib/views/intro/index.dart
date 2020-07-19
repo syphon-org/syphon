@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,11 @@ class IntroState extends State<Intro> {
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
     double width = MediaQuery.of(context).size.width;
 
-    if (alphaAgreement == null) {
+    if (alphaAgreement == null || true) {
+      final termsTitle = Platform.isIOS
+          ? Strings.titleDialogTerms
+          : Strings.titleDialogTermsAlpha;
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -84,8 +89,8 @@ class IntroState extends State<Intro> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: const Text(
-              "Confirm Open Alpha Terms Of Service",
+            title: Text(
+              termsTitle,
               textAlign: TextAlign.center,
             ),
             titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
@@ -103,18 +108,28 @@ class IntroState extends State<Intro> {
                 ),
               ),
               Text(
-                Strings.confirmationAlphaVersion,
+                Strings.confirmationThanks,
                 textAlign: TextAlign.center,
               ),
-              Text(
-                Strings.confirmationAlphaWarning,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Visibility(
+                visible: !Platform.isIOS,
+                child: Text(
+                  Strings.confirmationAlphaVersion,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Visibility(
+                visible: !Platform.isIOS,
+                child: Text(
+                  Strings.confirmationAlphaWarning,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.w100),
+                ),
               ),
               Text(
                 Strings.confirmationAlphaWarningAlt,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(fontWeight: FontWeight.w300),
               ),
               Text(
                 Strings.confirmationConclusion,
@@ -204,12 +219,6 @@ class IntroState extends State<Intro> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Container(
-                    width: widgetWidthScaling,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.buttonWidthMin,
-                      maxWidth: Dimensions.buttonWidthMax,
-                    ),
                     child: ButtonSolid(
                       text: buildButtonString(),
                       onPressed: () {
@@ -234,7 +243,9 @@ class IntroState extends State<Intro> {
                         }
 
                         pageController.nextPage(
-                          duration: Duration(milliseconds: 350),
+                          duration: Duration(
+                            milliseconds: Values.animationDurationDefault,
+                          ),
                           curve: Curves.ease,
                         );
                       },
@@ -243,69 +254,73 @@ class IntroState extends State<Intro> {
                 ],
               ),
             ),
-            Container(
-              height: Dimensions.inputHeight,
-              constraints: BoxConstraints(
-                minHeight: Dimensions.inputHeight,
-              ),
-              margin: const EdgeInsets.only(
-                left: 8,
-                right: 8,
-                top: 16,
-                bottom: 24,
-              ),
-              child: onboarding
-                  ? Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SmoothPageIndicator(
-                          controller: pageController, // PageController
-                          count: sections.length,
-                          effect: WormEffect(
-                            spacing: 16,
-                            dotHeight: 12,
-                            dotWidth: 12,
-                            paintStyle: PaintingStyle.fill,
-                            strokeWidth: 12,
-                            activeDotColor: Theme.of(context).primaryColor,
-                          ), // your preferred effect
-                        ),
-                      ],
-                    )
-                  : TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/login',
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            loginText,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText2,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Text(
-                              Strings.buttonIntroExistAction,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.white,
+            Flexible(
+              flex: 1,
+              child: Flex(
+                mainAxisAlignment: MainAxisAlignment.center,
+                direction: Axis.vertical,
+                children: <Widget>[
+                  Container(
+                    height: Dimensions.inputHeight,
+                    constraints: BoxConstraints(
+                      minHeight: Dimensions.inputHeight,
+                    ),
+                    child: onboarding
+                        ? Flex(
+                            direction: Axis.horizontal,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SmoothPageIndicator(
+                                controller: pageController, // PageController
+                                count: sections.length,
+                                effect: WormEffect(
+                                  spacing: 16,
+                                  dotHeight: 12,
+                                  dotWidth: 12,
+                                  paintStyle: PaintingStyle.fill,
+                                  strokeWidth: 12,
+                                  activeDotColor:
+                                      Theme.of(context).primaryColor,
+                                ), // your preferred effect
+                              ),
+                            ],
+                          )
+                        : TouchableOpacity(
+                            activeOpacity: 0.4,
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/login',
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  loginText,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyText2,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: Text(
+                                    Strings.buttonIntroExistAction,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        .copyWith(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.white,
+                                        ),
                                   ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

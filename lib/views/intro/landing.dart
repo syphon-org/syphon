@@ -13,37 +13,49 @@ class LandingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    final widthScale = width * 0.825;
     return Center(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Container(
-          width: widthScale,
+          width: Dimensions.contentWidth(context),
           constraints: BoxConstraints(
-            maxHeight: 253,
-            maxWidth: 320,
+            maxWidth: Dimensions.mediaSizeMax,
+            maxHeight: 252,
           ),
           child: SvgPicture.asset(
             Assets.heroIntroMobileUser,
             semanticsLabel: Strings.semanticsLabelImageIntro,
           ),
         ),
-        Container(
-          margin: EdgeInsets.only(bottom: 16),
-          child: Text(
-            Strings.titleIntro,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline4,
+        Flexible(
+          flex: 0,
+          child: Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            direction: Axis.vertical,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(bottom: 14),
+                child: Text(
+                  Strings.titleIntro,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ),
+            ],
           ),
         ),
-        FittedBox(
-          fit: BoxFit.fitWidth,
-          child: Text(
-            Strings.subtitleIntro,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline6,
+        Container(
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                Strings.subtitleIntro,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ],
           ),
         ),
       ],

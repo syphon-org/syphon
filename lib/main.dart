@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/settings/state.dart';
@@ -5,7 +6,6 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -50,13 +50,13 @@ void main() async {
   // init cold cache (mobile only)
   await initHive();
 
-  if(Platform.isAndroid || Platform.isIOS){
+  if (Platform.isAndroid || Platform.isIOS) {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
     Cache.stateRooms = await openHiveStateRooms();
   }
 
-  if(Platform.isLinux || Platform.isWindows || Platform.isLinux){
+  if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
     Cache.state = await openHiveStateUnsafe();
     Cache.stateRooms = await openHiveStateRoomsUnsafe();
   }
@@ -70,7 +70,6 @@ void main() async {
   if (Platform.isMacOS) {
     // await WindowUtils.setSize(Size(720, 720));
   }
-
 
   // init state cache (hot)
   final store = await initStore();
@@ -88,20 +87,13 @@ class Syphon extends StatefulWidget {
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
-  final Store<AppState> store;
-  Widget defaultHome = Home();
   SyphonState({this.store});
 
-  Future onSelectNotification(String payload) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Testing Notifications'),
-        content: Text('Payload : $payload'),
-      ),
-    );
-  }
+  final Store<AppState> store;
+  final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
+
+  Widget defaultHome = Home();
+  StreamSubscription alertsListener;
 
   @override
   void initState() {
@@ -117,19 +109,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     if (!authed) {
       defaultHome = Intro();
     }
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
   }
 
   @override
-  void deactivate() {
-    closeStorage();
-    WidgetsBinding.instance.removeObserver(this);
-    store.dispatch(stopAuthObserver());
-    store.dispatch(stopAlertsObserver());
-    super.deactivate();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -147,6 +132,69 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         NavigationService.clearTo('/home', context);
       }
     });
+
+    // init alerts listener
+    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
+      var color;
+
+      switch (alert.type) {
+        case 'warning':
+          color = Colors.red;
+          break;
+        case 'error':
+          color = Colors.red;
+          break;
+        case 'info':
+        default:
+          color = Colors.grey;
+      }
+
+      globalScaffold.currentState.showSnackBar(SnackBar(
+        backgroundColor: color,
+        content: Text(
+          alert.message,
+          style: Theme.of(context)
+              .textTheme
+              .subtitle1
+              .copyWith(color: Colors.white),
+        ),
+        duration: alert.duration,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            globalScaffold.currentState.removeCurrentSnackBar();
+          },
+        ),
+      ));
+    });
+  }
+
+  @override
+  void dispose() {
+    if (alertsListener != null) {
+      alertsListener.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    closeStorage();
+    WidgetsBinding.instance.removeObserver(this);
+    store.dispatch(stopAuthObserver());
+    store.dispatch(stopAlertsObserver());
+    super.deactivate();
+  }
+
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Testing Notifications'),
+        content: Text('Payload : $payload'),
+      ),
+    );
   }
 
   // Store should not need to be passed to a widget to affect
@@ -158,6 +206,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
               themeType: settings.theme,
               primaryColorHex: settings.primaryColor,
@@ -166,6 +215,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
             navigatorKey: NavigationService.navigatorKey,
             routes: NavigationProvider.getRoutes(store),
             home: defaultHome,
+            builder: (context, child) => Scaffold(
+              body: child,
+              appBar: null,
+              key: globalScaffold,
+            ),
           ),
         ),
       );

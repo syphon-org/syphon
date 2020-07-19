@@ -4,7 +4,6 @@ import 'package:syphon/global/strings.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -14,6 +13,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -35,88 +35,42 @@ class LoginState extends State<Login> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final GlobalKey<ScaffoldState> loginScaffold = GlobalKey<ScaffoldState>();
-
-  StreamSubscription alertsListener;
   bool visibility = false;
 
   LoginState({Key key});
-
-  @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
-  @protected
-  void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
-    // Init alerts listener
-    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
-      var color;
-
-      switch (alert.type) {
-        case 'warning':
-          color = Colors.red;
-          break;
-        case 'error':
-          color = Colors.red;
-          break;
-        case 'info':
-        default:
-          color = Colors.grey;
-      }
-
-      loginScaffold.currentState.showSnackBar(SnackBar(
-        backgroundColor: color,
-        content: Text(
-          alert.message,
-          style: Theme.of(context)
-              .textTheme
-              .subtitle1
-              .copyWith(color: Colors.white),
-        ),
-        duration: alert.duration,
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            loginScaffold.currentState.removeCurrentSnackBar();
-          },
-        ),
-      ));
-    });
-  }
 
   @override
   void dispose() {
     usernameController.dispose();
     passwordController.dispose();
     passwordFocus.dispose();
-    if (alertsListener != null) {
-      alertsListener.cancel();
-    }
     super.dispose();
-  }
-
-  void handleSubmitted(String value) {
-    FocusScope.of(context).requestFocus(passwordFocus);
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final double defaultWidgetScaling = width * 0.725;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
-        key: loginScaffold,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          brightness: Brightness.light,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Theme.of(context).primaryColor,
+            ),
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+          ),
+        ),
+        extendBodyBehindAppBar: true,
         body: ScrollConfiguration(
           behavior: DefaultScrollBehavior(),
           child: SingleChildScrollView(
@@ -179,7 +133,7 @@ class LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            width: defaultWidgetScaling,
+                            width: Dimensions.contentWidth(context),
                             height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -188,45 +142,34 @@ class LoginState extends State<Login> {
                               minWidth: Dimensions.inputWidthMin,
                               maxWidth: Dimensions.inputWidthMax,
                             ),
-                            child: TextField(
+                            child: TextFieldSecure(
                               maxLines: 1,
-                              autocorrect: false,
-                              enableSuggestions: false,
+                              label: 'username',
+                              disableSpacing: true,
+                              hint: props.usernameHint,
                               controller: usernameController,
-                              onSubmitted: handleSubmitted,
+                              onSubmitted: (text) {
+                                FocusScope.of(context)
+                                    .requestFocus(passwordFocus);
+                              },
                               onChanged: (username) {
-                                // Trim value for UI
-                                usernameController.value = TextEditingValue(
-                                  text: username.trim(),
-                                  selection: TextSelection.fromPosition(
-                                    TextPosition(
-                                      offset: username.trim().length,
-                                    ),
-                                  ),
-                                );
                                 props.onChangeUsername(username);
                               },
-                              decoration: InputDecoration(
-                                labelText: 'username',
-                                hintText: props.usernameHint,
-                                contentPadding: Dimensions.inputPadding,
-                                suffixIcon: IconButton(
-                                  highlightColor:
-                                      Theme.of(context).primaryColor,
-                                  icon: Icon(Icons.help_outline),
-                                  tooltip: Strings.tooltipSelectHomeserver,
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/search_home',
-                                    );
-                                  },
-                                ),
+                              suffix: IconButton(
+                                highlightColor: Theme.of(context).primaryColor,
+                                icon: Icon(Icons.help_outline),
+                                tooltip: Strings.tooltipSelectHomeserver,
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/search_home',
+                                  );
+                                },
                               ),
                             ),
                           ),
                           Container(
-                            width: defaultWidgetScaling,
+                            width: Dimensions.contentWidth(context),
                             height: Dimensions.inputHeight,
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -235,67 +178,49 @@ class LoginState extends State<Login> {
                               minWidth: Dimensions.inputWidthMin,
                               maxWidth: Dimensions.inputWidthMax,
                             ),
-                            child: TextField(
+                            child: TextFieldSecure(
+                              label: 'password',
                               focusNode: passwordFocus,
+                              obscureText: !visibility,
+                              textAlign: TextAlign.left,
                               onChanged: (password) {
                                 props.onChangePassword(password);
                               },
-                              autocorrect: false,
-                              enableSuggestions: false,
-                              smartQuotesType: SmartQuotesType.disabled,
-                              smartDashesType: SmartDashesType.disabled,
-                              textAlign: TextAlign.left,
-                              obscureText: !visibility,
-                              decoration: InputDecoration(
-                                suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    if (!passwordFocus.hasFocus) {
-                                      // Unfocus all focus nodes
-                                      passwordFocus.unfocus();
+                              suffix: GestureDetector(
+                                onTap: () {
+                                  if (!passwordFocus.hasFocus) {
+                                    // Unfocus all focus nodes
+                                    passwordFocus.unfocus();
 
-                                      // Disable text field's focus node request
-                                      passwordFocus.canRequestFocus = false;
-                                    }
+                                    // Disable text field's focus node request
+                                    passwordFocus.canRequestFocus = false;
+                                  }
 
-                                    // Do your stuff
-                                    this.setState(() {
-                                      visibility = !this.visibility;
+                                  // Do your stuff
+                                  this.setState(() {
+                                    visibility = !this.visibility;
+                                  });
+
+                                  if (!passwordFocus.hasFocus) {
+                                    //Enable the text field's focus node request after some delay
+                                    Future.delayed(Duration(milliseconds: 100),
+                                        () {
+                                      passwordFocus.canRequestFocus = true;
                                     });
-
-                                    if (!passwordFocus.hasFocus) {
-                                      //Enable the text field's focus node request after some delay
-                                      Future.delayed(
-                                          Duration(milliseconds: 100), () {
-                                        passwordFocus.canRequestFocus = true;
-                                      });
-                                    }
-                                  },
-                                  child: Icon(
-                                    visibility
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
+                                  }
+                                },
+                                child: Icon(
+                                  visibility
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
-                                contentPadding: Dimensions.inputPadding,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                labelText: 'password',
                               ),
                             ),
                           ),
                         ]),
                   ),
                   Container(
-                    width: defaultWidgetScaling,
-                    height: Dimensions.inputHeight,
-                    margin: const EdgeInsets.only(
-                      top: 24,
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 256,
-                      maxWidth: 336,
-                    ),
+                    margin: const EdgeInsets.only(top: 24),
                     child: ButtonSolid(
                       text: Strings.buttonLogin,
                       loading: props.loading,

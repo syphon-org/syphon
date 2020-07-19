@@ -42,7 +42,7 @@ description: Privacy focused matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.19+9
+version: 0.0.21+11
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -155,6 +155,8 @@ flutter:
    - assets/graphics/undraw_people.svg
    - assets/graphics/undraw_site_content.svg
    - assets/graphics/undraw_escaping.svg
+   - assets/graphics/undraw_message_sent.svg
+   - assets/graphics/undraw_new_message.svg
 
    - assets/graphics/undraw_in_thought.svg
    - assets/graphics/undraw_profile_data.svg

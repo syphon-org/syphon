@@ -1,7 +1,7 @@
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -23,11 +23,10 @@ class ChatPreferences extends StatelessWidget {
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
-
           final sectionBackgroundColor =
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color(BASICALLY_BLACK)
-                  : const Color(BACKGROUND);
+                  ? const Color(Colours.blackDefault)
+                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(
@@ -248,8 +247,10 @@ class Props {
   });
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        primaryColor: store.state.settingsStore.primaryColor ?? SYPHON_CYAN,
-        accentColor: store.state.settingsStore.accentColor ?? SYPHON_CYAN,
+        primaryColor:
+            store.state.settingsStore.primaryColor ?? Colours.cyanSyphon,
+        accentColor:
+            store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,

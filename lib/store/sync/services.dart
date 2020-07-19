@@ -34,8 +34,6 @@ FutureOr<void> saveSyncIsolate(dynamic params) async {
 
   await syncBox.put(Cache.syncData, params['sync']);
   await syncBox.close();
-
-  // print('[saveSyncIsolate] successful save');
 }
 
 /** 

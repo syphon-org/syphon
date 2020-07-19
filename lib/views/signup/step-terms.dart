@@ -1,4 +1,4 @@
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -58,7 +58,7 @@ class TermsStep extends StatelessWidget {
                           width: 56,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(40),
-                            color: const Color(SYPHON_CYAN),
+                            color: const Color(Colours.cyanSyphon),
                           ),
                           child: Container(
                             child: Icon(

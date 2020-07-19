@@ -1,4 +1,4 @@
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import "package:syphon/global/themes.dart";
 import 'package:syphon/store/settings/devices-settings/model.dart';
@@ -20,12 +20,12 @@ class SettingsStore extends Equatable {
   @HiveField(3)
   final bool smsEnabled;
   @HiveField(4)
-  final bool enterSend; // TODO: enabled
+  final bool enterSend; // TODO: rename *enabled
 
   @HiveField(5)
-  final bool readReceipts; // TODO: enabled
+  final bool readReceipts; // TODO: rename *enabled
   @HiveField(6)
-  final bool typingIndicators; // TODO: enabled
+  final bool typingIndicators; // TODO: rename *enabled
   @HiveField(7)
   final bool notificationsEnabled;
   @HiveField(8)
@@ -55,8 +55,8 @@ class SettingsStore extends Equatable {
   final bool loading;
 
   const SettingsStore({
-    this.primaryColor = SYPHON_CYAN,
-    this.accentColor = SYPHON_CYAN,
+    this.primaryColor = Colours.cyanSyphon,
+    this.accentColor = Colours.cyanSyphon,
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.language = 'English',

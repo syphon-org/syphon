@@ -349,12 +349,7 @@ class ProfileViewState extends State<ProfileView> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Container(
-                                    height: Dimensions.inputHeight,
                                     margin: const EdgeInsets.all(8.0),
-                                    constraints: BoxConstraints(
-                                      minWidth: Dimensions.buttonWidthMin,
-                                      maxWidth: Dimensions.buttonWidthMax,
-                                    ),
                                     child: ButtonSolid(
                                       text: Strings.buttonSaveGeneric,
                                       loading: props.loading,

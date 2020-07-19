@@ -334,11 +334,6 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      store.dispatch(addAlert(
-        type: 'confirmation',
-        message: 'Successfully uploaded new device key',
-      ));
     } catch (error) {
       store.dispatch(addAlert(
         type: 'warning',

@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 
 class Dimensions {
   // Generic
+  static const double widgetHeightMax = 1024;
   static const scrollviewPadding = EdgeInsets.only(
     bottom: 32,
   );
-  static const double widgetHeightMax = 1024;
 
   // Media
   static const double mediaSize = 264;
@@ -50,6 +50,7 @@ class Dimensions {
   static const double inputSizeMax = 296;
 
   static const double inputHeight = 52;
+  static const double inputBorderRadius = 30.0;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
@@ -59,10 +60,9 @@ class Dimensions {
   );
 
   // Dialogs
-
   static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 12,
+    horizontal: 24,
+    vertical: 16,
   );
 
   static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
@@ -99,6 +99,17 @@ class Dimensions {
   }
 
   // Content
+
+  static contentWidth(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width * 0.75;
+  }
+
+  static contentWidthWide(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width * 0.8;
+  }
+
   static const contentPadding = EdgeInsets.symmetric(
     horizontal: 32,
     vertical: 8,

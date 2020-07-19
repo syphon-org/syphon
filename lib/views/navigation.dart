@@ -33,6 +33,7 @@ import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/settings/advanced.dart';
 import 'package:syphon/views/home/settings/notifications.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/signup/verification.dart';
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -55,6 +56,7 @@ class NavigationProvider {
       '/login': (BuildContext context) => Login(),
       '/search_home': (BuildContext context) => HomeSearch(),
       '/signup': (BuildContext context) => SignupView(),
+      '/verification': (BuildContext context) => VerificationView(),
       '/home': (BuildContext context) => Home(),
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),

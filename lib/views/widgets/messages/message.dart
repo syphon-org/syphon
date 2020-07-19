@@ -1,7 +1,7 @@
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -124,13 +124,14 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      textColor = theme != ThemeType.LIGHT ? Colors.white : Color(GREY_DARK);
+      textColor =
+          theme != ThemeType.LIGHT ? Colors.white : Color(Colours.greyDark);
       if (theme == ThemeType.DARK) {
         bubbleColor = Colors.grey[700];
       } else if (theme == ThemeType.DARKER) {
         bubbleColor = Colors.grey[850];
       } else {
-        bubbleColor = const Color(GREY_BUBBLE);
+        bubbleColor = const Color(Colours.greyBubble);
       }
 
       indicatorColor = isRead ? textColor : bubbleColor;
