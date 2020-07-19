@@ -572,31 +572,10 @@ class HomeViewState extends State<Home> {
                     width: 32,
                     height: 32,
                     padding: EdgeInsets.only(left: 4),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Super hack
-                        Positioned(
-                            top: 8,
-                            left: -4,
-                            // TODO: clip the edges and
-                            // increase the icon size
-                            child: ClipRRect(
-                              clipBehavior: Clip.hardEdge,
-                              borderRadius: BorderRadius.circular(
-                                1,
-                              ),
-                              child: Icon(
-                                Icons.add,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                            )),
-                        Icon(
-                          Icons.person,
-                          color: Colors.white,
-                        ),
-                      ],
+                    child: Icon(
+                      Icons.person_add,
+                      size: 16,
+                      color: Colors.white,
                     ),
                   ),
                 ),

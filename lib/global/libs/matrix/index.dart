@@ -37,6 +37,7 @@ abstract class MatrixApi {
   // Events
   static final sendEvent = Events.sendEvent;
   static final sendTyping = Events.sendTyping;
+  static final sendReadReceipts = Events.sendReadMarkers;
   static final sendMessage = Events.sendMessage;
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;

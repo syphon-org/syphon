@@ -137,25 +137,6 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
   };
 }
 
-/**
- * 
- * Read Message Marker
- * https://matrix-client.matrix.org/_matrix/client/r0/rooms/!ajJxpUAIJjYYTzvsHo%3Amatrix.org/read_markers
- * 
- * {"m.fully_read":"$15870915721387891MHmpg:matrix.org","m.read":"$15870915721387891MHmpg:matrix.org","m.hidden":false}
- */
-ThunkAction<AppState> readMessages({
-  Room room,
-  Message message,
-  bool readAll = true,
-}) {
-  return (Store<AppState> store) async {
-    try {} catch (error) {
-      debugPrint('[readMessage] failed to send: $error');
-    }
-  };
-}
-
 ThunkAction<AppState> saveDraft({
   final body,
   String type = 'm.text',
@@ -173,6 +154,52 @@ ThunkAction<AppState> saveDraft({
     ));
   };
 }
+
+/**
+ * 
+ * Read Message Marker
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
+ThunkAction<AppState> sendReadReceipts({
+  Room room,
+  Message message,
+  bool readAll = true,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // Skip if typing indicators are disabled
+      if (!store.state.settingsStore.readReceipts) {
+        return debugPrint('[sendReadReceipts] read receipts disabled');
+      }
+
+      final data = await MatrixApi.sendReadReceipts(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        messageId: message.id,
+        readAll: readAll,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      debugPrint('[sendReadReceipts] sent ${message.id} $data');
+    } catch (error) {
+      debugPrint('[sendReadReceipts] failed $error');
+    }
+  };
+}
+/**
+ * 
+ * Read Message Marker
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
 
 ThunkAction<AppState> sendTyping({
   String roomId,
@@ -199,7 +226,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[toggleTyping] $error');
+      debugPrint('[sendTyping] $error');
     }
   };
 }

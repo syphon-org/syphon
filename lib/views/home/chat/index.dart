@@ -91,10 +91,12 @@ class ChatViewState extends State<ChatView> {
         });
       }
     });
+  }
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -104,6 +106,10 @@ class ChatViewState extends State<ChatView> {
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
+
+    if (store.state.settingsStore.readReceipts) {
+      props.onSendReadReceipts();
+    }
 
     // TODO: remove after the cache is updated
     if (props.room.invite != null && props.room.invite) {
@@ -902,6 +908,7 @@ class _Props extends Equatable {
   final Function onAcceptInvite;
   final Function onToggleEncryption;
   final Function onCheatCode;
+  final Function onSendReadReceipts;
 
   _Props({
     @required this.room,
@@ -919,6 +926,7 @@ class _Props extends Equatable {
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
     @required this.onCheatCode,
+    @required this.onSendReadReceipts,
   });
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
@@ -990,6 +998,14 @@ class _Props extends Equatable {
             sendTyping(
               typing: typing,
               roomId: roomId,
+            ),
+          ),
+      onSendReadReceipts: () => store.dispatch(
+            sendReadReceipts(
+              room: Room(id: roomId),
+              message: latestMessages(
+                roomSelectors.room(id: roomId, state: store.state).messages,
+              ).elementAt(0),
             ),
           ),
       onLoadFirstBatch: () {

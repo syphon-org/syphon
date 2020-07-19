@@ -20,12 +20,12 @@ class SettingsStore extends Equatable {
   @HiveField(3)
   final bool smsEnabled;
   @HiveField(4)
-  final bool enterSend; // TODO: enabled
+  final bool enterSend; // TODO: rename *enabled
 
   @HiveField(5)
-  final bool readReceipts; // TODO: enabled
+  final bool readReceipts; // TODO: rename *enabled
   @HiveField(6)
-  final bool typingIndicators; // TODO: enabled
+  final bool typingIndicators; // TODO: rename *enabled
   @HiveField(7)
   final bool notificationsEnabled;
   @HiveField(8)
