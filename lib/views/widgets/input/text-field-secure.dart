@@ -14,6 +14,7 @@ class TextFieldSecure extends StatelessWidget {
   TextFieldSecure({
     Key key,
     this.label,
+    this.hint,
     this.suffix,
     this.focusNode,
     this.controller,
@@ -34,6 +35,7 @@ class TextFieldSecure extends StatelessWidget {
   final bool disableSpacing;
   final int maxLines;
   final Widget suffix; // include actions
+  final String hint;
   final String label;
   final TextAlign textAlign;
 
@@ -70,6 +72,7 @@ class TextFieldSecure extends StatelessWidget {
           keyboardAppearance: Theme.of(context).brightness,
           decoration: InputDecoration(
             labelText: label,
+            hintText: hint,
             suffixIcon: suffix,
             contentPadding: Dimensions.inputPadding,
             border: OutlineInputBorder(

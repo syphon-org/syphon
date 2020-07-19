@@ -14,6 +14,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 // Styling
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -128,43 +129,28 @@ class LoginState extends State<Login> {
                               minWidth: Dimensions.inputWidthMin,
                               maxWidth: Dimensions.inputWidthMax,
                             ),
-                            child: TextField(
+                            child: TextFieldSecure(
+                              label: 'username',
+                              hint: props.usernameHint,
                               maxLines: 1,
-                              autocorrect: false,
-                              enableSuggestions: false,
                               controller: usernameController,
                               onSubmitted: (text) {
                                 FocusScope.of(context)
                                     .requestFocus(passwordFocus);
                               },
                               onChanged: (username) {
-                                // Trim value for UI
-                                usernameController.value = TextEditingValue(
-                                  text: username.trim(),
-                                  selection: TextSelection.fromPosition(
-                                    TextPosition(
-                                      offset: username.trim().length,
-                                    ),
-                                  ),
-                                );
                                 props.onChangeUsername(username);
                               },
-                              decoration: InputDecoration(
-                                labelText: 'username',
-                                hintText: props.usernameHint,
-                                contentPadding: Dimensions.inputPadding,
-                                suffixIcon: IconButton(
-                                  highlightColor:
-                                      Theme.of(context).primaryColor,
-                                  icon: Icon(Icons.help_outline),
-                                  tooltip: Strings.tooltipSelectHomeserver,
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/search_home',
-                                    );
-                                  },
-                                ),
+                              suffix: IconButton(
+                                highlightColor: Theme.of(context).primaryColor,
+                                icon: Icon(Icons.help_outline),
+                                tooltip: Strings.tooltipSelectHomeserver,
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/search_home',
+                                  );
+                                },
                               ),
                             ),
                           ),

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
@@ -97,6 +98,11 @@ class SetEmailValid {
   SetEmailValid({this.valid});
 }
 
+class SetEmailAvailability {
+  final bool available;
+  SetEmailAvailability({this.available});
+}
+
 class SetAgreement {
   final bool agreement;
   SetAgreement({this.agreement});
@@ -130,6 +136,11 @@ class SetCompleted {
 class SetCredential {
   final Credential credential;
   SetCredential({this.credential});
+}
+
+class SetVerificationNeeded {
+  final bool needed;
+  SetVerificationNeeded({this.needed});
 }
 
 class SetInteractiveAuths {
@@ -395,8 +406,8 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
       final List<String> completed =
           List<String>.from(auths['completed'] ?? []) ?? [];
 
-      await store.dispatch(SetCompleted(completed: completed));
       await store.dispatch(SetSession(session: auths['session']));
+      await store.dispatch(SetCompleted(completed: completed));
       await store.dispatch(SetInteractiveAuths(interactiveAuths: auths));
 
       if (auths['flows'] != null && auths['flows'].length > 0) {
@@ -408,7 +419,6 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
           (stage) => !completed.contains(stage),
         );
 
-        print('[currentStage check] ${currentStage.length > 0}');
         if (currentStage.length > 0) {
           print('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
@@ -425,9 +435,76 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
+ThunkAction<AppState> submitEmail() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final emailSubmitted = store.state.authStore.email;
+      final currentCredential = store.state.authStore.credential;
+
+      if (currentCredential.params.containsValue(emailSubmitted)) {
+        return true;
+      }
+
+      final data = await MatrixApi.registerEmail(
+        protocol: protocol,
+        homeserver: store.state.authStore.homeserver,
+        email: store.state.authStore.email,
+        clientSecret: Values.clientSecretMatrix,
+        sendAttempt: 2,
+      );
+
+      print(data);
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(
+        SetCredential(
+          credential: currentCredential.copyWith(
+            params: {
+              'sid': data['sid'],
+              'client_secret': Values.clientSecretMatrix,
+              'email_submitted': store.state.authStore.email
+            },
+          ),
+        ),
+      );
+      return true;
+    } catch (error) {
+      debugPrint('[submitEmail] $error');
+      store.dispatch(SetEmailValid(valid: false));
+      store.dispatch(SetEmailAvailability(available: false));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 /**
  * 
  * https://matrix.org/docs/spec/client_server/latest#id204
+ * 
+ * 
+ * Email Request (?)
+ * https://matrix-client.matrix.org/_matrix/client/r0/register/email/requestToken
+ * 
+ * Request Token + SID
+ * {"email":"syphon+testing@ere.io","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN","send_attempt":1,"next_link":"https://app.element.io/#/register?client_secret=MDWVwN79p5xIz7bgazVXvO8aabbVD0LN&hs_url=https%3A%2F%2Fmatrix-client.matrix.org&is_url=https%3A%2F%2Fvector.im&session_id=yGElwHyWRFHwVkChpyWIJqMO"}
+ * 
+ * Response Token + SID
+ * {"sid": "UTWiabjnSXWWTAPs"}
+ * 
+ * 
+ * Send Terms (?)
+ * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.terms"},"inhibit_login":true}
+ * 
+ * Send Email Auth (?)
+ * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.email.identity","threepid_creds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"},"threepidCreds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"}},"inhibit_login":true}
+ * 
  */
 ThunkAction<AppState> createUser() {
   return (Store<AppState> store) async {
@@ -440,6 +517,7 @@ ThunkAction<AppState> createUser() {
       final session = store.state.authStore.session;
       final authType = session != null ? credential.type : loginType;
       final authValue = session != null ? credential.value : null;
+      final authParams = session != null ? credential.params : null;
 
       final device = await store.dispatch(generateDeviceId(
         salt: store.state.authStore.username,
@@ -453,11 +531,17 @@ ThunkAction<AppState> createUser() {
         session: store.state.authStore.session,
         authType: authType,
         authValue: authValue,
+        authParams: authParams,
         deviceId: device.deviceId,
         deviceName: device.displayName,
       );
 
       if (data['errcode'] != null) {
+        if (data['errcode' == MatrixErrors.not_authorized] &&
+            credential.type == MatrixAuthTypes.EMAIL) {
+          store.dispatch(SetVerificationNeeded(needed: true));
+          throw 'Verification needed before completing signup';
+        }
         throw data['error'];
       }
 
@@ -485,7 +569,7 @@ ThunkAction<AppState> createUser() {
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      debugPrint('[createUser] $error');
+      debugPrint('[createUser] error $error');
       return false;
     } finally {
       store.dispatch(SetCreating(creating: false));
@@ -666,7 +750,7 @@ ThunkAction<AppState> setLoading(bool loading) {
 }
 
 /**
- * Fetch Active Devices for account
+ * Update current interactive auth attempt
  */
 ThunkAction<AppState> updateCredential({
   String type,
@@ -731,6 +815,7 @@ ThunkAction<AppState> setEmail({String email}) {
       valid: email != null && email.length > 0 && validEmail,
     ));
     store.dispatch(SetEmail(email: email));
+    store.dispatch(SetEmailAvailability(available: true));
   };
 }
 

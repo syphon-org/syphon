@@ -25,7 +25,7 @@ class AuthStore extends Equatable {
   final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
 
-  // Temporary Signup Params
+  // temp state values for signup
   final String email;
   final String username;
   final String password;
@@ -36,10 +36,12 @@ class AuthStore extends Equatable {
   final bool agreement;
   final bool captcha;
 
-  // Temporary state propertie
+  // temp state statuses for signup
   final bool loading;
   final bool creating;
+  final bool verificationNeeded;
   final bool isEmailValid;
+  final bool isEmailAvailable;
   final bool isUsernameValid;
   final bool isPasswordValid;
   final bool isHomeserverValid;
@@ -61,6 +63,7 @@ class AuthStore extends Equatable {
     this.loginType = 'm.login.dummy',
     this.interactiveAuths = const {},
     this.isEmailValid = false,
+    this.isEmailAvailable = true,
     this.isUsernameValid = false,
     this.isUsernameAvailable = false,
     this.isPasswordValid = false,
@@ -68,6 +71,7 @@ class AuthStore extends Equatable {
     this.credential,
     this.creating = false,
     this.loading = false,
+    this.verificationNeeded = false,
   });
 
   AuthStore copyWith({
@@ -88,10 +92,12 @@ class AuthStore extends Equatable {
     isUsernameAvailable,
     isPasswordValid,
     isEmailValid,
+    isEmailAvailable,
     interactiveAuths,
     interactiveStages,
     credential,
     creating,
+    verificationNeeded,
     authObserver,
   }) {
     return AuthStore(
@@ -109,6 +115,7 @@ class AuthStore extends Equatable {
       captcha: captcha ?? this.captcha,
       session: session ?? this.session,
       isEmailValid: isEmailValid ?? this.isEmailValid,
+      isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
       isUsernameValid: isUsernameValid ?? this.isUsernameValid,
       isUsernameAvailable: isUsernameAvailable != null
           ? isUsernameAvailable
@@ -118,6 +125,7 @@ class AuthStore extends Equatable {
       interactiveAuths: interactiveAuths ?? this.interactiveAuths,
       credential: credential ?? this.credential,
       creating: creating ?? this.creating,
+      verificationNeeded: verificationNeeded ?? this.verificationNeeded,
     );
   }
 
@@ -136,6 +144,7 @@ class AuthStore extends Equatable {
         session,
         loginType,
         isEmailValid,
+        isEmailAvailable,
         isUsernameValid,
         isPasswordValid,
         isHomeserverValid,
@@ -144,5 +153,6 @@ class AuthStore extends Equatable {
         credential,
         loading,
         creating,
+        verificationNeeded,
       ];
 }

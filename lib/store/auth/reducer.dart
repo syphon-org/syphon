@@ -44,6 +44,10 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(email: action.email);
     case SetEmailValid:
       return state.copyWith(isEmailValid: action.valid);
+    case SetEmailAvailability:
+      return state.copyWith(isEmailAvailable: action.available);
+    case SetVerificationNeeded:
+      return state.copyWith(verificationNeeded: action.needed);
     case SetCaptcha:
       return state.copyWith(captcha: action.completed);
     case SetAgreement:

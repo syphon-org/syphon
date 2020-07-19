@@ -84,7 +84,6 @@ class SignupViewState extends State<SignupView> {
         var newStages = [];
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
-          newStages = List.from(newStages.reversed);
         } catch (error) {
           debugPrint('Failed to parse stages');
         }
@@ -203,19 +202,6 @@ class SignupViewState extends State<SignupView> {
             curve: Curves.ease,
           );
         };
-      case EmailStep:
-        return () async {
-          var result = false;
-          if (!props.completed.contains(MatrixAuthTypes.EMAIL)) {
-            result = await props.onCreateUser();
-          }
-          if (!result) {
-            controller.nextPage(
-              duration: nextAnimationDuration,
-              curve: Curves.ease,
-            );
-          }
-        };
       case CaptchaStep:
         return () async {
           var result = false;
@@ -248,6 +234,23 @@ class SignupViewState extends State<SignupView> {
           if (result && props.user.accessToken == null) {
             await props.onResetCredential();
             props.onCreateUser();
+          }
+        };
+      case EmailStep:
+        return () async {
+          var result = false;
+          final validEmail = await props.onSubmitEmail();
+          if (!validEmail) {
+            return false;
+          }
+          if (!props.completed.contains(MatrixAuthTypes.EMAIL)) {
+            result = await props.onCreateUser();
+          }
+          if (!result) {
+            controller.nextPage(
+              duration: nextAnimationDuration,
+              curve: Curves.ease,
+            );
           }
         };
       default:
@@ -439,6 +442,7 @@ class _Props extends Equatable {
   final Map interactiveAuths;
 
   final Function onCreateUser;
+  final Function onSubmitEmail;
   final Function onResetCredential;
 
   _Props({
@@ -459,6 +463,7 @@ class _Props extends Equatable {
     @required this.interactiveAuths,
     @required this.completed,
     @required this.onCreateUser,
+    @required this.onSubmitEmail,
     @required this.onResetCredential,
   });
 
@@ -478,6 +483,9 @@ class _Props extends Equatable {
         agreement: store.state.authStore.agreement,
         loading: store.state.authStore.loading,
         interactiveAuths: store.state.authStore.interactiveAuths,
+        onSubmitEmail: () async {
+          return await store.dispatch(submitEmail());
+        },
         onResetCredential: () async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.DUMMY,

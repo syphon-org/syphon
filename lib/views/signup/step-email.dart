@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class EmailStep extends StatefulWidget {
@@ -38,9 +40,7 @@ class EmailStepState extends State<EmailStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    emailController.text = trimmedUserId(
-      userId: store.state.authStore.username,
-    );
+    emailController.text = store.state.authStore.email;
   }
 
   @override
@@ -59,7 +59,7 @@ class EmailStepState extends State<EmailStep> {
         );
 
         if (!props.loading && this.typingTimeout == null) {
-          if (props.isEmailValid) {
+          if (props.isEmailValid && props.isEmailAvailable) {
             suffixWidget = Icon(
               Icons.check,
               color: Colors.white,
@@ -93,7 +93,7 @@ class EmailStepState extends State<EmailStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupEmail,
-                    semanticsLabel: 'Person resting on I.D. card',
+                    semanticsLabel: 'Person resting on checked letter',
                   ),
                 ),
               ),
@@ -131,8 +131,16 @@ class EmailStepState extends State<EmailStep> {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                debugPrint(
-                                  'TODO: navigate to captcha explination',
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      DialogExplaination(
+                                    title: Strings.titleDialogEmailRequirement,
+                                    content: Strings.contentEmailRequirement,
+                                    onConfirm: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
                                 );
                               },
                               child: Container(
@@ -147,6 +155,19 @@ class EmailStepState extends State<EmailStep> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: !props.isEmailAvailable,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text(
+                          '* Email is already in use by another user',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.caption.copyWith(
+                                color: Colors.red,
+                              ),
+                        ),
                       ),
                     ),
                   ],
@@ -170,20 +191,9 @@ class EmailStepState extends State<EmailStep> {
                       FocusScope.of(context).unfocus();
                     },
                     onEditingComplete: () {
-                      props.onCheckEmailAvailable();
                       FocusScope.of(context).unfocus();
                     },
                     onChanged: (email) {
-                      // // Trim new username
-                      emailController.value = TextEditingValue(
-                        text: email,
-                        selection: TextSelection.fromPosition(
-                          TextPosition(
-                            offset: email.length,
-                          ),
-                        ),
-                      );
-
                       // Set new username
                       props.onSetEmail(email: email);
 
@@ -199,7 +209,6 @@ class EmailStepState extends State<EmailStep> {
                       typingTimeout = Timer(
                         Duration(milliseconds: 1000),
                         () {
-                          props.onCheckEmailAvailable();
                           this.setState(() {
                             typingTimeout = null;
                           });
@@ -207,7 +216,7 @@ class EmailStepState extends State<EmailStep> {
                       );
                     },
                     suffix: Visibility(
-                      visible: props.isEmailValid,
+                      visible: props.isEmailValid || !props.isEmailAvailable,
                       child: Container(
                         width: 12,
                         height: 12,
@@ -235,31 +244,33 @@ class _Props extends Equatable {
   final bool loading;
   final String email;
   final bool isEmailValid;
+  final bool isEmailAvailable;
 
   final Function onSetEmail;
-  final Function onCheckEmailAvailable;
 
   _Props({
     @required this.email,
     @required this.isEmailValid,
+    @required this.isEmailAvailable,
     @required this.loading,
     @required this.onSetEmail,
-    @required this.onCheckEmailAvailable,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         email: store.state.authStore.email,
         isEmailValid: store.state.authStore.isEmailValid,
+        isEmailAvailable: store.state.authStore.isEmailAvailable,
         loading: store.state.authStore.loading,
         onSetEmail: ({String email}) {
           if (email != null) {
+            store.dispatch(updateCredential(
+              type: MatrixAuthTypes.EMAIL,
+              value: email,
+            ));
             return store.dispatch(setEmail(email: email));
           }
 
           return store.dispatch(setEmail(email: store.state.authStore.email));
-        },
-        onCheckEmailAvailable: () {
-          // store.dispatch(checkUsernameAvailability());
         },
       );
 
@@ -268,5 +279,6 @@ class _Props extends Equatable {
         email,
         loading,
         isEmailValid,
+        isEmailAvailable,
       ];
 }

@@ -39,7 +39,6 @@ class UsernameStepState extends State<UsernameStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    print('[onMounted] ${store.state.authStore.username}');
     usernameController.text = trimmedUserId(
       userId: store.state.authStore.username,
     );
@@ -137,19 +136,8 @@ class UsernameStepState extends State<UsernameStep> {
                       FocusScope.of(context).unfocus();
                     },
                     onChanged: (username) {
-                      // // Trim new username
-                      final formattedUsername = username.trim();
-                      usernameController.value = TextEditingValue(
-                        text: formattedUsername,
-                        selection: TextSelection.fromPosition(
-                          TextPosition(
-                            offset: formattedUsername.length,
-                          ),
-                        ),
-                      );
-
                       // Set new username
-                      props.onSetUsername(username: formattedUsername);
+                      props.onSetUsername(username: username);
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {

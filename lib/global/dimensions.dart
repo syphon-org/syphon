@@ -60,10 +60,9 @@ class Dimensions {
   );
 
   // Dialogs
-
   static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 12,
+    horizontal: 24,
+    vertical: 16,
   );
 
   static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
