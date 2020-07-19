@@ -4,7 +4,6 @@ import 'package:syphon/global/strings.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -58,6 +57,21 @@ class LoginState extends State<Login> {
       distinct: true,
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          brightness: Brightness.light,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Theme.of(context).primaryColor,
+            ),
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+          ),
+        ),
+        extendBodyBehindAppBar: true,
         body: ScrollConfiguration(
           behavior: DefaultScrollBehavior(),
           child: SingleChildScrollView(
