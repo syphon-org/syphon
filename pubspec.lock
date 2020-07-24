@@ -327,7 +327,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.18.0"
+    version: "0.17.4"
   flutter_swiper:
     dependency: "direct main"
     description:
@@ -948,7 +948,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.2.0"
+    version: "3.7.0"
   yaml:
     dependency: transitive
     description:
@@ -958,4 +958,4 @@ packages:
     version: "2.2.0"
 sdks:
   dart: ">=2.7.0 <3.0.0"
-  flutter: ">=1.18.0-6.0.pre <2.0.0"
+  flutter: ">=1.12.13+hotfix.5 <2.0.0"
