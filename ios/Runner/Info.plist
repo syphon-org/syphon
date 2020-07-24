@@ -26,6 +26,8 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Taking a profile photo for the user avatar</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Uploading a profile photo for the user</string>
 	<key>UILaunchStoryboardName</key>
