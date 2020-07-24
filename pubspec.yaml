@@ -42,7 +42,7 @@ description: Privacy focused matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.22+12
+version: 0.0.23+23 
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -90,7 +90,7 @@ dependencies:
   
   # UI Only
   url_launcher: ^5.4.7
-  flutter_svg: ^0.18.0
+  flutter_svg: 0.17.4
   file_picker: 1.10.0
   image_picker: ^0.6.5
   flutter_swiper : 1.1.6
