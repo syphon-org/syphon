@@ -480,6 +480,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
       final currentUser = store.state.authStore.user;
 
+      // get deviceKeys for every user present in the chat
       final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
           .map((user) => deviceKeys[user.userId].values)
           .expand((x) => x));
@@ -624,7 +625,6 @@ ThunkAction<AppState> updateKeySessions({
         final identityKey = deviceKey.keys[keyId];
 
         store.dispatch(createOutboundKeySession(
-          deviceId: deviceId,
           identityKey: identityKey,
           oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
@@ -697,7 +697,6 @@ ThunkAction<AppState> updateKeySessions({
  * 
  */
 ThunkAction<AppState> createOutboundKeySession({
-  String deviceId,
   String identityKey,
   String oneTimeKey,
 }) {

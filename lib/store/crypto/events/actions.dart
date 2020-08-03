@@ -104,7 +104,7 @@ ThunkAction<AppState> decryptMessageEvent({
 }
 
 /**
- * Encrypt event content with loaded outbound session for a device
+ * Encrypt key sharing event content with loaded outbound session for a device
  * 
  * NOTE: Utilizes available one time keys pre-fetched 
  * and claimed by the current user
