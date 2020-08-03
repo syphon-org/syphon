@@ -697,8 +697,8 @@ ThunkAction<AppState> updateKeySessions({
  * 
  */
 ThunkAction<AppState> createOutboundKeySession({
-  String identityKey,
   String oneTimeKey,
+  String identityKey,
 }) {
   return (Store<AppState> store) {
     final outboundKeySession = olm.Session();
