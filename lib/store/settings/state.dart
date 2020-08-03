@@ -9,12 +9,16 @@ import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
+// Next Field ID: 17
 @HiveType(typeId: SettingsStoreHiveId)
 class SettingsStore extends Equatable {
   @HiveField(0)
   final int primaryColor;
   @HiveField(1)
   final int accentColor;
+  @HiveField(15)
+  final int appBarColor;
+
   @HiveField(2)
   final int brightness;
   @HiveField(3)
@@ -30,6 +34,10 @@ class SettingsStore extends Equatable {
   final bool notificationsEnabled;
   @HiveField(8)
   final bool membershipEventsEnabled;
+
+  @HiveField(16)
+  final String fontName;
+
   @HiveField(9)
   final String language;
 
@@ -57,8 +65,10 @@ class SettingsStore extends Equatable {
   const SettingsStore({
     this.primaryColor = Colours.cyanSyphon,
     this.accentColor = Colours.cyanSyphon,
+    this.appBarColor,
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
+    this.fontName = 'Rubik',
     this.language = 'English',
     this.enterSend = false,
     this.smsEnabled = false,
@@ -78,8 +88,10 @@ class SettingsStore extends Equatable {
   List<Object> get props => [
         primaryColor,
         accentColor,
+        appBarColor,
         brightness,
         theme,
+        fontName,
         language,
         smsEnabled,
         enterSend,
@@ -97,8 +109,10 @@ class SettingsStore extends Equatable {
   SettingsStore copyWith({
     int primaryColor,
     int accentColor,
+    int appBarColor,
     int brightness,
     ThemeType theme,
+    String fontName,
     String language,
     bool smsEnabled,
     bool enterSend,
@@ -116,8 +130,10 @@ class SettingsStore extends Equatable {
     return SettingsStore(
       primaryColor: primaryColor ?? this.primaryColor,
       accentColor: accentColor ?? this.accentColor,
+      appBarColor: appBarColor ?? this.appBarColor,
       brightness: brightness ?? this.brightness,
       theme: theme ?? this.theme,
+      fontName: fontName ?? this.fontName,
       language: language ?? this.language,
       smsEnabled: smsEnabled ?? this.smsEnabled,
       enterSend: enterSend != null ? enterSend : this.enterSend,

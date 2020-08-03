@@ -13,6 +13,8 @@ enum ThemeType {
   DARK,
   @HiveField(2)
   DARKER,
+  @HiveField(3)
+  NIGHT,
 }
 
 class Themes {
@@ -25,11 +27,13 @@ class Themes {
   static ThemeData generateCustomTheme({
     int primaryColorHex,
     int accentColorHex,
+    int appBarColorHex,
+    String fontName,
     ThemeType themeType,
   }) {
     int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
     int accentColor = accentColorHex ?? Colours.cyanSyphon;
-    int appBarColor = primaryColorHex ?? Colours.cyanSyphon;
+    int appBarColor = appBarColorHex;
     int scaffoldBackgroundColor = Colours.whiteDefault;
 
     var brightness = Brightness.light;
@@ -47,8 +51,16 @@ class Themes {
         brightness = Brightness.dark;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = primaryColorHex ?? Colours.blackDefault;
+        appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = Colours.blackDefault;
+        appBarElevation = 0.0;
+        break;
+      case ThemeType.NIGHT:
+        brightness = Brightness.dark;
+        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
+        accentColor = accentColorHex ?? Colours.cyanSyphon;
+        appBarColor = Colours.blackFull;
+        scaffoldBackgroundColor = Colours.blackFull;
         appBarElevation = 0.0;
         break;
       case ThemeType.LIGHT:
@@ -98,7 +110,7 @@ class Themes {
         ),
       ),
       // Fonts
-      fontFamily: 'Rubik',
+      fontFamily: fontName ?? 'Rubik',
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,

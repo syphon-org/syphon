@@ -16,6 +16,7 @@ class Colours {
   static const greyBubble = 0xffEEEEEE;
 
   static const blackDefault = 0xff121212;
+  static const blackFull = 0xff000000;
   static const greyDefault = 0xFF9E9E9E;
   static const whiteDefault = 0xffFEFEFE;
 

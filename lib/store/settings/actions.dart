@@ -26,6 +26,16 @@ class SetPrimaryColor {
   SetPrimaryColor({this.color});
 }
 
+class SetAccentColor {
+  final int color;
+  SetAccentColor({this.color});
+}
+
+class SetAppBarColor {
+  final int color;
+  SetAppBarColor({this.color});
+}
+
 class SetRoomPrimaryColor {
   final int color;
   final String roomId;
@@ -49,11 +59,6 @@ class SetLoading {
 class SetDevices {
   final List<Device> devices;
   SetDevices({this.devices});
-}
-
-class SetAccentColor {
-  final int color;
-  SetAccentColor({this.color});
 }
 
 class SetLanguage {
@@ -253,6 +258,15 @@ ThunkAction<AppState> selectPrimaryColor(int color) {
 ThunkAction<AppState> selectAccentColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAccentColor(color: color));
+  };
+}
+
+/**
+ * Send in a hex value to be used as the primary color
+ */
+ThunkAction<AppState> updateAppBarColor(int color) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetAppBarColor(color: color));
   };
 }
 

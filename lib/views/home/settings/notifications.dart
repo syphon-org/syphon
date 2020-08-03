@@ -22,7 +22,6 @@ class NotificationSettingsView extends StatelessWidget {
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          // Static horizontal: 16, vertical: 8
           final double width = MediaQuery.of(context).size.width;
 
           final sectionBackgroundColor =

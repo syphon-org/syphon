@@ -99,7 +99,6 @@ class Dimensions {
   }
 
   // Content
-
   static contentWidth(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.width * 0.75;
@@ -130,6 +129,12 @@ class Dimensions {
   // Progress Indicator
   static const double defaultStrokeWidth = 2;
   static const double defaultStrokeWidthLite = 1.5;
+
+  // Modals
+  static modalHeightDefault(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.height * 0.4;
+  }
 
   // * Device Specific *
   static const buttonlessHeightiOS = 736;

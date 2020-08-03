@@ -36,6 +36,11 @@ ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
       final mediaCache = store.state.mediaStore.mediaCache;
       final mediaChecks = store.state.mediaStore.mediaChecks;
 
+      // No op if cache is corrupted
+      if (mediaCache == null) {
+        return;
+      }
+
       // No op if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;

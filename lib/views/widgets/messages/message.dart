@@ -14,6 +14,7 @@ class MessageWidget extends StatelessWidget {
     Key key,
     @required this.message,
     this.onLongPress,
+    this.onPressAvatar,
     this.isUserSent,
     this.messageOnly = false,
     this.isLastSender = false,
@@ -33,6 +34,7 @@ class MessageWidget extends StatelessWidget {
   final ThemeType theme;
   final String selectedMessageId;
   final Function onLongPress;
+  final Function onPressAvatar;
   final String avatarUri;
 
   @override
@@ -52,7 +54,7 @@ class MessageWidget extends StatelessWidget {
     var opacity = 1.0;
     var isRead = message.timestamp < lastRead;
 
-    // CURRENT USER SENT STYLING
+    // Current User Bubble Styling
     if (isUserSent) {
       if (isLastSender) {
         if (isNextSender) {
@@ -86,7 +88,7 @@ class MessageWidget extends StatelessWidget {
           bottomRight: Radius.circular(16),
         );
       }
-      // OTHER USER SENT STYLING
+      // External User Sent Styling
     } else {
       if (isLastSender) {
         if (isNextSender) {
@@ -182,20 +184,39 @@ class MessageWidget extends StatelessWidget {
                       maintainState: !messageOnly,
                       maintainAnimation: !messageOnly,
                       maintainSize: !messageOnly,
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          right: 8,
-                        ),
-                        child: avatarUri != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.thumbnailSizeMax,
-                                ),
-                                child: MatrixImage(
-                                  width: Dimensions.avatarSizeMessage,
-                                  height: Dimensions.avatarSizeMessage,
-                                  mxcUri: avatarUri,
-                                  fallback: Text(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (this.onPressAvatar != null) {
+                            HapticFeedback.lightImpact();
+                            this.onPressAvatar(message: message);
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(
+                            right: 8,
+                          ),
+                          child: avatarUri != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    Dimensions.thumbnailSizeMax,
+                                  ),
+                                  child: MatrixImage(
+                                    width: Dimensions.avatarSizeMessage,
+                                    height: Dimensions.avatarSizeMessage,
+                                    mxcUri: avatarUri,
+                                    fallback: Text(
+                                      formatSenderInitials(message.sender),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: bubbleColor,
+                                  child: Text(
                                     formatSenderInitials(message.sender),
                                     style: TextStyle(
                                       fontSize: 14,
@@ -203,18 +224,7 @@ class MessageWidget extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                              )
-                            : CircleAvatar(
-                                radius: 14,
-                                backgroundColor: bubbleColor,
-                                child: Text(
-                                  formatSenderInitials(message.sender),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                        ),
                       ),
                     ),
                     Flexible(

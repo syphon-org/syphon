@@ -17,6 +17,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:syphon/global/behaviors.dart';
 
@@ -74,99 +75,12 @@ class ProfileViewState extends State<ProfileView> {
     await showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
-      builder: (BuildContext context) => Container(
-        height: 250,
-        padding: EdgeInsets.symmetric(
-          vertical: 12,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: 24,
-              ),
-              child: Text(
-                'Photo Select Method',
-                textAlign: TextAlign.start,
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                final File image = await ImagePicker.pickImage(
-                  source: ImageSource.camera,
-                  maxWidth: Dimensions.avatarSizeMax,
-                  maxHeight: Dimensions.avatarSizeMax,
-                );
-
-                this.setState(() {
-                  newAvatarFile = image;
-                });
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.camera_alt,
-                  size: 30,
-                ),
-              ),
-              title: Text(
-                'Take Photo',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                final File image = await ImagePicker.pickImage(
-                  maxWidth: Dimensions.avatarSizeMax,
-                  maxHeight: Dimensions.avatarSizeMax,
-                  source: ImageSource.gallery,
-                );
-                this.setState(() {
-                  newAvatarFile = image;
-                });
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.photo_library,
-                  size: 28,
-                ),
-              ),
-              title: Text(
-                'Pick from gallery',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.delete_forever,
-                  size: 34,
-                ),
-              ),
-              title: Text(
-                'Remove photo',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-          ],
-        ),
+      builder: (BuildContext context) => ModalImageOptions(
+        onSetNewAvatar: (File image) {
+          this.setState(() {
+            newAvatarFile = image;
+          });
+        },
       ),
     );
   }

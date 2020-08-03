@@ -20,7 +20,6 @@ class StorageView extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             appBar: AppBar(

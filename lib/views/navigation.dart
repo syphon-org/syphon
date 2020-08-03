@@ -75,15 +75,9 @@ class NavigationProvider {
       '/licenses': (BuildContext context) => LicensePage(
             applicationName: Values.appName,
           ),
-      '/privacy': (BuildContext context) => PrivacyPreferences(
-            title: 'Privacy',
-          ),
-      '/chat-preferences': (BuildContext context) => ChatPreferences(
-            title: 'Chat Preferences',
-          ),
-      '/theming': (BuildContext context) => Theming(
-            title: 'Theming',
-          ),
+      '/privacy': (BuildContext context) => PrivacyPreferences(),
+      '/chat-preferences': (BuildContext context) => ChatPreferences(),
+      '/theming': (BuildContext context) => Theming(),
       '/devices': (BuildContext context) => DevicesView(),
       '/settings': (BuildContext context) => SettingsScreen(
             title: 'Settings',

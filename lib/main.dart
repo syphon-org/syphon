@@ -208,9 +208,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           builder: (context, settings) => MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
-              themeType: settings.theme,
               primaryColorHex: settings.primaryColor,
               accentColorHex: settings.accentColor,
+              appBarColorHex: settings.appBarColor,
+              fontName: settings.fontName,
+              themeType: settings.theme,
             ),
             navigatorKey: NavigationService.navigatorKey,
             routes: NavigationProvider.getRoutes(store),

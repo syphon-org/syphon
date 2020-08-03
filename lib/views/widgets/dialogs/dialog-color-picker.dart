@@ -1,6 +1,7 @@
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colours.dart';
 
 class DialogColorPicker extends StatelessWidget {
   DialogColorPicker({
@@ -37,6 +38,45 @@ class DialogColorPicker extends StatelessWidget {
           width: width,
           height: 248,
           child: MaterialColorPicker(
+            colors: const <ColorSwatch>[
+              MaterialColor(
+                Colours.cyanSyphon,
+                <int, Color>{
+                  500: Color(Colours.cyanSyphon),
+                },
+              ),
+              MaterialColor(
+                Colours.chatBlue,
+                <int, Color>{
+                  500: Color(Colours.chatBlue),
+                },
+              ),
+              Colors.red,
+              Colors.pink,
+              Colors.purple,
+              Colors.deepPurple,
+              Colors.indigo,
+              Colors.blue,
+              Colors.lightBlue,
+              Colors.cyan,
+              Colors.teal,
+              Colors.green,
+              Colors.lightGreen,
+              Colors.lime,
+              Colors.yellow,
+              Colors.amber,
+              Colors.orange,
+              Colors.deepOrange,
+              Colors.brown,
+              Colors.grey,
+              Colors.blueGrey,
+              MaterialColor(
+                Colours.blackFull,
+                <int, Color>{
+                  500: Color(Colours.blackFull),
+                },
+              ),
+            ],
             onlyShadeSelection: true,
             selectedColor: Color(currentColor),
             onColorChange: (Color color) {

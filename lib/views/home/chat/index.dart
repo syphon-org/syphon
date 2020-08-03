@@ -18,7 +18,6 @@ import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -36,6 +35,7 @@ import 'package:syphon/views/widgets/messages/message.dart';
 // Styling
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/widgets/menu-rounded.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 enum ChatOptions {
   search,
@@ -289,6 +289,21 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
+  onViewUserDetails({Message message}) {
+    final arguements =
+        ModalRoute.of(context).settings.arguments as ChatViewArguements;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        roomId: arguements.roomId,
+        userId: message.sender,
+      ),
+    );
+  }
+
+  @protected
   onDismissMessageOptions() {
     this.setState(() {
       selectedMessage = null;
@@ -469,6 +484,7 @@ class ChatViewState extends State<ChatView> {
                   isNextSender: isNextSender,
                   lastRead: props.room.lastRead,
                   selectedMessageId: selectedMessageId,
+                  onPressAvatar: onViewUserDetails,
                   onLongPress: onToggleMessageOptions,
                   avatarUri: avatarUri,
                   theme: props.theme,
@@ -1000,14 +1016,18 @@ class _Props extends Equatable {
               roomId: roomId,
             ),
           ),
-      onSendReadReceipts: () => store.dispatch(
-            sendReadReceipts(
-              room: Room(id: roomId),
-              message: latestMessages(
-                roomSelectors.room(id: roomId, state: store.state).messages,
-              ).elementAt(0),
-            ),
-          ),
+      onSendReadReceipts: () {
+        final messagesSorted = latestMessages(
+          roomSelectors.room(id: roomId, state: store.state).messages,
+        );
+
+        if (messagesSorted.isNotEmpty) {
+          store.dispatch(sendReadReceipts(
+            room: Room(id: roomId),
+            message: messagesSorted.elementAt(0),
+          ));
+        }
+      },
       onLoadFirstBatch: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(

@@ -553,13 +553,23 @@ class HomeViewState extends State<Home> {
               onDisplayChange: (opened) {},
               children: [
                 FloatingActionButton(
+                  heroTag: 'fab4',
+                  child: Icon(
+                    Icons.public,
+                    color: Colors.white,
+                  ),
+                  tooltip: 'Create Public Room',
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                  },
+                ),
+                FloatingActionButton(
                   heroTag: 'fab2',
                   child: Icon(
                     Icons.group_add,
-                    // Icons.widgets,
                     color: Colors.white,
                   ),
-                  tooltip: 'Create Chat Or Group',
+                  tooltip: 'Create Group',
                   onPressed: () {
                     HapticFeedback.lightImpact();
                   },
@@ -569,12 +579,9 @@ class HomeViewState extends State<Home> {
                   tooltip: 'Direct Message',
                   onPressed: () => onNavigateToDraft(context),
                   child: Container(
-                    width: 32,
-                    height: 32,
-                    padding: EdgeInsets.only(left: 4),
                     child: Icon(
                       Icons.person_add,
-                      size: 16,
+                      size: 22,
                       color: Colors.white,
                     ),
                   ),

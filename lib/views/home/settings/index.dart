@@ -1,4 +1,5 @@
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:equatable/equatable.dart';
@@ -10,9 +11,7 @@ import 'package:redux/redux.dart';
 import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({Key key, this.title}) : super(key: key);
-
-  final String title;
+  SettingsScreen({Key key}) : super(key: key);
 
   Widget buildToggledSubtitle({bool value}) {
     return Text(
@@ -35,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
                     : () => Navigator.pop(context, false),
               ),
               title: Text(
-                title,
+                Strings.titleSettings,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,

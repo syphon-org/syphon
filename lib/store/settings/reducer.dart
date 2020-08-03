@@ -15,6 +15,14 @@ SettingsStore settingsReducer(
       return state.copyWith(
         primaryColor: action.color,
       );
+    case SetAccentColor:
+      return state.copyWith(
+        accentColor: action.color,
+      );
+    case SetAppBarColor:
+      return state.copyWith(
+        appBarColor: action.color,
+      );
     case SetDevices:
       return state.copyWith(
         devices: action.devices,
@@ -41,10 +49,6 @@ SettingsStore settingsReducer(
       );
       return state.copyWith(
         customChatSettings: chatSettings,
-      );
-    case SetAccentColor:
-      return state.copyWith(
-        accentColor: action.color,
       );
     case SetLanguage:
       return state.copyWith(

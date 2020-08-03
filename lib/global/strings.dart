@@ -16,13 +16,19 @@ class Strings {
   static const titleViewSignup = 'Signup';
   static const titleViewDevices = 'Devices';
   static const titleViewSettings = 'Settings';
+  static const titleChatsAndMedia = 'Chat Preferences';
+  static const titleThemeing = 'Theming';
+  static const titlePrivacy = 'Privacy';
   static const titleHomeserverSearch = 'Find Your Homeserver';
+  static const titleProfile = 'Set up Your Profile';
+  static const titleSettings = 'Settings';
+
+  // Dialog Titles
   static const titleDialogCaptcha = 'Complete Captcha';
   static const titleDialogTerms = "Confirm Terms Of Service";
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
-  static const titleProfile = 'Set up Your Profile';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
