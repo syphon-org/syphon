@@ -7,7 +7,7 @@ import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 
-// Next Hive Field Number: 12
+// Next Hive Field Number: 14
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
   // Active olm account
@@ -17,6 +17,10 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
+  // Map<roomId, index(int)> // megolm - message index
+  @HiveField(10)
+  final Map<String, int> messageSessionIndex;
+
   // Map<roomId, serializedSession> // megolm - messages
   @HiveField(5)
   final Map<String, String> outboundMessageSessions;
@@ -25,17 +29,21 @@ class CryptoStore extends Equatable {
   @HiveField(11)
   final Map<String, Map<String, String>> inboundMessageSessions;
 
-  // Map<roomId, index(int)> // megolm - message index
-  @HiveField(10)
-  final Map<String, int> messageSessionIndex;
-
-  // Map<identityKey, serializedSession> // olmv1 - key-sharing
+  // TODO: DEPRECATED - Map<identityKey, serializedSession> // olmv1 - key-sharing
   @HiveField(8)
   final Map<String, String> inboundKeySessions;
 
-  // Map<identityKey, serializedSession>  // olmv1 - key-sharing
+  // TODO: DEPRECATED - Map<identityKey, serializedSession>  // olmv1 - key-sharing
   @HiveField(6)
   final Map<String, String> outboundKeySessions;
+
+  // Map<roomId, <identityKey, serializedSession>>  // olmv1 - key-sharing
+  @HiveField(12)
+  final Map<String, Map<String, String>> keySessionsOutbound;
+
+  // Map<roomId, <identityKey, serializedSession>>  // olmv1 - key-sharing
+  @HiveField(13)
+  final Map<String, Map<String, String>> keySessionsInbound;
 
   // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   @HiveField(0)
@@ -68,6 +76,8 @@ class CryptoStore extends Equatable {
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
     this.messageSessionIndex = const {},
+    this.keySessionsOutbound = const {},
+    this.keySessionsInbound = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
@@ -84,6 +94,8 @@ class CryptoStore extends Equatable {
         outboundMessageSessions,
         inboundKeySessions,
         outboundKeySessions,
+        keySessionsOutbound,
+        keySessionsInbound,
         messageSessionIndex,
         deviceKeys,
         deviceKeysOwned,
@@ -100,6 +112,8 @@ class CryptoStore extends Equatable {
     outboundMessageSessions,
     inboundKeySessions,
     outboundKeySessions,
+    keySessionsInbound,
+    keySessionsOutbound,
     messageSessionIndex,
     deviceKeys,
     deviceKeysOwned,
@@ -118,6 +132,8 @@ class CryptoStore extends Equatable {
       messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
       inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
       outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
+      keySessionsInbound: keySessionsInbound ?? this.keySessionsInbound,
+      keySessionsOutbound: keySessionsOutbound ?? this.keySessionsOutbound,
       deviceKeys: deviceKeys ?? this.deviceKeys,
       deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
       oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,

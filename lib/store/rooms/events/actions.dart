@@ -232,103 +232,6 @@ ThunkAction<AppState> sendTyping({
 }
 
 /**
- * Send Session Encryption Keys
- * 
- * Specifically for sending encrypted keys using olm
- * for later use with encrypted messages using megolm
- * sent directly to devices within the room
- * 
- * https://matrix.org/docs/spec/client_server/latest#id454
- * https://matrix.org/docs/spec/client_server/latest#id461
- */
-/**
- */
-ThunkAction<AppState> sendSessionKeys({
-  Room room,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      // if you're incredibly unlucky, and fast, you could have a problem here
-      final String trxId = DateTime.now().millisecond.toString();
-
-      // Create payload of megolm session keys for message decryption
-      final messageSession = await store.dispatch(
-        exportMessageSession(roomId: room.id),
-      );
-
-      final roomKeyEventContent = {
-        'algorithm': Algorithms.megolmv1,
-        'room_id': room.id,
-        'session_id': messageSession['session_id'],
-        'session_key': messageSession['session_key'],
-      };
-
-      // manage which devices to claim oneTimeKeys for
-      // here instead of within the function, because you'll
-      // need to cycle through those necessary devices here anyway
-      // for now, we're just sending the request to all the
-      // one time keys that were saved from this call
-      // global mutatable, this is real bad
-      await store.dispatch(claimOneTimeKeys(room: room));
-      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
-
-      // For each one time key claimed
-      // send a m.room_key event directly to each device
-
-      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
-
-      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
-        try {
-          // find the identityKey for the device
-          final deviceKey = store.state.cryptoStore
-              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
-          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
-          final identityKey = deviceKey.keys[keyId];
-
-          // Poorly decided to save key sessions by deviceId at first but then
-          // realised that you may have the same identityKey for diff
-          // devices and you also don't have the device id in the
-          // toDevice event payload -__-, convert back to identity key
-          final roomKeyEventContentEncrypted = await store.dispatch(
-            encryptKeyContent(
-              roomId: room.id,
-              identityKey: identityKey,
-              eventType: EventTypes.roomKey,
-              content: roomKeyEventContent,
-            ),
-          );
-
-          final response = await MatrixApi.sendEventToDevice(
-            protocol: protocol,
-            accessToken: store.state.authStore.user.accessToken,
-            homeserver: store.state.authStore.user.homeserver,
-            userId: deviceKey.userId,
-            deviceId: deviceKey.deviceId,
-            eventType: EventTypes.encrypted,
-            content: roomKeyEventContentEncrypted,
-            trxId: trxId,
-          );
-
-          if (response['errcode'] != null) {
-            throw response['error'];
-          }
-        } catch (error) {
-          debugPrint('[sendSessionKeys] $error');
-        }
-      });
-
-      // await all sendToDevice room key events to be sent to users
-      await Future.wait(sendToDeviceRequests);
-    } catch (error) {
-      debugPrint(error);
-      store.dispatch(
-        addAlert(type: 'warning', message: error.message),
-      );
-    }
-  };
-}
-
-/**
  * Send Encrypted Messages
  * 
  * Specifically for sending encrypted messages using megolm
@@ -343,14 +246,9 @@ ThunkAction<AppState> sendMessageEncrypted({
       // if you're incredibly fast, you could have a problem here
       final String trxId = DateTime.now().millisecond.toString();
 
-      // send the session keys if an inbound session does not exist
-      final keySession = store.state.cryptoStore.outboundKeySessions[room.id];
-
       // send the key session if one hasn't been sent or created
-
-      if (keySession == null) {
-        await store.dispatch(sendSessionKeys(room: room));
-      }
+      // to every user within the roomId
+      await store.dispatch(updateKeySessions(room: room));
 
       final messageEvent = {
         'body': body,
