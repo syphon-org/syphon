@@ -1,5 +1,4 @@
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/index.dart'; // TODO: remove need for store in view dependencies
 
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
@@ -7,7 +6,6 @@ import 'package:syphon/views/home/search/search-groups.dart';
 import 'package:syphon/views/home/search/search-users.dart';
 import 'package:syphon/views/home/settings/chats.dart';
 import 'package:syphon/views/home/settings/devices.dart';
-import 'package:syphon/views/home/settings/licenses.dart';
 import 'package:syphon/views/home/settings/password/index.dart';
 import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
@@ -50,7 +48,7 @@ class NavigationService {
 }
 
 class NavigationProvider {
-  static getRoutes(Store<AppState> store) {
+  static getRoutes() {
     return <String, WidgetBuilder>{
       '/intro': (BuildContext context) => Intro(),
       '/login': (BuildContext context) => Login(),
@@ -61,12 +59,8 @@ class NavigationProvider {
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
       '/home/chat/details': (BuildContext context) => MessageDetails(),
-      '/home/groups/search': (BuildContext context) => GroupSearchView(
-            title: 'Explore Groups',
-          ),
-      '/home/user/search': (BuildContext context) => SearchUserView(
-            title: 'Search Users',
-          ),
+      '/home/groups/search': (BuildContext context) => GroupSearchView(),
+      '/home/user/search': (BuildContext context) => SearchUserView(),
       '/profile': (BuildContext context) => ProfileView(),
       '/notifications': (BuildContext context) => NotificationSettingsView(),
       '/advanced': (BuildContext context) => AdvancedView(),
@@ -79,9 +73,7 @@ class NavigationProvider {
       '/chat-preferences': (BuildContext context) => ChatPreferences(),
       '/theming': (BuildContext context) => Theming(),
       '/devices': (BuildContext context) => DevicesView(),
-      '/settings': (BuildContext context) => SettingsScreen(
-            title: 'Settings',
-          ),
+      '/settings': (BuildContext context) => SettingsScreen(),
       '/loading': (BuildContext context) => Loading(
             title: 'Loading',
           ),

@@ -55,21 +55,6 @@ class PasswordUpdateState extends State<PasswordView> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
-  @protected
-  void onMounted() async {
-    final store = StoreProvider.of<AppState>(context);
-  }
-
-  @override
-  void deactivate() {
-    subscription.cancel();
-    super.deactivate();
   }
 
   @override
@@ -82,6 +67,7 @@ class PasswordUpdateState extends State<PasswordView> {
 
           return Scaffold(
             appBar: AppBar(
+              brightness: Brightness.light,
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(

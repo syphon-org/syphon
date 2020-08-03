@@ -17,6 +17,11 @@ enum ThemeType {
   NIGHT,
 }
 
+const List<String> fontTypes = [
+  'Rubik',
+  "Roboto",
+];
+
 class Themes {
   static Color invertedPrimaryColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
@@ -90,7 +95,7 @@ class Themes {
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
-        color: Color(appBarColor),
+        color: Color(appBarColor ?? primaryColorHex),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(

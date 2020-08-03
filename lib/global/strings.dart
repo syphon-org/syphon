@@ -3,8 +3,7 @@ import 'package:syphon/global/values.dart';
 /**
  * Will be converted to
  * i18n json soon, but a "String" 
- * class below is just a stub for this
- * for now
+ * class below is just a stub for now
  */
 class Strings {
   // Titles
@@ -16,12 +15,15 @@ class Strings {
   static const titleViewSignup = 'Signup';
   static const titleViewDevices = 'Devices';
   static const titleViewSettings = 'Settings';
-  static const titleChatsAndMedia = 'Chat Preferences';
+  static const titleChatPreferences = 'Chat Preferences';
   static const titleThemeing = 'Theming';
   static const titlePrivacy = 'Privacy';
   static const titleHomeserverSearch = 'Find Your Homeserver';
   static const titleProfile = 'Set up Your Profile';
   static const titleSettings = 'Settings';
+  static const titleAdvanced = 'Advanced';
+  static const titleSearchGroups = 'Explore Groups';
+  static const titleSearchUsers = 'Search Users';
 
   // Dialog Titles
   static const titleDialogCaptcha = 'Complete Captcha';

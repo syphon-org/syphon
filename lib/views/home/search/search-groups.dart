@@ -1,16 +1,15 @@
 import 'dart:async';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
@@ -32,38 +31,25 @@ class SearchScrollBehavior extends ScrollBehavior {
 }
 
 class GroupSearchView extends StatefulWidget {
-  final String title;
-  final Store<AppState> store;
-  const GroupSearchView({Key key, this.title, this.store}) : super(key: key);
+  const GroupSearchView({Key key}) : super(key: key);
 
   @override
-  GroupSearchState createState() => GroupSearchState(
-        title: this.title,
-        store: this.store,
-      );
+  GroupSearchState createState() => GroupSearchState();
 }
 
 class GroupSearchState extends State<GroupSearchView> {
-  final String title;
-  final Store<AppState> store;
   final searchInputFocusNode = FocusNode();
 
-  GroupSearchState({
-    Key key,
-    this.title,
-    this.store,
-  });
+  GroupSearchState({Key key});
 
   Timer searchTimeout;
   bool searching = false;
 
+  // componentDidMount(){}
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -140,7 +126,7 @@ class GroupSearchState extends State<GroupSearchView> {
                       activeOpacity: 0.4,
                       onTap: () => onToggleSearch(context: context),
                       child: Text(
-                        title,
+                        Strings.titleSearchGroups,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w100,

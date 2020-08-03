@@ -53,7 +53,7 @@ class PrivacyPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: null,
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Screen lock',
@@ -68,7 +68,7 @@ class PrivacyPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: null,
+                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Screen lock inactivity timeout',
@@ -169,6 +169,7 @@ class PrivacyPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
+                            enabled: false,
                             onTap: props.onImportDeviceKey,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -176,6 +177,7 @@ class PrivacyPreferences extends StatelessWidget {
                             ),
                           ),
                           ListTile(
+                            enabled: false,
                             onTap: () => props.onExportDeviceKey(context),
                             contentPadding: Dimensions.listPadding,
                             title: Text(

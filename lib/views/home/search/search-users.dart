@@ -14,7 +14,6 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux/redux.dart';
@@ -34,39 +33,27 @@ class SearchScrollBehavior extends ScrollBehavior {
 }
 
 class SearchUserView extends StatefulWidget {
-  final String title;
-  const SearchUserView({
-    Key key,
-    this.title,
-  }) : super(key: key);
+  const SearchUserView({Key key}) : super(key: key);
 
   @override
-  SearchUserState createState() => SearchUserState(
-        title: this.title,
-      );
+  SearchUserState createState() => SearchUserState();
 }
 
 class SearchUserState extends State<SearchUserView> {
-  final String title;
   final searchInputFocusNode = FocusNode();
 
-  SearchUserState({
-    Key key,
-    this.title,
-  });
+  SearchUserState({Key key});
 
   Timer searchTimeout;
   bool searching = false;
   String searchable;
   String creatingRoomDisplayName;
 
+  // componentDidMount(){}
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -386,7 +373,7 @@ class SearchUserState extends State<SearchUserView> {
                       activeOpacity: 0.4,
                       onTap: () => onToggleSearch(context: context),
                       child: Text(
-                        title,
+                        Strings.titleSearchUsers,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w100,

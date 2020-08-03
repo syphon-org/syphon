@@ -77,7 +77,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ### environment
 - you'll to do several things to setup the environment for Syphon
-    - install flutter
+    - install flutter (stable channel - mobile / dev channel - desktop)
     - install android studio
     - install cmake version 3.10.2 - (for olm/megolm)
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 

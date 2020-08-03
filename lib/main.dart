@@ -215,7 +215,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               themeType: settings.theme,
             ),
             navigatorKey: NavigationService.navigatorKey,
-            routes: NavigationProvider.getRoutes(store),
+            routes: NavigationProvider.getRoutes(),
             home: defaultHome,
             builder: (context, child) => Scaffold(
               body: child,

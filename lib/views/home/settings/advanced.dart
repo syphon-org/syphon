@@ -1,4 +1,5 @@
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/global/colours.dart';
@@ -32,7 +33,7 @@ class AdvancedView extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                'Advanced',
+                Strings.titleAdvanced,
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),

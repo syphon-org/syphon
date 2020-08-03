@@ -74,7 +74,6 @@ class HomeViewState extends State<Home> {
   @protected
   Widget buildAppBarRoomOptions({BuildContext context, _Props props}) {
     return AppBar(
-      brightness: Brightness.dark, // TOOD: this should inherit from theme
       backgroundColor: Colors.grey[500],
       automaticallyImplyLeading: false,
       titleSpacing: 0.0,
