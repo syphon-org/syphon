@@ -560,20 +560,6 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // cache of one time keys
       await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
-
-      // create sessions from new one time keys per device id
-      oneTimekeys.forEach((deviceId, oneTimeKey) {
-        final userId = oneTimeKey.userId;
-        final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
-        final keyId = '${Algorithms.curve25591}:$deviceId';
-        final identityKey = deviceKey.keys[keyId];
-
-        store.dispatch(createOutboundKeySession(
-          deviceId: deviceId,
-          identityKey: identityKey,
-          oneTimeKey: oneTimeKey.keys.values.elementAt(0),
-        ));
-      });
       return true;
     } catch (error) {
       debugPrint(error);
@@ -630,6 +616,20 @@ ThunkAction<AppState> updateKeySessions({
       await store.dispatch(claimOneTimeKeys(room: room));
       final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
 
+      // create sessions from new one time keys per device id
+      oneTimeKeys.forEach((deviceId, oneTimeKey) {
+        final userId = oneTimeKey.userId;
+        final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
+        final keyId = '${Algorithms.curve25591}:$deviceId';
+        final identityKey = deviceKey.keys[keyId];
+
+        store.dispatch(createOutboundKeySession(
+          deviceId: deviceId,
+          identityKey: identityKey,
+          oneTimeKey: oneTimeKey.keys.values.elementAt(0),
+        ));
+      });
+
       // For each one time key claimed
       // send a m.room_key event directly to each device
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
@@ -676,6 +676,7 @@ ThunkAction<AppState> updateKeySessions({
 
       // await all sendToDevice room key events to be sent to users
       await Future.wait(sendToDeviceRequests);
+      await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
       debugPrint(error);
       store.dispatch(
@@ -746,8 +747,6 @@ ThunkAction<AppState> saveInboundKeySession({
 }
 
 ThunkAction<AppState> loadOutboundKeySession({
-  int type,
-  String body,
   String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {

@@ -140,7 +140,7 @@ ThunkAction<AppState> encryptKeyContent({
     // Save the outbound session after processing content
     await store.dispatch(saveOutboundKeySession(
       identityKey: identityKey,
-      session: outboundKeySession.pickle(roomId),
+      session: outboundKeySession.pickle(identityKey),
     ));
 
     // Pull current user identity keys out of olm account
