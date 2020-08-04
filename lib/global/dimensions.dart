@@ -20,10 +20,10 @@ class Dimensions {
   static const double thumbnailSizeMax = 48;
 
   // Avatars
-  static const double avatarSizeMessage = 28;
-  static const double avatarSizeMin = 48;
   static const double avatarSize = 56; // was 52
+  static const double avatarSizeMin = 48;
   static const double avatarSizeMax = 350; // Change to HeroSize
+  static const double avatarSizeMessage = 28;
   static const double avatarHeroSize = 120;
 
   // Buttons
@@ -139,6 +139,12 @@ class Dimensions {
   static modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;
+  }
+
+  // Action Rin
+  static actionRingDefaultWidth(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width < 400 ? size.width : size.width * 0.9;
   }
 
   // * Device Specific *

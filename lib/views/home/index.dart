@@ -11,7 +11,6 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +29,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:syphon/views/widgets/containers/ring-actions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
@@ -45,6 +45,9 @@ class HomeViewState extends State<Home> {
   HomeViewState({Key key}) : super();
 
   Room selectedRoom;
+
+  final GlobalKey<FabCircularMenuState> fabKey =
+      GlobalKey<FabCircularMenuState>();
 
   @protected
   onNavigateToGroupSearch(context) {
@@ -456,6 +459,7 @@ class HomeViewState extends State<Home> {
 
           return Scaffold(
             appBar: currentAppBar,
+            floatingActionButton: ActionRing(fabKey: fabKey),
             body: Align(
               alignment: Alignment.topCenter,
               child: Column(
@@ -503,70 +507,6 @@ class HomeViewState extends State<Home> {
                   ),
                 ],
               ),
-            ),
-            floatingActionButton: FabCircularMenu(
-              key: Key('FabCircleMenu'),
-              fabSize: 58,
-              fabElevation: 4.0,
-              fabOpenIcon: Icon(
-                Icons.bubble_chart,
-                size: 32.0,
-                color: Colors.white,
-              ),
-              fabCloseIcon: Icon(
-                Icons.close,
-                color: Colors.white,
-              ),
-              fabColor: Theme.of(context).accentColor,
-              ringDiameter: MediaQuery.of(context).size.width * 0.9,
-              ringColor: Theme.of(context).accentColor.withAlpha(144),
-              animationDuration: Duration(milliseconds: 275),
-              onDisplayChange: (opened) {},
-              children: [
-                FloatingActionButton(
-                  heroTag: 'fab4',
-                  child: Icon(
-                    Icons.public,
-                    color: Colors.white,
-                  ),
-                  tooltip: 'Create Public Room',
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                  },
-                ),
-                FloatingActionButton(
-                  heroTag: 'fab2',
-                  child: Icon(
-                    Icons.group_add,
-                    color: Colors.white,
-                  ),
-                  tooltip: 'Create Group',
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                  },
-                ),
-                FloatingActionButton(
-                  heroTag: 'fab3',
-                  tooltip: 'Direct Message',
-                  onPressed: () => onNavigateToDraft(context),
-                  child: Container(
-                    child: Icon(
-                      Icons.person_add,
-                      size: 22,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                FloatingActionButton(
-                  heroTag: 'fab1',
-                  child: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  tooltip: 'Search Groups',
-                  onPressed: () => onNavigateToGroupSearch(context),
-                ),
-              ],
             ),
           );
         },

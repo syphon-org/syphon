@@ -1,7 +1,16 @@
 class Assets {
-  // Icons
+  // App Icons
   static const appIcon = 'assets/icons/app_icon.svg';
   static const appIconPng = 'assets/icons/app_icon.png';
+
+  // Generic Icons
+  static const iconPersonAddBeing = 'assets/icons/global/being-person-add.svg';
+  static const iconPublicAddBeing = 'assets/icons/global/being-public-add.svg';
+  static const iconGroupAddBeing = 'assets/icons/global/being-group-add.svg';
+  static const iconSearchPublicBeing =
+      'assets/icons/global/being-search-public.svg';
+  static const iconSearchPublicCondensedBeing =
+      'assets/icons/global/being-search-public-condensed.svg';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';

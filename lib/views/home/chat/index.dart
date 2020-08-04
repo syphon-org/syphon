@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Store
+import 'package:flutter/scheduler.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -14,7 +15,6 @@ import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -92,12 +92,11 @@ class ChatViewState extends State<ChatView> {
         });
       }
     });
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+    // NOTE: still needed to have navigator context in dialogs
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
   @protected
@@ -117,8 +116,11 @@ class ChatViewState extends State<ChatView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        child: DialogInvite(
+        builder: (context) => DialogInvite(
           onAccept: props.onAcceptInvite,
+          onCancel: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
         ),
       );
     }

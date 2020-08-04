@@ -43,11 +43,9 @@ class CaptchaState extends State<Captcha> {
       Completer<WebViewController>();
 
   @override
-  void initState() {
-    super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

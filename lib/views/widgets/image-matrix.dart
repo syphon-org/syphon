@@ -57,9 +57,12 @@ class MatrixImageState extends State<MatrixImage> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

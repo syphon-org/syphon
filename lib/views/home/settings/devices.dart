@@ -31,12 +31,9 @@ class DeviceViewState extends State<DevicesView> {
   List<Device> selectedDevices;
 
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

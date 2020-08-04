@@ -43,12 +43,9 @@ class HomeSearchState extends State<HomeSearch> {
   HomeSearchState({Key key, this.title, this.store});
 
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

@@ -59,10 +59,12 @@ class IntroState extends State<Intro> {
       keepPage: false,
       viewportFraction: 1.5,
     );
+  }
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

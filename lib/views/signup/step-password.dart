@@ -32,14 +32,6 @@ class PasswordStepState extends State<PasswordStep> {
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   SchedulerBinding.instance.addPostFrameCallback((_) {
-  //     onMounted();
-  //   });
-  // }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

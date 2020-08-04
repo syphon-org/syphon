@@ -136,10 +136,8 @@ flutter:
     - family: Rubik
       fonts:
         - asset: assets/fonts/Rubik-Regular.ttf
-        - asset: assets/fonts/Rubik-Medium.ttf
-          weight: 400
-        - asset: assets/fonts/Rubik-Light.ttf
-          weight: 400
+        - asset: assets/fonts/Rubik-Medium.ttf 
+        - asset: assets/fonts/Rubik-Light.ttf 
 
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
@@ -165,6 +163,12 @@ flutter:
    - assets/icons/app_icon.svg
    - assets/icons/app_icon.png
    - assets/icons/app_icon_white.png
+   - assets/icons/global/being-person-add.svg
+   - assets/icons/global/being-group-add.svg
+   - assets/icons/global/being-public-add.svg
+   - assets/icons/global/being-search-public.svg
+   - assets/icons/global/being-search-public-condensed.svg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

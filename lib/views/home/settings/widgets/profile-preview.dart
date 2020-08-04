@@ -1,7 +1,7 @@
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,56 +17,37 @@ class ProfilePreview extends StatelessWidget {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-        builder: (context, props) {
-          return Container(
-            child: Row(
-              children: <Widget>[
-                Container(
-                  height: 56,
-                  width: 56,
-                  margin: EdgeInsets.only(right: 16),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    child: props.avatarUri != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              Dimensions.thumbnailSizeMax,
-                            ),
-                            child: MatrixImage(
-                              width: 52,
-                              height: 52,
-                              mxcUri: props.avatarUri,
-                              forceLoading: props.loading,
-                            ),
-                          )
-                        : Text(
-                            props.initials,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
+        builder: (context, props) => Container(
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: Dimensions.avatarSize,
+                height: Dimensions.avatarSize,
+                margin: EdgeInsets.only(right: 16),
+                child: AvatarCircle(
+                  uri: props.avatarUri,
+                  alt: props.initials,
+                  size: Dimensions.avatarSize,
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      props.user.displayName ?? '',
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                    Text(
-                      props.username ?? '',
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    props.user.displayName ?? '',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  Text(
+                    props.username ?? '',
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
       );
 }
 
