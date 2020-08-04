@@ -1,7 +1,12 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:convert';
-import 'package:syphon/store/rooms/events/model.dart';
+
+// Package imports:
 import 'package:http/http.dart' as http;
+
+// Project imports:
+import 'package:syphon/store/rooms/events/model.dart';
 
 abstract class Users {
   /**

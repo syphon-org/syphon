@@ -1,11 +1,16 @@
+// Dart imports:
 import 'dart:collection';
+
+// Package imports:
+import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:hive/hive.dart';
 
 part 'model.g.dart';
 

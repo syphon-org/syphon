@@ -1,6 +1,11 @@
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+
+// Project imports:
 import 'package:syphon/global/colours.dart';
 
 class DialogColorPicker extends StatelessWidget {

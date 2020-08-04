@@ -1,17 +1,21 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/credential/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/global/notifications.dart';
+
+// Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/store/index.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];

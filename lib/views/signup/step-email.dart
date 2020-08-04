@@ -1,23 +1,29 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Store
-import 'package:redux/redux.dart';
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:syphon/store/index.dart';
-
-// Styling
-import 'package:syphon/global/assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
+
+// Store
+
+// Styling
 
 class EmailStep extends StatefulWidget {
   const EmailStep({Key key}) : super(key: key);

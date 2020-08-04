@@ -1,33 +1,39 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/scheduler.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/settings/state.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
+
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+
+// Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/intro/index.dart';
+import 'package:syphon/views/navigation.dart';
 
 // Library Implimentations
-import 'package:syphon/global/libs/hive/index.dart';
 
 // Redux - State Managment - "store" - IMPORT ONLY ONCE
-import 'package:syphon/store/index.dart';
 
 // Navigation
-import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/intro/index.dart';
-import 'package:syphon/views/home/index.dart';
 
 // Styling
-import 'package:syphon/global/themes.dart';
-import 'package:redux/redux.dart';
 
 /**
  * DESKTOP ONLY
-import 'package:window_utils/window_utils.dart';
  */
 
 void _enablePlatformOverrideForDesktop() {

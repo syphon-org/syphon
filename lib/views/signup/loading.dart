@@ -1,17 +1,22 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-// Store
+// Package imports:
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
+
+// Project imports:
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/behaviors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
+// Store
+
 // Styling
-import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:syphon/global/behaviors.dart';
 
 // Assets
-import 'package:syphon/global/assets.dart';
 
 class Loading extends StatelessWidget {
   Loading({Key key, this.title}) : super(key: key);

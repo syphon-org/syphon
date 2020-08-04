@@ -1,7 +1,9 @@
+// Dart imports:
 import 'dart:typed_data';
 
-import './state.dart';
+// Project imports:
 import './actions.dart';
+import './state.dart';
 
 MediaStore mediaReducer(
     [MediaStore state = const MediaStore(), dynamic action]) {

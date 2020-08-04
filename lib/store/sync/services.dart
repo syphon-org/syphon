@@ -1,16 +1,20 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:math';
+
+// Package imports:
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:hive/hive.dart';
-
-import 'package:syphon/global/notifications.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart';
 
 /** 
  *  Save Full Sync

@@ -1,7 +1,17 @@
+// Dart imports:
 import 'dart:typed_data';
 
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_persist/redux_persist.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
@@ -11,27 +21,23 @@ import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
-import 'package:equatable/equatable.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
-
-// Temporary State Store
 import './alerts/model.dart';
-import './search/model.dart';
-
-// Persisted State Stores
-import './media/state.dart';
-import './rooms/state.dart';
-import './settings/state.dart';
-import './auth/state.dart';
-
-// Reducers for Stores
 import './alerts/reducer.dart';
+import './auth/state.dart';
+import './media/state.dart';
 import './rooms/reducer.dart';
+import './rooms/state.dart';
+import './search/model.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
+import './settings/state.dart';
 
-import 'package:redux_persist/redux_persist.dart';
+// Temporary State Store
+
+// Persisted State Stores
+
+// Reducers for Stores
+
 
 class AppState extends Equatable {
   final bool loading;

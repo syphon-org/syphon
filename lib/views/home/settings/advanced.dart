@@ -1,19 +1,24 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/user/model.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 final String protocol = DotEnv().env['PROTOCOL'];

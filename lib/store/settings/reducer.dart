@@ -1,8 +1,8 @@
+// Project imports:
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
-
-import './state.dart';
 import './actions.dart';
+import './state.dart';
 
 SettingsStore settingsReducer(
     [SettingsStore state = const SettingsStore(), dynamic action]) {

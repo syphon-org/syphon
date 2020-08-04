@@ -1,5 +1,6 @@
-import './model.dart';
+// Project imports:
 import './actions.dart';
+import './model.dart';
 
 SearchStore matrixReducer(
     [SearchStore state = const SearchStore(), dynamic action]) {

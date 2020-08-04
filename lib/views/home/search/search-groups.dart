@@ -1,27 +1,28 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:expandable/expandable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:intl/intl.dart';
+import 'package:redux/redux.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
+
+// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/global/themes.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:expandable/expandable.dart';
-import 'package:intl/intl.dart';
-
-import 'package:redux/redux.dart';
 import 'package:syphon/store/search/actions.dart';
-
-import 'package:syphon/store/index.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
-// Assets
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class SearchScrollBehavior extends ScrollBehavior {
   @override

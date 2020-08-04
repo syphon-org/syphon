@@ -1,34 +1,39 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/auth/credential/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:syphon/store/sync/actions.dart';
-import 'package:device_info/device_info.dart';
-import 'package:mime/mime.dart';
-import 'package:crypt/crypt.dart';
 
-import 'package:syphon/global/libs/matrix/media.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/global/notifications.dart';
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:crypt/crypt.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Store
-import 'package:syphon/store/index.dart';
+// Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/media.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 import '../user/model.dart';
+
+// Store
 
 final protocol = DotEnv().env['PROTOCOL'];
 

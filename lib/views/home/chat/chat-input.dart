@@ -1,9 +1,12 @@
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+// Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/model.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 /**
  * RoundedPopupMenu

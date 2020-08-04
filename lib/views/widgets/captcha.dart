@@ -1,12 +1,16 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
+// Package imports:
 import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
-import 'package:syphon/global/values.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+// Project imports:
+import 'package:syphon/global/values.dart';
 
 /**
  * Captcha

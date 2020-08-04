@@ -1,10 +1,13 @@
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/libs/hive/type-ids.dart';
-import "package:syphon/global/themes.dart";
-import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/model.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+
+// Project imports:
+import "package:syphon/global/themes.dart";
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
 
 part 'state.g.dart';

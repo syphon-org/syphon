@@ -1,27 +1,32 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:syphon/global/strings.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:redux/redux.dart';
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
 
-// Store
+// Project imports:
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
+// Store
+
 // Styling
-import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/behaviors.dart';
 
 // Assets
-import 'package:syphon/global/assets.dart';
 
 class Login extends StatefulWidget {
   final Store<AppState> store;

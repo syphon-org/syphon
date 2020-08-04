@@ -1,23 +1,28 @@
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/captcha.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 
 // Store
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:syphon/store/index.dart';
 
 // Styling
-import 'package:syphon/global/assets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 
 class CaptchaStep extends StatefulWidget {
   const CaptchaStep({Key key}) : super(key: key);

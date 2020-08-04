@@ -1,7 +1,10 @@
-import 'package:flutter/services.dart';
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
 
 /**
  * Secured Text Field Input

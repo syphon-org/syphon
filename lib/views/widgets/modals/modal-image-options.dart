@@ -1,9 +1,15 @@
+// Dart imports:
 import 'dart:io';
 
-import 'package:image_picker/image_picker.dart';
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:image_picker/image_picker.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
 
 class ModalImageOptions extends StatelessWidget {
   ModalImageOptions({

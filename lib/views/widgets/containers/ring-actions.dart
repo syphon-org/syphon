@@ -1,12 +1,17 @@
-import 'package:equatable/equatable.dart';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:redux/redux.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
 
@@ -43,7 +48,7 @@ class ActionRing extends StatelessWidget {
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey.currentState.close();
-    // Navigator.pushNamed(context, '/home/groups/create-public');
+    Navigator.pushNamed(context, '/home/groups/create-public');
   }
 
   @override

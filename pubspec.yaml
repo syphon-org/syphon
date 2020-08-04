@@ -118,6 +118,7 @@ dev_dependencies:
   #   sdk: flutter
   build_runner: ^1.0.0
   hive_generator: 0.7.0
+  import_sorter: ^4.2.1
 
 dependency_overrides:
   dartx: ^0.3.0

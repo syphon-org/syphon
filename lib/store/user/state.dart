@@ -1,7 +1,10 @@
-import 'package:syphon/global/libs/hive/type-ids.dart';
-import 'package:syphon/store/user/model.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 

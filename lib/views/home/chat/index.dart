@@ -1,42 +1,49 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
-// Store
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/events/actions.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/views/home/chat/chat-input.dart';
-import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:syphon/views/widgets/messages/message.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 // Store
-import 'package:redux/redux.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
-import 'package:syphon/store/rooms/events/actions.dart';
+
+// Store
 
 // Global widgets
-import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/views/widgets/containers/menu-rounded.dart';
-import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 enum ChatOptions {
   search,

@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added 
 - E2EE Group Creation
 - E2EE Existing Group Handling
+- Color Assignment for Public Rooms without Avatars
 
 ### Changed
 - Confirmation Alert Improvements
 - Standardized view mounting and unmounting
 - Disabled all non-available features in menus
+- New Action Ring Icons
 
 ### Removed
 - Dead clickable links in menus
