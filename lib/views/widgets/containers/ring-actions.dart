@@ -58,22 +58,23 @@ class ActionRing extends StatelessWidget {
         fabElevation: 4.0,
         fabOpenIcon: Icon(
           Icons.bubble_chart,
-          size: 32.0,
+          size: Dimensions.iconSizeLarge,
           color: Colors.white,
         ),
         fabCloseIcon: Icon(
           Icons.close,
           color: Colors.white,
         ),
-        fabColor: Theme.of(context).accentColor,
+        fabColor: Theme.of(context).primaryColor,
+        ringColor: Theme.of(context).primaryColor.withAlpha(144),
         ringDiameter: Dimensions.actionRingDefaultWidth(context),
-        ringColor: Theme.of(context).accentColor.withAlpha(144),
         animationDuration: Duration(milliseconds: 275),
         onDisplayChange: (opened) {},
         children: [
           FloatingActionButton(
             heroTag: 'fab1',
             tooltip: 'Create Public Room',
+            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () => onNavigateToCreateGroupPublic(context),
             child: SvgPicture.asset(
               Assets.iconPublicAddBeing,
@@ -84,6 +85,7 @@ class ActionRing extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'fab2',
             tooltip: 'Create Group',
+            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () => onNavigateToCreateGroup(context),
             child: SvgPicture.asset(
               Assets.iconGroupAddBeing,
@@ -94,6 +96,7 @@ class ActionRing extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'fab3',
             tooltip: 'Direct Message',
+            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () => onNavigateToDraft(context),
             child: SvgPicture.asset(
               Assets.iconPersonAddBeing,
@@ -104,6 +107,7 @@ class ActionRing extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'fab4',
             tooltip: 'Search Public Groups',
+            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () => onNavigateToPublicSearch(context),
             child: SvgPicture.asset(
               Assets.iconSearchPublicCondensedBeing,

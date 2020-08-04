@@ -229,7 +229,7 @@ class DeviceViewState extends State<DevicesView> {
 
                       if (this.selectedDevices != null &&
                           this.selectedDevices.contains(device)) {
-                        backgroundColor = hashedColor(device.deviceId);
+                        backgroundColor = Colours.hashedColor(device.deviceId);
                         backgroundColor = Colors.grey[500];
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;

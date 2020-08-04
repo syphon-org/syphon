@@ -4,6 +4,7 @@ import 'dart:async';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 // Package imports:
 import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
@@ -12,12 +13,10 @@ import 'package:webview_flutter/webview_flutter.dart';
 // Project imports:
 import 'package:syphon/global/values.dart';
 
-/**
+/*
  * Captcha
  * renders the captcha needed to be completed 
  * by certain matrix servers -_-
- * 
- * TODO: find out how t ouse recaptcha with public key
  */
 class Captcha extends StatefulWidget {
   final String publicKey;
@@ -47,9 +46,13 @@ class CaptchaState extends State<Captcha> {
       Completer<WebViewController>();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+  void initState() {
+    super.initState();
+
+    // NOTE: SchedulerBinding still needed to have navigator context in dialogs
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
   @protected

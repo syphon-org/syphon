@@ -25,6 +25,7 @@ class MatrixImage extends StatefulWidget {
   final String mxcUri;
   final double width;
   final double height;
+  final double size;
   final double strokeWidth;
   final String imageType;
   final BoxFit fit;
@@ -39,6 +40,7 @@ class MatrixImage extends StatefulWidget {
     @required this.mxcUri,
     this.width = 48,
     this.height = 48,
+    this.size,
     this.strokeWidth = Dimensions.defaultStrokeWidthLite,
     this.imageType,
     this.fit = BoxFit.fill,
@@ -116,8 +118,8 @@ class MatrixImageState extends State<MatrixImage> {
 
           if (loading) {
             return Container(
-              width: widget.width,
-              height: widget.height,
+              width: widget.size ?? widget.width,
+              height: widget.size ?? widget.height,
               child: CircularProgressIndicator(
                 strokeWidth: widget.strokeWidth * 1.5,
                 valueColor: new AlwaysStoppedAnimation<Color>(

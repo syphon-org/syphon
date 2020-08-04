@@ -26,14 +26,6 @@ import 'package:syphon/views/signup/index.dart';
 import 'package:syphon/views/signup/loading.dart';
 import 'package:syphon/views/signup/verification.dart';
 
-// Intro
-
-// Home
-
-// Messages
-
-// Settings
-
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
@@ -60,6 +52,7 @@ class NavigationProvider {
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
       '/home/chat/details': (BuildContext context) => MessageDetails(),
+      '/home/chat/details/users': (BuildContext context) => MessageDetails(),
       '/home/groups/search': (BuildContext context) => GroupSearchView(),
       '/home/user/search': (BuildContext context) => SearchUserView(),
       '/profile': (BuildContext context) => ProfileView(),

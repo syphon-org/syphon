@@ -3,6 +3,7 @@ import 'dart:collection';
 
 // Package imports:
 import 'package:hive/hive.dart';
+import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -92,6 +93,22 @@ class Room {
   @HiveField(27)
   final bool invite;
 
+  dynamic get colorDefault {
+    return Colours.hashedColor(id);
+  }
+
+  String get type {
+    if (direct) {
+      return 'Direct';
+    }
+    // TODO: based on join rules
+    if (worldReadable) {
+      return 'Public';
+    }
+
+    return 'Group';
+  }
+
   const Room({
     this.id,
     this.name = 'Chat',
@@ -180,7 +197,7 @@ class Room {
       messageReads: messageReads ?? this.messageReads,
       endHash: endHash ?? this.endHash,
       startHash: startHash ?? this.startHash,
-      prevHash: prevHash, // TODO: may always need a prev hash?,z
+      prevHash: prevHash, // TODO: may always need a prev hash?
       invite: invite ?? this.invite,
       // state: state ?? this.state,
     );

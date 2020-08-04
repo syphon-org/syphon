@@ -65,12 +65,10 @@ class IntroState extends State<Intro> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+    // NOTE: SchedulerBinding still needed to have navigator context in dialogs
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
   @protected

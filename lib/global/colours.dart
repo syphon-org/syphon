@@ -30,6 +30,11 @@ class Colours {
   static const chatTeal = 0xFF00796B;
   static const chatBlue = 0xFF1976D2;
 
+  static hashedColor(String hashable) {
+    int hash = hashable.codeUnits.reduce((value, element) => value + element);
+    return Colours.chatColors[hash % Colours.chatColors.length];
+  }
+
   static const chatColors = [
     Color(Colours.chatRed),
     Color(Colours.chatOrange),
@@ -39,9 +44,4 @@ class Colours {
     Color(Colours.chatGreen),
     Color(Colours.chatBlue),
   ];
-}
-
-Color hashedColor(String hashable) {
-  int hash = hashable.codeUnits.reduce((value, element) => value + element);
-  return Colours.chatColors[hash % Colours.chatColors.length];
 }

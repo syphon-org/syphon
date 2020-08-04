@@ -9,6 +9,7 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
@@ -47,19 +48,15 @@ class HomeViewState extends State<Home> {
 
   Room selectedRoom;
 
+  Map<String, Color> roomColorDefaults;
+
   final GlobalKey<FabCircularMenuState> fabKey =
       GlobalKey<FabCircularMenuState>();
 
-  @protected
-  onNavigateToGroupSearch(context) {
-    HapticFeedback.lightImpact();
-    Navigator.pushNamed(context, '/home/groups/search');
-  }
-
-  @protected
-  onNavigateToDraft(context) {
-    HapticFeedback.lightImpact();
-    Navigator.pushNamed(context, '/home/user/search');
+  @override
+  void initState() {
+    super.initState();
+    roomColorDefaults = Map();
   }
 
   @protected
@@ -167,85 +164,83 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildAppBar({BuildContext context, _Props props}) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      brightness: Brightness.dark,
-      titleSpacing: 16.00,
-      title: Row(children: <Widget>[
-        AvatarAppBar(
-          user: props.currentUser,
-          offline: props.offline,
-          // show syncing if offline and refresh or initial sync
-          syncing: (props.syncing && props.offline) || props.loadingRooms,
-          tooltip: 'Profile and Settings',
-          onPressed: () {
-            Navigator.pushNamed(context, '/profile');
-          },
-        ),
-        Text(
-          Values.appName,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
+  Widget buildAppBar({BuildContext context, _Props props}) => AppBar(
+        automaticallyImplyLeading: false,
+        brightness: Brightness.dark,
+        titleSpacing: 16.00,
+        title: Row(children: <Widget>[
+          AvatarAppBar(
+            user: props.currentUser,
+            offline: props.offline,
+            // show syncing if offline and refresh or initial sync
+            syncing: (props.syncing && props.offline) || props.loadingRooms,
+            tooltip: 'Profile and Settings',
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
           ),
-        ),
-      ]),
-      actions: <Widget>[
-        IconButton(
-          color: Colors.white,
-          icon: Icon(Icons.search),
-          onPressed: () {
-            Navigator.pushNamed(context, '/search');
-          },
-          tooltip: 'Search Chats',
-        ),
-        RoundedPopupMenu<Options>(
-          icon: Icon(Icons.more_vert, color: Colors.white),
-          onSelected: (Options result) {
-            switch (result) {
-              case Options.newGroup:
-                // TODO: allow users to create and edit groups
-                break;
-              case Options.settings:
-                Navigator.pushNamed(context, '/settings');
-                break;
-              case Options.help:
-                props.onSelectHelp();
-                break;
-              default:
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
-            const PopupMenuItem<Options>(
-              value: Options.newGroup,
-              enabled: false,
-              child: Text('New Group'),
+          Text(
+            Values.appName,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
-            const PopupMenuItem<Options>(
-              value: Options.markAllRead,
-              enabled: false,
-              child: Text('Mark All Read'),
-            ),
-            const PopupMenuItem<Options>(
-              value: Options.inviteFriends,
-              enabled: false,
-              child: Text('Invite Friends'),
-            ),
-            const PopupMenuItem<Options>(
-              value: Options.settings,
-              child: Text('Settings'),
-            ),
-            const PopupMenuItem<Options>(
-              value: Options.help,
-              child: Text('Help'),
-            ),
-          ],
-        )
-      ],
-    );
-  }
+          ),
+        ]),
+        actions: <Widget>[
+          IconButton(
+            color: Colors.white,
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
+            tooltip: 'Search Chats',
+          ),
+          RoundedPopupMenu<Options>(
+            icon: Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (Options result) {
+              switch (result) {
+                case Options.newGroup:
+                  // TODO: allow users to create and edit groups
+                  break;
+                case Options.settings:
+                  Navigator.pushNamed(context, '/settings');
+                  break;
+                case Options.help:
+                  props.onSelectHelp();
+                  break;
+                default:
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
+              const PopupMenuItem<Options>(
+                value: Options.newGroup,
+                enabled: false,
+                child: Text('New Group'),
+              ),
+              const PopupMenuItem<Options>(
+                value: Options.markAllRead,
+                enabled: false,
+                child: Text('Mark All Read'),
+              ),
+              const PopupMenuItem<Options>(
+                value: Options.inviteFriends,
+                enabled: false,
+                child: Text('Invite Friends'),
+              ),
+              const PopupMenuItem<Options>(
+                value: Options.settings,
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem<Options>(
+                value: Options.help,
+                child: Text('Help'),
+              ),
+            ],
+          )
+        ],
+      );
 
   @protected
   Widget buildChatList(List<Room> rooms, BuildContext context, _Props props) {
@@ -290,8 +285,19 @@ class HomeViewState extends State<Home> {
         var backgroundColor;
         var fontStyle;
 
+        // Check settings for custom color, then check temp cache,
+        // or generate new temp color
         if (roomSettings != null) {
           primaryColor = Color(roomSettings.primaryColor);
+        } else if (roomColorDefaults.containsKey(room.id)) {
+          primaryColor = roomColorDefaults[room.id];
+        } else {
+          debugPrint('[ListView.builder] generating new color');
+          primaryColor = Colours.hashedColor(room.id);
+          roomColorDefaults.putIfAbsent(
+            room.id,
+            () => primaryColor,
+          );
         }
 
         if (selectedRoom != null) {
@@ -481,27 +487,6 @@ class HomeViewState extends State<Home> {
                               props,
                             ),
                           ),
-                          // TODO: decide if /sync indicator
-                          // should just be on current user avatar
-                          // Positioned(
-                          //   child: Visibility(
-                          //     visible: props.loadingRooms,
-                          //     child: Container(
-                          //         child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: <Widget>[
-                          //         RefreshProgressIndicator(
-                          //           strokeWidth: Dimensions.defaultStrokeWidth,
-                          //           valueColor:
-                          //               new AlwaysStoppedAnimation<Color>(
-                          //             PRIMARY_COLOR,
-                          //           ),
-                          //           value: null,
-                          //         ),
-                          //       ],
-                          //     )),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -524,9 +509,9 @@ class _Props extends Equatable {
 
   final Function onLeaveChat;
   final Function onDeleteChat;
-  final Function onFetchSyncForced;
   final Function onSelectHelp;
   final Function onArchiveRoom;
+  final Function onFetchSyncForced;
 
   _Props({
     @required this.rooms,
@@ -537,9 +522,9 @@ class _Props extends Equatable {
     @required this.chatSettings,
     @required this.onLeaveChat,
     @required this.onDeleteChat,
-    @required this.onFetchSyncForced,
     @required this.onSelectHelp,
     @required this.onArchiveRoom,
+    @required this.onFetchSyncForced,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

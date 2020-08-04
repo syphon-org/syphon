@@ -48,14 +48,16 @@ class Themes {
 
     var brightness = Brightness.light;
     var appBarElevation;
+    var iconColor = Colors.grey[500];
 
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = primaryColorHex ?? Colours.blackDefault;
+        appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = null;
+        iconColor = Colors.white;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
@@ -64,14 +66,16 @@ class Themes {
         appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = Colours.blackDefault;
         appBarElevation = 0.0;
+        iconColor = Colors.white;
         break;
       case ThemeType.NIGHT:
         brightness = Brightness.dark;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = Colours.blackFull;
+        appBarColor = appBarColor ?? Colours.blackFull;
         scaffoldBackgroundColor = Colours.blackFull;
         appBarElevation = 0.0;
+        iconColor = Colors.white;
         break;
       case ThemeType.LIGHT:
       default:
@@ -92,6 +96,7 @@ class Themes {
       // Core UI
       focusColor: Color(primaryColor),
       cursorColor: Color(primaryColor),
+      iconTheme: IconThemeData(color: iconColor),
       textSelectionColor: Color(primaryColor).withAlpha(100),
       textSelectionHandleColor: Color(primaryColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null

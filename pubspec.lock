@@ -545,6 +545,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.10"
+  palette_generator:
+    dependency: "direct main"
+    description:
+      name: palette_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   path:
     dependency: transitive
     description:
@@ -972,4 +979,4 @@ packages:
     version: "2.2.0"
 sdks:
   dart: ">=2.7.0 <3.0.0"
-  flutter: ">=1.12.13+hotfix.5 <2.0.0"
+  flutter: ">=1.15.21 <2.0.0"

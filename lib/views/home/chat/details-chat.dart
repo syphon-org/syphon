@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -20,11 +22,8 @@ import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/home/chat/key-inspector/index.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
 
 class ChatSettingsArguments {
   final String roomId;
@@ -87,12 +86,28 @@ class ChatDetailsState extends State<ChatDetailsView> {
   }
 
   @protected
+  onShowUserDetails({
+    BuildContext context,
+    String roomId,
+    String userId,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        roomId: roomId,
+        userId: userId,
+      ),
+    );
+  }
+
+  @protected
   onShowColorPicker({
     context,
     int originalColor,
     Function onSelectColor,
   }) async {
-    return await showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) => DialogColorPicker(
         title: 'Select Chat Color',
@@ -104,7 +119,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
   @protected
   Widget buildUsersPreview(_Props props) {
-    final List<User> users = List.from(props.room.users.values);
+    final List<User> users = props.userList;
 
     return ListView.builder(
       shrinkWrap: true,
@@ -115,12 +130,24 @@ class ChatDetailsState extends State<ChatDetailsView> {
         return Align(
           alignment: Alignment.topLeft,
           heightFactor: 0.8,
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            child: AvatarCircle(
-              uri: user.avatarUri,
-              alt: user.displayName ?? user.userId,
-              size: 54,
+          child: GestureDetector(
+            onTap: () {
+              onShowUserDetails(
+                context: context,
+                roomId: props.room.id,
+                userId: user.userId,
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              child: AvatarCircle(
+                uri: user.avatarUri,
+                alt: user.displayName ?? user.userId,
+                size: 54,
+                background: user.avatarUri != null
+                    ? Colors.transparent
+                    : Colours.hashedColor(user.userId),
+              ),
             ),
           ),
         );
@@ -140,14 +167,10 @@ class ChatDetailsState extends State<ChatDetailsView> {
     final ChatSettingsArguments arguments =
         ModalRoute.of(context).settings.arguments;
 
-    final sectionBackgroundColor =
-        Theme.of(context).brightness == Brightness.dark
-            ? const Color(Colours.blackDefault)
-            : const Color(Colours.whiteDefault);
-
-    final mainBackgroundColor = Theme.of(context).brightness == Brightness.dark
-        ? null
-        : const Color(Colours.greyDisabled);
+    final scaffordBackgroundColor =
+        Theme.of(context).brightness == Brightness.light
+            ? Colors.grey[200]
+            : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -156,7 +179,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
         arguments.roomId,
       ),
       builder: (context, props) => Scaffold(
-        backgroundColor: mainBackgroundColor,
+        backgroundColor: scaffordBackgroundColor,
         body: CustomScrollView(
           controller: scrollController,
           scrollDirection: Axis.vertical,
@@ -164,59 +187,50 @@ class ChatDetailsState extends State<ChatDetailsView> {
             SliverAppBar(
               pinned: true,
               expandedHeight: height * 0.3,
-              brightness:
-                  Brightness.dark, // TOOD: this should inherit from theme
+              brightness: Theme.of(context).appBarTheme.brightness,
               automaticallyImplyLeading: false,
               titleSpacing: 0.0,
-              title: Row(children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(left: 8),
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context, false),
+              title: Row(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(left: 8),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context, false),
+                    ),
                   ),
-                ),
-                Text(
-                  arguments.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w100,
+                  Flexible(
+                    child: Text(
+                      arguments.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
               flexibleSpace: Hero(
                 tag: "ChatAvatar",
                 child: Container(
-                  padding: EdgeInsets.only(top: height * 0.05),
+                  padding: EdgeInsets.only(top: height * 0.075),
                   color: props.roomPrimaryColor,
                   width: width,
                   child: OverflowBox(
                     minHeight: 64,
-                    maxHeight: height * 0.25,
+                    maxHeight: height * 0.3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Opacity(
                           opacity: headerOpacity,
-                          child: props.room.avatarUri != null
-                              ? MatrixImage(
-                                  mxcUri: props.room.avatarUri,
-                                  fit: BoxFit.fitHeight,
-                                  width: height * 0.15,
-                                  height: height * 0.15,
-                                  disableRebuild: true,
-                                )
-                              : Container(
-                                  child: Text(
-                                    props.room.name
-                                        .substring(0, 2)
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
+                          child: AvatarCircle(
+                            size: height * 0.15,
+                            uri: props.room.avatarUri,
+                            alt: props.room.name,
+                            background: props.room.colorDefault,
+                          ),
                         ),
                       ],
                     ),
@@ -230,10 +244,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
                 padding: EdgeInsets.only(bottom: 12),
                 child: Column(
                   children: <Widget>[
-                    Card(
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
+                    CardSection(
                       margin: EdgeInsets.only(bottom: 4),
+                      padding: EdgeInsets.zero,
                       child: Column(
                         children: [
                           Container(
@@ -248,13 +261,20 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                       Text(
                                         'Users',
                                         textAlign: TextAlign.start,
-                                        style: TextStyle(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle2,
                                       ),
                                     ],
                                   ),
                                 ),
                                 TouchableOpacity(
-                                  onTap: () {},
+                                  onTap: () {
+                                    // Navigator.pushNamed(
+                                    //   context,
+                                    //   '/home/chat/details/users',
+                                    // );
+                                  },
                                   activeOpacity: 0.4,
                                   child: Container(
                                     padding: EdgeInsets.only(
@@ -297,71 +317,59 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         ],
                       ),
                     ),
-                    Card(
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
-                      margin: EdgeInsets.symmetric(vertical: 4),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: width,
-                              padding: titlePadding,
-                              // decoration: BoxDecoration(
-                              //   border: Border.all(width: 1, color: Colors.white),
-                              // ),
-                              child: Text(
-                                'About',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle1,
-                              ),
+                    CardSection(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: width,
+                            padding: titlePadding,
+                            child: Text(
+                              'About',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
                             ),
-                            Container(
-                              padding: contentPadding,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    props.room.name,
-                                    textAlign: TextAlign.start,
-                                    style:
-                                        Theme.of(context).textTheme.headline6,
+                          ),
+                          Container(
+                            padding: contentPadding,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  props.room.name,
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                Text(
+                                  props.room.id,
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                                Text(
+                                  props.room.type,
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                                Visibility(
+                                  visible: props.room.topic != null &&
+                                      props.room.topic.length > 0,
+                                  maintainSize: false,
+                                  child: Container(
+                                    padding: EdgeInsets.only(top: 12),
+                                    child: Text(props.room.topic,
+                                        style: TextStyle(fontSize: 16)),
                                   ),
-                                  Text(
-                                    props.room.id,
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
-                                  Text(
-                                    props.room.direct ? 'Direct' : 'Group',
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
-                                  Visibility(
-                                    visible: props.room.topic != null &&
-                                        props.room.topic.length > 0,
-                                    maintainSize: false,
-                                    child: Container(
-                                      padding: EdgeInsets.only(top: 12),
-                                      child: Text(props.room.topic,
-                                          style: TextStyle(fontSize: 16)),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Card(
-                      margin: EdgeInsets.symmetric(vertical: 4),
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
+                    CardSection(
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       child: Container(
-                        padding: EdgeInsets.only(top: 12),
                         child: Column(
                           children: [
                             Container(
@@ -416,106 +424,92 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         ),
                       ),
                     ),
-                    Card(
-                      margin: EdgeInsets.symmetric(vertical: 4),
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
-                      child: Container(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: width,
-                              padding: contentPadding,
+                    CardSection(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: contentPadding,
+                            child: Text(
+                              'Notifications Settings',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Mute Notifications',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            trailing: Container(
+                              child: Switch(
+                                value: false,
+                                onChanged: (value) {
+                                  // TODO: prevent notification if room id exists in this setting
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Vibrate',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            trailing: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
                               child: Text(
-                                'Notifications Settings',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
-                              ),
-                            ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Mute Notifications',
+                                'Default',
                                 style: TextStyle(fontSize: 18.0),
                               ),
-                              trailing: Container(
-                                child: Switch(
-                                  value: false,
-                                  onChanged: (value) {
-                                    // TODO: prevent notification if room id exists in this setting
-                                  },
-                                ),
-                              ),
                             ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Vibrate',
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Notification Sound',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            trailing: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                'Default (Argon)',
                                 style: TextStyle(fontSize: 18.0),
                               ),
-                              trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  'Default',
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ),
                             ),
-                            ListTile(
-                              onTap: () {},
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Notification Sound',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  'Default (Argon)',
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Card(
-                      margin: EdgeInsets.symmetric(vertical: 4),
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
-                      child: Container(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: width,
-                              padding: contentPadding,
-                              child: Text(
-                                'Privacy and Status',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
-                              ),
+                    CardSection(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: contentPadding,
+                            child: Text(
+                              'Privacy and Status',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
                             ),
-                            ListTile(
-                              onTap: () => props.onViewEncryptionKeys(context),
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'View Encryption Key',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'View Encryption Key',
+                              style: TextStyle(fontSize: 18.0),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Card(
-                      elevation: 0.5,
-                      color: sectionBackgroundColor,
-                      margin: EdgeInsets.symmetric(vertical: 4),
+                    CardSection(
                       child: Container(
                         child: Column(
                           children: [
@@ -547,10 +541,10 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
 class _Props extends Equatable {
   final Room room;
-  final String userId;
   final bool loading;
   final Color roomPrimaryColor;
   final List<Message> messages;
+  final List<User> userList;
 
   final Function onLeaveChat;
   final Function onSelectPrimaryColor;
@@ -559,7 +553,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.room,
-    @required this.userId,
+    @required this.userList,
     @required this.loading,
     @required this.messages,
     @required this.onLeaveChat,
@@ -569,15 +563,20 @@ class _Props extends Equatable {
     @required this.onViewEncryptionKeys,
   });
 
+  @override
+  List<Object> get props => [
+        room,
+        messages,
+        roomPrimaryColor,
+        loading,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-      userId: store.state.authStore.user.userId,
       room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
-      onViewEncryptionKeys: (
-        BuildContext context,
-      ) {
-        showDialog(context: context, child: DialogKeyInspector());
-      },
+      userList: List.from(
+        roomSelectors.room(id: roomId, state: store.state).users.values,
+      ),
       messages: latestMessages(
         roomSelectors.room(id: roomId, state: store.state).messages,
       ),
@@ -595,7 +594,7 @@ class _Props extends Equatable {
               : Colors.grey;
         }
 
-        return Colors.grey;
+        return Colours.hashedColor(roomId);
       }(),
       onSelectPrimaryColor: (color) {
         store.dispatch(
@@ -606,13 +605,4 @@ class _Props extends Equatable {
         final room = roomSelectors.room(id: roomId, state: store.state);
         store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
       });
-
-  @override
-  List<Object> get props => [
-        room,
-        userId,
-        messages,
-        roomPrimaryColor,
-        loading,
-      ];
 }

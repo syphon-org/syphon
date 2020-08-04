@@ -143,6 +143,18 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
   };
 }
 
+ThunkAction<AppState> clearDraft({Room room}) {
+  return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        body: null,
+      ),
+    ));
+  };
+}
+
 ThunkAction<AppState> saveDraft({
   final body,
   String type = 'm.text',

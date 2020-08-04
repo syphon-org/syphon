@@ -36,7 +36,8 @@ class UpdateMediaCache {
   });
 }
 
-ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
+ThunkAction<AppState> fetchThumbnail(
+    {String mxcUri, double size, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
@@ -62,14 +63,20 @@ ThunkAction<AppState> fetchThumbnail({String mxcUri, bool force = false}) {
 
       store.dispatch(UpdateMediaChecks(mxcUri: mxcUri, status: 'checking'));
 
+      final params = {
+        'protocol': protocol,
+        'accessToken': store.state.authStore.user.accessToken,
+        'homeserver': store.state.authStore.currentUser.homeserver,
+        'mediaUri': mxcUri,
+      };
+
+      if (size != null) {
+        params['size'] = size.toString();
+      }
+
       final data = await compute(
         MatrixApi.fetchThumbnail,
-        {
-          'protocol': protocol,
-          'accessToken': store.state.authStore.user.accessToken,
-          'homeserver': store.state.authStore.currentUser.homeserver,
-          'mediaUri': mxcUri,
-        },
+        params,
       );
 
       final bodyBytes = data['bodyBytes'];

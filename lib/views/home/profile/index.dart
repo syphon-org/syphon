@@ -72,8 +72,8 @@ class ProfileViewState extends State<ProfileView> {
     context,
   ) async {
     await showModalBottomSheet(
-      backgroundColor: Colors.transparent,
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
         onSetNewAvatar: (File image) {
           this.setState(() {

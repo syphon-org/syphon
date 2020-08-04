@@ -106,8 +106,8 @@ class Theming extends StatelessWidget {
                                 DialogColorPicker(
                               title: 'Select App Bar Color',
                               resetColor: Colours.cyanSyphon,
-                              currentColor: props.primaryColor,
-                              onSelectColor: props.onSelectAccentColor,
+                              currentColor: props.appBarColor,
+                              onSelectColor: props.onSelectAppBarColor,
                             ),
                           ),
                           contentPadding: Dimensions.listPadding,
@@ -116,7 +116,7 @@ class Theming extends StatelessWidget {
                           ),
                           trailing: CircleAvatar(
                             radius: 16,
-                            backgroundColor: Color(props.accentColor),
+                            backgroundColor: Color(props.appBarColor),
                           ),
                         ),
                         ListTile(
@@ -222,6 +222,8 @@ class Props extends Equatable {
             store.state.settingsStore.primaryColor ?? Colours.cyanSyphon,
         accentColor:
             store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
+        appBarColor:
+            store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         fontName: store.state.settingsStore.fontName,

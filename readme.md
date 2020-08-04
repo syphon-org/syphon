@@ -149,6 +149,7 @@ dependency_overrides:
 - [iOS icons](https://github.com/smallmuou/ios-icon-generator)
 
 ### helpful references
+- [End-To-End Encryption implimentation guide from Matrix.org](https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide)
 - [iOS file management flutter](https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter)
 - [scrolling With Text Inputs](https://github.com/flutter/flutter/issues/13339)
 - [multi-line text field](https://stackoverflow.com/questions/45900387/multi-line-textfield-in-flutter)
@@ -161,6 +162,7 @@ decoration: BoxDecoration(
    border: Border.all(width: 1, color: Colors.white),
 ),
 ```
+- understanding why olm chose the world 'pickle' for serialization, [its from python](https://gitlab.matrix.org/matrix-org/olm/-/tree/master/python)
 
 
 ## contributing

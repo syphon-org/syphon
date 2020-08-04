@@ -240,7 +240,7 @@ class AdvancedView extends StatelessWidget {
 class _Props extends Equatable {
   final bool syncing;
   final bool loading;
-  final bool roomsLoading;
+  final bool loadingForced;
   final bool roomsObserverEnabled;
   final String language;
   final String lastSince;
@@ -254,7 +254,7 @@ class _Props extends Equatable {
   _Props({
     @required this.syncing,
     @required this.loading,
-    @required this.roomsLoading,
+    @required this.loadingForced,
     @required this.language,
     @required this.roomsObserverEnabled,
     @required this.currentUser,
@@ -271,7 +271,7 @@ class _Props extends Equatable {
         loading,
         lastSince,
         currentUser,
-        roomsLoading,
+        loadingForced,
         roomsObserverEnabled,
       ];
 
@@ -281,7 +281,7 @@ class _Props extends Equatable {
       _Props(
         syncing: store.state.syncStore.syncing,
         loading: store.state.syncStore.syncing || store.state.syncStore.loading,
-        roomsLoading: store.state.syncStore.loading,
+        loadingForced: store.state.syncStore.loading,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,

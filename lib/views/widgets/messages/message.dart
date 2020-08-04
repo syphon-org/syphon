@@ -43,13 +43,12 @@ class MessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message = this.message;
-    var textColor = Colors.white;
-    double indicatorSize = 14;
 
+    var textColor = Colors.white;
     var showSender = true;
-    var indicatorColor = Colors.white;
-    var indicatorIconColor = Colors.white;
-    var bubbleColor = hashedColor(message.sender);
+    var indicatorColor = Theme.of(context).iconTheme.color;
+    var indicatorIconColor = Theme.of(context).iconTheme.color;
+    var bubbleColor = Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var messageAlignment = MainAxisAlignment.start;
     var messageTextAlignment = CrossAxisAlignment.start;
@@ -129,13 +128,12 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      textColor =
-          theme != ThemeType.LIGHT ? Colors.white : Color(Colours.greyDark);
       if (theme == ThemeType.DARK) {
         bubbleColor = Colors.grey[700];
-      } else if (theme == ThemeType.DARKER) {
+      } else if (theme != ThemeType.LIGHT) {
         bubbleColor = Colors.grey[850];
       } else {
+        textColor = const Color(Colours.blackFull);
         bubbleColor = const Color(Colours.greyBubble);
       }
 
@@ -283,12 +281,12 @@ class MessageWidget extends StatelessWidget {
                                   visible: !isUserSent &&
                                       message.type == EventTypes.encrypted,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(right: 4),
                                     child: Icon(
                                       Icons.lock,
-                                      color: Colors.white,
+                                      color: textColor,
                                       size: Dimensions.miniLockSize,
                                     ),
                                   ),
@@ -313,12 +311,12 @@ class MessageWidget extends StatelessWidget {
                                   visible: isUserSent &&
                                       message.type == EventTypes.encrypted,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(left: 2),
                                     child: Icon(
                                       Icons.lock,
-                                      color: Colors.white,
+                                      color: textColor,
                                       size: Dimensions.miniLockSize,
                                     ),
                                   ),
@@ -326,8 +324,8 @@ class MessageWidget extends StatelessWidget {
                                 Visibility(
                                   visible: isUserSent && message.failed,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(left: 3),
                                     child: Icon(
                                       Icons.close,
@@ -342,8 +340,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: message.pending,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: CircularProgressIndicator(
                                           strokeWidth:
@@ -354,8 +352,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: !message.pending,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: Icon(
                                           Icons.check,
@@ -376,8 +374,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: !message.syncing,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 11),
                                         child: Icon(
                                           Icons.check,

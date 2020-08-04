@@ -25,7 +25,7 @@ String formatTotalUsers(int totalUsers) {
 
 String formatPreview({Room room}) {
   // Prioritize drafts for any room, regardless of state
-  if (room.draft != null) {
+  if (room.draft != null && room.draft.body != null) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
   }
 

@@ -11,6 +11,8 @@ class Assets {
       'assets/icons/global/being-search-public.svg';
   static const iconSearchPublicCondensedBeing =
       'assets/icons/global/being-search-public-condensed.svg';
+  static const iconMessageSyphonBeing =
+      'assets/icons/global/being-message-syphon.svg';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';

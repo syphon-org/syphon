@@ -12,6 +12,13 @@ class Dimensions {
     bottom: 32,
   );
 
+  // Avatars
+  static const double avatarSize = 56; // was 52
+  static const double avatarSizeMin = 48;
+  static const double avatarSizeMax = 350; // Change to HeroSize
+  static const double avatarSizeMessage = 28;
+  static const double avatarSizeDetails = 120;
+
   // Media
   static const double mediaSize = 264;
   static const double mediaSizeMin = 208;
@@ -19,13 +26,6 @@ class Dimensions {
 
   static const double thumbnailSizeMin = 48;
   static const double thumbnailSizeMax = 48;
-
-  // Avatars
-  static const double avatarSize = 56; // was 52
-  static const double avatarSizeMin = 48;
-  static const double avatarSizeMax = 350; // Change to HeroSize
-  static const double avatarSizeMessage = 28;
-  static const double avatarHeroSize = 120;
 
   // Buttons
   static const double buttonHeightMin = 56;
@@ -40,9 +40,12 @@ class Dimensions {
   // Icons
   static const double iconSize = 26;
   static const double iconSizeLite = 24;
-  static const double indicatorSize = 16;
+  static const double iconSizeLarge = 32;
+  static const double indicatorSize = 14;
   static const double miniLockSize = 12;
 
+  // Badges
+  static const double badgeAvatarSize = 16;
   // Progress
   static const double progressIndicatorSize = 26;
   static const double progressIndicatorSizeLite = 12;
@@ -137,6 +140,7 @@ class Dimensions {
 
   // Modals
   static const double defaultModalHeight = 256;
+  static const double defaultModalHeightMax = 800;
   static modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;

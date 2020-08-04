@@ -101,6 +101,7 @@ dependencies:
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5 
+  palette_generator: 0.2.3
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
@@ -169,6 +170,7 @@ flutter:
    - assets/icons/global/being-public-add.svg
    - assets/icons/global/being-search-public.svg
    - assets/icons/global/being-search-public-condensed.svg
+   - assets/icons/global/being-message-syphon.svg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
