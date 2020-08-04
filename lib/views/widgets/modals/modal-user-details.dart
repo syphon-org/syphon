@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class ModalUserDetails extends StatelessWidget {
   ModalUserDetails({
@@ -54,9 +55,10 @@ class ModalUserDetails extends StatelessWidget {
                   vertical: 8,
                   horizontal: 24,
                 ),
-                child: Text(
-                  'Photo Select Method',
-                  textAlign: TextAlign.start,
+                child: AvatarCircle(
+                  uri: props.user.avatarUri,
+                  alt: props.user.displayName ?? props.user.userId,
+                  size: Dimensions.avatarHeroSize,
                 ),
               ),
               ListTile(

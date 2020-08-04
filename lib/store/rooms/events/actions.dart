@@ -320,10 +320,7 @@ ThunkAction<AppState> sendSessionKeys({
       // await all sendToDevice room key events to be sent to users
       await Future.wait(sendToDeviceRequests);
     } catch (error) {
-      debugPrint(error);
-      store.dispatch(
-        addAlert(type: 'warning', message: error.message),
-      );
+      store.dispatch(addAlert(message: error.message, error: error));
     }
   };
 }
@@ -382,14 +379,10 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint(error);
-      store.dispatch(
-        addAlert(
-          type: 'warning',
-          message: error,
-          origin: 'sendMessageEncrypted',
-        ),
-      );
+      store.dispatch(addAlert(
+          error: error,
+          message: error.message,
+          origin: 'sendMessageEncrypted'));
     }
   };
 }

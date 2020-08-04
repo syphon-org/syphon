@@ -141,8 +141,11 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[updateDevice] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error.message,
+        origin: 'updateDevice',
+      ));
     } finally {
       store.dispatch(fetchDevices());
       store.dispatch(SetLoading(loading: false));
@@ -151,7 +154,8 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
 }
 
 /**
- * Delete a device
+ * Delete a single device
+ * ** Fails after recent matix.org update **
  */
 ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
   return (Store<AppState> store) async {
@@ -185,8 +189,11 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      debugPrint('[deleteDevice] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error.message,
+        origin: 'deleteDevice',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -226,8 +233,11 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      debugPrint('[deleteDevice(s)] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error.message,
+        origin: 'deleteDevice(s)',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

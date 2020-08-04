@@ -530,8 +530,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
 
       await store.dispatch(fetchStateEvents(room: room));
     } catch (error) {
-      debugPrint('[toggleRoomEncryption] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'toggleRoomEncryption'));
     }
   };
 }
@@ -571,7 +570,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRooms());
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'joinRoom'));
     }
   };
 }
@@ -611,7 +610,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
       await store.dispatch(fetchRooms());
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'acceptRoom'));
     }
   };
 }

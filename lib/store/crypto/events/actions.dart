@@ -290,8 +290,7 @@ ThunkAction<AppState> syncDevice(Map dataToDevice) {
       );
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'syncDevice',
       ));
     }

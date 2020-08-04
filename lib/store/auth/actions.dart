@@ -308,8 +308,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      debugPrint('[loginUser] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(message: error.message, error: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -344,7 +343,10 @@ ThunkAction<AppState> logoutUser() {
 
       store.state.authStore.authObserver.add(null);
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error.message));
+      store.dispatch(addAlert(
+        error: error,
+        message: error.message,
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -574,7 +576,9 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
     } catch (error) {
       debugPrint('[createUser] error $error');
       if (enableErrors) {
-        store.dispatch(addAlert(message: 'Failed to signup', error: error));
+        store.dispatch(
+          addAlert(message: 'Failed to signup', error: error),
+        );
       }
       return false;
     } finally {
@@ -621,17 +625,16 @@ ThunkAction<AppState> updatePassword(String password) {
         throw data['error'];
       }
 
-      store.dispatch(addAlert(
-        type: 'success',
+      store.dispatch(addConfirmation(
         message: 'Password updated successfully',
       ));
 
       return true;
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
         origin: 'updatePassword',
+        message: 'Failed to update passwod',
+        error: error,
       ));
       return false;
     } finally {
@@ -658,7 +661,7 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
       }
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(origin: 'updateDisplayName', message: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -719,7 +722,7 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(origin: 'updateAvatarPhoto', message: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

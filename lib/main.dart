@@ -119,7 +119,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @protected
   void onMounted() {
-    // init authenticated navigation
+    // init auth listener
     store.state.authStore.onAuthStateChanged.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
@@ -138,11 +138,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       var color;
 
       switch (alert.type) {
+        case 'error':
+          color = Colors.red;
+          break;
         case 'warning':
           color = Colors.red;
           break;
-        case 'error':
-          color = Colors.red;
+        case 'success':
+          color = Colors.green;
           break;
         case 'info':
         default:

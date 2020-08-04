@@ -122,9 +122,7 @@ class MessageTypingState extends State<MessageTypingWidget>
                       maintainAnimation: true,
                       maintainSize: true,
                       child: Container(
-                        margin: const EdgeInsets.only(
-                          right: 8,
-                        ),
+                        margin: const EdgeInsets.only(right: 8),
                         child: mostRecentTyper.avatarUri != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(

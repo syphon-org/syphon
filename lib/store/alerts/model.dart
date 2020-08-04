@@ -10,7 +10,7 @@ class Alert {
 
   const Alert({
     this.type = 'warning',
-    this.message = 'This is a warning',
+    this.message = '',
     this.duration = const Duration(milliseconds: 3000),
     this.error,
   });

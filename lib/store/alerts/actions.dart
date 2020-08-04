@@ -45,6 +45,38 @@ ThunkAction<AppState> startAlertsObserver() {
   };
 }
 
+ThunkAction<AppState> addInfo({
+  type = 'info',
+  origin = 'Unknown',
+  message,
+  error,
+}) {
+  return (Store<AppState> store) async {
+    debugPrint('[$origin] $type : $message');
+
+    final alertsObserver = store.state.alertsStore.alertsObserver;
+    final alert = new Alert(type: type, message: message);
+    store.dispatch(AddAlert(alert: alert));
+    alertsObserver.add(alert);
+  };
+}
+
+ThunkAction<AppState> addConfirmation({
+  type = 'success',
+  origin = 'Unknown',
+  message,
+  error,
+}) {
+  return (Store<AppState> store) async {
+    debugPrint('[$origin] $type : $message');
+
+    final alertsObserver = store.state.alertsStore.alertsObserver;
+    final alert = new Alert(type: type, message: message);
+    store.dispatch(AddAlert(alert: alert));
+    alertsObserver.add(alert);
+  };
+}
+
 ThunkAction<AppState> addAlert({
   type = 'warning',
   origin = 'Unknown',
@@ -52,7 +84,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] $type : $message');
+    debugPrint('[$origin] $type : ${message ?? error}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);
