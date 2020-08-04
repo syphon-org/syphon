@@ -9,6 +9,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
@@ -167,30 +168,6 @@ class SearchUserState extends State<SearchUserView> {
   }
 
   @protected
-  Widget buildUserAvatar({User user}) {
-    if (user.avatarUri != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(
-          Dimensions.thumbnailSizeMax,
-        ),
-        child: MatrixImage(
-          width: 52,
-          height: 52,
-          mxcUri: user.avatarUri,
-        ),
-      );
-    }
-
-    return Text(
-      displayInitials(user),
-      style: TextStyle(
-        fontSize: 18,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  @protected
   Widget buildUserList(BuildContext context, _Props props) {
     final sectionBackgroundColor =
         Theme.of(context).brightness == Brightness.dark
@@ -237,9 +214,10 @@ class SearchUserState extends State<SearchUserView> {
                     ),
                     child: ListTile(
                       enabled: creatingRoomDisplayName != searchable,
-                      leading: CircleAvatar(
-                        child: buildUserAvatar(user: attemptableUser),
-                        backgroundColor: Colors.grey,
+                      leading: AvatarCircle(
+                        uri: attemptableUser.avatarUri,
+                        alt: attemptableUser.displayName ??
+                            attemptableUser.userId,
                       ),
                       title: Text(
                         formatDisplayName(attemptableUser),
@@ -287,9 +265,6 @@ class SearchUserState extends State<SearchUserView> {
                         ? const Color(Colours.blackDefault)
                         : const Color(Colours.whiteDefault);
 
-                Color avatarBackground =
-                    user.avatarUri != null ? Colors.transparent : Colors.grey;
-
                 return GestureDetector(
                   onTap: () => this.onSelectUser(
                     context: context,
@@ -305,9 +280,9 @@ class SearchUserState extends State<SearchUserView> {
                       ),
                       child: ListTile(
                         enabled: creatingRoomDisplayName != user.displayName,
-                        leading: CircleAvatar(
-                          child: buildUserAvatar(user: user),
-                          backgroundColor: avatarBackground,
+                        leading: AvatarCircle(
+                          uri: user.avatarUri,
+                          alt: user.displayName ?? user.userId,
                         ),
                         title: Text(
                           formatDisplayName(user),

@@ -10,6 +10,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -26,7 +27,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/global/formatters.dart';
 
 // View And Styling
-import 'package:syphon/views/widgets/menu-rounded.dart';
+import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -344,36 +345,11 @@ class HomeViewState extends State<Home> {
                   margin: const EdgeInsets.only(right: 12),
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: primaryColor,
-                        child: room.avatarUri != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.thumbnailSizeMax,
-                                ),
-                                child: MatrixImage(
-                                  width: Dimensions.avatarSize,
-                                  height: Dimensions.avatarSize,
-                                  mxcUri: room.avatarUri,
-                                  fallbackColor: primaryColor,
-                                  fallback: Text(
-                                    formatRoomInitials(room: room),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                formatRoomInitials(room: room),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
+                      AvatarCircle(
+                        uri: room.avatarUri,
+                        size: Dimensions.avatarSizeMin,
+                        alt: formatRoomInitials(room: room),
+                        background: primaryColor,
                       ),
                       Visibility(
                         visible: room.encryptionEnabled,
@@ -381,9 +357,7 @@ class HomeViewState extends State<Home> {
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                Dimensions.thumbnailSizeMax,
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                               child: Container(
                                 height: 16,
                                 width: 16,
@@ -402,9 +376,7 @@ class HomeViewState extends State<Home> {
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                Dimensions.thumbnailSizeMax,
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                               child: Container(
                                 height: 16,
                                 width: 16,

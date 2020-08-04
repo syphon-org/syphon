@@ -21,6 +21,7 @@ class Dimensions {
 
   // Avatars
   static const double avatarSizeMessage = 28;
+  static const double avatarSizeMin = 48;
   static const double avatarSize = 56; // was 52
   static const double avatarSizeMax = 350; // Change to HeroSize
   static const double avatarHeroSize = 120;
@@ -44,6 +45,9 @@ class Dimensions {
   // Progress
   static const double progressIndicatorSize = 26;
   static const double progressIndicatorSizeLite = 12;
+
+  // Text
+  static const double textInitialSize = 18;
 
   // Inputs
   static const double inputSizeMin = 200;
@@ -131,6 +135,7 @@ class Dimensions {
   static const double defaultStrokeWidthLite = 1.5;
 
   // Modals
+  static const double defaultModalHeight = 256;
   static modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;

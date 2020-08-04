@@ -8,9 +8,7 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/store/index.dart';
@@ -39,12 +37,9 @@ class ProfileViewState extends State<ProfileView> {
   final String title = Strings.titleProfile;
 
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected

@@ -13,6 +13,7 @@ import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:equatable/equatable.dart';
@@ -34,7 +35,7 @@ import 'package:syphon/views/widgets/messages/message.dart';
 
 // Styling
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/views/widgets/menu-rounded.dart';
+import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 enum ChatOptions {
@@ -498,10 +499,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  buildRoomAppBar({
-    _Props props,
-    BuildContext context,
-  }) {
+  buildRoomAppBar({_Props props, BuildContext context}) {
     return AppBar(
       brightness: Brightness.dark, // TOOD: this should inherit from theme
       automaticallyImplyLeading: false,
@@ -529,45 +527,21 @@ class ChatViewState extends State<ChatView> {
               child: Stack(
                 children: [
                   Hero(
-                      tag: "ChatAvatar",
-                      child: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: props.roomPrimaryColor,
-                        child: props.room.avatarUri != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.thumbnailSizeMax,
-                                ),
-                                child: MatrixImage(
-                                  width: Dimensions.avatarSize,
-                                  height: Dimensions.avatarSize,
-                                  mxcUri: props.room.avatarUri,
-                                  fallback: Text(
-                                    formatRoomInitials(room: props.room),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                formatRoomInitials(room: props.room),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      )),
+                    tag: "ChatAvatar",
+                    child: AvatarCircle(
+                      uri: props.room.avatarUri,
+                      size: Dimensions.avatarSizeMin,
+                      alt: formatRoomInitials(room: props.room),
+                      background: props.roomPrimaryColor,
+                    ),
+                  ),
                   Visibility(
                     visible: props.room.encryptionEnabled,
                     child: Positioned(
                       bottom: 0,
                       right: 0,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          Dimensions.thumbnailSizeMax,
-                        ),
+                        borderRadius: BorderRadius.circular(16),
                         child: Container(
                           height: 16,
                           width: 16,

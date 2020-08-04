@@ -6,6 +6,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -203,37 +204,15 @@ class GroupSearchState extends State<GroupSearchView> {
                 children: [
                   ListView.builder(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 2,
                       vertical: 4,
+                      horizontal: 2,
                     ),
                     scrollDirection: Axis.vertical,
                     itemCount: props.searchResults.length,
                     itemBuilder: (BuildContext context, int index) {
                       final room = (props.searchResults[index] as Room);
-
                       final formattedUserTotal = NumberFormat.compact();
                       final localUserTotal = NumberFormat();
-
-                      Widget roomAvatar = Text(
-                        formatRoomInitials(room: room),
-                        style: Theme.of(context).textTheme.bodyText2.merge(
-                              TextStyle(color: Colors.white),
-                            ),
-                      );
-
-                      // Override the initials if an avatar is present
-                      if (room.avatarUri != null) {
-                        roomAvatar = ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.thumbnailSizeMax,
-                          ),
-                          child: MatrixImage(
-                            width: 52,
-                            height: 52,
-                            mxcUri: room.avatarUri,
-                          ),
-                        );
-                      }
 
                       return Container(
                         padding: const EdgeInsets.only(
@@ -248,66 +227,66 @@ class GroupSearchState extends State<GroupSearchView> {
                               top: 8,
                             ),
                             child: ListTile(
-                              leading: Stack(children: [
-                                CircleAvatar(
-                                  backgroundColor: room.avatarUri != null
-                                      ? Colors.transparent
-                                      : Colors.grey,
-                                  child: roomAvatar,
-                                ),
-                                Visibility(
-                                  visible: !room.encryptionEnabled,
-                                  child: Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.thumbnailSizeMax,
-                                      ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.red,
-                                              offset: Offset(8.0, 8.0),
-                                            )
-                                          ],
+                              leading: Stack(
+                                children: [
+                                  AvatarCircle(
+                                    uri: room.avatarUri,
+                                    alt: room.name,
+                                  ),
+                                  Visibility(
+                                    visible: !room.encryptionEnabled,
+                                    child: Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          Dimensions.thumbnailSizeMax,
                                         ),
-                                        height: 16,
-                                        width: 16,
-                                        child: Icon(
-                                          Icons.lock_open,
-                                          color: Colors.white,
-                                          size: 10,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.red,
+                                                offset: Offset(8.0, 8.0),
+                                              )
+                                            ],
+                                          ),
+                                          height: 16,
+                                          width: 16,
+                                          child: Icon(
+                                            Icons.lock_open,
+                                            color: Colors.white,
+                                            size: 10,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Visibility(
-                                  visible: room.encryptionEnabled,
-                                  child: Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.thumbnailSizeMax,
-                                      ),
-                                      child: Container(
-                                        height: 16,
-                                        width: 16,
-                                        color: Colors.green,
-                                        child: Icon(
-                                          Icons.lock,
-                                          color: Colors.white,
-                                          size: 10,
+                                  Visibility(
+                                    visible: room.encryptionEnabled,
+                                    child: Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          Dimensions.thumbnailSizeMax,
+                                        ),
+                                        child: Container(
+                                          height: 16,
+                                          width: 16,
+                                          color: Colors.green,
+                                          child: Icon(
+                                            Icons.lock,
+                                            color: Colors.white,
+                                            size: 10,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ]),
+                                ],
+                              ),
                               title: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.start,

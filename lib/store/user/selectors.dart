@@ -31,6 +31,19 @@ String formatDisplayName(User user) {
   return user.displayName ?? displayShortname(user);
 }
 
+String formatInitials(String fullword) {
+  if (fullword == null) {
+    return '?';
+  }
+
+  final word = fullword.replaceAll('@', '');
+
+  final initials =
+      word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
+
+  return initials.toUpperCase();
+}
+
 String displayInitials(User user) {
   final userId = user.userId ?? 'Unknown';
   final displayName = user.displayName ?? userId.replaceFirst('@', '');

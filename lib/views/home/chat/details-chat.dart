@@ -9,6 +9,7 @@ import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/key-inspector/index.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:equatable/equatable.dart';
@@ -89,34 +90,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
     Function onSelectColor,
   }) async {
     return await showDialog(
-        context: context,
-        builder: (BuildContext context) => DialogColorPicker(
-              title: 'Select Chat Color',
-              currentColor: originalColor,
-              onSelectColor: onSelectColor,
-            ));
-  }
-
-  @protected
-  Widget buildUserAvatar({User user}) {
-    if (user.avatarUri != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(
-          Dimensions.thumbnailSizeMax,
-        ),
-        child: MatrixImage(
-          width: Dimensions.avatarSize,
-          height: Dimensions.avatarSize,
-          mxcUri: user.avatarUri,
-        ),
-      );
-    }
-
-    return Text(
-      displayInitials(user),
-      style: TextStyle(
-        fontSize: 18,
-        color: Colors.white,
+      context: context,
+      builder: (BuildContext context) => DialogColorPicker(
+        title: 'Select Chat Color',
+        currentColor: originalColor,
+        onSelectColor: onSelectColor,
       ),
     );
   }
@@ -130,17 +108,16 @@ class ChatDetailsState extends State<ChatDetailsView> {
       itemCount: users.length < 12 ? users.length : 12,
       scrollDirection: Axis.horizontal,
       itemBuilder: (BuildContext context, int index) {
+        final user = users[index];
         return Align(
           alignment: Alignment.topLeft,
           heightFactor: 0.8,
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: 4),
-            child: CircleAvatar(
-              radius: Dimensions.avatarSize / 2,
-              backgroundColor: Colors.grey,
-              child: buildUserAvatar(
-                user: users[index],
-              ),
+            child: AvatarCircle(
+              uri: user.avatarUri,
+              alt: user.displayName ?? user.userId,
+              size: 54,
             ),
           ),
         );

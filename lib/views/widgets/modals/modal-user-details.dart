@@ -133,7 +133,6 @@ class Props extends Equatable {
       Props(
         user: () {
           final room = store.state.roomStore.rooms[roomId];
-          print('$roomId, $userId');
           if (room != null) {
             return room.users[userId];
           }
