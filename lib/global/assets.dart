@@ -13,6 +13,8 @@ class Assets {
       'assets/icons/global/being-search-public-condensed.svg';
   static const iconMessageSyphonBeing =
       'assets/icons/global/being-message-syphon.svg';
+  static const iconMessageCircleBeing =
+      'assets/icons/global/being-message-circle.svg';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';

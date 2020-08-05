@@ -172,7 +172,7 @@ ThunkAction<AppState> startAuthObserver() {
     final Function onAuthStateChanged = (User user) async {
       debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
-        await store.dispatch(fetchUserProfile());
+        await store.dispatch(fetchUserCurrentProfile());
 
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {
@@ -358,7 +358,7 @@ ThunkAction<AppState> logoutUser() {
   };
 }
 
-ThunkAction<AppState> fetchUserProfile() {
+ThunkAction<AppState> fetchUserCurrentProfile() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -377,7 +377,11 @@ ThunkAction<AppState> fetchUserProfile() {
         ),
       ));
     } catch (error) {
-      debugPrint('[fetchUserProfile] $error');
+      store.dispatch(addAlert(
+        error: error,
+        message: 'Failed to fetch current user profile',
+        origin: 'fetchUserCurrentProfile',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

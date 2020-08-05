@@ -14,6 +14,7 @@ part 'model.g.dart';
 class AccountDataTypes {
   static const direct = 'm.direct';
   static const presence = 'm.presence';
+  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class EventTypes {
@@ -33,6 +34,8 @@ class EventTypes {
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
   static const roomKey = 'm.room_key';
+
+  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class MessageTypes {

@@ -375,7 +375,7 @@ class HomeViewState extends State<Home> {
                                 child: Icon(
                                   Icons.lock,
                                   color: Colors.white,
-                                  size: 10,
+                                  size: Dimensions.iconSizeMini,
                                 ),
                               )),
                         ),
@@ -394,13 +394,13 @@ class HomeViewState extends State<Home> {
                                 child: Icon(
                                   Icons.mail_outline,
                                   color: Colors.white,
-                                  size: 10,
+                                  size: Dimensions.iconSizeMini,
                                 ),
                               )),
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'Group',
+                        visible: room.type == 'Group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

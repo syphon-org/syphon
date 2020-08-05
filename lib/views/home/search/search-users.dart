@@ -119,7 +119,7 @@ class SearchUserState extends State<SearchUserView> {
           this.setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props.onCreateUserChat(user: user);
+          final newRoomId = await props.onCreateChatDirect(user: user);
           Navigator.pop(context);
           Navigator.popAndPushNamed(
             context,
@@ -153,7 +153,7 @@ class SearchUserState extends State<SearchUserView> {
           this.setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props.onCreateUserChat(user: user);
+          final newRoomId = await props.onCreateChatDirect(user: user);
           Navigator.pop(context);
           Navigator.popAndPushNamed(
             context,
@@ -460,7 +460,7 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
-  final Function onCreateUserChat;
+  final Function onCreateChatDirect;
 
   _Props({
     @required this.theme,
@@ -468,7 +468,7 @@ class _Props extends Equatable {
     @required this.creatingRoom,
     @required this.searchResults,
     @required this.onSearch,
-    @required this.onCreateUserChat,
+    @required this.onCreateChatDirect,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -479,7 +479,7 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateUserChat: ({User user}) async {
+        onCreateChatDirect: ({User user}) async {
           return store.dispatch(createRoom(
             isDirect: true,
             invites: <User>[user],

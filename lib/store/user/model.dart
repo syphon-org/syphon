@@ -38,16 +38,15 @@ class User extends Equatable {
     String accessToken,
     String displayName,
     String avatarUri,
-  }) {
-    return User(
-      userId: userId ?? this.userId,
-      deviceId: deviceId ?? this.deviceId,
-      homeserver: homeserver ?? this.homeserver,
-      accessToken: accessToken ?? this.accessToken,
-      displayName: displayName ?? this.displayName,
-      avatarUri: avatarUri ?? this.avatarUri,
-    );
-  }
+  }) =>
+      User(
+        userId: userId ?? this.userId,
+        deviceId: deviceId ?? this.deviceId,
+        homeserver: homeserver ?? this.homeserver,
+        accessToken: accessToken ?? this.accessToken,
+        displayName: displayName ?? this.displayName,
+        avatarUri: avatarUri ?? this.avatarUri,
+      );
 
   @override
   List<Object> get props => [

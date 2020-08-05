@@ -49,9 +49,12 @@ abstract class MatrixApi {
   // Account Data & User Management
   static final fetchAccountData = Users.fetchAccountData;
   static final saveAccountData = Users.saveAccountData;
-  static final fetchUserProfile = Users.fetchUserProfile;
   static final updateDisplayName = Users.updateDisplayName;
   static final updateAvatarUri = Users.updateAvatarUri;
+
+  // Users
+  static final fetchUserProfile = Users.fetchUserProfile;
+  static final blockUser = Users.blockUser;
 
   // Media
   static final fetchThumbnail = Media.fetchThumbnail;

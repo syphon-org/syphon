@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -129,6 +131,16 @@ class ProfileViewState extends State<ProfileView> {
           );
         }
 
+        var backgroundColor = Colors.grey[500];
+        switch (props.theme) {
+          case ThemeType.LIGHT:
+            backgroundColor = Colors.grey[200];
+            break;
+          default:
+            backgroundColor = Colors.grey[700];
+            break;
+        }
+
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -148,7 +160,7 @@ class ProfileViewState extends State<ProfileView> {
             child: SingleChildScrollView(
               // eventually expand as profile grows
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+                padding: Dimensions.appPaddingHorizontal,
                 constraints: BoxConstraints(
                   maxHeight: height * 0.9,
                   maxWidth: width,
@@ -178,12 +190,12 @@ class ProfileViewState extends State<ProfileView> {
                                 right: 6,
                                 bottom: 2,
                                 child: Container(
-                                  width: width * 0.08,
-                                  height: width * 0.08,
+                                  width: Dimensions.iconSizeLarge,
+                                  height: Dimensions.iconSizeLarge,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: backgroundColor,
                                     borderRadius: BorderRadius.circular(
-                                      width * 0.08,
+                                      Dimensions.iconSizeLarge,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
@@ -194,11 +206,8 @@ class ProfileViewState extends State<ProfileView> {
                                   ),
                                   child: Icon(
                                     Icons.camera_alt,
-                                    color: Theme.of(context).brightness !=
-                                            Brightness.light
-                                        ? Colors.grey[200]
-                                        : Colors.grey[600],
-                                    size: width * 0.06,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: Dimensions.iconSizeLite,
                                   ),
                                 ),
                               ),
@@ -223,18 +232,14 @@ class ProfileViewState extends State<ProfileView> {
                                     maxHeight: Dimensions.inputHeight,
                                     maxWidth: Dimensions.inputWidthMax,
                                   ),
-                                  child: TextField(
-                                    onTap: () {},
+                                  child: TextFieldSecure(
+                                    label: 'Display Name',
                                     onChanged: (name) {
                                       this.setState(() {
                                         newDisplayName = name;
                                       });
                                     },
                                     controller: displayNameController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Display Name',
-                                    ),
                                   ),
                                 ),
                                 Container(
@@ -243,14 +248,11 @@ class ProfileViewState extends State<ProfileView> {
                                     maxHeight: Dimensions.inputHeight,
                                     maxWidth: Dimensions.inputWidthMax,
                                   ),
-                                  child: TextField(
-                                    enabled: false,
+                                  child: TextFieldSecure(
+                                    disabled: true,
                                     onChanged: null,
+                                    label: 'User ID',
                                     controller: userIdController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'User ID',
-                                    ),
                                   ),
                                 ),
                               ],
@@ -284,7 +286,9 @@ class ProfileViewState extends State<ProfileView> {
                                     height: Dimensions.inputHeight,
                                     margin: const EdgeInsets.all(10.0),
                                     constraints: BoxConstraints(
-                                        minWidth: 200, minHeight: 45),
+                                      minWidth: Dimensions.buttonWidthMin,
+                                      minHeight: Dimensions.buttonHeightMin,
+                                    ),
                                     child: Visibility(
                                       child: TouchableOpacity(
                                         activeOpacity: 0.4,
@@ -319,16 +323,19 @@ class ProfileViewState extends State<ProfileView> {
 class _Props extends Equatable {
   final User user;
   final bool loading;
+  final ThemeType theme;
   final Function onSaveProfile;
 
   _Props({
     @required this.user,
+    @required this.theme,
     @required this.loading,
     @required this.onSaveProfile,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
+        theme: store.state.settingsStore.theme,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
           File newAvatarFile,
@@ -352,7 +359,7 @@ class _Props extends Equatable {
             if (!successful) return false;
           }
 
-          await store.dispatch(fetchUserProfile());
+          await store.dispatch(fetchUserCurrentProfile());
           return true;
         },
       );

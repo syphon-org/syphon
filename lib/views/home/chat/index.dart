@@ -366,7 +366,7 @@ class ChatViewState extends State<ChatView> {
                           bottom: -1.5,
                           child: Icon(
                             Icons.lock_open,
-                            size: Dimensions.miniLockSize,
+                            size: Dimensions.iconSizeMini,
                             color: Colors.white,
                           ),
                         ),
@@ -408,7 +408,7 @@ class ChatViewState extends State<ChatView> {
                           bottom: -1.5,
                           child: Icon(
                             Icons.lock,
-                            size: Dimensions.miniLockSize,
+                            size: Dimensions.iconSizeMini,
                             color: Colors.white,
                           ),
                         ),

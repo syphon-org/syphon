@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 class Dimensions {
   // Generic
   static const double widgetHeightMax = 1024;
-  static const scrollviewPadding = EdgeInsets.only(
-    bottom: 32,
+  static const scrollviewPadding = EdgeInsets.only(bottom: 32);
+  static const appPaddingHorizontal = EdgeInsets.symmetric(
+    horizontal: 16,
   );
 
   // Avatars
@@ -39,10 +40,10 @@ class Dimensions {
 
   // Icons
   static const double iconSize = 26;
+  static const double iconSizeMini = 12;
   static const double iconSizeLite = 24;
   static const double iconSizeLarge = 32;
   static const double indicatorSize = 14;
-  static const double miniLockSize = 12;
 
   // Badges
   static const double badgeAvatarSize = 16;

@@ -8,12 +8,17 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class ModalUserDetails extends StatelessWidget {
   ModalUserDetails({
@@ -25,10 +30,38 @@ class ModalUserDetails extends StatelessWidget {
   final String userId;
   final String roomId;
 
+  @protected
+  void onSelectUser({BuildContext context, _Props props, User user}) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => DialogStartChat(
+        user: user,
+        title: 'Chat with ${user.displayName}',
+        content: Strings.confirmationStartChat,
+        onStartChat: () async {
+          final newRoomId = await props.onCreateChatDirect(user: user);
+          Navigator.pop(context);
+          Navigator.popAndPushNamed(
+            context,
+            '/home/chat',
+            arguments: ChatViewArguements(
+              roomId: newRoomId,
+              title: user.displayName,
+            ),
+          );
+        },
+        onCancel: () async {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(
+        converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           roomId: roomId,
           userId: userId,
@@ -65,6 +98,7 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
+                            background: Colours.hashedColor(props.user.userId),
                           ),
                         ),
                       ],
@@ -114,7 +148,7 @@ class ModalUserDetails extends StatelessWidget {
                         padding: EdgeInsets.all(4),
                         margin: EdgeInsets.only(left: 2),
                         child: SvgPicture.asset(
-                          Assets.iconMessageSyphonBeing,
+                          Assets.iconMessageCircleBeing,
                           fit: BoxFit.contain,
                           width: Dimensions.iconSize,
                           height: Dimensions.iconSize,
@@ -122,9 +156,11 @@ class ModalUserDetails extends StatelessWidget {
                           color: Theme.of(context).iconTheme.color,
                         ),
                       ),
-                      onTap: () async {
-                        Navigator.pop(context);
-                      },
+                      onTap: () => this.onSelectUser(
+                        context: context,
+                        props: props,
+                        user: props.user,
+                      ),
                     ),
                     ListTile(
                       title: Text(
@@ -168,11 +204,14 @@ class ModalUserDetails extends StatelessWidget {
       );
 }
 
-class Props extends Equatable {
+class _Props extends Equatable {
   final User user;
 
-  Props({
+  final Function onCreateChatDirect;
+
+  _Props({
     @required this.user,
+    @required this.onCreateChatDirect,
   });
 
   @override
@@ -180,12 +219,12 @@ class Props extends Equatable {
         user,
       ];
 
-  static Props mapStateToProps(
+  static _Props mapStateToProps(
     Store<AppState> store, {
     String userId,
     String roomId,
   }) =>
-      Props(
+      _Props(
         user: () {
           final room = store.state.roomStore.rooms[roomId];
           if (room != null) {
@@ -193,5 +232,11 @@ class Props extends Equatable {
           }
           return null;
         }(),
+        onCreateChatDirect: ({User user}) async => store.dispatch(
+          createRoom(
+            isDirect: true,
+            invites: <User>[user],
+          ),
+        ),
       );
 }

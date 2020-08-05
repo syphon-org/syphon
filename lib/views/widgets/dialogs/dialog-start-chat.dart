@@ -4,19 +4,15 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
-import 'package:syphon/views/widgets/captcha.dart';
 
 class DialogStartChat extends StatelessWidget {
   DialogStartChat({

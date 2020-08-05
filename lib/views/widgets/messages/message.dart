@@ -287,7 +287,7 @@ class MessageWidget extends StatelessWidget {
                                     child: Icon(
                                       Icons.lock,
                                       color: textColor,
-                                      size: Dimensions.miniLockSize,
+                                      size: Dimensions.iconSizeMini,
                                     ),
                                   ),
                                 ),
@@ -317,7 +317,7 @@ class MessageWidget extends StatelessWidget {
                                     child: Icon(
                                       Icons.lock,
                                       color: textColor,
-                                      size: Dimensions.miniLockSize,
+                                      size: Dimensions.iconSizeMini,
                                     ),
                                   ),
                                 ),

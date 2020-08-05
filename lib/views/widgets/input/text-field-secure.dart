@@ -52,6 +52,7 @@ class TextFieldSecure extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         child: TextField(
+          enabled: !disabled,
           maxLines: maxLines,
           focusNode: focusNode,
           controller: controller,

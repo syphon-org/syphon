@@ -10,22 +10,29 @@ part 'state.g.dart';
 
 @HiveType(typeId: UsersStoreHiveId)
 class UsersStore extends Equatable {
+  @HiveField(0)
   final Map<String, User> users;
+
+  final bool loading;
 
   const UsersStore({
     this.users = const {},
+    this.loading = false,
   });
 
   UsersStore copyWith({
-    users,
+    Map<String, User> users,
+    bool loading,
   }) {
     return UsersStore(
       users: users ?? this.users,
+      loading: loading ?? this.loading,
     );
   }
 
   @override
   List<Object> get props => [
         users,
+        loading,
       ];
 }
