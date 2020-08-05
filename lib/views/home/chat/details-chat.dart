@@ -86,6 +86,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    scrollController.dispose();
+  }
+
   @protected
   onShowUserDetails({
     BuildContext context,

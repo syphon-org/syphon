@@ -11,7 +11,7 @@ SearchStore searchReducer(
       );
     case SetSearchText:
       return state.copyWith(
-        searchText: action.searchText,
+        searchText: action.text,
       );
     case SetHomeservers:
       return state.copyWith(

@@ -67,10 +67,6 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
-    if (!this.searching) {
-      this.onToggleSearch(context: context);
-    }
-
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
@@ -201,7 +197,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
                   activeOpacity: 0.4,
                   onTap: () => onToggleSearch(context: context),
                   child: Text(
-                    Strings.titleSearchUsers,
+                    Strings.titleRoomUsers,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w100,
@@ -228,11 +224,9 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
                       });
                     },
                     cursorColor: Colors.white,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w100,
-                    ),
+                    style: Theme.of(context).textTheme.headline6.copyWith(
+                          color: Colors.white,
+                        ),
                     decoration: InputDecoration(
                       disabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
@@ -307,37 +301,30 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 class _Props extends Equatable {
   final Room room;
   final bool loading;
-  final ThemeType theme;
-  final bool creatingRoom;
+  final String searchText;
   final List<dynamic> usersFiltered;
 
   final Function onSearch;
-  final Function onCreateChatDirect;
 
   _Props({
     @required this.room,
-    @required this.theme,
     @required this.loading,
-    @required this.creatingRoom,
+    @required this.searchText,
     @required this.usersFiltered,
     @required this.onSearch,
-    @required this.onCreateChatDirect,
   });
 
   @override
   List<Object> get props => [
-        room,
-        loading,
-        theme,
-        creatingRoom,
+        searchText,
         usersFiltered,
+        loading,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-        room: store.state.roomStore.rooms[roomId] ?? Room(),
-        theme: store.state.settingsStore.theme,
         loading: store.state.roomStore.loading,
-        creatingRoom: store.state.roomStore.loading,
+        searchText: store.state.searchStore.searchText,
+        room: store.state.roomStore.rooms[roomId] ?? Room(),
         usersFiltered: searchUsersLocal(
           List.from(
             (store.state.roomStore.rooms[roomId] ?? Room()).users.values,

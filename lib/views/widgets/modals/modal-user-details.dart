@@ -165,8 +165,8 @@ class ModalUserDetails extends StatelessWidget {
                         child: SvgPicture.asset(
                           Assets.iconMessageCircleBeing,
                           fit: BoxFit.contain,
-                          width: Dimensions.iconSize,
-                          height: Dimensions.iconSize,
+                          width: Dimensions.iconSize - 2,
+                          height: Dimensions.iconSize - 2,
                           semanticsLabel: 'Create A Public Room',
                           color: Theme.of(context).iconTheme.color,
                         ),

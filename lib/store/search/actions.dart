@@ -30,6 +30,12 @@ class SetLoading {
   SetLoading({this.loading});
 }
 
+class SetSearchText {
+  final String text;
+
+  SetSearchText({this.text});
+}
+
 class SetHomeservers {
   final List<dynamic> homeservers;
 
@@ -40,12 +46,6 @@ class UpdateHomeservers {
   final List<dynamic> homeservers;
 
   UpdateHomeservers({this.homeservers});
-}
-
-class SetSearchText {
-  final String text;
-
-  SetSearchText({this.text});
 }
 
 // sets the "since" variable for pagination

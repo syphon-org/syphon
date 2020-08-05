@@ -72,7 +72,7 @@ List<User> searchUsersLocal(List<User> users, {String searchText = ''}) {
 
   return List.from(users.where(
     (user) =>
-        user.displayName.contains(searchText) ||
-        user.userId.contains(searchText),
+        (user.displayName ?? '').contains(searchText) ||
+        (user.userId ?? '').contains(searchText),
   ));
 }
