@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -80,20 +81,24 @@ class ChatPreferences extends StatelessWidget {
                                 props.chatFontSize,
                               ),
                             ),
-                            ListTile(
-                              enabled: false,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'Show Membership Events',
-                              ),
-                              subtitle: Text(
-                                'Show membership changes within the chat',
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                              trailing: Switch(
-                                value: false,
-                                inactiveThumbColor: Color(Colours.greyDisabled),
-                                onChanged: (showMembershipEvents) {},
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                enabled: false,
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'Show Membership Events',
+                                ),
+                                subtitle: Text(
+                                  'Show membership changes within the chat',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                                trailing: Switch(
+                                  value: false,
+                                  inactiveThumbColor:
+                                      Color(Colours.greyDisabled),
+                                  onChanged: (showMembershipEvents) {},
+                                ),
                               ),
                             ),
                             ListTile(
@@ -127,16 +132,18 @@ class ChatPreferences extends StatelessWidget {
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
-                            ListTile(
-                              onTap: () {},
-                              enabled: false,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'View all uploaded Media',
-                              ),
-                              subtitle: Text(
-                                'See all uploaded data, even those unaccessible from messages',
-                                style: Theme.of(context).textTheme.caption,
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                enabled: false,
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'View all uploaded Media',
+                                ),
+                                subtitle: Text(
+                                  'See all uploaded data, even those unaccessible from messages',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
                               ),
                             ),
                           ],
@@ -154,37 +161,46 @@ class ChatPreferences extends StatelessWidget {
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
-                            ListTile(
-                              enabled: false,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'When using mobile data',
-                              ),
-                              subtitle: Text(
-                                'Images, Audio, Video, Documents, Other',
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                            ),
-                            ListTile(
-                              enabled: false,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'When using Wi-Fi',
-                              ),
-                              subtitle: Text(
-                                'Images, Audio, Video, Documents, Other',
-                                style: Theme.of(context).textTheme.caption,
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                enabled: false,
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'When using mobile data',
+                                ),
+                                subtitle: Text(
+                                  'Images, Audio, Video, Documents, Other',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
                               ),
                             ),
-                            ListTile(
-                              enabled: false,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'When Roaming',
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                enabled: false,
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'When using Wi-Fi',
+                                ),
+                                subtitle: Text(
+                                  'Images, Audio, Video, Documents, Other',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
                               ),
-                              subtitle: Text(
-                                'Images, Audio, Video, Documents, Other',
-                                style: Theme.of(context).textTheme.caption,
+                            ),
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                enabled: false,
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'When Roaming',
+                                ),
+                                subtitle: Text(
+                                  'Images, Audio, Video, Documents, Other',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
                               ),
                             ),
                           ],
@@ -203,6 +219,7 @@ class Props extends Equatable {
   final bool enterSend;
   final String chatFontSize;
 
+  final Function onDisabled;
   final Function onToggleEnterSend;
 
   Props({
@@ -210,6 +227,7 @@ class Props extends Equatable {
     @required this.enterSend,
     @required this.chatFontSize,
     @required this.onToggleEnterSend,
+    @required this.onDisabled,
   });
 
   @override
@@ -224,5 +242,6 @@ class Props extends Equatable {
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
+        onDisabled: () => store.dispatch(addInProgress()),
       );
 }

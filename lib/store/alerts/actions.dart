@@ -49,6 +49,12 @@ ThunkAction<AppState> startAlertsObserver() {
   };
 }
 
+ThunkAction<AppState> addInProgress() {
+  return (Store<AppState> store) async {
+    store.dispatch(addInfo(message: '🛠 This feature is coming soon'));
+  };
+}
+
 ThunkAction<AppState> addInfo({
   type = 'info',
   origin = 'Unknown',

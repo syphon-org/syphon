@@ -93,8 +93,8 @@ class Dimensions {
     return EdgeInsets.only(
       left: width * 0.04,
       right: width * 0.04,
-      top: 6,
-      bottom: 14,
+      top: 4,
+      bottom: 8,
     );
   }
 

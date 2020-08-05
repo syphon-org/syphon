@@ -12,7 +12,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -30,11 +29,6 @@ class NotificationSettingsView extends StatelessWidget {
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-
-          final sectionBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(Colours.blackDefault)
-                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(

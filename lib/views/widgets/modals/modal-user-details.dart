@@ -13,10 +13,12 @@ import 'package:syphon/global/colours.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
@@ -31,23 +33,34 @@ class ModalUserDetails extends StatelessWidget {
   final String roomId;
 
   @protected
-  void onSelectUser({BuildContext context, _Props props, User user}) async {
+  void onNavigateToProfile({BuildContext context, _Props props}) async {
+    Navigator.pushNamed(
+      context,
+      '/home/user/details',
+      arguments: UserDetailsArguments(
+        user: props.user,
+      ),
+    );
+  }
+
+  @protected
+  void onMessageUser({BuildContext context, _Props props}) async {
     return await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => DialogStartChat(
-        user: user,
-        title: 'Chat with ${user.displayName}',
+        user: props.user,
+        title: 'Chat with ${props.user.displayName}',
         content: Strings.confirmationStartChat,
         onStartChat: () async {
-          final newRoomId = await props.onCreateChatDirect(user: user);
+          final newRoomId = await props.onCreateChatDirect(user: props.user);
           Navigator.pop(context);
           Navigator.popAndPushNamed(
             context,
             '/home/chat',
             arguments: ChatViewArguements(
               roomId: newRoomId,
-              title: user.displayName,
+              title: props.user.displayName,
             ),
           );
         },
@@ -98,7 +111,9 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
-                            background: Colours.hashedColor(props.user.userId),
+                            background: props.user.avatarUri == null
+                                ? Colours.hashedColor(props.user.userId)
+                                : null,
                           ),
                         ),
                       ],
@@ -141,7 +156,7 @@ class ModalUserDetails extends StatelessWidget {
                   children: <Widget>[
                     ListTile(
                       title: Text(
-                        'Send a message',
+                        'Send A Message',
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       leading: Container(
@@ -156,33 +171,16 @@ class ModalUserDetails extends StatelessWidget {
                           color: Theme.of(context).iconTheme.color,
                         ),
                       ),
-                      onTap: () => this.onSelectUser(
+                      onTap: () => this.onMessageUser(
                         context: context,
                         props: props,
-                        user: props.user,
                       ),
                     ),
                     ListTile(
                       title: Text(
-                        'Block',
+                        'View Profile',
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
-                      leading: Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          Icons.block,
-                          size: Dimensions.iconSize,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
                       leading: Container(
                         padding: EdgeInsets.all(4),
                         child: Icon(
@@ -190,9 +188,28 @@ class ModalUserDetails extends StatelessWidget {
                           size: Dimensions.iconSize,
                         ),
                       ),
-                      title: Text(
-                        'View profile',
-                        style: Theme.of(context).textTheme.subtitle1,
+                      onTap: () => this.onNavigateToProfile(
+                        context: context,
+                        props: props,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => props.onDisabled(),
+                      child: ListTile(
+                        enabled: false,
+                        title: Text(
+                          'Block',
+                        ),
+                        leading: Container(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.block,
+                            size: Dimensions.iconSize,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
                   ],
@@ -207,11 +224,13 @@ class ModalUserDetails extends StatelessWidget {
 class _Props extends Equatable {
   final User user;
 
+  final Function onDisabled;
   final Function onCreateChatDirect;
 
   _Props({
     @required this.user,
     @required this.onCreateChatDirect,
+    @required this.onDisabled,
   });
 
   @override
@@ -232,6 +251,9 @@ class _Props extends Equatable {
           }
           return null;
         }(),
+        onDisabled: () => store.dispatch(
+          addInfo(message: '🛠 This feature is coming soon'),
+        ),
         onCreateChatDirect: ({User user}) async => store.dispatch(
           createRoom(
             isDirect: true,

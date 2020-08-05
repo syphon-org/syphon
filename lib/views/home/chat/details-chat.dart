@@ -382,34 +382,29 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ),
                             ),
                             ListTile(
-                              onTap: () => onShowColorPicker(
-                                context: context,
-                                onSelectColor: props.onSelectPrimaryColor,
-                                originalColor: props.roomPrimaryColor.value,
-                              ),
                               contentPadding: contentPadding,
                               title: Text(
                                 'Color',
-                                style: TextStyle(fontSize: 18.0),
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.only(right: 16),
+                                padding: EdgeInsets.only(right: 8),
                                 child: CircleAvatar(
                                   radius: 16,
                                   backgroundColor: props.roomPrimaryColor,
                                 ),
                               ),
+                              onTap: () => onShowColorPicker(
+                                context: context,
+                                onSelectColor: props.onSelectPrimaryColor,
+                                originalColor: props.roomPrimaryColor.value,
+                              ),
                             ),
                             ListTile(
-                              dense: true,
                               enabled: !props.loading,
-                              onTap: () {
-                                props.onToggleDirectRoom();
-                              },
                               contentPadding: contentPadding,
                               title: Text(
                                 'Toggle Direct Room',
-                                style: TextStyle(fontSize: 18.0),
+                                style: Theme.of(context).textTheme.subtitle1,
                               ),
                               trailing: Container(
                                 child: Switch(
@@ -419,6 +414,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   },
                                 ),
                               ),
+                              onTap: () {
+                                props.onToggleDirectRoom();
+                              },
                             ),
                           ],
                         ),
@@ -442,14 +440,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             contentPadding: contentPadding,
                             title: Text(
                               'Mute Notifications',
-                              style: TextStyle(fontSize: 18.0),
                             ),
                             trailing: Container(
                               child: Switch(
                                 value: false,
-                                onChanged: (value) {
-                                  // TODO: prevent notification if room id exists in this setting
-                                },
+                                onChanged: null,
                               ),
                             ),
                           ),
@@ -458,13 +453,15 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             contentPadding: contentPadding,
                             title: Text(
                               'Vibrate',
-                              style: TextStyle(fontSize: 18.0),
                             ),
                             trailing: Container(
                               padding: EdgeInsets.symmetric(horizontal: 8),
                               child: Text(
                                 'Default',
-                                style: TextStyle(fontSize: 18.0),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1
+                                    .copyWith(color: Colors.grey),
                               ),
                             ),
                           ),
@@ -473,13 +470,15 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             contentPadding: contentPadding,
                             title: Text(
                               'Notification Sound',
-                              style: TextStyle(fontSize: 18.0),
                             ),
                             trailing: Container(
                               padding: EdgeInsets.symmetric(horizontal: 8),
                               child: Text(
                                 'Default (Argon)',
-                                style: TextStyle(fontSize: 18.0),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1
+                                    .copyWith(color: Colors.grey),
                               ),
                             ),
                           ),
@@ -503,7 +502,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             contentPadding: contentPadding,
                             title: Text(
                               'View Encryption Key',
-                              style: TextStyle(fontSize: 18.0),
                             ),
                           ),
                         ],
@@ -514,14 +512,16 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             ListTile(
-                              onTap: () {},
+                              onTap: () => props.onLeaveChat(),
                               contentPadding: contentPadding,
                               title: Text(
                                 'Leave Chat',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.redAccent,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1
+                                    .copyWith(
+                                      color: Colors.redAccent,
+                                    ),
                               ),
                             ),
                           ],
