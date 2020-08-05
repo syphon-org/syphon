@@ -14,7 +14,7 @@ class Assets {
   static const iconMessageSyphonBeing =
       'assets/icons/global/being-message-syphon.svg';
   static const iconMessageCircleBeing =
-      'assets/icons/global/being-message-circle.svg';
+      'assets/icons/global/feather-message-circle.svg';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -170,11 +171,6 @@ class SearchUserState extends State<SearchUserView> {
 
   @protected
   Widget buildUserList(BuildContext context, _Props props) {
-    final sectionBackgroundColor =
-        Theme.of(context).brightness == Brightness.dark
-            ? const Color(Colours.blackDefault)
-            : const Color(Colours.whiteDefault);
-
     final searchText = searchable ?? '';
 
     final attemptableUser = User(
@@ -191,140 +187,124 @@ class SearchUserState extends State<SearchUserView> {
     final showManualUser =
         searchable != null && searchable.length > 0 && foundResult < 0;
 
-    return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 2,
-          vertical: 4,
-        ),
-        child: ListView(
-          children: [
-            Visibility(
-              visible: showManualUser,
-              child: GestureDetector(
-                onTap: () => this.onAttemptChat(
-                  props: props,
-                  context: context,
-                  user: attemptableUser,
-                ),
-                child: Card(
-                  color: sectionBackgroundColor,
-                  elevation: 0,
-                  child: Container(
-                    padding: const EdgeInsets.only(
-                      bottom: 8,
-                    ),
-                    child: ListTile(
-                      enabled: creatingRoomDisplayName != searchable,
-                      leading: AvatarCircle(
-                        uri: attemptableUser.avatarUri,
-                        alt: attemptableUser.displayName ??
-                            attemptableUser.userId,
-                      ),
-                      title: Text(
-                        formatDisplayName(attemptableUser),
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                      subtitle: Text(
-                        attemptableUser.userId,
-                        style: Theme.of(context).textTheme.caption.merge(
-                              TextStyle(
-                                color: props.loading
-                                    ? Color(Colours.greyDisabled)
-                                    : null,
-                              ),
-                            ),
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: Dimensions.progressIndicatorSize,
-                            height: Dimensions.progressIndicatorSize,
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            child: Icon(
-                              Icons.send,
-                              size: Dimensions.iconSize,
-                            ),
+    return ListView(
+      children: [
+        Visibility(
+          visible: showManualUser,
+          child: GestureDetector(
+            onTap: () => this.onAttemptChat(
+              props: props,
+              context: context,
+              user: attemptableUser,
+            ),
+            child: CardSection(
+              padding: EdgeInsets.zero,
+              elevation: 0,
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  enabled: creatingRoomDisplayName != searchable,
+                  leading: AvatarCircle(
+                    uri: attemptableUser.avatarUri,
+                    alt: attemptableUser.displayName ?? attemptableUser.userId,
+                    size: Dimensions.avatarSizeMin,
+                  ),
+                  title: Text(
+                    formatDisplayName(attemptableUser),
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  subtitle: Text(
+                    attemptableUser.userId,
+                    style: Theme.of(context).textTheme.caption.merge(
+                          TextStyle(
+                            color: props.loading
+                                ? Color(Colours.greyDisabled)
+                                : null,
                           ),
-                        ],
+                        ),
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: Dimensions.progressIndicatorSize,
+                        height: Dimensions.progressIndicatorSize,
+                        margin: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(
+                          Icons.send,
+                          size: Dimensions.iconSize,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: props.searchResults.length,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                final user = (props.searchResults[index] as User);
-                final sectionBackgroundColor =
-                    Theme.of(context).brightness == Brightness.dark
-                        ? const Color(Colours.blackDefault)
-                        : const Color(Colours.whiteDefault);
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: props.searchResults.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            final user = (props.searchResults[index] as User);
 
-                return GestureDetector(
-                  onTap: () => this.onSelectUser(
-                    context: context,
-                    props: props,
-                    user: user,
-                  ),
-                  child: Card(
-                    color: sectionBackgroundColor,
-                    elevation: 0,
-                    child: Container(
-                      padding: const EdgeInsets.only(
-                        bottom: 8,
-                      ),
-                      child: ListTile(
-                        enabled: creatingRoomDisplayName != user.displayName,
-                        leading: AvatarCircle(
-                          uri: user.avatarUri,
-                          alt: user.displayName ?? user.userId,
-                        ),
-                        title: Text(
-                          formatDisplayName(user),
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
+            return GestureDetector(
+              onTap: () => this.onSelectUser(
+                context: context,
+                props: props,
+                user: user,
+              ),
+              child: CardSection(
+                padding: EdgeInsets.zero,
+                elevation: 0,
+                child: Container(
+                  child: ListTile(
+                    enabled: creatingRoomDisplayName != user.displayName,
+                    leading: AvatarCircle(
+                      uri: user.avatarUri,
+                      alt: user.displayName ?? user.userId,
+                      size: Dimensions.avatarSizeMin,
+                    ),
+                    title: Text(
+                      formatDisplayName(user),
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    subtitle: Text(
+                      user.userId,
+                      style: Theme.of(context).textTheme.caption.merge(
+                            TextStyle(
+                              color: props.loading
+                                  ? Color(Colours.greyDisabled)
+                                  : null,
+                            ),
+                          ),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: Dimensions.progressIndicatorSize,
+                          height: Dimensions.progressIndicatorSize,
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(
+                            Icons.send,
+                            size: Dimensions.iconSizeLite,
                           ),
                         ),
-                        subtitle: Text(
-                          user.userId,
-                          style: Theme.of(context).textTheme.caption.merge(
-                                TextStyle(
-                                  color: props.loading
-                                      ? Color(Colours.greyDisabled)
-                                      : null,
-                                ),
-                              ),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: Dimensions.progressIndicatorSize,
-                              height: Dimensions.progressIndicatorSize,
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(
-                                Icons.send,
-                                size: Dimensions.iconSize,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-                );
-              },
-            )
-          ],
-        ));
+                ),
+              ),
+            );
+          },
+        )
+      ],
+    );
   }
 
   @override
@@ -422,31 +402,29 @@ class SearchUserState extends State<SearchUserView> {
                 ),
               ],
             ),
-            body: Center(
-              child: Stack(
-                children: [
-                  buildUserList(context, props),
-                  Positioned(
-                    child: Visibility(
-                      visible: props.loading,
-                      child: Container(
-                          margin: EdgeInsets.only(top: height * 0.02),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RefreshProgressIndicator(
-                                strokeWidth: Dimensions.defaultStrokeWidth,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor,
-                                ),
-                                value: null,
+            body: Stack(
+              children: [
+                buildUserList(context, props),
+                Positioned(
+                  child: Visibility(
+                    visible: props.loading,
+                    child: Container(
+                        margin: EdgeInsets.only(top: height * 0.02),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            RefreshProgressIndicator(
+                              strokeWidth: Dimensions.defaultStrokeWidth,
+                              valueColor: new AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).primaryColor,
                               ),
-                            ],
-                          )),
-                    ),
+                              value: null,
+                            ),
+                          ],
+                        )),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

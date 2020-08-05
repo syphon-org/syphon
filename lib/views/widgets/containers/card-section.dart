@@ -18,11 +18,13 @@ class CardSection extends StatelessWidget {
     this.child,
     this.margin,
     this.padding,
+    this.elevation,
   }) : super(key: key);
 
   final Widget child;
   final EdgeInsets margin;
   final EdgeInsets padding;
+  final double elevation;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -50,7 +52,7 @@ class CardSection extends StatelessWidget {
 
           return Card(
             margin: margin ?? EdgeInsets.symmetric(vertical: 4),
-            elevation: 0.5,
+            elevation: elevation ?? 0.5,
             color: backgroundColor,
             child: Container(
               padding: padding ?? EdgeInsets.only(top: 12),

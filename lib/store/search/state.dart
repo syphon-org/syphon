@@ -4,9 +4,9 @@ import 'package:equatable/equatable.dart';
 class SearchStore extends Equatable {
   final bool loading;
   final String since;
+  final bool hasMore;
   final int totalResults;
   final String searchText;
-  final bool hasMore;
   final List<dynamic> searchResults;
   final List<dynamic> homeservers;
 

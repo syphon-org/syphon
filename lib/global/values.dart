@@ -48,4 +48,15 @@ class Values {
   // Animations
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;
+
+  static const fontTypes = [
+    'Rubik',
+    "Roboto",
+  ];
+
+  static const fontSizes = [
+    'Small',
+    'Default',
+    "Large",
+  ];
 }

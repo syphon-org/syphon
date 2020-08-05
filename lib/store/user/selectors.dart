@@ -64,3 +64,15 @@ String displayInitials(User user) {
 
   return 'NA';
 }
+
+List<User> searchUsersLocal(List<User> users, {String searchText = ''}) {
+  if (searchText == null || searchText.isEmpty) {
+    return users;
+  }
+
+  return List.from(users.where(
+    (user) =>
+        user.displayName.contains(searchText) ||
+        user.userId.contains(searchText),
+  ));
+}

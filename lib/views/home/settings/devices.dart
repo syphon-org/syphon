@@ -215,8 +215,10 @@ class DeviceViewState extends State<DevicesView> {
                       Color iconColor;
                       Color backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
-                      TextStyle textStyle =
-                          Theme.of(context).textTheme.overline;
+                      TextStyle textStyle = Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(fontSize: 12);
                       bool isCurrentDevice =
                           props.currentDeviceId == device.deviceId;
 

@@ -222,6 +222,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               accentColorHex: settings.accentColor,
               appBarColorHex: settings.appBarColor,
               fontName: settings.fontName,
+              fontSize: settings.fontSize,
               themeType: settings.theme,
             ),
             navigatorKey: NavigationService.navigatorKey,

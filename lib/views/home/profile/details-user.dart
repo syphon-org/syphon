@@ -9,12 +9,10 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
@@ -161,7 +159,7 @@ class UserDetailsState extends State<UserDetailsView> {
                   ),
                   Flexible(
                     child: Text(
-                      user.displayName,
+                      user.displayName ?? user.userId,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white,
@@ -188,7 +186,7 @@ class UserDetailsState extends State<UserDetailsView> {
                           child: AvatarCircle(
                             size: height * 0.15,
                             uri: user.avatarUri,
-                            alt: user.displayName ?? user.userId,
+                            alt: user.displayName ?? user.userId ?? '',
                             background: userColor,
                           ),
                         ),
@@ -224,12 +222,12 @@ class UserDetailsState extends State<UserDetailsView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  user.displayName,
+                                  user.displayName ?? '',
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
                                 Text(
-                                  user.userId,
+                                  user.userId ?? '',
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context).textTheme.caption,
                                 ),

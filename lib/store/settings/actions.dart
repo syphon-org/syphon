@@ -11,6 +11,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
@@ -38,6 +39,16 @@ class SetAccentColor {
 class SetAppBarColor {
   final int color;
   SetAppBarColor({this.color});
+}
+
+class SetFontName {
+  final String fontName;
+  SetFontName({this.fontName});
+}
+
+class SetFontSize {
+  final String fontSize;
+  SetFontSize({this.fontSize});
 }
 
 class SetRoomPrimaryColor {
@@ -267,7 +278,7 @@ ThunkAction<AppState> selectPrimaryColor(int color) {
 }
 
 /**
- * Send in a hex value to be used as the primary color
+ * Send in a hex value to be used as the secondary color
  */
 ThunkAction<AppState> selectAccentColor(int color) {
   return (Store<AppState> store) async {
@@ -276,11 +287,55 @@ ThunkAction<AppState> selectAccentColor(int color) {
 }
 
 /**
- * Send in a hex value to be used as the primary color
+ * Send in a hex value to be used as the app bar color
  */
 ThunkAction<AppState> updateAppBarColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAppBarColor(color: color));
+  };
+}
+
+/**
+ * Iterate over fontTypes on action
+ */
+ThunkAction<AppState> incrementFontType() {
+  return (Store<AppState> store) async {
+    final currentFontType = store.state.settingsStore.fontName;
+    final currentIndex = Values.fontTypes.indexOf(currentFontType);
+
+    store.dispatch(SetFontName(
+      fontName: Values.fontTypes[(currentIndex + 1) % Values.fontTypes.length],
+    ));
+  };
+}
+
+/**
+ * Iterate over fontTypes on action
+ */
+ThunkAction<AppState> incrementFontSize() {
+  return (Store<AppState> store) async {
+    final currentFontSize = store.state.settingsStore.fontSize;
+    final fontSizes = Values.fontSizes;
+    final currentIndex = fontSizes.indexOf(currentFontSize);
+
+    print(fontSizes[(currentIndex + 1) % fontSizes.length]);
+    store.dispatch(SetFontSize(
+      fontSize: fontSizes[(currentIndex + 1) % fontSizes.length],
+    ));
+  };
+}
+
+/**
+ * Iterate over theme types on action
+ */
+ThunkAction<AppState> incrementTheme() {
+  return (Store<AppState> store) async {
+    final currentTheme = store.state.settingsStore.theme;
+    final themeIndex = ThemeType.values.indexOf(currentTheme);
+
+    store.dispatch(SetTheme(
+      ThemeType.values[(themeIndex + 1) % ThemeType.values.length],
+    ));
   };
 }
 
@@ -354,14 +409,5 @@ ThunkAction<AppState> toggleNotifications() {
         );
       }
     }
-  };
-}
-
-ThunkAction<AppState> incrementTheme() {
-  return (Store<AppState> store) async {
-    ThemeType currentTheme = store.state.settingsStore.theme;
-    int themeIndex = ThemeType.values.indexOf(currentTheme);
-    store.dispatch(
-        SetTheme(ThemeType.values[(themeIndex + 1) % ThemeType.values.length]));
   };
 }

@@ -25,6 +25,7 @@ class Strings {
   static const titleAdvanced = 'Advanced';
   static const titleSearchGroups = 'Explore Groups';
   static const titleSearchUsers = 'Search Users';
+  static const titleRoomUsers = 'All Room Users';
 
   // Dialog Titles
   static const titleDialogCaptcha = 'Complete Captcha';

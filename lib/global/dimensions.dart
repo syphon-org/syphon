@@ -17,6 +17,7 @@ class Dimensions {
   static const double avatarSize = 56; // was 52
   static const double avatarSizeMin = 48;
   static const double avatarSizeMax = 350; // Change to HeroSize
+  static const double avatarSizeLarge = 84;
   static const double avatarSizeMessage = 28;
   static const double avatarSizeDetails = 120;
 
@@ -68,22 +69,12 @@ class Dimensions {
     bottom: 32,
   );
 
-  // Dialogs
-  static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
-    horizontal: 24,
-    vertical: 16,
-  );
-
-  static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
-    horizontal: 8,
-    vertical: 12,
-  );
-
   // Lists
   static const heroPadding = EdgeInsets.symmetric(
     vertical: 24,
     horizontal: 24,
   );
+
   static const listPadding = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 8,
@@ -106,6 +97,17 @@ class Dimensions {
       bottom: 14,
     );
   }
+
+  // Dialogs
+  static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
+    horizontal: 24,
+    vertical: 16,
+  );
+
+  static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
+    horizontal: 8,
+    vertical: 12,
+  );
 
   // Content
   static contentWidth(BuildContext context) {

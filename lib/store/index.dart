@@ -27,7 +27,7 @@ import './auth/state.dart';
 import './media/state.dart';
 import './rooms/reducer.dart';
 import './rooms/state.dart';
-import './search/model.dart';
+import 'search/state.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
@@ -37,7 +37,6 @@ import './settings/state.dart';
 // Persisted State Stores
 
 // Reducers for Stores
-
 
 class AppState extends Equatable {
   final bool loading;
@@ -84,7 +83,7 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
-    searchStore: matrixReducer(state.searchStore, action),
+    searchStore: searchReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
   );

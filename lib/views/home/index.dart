@@ -168,25 +168,27 @@ class HomeViewState extends State<Home> {
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
-        title: Row(children: <Widget>[
-          AvatarAppBar(
-            user: props.currentUser,
-            offline: props.offline,
-            // show syncing if offline and refresh or initial sync
-            syncing: (props.syncing && props.offline) || props.loadingRooms,
-            tooltip: 'Profile and Settings',
-            onPressed: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-          ),
-          Text(
-            Values.appName,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
+        title: Row(
+          children: <Widget>[
+            AvatarAppBar(
+              user: props.currentUser,
+              offline: props.offline,
+              // show syncing if offline and refresh or initial sync
+              syncing: (props.syncing && props.offline) || props.loadingRooms,
+              tooltip: 'Profile and Settings',
+              onPressed: () {
+                Navigator.pushNamed(context, '/profile');
+              },
             ),
-          ),
-        ]),
+            Text(
+              Values.appName,
+              style: Theme.of(context).textTheme.headline6.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+            ),
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             color: Colors.white,
@@ -386,17 +388,18 @@ class HomeViewState extends State<Home> {
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                height: 16,
-                                width: 16,
-                                color: Colors.grey,
-                                child: Icon(
-                                  Icons.mail_outline,
-                                  color: Colors.white,
-                                  size: Dimensions.iconSizeMini,
-                                ),
-                              )),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              height: 16,
+                              width: 16,
+                              color: Colors.grey,
+                              child: Icon(
+                                Icons.mail_outline,
+                                color: Colors.white,
+                                size: Dimensions.iconSizeMini,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       Visibility(

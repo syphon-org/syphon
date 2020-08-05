@@ -41,6 +41,9 @@ class SettingsStore extends Equatable {
   @HiveField(16)
   final String fontName;
 
+  @HiveField(17)
+  final String fontSize;
+
   @HiveField(9)
   final String language;
 
@@ -72,6 +75,7 @@ class SettingsStore extends Equatable {
     this.brightness = 0,
     this.theme = ThemeType.LIGHT,
     this.fontName = 'Rubik',
+    this.fontSize = 'Default',
     this.language = 'English',
     this.enterSend = false,
     this.smsEnabled = false,
@@ -95,6 +99,7 @@ class SettingsStore extends Equatable {
         brightness,
         theme,
         fontName,
+        fontSize,
         language,
         smsEnabled,
         enterSend,
@@ -116,6 +121,7 @@ class SettingsStore extends Equatable {
     int brightness,
     ThemeType theme,
     String fontName,
+    String fontSize,
     String language,
     bool smsEnabled,
     bool enterSend,
@@ -137,6 +143,7 @@ class SettingsStore extends Equatable {
       brightness: brightness ?? this.brightness,
       theme: theme ?? this.theme,
       fontName: fontName ?? this.fontName,
+      fontSize: fontSize ?? this.fontSize,
       language: language ?? this.language,
       smsEnabled: smsEnabled ?? this.smsEnabled,
       enterSend: enterSend != null ? enterSend : this.enterSend,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/home/chat/details-chat-users.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -121,37 +122,92 @@ class ChatDetailsState extends State<ChatDetailsView> {
   Widget buildUsersPreview(_Props props) {
     final List<User> users = props.userList;
 
-    return ListView.builder(
+    return ListView(
       shrinkWrap: true,
-      itemCount: users.length < 12 ? users.length : 12,
       scrollDirection: Axis.horizontal,
-      itemBuilder: (BuildContext context, int index) {
-        final user = users[index];
-        return Align(
-          alignment: Alignment.topLeft,
-          heightFactor: 0.8,
-          child: GestureDetector(
-            onTap: () {
-              onShowUserDetails(
-                context: context,
-                roomId: props.room.id,
-                userId: user.userId,
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              child: AvatarCircle(
-                uri: user.avatarUri,
-                alt: user.displayName ?? user.userId,
-                size: 54,
-                background: user.avatarUri != null
-                    ? Colors.transparent
-                    : Colours.hashedColor(user.userId),
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: users.length < 12 ? users.length : 12,
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            final user = users[index];
+            return Align(
+              child: GestureDetector(
+                onTap: () {
+                  onShowUserDetails(
+                    context: context,
+                    roomId: props.room.id,
+                    userId: user.userId,
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? 12 : 4,
+                    right: index == users.length - 1 ? 12 : 4,
+                  ),
+                  child: AvatarCircle(
+                    uri: user.avatarUri,
+                    alt: user.displayName ?? user.userId,
+                    size: Dimensions.avatarSize,
+                    background: user.avatarUri != null
+                        ? Colors.transparent
+                        : Colours.hashedColor(user.userId),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        Visibility(
+          visible: users.length > 12,
+          child: Container(
+            margin: EdgeInsets.only(left: 4, right: 12),
+            padding: EdgeInsets.symmetric(vertical: 14),
+            child: ClipOval(
+              child: Material(
+                color:
+                    Theme.of(context).scaffoldBackgroundColor, // button color
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/home/chat/details/users',
+                      arguments: ChatUsersDetailArguments(
+                        roomId: props.room.id,
+                      ),
+                    );
+                  },
+                  splashColor: Colors.grey, // inkwell color
+                  child: SizedBox(
+                    width: Dimensions.avatarSize,
+                    height: Dimensions.avatarSize,
+                    child: Container(
+                      width: Dimensions.avatarSize,
+                      height: Dimensions.avatarSize,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 2,
+                          color: Theme.of(context).textTheme.caption.color,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(Dimensions.avatarSize),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.keyboard_arrow_right,
+                        size: Dimensions.iconSizeLarge * 1.25,
+                        color: Theme.of(context).textTheme.caption.color,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -203,10 +259,10 @@ class ChatDetailsState extends State<ChatDetailsView> {
                     child: Text(
                       arguments.title,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w100,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(color: Colors.white),
                     ),
                   ),
                 ],
@@ -245,8 +301,8 @@ class ChatDetailsState extends State<ChatDetailsView> {
                 child: Column(
                   children: <Widget>[
                     CardSection(
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       margin: EdgeInsets.only(bottom: 4),
-                      padding: EdgeInsets.zero,
                       child: Column(
                         children: [
                           Container(
@@ -270,47 +326,39 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 ),
                                 TouchableOpacity(
                                   onTap: () {
-                                    // Navigator.pushNamed(
-                                    //   context,
-                                    //   '/home/chat/details/users',
-                                    // );
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/home/chat/details/users',
+                                      arguments: ChatUsersDetailArguments(
+                                        roomId: props.room.id,
+                                      ),
+                                    );
                                   },
                                   activeOpacity: 0.4,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        left: 24, right: 4, top: 8, bottom: 8),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          'See all users',
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'See all users',
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          ' (${props.room.users.length})',
                                           textAlign: TextAlign.start,
                                           style: TextStyle(),
                                         ),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: Text(
-                                            '(${props.room.users.length})',
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 )
                               ],
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.only(
-                              left: 8,
-                              top: 8,
-                              bottom: 8,
-                            ),
                             constraints: BoxConstraints(
-                              maxHeight: Dimensions.avatarSize * 1.5,
                               maxWidth: width,
+                              maxHeight: Dimensions.avatarSizeLarge,
                             ),
                             child: buildUsersPreview(props),
                           )
@@ -357,8 +405,10 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   maintainSize: false,
                                   child: Container(
                                     padding: EdgeInsets.only(top: 12),
-                                    child: Text(props.room.topic,
-                                        style: TextStyle(fontSize: 16)),
+                                    child: Text(
+                                      props.room.topic,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ),
                                 ),
                               ],

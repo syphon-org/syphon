@@ -22,11 +22,6 @@ enum ThemeType {
   NIGHT,
 }
 
-const List<String> fontTypes = [
-  'Rubik',
-  "Roboto",
-];
-
 class Themes {
   static Color invertedPrimaryColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
@@ -39,6 +34,7 @@ class Themes {
     int accentColorHex,
     int appBarColorHex,
     String fontName,
+    String fontSize,
     ThemeType themeType,
   }) {
     int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
@@ -81,6 +77,44 @@ class Themes {
         break;
       case ThemeType.LIGHT:
       default:
+        break;
+    }
+
+    var titleWeight = FontWeight.w400;
+    var bodyWeight = FontWeight.w400;
+
+    double letterSpacing;
+    switch (fontName) {
+      case 'Rubik':
+        titleWeight = FontWeight.w100;
+        bodyWeight = FontWeight.w400;
+        letterSpacing = 0.5;
+        break;
+      default:
+        break;
+    }
+    double subtitleSize;
+    double subtitleSizeLarge;
+    double bodySize;
+    double bodySizeLarge;
+    switch (fontSize) {
+      case 'Small':
+        subtitleSize = 12;
+        subtitleSizeLarge = 14;
+        bodySize = 16;
+        bodySizeLarge = 18;
+        break;
+      case 'Large':
+        subtitleSize = 16;
+        subtitleSizeLarge = 18;
+        bodySize = 20;
+        bodySizeLarge = 22;
+        break;
+      default:
+        subtitleSize = 14;
+        subtitleSizeLarge = 16;
+        bodySize = 18;
+        bodySizeLarge = 20;
         break;
     }
 
@@ -127,51 +161,48 @@ class Themes {
           ),
         ),
       ),
+
       // Fonts
       fontFamily: fontName ?? 'Rubik',
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
+          fontWeight: titleWeight,
         ),
       ),
       textTheme: TextTheme(
         headline5: TextStyle(
-          fontWeight: FontWeight.w100,
+          fontWeight: titleWeight,
         ),
         headline6: TextStyle(
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         subtitle1: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontSize: subtitleSizeLarge,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         subtitle2: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.4,
+          fontSize: subtitleSize,
+          fontWeight: bodyWeight,
+          letterSpacing: letterSpacing,
           color: Color(accentColor),
         ),
-        overline: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+        caption: TextStyle(
+          fontSize: subtitleSize,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         bodyText1: TextStyle(
-          fontSize: 20,
-          letterSpacing: 0.4,
-          fontWeight: FontWeight.w400,
+          fontSize: bodySizeLarge,
+          letterSpacing: letterSpacing,
+          fontWeight: bodyWeight,
         ),
         bodyText2: TextStyle(
-          fontSize: 18,
-          letterSpacing: 0.4,
-          fontWeight: FontWeight.w100,
-        ),
-        caption: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontSize: bodySize,
+          letterSpacing: letterSpacing,
+          fontWeight: titleWeight,
         ),
       ),
     );

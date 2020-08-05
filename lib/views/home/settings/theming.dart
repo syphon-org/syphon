@@ -38,8 +38,9 @@ class Theming extends StatelessWidget {
               ),
               title: Text(
                 Strings.titleThemeing,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                      color: Colors.white,
+                    ),
               ),
             ),
             body: SingleChildScrollView(
@@ -145,7 +146,6 @@ class Theming extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Font',
@@ -153,9 +153,9 @@ class Theming extends StatelessWidget {
                           trailing: Text(
                             props.fontName,
                           ),
+                          onTap: () => props.onIncrementFontType(),
                         ),
                         ListTile(
-                          onTap: () {},
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Font Size',
@@ -163,6 +163,7 @@ class Theming extends StatelessWidget {
                           trailing: Text(
                             props.fontSize,
                           ),
+                          onTap: () => props.onIncrementFontSize(),
                         ),
                       ],
                     ),
@@ -183,11 +184,12 @@ class Props extends Equatable {
   final String language;
   final String fontName;
   final String fontSize;
-  final String chatFontSize;
 
   final Function onSelectPrimaryColor;
   final Function onSelectAccentColor;
   final Function onSelectAppBarColor;
+  final Function onIncrementFontType;
+  final Function onIncrementFontSize;
   final Function onIncrementTheme;
 
   Props({
@@ -198,10 +200,11 @@ class Props extends Equatable {
     @required this.language,
     @required this.fontName,
     @required this.fontSize,
-    @required this.chatFontSize,
     @required this.onSelectPrimaryColor,
     @required this.onSelectAccentColor,
     @required this.onSelectAppBarColor,
+    @required this.onIncrementFontType,
+    @required this.onIncrementFontSize,
     @required this.onIncrementTheme,
   });
 
@@ -214,7 +217,6 @@ class Props extends Equatable {
         language,
         fontName,
         fontSize,
-        chatFontSize,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
@@ -227,8 +229,7 @@ class Props extends Equatable {
         themeType: store.state.settingsStore.theme.toString(),
         language: store.state.settingsStore.language,
         fontName: store.state.settingsStore.fontName,
-        fontSize: "Default",
-        chatFontSize: "Default",
+        fontSize: store.state.settingsStore.fontSize,
         onSelectPrimaryColor: (int color) => store.dispatch(
           // convert to int hex color code
           selectPrimaryColor(color),
@@ -240,6 +241,12 @@ class Props extends Equatable {
         onSelectAppBarColor: (int color) => store.dispatch(
           // convert to int hex color code
           updateAppBarColor(color),
+        ),
+        onIncrementFontType: () => store.dispatch(
+          incrementFontType(),
+        ),
+        onIncrementFontSize: () => store.dispatch(
+          incrementFontSize(),
         ),
         onIncrementTheme: () => store.dispatch(
           incrementTheme(),

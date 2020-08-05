@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import 'package:syphon/global/values.dart';
+import 'package:syphon/views/home/chat/details-chat-users.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/index.dart';
@@ -53,7 +54,8 @@ class NavigationProvider {
       '/home/chat': (BuildContext context) => ChatView(),
       '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
       '/home/chat/details': (BuildContext context) => MessageDetails(),
-      '/home/chat/details/users': (BuildContext context) => MessageDetails(),
+      '/home/chat/details/users': (BuildContext context) =>
+          ChatUsersDetailView(),
       '/home/groups/search': (BuildContext context) => GroupSearchView(),
       '/home/user/search': (BuildContext context) => SearchUserView(),
       '/home/user/details': (BuildContext context) => UserDetailsView(),

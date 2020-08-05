@@ -1,5 +1,4 @@
 // Project imports:
-import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import './actions.dart';
 import './state.dart';
@@ -18,6 +17,18 @@ SettingsStore settingsReducer(
     case SetAccentColor:
       return state.copyWith(
         accentColor: action.color,
+      );
+    case SetAppBarColor:
+      return state.copyWith(
+        appBarColor: action.color,
+      );
+    case SetFontName:
+      return state.copyWith(
+        fontName: action.fontName,
+      );
+    case SetFontSize:
+      return state.copyWith(
+        fontSize: action.fontSize,
       );
     case SetAppBarColor:
       return state.copyWith(

@@ -42,6 +42,12 @@ class UpdateHomeservers {
   UpdateHomeservers({this.homeservers});
 }
 
+class SetSearchText {
+  final String text;
+
+  SetSearchText({this.text});
+}
+
 // sets the "since" variable for pagination
 class SetSearchResults {
   final String since;
@@ -205,6 +211,12 @@ ThunkAction<AppState> searchUsers({String searchText}) {
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
+  };
+}
+
+ThunkAction<AppState> setSearchText({String text}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSearchText(text: text));
   };
 }
 

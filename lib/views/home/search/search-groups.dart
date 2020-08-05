@@ -110,7 +110,6 @@ class GroupSearchState extends State<GroupSearchView> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          // final width = MediaQuery.of(context).size.width;
           final height = MediaQuery.of(context).size.height;
 
           return Scaffold(
@@ -204,10 +203,6 @@ class GroupSearchState extends State<GroupSearchView> {
               child: Stack(
                 children: [
                   ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 2,
-                    ),
                     scrollDirection: Axis.vertical,
                     itemCount: props.searchResults.length,
                     itemBuilder: (BuildContext context, int index) {
@@ -217,136 +212,129 @@ class GroupSearchState extends State<GroupSearchView> {
 
                       return Container(
                         padding: const EdgeInsets.only(
+                          top: 8,
                           bottom: 8,
                         ),
                         child: ExpandablePanel(
                           hasIcon: false,
                           tapBodyToCollapse: true,
                           tapHeaderToExpand: true,
-                          header: Container(
-                            padding: const EdgeInsets.only(
-                              top: 8,
+                          header: ListTile(
+                            leading: Stack(
+                              children: [
+                                AvatarCircle(
+                                  uri: room.avatarUri,
+                                  alt: room.name,
+                                  size: Dimensions.avatarSizeMin,
+                                ),
+                                Visibility(
+                                  visible: !room.encryptionEnabled,
+                                  child: Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        Dimensions.thumbnailSizeMax,
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.red,
+                                              offset: Offset(8.0, 8.0),
+                                            )
+                                          ],
+                                        ),
+                                        height: 16,
+                                        width: 16,
+                                        child: Icon(
+                                          Icons.lock_open,
+                                          color: Colors.white,
+                                          size: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: room.encryptionEnabled,
+                                  child: Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        Dimensions.thumbnailSizeMax,
+                                      ),
+                                      child: Container(
+                                        height: 16,
+                                        width: 16,
+                                        color: Colors.green,
+                                        child: Icon(
+                                          Icons.lock,
+                                          color: Colors.white,
+                                          size: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: ListTile(
-                              leading: Stack(
-                                children: [
-                                  AvatarCircle(
-                                    uri: room.avatarUri,
-                                    alt: room.name,
-                                  ),
-                                  Visibility(
-                                    visible: !room.encryptionEnabled,
-                                    child: Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          Dimensions.thumbnailSizeMax,
-                                        ),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.red,
-                                                offset: Offset(8.0, 8.0),
-                                              )
-                                            ],
-                                          ),
-                                          height: 16,
-                                          width: 16,
-                                          child: Icon(
-                                            Icons.lock_open,
-                                            color: Colors.white,
-                                            size: 10,
-                                          ),
-                                        ),
+                            title: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  formatRoomName(room: room),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      formattedUserTotal.format(
+                                        room.totalJoinedUsers,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 10,
                                       ),
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: room.encryptionEnabled,
-                                    child: Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          Dimensions.thumbnailSizeMax,
-                                        ),
-                                        child: Container(
-                                          height: 16,
-                                          width: 16,
-                                          color: Colors.green,
-                                          child: Icon(
-                                            Icons.lock,
-                                            color: Colors.white,
-                                            size: 10,
-                                          ),
-                                        ),
-                                      ),
+                                    Icon(
+                                      Icons.person,
+                                      size: 20,
                                     ),
+                                  ],
+                                ),
+                                IconButton(
+                                  padding: EdgeInsets.only(
+                                    left: 8,
+                                    top: 8,
+                                    bottom: 8,
                                   ),
-                                ],
-                              ),
-                              title: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    formatRoomName(room: room),
-                                    overflow: TextOverflow.ellipsis,
-                                    style:
-                                        Theme.of(context).textTheme.subtitle1,
+                                  icon: Icon(
+                                    Icons.add_circle,
+                                    color: Colors.greenAccent,
                                   ),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          formattedUserTotal.format(
-                                            room.totalJoinedUsers,
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.person,
-                                          size: 20,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.add_circle,
-                                      color: Colors.greenAccent,
-                                      size: Dimensions.iconSize,
-                                    ),
-                                    iconSize: Dimensions.iconSize,
-                                    onPressed: () async {
-                                      await props.onJoin(room: room);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              ),
+                                  iconSize: Dimensions.iconSize,
+                                  onPressed: () async {
+                                    await props.onJoin(room: room);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                           collapsed: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            padding: Dimensions.listPadding,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -366,20 +354,14 @@ class GroupSearchState extends State<GroupSearchView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
+                                padding: Dimensions.listPadding,
                                 child: Text(
                                   room.topic ?? 'No Topic Available',
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
+                                padding: Dimensions.listPadding,
                                 child: Text(
                                   room.name,
                                   textAlign: TextAlign.start,
@@ -398,17 +380,18 @@ class GroupSearchState extends State<GroupSearchView> {
                                         children: <Widget>[
                                           Container(
                                             padding: EdgeInsets.symmetric(
-                                              vertical: 4,
-                                            ),
+                                                vertical: 4),
                                             child: !room.encryptionEnabled
                                                 ? Icon(
                                                     Icons.lock_open,
-                                                    size: 24.0,
+                                                    size: Dimensions
+                                                        .iconSizeLarge,
                                                     color: Colors.redAccent,
                                                   )
                                                 : Icon(
                                                     Icons.lock,
-                                                    size: 24.0,
+                                                    size: Dimensions
+                                                        .iconSizeLarge,
                                                     color: Colors.greenAccent,
                                                   ),
                                           ),
@@ -464,7 +447,7 @@ class GroupSearchState extends State<GroupSearchView> {
                     child: Visibility(
                       visible: props.loading,
                       child: Container(
-                          margin: EdgeInsets.only(top: height * 0.02),
+                          margin: EdgeInsets.only(top: 16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[

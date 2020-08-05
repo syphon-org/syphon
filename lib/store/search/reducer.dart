@@ -1,13 +1,17 @@
 // Project imports:
 import './actions.dart';
-import './model.dart';
+import './state.dart';
 
-SearchStore matrixReducer(
+SearchStore searchReducer(
     [SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(
         loading: action.loading,
+      );
+    case SetSearchText:
+      return state.copyWith(
+        searchText: action.searchText,
       );
     case SetHomeservers:
       return state.copyWith(
