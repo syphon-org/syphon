@@ -399,6 +399,26 @@ class HomeViewState extends State<Home> {
                               )),
                         ),
                       ),
+                      Visibility(
+                        visible: room.type == 'Group',
+                        child: Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: Dimensions.badgeAvatarSize,
+                              height: Dimensions.badgeAvatarSize,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Icon(
+                                Icons.public,
+                                color: Theme.of(context).iconTheme.color,
+                                size: Dimensions.badgeAvatarSize,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

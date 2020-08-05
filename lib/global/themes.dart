@@ -46,36 +46,38 @@ class Themes {
     int appBarColor = appBarColorHex;
     int scaffoldBackgroundColor = Colours.whiteDefault;
 
-    var brightness = Brightness.light;
     var appBarElevation;
+    var modalColor;
+    var brightness = Brightness.light;
     var iconColor = Colors.grey[500];
 
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
+        iconColor = Colors.white;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
         appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = null;
-        iconColor = Colors.white;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
+        appBarElevation = 0.0;
+        iconColor = Colors.white;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
         appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = Colours.blackDefault;
-        appBarElevation = 0.0;
-        iconColor = Colors.white;
         break;
       case ThemeType.NIGHT:
         brightness = Brightness.dark;
+        appBarElevation = 0.0;
+        iconColor = Colors.white;
+        modalColor = Colors.grey[900];
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
         appBarColor = appBarColor ?? Colours.blackFull;
         scaffoldBackgroundColor = Colours.blackFull;
-        appBarElevation = 0.0;
-        iconColor = Colors.white;
         break;
       case ThemeType.LIGHT:
       default:
@@ -93,7 +95,8 @@ class Themes {
       accentColor: Color(accentColor),
       brightness: brightness,
 
-      // Core UI
+      // Core UI\
+      dialogBackgroundColor: modalColor,
       focusColor: Color(primaryColor),
       cursorColor: Color(primaryColor),
       iconTheme: IconThemeData(color: iconColor),

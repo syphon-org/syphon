@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
 
 class AvatarAppBar extends StatelessWidget {
   AvatarAppBar({

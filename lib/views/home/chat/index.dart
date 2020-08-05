@@ -299,7 +299,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onViewUserDetails({Message message}) {
+  onViewUserDetails({Message message, String userId}) {
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
 
@@ -308,7 +308,7 @@ class ChatViewState extends State<ChatView> {
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         roomId: arguements.roomId,
-        userId: message.sender,
+        userId: userId ?? message.sender,
       ),
     );
   }
@@ -453,6 +453,7 @@ class ChatViewState extends State<ChatView> {
               roomUsers: props.room.users,
               selectedMessageId:
                   this.selectedMessage != null ? this.selectedMessage.id : null,
+              onPressAvatar: onViewUserDetails,
             ),
             ListView.builder(
               reverse: true,
@@ -826,8 +827,7 @@ class ChatViewState extends State<ChatView> {
                                 children: <Widget>[
                                   RefreshProgressIndicator(
                                     strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
                                       Theme.of(context).primaryColor,
                                     ),
                                     value: null,

@@ -27,14 +27,13 @@ class ModalUserDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
-      distinct: true,
-      converter: (Store<AppState> store) => Props.mapStateToProps(
-            store,
-            roomId: roomId,
-            userId: userId,
-          ),
-      builder: (context, props) {
-        return Container(
+        distinct: true,
+        converter: (Store<AppState> store) => Props.mapStateToProps(
+          store,
+          roomId: roomId,
+          userId: userId,
+        ),
+        builder: (context, props) => Container(
           constraints: BoxConstraints(
             maxHeight: Dimensions.defaultModalHeightMax,
           ),
@@ -43,7 +42,7 @@ class ModalUserDetails extends StatelessWidget {
             horizontal: 24,
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
+            color: Theme.of(context).dialogBackgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
@@ -165,8 +164,8 @@ class ModalUserDetails extends StatelessWidget {
               ),
             ],
           ),
-        );
-      });
+        ),
+      );
 }
 
 class Props extends Equatable {
