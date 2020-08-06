@@ -43,6 +43,7 @@ class Strings {
 
   // Labels
   static const labelRoomNameDefault = 'New Chat';
+  static const labelNoMessages = 'no messages found';
 
   // Buttons
   static const buttonLogin = 'login';
@@ -61,6 +62,10 @@ class Strings {
   static const buttonLoginCreateQuestion = 'Don\'t have a username?';
   static const buttonLoginCreateAction = 'Create One';
   static const buttonTextLogin = 'Login';
+
+  // Errors
+  static const errorCheckHomeserver =
+      'This server failed the \'well-known\' check, make sure the server is configured correctly';
 
   // intro
   static const contentIntroFirstPartOne =

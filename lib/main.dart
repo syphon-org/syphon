@@ -159,10 +159,13 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           color = Colors.grey;
       }
 
+      final alertMessage =
+          alert.message ?? alert.error ?? 'Unknown Error Occured';
+
       globalScaffold.currentState.showSnackBar(SnackBar(
         backgroundColor: color,
         content: Text(
-          alert.message,
+          alertMessage,
           style: Theme.of(context)
               .textTheme
               .subtitle1

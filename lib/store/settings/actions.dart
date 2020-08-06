@@ -296,21 +296,22 @@ ThunkAction<AppState> updateAppBarColor(int color) {
 }
 
 /**
- * Iterate over fontTypes on action
+ * Iterate over fontFamilies on action
  */
 ThunkAction<AppState> incrementFontType() {
   return (Store<AppState> store) async {
     final currentFontType = store.state.settingsStore.fontName;
-    final currentIndex = Values.fontTypes.indexOf(currentFontType);
+    final currentIndex = Values.fontFamilies.indexOf(currentFontType);
 
     store.dispatch(SetFontName(
-      fontName: Values.fontTypes[(currentIndex + 1) % Values.fontTypes.length],
+      fontName:
+          Values.fontFamilies[(currentIndex + 1) % Values.fontFamilies.length],
     ));
   };
 }
 
 /**
- * Iterate over fontTypes on action
+ * Iterate over fontFamilies on action
  */
 ThunkAction<AppState> incrementFontSize() {
   return (Store<AppState> store) async {

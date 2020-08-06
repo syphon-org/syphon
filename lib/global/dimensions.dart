@@ -74,12 +74,17 @@ class Dimensions {
   // Lists
   static const heroPadding = EdgeInsets.symmetric(
     vertical: 24,
-    horizontal: 24,
+    horizontal: 8,
   );
 
   static const listPadding = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 8,
+  );
+
+  static const listPaddingSettings = EdgeInsets.symmetric(
+    horizontal: 20,
+    vertical: 4,
   );
 
   static listPaddingDynamic({width = 500}) => EdgeInsets.only(

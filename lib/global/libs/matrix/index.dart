@@ -18,6 +18,7 @@ abstract class MatrixApi {
   static final registerUser = Auth.registerUser;
   static final updatePassword = Auth.updatePassword;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
+  static final checkHomeserver = Auth.checkHomeserver;
   static final registerEmail = Auth.registerEmail;
 
   // Search

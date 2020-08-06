@@ -43,6 +43,8 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
+    print('[loginUser] ${url}');
+
     Map body = {
       'type': type,
       "identifier": {"type": "m.id.user", "user": username},
@@ -227,6 +229,25 @@ abstract class Auth {
 
     url += username != null ? '?username=$username' : '';
 
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   *  https://matrix.org/docs/spec/client_server/latest#id211 
+   * 
+   *  Check Username Availability
+   * 
+   *  Used to check what types of logins are available on the server
+   */
+  static Future<dynamic> checkHomeserver({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+  }) async {
+    String url = '$protocol$homeserver/.well-known/matrix/client';
+
+    print(url);
     final response = await http.get(url);
 
     return await json.decode(response.body);

@@ -86,7 +86,7 @@ class AdvancedViewState extends State<AdvancedView> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Start Background Service',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -104,7 +104,7 @@ class AdvancedViewState extends State<AdvancedView> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Stop All Services',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -125,7 +125,7 @@ class AdvancedViewState extends State<AdvancedView> {
                     },
                     title: Text(
                       'Test Dialog',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -147,10 +147,8 @@ class AdvancedViewState extends State<AdvancedView> {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text(
-                      'Test Notifcations',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
+                    title: Text('Test Notifcations',
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
@@ -162,10 +160,8 @@ class AdvancedViewState extends State<AdvancedView> {
                     onTap: () {
                       props.onForceFunction();
                     },
-                    title: Text(
-                      'Force Function',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
+                    title: Text('Force Function',
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 ListTile(
@@ -185,7 +181,7 @@ class AdvancedViewState extends State<AdvancedView> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Toggle Syncing',
-                    style: TextStyle(fontSize: 18.0),
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
@@ -209,11 +205,11 @@ class AdvancedViewState extends State<AdvancedView> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color:
-                            props.loading ? Color(Colours.greyDisabled) : null,
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            color: props.loading
+                                ? Color(Colours.greyDisabled)
+                                : null,
+                          ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
@@ -237,11 +233,11 @@ class AdvancedViewState extends State<AdvancedView> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color:
-                            props.loading ? Color(Colours.greyDisabled) : null,
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            color: props.loading
+                                ? Color(Colours.greyDisabled)
+                                : null,
+                          ),
                     ),
                     subtitle: Text(
                       'Perform a forced full sync of all user data and messages',

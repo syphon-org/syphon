@@ -133,8 +133,16 @@ flutter:
   uses-material-design: true
 
   fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Italic.ttf 
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf 
+        - asset: assets/fonts/Poppins-Light.ttf 
+        - asset: assets/fonts/Poppins-Thin.ttf 
     - family: Rubik
       fonts:
+        - asset: assets/fonts/Rubik-Italic.ttf 
         - asset: assets/fonts/Rubik-Regular.ttf
         - asset: assets/fonts/Rubik-Medium.ttf 
         - asset: assets/fonts/Rubik-Light.ttf 

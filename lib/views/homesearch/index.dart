@@ -4,7 +4,6 @@ import 'dart:async';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
@@ -14,7 +13,6 @@ import 'package:redux/redux.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
-import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';

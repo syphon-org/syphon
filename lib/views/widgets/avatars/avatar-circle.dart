@@ -13,11 +13,13 @@ class AvatarCircle extends StatelessWidget {
     this.uri,
     this.alt,
     this.size = 40,
+    this.force = false,
     this.margin,
     this.padding,
     this.background,
   }) : super(key: key);
 
+  final bool force;
   final String uri;
   final String alt;
   final double size;
@@ -47,6 +49,7 @@ class AvatarCircle extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.fill,
+          fallbackColor: Colors.transparent,
         ),
       );
     }
@@ -56,10 +59,13 @@ class AvatarCircle extends StatelessWidget {
       height: size,
       margin: margin,
       padding: padding,
+      color: Colors.transparent,
       child: CircleAvatar(
         radius: size / 2,
         child: avatarWidget,
-        backgroundColor: background ?? backgroundColor,
+        backgroundColor: uri == null && !force
+            ? background ?? backgroundColor
+            : Colors.transparent,
       ),
     );
   }

@@ -10,7 +10,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class MessageWidget extends StatelessWidget {
   MessageWidget({
@@ -193,38 +193,15 @@ class MessageWidget extends StatelessWidget {
                           }
                         },
                         child: Container(
-                          margin: const EdgeInsets.only(
-                            right: 8,
+                          margin: const EdgeInsets.only(right: 8),
+                          child: AvatarCircle(
+                            margin: EdgeInsets.zero,
+                            padding: EdgeInsets.zero,
+                            uri: avatarUri,
+                            alt: message.sender,
+                            size: Dimensions.avatarSizeMessage,
+                            background: Colours.hashedColor(message.sender),
                           ),
-                          child: avatarUri != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    Dimensions.thumbnailSizeMax,
-                                  ),
-                                  child: MatrixImage(
-                                    width: Dimensions.avatarSizeMessage,
-                                    height: Dimensions.avatarSizeMessage,
-                                    mxcUri: avatarUri,
-                                    fallback: Text(
-                                      formatSenderInitials(message.sender),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : CircleAvatar(
-                                  radius: 14,
-                                  backgroundColor: bubbleColor,
-                                  child: Text(
-                                    formatSenderInitials(message.sender),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
                         ),
                       ),
                     ),

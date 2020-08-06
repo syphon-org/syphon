@@ -333,7 +333,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: deviceKeyMap,
       );
@@ -444,7 +444,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
 
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: payload,
       );
@@ -880,7 +880,7 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       final data = await MatrixApi.fetchKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         lastSince: store.state.syncStore.lastSince,
         users: userMap,

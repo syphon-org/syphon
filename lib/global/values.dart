@@ -49,9 +49,10 @@ class Values {
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;
 
-  static const fontTypes = [
+  static const fontFamilies = [
     'Rubik',
     "Roboto",
+    "Poppins",
   ];
 
   static const fontSizes = [

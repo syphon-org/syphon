@@ -261,13 +261,16 @@ class HomeViewState extends State<Home> {
               semanticsLabel: Strings.semanticsLabelHomeEmpty,
             ),
           ),
-          Container(
+          GestureDetector(
+            child: Container(
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                'there\'s no messages yet',
+                Strings.labelNoMessages,
                 style: Theme.of(context).textTheme.headline6,
-              ))
+              ),
+            ),
+          ),
         ],
       ));
     }
@@ -343,10 +346,9 @@ class HomeViewState extends State<Home> {
             decoration: BoxDecoration(
               color: backgroundColor, // if selected, color seperately
             ),
-            padding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 18,
-            ),
+            padding: EdgeInsets.symmetric(
+              vertical: Theme.of(context).textTheme.subtitle1.fontSize,
+            ).add(Dimensions.appPaddingHorizontal),
             child: Flex(
               direction: Axis.horizontal,
               mainAxisAlignment: MainAxisAlignment.start,

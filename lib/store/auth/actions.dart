@@ -22,6 +22,7 @@ import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/libs/matrix/media.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
@@ -285,10 +286,28 @@ ThunkAction<AppState> loginUser() {
         generateDeviceId(salt: username),
       );
 
+      var homeserver = store.state.authStore.homeserver;
+      try {
+        final check = await MatrixApi.checkHomeserver(
+              protocol: protocol,
+              homeserver: homeserver,
+            ) ??
+            {};
+
+        homeserver = (check['m.homeserver']['base_url'] as String)
+            .replaceAll('https://', '');
+
+        if (check['m.homeserver'] == null) {
+          addInfo(
+            message: Strings.errorCheckHomeserver,
+          );
+        }
+      } catch (error) {/* still attempt login */}
+
       final data = await MatrixApi.loginUser(
         protocol: protocol,
         type: "m.login.password",
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         deviceName: device.displayName,
@@ -363,6 +382,7 @@ ThunkAction<AppState> fetchUserCurrentProfile() {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      print('User Profiles ${store.state.authStore.user.homeserver}');
       final data = await MatrixApi.fetchUserProfile(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,

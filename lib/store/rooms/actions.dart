@@ -197,6 +197,7 @@ ThunkAction<AppState> fetchRooms() {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      print(store.state.authStore.user.homeserver);
       final data = await MatrixApi.fetchRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,

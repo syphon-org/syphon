@@ -128,11 +128,9 @@ class MessageTypingState extends State<MessageTypingWidget>
                                   alt: userTyping.displayName ??
                                       userTyping.userId,
                                   size: Dimensions.avatarSizeMessage,
-                                  background: userTyping.avatarUri != null
-                                      ? Colors.transparent
-                                      : Colours.hashedColor(
-                                          userTyping.userId ?? '',
-                                        ),
+                                  background: Colours.hashedColor(
+                                    userTyping.userId ?? '',
+                                  ),
                                 ),
                         ),
                       ),

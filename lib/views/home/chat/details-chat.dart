@@ -157,9 +157,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                     uri: user.avatarUri,
                     alt: user.displayName ?? user.userId,
                     size: Dimensions.avatarSize,
-                    background: user.avatarUri != null
-                        ? Colors.transparent
-                        : Colours.hashedColor(user.userId),
+                    background: Colours.hashedColor(user.userId),
                   ),
                 ),
               ),

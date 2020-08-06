@@ -35,7 +35,7 @@ class AvatarAppBar extends StatelessWidget {
               icon: AvatarCircle(
                 uri: user.avatarUri,
                 alt: user.displayName ?? user.userId,
-                // background: Colors.grey,
+                background: Colors.grey,
               ),
               onPressed: onPressed,
               tooltip: tooltip,

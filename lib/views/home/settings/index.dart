@@ -55,6 +55,7 @@ class SettingsScreen extends StatelessWidget {
               child: IgnorePointer(
                 ignoring: props.authLoading,
                 child: Container(
+                  padding: Dimensions.appPaddingHorizontal,
                   child: Column(
                     children: <Widget>[
                       InkWell(
@@ -73,19 +74,18 @@ class SettingsScreen extends StatelessWidget {
                           GestureDetector(
                             onTap: () => props.onDisabled(),
                             child: ListTile(
+                              contentPadding: Dimensions.listPaddingSettings,
                               enabled: false,
-                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'SMS and MMS',
+                              ),
+                              subtitle: buildToggledSubtitle(value: false),
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
                                     Icons.chat,
                                     size: 28,
                                   )),
-                              title: Text(
-                                'SMS and MMS',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              subtitle: buildToggledSubtitle(value: false),
                             ),
                           ),
                           ListTile(
@@ -93,9 +93,11 @@ class SettingsScreen extends StatelessWidget {
                                 ? null
                                 : () {
                                     Navigator.pushNamed(
-                                        context, '/notifications');
+                                      context,
+                                      '/notifications',
+                                    );
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -104,7 +106,6 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Notifications',
-                              style: TextStyle(fontSize: 18.0),
                             ),
                             subtitle: buildToggledSubtitle(
                               value: props.notificationsEnabled,
@@ -117,7 +118,7 @@ class SettingsScreen extends StatelessWidget {
                                     Navigator.pushNamed(
                                         context, '/chat-preferences');
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.only(
                                   top: 4,
@@ -131,7 +132,7 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Chats And Media',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
                           ListTile(
@@ -140,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                                 : () {
                                     Navigator.pushNamed(context, '/privacy');
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -149,11 +150,11 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Security & Privacy',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
                               'Screen Lock Off, Registration Lock Off',
-                              style: TextStyle(fontSize: 14.0),
+                              style: Theme.of(context).textTheme.caption,
                             ),
                           ),
                           ListTile(
@@ -162,7 +163,7 @@ class SettingsScreen extends StatelessWidget {
                                 : () {
                                     Navigator.pushNamed(context, '/theming');
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -171,7 +172,7 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Theming',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
                           ListTile(
@@ -180,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
                                 : () {
                                     Navigator.pushNamed(context, '/devices');
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -189,7 +190,7 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Devices',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
                           ListTile(
@@ -198,7 +199,7 @@ class SettingsScreen extends StatelessWidget {
                                 : () {
                                     Navigator.pushNamed(context, '/advanced');
                                   },
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -207,14 +208,14 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Advanced',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
                           ListTile(
                             onTap: props.authLoading
                                 ? null
                                 : () => props.onLogoutUser(),
-                            contentPadding: Dimensions.listPadding,
+                            contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(
@@ -223,7 +224,7 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               'Logout',
-                              style: TextStyle(fontSize: 18.0),
+                              style: Theme.of(context).textTheme.subtitle1,
                             ),
                             trailing: Visibility(
                               visible: props.authLoading,
