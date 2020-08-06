@@ -7,6 +7,7 @@ import 'package:syphon/views/home/chat/details-chat-users.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/home/groups/group-create-public.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/profile/index.dart';
@@ -56,9 +57,12 @@ class NavigationProvider {
       '/home/chat/details': (BuildContext context) => MessageDetails(),
       '/home/chat/details/users': (BuildContext context) =>
           ChatUsersDetailView(),
-      '/home/groups/search': (BuildContext context) => GroupSearchView(),
       '/home/user/search': (BuildContext context) => SearchUserView(),
       '/home/user/details': (BuildContext context) => UserDetailsView(),
+      '/home/groups/search': (BuildContext context) => GroupSearchView(),
+      '/home/groups/create': (BuildContext context) => CreateGroupPublicView(),
+      '/home/groups/create-public': (BuildContext context) =>
+          CreateGroupPublicView(),
       '/profile': (BuildContext context) => ProfileView(),
       '/notifications': (BuildContext context) => NotificationSettingsView(),
       '/advanced': (BuildContext context) => AdvancedView(),

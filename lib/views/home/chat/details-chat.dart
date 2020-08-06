@@ -346,13 +346,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                       Text(
                                         'See all users',
                                         textAlign: TextAlign.start,
-                                        style: TextStyle(),
                                       ),
                                       Container(
                                         child: Text(
                                           ' (${props.room.users.length})',
                                           textAlign: TextAlign.start,
-                                          style: TextStyle(),
                                         ),
                                       ),
                                     ],
@@ -441,6 +439,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               contentPadding: contentPadding,
                               title: Text(
                                 'Color',
+                                style: Theme.of(context).textTheme.subtitle1,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.only(right: 8),

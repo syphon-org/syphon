@@ -19,10 +19,6 @@ import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 class Theming extends StatelessWidget {
   Theming({Key key}) : super(key: key);
 
-  displayThemeType(String themeTypeName) {
-    return themeTypeName.split('.')[1].toLowerCase();
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
@@ -94,6 +90,7 @@ class Theming extends StatelessWidget {
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Accent Color',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: CircleAvatar(
                             radius: 16,
@@ -114,6 +111,7 @@ class Theming extends StatelessWidget {
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'App Bar Color',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: CircleAvatar(
                             radius: 16,
@@ -125,9 +123,10 @@ class Theming extends StatelessWidget {
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Theme',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            displayThemeType(props.themeType),
+                            props.themeType,
                           ),
                         ),
                       ],
@@ -149,6 +148,7 @@ class Theming extends StatelessWidget {
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Font',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
                             props.fontName,
@@ -159,6 +159,7 @@ class Theming extends StatelessWidget {
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Font Size',
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
                             props.fontSize,
@@ -226,7 +227,10 @@ class Props extends Equatable {
             store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
         appBarColor:
             store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
-        themeType: store.state.settingsStore.theme.toString(),
+        themeType: store.state.settingsStore.theme
+            .toString()
+            .split('.')[1]
+            .toLowerCase(),
         language: store.state.settingsStore.language,
         fontName: store.state.settingsStore.fontName,
         fontSize: store.state.settingsStore.fontSize,

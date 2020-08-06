@@ -36,8 +36,9 @@ class ProfileViewState extends State<ProfileView> {
   ProfileViewState({Key key}) : super();
 
   File newAvatarFile;
-  String newDisplayName;
+
   String newUserId;
+  String newDisplayName;
   final displayNameController = TextEditingController();
   final userIdController = TextEditingController();
   final String title = Strings.titleProfile;
@@ -70,9 +71,7 @@ class ProfileViewState extends State<ProfileView> {
   }
 
   @protected
-  onShowBottomSheet(
-    context,
-  ) async {
+  onShowImageOptions(context) async {
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -95,14 +94,14 @@ class ProfileViewState extends State<ProfileView> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final double imageSize = width * 0.28;
+        final double imageSize = Dimensions.avatarSizeDetails;
         final currentAvatar = props.user.avatarUri;
 
         // Space for confirming rebuilding
-        dynamic avatarWidget = CircleAvatar(
+        Widget avatarWidget = CircleAvatar(
           backgroundColor: Colors.grey,
           child: Text(
-            displayInitials(props.user),
+            formatInitials(props.user.displayName ?? props.user.displayName),
             style: TextStyle(
               color: Colors.white,
               fontSize: 32.0,
@@ -182,7 +181,7 @@ class ProfileViewState extends State<ProfileView> {
                                 width: imageSize,
                                 height: imageSize,
                                 child: GestureDetector(
-                                  onTap: () => onShowBottomSheet(context),
+                                  onTap: () => onShowImageOptions(context),
                                   child: avatarWidget,
                                 ),
                               ),

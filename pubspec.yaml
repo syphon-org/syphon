@@ -55,10 +55,7 @@ dependencies:
     git:
       url: https://gitlab.com/famedly/libraries/dart-olm
       ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
-
-  # Old Packages
-  # workmanager: ^0.2.0 # TODO
-
+ 
   # Domain / Store
   expandable: 3.0.1
   equatable: ^1.1.0
@@ -76,6 +73,7 @@ dependencies:
   flutter_secure_storage: 3.3.1+1 
   mime: ^0.9.6
   path_provider: ^1.6.11
+  package_info: '0.4.1'
   # steel_crypt: 1.7.1
   # cryptography: 1.2.1
 

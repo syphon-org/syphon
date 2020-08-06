@@ -33,7 +33,7 @@ class AvatarCircle extends StatelessWidget {
       formatInitials(alt),
       style: TextStyle(
         color: Colors.white,
-        fontSize: size / 2.22,
+        fontSize: Dimensions.avatarFontSize(size: size),
         fontWeight: FontWeight.w500,
         letterSpacing: 0.9,
       ),

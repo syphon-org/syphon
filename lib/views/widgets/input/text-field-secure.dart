@@ -1,4 +1,6 @@
 // Flutter imports:
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,8 +63,11 @@ class TextFieldSecure extends StatelessWidget {
           onEditingComplete: onEditingComplete,
           autocorrect: false,
           enableSuggestions: false,
+          selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
-              ? null
+              ? [
+                  BlacklistingTextInputFormatter(RegExp(r"\t")),
+                ]
               : [
                   BlacklistingTextInputFormatter(RegExp(r"\s")),
                   BlacklistingTextInputFormatter(RegExp(r"\t")),

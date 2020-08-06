@@ -1,12 +1,35 @@
 // Project imports:
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import './model.dart';
 
-// Preauth
+/*
+ * Selectors
+ */
 dynamic homeserver(AppState state) {
   return state.authStore.homeserver;
 }
 
+// Users the authed user has dm'ed
+List<User> friendlyUsers(AppState state) {
+  final rooms = state.roomStore.rooms.values as Iterable<Room>;
+  final roomsDirect = rooms.where((room) => room.direct);
+  final roomsDirectUsers = roomsDirect.map((room) => room.users);
+
+  final allDirectUsers = roomsDirectUsers.fold(
+    {},
+    (usersAll, users) {
+      (usersAll as Map).addAll(users);
+      return usersAll;
+    },
+  );
+
+  return List.from(allDirectUsers.values);
+}
+
+/*
+ * Getters
+ */
 String trimmedUserId({String userId}) {
   return userId.replaceAll('@', '');
 }

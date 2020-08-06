@@ -56,7 +56,7 @@ class ButtonText extends StatelessWidget {
                         if (color != null) {
                           return color;
                         }
-                        return Theme.of(context).primaryColor;
+                        return Theme.of(context).buttonColor;
                       }(),
                     ),
                   )),

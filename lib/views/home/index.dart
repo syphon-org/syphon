@@ -46,12 +46,11 @@ class Home extends StatefulWidget {
 class HomeViewState extends State<Home> {
   HomeViewState({Key key}) : super();
 
-  Room selectedRoom;
-
-  Map<String, Color> roomColorDefaults;
-
   final GlobalKey<FabCircularMenuState> fabKey =
       GlobalKey<FabCircularMenuState>();
+
+  Room selectedRoom;
+  Map<String, Color> roomColorDefaults;
 
   @override
   void initState() {

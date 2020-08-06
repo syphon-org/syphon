@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
@@ -23,8 +24,33 @@ import 'package:syphon/store/user/model.dart';
 final String debug = DotEnv().env['DEBUG'];
 final String protocol = DotEnv().env['PROTOCOL'];
 
-class AdvancedView extends StatelessWidget {
-  AdvancedView({Key key}) : super(key: key);
+class AdvancedView extends StatefulWidget {
+  const AdvancedView({Key key}) : super(key: key);
+
+  @override
+  AdvancedViewState createState() => AdvancedViewState();
+}
+
+class AdvancedViewState extends State<AdvancedView> {
+  AdvancedViewState({Key key});
+
+  String version;
+  String buildNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    onMounted();
+  }
+
+  @protected
+  void onMounted() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    this.setState(() {
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+    });
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -51,14 +77,12 @@ class AdvancedView extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
-                    onTap: () {
-                      BackgroundSync.start(
-                        protocol: protocol,
-                        homeserver: props.currentUser.homeserver,
-                        accessToken: props.currentUser.accessToken,
-                        lastSince: props.lastSince,
-                      );
-                    },
+                    onTap: () => BackgroundSync.start(
+                      protocol: protocol,
+                      homeserver: props.currentUser.homeserver,
+                      accessToken: props.currentUser.accessToken,
+                      lastSince: props.lastSince,
+                    ),
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Start Background Service',
@@ -228,6 +252,19 @@ class AdvancedView extends StatelessWidget {
                         value: props.loading ? null : 0,
                       ),
                     ),
+                  ),
+                ),
+                ListTile(
+                  dense: true,
+                  onTap: props.loading ? null : props.onForceFullSync,
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Version',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  trailing: Text(
+                    '$version ($buildNumber)',
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
               ],

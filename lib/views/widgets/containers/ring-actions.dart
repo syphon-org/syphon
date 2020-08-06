@@ -41,7 +41,7 @@ class ActionRing extends StatelessWidget {
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey.currentState.close();
-    // Navigator.pushNamed(context, '/home/groups/create');
+    Navigator.pushNamed(context, '/home/groups/create');
   }
 
   @protected

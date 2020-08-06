@@ -20,6 +20,7 @@ class Dimensions {
   static const double avatarSizeLarge = 84;
   static const double avatarSizeMessage = 28;
   static const double avatarSizeDetails = 120;
+  static double avatarFontSize({double size = 32}) => (size / 2.22);
 
   // Media
   static const double mediaSize = 264;
@@ -60,6 +61,7 @@ class Dimensions {
   static const double inputSizeMax = 296;
 
   static const double inputHeight = 52;
+  static const double inputEditorHeight = 128;
   static const double inputBorderRadius = 30.0;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
@@ -80,23 +82,19 @@ class Dimensions {
     vertical: 8,
   );
 
-  static listPaddingDynamic({width = 500}) {
-    return EdgeInsets.only(
-      left: width * 0.04,
-      right: width * 0.04,
-      top: 4,
-      bottom: 8,
-    );
-  }
+  static listPaddingDynamic({width = 500}) => EdgeInsets.only(
+        left: width * 0.04,
+        right: width * 0.04,
+        top: 4,
+        bottom: 8,
+      );
 
-  static listTitlePaddingDynamic({width = 500}) {
-    return EdgeInsets.only(
-      left: width * 0.04,
-      right: width * 0.04,
-      top: 6,
-      bottom: 14,
-    );
-  }
+  static listTitlePaddingDynamic({width = 500}) => EdgeInsets.only(
+        left: width * 0.04,
+        right: width * 0.04,
+        top: 6,
+        bottom: 14,
+      );
 
   // Dialogs
   static const EdgeInsets dialogPadding = EdgeInsets.symmetric(

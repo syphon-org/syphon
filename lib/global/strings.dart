@@ -26,6 +26,7 @@ class Strings {
   static const titleSearchGroups = 'Explore Groups';
   static const titleSearchUsers = 'Search Users';
   static const titleRoomUsers = 'All Room Users';
+  static const titleCreateGroupPublic = 'Create A Public Group';
 
   // Dialog Titles
   static const titleDialogCaptcha = 'Complete Captcha';
@@ -45,20 +46,21 @@ class Strings {
 
   // Buttons
   static const buttonLogin = 'login';
-  static const buttonTextLogin = 'Login';
   static const buttonSaveGeneric = 'save';
-
-  static const buttonIntroExistQuestion = 'Already have a username?';
-  static const buttonIntroExistAction = 'Login';
-
-  static const buttonLoginCreateQuestion = 'Don\'t have a username?';
-  static const buttonLoginCreateAction = 'Create One';
-
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';
+  static const buttonCreate = 'create';
   static const buttonCancel = 'cancel';
+  static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+
+  // Text Buttons
+  static const buttonIntroExistQuestion = 'Already have a username?';
+  static const buttonIntroExistAction = 'Login';
+  static const buttonLoginCreateQuestion = 'Don\'t have a username?';
+  static const buttonLoginCreateAction = 'Create One';
+  static const buttonTextLogin = 'Login';
 
   // intro
   static const contentIntroFirstPartOne =
