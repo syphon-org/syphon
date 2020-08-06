@@ -86,8 +86,6 @@ class User extends Equatable {
         }
       }
 
-      print('User.fromJson ${homeserver}');
-      print('User.fromJson ${idserver}');
       return User(
         userId: json['user_id'] as String,
         deviceId: json['device_id'] as String,

@@ -444,9 +444,7 @@ class HomeViewState extends State<Home> {
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
                           Text(
-                            formatTimestamp(
-                              lastUpdateMillis: room.lastUpdate,
-                            ),
+                            formatTimestamp(lastUpdateMillis: room.lastUpdate),
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w100),
                           ),

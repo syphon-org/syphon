@@ -9,6 +9,11 @@ class Dimensions {
   // Generic
   static const double widgetHeightMax = 1024;
   static const scrollviewPadding = EdgeInsets.only(bottom: 32);
+
+  static const appPaddingVertical = EdgeInsets.symmetric(
+    vertical: 16,
+  );
+
   static const appPaddingHorizontal = EdgeInsets.symmetric(
     horizontal: 16,
   );

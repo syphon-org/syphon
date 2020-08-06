@@ -85,7 +85,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
           backgroundColor: Colors.grey,
           child: Icon(
             Icons.public,
-            color: Theme.of(context).iconTheme.color,
+            color: Theme.of(context).indicatorColor,
             size: Dimensions.avatarSizeDetails / 1.4,
           ),
         );
@@ -130,210 +130,260 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
           ),
           body: ScrollConfiguration(
             behavior: DefaultScrollBehavior(),
-            child: SingleChildScrollView(
-              // eventually expand as profile grows
-              child: Container(
-                padding: Dimensions.appPaddingHorizontal,
-                constraints: BoxConstraints(
-                  maxHeight: height * 0.9,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
+            child: LayoutBuilder(
+              builder: (
+                BuildContext context,
+                BoxConstraints viewportConstraints,
+              ) =>
+                  SingleChildScrollView(
+                // eventually expand as profile grows
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
+                      children: [
                         Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
+                          flex: 0,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              Stack(
-                                children: [
-                                  Container(
-                                    width: imageSize,
-                                    height: imageSize,
-                                    child: GestureDetector(
-                                      onTap: () => onShowImageOptions(context),
-                                      child: avatarWidget,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 6,
-                                    bottom: 2,
-                                    child: Container(
-                                      width: Dimensions.iconSizeLarge,
-                                      height: Dimensions.iconSizeLarge,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius: BorderRadius.circular(
-                                          Dimensions.iconSizeLarge,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              blurRadius: 6,
-                                              offset: Offset(0, 0),
-                                              color: Colors.black54)
-                                        ],
-                                      ),
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        color:
-                                            Theme.of(context).iconTheme.color,
-                                        size: Dimensions.iconSizeLite,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(top: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: 4),
-                                      child: Text(
-                                        this.name ?? '',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
-                                            .copyWith(color: Colors.white),
-                                      ),
-                                    ),
-                                    Text(
-                                      this.alias != null &&
-                                              this.alias.isNotEmpty
-                                          ? '@${this.alias}'
-                                          : '',
-                                      textAlign: TextAlign.center,
-                                      style:
-                                          Theme.of(context).textTheme.caption,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          flex: 2,
-                          fit: FlexFit.loose,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    padding: Dimensions.listPadding,
-                                    child: Text(
-                                      'About',
-                                      textAlign: TextAlign.start,
-                                      style:
-                                          Theme.of(context).textTheme.subtitle2,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.all(8.0),
-                                    constraints: BoxConstraints(
-                                      maxHeight: Dimensions.inputHeight,
-                                      maxWidth: Dimensions.inputWidthMax,
-                                    ),
-                                    child: TextFieldSecure(
-                                      label: 'Name*',
-                                      disableSpacing: true,
-                                      controller: nameController,
-                                      onChanged: (text) => this.setState(() {
-                                        name = text;
-                                      }),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.all(8.0),
-                                    constraints: BoxConstraints(
-                                      maxHeight: Dimensions.inputHeight,
-                                      maxWidth: Dimensions.inputWidthMax,
-                                    ),
-                                    child: TextFieldSecure(
-                                      label: 'Alias*',
-                                      disableSpacing: true,
-                                      onChanged: (text) => this.setState(() {
-                                        alias = text;
-                                      }),
-                                      controller: aliasController,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.all(8.0),
-                                    height: Dimensions.inputEditorHeight,
-                                    constraints: BoxConstraints(
-                                      maxHeight: Dimensions.inputEditorHeight,
-                                      maxWidth: Dimensions.inputWidthMax,
-                                    ),
-                                    child: TextFieldSecure(
-                                      label: 'Topic',
-                                      maxLines: 25,
-                                      controller: topicController,
-                                      onChanged: (text) => this.setState(() {
-                                        topic = text;
-                                      }),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
+                              Flexible(
+                                flex: 0,
+                                // fit: FlexFit.loose,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.all(8.0),
-                                      child: ButtonSolid(
-                                        text: Strings.buttonCreate,
-                                        loading: props.loading,
-                                        disabled: props.loading,
-                                        onPressed: () async {
-                                          final bool successful =
-                                              await props.onCreateRoomPublic(
-                                            name: this.name,
-                                            topic: this.topic,
-                                            alias: this.alias,
-                                            avatar: this.avatar,
-                                          );
-                                          if (successful) {
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                      ),
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 42, bottom: 8),
+                                          width: imageSize,
+                                          height: imageSize,
+                                          child: GestureDetector(
+                                            onTap: () =>
+                                                onShowImageOptions(context),
+                                            child: avatarWidget,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: 6,
+                                          bottom: 2,
+                                          child: Container(
+                                            width: Dimensions.iconSizeLarge,
+                                            height: Dimensions.iconSizeLarge,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                Dimensions.iconSizeLarge,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    blurRadius: 6,
+                                                    offset: Offset(0, 0),
+                                                    color: Colors.black54)
+                                              ],
+                                            ),
+                                            child: Icon(
+                                              Icons.camera_alt,
+                                              color: Theme.of(context)
+                                                  .indicatorColor,
+                                              size: Dimensions.iconSizeLite,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     Container(
-                                      height: Dimensions.inputHeight,
-                                      margin: const EdgeInsets.all(10.0),
-                                      constraints: BoxConstraints(
-                                        minWidth: Dimensions.buttonWidthMin,
-                                        minHeight: Dimensions.buttonHeightMin,
-                                      ),
-                                      child: ButtonTextOpacity(
-                                        text: Strings.buttonQuit,
-                                        onPressed: () => Navigator.pop(context),
+                                      padding: EdgeInsets.only(top: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(bottom: 4),
+                                            child: Text(
+                                              this.name ?? '',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                            ),
+                                          ),
+                                          Text(
+                                            this.alias == null
+                                                ? ''
+                                                : matrixAlias(
+                                                    resource: this.alias ?? '',
+                                                    homeserver:
+                                                        props.homeserver,
+                                                  ),
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption,
+                                          ),
+                                          Flexible(
+                                              flex: 0,
+                                              fit: FlexFit.tight,
+                                              child: Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 4),
+                                                constraints: BoxConstraints(
+                                                  maxWidth: width / 1.5,
+                                                ),
+                                                child: Text(
+                                                  this.topic ?? '',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.center,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .caption,
+                                                ),
+                                              )),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                              Flexible(
+                                flex: 0,
+                                fit: FlexFit.loose,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                          padding: Dimensions.listPadding,
+                                          child: Text(
+                                            'About',
+                                            textAlign: TextAlign.start,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .subtitle2,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.all(8.0),
+                                          constraints: BoxConstraints(
+                                            maxHeight: Dimensions.inputHeight,
+                                            maxWidth: Dimensions.inputWidthMax,
+                                          ),
+                                          child: TextFieldSecure(
+                                            label: 'Name*',
+                                            controller: nameController,
+                                            onChanged: (text) =>
+                                                this.setState(() {
+                                              name = text;
+                                            }),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.all(8.0),
+                                          constraints: BoxConstraints(
+                                            maxHeight: Dimensions.inputHeight,
+                                            maxWidth: Dimensions.inputWidthMax,
+                                          ),
+                                          child: TextFieldSecure(
+                                            label: 'Alias*',
+                                            disableSpacing: true,
+                                            onChanged: (text) =>
+                                                this.setState(() {
+                                              alias = text;
+                                            }),
+                                            controller: aliasController,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.all(8.0),
+                                          height: Dimensions.inputEditorHeight,
+                                          constraints: BoxConstraints(
+                                            maxHeight:
+                                                Dimensions.inputEditorHeight,
+                                            maxWidth: Dimensions.inputWidthMax,
+                                          ),
+                                          child: TextFieldSecure(
+                                            label: 'Topic',
+                                            maxLines: 25,
+                                            controller: topicController,
+                                            onChanged: (text) =>
+                                                this.setState(() {
+                                              topic = text;
+                                            }),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                flex: 0,
+                                child: Container(
+                                  padding: EdgeInsets.only(top: 32),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.all(8.0),
+                                        child: ButtonSolid(
+                                          text: Strings.buttonCreate,
+                                          loading: props.loading,
+                                          disabled: props.loading,
+                                          onPressed: () async {
+                                            final bool successful =
+                                                await props.onCreateRoomPublic(
+                                              name: this.name,
+                                              topic: this.topic,
+                                              alias: this.alias,
+                                              avatar: this.avatar,
+                                            );
+                                            if (successful) {
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      Container(
+                                        height: Dimensions.inputHeight,
+                                        margin: const EdgeInsets.all(10.0),
+                                        constraints: BoxConstraints(
+                                          minWidth: Dimensions.buttonWidthMin,
+                                          minHeight: Dimensions.buttonHeightMin,
+                                        ),
+                                        child: ButtonTextOpacity(
+                                          text: Strings.buttonQuit,
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -346,12 +396,15 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
 
 class _Props extends Equatable {
   final bool loading;
+  final String homeserver;
   final List<User> users;
+
   final Function onCreateRoomPublic;
 
   _Props({
     @required this.users,
     @required this.loading,
+    @required this.homeserver,
     @required this.onCreateRoomPublic,
   });
 
@@ -359,10 +412,12 @@ class _Props extends Equatable {
   List<Object> get props => [
         users,
         loading,
+        homeserver,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: friendlyUsers(store.state),
+        homeserver: store.state.authStore.user.homeserver,
         loading: store.state.authStore.loading,
         onCreateRoomPublic: ({
           File avatar,
@@ -370,6 +425,10 @@ class _Props extends Equatable {
           String topic,
           String alias,
         }) async {
+          final aliasFormatted = matrixAlias(
+            resource: alias,
+            homeserver: store.state.authStore.user.homeserver,
+          );
           await store.dispatch(fetchUserCurrentProfile());
           return true;
         },

@@ -64,6 +64,7 @@ class Strings {
   static const buttonTextLogin = 'Login';
 
   // Errors
+  static const errorMessageSendingFailed = 'Message Failed To Send';
   static const errorCheckHomeserver =
       'This server failed the \'well-known\' check, make sure the server is configured correctly';
 

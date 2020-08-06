@@ -272,7 +272,7 @@ class MessageWidget extends StatelessWidget {
                                   margin: EdgeInsets.only(right: 4),
                                   child: Text(
                                     message.failed
-                                        ? 'Message failed to send'
+                                        ? Strings.errorMessageSendingFailed
                                         : formatTimestamp(
                                             lastUpdateMillis: message.timestamp,
                                             showTime: true,
