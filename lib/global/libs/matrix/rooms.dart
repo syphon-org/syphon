@@ -183,9 +183,10 @@ abstract class Rooms {
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
-    String roomName,
-    String roomAlias,
-    String roomTopic,
+    String name,
+    String alias,
+    String topic,
+    String visibility = 'private',
     List<String> invites = const [],
     String chatTypePreset = "private_chat",
     bool isDirect = false,
@@ -197,13 +198,22 @@ abstract class Rooms {
     };
 
     Map body = {
+      'visibility': visibility,
       "is_direct": isDirect,
       "preset": chatTypePreset,
       'invite': invites
     };
 
-    if (roomName != null) {
-      body['name'] = roomName;
+    if (name != null) {
+      body['name'] = name;
+    }
+
+    if (alias != null) {
+      body['room_alias_name'] = alias;
+    }
+
+    if (topic != null) {
+      body['topic'] = topic;
     }
 
     final response = await http.post(

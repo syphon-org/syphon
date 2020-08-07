@@ -27,14 +27,6 @@ import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
-class SearchScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
-
 class SearchUserView extends StatefulWidget {
   const SearchUserView({Key key}) : super(key: key);
 

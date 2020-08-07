@@ -18,7 +18,6 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
@@ -29,14 +28,6 @@ class ChatUsersDetailArguments {
   final String roomId;
 
   ChatUsersDetailArguments({this.roomId});
-}
-
-class SearchScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
 }
 
 class ChatUsersDetailView extends StatefulWidget {
@@ -53,6 +44,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 
   Timer searchTimeout;
   bool searching = false;
+  bool loading = false;
   String searchable;
   String creatingRoomDisplayName;
 
@@ -176,8 +168,6 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
     final ChatUsersDetailArguments arguments =
         ModalRoute.of(context).settings.arguments;
 
-    final height = MediaQuery.of(context).size.height;
-
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) =>
@@ -218,8 +208,12 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
                       }
                       this.setState(() {
                         searchable = text;
+                        loading = true;
                         searchTimeout = Timer(Duration(milliseconds: 400), () {
                           props.onSearch(text);
+                          this.setState(() {
+                            loading = false;
+                          });
                         });
                       });
                     },
@@ -267,31 +261,30 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
             ),
           ],
         ),
-        body: Center(
-          child: Stack(
-            children: [
-              buildUserList(context, props),
-              Positioned(
-                child: Visibility(
-                  visible: props.loading,
-                  child: Container(
-                      margin: EdgeInsets.only(top: height * 0.02),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          RefreshProgressIndicator(
-                            strokeWidth: Dimensions.defaultStrokeWidth,
-                            valueColor: new AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor,
-                            ),
-                            value: null,
-                          ),
-                        ],
-                      )),
+        body: Stack(
+          children: [
+            buildUserList(context, props),
+            Positioned(
+              child: Visibility(
+                visible: this.loading,
+                child: Container(
+                  margin: EdgeInsets.only(top: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      RefreshProgressIndicator(
+                        strokeWidth: Dimensions.defaultStrokeWidth,
+                        valueColor: new AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor,
+                        ),
+                        value: null,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

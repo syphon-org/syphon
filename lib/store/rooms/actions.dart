@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:io';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
@@ -367,24 +368,28 @@ ThunkAction<AppState> createRoom({
   String name,
   String alias,
   String topic,
+  File avatarFile,
   String avatarUri,
   List<User> invites,
   bool isDirect = false,
+  String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
+      final inviteeIds = invites.map((user) => user.userId).toList();
       final data = await MatrixApi.createRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomName: name,
-        roomTopic: topic,
-        roomAlias: alias,
-        invites: invites.map((user) => user.userId).toList(),
+        name: name,
+        topic: topic,
+        alias: alias,
+        invites: inviteeIds,
         isDirect: isDirect,
+        chatTypePreset: preset,
       );
 
       final newRoomId = data['room_id'];
@@ -410,6 +415,34 @@ ThunkAction<AppState> createRoom({
       return newRoomId;
     } catch (error) {
       debugPrint('[createRoom] $error');
+      return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Create Room 
+ * 
+ * stop / start the /sync session for this to run,
+ * otherwise it will appear like the room does
+ * not exist for the seconds between the response from
+ * matrix and caching in the app
+ */
+ThunkAction<AppState> updateRoom({
+  String name,
+  String alias,
+  String topic,
+  File avatarFile,
+  String avatarUri,
+  List<User> invites,
+  bool isDirect = false,
+  String preset = RoomPresets.private,
+}) {
+  return (Store<AppState> store) async {
+    try {} catch (error) {
+      debugPrint('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));

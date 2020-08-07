@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/views/home/chat/details-chat-users.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -177,7 +179,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                   onTap: () {
                     Navigator.pushNamed(
                       context,
-                      '/home/chat/details/users',
+                      '/home/chat/users',
                       arguments: ChatUsersDetailArguments(
                         roomId: props.room.id,
                       ),
@@ -332,7 +334,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   onTap: () {
                                     Navigator.pushNamed(
                                       context,
-                                      '/home/chat/details/users',
+                                      '/home/chat/users',
                                       arguments: ChatUsersDetailArguments(
                                         roomId: props.room.id,
                                       ),
@@ -342,7 +344,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   child: Row(
                                     children: [
                                       Text(
-                                        'See all users',
+                                        Strings.buttonTextSeeAllUsers,
                                         textAlign: TextAlign.start,
                                       ),
                                       Container(
@@ -362,7 +364,10 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               maxWidth: width,
                               maxHeight: Dimensions.avatarSizeLarge,
                             ),
-                            child: buildUsersPreview(props),
+                            child: ListUserBubbles(
+                              users: props.userList,
+                              roomId: props.room.id,
+                            ),
                           )
                         ],
                       ),

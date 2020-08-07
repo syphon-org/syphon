@@ -12,16 +12,8 @@ import 'package:syphon/global/behaviors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
-// Store
-
-// Styling
-
-// Assets
-
 class Loading extends StatelessWidget {
-  Loading({Key key, this.title}) : super(key: key);
-
-  final String title;
+  Loading({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

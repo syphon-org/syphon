@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import 'package:syphon/global/values.dart';
-import 'package:syphon/views/home/chat/details-chat-users.dart';
+import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/groups/group-create-public.dart';
+import 'package:syphon/views/home/groups/invite-users.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/profile/index.dart';
@@ -43,42 +44,46 @@ class NavigationService {
   }
 }
 
+class NavigationRouteIds {
+  static const Intro = '/intro';
+  static const Login = '/login';
+  static const HomeSearch = '/search_home';
+  static const Signup = '/signup';
+  static const VerificationView = '/verification';
+}
+
 class NavigationProvider {
-  static getRoutes() {
-    return <String, WidgetBuilder>{
-      '/intro': (BuildContext context) => Intro(),
-      '/login': (BuildContext context) => Login(),
-      '/search_home': (BuildContext context) => HomeSearch(),
-      '/signup': (BuildContext context) => SignupView(),
-      '/verification': (BuildContext context) => VerificationView(),
-      '/home': (BuildContext context) => Home(),
-      '/home/chat': (BuildContext context) => ChatView(),
-      '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
-      '/home/chat/details': (BuildContext context) => MessageDetails(),
-      '/home/chat/details/users': (BuildContext context) =>
-          ChatUsersDetailView(),
-      '/home/user/search': (BuildContext context) => SearchUserView(),
-      '/home/user/details': (BuildContext context) => UserDetailsView(),
-      '/home/groups/search': (BuildContext context) => GroupSearchView(),
-      '/home/groups/create': (BuildContext context) => CreateGroupPublicView(),
-      '/home/groups/create-public': (BuildContext context) =>
-          CreateGroupPublicView(),
-      '/profile': (BuildContext context) => ProfileView(),
-      '/notifications': (BuildContext context) => NotificationSettingsView(),
-      '/advanced': (BuildContext context) => AdvancedView(),
-      '/storage': (BuildContext context) => StorageView(),
-      '/password': (BuildContext context) => PasswordView(),
-      '/licenses': (BuildContext context) => LicensePage(
-            applicationName: Values.appName,
-          ),
-      '/privacy': (BuildContext context) => PrivacyPreferences(),
-      '/chat-preferences': (BuildContext context) => ChatPreferences(),
-      '/theming': (BuildContext context) => Theming(),
-      '/devices': (BuildContext context) => DevicesView(),
-      '/settings': (BuildContext context) => SettingsScreen(),
-      '/loading': (BuildContext context) => Loading(
-            title: 'Loading',
-          ),
-    };
-  }
+  static getRoutes() => <String, WidgetBuilder>{
+        '/intro': (BuildContext context) => Intro(),
+        '/login': (BuildContext context) => Login(),
+        '/search_home': (BuildContext context) => HomeSearch(),
+        '/signup': (BuildContext context) => SignupView(),
+        '/verification': (BuildContext context) => VerificationView(),
+        '/home': (BuildContext context) => Home(),
+        '/home/chat': (BuildContext context) => ChatView(),
+        '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
+        '/home/chat/details': (BuildContext context) => MessageDetails(),
+        '/home/chat/users': (BuildContext context) => ChatUsersDetailView(),
+        '/home/user/search': (BuildContext context) => SearchUserView(),
+        '/home/user/details': (BuildContext context) => UserDetailsView(),
+        '/home/user/invite': (BuildContext context) => InviteUsersView(),
+        '/home/groups/search': (BuildContext context) => GroupSearchView(),
+        '/home/groups/create': (BuildContext context) =>
+            CreateGroupPublicView(),
+        '/home/groups/create-public': (BuildContext context) =>
+            CreateGroupPublicView(),
+        '/profile': (BuildContext context) => ProfileView(),
+        '/notifications': (BuildContext context) => NotificationSettingsView(),
+        '/advanced': (BuildContext context) => AdvancedView(),
+        '/storage': (BuildContext context) => StorageView(),
+        '/password': (BuildContext context) => PasswordView(),
+        '/licenses': (BuildContext context) =>
+            LicensePage(applicationName: Values.appName),
+        '/privacy': (BuildContext context) => PrivacyPreferences(),
+        '/chat-preferences': (BuildContext context) => ChatPreferences(),
+        '/theming': (BuildContext context) => Theming(),
+        '/devices': (BuildContext context) => DevicesView(),
+        '/settings': (BuildContext context) => SettingsScreen(),
+        '/loading': (BuildContext context) => Loading(),
+      };
 }

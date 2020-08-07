@@ -1,10 +1,11 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:syphon/global/assets.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 
@@ -49,7 +50,11 @@ class ChatInput extends StatelessWidget {
 
     if (mediumType == MediumType.plaintext) {
       if (sendable) {
-        sendButtonColor = Theme.of(context).accentColor;
+        if (Theme.of(context).accentColor != Theme.of(context).primaryColor) {
+          sendButtonColor = Theme.of(context).accentColor;
+        } else {
+          sendButtonColor = Colors.grey[700];
+        }
       }
     }
 
@@ -63,8 +68,8 @@ class ChatInput extends StatelessWidget {
 
     if (Theme.of(context).brightness == Brightness.dark) {
       inputTextColor = Colors.white;
-      inputColorBackground = Colors.blueGrey;
       inputCursorColor = Colors.white;
+      inputColorBackground = Colors.blueGrey;
     }
 
     // Default, but shouldn't be used
@@ -88,22 +93,14 @@ class ChatInput extends StatelessWidget {
         onTap: !sendable ? null : onSubmitMessage,
         child: CircleAvatar(
           backgroundColor: sendButtonColor,
-          child: Stack(children: [
-            Positioned(
-              right: 0,
-              bottom: -1.5,
-              child: Icon(
-                Icons.lock_open,
-                size: Dimensions.iconSizeMini,
-                color: Colors.white,
-              ),
-            ),
-            Icon(
-              Icons.send,
-              size: Dimensions.iconSizeLite,
+          child: Container(
+            margin: EdgeInsets.only(left: 2, top: 3),
+            child: SvgPicture.asset(
+              Assets.iconSendUnlockBeing,
               color: Colors.white,
+              semanticsLabel: Strings.semanticsSendUnencrypted,
             ),
-          ]),
+          ),
         ),
       );
     }
@@ -115,22 +112,14 @@ class ChatInput extends StatelessWidget {
         onTap: !sendable ? null : onSubmitMessage,
         child: CircleAvatar(
           backgroundColor: sendButtonColor,
-          child: Stack(children: [
-            Positioned(
-              right: 0,
-              bottom: -1.5,
-              child: Icon(
-                Icons.lock,
-                size: Dimensions.iconSizeMini,
-                color: Colors.white,
-              ),
-            ),
-            Icon(
-              Icons.send,
-              size: Dimensions.iconSizeLite,
+          child: Container(
+            margin: EdgeInsets.only(left: 2, top: 3),
+            child: SvgPicture.asset(
+              Assets.iconSendLockBeing,
               color: Colors.white,
+              semanticsLabel: Strings.semanticsSendUnencrypted,
             ),
-          ]),
+          ),
         ),
       );
     }

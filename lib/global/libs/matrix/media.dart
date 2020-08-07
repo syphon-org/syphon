@@ -68,6 +68,44 @@ class Media {
 
     return {"bodyBytes": response.bodyBytes};
   }
+
+  static Future<dynamic> uploadMedia({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String fileName,
+    String fileType = 'application/jpeg', // Content-Type: application/pdf
+    Stream<List<int>> fileStream,
+    int fileLength,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/media/r0/upload';
+
+    // Params
+    url += fileName != null ? '?filename=$fileName' : '';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': '$fileType',
+      'Content-Length': '$fileLength',
+    };
+
+    // POST StreamedRequest for uploading byteStream
+    final request = new http.StreamedRequest(
+      'POST',
+      Uri.parse(url),
+    );
+
+    request.headers.addAll(headers);
+    fileStream.listen(request.sink.add, onDone: () => request.sink.close());
+
+    // Attempting to await the upload response successfully
+    final mediaUploadResponseStream = await request.send();
+    final mediaUploadResponse = await http.Response.fromStream(
+      mediaUploadResponseStream,
+    );
+
+    return json.decode(mediaUploadResponse.body);
+  }
 }
 
 dynamic buildMediaDownloadRequest({

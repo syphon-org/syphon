@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:io';
 import 'dart:typed_data';
 
 // Flutter imports:
@@ -7,11 +8,13 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -34,6 +37,44 @@ class UpdateMediaCache {
     this.mxcUri,
     this.data,
   });
+}
+
+ThunkAction<AppState> uploadMedia({File localFile}) {
+  return (Store<AppState> store) async {
+    try {
+      // Extension handling
+      final String displayName = store.state.authStore.user.displayName;
+      final String fileType = lookupMimeType(localFile.path);
+      final String fileExtension = fileType.split('/')[1];
+
+      // Setting up params for upload
+      final int fileLength = await localFile.length();
+      final Stream<List<int>> fileStream = localFile.openRead();
+      final String fileName = '${displayName}_profile_photo.${fileExtension}';
+
+      // Create request vars for upload
+      final data = await MatrixApi.uploadMedia(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.currentUser.homeserver,
+        fileName: fileName,
+        fileType: fileType,
+        fileLength: fileLength,
+        fileStream: fileStream,
+      );
+      // If upload fails, throw an error for the whole update
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      return data;
+    } catch (error) {
+      store.dispatch(addAlert(origin: 'updateAvatarPhoto', message: error));
+      return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
 }
 
 ThunkAction<AppState> fetchThumbnail(

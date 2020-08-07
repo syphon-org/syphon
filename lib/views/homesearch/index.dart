@@ -19,14 +19,6 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 
-class SearchScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
-
 class HomeSearch extends StatefulWidget {
   final String title;
   const HomeSearch({Key key, this.title}) : super(key: key);

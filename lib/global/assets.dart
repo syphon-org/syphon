@@ -13,6 +13,9 @@ class Assets {
       'assets/icons/global/being-search-public-condensed.svg';
   static const iconMessageSyphonBeing =
       'assets/icons/global/being-message-syphon.svg';
+  static const iconSendLockBeing = 'assets/icons/global/being-send-lock.svg';
+  static const iconSendUnlockBeing =
+      'assets/icons/global/being-send-unlock.svg';
   static const iconMessageCircleBeing =
       'assets/icons/global/feather-message-circle.svg';
 

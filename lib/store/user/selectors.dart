@@ -38,7 +38,8 @@ String userAlias({String username, String homeserver}) {
   return "@" + username + ":" + homeserver;
 }
 
-String matrixAlias({String resource, String homeserver}) {
+String matrixAlias({String resource = '', String homeserver = ''}) {
+  print('$resource $homeserver');
   return "@" + resource + ":" + homeserver;
 }
 

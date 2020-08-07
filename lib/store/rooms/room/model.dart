@@ -15,6 +15,12 @@ import 'package:syphon/store/user/selectors.dart';
 
 part 'model.g.dart';
 
+class RoomPresets {
+  static const private = 'private_chat';
+  static const privateTrusted = 'trusted_private_chat';
+  static const public = 'public_chat';
+}
+
 // Next Hive Field 27
 @HiveType(typeId: RoomHiveId)
 class Room {

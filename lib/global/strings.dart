@@ -57,6 +57,7 @@ class Strings {
   static const buttonConfirm = 'got it';
 
   // Text Buttons
+  static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';
   static const buttonLoginCreateQuestion = 'Don\'t have a username?';
@@ -148,6 +149,7 @@ class Strings {
   static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 
   // Accessibility
+  static const semanticsSendUnencrypted = 'Send unencrypted message';
   static const semanticsIntroFinal =
       'Two people different feeling confident and lookin\' good';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';

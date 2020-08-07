@@ -751,7 +751,8 @@ ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateAvatarPhoto', message: error));
+      store.dispatch(
+          addAlert(origin: 'updateAvatarPhoto', message: error.error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

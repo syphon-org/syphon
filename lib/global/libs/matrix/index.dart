@@ -59,6 +59,7 @@ abstract class MatrixApi {
 
   // Media
   static final fetchThumbnail = Media.fetchThumbnail;
+  static final uploadMedia = Media.uploadMedia;
 
   // Device Management
   static final fetchDevices = Devices.fetchDevices;
