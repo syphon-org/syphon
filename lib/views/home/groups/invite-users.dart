@@ -70,6 +70,7 @@ class InviteUsersState extends State<InviteUsersView> {
         searching = !searching;
       });
     }
+
     if (store.state.userStore.invites.isNotEmpty) {
       this.setState(() {
         invites = store.state.userStore.invites;
@@ -82,12 +83,6 @@ class InviteUsersState extends State<InviteUsersView> {
     if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
       store.dispatch(clearSearchResults());
     }
-
-    searchInputFocusNode.addListener(() {
-      if (!searchInputFocusNode.hasFocus) {
-        searching = false;
-      }
-    });
   }
 
   @override

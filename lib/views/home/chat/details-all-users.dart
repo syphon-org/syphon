@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -42,11 +43,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 
   ChatUsersDetailState({Key key});
 
-  Timer searchTimeout;
-  bool searching = false;
   bool loading = false;
-  String searchable;
-  String creatingRoomDisplayName;
 
   // componentDidMount(){}
   @override
@@ -65,39 +62,12 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
     if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
       store.dispatch(clearSearchResults());
     }
-
-    searchInputFocusNode.addListener(() {
-      if (!searchInputFocusNode.hasFocus) {
-        searching = false;
-      }
-    });
   }
 
   @override
   void dispose() {
     searchInputFocusNode.dispose();
     super.dispose();
-  }
-
-  @protected
-  void onToggleSearch({BuildContext context}) {
-    setState(() {
-      searching = !searching;
-    });
-    if (searching) {
-      Timer(
-        Duration(milliseconds: 1), // hack to focus after visibility change
-        () => FocusScope.of(
-          context,
-        ).requestFocus(
-          searchInputFocusNode,
-        ),
-      );
-    } else {
-      FocusScope.of(
-        context,
-      ).unfocus();
-    }
   }
 
   @protected
@@ -135,11 +105,13 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
               elevation: 0,
               child: Container(
                 child: ListTile(
-                  enabled: creatingRoomDisplayName != user.displayName,
                   leading: AvatarCircle(
                     uri: user.avatarUri,
                     alt: user.displayName ?? user.userId,
                     size: Dimensions.avatarSizeMin,
+                    background: Colours.hashedColor(
+                      user.displayName ?? user.userId,
+                    ),
                   ),
                   title: Text(
                     formatUsername(user),
@@ -173,93 +145,18 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
       converter: (Store<AppState> store) =>
           _Props.mapStateToProps(store, arguments.roomId),
       builder: (context, props) => Scaffold(
-        appBar: AppBar(
+        appBar: AppBarSearch(
+          title: Strings.titleRoomUsers,
+          label: Strings.labelSearchForUsers,
+          tooltip: 'Search users',
           brightness: Brightness.dark,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-          title: Stack(
-            children: [
-              Visibility(
-                visible: !searching,
-                child: TouchableOpacity(
-                  activeOpacity: 0.4,
-                  onTap: () => onToggleSearch(context: context),
-                  child: Text(
-                    Strings.titleRoomUsers,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w100,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                child: Visibility(
-                  visible: searching,
-                  maintainState: true,
-                  child: TextField(
-                    focusNode: searchInputFocusNode,
-                    onChanged: (text) {
-                      if (this.searchTimeout != null) {
-                        this.searchTimeout.cancel();
-                        this.searchTimeout = null;
-                      }
-                      this.setState(() {
-                        searchable = text;
-                        loading = true;
-                        searchTimeout = Timer(Duration(milliseconds: 400), () {
-                          props.onSearch(text);
-                          this.setState(() {
-                            loading = false;
-                          });
-                        });
-                      });
-                    },
-                    cursorColor: Colors.white,
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                          color: Colors.white,
-                        ),
-                    decoration: InputDecoration(
-                      disabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 0.0,
-                          color: Colors.transparent,
-                        ),
-                      ),
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 0.0,
-                          color: Colors.transparent,
-                        ),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 0.0,
-                          color: Colors.transparent,
-                        ),
-                      ),
-                      hintText: 'Search for a user...',
-                      hintStyle: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w100,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            IconButton(
-              color: Colors.white,
-              icon: Icon(searching ? Icons.cancel : Icons.search),
-              onPressed: () => onToggleSearch(context: context),
-              tooltip: 'Search users',
-            ),
-          ],
+          focusNode: searchInputFocusNode,
+          onChange: (text) {
+            props.onSearch(text);
+          },
+          onSearch: (text) {
+            props.onSearch(text);
+          },
         ),
         body: Stack(
           children: [

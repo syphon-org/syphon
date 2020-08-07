@@ -43,8 +43,6 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    print('[loginUser] ${url}');
-
     Map body = {
       'type': type,
       "identifier": {"type": "m.id.user", "user": username},
@@ -247,7 +245,6 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/.well-known/matrix/client';
 
-    print(url);
     final response = await http.get(url);
 
     return await json.decode(response.body);

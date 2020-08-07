@@ -11,6 +11,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -36,9 +37,6 @@ class GroupSearchState extends State<GroupSearchView> {
 
   GroupSearchState({Key key});
 
-  Timer searchTimeout;
-  bool searching = false;
-
   // componentDidMount(){}
   @override
   void didChangeDependencies() {
@@ -51,10 +49,6 @@ class GroupSearchState extends State<GroupSearchView> {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
 
-    if (!this.searching) {
-      this.onToggleSearch(context: context);
-    }
-
     // Clear search if previous results are not from User searching
     if (searchResults.isNotEmpty && !(searchResults[0] is Room)) {
       store.dispatch(clearSearchResults());
@@ -63,11 +57,6 @@ class GroupSearchState extends State<GroupSearchView> {
     if (store.state.searchStore.searchResults.isEmpty) {
       store.dispatch(searchPublicRooms(searchText: ''));
     }
-    searchInputFocusNode.addListener(() {
-      if (!searchInputFocusNode.hasFocus) {
-        searching = false;
-      }
-    });
   }
 
   @override
@@ -76,117 +65,24 @@ class GroupSearchState extends State<GroupSearchView> {
     super.dispose();
   }
 
-  @protected
-  void onToggleSearch({BuildContext context}) {
-    setState(() {
-      searching = !searching;
-    });
-    if (searching) {
-      Timer(
-        Duration(milliseconds: 1), // hack to focus after visibility change
-        () => FocusScope.of(
-          context,
-        ).requestFocus(
-          searchInputFocusNode,
-        ),
-      );
-    } else {
-      FocusScope.of(
-        context,
-      ).unfocus();
-    }
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) => Scaffold(
-          appBar: AppBar(
+          appBar: AppBarSearch(
+            title: Strings.titleSearchGroups,
+            label: 'Search a topic...',
+            tooltip: 'Search topics',
             brightness: Brightness.dark,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context, false),
-            ),
-            title: Stack(
-              children: [
-                Visibility(
-                  visible: !searching,
-                  child: TouchableOpacity(
-                    activeOpacity: 0.4,
-                    onTap: () => onToggleSearch(context: context),
-                    child: Text(
-                      Strings.titleSearchGroups,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w100,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  child: Visibility(
-                    visible: searching,
-                    maintainState: true,
-                    child: TextField(
-                      focusNode: searchInputFocusNode,
-                      onChanged: (text) {
-                        if (this.searchTimeout != null) {
-                          this.searchTimeout.cancel();
-                          this.searchTimeout = null;
-                        }
-                        this.setState(() {
-                          searchTimeout =
-                              new Timer(Duration(milliseconds: 400), () {
-                            props.onSearch(text);
-                          });
-                        });
-                      },
-                      cursorColor: Colors.white,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w100,
-                      ),
-                      decoration: InputDecoration(
-                        disabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.0,
-                            color: Colors.transparent,
-                          ),
-                        ),
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.0,
-                            color: Colors.transparent,
-                          ),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.0,
-                            color: Colors.transparent,
-                          ),
-                        ),
-                        hintText: 'Search a topic...',
-                        hintStyle: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w100,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              IconButton(
-                color: Colors.white,
-                icon: Icon(searching ? Icons.cancel : Icons.search),
-                onPressed: () => onToggleSearch(context: context),
-                tooltip: 'Search Homeservers',
-              ),
-            ],
+            forceFocus: true,
+            focusNode: searchInputFocusNode,
+            onChange: (text) {
+              props.onSearch(text);
+            },
+            onSearch: (text) {
+              props.onSearch(text);
+            },
           ),
           body: Center(
             child: Stack(

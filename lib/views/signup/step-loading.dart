@@ -11,7 +11,6 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 
@@ -79,7 +78,7 @@ class HomeserverStep extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(
                             context,
-                            '/search_home',
+                            '/search/homeservers',
                           );
                         }),
                     border: OutlineInputBorder(

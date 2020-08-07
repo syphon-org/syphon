@@ -198,7 +198,6 @@ ThunkAction<AppState> fetchRooms() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      print(store.state.authStore.user.homeserver);
       final data = await MatrixApi.fetchRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -415,7 +414,7 @@ ThunkAction<AppState> createRoom({
 
       return newRoomId;
     } catch (error) {
-      addAlert(message: error.message, origin: 'createRoom|$preset');
+      addAlert(message: error, origin: 'createRoom|$preset');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));

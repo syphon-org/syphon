@@ -14,6 +14,7 @@ class AvatarCircle extends StatelessWidget {
   AvatarCircle({
     Key key,
     this.uri,
+    this.url,
     this.alt,
     this.size = 40,
     this.force = false,
@@ -26,6 +27,7 @@ class AvatarCircle extends StatelessWidget {
   final bool force;
   final bool selected;
   final String uri;
+  final String url;
   final String alt;
   final double size;
   final Color background;
@@ -34,7 +36,8 @@ class AvatarCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = uri != null ? Colors.transparent : Colors.grey;
+    Color backgroundColor =
+        uri != null || url != null ? Colors.transparent : Colors.grey;
 
     dynamic avatarWidget = Text(
       formatInitials(alt),
@@ -45,6 +48,18 @@ class AvatarCircle extends StatelessWidget {
         letterSpacing: 0.9,
       ),
     );
+
+    if (url != null) {
+      avatarWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(size),
+        child: Image(
+          image: NetworkImage(url),
+          width: size,
+          height: size,
+          fit: BoxFit.fill,
+        ),
+      );
+    }
 
     if (uri != null) {
       avatarWidget = ClipRRect(
@@ -70,7 +85,7 @@ class AvatarCircle extends StatelessWidget {
           CircleAvatar(
             radius: size / 2,
             child: avatarWidget,
-            backgroundColor: uri == null && !force
+            backgroundColor: uri == null && url == null && !force
                 ? background ?? backgroundColor
                 : Colors.transparent,
           ),

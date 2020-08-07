@@ -34,7 +34,6 @@ class ClearUserInvites {}
 
 ThunkAction<AppState> setUserInvites({List<User> users}) {
   return (Store<AppState> store) async {
-    print(users);
     store.dispatch(SetUserInvites(users: users));
   };
 }
@@ -95,8 +94,6 @@ ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
           accessToken: store.state.authStore.user.accessToken,
           userId: store.state.authStore.user.userId,
           type: AccountDataTypes.ignoredUserList);
-
-      print(data);
 
       if (data['errcode'] != null) {
         throw data['error'];

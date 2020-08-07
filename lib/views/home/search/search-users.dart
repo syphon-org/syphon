@@ -11,6 +11,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -42,8 +43,6 @@ class SearchUserState extends State<SearchUserView> {
 
   SearchUserState({Key key});
 
-  Timer searchTimeout;
-  bool searching = false;
   String searchable;
   String creatingRoomDisplayName;
 
@@ -58,49 +57,18 @@ class SearchUserState extends State<SearchUserView> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
-    if (!this.searching) {
-      this.onToggleSearch(context: context);
-    }
-
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
     if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
       store.dispatch(clearSearchResults());
     }
-
-    searchInputFocusNode.addListener(() {
-      if (!searchInputFocusNode.hasFocus) {
-        searching = false;
-      }
-    });
   }
 
   @override
   void dispose() {
     searchInputFocusNode.dispose();
     super.dispose();
-  }
-
-  @protected
-  void onToggleSearch({BuildContext context}) {
-    setState(() {
-      searching = !searching;
-    });
-    if (searching) {
-      Timer(
-        Duration(milliseconds: 1), // hack to focus after visibility change
-        () => FocusScope.of(
-          context,
-        ).requestFocus(
-          searchInputFocusNode,
-        ),
-      );
-    } else {
-      FocusScope.of(
-        context,
-      ).unfocus();
-    }
   }
 
   @protected
@@ -196,8 +164,31 @@ class SearchUserState extends State<SearchUserView> {
     final showManualUser =
         searchable != null && searchable.length > 0 && foundResult < 0;
 
+    final usersList = searchable == null || searchable.isEmpty
+        ? props.usersRecent
+        : props.searchResults;
+
     return ListView(
       children: [
+        Visibility(
+          visible: searchable == null || searchable.isEmpty,
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 16,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Recent Users',
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+              ],
+            ),
+          ),
+        ),
         Visibility(
           visible: showManualUser,
           child: GestureDetector(
@@ -210,7 +201,6 @@ class SearchUserState extends State<SearchUserView> {
               padding: EdgeInsets.zero,
               elevation: 0,
               child: Container(
-                padding: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   enabled: creatingRoomDisplayName != searchable,
                   leading: AvatarCircle(
@@ -237,14 +227,14 @@ class SearchUserState extends State<SearchUserView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: Dimensions.progressIndicatorSize,
-                        height: Dimensions.progressIndicatorSize,
-                        margin: EdgeInsets.symmetric(horizontal: 8),
+                        width: Dimensions.iconSizeLite,
+                        height: Dimensions.iconSizeLite,
                         child: SvgPicture.asset(
                           Assets.iconSendBeing,
-                          height: Dimensions.iconSizeLite,
-                          width: Dimensions.iconSizeLite,
+                          height: Dimensions.iconSize,
+                          width: Dimensions.iconSize,
                           semanticsLabel: Strings.semanticsSendUnencrypted,
+                          color: Theme.of(context).iconTheme.color,
                         ),
                       ),
                     ],
@@ -257,10 +247,10 @@ class SearchUserState extends State<SearchUserView> {
         ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
-          itemCount: props.searchResults.length,
+          itemCount: usersList.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
-            final user = (props.searchResults[index] as User);
+            final user = (usersList[index] as User);
 
             return GestureDetector(
               onTap: () => this.onShowUserDetails(
@@ -305,7 +295,6 @@ class SearchUserState extends State<SearchUserView> {
                           child: Container(
                             width: Dimensions.iconSizeLite,
                             height: Dimensions.iconSizeLite,
-                            // margin: EdgeInsets.symmetric(horizontal: 8),
                             child: SvgPicture.asset(
                               Assets.iconSendBeing,
                               fit: BoxFit.contain,
@@ -336,92 +325,22 @@ class SearchUserState extends State<SearchUserView> {
           final height = MediaQuery.of(context).size.height;
 
           return Scaffold(
-            appBar: AppBar(
+            appBar: AppBarSearch(
+              title: Strings.titleSearchUsers,
+              label: 'Search for a user...',
+              tooltip: 'Search users',
               brightness: Brightness.dark,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Stack(
-                children: [
-                  Visibility(
-                    visible: !searching,
-                    child: TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => onToggleSearch(context: context),
-                      child: Text(
-                        Strings.titleSearchUsers,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w100,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    child: Visibility(
-                      visible: searching,
-                      maintainState: true,
-                      child: TextField(
-                        focusNode: searchInputFocusNode,
-                        onChanged: (text) {
-                          if (this.searchTimeout != null) {
-                            this.searchTimeout.cancel();
-                            this.searchTimeout = null;
-                          }
-                          this.setState(() {
-                            searchable = text;
-                            searchTimeout =
-                                Timer(Duration(milliseconds: 400), () {
-                              props.onSearch(text);
-                            });
-                          });
-                        },
-                        cursorColor: Colors.white,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w100,
-                        ),
-                        decoration: InputDecoration(
-                          disabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          hintText: 'Search for a user...',
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w100,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                IconButton(
-                  color: Colors.white,
-                  icon: Icon(searching ? Icons.cancel : Icons.search),
-                  onPressed: () => onToggleSearch(context: context),
-                  tooltip: 'Search users',
-                ),
-              ],
+              forceFocus: true,
+              focusNode: searchInputFocusNode,
+              onChange: (text) => this.setState(() {
+                searchable = text;
+              }),
+              onSearch: (text) {
+                this.setState(() {
+                  searchable = text;
+                });
+                props.onSearch(text);
+              },
             ),
             body: Stack(
               children: [
@@ -456,6 +375,7 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
   final bool creatingRoom;
+  final List<User> usersRecent;
   final List<dynamic> searchResults;
 
   final Function onSearch;
@@ -466,6 +386,7 @@ class _Props extends Equatable {
     @required this.loading,
     @required this.creatingRoom,
     @required this.searchResults,
+    @required this.usersRecent,
     @required this.onSearch,
     @required this.onCreateChatDirect,
   });
@@ -474,6 +395,7 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
+        usersRecent: friendlyUsers(store.state),
         searchResults: store.state.searchStore.searchResults ?? [],
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));

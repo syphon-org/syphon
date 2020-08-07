@@ -338,7 +338,7 @@ ThunkAction<AppState> sendSessionKeys({
       // await all sendToDevice room key events to be sent to users
       await Future.wait(sendToDeviceRequests);
     } catch (error) {
-      store.dispatch(addAlert(message: error.message, error: error));
+      store.dispatch(addAlert(message: error, error: error));
     }
   };
 }
@@ -398,9 +398,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       }
     } catch (error) {
       store.dispatch(addAlert(
-          error: error,
-          message: error.message,
-          origin: 'sendMessageEncrypted'));
+          error: error, message: error, origin: 'sendMessageEncrypted'));
     }
   };
 }

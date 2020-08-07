@@ -44,7 +44,7 @@ String formatUsername(User user) {
 }
 
 String formatInitials(String fullword) {
-  if (fullword == null) {
+  if (fullword == null || fullword.isEmpty) {
     return '?';
   }
 

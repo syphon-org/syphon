@@ -332,7 +332,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      store.dispatch(addAlert(message: error.message, error: error));
+      store.dispatch(addAlert(message: error, error: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -369,7 +369,7 @@ ThunkAction<AppState> logoutUser() {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: error.message,
+        message: error,
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -382,7 +382,6 @@ ThunkAction<AppState> fetchUserCurrentProfile() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      print('User Profiles ${store.state.authStore.user.homeserver}');
       final data = await MatrixApi.fetchUserProfile(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,

@@ -43,6 +43,7 @@ class Strings {
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelRecentUsers = 'Users';
   static const labelRoomNameDefault = 'New Chat';

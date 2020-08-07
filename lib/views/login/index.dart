@@ -167,7 +167,7 @@ class LoginState extends State<Login> {
                                 onPressed: () {
                                   Navigator.pushNamed(
                                     context,
-                                    '/search_home',
+                                    '/search/homeservers',
                                   );
                                 },
                               ),

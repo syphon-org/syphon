@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 // Project imports:
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -19,10 +20,12 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
     this.onChange,
     this.onSearch,
     this.onToggleSearch,
+    this.forceFocus = false,
     this.loading = false,
   }) : super(key: key);
 
   final bool loading;
+  final bool forceFocus;
   final String title;
   final String label;
   final String tooltip;
@@ -61,14 +64,26 @@ class AppBarSearchState extends State<AppBarSearch> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    // NOTE: still needed to have navigator context in dialogs
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (widget.forceFocus) {
+        onToggleSearch(context: context);
+      }
+    });
+  }
+
   @protected
   void onToggleSearch({BuildContext context}) {
     setState(() {
       searching = !searching;
     });
-    if (searching) {
+    if (this.searching) {
       Timer(
-        Duration(milliseconds: 1), // hack to focus after visibility change
+        Duration(milliseconds: 5), // hack to focus after visibility change
         () => FocusScope.of(
           context,
         ).requestFocus(
@@ -76,9 +91,7 @@ class AppBarSearchState extends State<AppBarSearch> {
         ),
       );
     } else {
-      FocusScope.of(
-        context,
-      ).unfocus();
+      FocusScope.of(context).unfocus();
     }
   }
 

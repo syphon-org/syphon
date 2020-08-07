@@ -23,7 +23,7 @@ import 'package:syphon/views/home/settings/password/index.dart';
 import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
 import 'package:syphon/views/home/settings/theming.dart';
-import 'package:syphon/views/homesearch/index.dart';
+import 'package:syphon/views/search/search-homeservers.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/login/index.dart';
 import 'package:syphon/views/signup/index.dart';
@@ -47,7 +47,7 @@ class NavigationService {
 class NavigationRouteIds {
   static const Intro = '/intro';
   static const Login = '/login';
-  static const HomeSearch = '/search_home';
+  static const SearchHomeservers = '/search/homeservers';
   static const Signup = '/signup';
   static const VerificationView = '/verification';
 }
@@ -56,8 +56,8 @@ class NavigationProvider {
   static getRoutes() => <String, WidgetBuilder>{
         '/intro': (BuildContext context) => Intro(),
         '/login': (BuildContext context) => Login(),
-        '/search_home': (BuildContext context) => HomeSearch(),
         '/signup': (BuildContext context) => SignupView(),
+        '/search/homeservers': (BuildContext context) => SearchHomeservers(),
         '/verification': (BuildContext context) => VerificationView(),
         '/home': (BuildContext context) => Home(),
         '/home/chat': (BuildContext context) => ChatView(),
