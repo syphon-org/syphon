@@ -27,6 +27,8 @@ class Dimensions {
   static const double avatarSizeDetails = 120;
   static double avatarFontSize({double size = 32}) => (size / 2.22);
 
+  static const double listAvatarHeighttMax = 72;
+
   // Media
   static const double mediaSize = 264;
   static const double mediaSizeMin = 208;

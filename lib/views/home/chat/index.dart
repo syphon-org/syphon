@@ -11,11 +11,14 @@ import 'package:flutter/services.dart';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -360,22 +363,11 @@ class ChatViewState extends State<ChatView> {
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
                       backgroundColor: const Color(Colours.greyDisabled),
-                      child: Stack(children: [
-                        Positioned(
-                          right: 0,
-                          bottom: -1.5,
-                          child: Icon(
-                            Icons.lock_open,
-                            size: Dimensions.iconSizeMini,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Icon(
-                          Icons.send,
-                          size: Dimensions.iconSizeLite,
-                          color: Colors.white,
-                        ),
-                      ]),
+                      child: SvgPicture.asset(
+                        Assets.iconSendUnlockBeing,
+                        color: Colors.white,
+                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                      ),
                     ),
                   ),
                   Text('Unencrypted'),
@@ -402,22 +394,11 @@ class ChatViewState extends State<ChatView> {
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: Stack(children: [
-                        Positioned(
-                          right: 0,
-                          bottom: -1.5,
-                          child: Icon(
-                            Icons.lock,
-                            size: Dimensions.iconSizeMini,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Icon(
-                          Icons.send,
-                          size: Dimensions.iconSizeLite,
-                          color: Colors.white,
-                        ),
-                      ]),
+                      child: SvgPicture.asset(
+                        Assets.iconSendLockSolidBeing,
+                        color: Colors.white,
+                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                      ),
                     ),
                   ),
                   Text('Encrypted'),

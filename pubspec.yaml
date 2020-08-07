@@ -177,7 +177,10 @@ flutter:
    - assets/icons/global/being-search-public.svg
    - assets/icons/global/being-search-public-condensed.svg
    - assets/icons/global/being-message-syphon.svg
+   - assets/icons/global/being-send.svg
+   - assets/icons/global/being-send-solid.svg
    - assets/icons/global/being-send-lock.svg
+   - assets/icons/global/being-send-lock-solid.svg
    - assets/icons/global/being-send-unlock.svg
    - assets/icons/global/feather-message-circle.svg
 

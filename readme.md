@@ -123,19 +123,23 @@ dependency_overrides:
 6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
 
 
+### store (current)
+- state (redux)
+- state cache (redux_persist + hive) 
+- cold storage (hive)
 
-### store
-- State (redux)
-- State Cache (redux_persist + Hive) 
-- Cold Storage (Hive)
+### store (future)
+- state (redux)
+- state cache (redux_persist + json_serializable + sembast)
+- cold storage (sqlcipher)
 
-### state
+### store references
+- [hive](https://github.com/hivedb/hive)
+- [sembast](https://pub.dev/packages/sembast)
+- [sqlcipher](https://pub.dev/packages/sqflite_sqlcipher) 
 - [Redux vs. Bloc](https://github.com/ereio/state)
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
 - [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/)
-
-### cold storage
-- [Hive](https://github.com/hivedb/hive)
 
 ### local notifications (android only)
 - utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
@@ -148,7 +152,7 @@ dependency_overrides:
 - [paid icon](https://thenounproject.com/search/?q=polygon&i=2596282)
 - [iOS icons](https://github.com/smallmuou/ios-icon-generator)
 
-### helpful references
+### generic references
 - [End-To-End Encryption implimentation guide from Matrix.org](https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide)
 - [iOS file management flutter](https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter)
 - [scrolling With Text Inputs](https://github.com/flutter/flutter/issues/13339)

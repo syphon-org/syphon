@@ -284,7 +284,7 @@ class _Props extends Equatable {
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
         onDisabled: () => store.dispatch(
-          addInfo(message: '🛠 This feature is coming soon'),
+          addInfo(message: Strings.alertFeatureInProgress),
         ),
         onLogoutUser: () {
           store.dispatch(logoutUser());

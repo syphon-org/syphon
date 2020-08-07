@@ -13,9 +13,13 @@ class Assets {
       'assets/icons/global/being-search-public-condensed.svg';
   static const iconMessageSyphonBeing =
       'assets/icons/global/being-message-syphon.svg';
+  static const iconSendBeing = 'assets/icons/global/being-send.svg';
+  static const iconSendSolidBeing = 'assets/icons/global/being-send-solid.svg';
   static const iconSendLockBeing = 'assets/icons/global/being-send-lock.svg';
   static const iconSendUnlockBeing =
       'assets/icons/global/being-send-unlock.svg';
+  static const iconSendLockSolidBeing =
+      'assets/icons/global/being-send-lock-solid.svg';
   static const iconMessageCircleBeing =
       'assets/icons/global/feather-message-circle.svg';
 

@@ -17,6 +17,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
@@ -25,10 +26,12 @@ import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 class ModalUserDetails extends StatelessWidget {
   ModalUserDetails({
     Key key,
+    this.user,
     this.roomId,
     this.userId,
   }) : super(key: key);
 
+  final User user;
   final String userId;
   final String roomId;
 
@@ -60,7 +63,7 @@ class ModalUserDetails extends StatelessWidget {
             '/home/chat',
             arguments: ChatViewArguements(
               roomId: newRoomId,
-              title: props.user.displayName,
+              title: formatUsername(props.user),
             ),
           );
         },
@@ -76,6 +79,7 @@ class ModalUserDetails extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
+          user: user,
           roomId: roomId,
           userId: userId,
         ),
@@ -240,11 +244,16 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(
     Store<AppState> store, {
+    User user,
     String userId,
     String roomId,
   }) =>
       _Props(
         user: () {
+          if (user != null) {
+            return user;
+          }
+
           final room = store.state.roomStore.rooms[roomId];
           if (room != null) {
             return room.users[userId];
@@ -252,7 +261,7 @@ class _Props extends Equatable {
           return null;
         }(),
         onDisabled: () => store.dispatch(
-          addInfo(message: '🛠 This feature is coming soon'),
+          addInfo(message: Strings.alertFeatureInProgress),
         ),
         onCreateChatDirect: ({User user}) async => store.dispatch(
           createRoom(

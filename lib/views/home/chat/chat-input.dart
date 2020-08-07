@@ -115,7 +115,7 @@ class ChatInput extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.only(left: 2, top: 3),
             child: SvgPicture.asset(
-              Assets.iconSendLockBeing,
+              Assets.iconSendLockSolidBeing,
               color: Colors.white,
               semanticsLabel: Strings.semanticsSendUnencrypted,
             ),

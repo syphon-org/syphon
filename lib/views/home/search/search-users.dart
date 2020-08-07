@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -101,12 +104,26 @@ class SearchUserState extends State<SearchUserView> {
   }
 
   @protected
-  void onSelectUser({BuildContext context, _Props props, User user}) async {
+  onShowUserDetails({
+    BuildContext context,
+    User user,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        user: user,
+      ),
+    );
+  }
+
+  @protected
+  void onMessageUser({BuildContext context, _Props props, User user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Chat with ${user.displayName}',
+        title: 'Chat with ${formatUsername(user)}',
         content: Strings.confirmationStartChat,
         onStartChat: () async {
           this.setState(() {
@@ -140,7 +157,7 @@ class SearchUserState extends State<SearchUserView> {
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${user.displayName}',
+        title: 'Try chatting with ${formatUsername(user)}}',
         content: Strings.confirmationAttemptChat,
         onStartChat: () async {
           this.setState(() {
@@ -223,9 +240,11 @@ class SearchUserState extends State<SearchUserView> {
                         width: Dimensions.progressIndicatorSize,
                         height: Dimensions.progressIndicatorSize,
                         margin: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(
-                          Icons.send,
-                          size: Dimensions.iconSize,
+                        child: SvgPicture.asset(
+                          Assets.iconSendBeing,
+                          height: Dimensions.iconSizeLite,
+                          width: Dimensions.iconSizeLite,
+                          semanticsLabel: Strings.semanticsSendUnencrypted,
                         ),
                       ),
                     ],
@@ -244,9 +263,8 @@ class SearchUserState extends State<SearchUserView> {
             final user = (props.searchResults[index] as User);
 
             return GestureDetector(
-              onTap: () => this.onSelectUser(
+              onTap: () => this.onShowUserDetails(
                 context: context,
-                props: props,
                 user: user,
               ),
               child: CardSection(
@@ -278,13 +296,24 @@ class SearchUserState extends State<SearchUserView> {
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: Dimensions.progressIndicatorSize,
-                          height: Dimensions.progressIndicatorSize,
-                          margin: EdgeInsets.symmetric(horizontal: 8),
-                          child: Icon(
-                            Icons.send,
-                            size: Dimensions.iconSizeLite,
+                        GestureDetector(
+                          onTap: () => this.onMessageUser(
+                            context: context,
+                            props: props,
+                            user: user,
+                          ),
+                          child: Container(
+                            width: Dimensions.iconSize,
+                            height: Dimensions.iconSize,
+                            // margin: EdgeInsets.symmetric(horizontal: 8),
+                            child: SvgPicture.asset(
+                              Assets.iconSendBeing,
+                              fit: BoxFit.contain,
+                              height: Dimensions.iconSize,
+                              width: Dimensions.iconSize,
+                              color: Theme.of(context).iconTheme.color,
+                              semanticsLabel: Strings.semanticsSendUnencrypted,
+                            ),
                           ),
                         ),
                       ],

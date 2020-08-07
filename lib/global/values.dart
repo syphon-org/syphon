@@ -7,7 +7,7 @@ class Values {
   static const appName = 'Syphon';
   static const appNameLabel = 'syphon';
   static const appNameLong = 'Syphon Messenger';
-  static const appDisplayName = 'Syphon Client';
+  static const appDisplayName = 'Syphon';
 
   static const defaultLanguage = 'en-US';
 
