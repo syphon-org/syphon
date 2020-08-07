@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
@@ -26,6 +29,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class InviteUsersArguments {
   final String roomId;
@@ -62,8 +66,13 @@ class InviteUsersState extends State<InviteUsersView> {
     final store = StoreProvider.of<AppState>(context);
 
     if (!this.searching) {
-      setState(() {
+      this.setState(() {
         searching = !searching;
+      });
+    }
+    if (store.state.userStore.invites.isNotEmpty) {
+      this.setState(() {
+        invites = store.state.userStore.invites;
       });
     }
 
@@ -121,6 +130,34 @@ class InviteUsersState extends State<InviteUsersView> {
 
   /**
    * 
+   * User Invite
+   * 
+   * add user to invite list
+   */
+  @protected
+  void onSubmitUsers({BuildContext context, _Props props}) async {
+    await props.onSubmitInvites(
+      users: this.invites,
+    );
+    Navigator.pop(context);
+  }
+
+  @protected
+  onShowUserDetails({
+    BuildContext context,
+    User user,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        user: user,
+      ),
+    );
+  }
+
+  /**
+   * 
    * Attempt User Invite
    * 
    * attempt chating with a user 
@@ -132,8 +169,9 @@ class InviteUsersState extends State<InviteUsersView> {
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try inviting with ${user.displayName}',
-        content: Strings.confirmationAttemptChat,
+        title: 'Try inviting ${user.displayName}',
+        content: Strings.alertInviteUnknownUser,
+        action: 'try invite',
         onStartChat: () => this.onInviteUser(user: user),
       ),
     );
@@ -163,9 +201,17 @@ class InviteUsersState extends State<InviteUsersView> {
           final showManualUser =
               searchable != null && searchable.length > 0 && foundResult < 0;
 
+          final usersList = searchable == null || searchable.isEmpty
+              ? props.usersRecent
+              : props.searchResults;
+
+          final usersListLabel = searchable == null || searchable.isEmpty
+              ? Strings.labelRecentUsers
+              : Strings.labelSearchedUsers;
+
           return Scaffold(
             appBar: AppBarSearch(
-              title: Strings.titleSearchUsers,
+              title: Strings.titleInviteusers,
               label: 'Search for a user...',
               tooltip: 'Search Users',
               elevation: 0,
@@ -176,6 +222,26 @@ class InviteUsersState extends State<InviteUsersView> {
               onToggleSearch: () => this.setState(() {
                 searching = !searching;
               }),
+            ),
+            floatingActionButton: Container(
+              padding: Dimensions.appPaddingVertical,
+              child: FloatingActionButton(
+                heroTag: 'fab5',
+                tooltip: 'Add User Invites',
+                backgroundColor: Theme.of(context).accentColor,
+                onPressed: () => onSubmitUsers(
+                  context: context,
+                  props: props,
+                ),
+                child: Container(
+                  padding: EdgeInsets.only(left: 2),
+                  child: SvgPicture.asset(
+                    Assets.iconChevronsRightBeing,
+                    color: Colors.white,
+                    semanticsLabel: Strings.semanticsLabelHomeEmpty,
+                  ),
+                ),
+              ),
             ),
             body: Align(
               alignment: Alignment.topRight,
@@ -202,7 +268,10 @@ class InviteUsersState extends State<InviteUsersView> {
 
                           return Align(
                             child: GestureDetector(
-                              onTap: () => onInviteUser(user: user),
+                              onTap: () => onShowUserDetails(
+                                context: context,
+                                user: user,
+                              ),
                               child: Container(
                                 padding: EdgeInsets.only(
                                   left: index == 0 ? 12 : 4,
@@ -210,7 +279,12 @@ class InviteUsersState extends State<InviteUsersView> {
                                       index == this.invites.length - 1 ? 12 : 4,
                                 ),
                                 child: Chip(
+                                  labelPadding: EdgeInsets.only(left: 8),
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: VisualDensity.comfortable,
                                   avatar: AvatarCircle(
+                                    margin: EdgeInsets.zero,
+                                    padding: EdgeInsets.zero,
                                     uri: user.avatarUri,
                                     alt: user.displayName ?? user.userId,
                                     size: Dimensions.avatarSizeMessage,
@@ -229,6 +303,15 @@ class InviteUsersState extends State<InviteUsersView> {
                                               .color,
                                         ),
                                   ),
+                                  deleteIcon: Icon(
+                                    Icons.close,
+                                    size: Dimensions.avatarSizeMessage / 1.5,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        .color,
+                                  ),
+                                  onDeleted: () => onInviteUser(user: user),
                                 ),
                               ),
                             ),
@@ -243,76 +326,113 @@ class InviteUsersState extends State<InviteUsersView> {
                         ListView(
                           shrinkWrap: true,
                           children: [
-                            Visibility(
-                              visible: showManualUser,
-                              child: GestureDetector(
-                                onTap: () => this.onAttemptInvite(
-                                  props: props,
-                                  context: context,
-                                  user: attemptableUser,
-                                ),
-                                child: CardSection(
-                                  padding: EdgeInsets.zero,
-                                  elevation: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: ListTile(
-                                      enabled:
-                                          creatingRoomDisplayName != searchable,
-                                      leading: AvatarCircle(
-                                        uri: attemptableUser.avatarUri,
-                                        alt: attemptableUser.displayName ??
-                                            attemptableUser.userId,
-                                        size: Dimensions.avatarSizeMin,
-                                      ),
-                                      title: Text(
-                                        formatUsername(attemptableUser),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1,
-                                      ),
-                                      subtitle: Text(
-                                        attemptableUser.userId,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .caption
-                                            .merge(
-                                              TextStyle(
-                                                color: props.loading
-                                                    ? Color(
-                                                        Colours.greyDisabled)
-                                                    : null,
-                                              ),
-                                            ),
-                                      ),
-                                    ),
+                            Container(
+                              padding: EdgeInsets.only(
+                                left: 20,
+                                right: 20,
+                                top: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    usersListLabel,
+                                    textAlign: TextAlign.start,
+                                    style:
+                                        Theme.of(context).textTheme.subtitle2,
                                   ),
-                                ),
+                                ],
                               ),
                             ),
+                            Visibility(
+                                visible: showManualUser,
+                                child: GestureDetector(
+                                    onTap: () => this.onAttemptInvite(
+                                          props: props,
+                                          context: context,
+                                          user: attemptableUser,
+                                        ),
+                                    child: CardSection(
+                                      margin: EdgeInsets.zero,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 4),
+                                      elevation: 0,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 8),
+                                        child: ListTile(
+                                          enabled: creatingRoomDisplayName !=
+                                              searchable,
+                                          leading: AvatarCircle(
+                                            uri: attemptableUser.avatarUri,
+                                            alt: attemptableUser.displayName ??
+                                                attemptableUser.userId,
+                                            size: Dimensions.avatarSizeMin,
+                                            background: Colours.hashedColor(
+                                                attemptableUser.userId),
+                                          ),
+                                          title: Text(
+                                            formatUsername(attemptableUser),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1,
+                                          ),
+                                          subtitle: Text(
+                                            attemptableUser.userId,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption
+                                                .merge(
+                                                  TextStyle(
+                                                    color: props.loading
+                                                        ? Color(Colours
+                                                            .greyDisabled)
+                                                        : null,
+                                                  ),
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ))),
                             ListView.builder(
                               shrinkWrap: true,
                               scrollDirection: Axis.vertical,
-                              itemCount: props.searchResults.length,
+                              itemCount: usersList.length,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int index) {
-                                final user =
-                                    (props.searchResults[index] as User);
+                                final user = (usersList[index] as User);
 
-                                return GestureDetector(
-                                  onTap: () => this.onInviteUser(user: user),
-                                  child: CardSection(
-                                    padding: EdgeInsets.zero,
-                                    elevation: 0,
+                                return CardSection(
+                                  margin: EdgeInsets.zero,
+                                  padding: EdgeInsets.symmetric(vertical: 4),
+                                  elevation: 0,
+                                  child: InkWell(
+                                    onTap: () => this.onInviteUser(user: user),
                                     child: Container(
                                       child: ListTile(
                                         enabled: creatingRoomDisplayName !=
                                             user.displayName,
-                                        leading: AvatarCircle(
-                                          uri: user.avatarUri,
-                                          alt: user.displayName ?? user.userId,
-                                          size: Dimensions.avatarSizeMin,
+                                        leading: GestureDetector(
+                                          onTap: () => this.onShowUserDetails(
+                                            context: context,
+                                            user: user,
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              AvatarCircle(
+                                                uri: user.avatarUri,
+                                                alt: user.displayName ??
+                                                    user.userId,
+                                                size: Dimensions.avatarSizeMin,
+                                                selected: this.invites.contains(
+                                                      user,
+                                                    ),
+                                                background: Colours.hashedColor(
+                                                  user.userId,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         title: Text(
                                           formatUsername(user),
@@ -383,7 +503,7 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
-  final Function onCreateChatDirect;
+  final Function onSubmitInvites;
 
   _Props({
     @required this.theme,
@@ -392,7 +512,7 @@ class _Props extends Equatable {
     @required this.creatingRoom,
     @required this.searchResults,
     @required this.onSearch,
-    @required this.onCreateChatDirect,
+    @required this.onSubmitInvites,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -404,11 +524,8 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateChatDirect: ({User user}) async {
-          return store.dispatch(createRoom(
-            isDirect: true,
-            invites: <User>[user],
-          ));
+        onSubmitInvites: ({List<User> users}) async {
+          return store.dispatch(setUserInvites(users: users));
         },
       );
 

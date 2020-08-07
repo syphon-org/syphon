@@ -379,7 +379,8 @@ ThunkAction<AppState> createRoom({
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
-      final inviteeIds = invites.map((user) => user.userId).toList();
+      final inviteIds = invites.map((user) => user.userId).toList();
+
       final data = await MatrixApi.createRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -387,7 +388,7 @@ ThunkAction<AppState> createRoom({
         name: name,
         topic: topic,
         alias: alias,
-        invites: inviteeIds,
+        invites: inviteIds,
         isDirect: isDirect,
         chatTypePreset: preset,
       );
@@ -414,7 +415,7 @@ ThunkAction<AppState> createRoom({
 
       return newRoomId;
     } catch (error) {
-      debugPrint('[createRoom] $error');
+      addAlert(message: error.message, origin: 'createRoom|$preset');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));

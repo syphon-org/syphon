@@ -303,8 +303,8 @@ class SearchUserState extends State<SearchUserView> {
                             user: user,
                           ),
                           child: Container(
-                            width: Dimensions.iconSize,
-                            height: Dimensions.iconSize,
+                            width: Dimensions.iconSizeLite,
+                            height: Dimensions.iconSizeLite,
                             // margin: EdgeInsets.symmetric(horizontal: 8),
                             child: SvgPicture.asset(
                               Assets.iconSendBeing,

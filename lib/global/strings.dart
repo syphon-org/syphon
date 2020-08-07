@@ -25,6 +25,7 @@ class Strings {
   static const titleAdvanced = 'Advanced';
   static const titleSearchGroups = 'Explore Groups';
   static const titleSearchUsers = 'Search Users';
+  static const titleInviteusers = 'Invite Users';
   static const titleRoomUsers = 'All Room Users';
   static const titleCreateGroupPublic = 'Create A Public Group';
 
@@ -42,6 +43,8 @@ class Strings {
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSearchedUsers = 'Matched Users';
+  static const labelRecentUsers = 'Users';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
 
@@ -65,6 +68,8 @@ class Strings {
   static const buttonTextLogin = 'Login';
 
   // Errors
+  static const alertInviteUnknownUser =
+      'This user doens\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
   static const alertFeatureInProgress = '🛠 This feature is coming soon';
   static const errorMessageSendingFailed = 'Message Failed To Send';
   static const errorCheckHomeserver =

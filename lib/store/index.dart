@@ -21,6 +21,8 @@ import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/reducer.dart';
+import 'package:syphon/store/user/state.dart';
 import './alerts/model.dart';
 import './alerts/reducer.dart';
 import './auth/state.dart';
@@ -46,6 +48,7 @@ class AppState extends Equatable {
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
+  final UserStore userStore;
   final SyncStore syncStore;
   final CryptoStore cryptoStore;
 
@@ -55,6 +58,7 @@ class AppState extends Equatable {
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
     this.roomStore = const RoomStore(),
+    this.userStore = const UserStore(),
     this.mediaStore = const MediaStore(),
     this.searchStore = const SearchStore(),
     this.settingsStore = const SettingsStore(),
@@ -68,6 +72,7 @@ class AppState extends Equatable {
         authStore,
         syncStore,
         roomStore,
+        userStore,
         mediaStore,
         searchStore,
         settingsStore,
@@ -83,6 +88,7 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
+    userStore: userReducer(state.userStore, action),
     searchStore: searchReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
@@ -211,6 +217,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     MediaStore mediaStoreConverted = MediaStore();
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
+    UserStore userStore = UserStore();
 
     authStoreConverted = Cache.state.get(
       authStoreConverted.runtimeType.toString(),
@@ -268,6 +275,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       syncStore: syncStoreConverted,
       cryptoStore: cryptoStoreConverted,
       roomStore: roomStoreConverted,
+      userStore: userStore, // not cached
       mediaStore: mediaStoreConverted,
       settingsStore: settingsStoreConverted,
     );

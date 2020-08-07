@@ -80,22 +80,6 @@ class UserDetailsState extends State<UserDetailsView> {
   }
 
   @protected
-  onShowUserDetails({
-    BuildContext context,
-    String roomId,
-    String userId,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ModalUserDetails(
-        roomId: roomId,
-        userId: userId,
-      ),
-    );
-  }
-
-  @protected
   onShowColorPicker({
     context,
     int originalColor,

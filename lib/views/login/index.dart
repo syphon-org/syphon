@@ -63,8 +63,8 @@ class LoginState extends State<Login> {
       builder: (context, props) => Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.transparent,
           brightness: Brightness.light,
+          backgroundColor: Colors.transparent,
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios,

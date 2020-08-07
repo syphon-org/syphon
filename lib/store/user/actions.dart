@@ -25,6 +25,26 @@ class SaveUser {
   SaveUser({this.user});
 }
 
+class SetUserInvites {
+  final List<User> users;
+  SetUserInvites({this.users});
+}
+
+class ClearUserInvites {}
+
+ThunkAction<AppState> setUserInvites({List<User> users}) {
+  return (Store<AppState> store) async {
+    print(users);
+    store.dispatch(SetUserInvites(users: users));
+  };
+}
+
+ThunkAction<AppState> clearUserInvites() {
+  return (Store<AppState> store) async {
+    store.dispatch(ClearUserInvites());
+  };
+}
+
 ThunkAction<AppState> fetchUserProfile({User user}) {
   return (Store<AppState> store) async {
     try {

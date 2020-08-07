@@ -53,6 +53,7 @@ class Values {
     'Rubik',
     "Roboto",
     "Poppins",
+    "Inter",
   ];
 
   static const fontSizes = [

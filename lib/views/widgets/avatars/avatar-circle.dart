@@ -1,9 +1,12 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:syphon/global/assets.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 
@@ -17,9 +20,11 @@ class AvatarCircle extends StatelessWidget {
     this.margin,
     this.padding,
     this.background,
+    this.selected = false,
   }) : super(key: key);
 
   final bool force;
+  final bool selected;
   final String uri;
   final String alt;
   final double size;
@@ -60,12 +65,44 @@ class AvatarCircle extends StatelessWidget {
       margin: margin,
       padding: padding,
       color: Colors.transparent,
-      child: CircleAvatar(
-        radius: size / 2,
-        child: avatarWidget,
-        backgroundColor: uri == null && !force
-            ? background ?? backgroundColor
-            : Colors.transparent,
+      child: Stack(
+        children: [
+          CircleAvatar(
+            radius: size / 2,
+            child: avatarWidget,
+            backgroundColor: uri == null && !force
+                ? background ?? backgroundColor
+                : Colors.transparent,
+          ),
+          Visibility(
+            visible: selected,
+            child: Positioned(
+              right: 0,
+              bottom: 0,
+              child: ClipRRect(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1,
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(Dimensions.badgeAvatarSize),
+                  ),
+                  width: Dimensions.badgeAvatarSize,
+                  height: Dimensions.badgeAvatarSize,
+                  margin: EdgeInsets.only(left: 4),
+                  child: Icon(
+                    Icons.check,
+                    size: Dimensions.iconSizeMini,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

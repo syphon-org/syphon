@@ -20,6 +20,7 @@ class DialogStartChat extends StatelessWidget {
     this.user,
     this.title = 'Try chatting',
     this.content = Strings.confirmationAttemptChat,
+    this.action = Strings.buttonLetsChat,
     this.onCancel,
     this.onStartChat,
   }) : super(key: key);
@@ -27,6 +28,7 @@ class DialogStartChat extends StatelessWidget {
   final User user;
   final String title;
   final String content;
+  final String action;
   final Function onCancel;
   final Function onStartChat;
 
@@ -66,7 +68,7 @@ class DialogStartChat extends StatelessWidget {
                   ),
                   ButtonText(
                     textWidget: Text(
-                      Strings.buttonLetsChat,
+                      action ?? Strings.buttonLetsChat,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     loading: creating,

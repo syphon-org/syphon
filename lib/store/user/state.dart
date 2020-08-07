@@ -8,24 +8,30 @@ import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: UsersStoreHiveId)
-class UsersStore extends Equatable {
+@HiveType(typeId: UserStoreHiveId)
+class UserStore extends Equatable {
+  final bool loading;
+
   @HiveField(0)
   final Map<String, User> users;
 
-  final bool loading;
+  @HiveField(1)
+  final List<User> invites;
 
-  const UsersStore({
+  const UserStore({
     this.users = const {},
+    this.invites = const [],
     this.loading = false,
   });
 
-  UsersStore copyWith({
-    Map<String, User> users,
+  UserStore copyWith({
     bool loading,
+    List<User> invites,
+    Map<String, User> users,
   }) {
-    return UsersStore(
+    return UserStore(
       users: users ?? this.users,
+      invites: invites ?? this.invites,
       loading: loading ?? this.loading,
     );
   }
@@ -33,6 +39,7 @@ class UsersStore extends Equatable {
   @override
   List<Object> get props => [
         users,
+        invites,
         loading,
       ];
 }

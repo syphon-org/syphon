@@ -141,11 +141,16 @@ flutter:
         - asset: assets/fonts/Poppins-Light.ttf 
         - asset: assets/fonts/Poppins-Thin.ttf 
     - family: Rubik
-      fonts:
-        - asset: assets/fonts/Rubik-Italic.ttf 
+      fonts: 
         - asset: assets/fonts/Rubik-Regular.ttf
         - asset: assets/fonts/Rubik-Medium.ttf 
         - asset: assets/fonts/Rubik-Light.ttf 
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Italic.ttf 
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf 
+        - asset: assets/fonts/Inter-Light.ttf 
 
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
@@ -171,6 +176,7 @@ flutter:
    - assets/icons/app_icon.svg
    - assets/icons/app_icon.png
    - assets/icons/app_icon_white.png
+   - assets/icons/global/being-check.svg
    - assets/icons/global/being-person-add.svg
    - assets/icons/global/being-group-add.svg
    - assets/icons/global/being-public-add.svg
@@ -182,6 +188,7 @@ flutter:
    - assets/icons/global/being-send-lock.svg
    - assets/icons/global/being-send-lock-solid.svg
    - assets/icons/global/being-send-unlock.svg
+   - assets/icons/global/being-chevrons-right.svg
    - assets/icons/global/feather-message-circle.svg
 
 

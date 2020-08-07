@@ -20,6 +20,9 @@ class Assets {
       'assets/icons/global/being-send-unlock.svg';
   static const iconSendLockSolidBeing =
       'assets/icons/global/being-send-lock-solid.svg';
+  static const iconCheckBeing = 'assets/icons/global/being-check.svg';
+  static const iconChevronsRightBeing =
+      'assets/icons/global/being-chevrons-right.svg';
   static const iconMessageCircleBeing =
       'assets/icons/global/feather-message-circle.svg';
 

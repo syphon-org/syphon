@@ -189,7 +189,13 @@ class IntroState extends State<Intro> {
     final double widgetWidthScaling = width * 0.725;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        brightness: Brightness.light,
+        backgroundColor: Colors.transparent,
+      ),
       body: StoreConnector<AppState, AppState>(
+        distinct: true,
         converter: (Store<AppState> store) => store.state,
         builder: (context, state) => Column(
           mainAxisAlignment: MainAxisAlignment.center,

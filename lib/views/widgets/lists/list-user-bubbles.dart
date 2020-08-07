@@ -34,15 +34,13 @@ class ListUserBubbles extends StatelessWidget {
   @protected
   onShowUserDetails({
     BuildContext context,
-    String roomId,
-    String userId,
+    User user,
   }) async {
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
-        roomId: roomId,
-        userId: userId,
+        user: user,
       ),
     );
   }
@@ -65,14 +63,13 @@ class ListUserBubbles extends StatelessWidget {
                   onTap: () {
                     onShowUserDetails(
                       context: context,
-                      roomId: roomId,
-                      userId: user.userId,
+                      user: user,
                     );
                   },
                   child: Container(
                     padding: EdgeInsets.only(
                       left: index == 0 ? 12 : 4,
-                      right: index == users.length - 1 ? 12 : 4,
+                      right: index == users.length ? 12 : 4,
                     ),
                     child: AvatarCircle(
                       uri: user.avatarUri,
@@ -122,13 +119,15 @@ class ListUserBubbles extends StatelessWidget {
                             Radius.circular(Dimensions.avatarSize),
                           ),
                           border: Border.all(
-                            width: 2,
+                            width: 1,
                             color: Theme.of(context).textTheme.caption.color,
                           ),
                         ),
                         child: Icon(
-                          invite ? Icons.add : Icons.arrow_forward_ios,
-                          size: Dimensions.iconSizeLarge,
+                          invite ? Icons.edit : Icons.arrow_forward_ios,
+                          size: invite
+                              ? Dimensions.iconSize
+                              : Dimensions.iconSizeLarge,
                           color: Theme.of(context).textTheme.caption.color,
                         ),
                       ),

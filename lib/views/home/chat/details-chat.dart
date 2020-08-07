@@ -95,22 +95,6 @@ class ChatDetailsState extends State<ChatDetailsView> {
   }
 
   @protected
-  onShowUserDetails({
-    BuildContext context,
-    String roomId,
-    String userId,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ModalUserDetails(
-        roomId: roomId,
-        userId: userId,
-      ),
-    );
-  }
-
-  @protected
   onShowColorPicker({
     context,
     int originalColor,
@@ -200,7 +184,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                             size: height * 0.15,
                             uri: props.room.avatarUri,
                             alt: props.room.name,
-                            background: props.room.colorDefault,
+                            background: Colours.hashedColor(props.room.id),
                           ),
                         ),
                       ],
