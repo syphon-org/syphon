@@ -142,7 +142,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
                     size: Dimensions.avatarSizeMin,
                   ),
                   title: Text(
-                    formatDisplayName(user),
+                    formatUsername(user),
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyText1,
                   ),

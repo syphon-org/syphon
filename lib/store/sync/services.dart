@@ -150,7 +150,7 @@ void notificationSyncIsolate() async {
 
               if (room.messages.length == 1) {
                 final String messageSender = room.messages[0].sender;
-                final formattedSender = formatShortname(messageSender);
+                final formattedSender = trimAlias(messageSender);
 
                 if (!formattedSender.contains(currentUser)) {
                   if (room.direct) {

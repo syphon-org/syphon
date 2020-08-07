@@ -30,7 +30,7 @@ class ProfilePreview extends StatelessWidget {
                 margin: EdgeInsets.only(right: 16),
                 child: AvatarCircle(
                   uri: props.avatarUri,
-                  alt: props.initials,
+                  alt: props.user.displayName ?? props.user.userId,
                   size: Dimensions.avatarSize,
                 ),
               ),
@@ -40,11 +40,11 @@ class ProfilePreview extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    props.user.displayName ?? '',
+                    props.username ?? '',
                     style: TextStyle(fontSize: 20.0),
                   ),
                   Text(
-                    props.username ?? '',
+                    props.userId ?? '',
                     style: TextStyle(fontSize: 14.0),
                   ),
                 ],
@@ -58,26 +58,23 @@ class ProfilePreview extends StatelessWidget {
 class _Props extends Equatable {
   final User user;
   final bool loading;
-  final String shortname;
-  final String initials;
+  final String userId;
   final String username;
   final String avatarUri;
 
   _Props({
     @required this.user,
+    @required this.userId,
     @required this.loading,
-    @required this.shortname,
     @required this.username,
-    @required this.initials,
     @required this.avatarUri,
   });
 
   @override
   List<Object> get props => [
         user,
+        userId,
         loading,
-        shortname,
-        initials,
         username,
         avatarUri,
       ];
@@ -88,16 +85,14 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-          user: store.state.authStore.user ?? const User(),
-          loading: store.state.authStore.loading,
-          shortname: displayShortname(
-            store.state.authStore.user ?? const User(),
-          ),
-          initials: displayInitials(
-            store.state.authStore.user ?? const User(),
-          ),
-          avatarUri: (store.state.authStore.user ?? const User()).avatarUri,
-          username: store.state.authStore.user != null
-              ? store.state.authStore.user.userId
-              : '');
+        user: store.state.authStore.user ?? const User(),
+        userId: store.state.authStore.user != null
+            ? store.state.authStore.user.userId
+            : '',
+        loading: store.state.authStore.loading,
+        username: formatUsername(
+          store.state.authStore.user ?? const User(),
+        ),
+        avatarUri: (store.state.authStore.user ?? const User()).avatarUri,
+      );
 }

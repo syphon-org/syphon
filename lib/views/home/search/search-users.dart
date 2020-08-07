@@ -202,7 +202,7 @@ class SearchUserState extends State<SearchUserView> {
                     size: Dimensions.avatarSizeMin,
                   ),
                   title: Text(
-                    formatDisplayName(attemptableUser),
+                    formatUsername(attemptableUser),
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
@@ -261,7 +261,7 @@ class SearchUserState extends State<SearchUserView> {
                       size: Dimensions.avatarSizeMin,
                     ),
                     title: Text(
-                      formatDisplayName(user),
+                      formatUsername(user),
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyText1,
                     ),

@@ -421,7 +421,7 @@ class Room {
             // if nothing else takes priority
             if (namePriority == 4 && event.sender != currentUser.userId) {
               if (displayName == null) {
-                name = formatShortname(event.sender);
+                name = trimAlias(event.sender);
                 avatarUri = memberAvatarUri;
               } else {
                 name = displayName;

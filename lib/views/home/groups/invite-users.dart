@@ -208,7 +208,7 @@ class InviteUsersState extends State<InviteUsersView> {
                     size: Dimensions.avatarSizeMin,
                   ),
                   title: Text(
-                    formatDisplayName(attemptableUser),
+                    formatUsername(attemptableUser),
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
@@ -267,7 +267,7 @@ class InviteUsersState extends State<InviteUsersView> {
                       size: Dimensions.avatarSizeMin,
                     ),
                     title: Text(
-                      formatDisplayName(user),
+                      formatUsername(user),
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyText1,
                     ),

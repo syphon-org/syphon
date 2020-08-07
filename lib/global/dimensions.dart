@@ -66,7 +66,7 @@ class Dimensions {
   static const double inputSizeMax = 296;
 
   static const double inputHeight = 52;
-  static const double inputEditorHeight = 128;
+  static const double inputEditorHeight = 96;
   static const double inputBorderRadius = 30.0;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8

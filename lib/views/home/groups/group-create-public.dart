@@ -229,7 +229,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                               maintainState: true,
                                               maintainAnimation: true,
                                               child: Text(
-                                                matrixAlias(
+                                                formatAlias(
                                                   resource: this.alias ?? '',
                                                   homeserver:
                                                       props.homeserver ?? '',
@@ -356,7 +356,11 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Container(
-                                        padding: Dimensions.listPadding,
+                                        padding: EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 8,
+                                        ),
                                         child: Row(
                                           children: [
                                             Text(
@@ -479,7 +483,7 @@ class _Props extends Equatable {
           String topic,
           String alias,
         }) async {
-          final aliasFormatted = matrixAlias(
+          final aliasFormatted = formatAlias(
             resource: alias,
             homeserver: store.state.authStore.user.homeserverName,
           );

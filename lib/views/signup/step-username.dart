@@ -45,9 +45,7 @@ class UsernameStepState extends State<UsernameStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    usernameController.text = trimmedUserId(
-      userId: store.state.authStore.username,
-    );
+    usernameController.text = trimAlias(store.state.authStore.username);
   }
 
   @override
@@ -211,8 +209,8 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         username: store.state.authStore.username,
-        fullUserId: userAlias(
-          username: store.state.authStore.username,
+        fullUserId: formatAlias(
+          resource: store.state.authStore.username,
           homeserver: store.state.authStore.homeserver,
         ),
         isUsernameValid: store.state.authStore.isUsernameValid,
