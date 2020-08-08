@@ -371,11 +371,11 @@ ThunkAction<AppState> createRoom({
   String avatarUri,
   List<User> invites,
   bool isDirect = false,
+  bool encryption = false, // TODO: defaults without group E2EE for now
   String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
     try {
-      print('[createRoom] are we even trying?');
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
@@ -397,28 +397,34 @@ ThunkAction<AppState> createRoom({
         throw data['error'];
       }
 
-      final roomIdNew = data['room_id'];
+      var room = Room(
+        id: data['room_id'],
+      );
 
       if (avatarFile != null) {
         await store.dispatch(
-          updateRoomAvatar(roomId: roomIdNew, localFile: avatarFile),
+          updateRoomAvatar(roomId: room.id, localFile: avatarFile),
         );
       }
 
       if (isDirect) {
         final directUser = invites[0];
-        final newRoom = Room(
-          id: roomIdNew,
+        room = room.copyWith(
           direct: true,
           users: {directUser.userId: directUser},
         );
 
-        await store.dispatch(toggleDirectRoom(room: newRoom, enabled: true));
-        await store.dispatch(toggleRoomEncryption(room: newRoom));
+        await store.dispatch(toggleDirectRoom(room: room, enabled: true));
       }
 
-      print('Create Room $roomIdNew');
-      return roomIdNew;
+      // direct chats are encrypted by default
+      // group e2ee is not done yet
+      if (encryption || isDirect) {
+        await store.dispatch(toggleRoomEncryption(room: room));
+      }
+
+      debugPrint('[createRoom] ${room.id}');
+      return room.id;
     } catch (error) {
       store.dispatch(
         addAlert(message: error.toString(), origin: 'createRoom|$preset'),

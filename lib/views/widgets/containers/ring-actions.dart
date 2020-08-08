@@ -48,7 +48,7 @@ class ActionRing extends StatelessWidget {
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey.currentState.close();
-    Navigator.pushNamed(context, '/home/groups/create-public');
+    Navigator.pushNamed(context, '/home/groups/create/public');
   }
 
   @override

@@ -202,7 +202,7 @@ class HomeViewState extends State<Home> {
             onSelected: (Options result) {
               switch (result) {
                 case Options.newGroup:
-                  // TODO: allow users to create and edit groups
+                  Navigator.pushNamed(context, '/home/groups/create');
                   break;
                 case Options.settings:
                   Navigator.pushNamed(context, '/settings');
@@ -217,7 +217,6 @@ class HomeViewState extends State<Home> {
             itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
               const PopupMenuItem<Options>(
                 value: Options.newGroup,
-                enabled: false,
                 child: Text('New Group'),
               ),
               const PopupMenuItem<Options>(

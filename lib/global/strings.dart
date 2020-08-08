@@ -27,6 +27,7 @@ class Strings {
   static const titleSearchUsers = 'Search Users';
   static const titleInviteusers = 'Invite Users';
   static const titleRoomUsers = 'All Room Users';
+  static const titleCreateGroup = 'Create A Group Chat';
   static const titleCreateGroupPublic = 'Create A Public Group';
 
   // Dialog Titles

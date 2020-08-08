@@ -13,7 +13,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/buttons/button-text-opacity.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
