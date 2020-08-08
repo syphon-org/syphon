@@ -400,7 +400,9 @@ ThunkAction<AppState> createRoom({
       final roomIdNew = data['room_id'];
 
       if (avatarFile != null) {
-        await store.dispatch(updateRoomAvatar(localFile: avatarFile));
+        await store.dispatch(
+          updateRoomAvatar(roomId: roomIdNew, localFile: avatarFile),
+        );
       }
 
       if (isDirect) {
@@ -549,12 +551,12 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 /**
  * Update room avatar
  */
-ThunkAction<AppState> updateRoomAvatar({Room room, File localFile}) {
+ThunkAction<AppState> updateRoomAvatar({String roomId, File localFile}) {
   return (Store<AppState> store) async {
     try {
       final data = await store.dispatch(uploadMedia(
         localFile: localFile,
-        mediaName: room.name ?? room.id,
+        mediaName: roomId,
       ));
 
       final content = {
@@ -565,7 +567,7 @@ ThunkAction<AppState> updateRoomAvatar({Room room, File localFile}) {
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
+        roomId: roomId,
         eventType: EventTypes.avatar,
         content: content,
       );
@@ -574,8 +576,7 @@ ThunkAction<AppState> updateRoomAvatar({Room room, File localFile}) {
         throw data['error'];
       }
 
-      await store.dispatch(fetchStateEvents(room: room));
-
+      await store.dispatch(fetchStateEvents(room: Room(id: roomId)));
       return data['event_id'];
     } catch (error) {
       store.dispatch(
