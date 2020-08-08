@@ -375,6 +375,7 @@ ThunkAction<AppState> createRoom({
 }) {
   return (Store<AppState> store) async {
     try {
+      print('[createRoom] are we even trying?');
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
@@ -392,16 +393,20 @@ ThunkAction<AppState> createRoom({
         chatTypePreset: preset,
       );
 
-      final newRoomId = data['room_id'];
-
       if (data['errcode'] != null) {
         throw data['error'];
+      }
+
+      final roomIdNew = data['room_id'];
+
+      if (avatarFile != null) {
+        await store.dispatch(updateRoomAvatar(localFile: avatarFile));
       }
 
       if (isDirect) {
         final directUser = invites[0];
         final newRoom = Room(
-          id: newRoomId,
+          id: roomIdNew,
           direct: true,
           users: {directUser.userId: directUser},
         );
@@ -410,13 +415,15 @@ ThunkAction<AppState> createRoom({
         await store.dispatch(toggleRoomEncryption(room: newRoom));
       }
 
-      await store.dispatch(startSyncObserver());
-
-      return newRoomId;
+      print('Create Room $roomIdNew');
+      return roomIdNew;
     } catch (error) {
-      addAlert(message: error, origin: 'createRoom|$preset');
+      store.dispatch(
+        addAlert(message: error.toString(), origin: 'createRoom|$preset'),
+      );
       return null;
     } finally {
+      await store.dispatch(startSyncObserver());
       store.dispatch(SetLoading(loading: false));
     }
   };
@@ -535,6 +542,46 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       debugPrint('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Update room avatar
+ */
+ThunkAction<AppState> updateRoomAvatar({Room room, File localFile}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await store.dispatch(uploadMedia(
+        localFile: localFile,
+        mediaName: room.name ?? room.id,
+      ));
+
+      final content = {
+        'url': data['content_uri'],
+      };
+
+      await MatrixApi.sendEvent(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        eventType: EventTypes.avatar,
+        content: content,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      await store.dispatch(fetchStateEvents(room: room));
+
+      return data['event_id'];
+    } catch (error) {
+      store.dispatch(
+        addAlert(error: error, origin: 'toggleRoomEncryption'),
+      );
+      return null;
     }
   };
 }

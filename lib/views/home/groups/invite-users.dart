@@ -122,7 +122,7 @@ class InviteUsersState extends State<InviteUsersView> {
    * add user to invite list
    */
   @protected
-  void onSubmitUsers({BuildContext context, _Props props}) async {
+  void onSubmitUsers(_Props props) async {
     await props.onSubmitInvites(
       users: this.invites,
     );
@@ -209,6 +209,7 @@ class InviteUsersState extends State<InviteUsersView> {
               elevation: 0,
               forceFocus: true,
               focusNode: searchInputFocusNode,
+              onBack: () => onSubmitUsers(props),
               onSearch: (text) => props.onSearch(text),
               onChange: (text) => this.setState(() {
                 searchable = text;
@@ -220,10 +221,7 @@ class InviteUsersState extends State<InviteUsersView> {
                 heroTag: 'fab5',
                 tooltip: 'Add User Invites',
                 backgroundColor: Theme.of(context).accentColor,
-                onPressed: () => onSubmitUsers(
-                  context: context,
-                  props: props,
-                ),
+                onPressed: () => onSubmitUsers(props),
                 child: Container(
                   padding: EdgeInsets.only(left: 2),
                   child: SvgPicture.asset(

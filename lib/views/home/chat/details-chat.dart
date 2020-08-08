@@ -110,6 +110,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
     );
   }
 
+  @protected
+  onLeaveChat(_Props props) async {
+    props.onLeaveChat();
+    Navigator.popUntil(context, (route) => route.isFirst);
+  }
+
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
@@ -463,7 +469,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             ListTile(
-                              onTap: () => props.onLeaveChat(),
+                              onTap: () => this.onLeaveChat(props),
                               contentPadding: contentPadding,
                               title: Text(
                                 'Leave Chat',

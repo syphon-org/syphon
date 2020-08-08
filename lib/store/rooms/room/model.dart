@@ -4,7 +4,6 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -118,7 +117,7 @@ class Room {
 
   const Room({
     this.id,
-    this.name = 'Chat',
+    this.name = 'Empty Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,

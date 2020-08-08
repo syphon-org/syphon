@@ -39,18 +39,20 @@ class UpdateMediaCache {
   });
 }
 
-ThunkAction<AppState> uploadMedia({File localFile}) {
+ThunkAction<AppState> uploadMedia({
+  File localFile,
+  String mediaName = 'photo',
+}) {
   return (Store<AppState> store) async {
     try {
       // Extension handling
-      final String displayName = store.state.authStore.user.displayName;
       final String fileType = lookupMimeType(localFile.path);
       final String fileExtension = fileType.split('/')[1];
 
       // Setting up params for upload
       final int fileLength = await localFile.length();
       final Stream<List<int>> fileStream = localFile.openRead();
-      final String fileName = '${displayName}_profile_photo.${fileExtension}';
+      final String fileName = '${mediaName}.${fileExtension}';
 
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(
@@ -69,7 +71,9 @@ ThunkAction<AppState> uploadMedia({File localFile}) {
 
       return data;
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateAvatarPhoto', message: error));
+      store.dispatch(
+        addAlert(origin: 'uploadMedia', message: error),
+      );
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));

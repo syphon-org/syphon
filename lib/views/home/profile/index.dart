@@ -203,98 +203,99 @@ class ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     Flexible(
-                        flex: 2,
-                        fit: FlexFit.loose,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
+                      flex: 2,
+                      fit: FlexFit.loose,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.all(8.0),
+                                constraints: BoxConstraints(
+                                  maxHeight: Dimensions.inputHeight,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  label: 'Display Name',
+                                  onChanged: (name) {
+                                    this.setState(() {
+                                      displayNameNew = name;
+                                    });
+                                  },
+                                  controller: displayNameController,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.all(8.0),
+                                constraints: BoxConstraints(
+                                  maxHeight: Dimensions.inputHeight,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  disabled: true,
+                                  onChanged: null,
+                                  label: 'User ID',
+                                  controller: userIdController,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(bottom: 24),
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Container(
                                   margin: const EdgeInsets.all(8.0),
-                                  constraints: BoxConstraints(
-                                    maxHeight: Dimensions.inputHeight,
-                                    maxWidth: Dimensions.inputWidthMax,
-                                  ),
-                                  child: TextFieldSecure(
-                                    label: 'Display Name',
-                                    onChanged: (name) {
-                                      this.setState(() {
-                                        displayNameNew = name;
-                                      });
+                                  child: ButtonSolid(
+                                    text: Strings.buttonSaveGeneric,
+                                    loading: props.loading,
+                                    disabled: props.loading,
+                                    onPressed: () async {
+                                      final bool successful =
+                                          await props.onSaveProfile(
+                                        userIdNew: null,
+                                        avatarFileNew: this.avatarFileNew,
+                                        displayNameNew: this.displayNameNew,
+                                      );
+                                      if (successful) {
+                                        Navigator.pop(context);
+                                      }
                                     },
-                                    controller: displayNameController,
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.all(8.0),
+                                  height: Dimensions.inputHeight,
+                                  margin: const EdgeInsets.all(10.0),
                                   constraints: BoxConstraints(
-                                    maxHeight: Dimensions.inputHeight,
-                                    maxWidth: Dimensions.inputWidthMax,
+                                    minWidth: Dimensions.buttonWidthMin,
+                                    minHeight: Dimensions.buttonHeightMin,
                                   ),
-                                  child: TextFieldSecure(
-                                    disabled: true,
-                                    onChanged: null,
-                                    label: 'User ID',
-                                    controller: userIdController,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(bottom: 24),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    margin: const EdgeInsets.all(8.0),
-                                    child: ButtonSolid(
-                                      text: Strings.buttonSaveGeneric,
-                                      loading: props.loading,
-                                      disabled: props.loading,
-                                      onPressed: () async {
-                                        final bool successful =
-                                            await props.onSaveProfile(
-                                          userIdNew: null,
-                                          avatarFileNew: this.avatarFileNew,
-                                          displayNameNew: this.displayNameNew,
-                                        );
-                                        if (successful) {
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: Dimensions.inputHeight,
-                                    margin: const EdgeInsets.all(10.0),
-                                    constraints: BoxConstraints(
-                                      minWidth: Dimensions.buttonWidthMin,
-                                      minHeight: Dimensions.buttonHeightMin,
-                                    ),
-                                    child: Visibility(
-                                      child: TouchableOpacity(
-                                        activeOpacity: 0.4,
-                                        onTap: () => Navigator.pop(context),
-                                        child: Text(
-                                          'quit editing',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w100,
-                                          ),
+                                  child: Visibility(
+                                    child: TouchableOpacity(
+                                      activeOpacity: 0.4,
+                                      onTap: () => Navigator.pop(context),
+                                      child: Text(
+                                        'quit editing',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w100,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        )),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -340,7 +341,7 @@ class _Props extends Equatable {
 
           if (avatarFileNew != null) {
             final bool successful = await store.dispatch(
-              updateAvatarPhoto(localFile: avatarFileNew),
+              updateAvatar(localFile: avatarFileNew),
             );
             if (!successful) return false;
           }

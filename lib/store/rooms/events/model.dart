@@ -18,11 +18,12 @@ class AccountDataTypes {
 }
 
 class EventTypes {
-  static const message = 'm.room.message';
-  static const encrypted = 'm.room.encrypted';
-  static const creation = 'm.room.create';
   static const name = 'm.room.name';
   static const topic = 'm.room.topic';
+  static const avatar = 'm.room.avatar';
+  static const creation = 'm.room.create';
+  static const message = 'm.room.message';
+  static const encrypted = 'm.room.encrypted';
 
   // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
   // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}

@@ -11,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:crypt/crypt.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -20,7 +18,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/matrix/media.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
@@ -28,6 +25,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
@@ -697,61 +695,27 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   };
 }
 
-ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
+ThunkAction<AppState> updateAvatar({File localFile}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      // Extension handling
       final String displayName = store.state.authStore.user.displayName;
-      final String fileType = lookupMimeType(localFile.path);
-      final String fileExtension = fileType.split('/')[1];
 
-      // Setting up params for upload
-      final int fileLength = await localFile.length();
-      final Stream<List<int>> fileStream = localFile.openRead();
-      final String fileName = '${displayName}_profile_photo.${fileExtension}';
-
-      // Create request vars for upload
-      final mediaUploadRequest = buildMediaUploadRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        fileName: fileName,
-        fileType: fileType,
-        fileLength: fileLength,
-      );
-
-      // POST StreamedRequest for uploading byteStream
-      final request = new http.StreamedRequest(
-        'POST',
-        Uri.parse(mediaUploadRequest['url']),
-      );
-      request.headers.addAll(mediaUploadRequest['headers']);
-      fileStream.listen(request.sink.add, onDone: () => request.sink.close());
-
-      // Attempting to await the upload response successfully
-      final mediaUploadResponseStream = await request.send();
-      final mediaUploadResponse = await http.Response.fromStream(
-        mediaUploadResponseStream,
-      );
-      final mediaUploadData = json.decode(
-        mediaUploadResponse.body,
-      );
-
-      // If upload fails, throw an error for the whole update
-      if (mediaUploadData['errcode'] != null) {
-        throw mediaUploadData['error'];
-      }
+      final data = await store.dispatch(uploadMedia(
+        localFile: localFile,
+        mediaName: '${displayName}_profile_photo',
+      ));
 
       await store.dispatch(updateAvatarUri(
-        mxcUri: mediaUploadData['content_uri'],
+        mxcUri: data['content_uri'],
       ));
 
       return true;
     } catch (error) {
       store.dispatch(
-          addAlert(origin: 'updateAvatarPhoto', message: error.error));
+        addAlert(origin: 'updateAvatar', message: error.error),
+      );
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

@@ -61,7 +61,27 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
   }
 
   @protected
-  void onShowImageOptions(BuildContext context) async {
+  void onCreateRoom(_Props props) async {
+    print('${avatar} ${name} ${topic} ${alias}');
+    final roomId = await props.onCreateRoomPublic(
+      avatar: this.avatar,
+      name: this.name,
+      topic: this.topic,
+      alias: this.alias,
+    );
+    if (roomId != null) {
+      Navigator.pop(context);
+    }
+  }
+
+  @protected
+  void onQuit(_Props props) async {
+    props.onClearUserInvites();
+    Navigator.pop(context);
+  }
+
+  @protected
+  void onShowImageOptions() async {
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -182,8 +202,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                                 height: imageSize,
                                                 child: GestureDetector(
                                                   onTap: () =>
-                                                      onShowImageOptions(
-                                                          context),
+                                                      onShowImageOptions(),
                                                   child: avatarWidget,
                                                 ),
                                               ),
@@ -440,19 +459,8 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                                 text: Strings.buttonCreate,
                                                 loading: props.loading,
                                                 disabled: props.loading,
-                                                onPressed: () async {
-                                                  final bool successful =
-                                                      await props
-                                                          .onCreateRoomPublic(
-                                                    name: this.name,
-                                                    topic: this.topic,
-                                                    alias: this.alias,
-                                                    avatar: this.avatar,
-                                                  );
-                                                  if (successful) {
-                                                    Navigator.pop(context);
-                                                  }
-                                                },
+                                                onPressed: () =>
+                                                    this.onCreateRoom(props),
                                               ),
                                             ),
                                             Container(
@@ -468,7 +476,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                               child: ButtonTextOpacity(
                                                 text: Strings.buttonQuit,
                                                 onPressed: () =>
-                                                    Navigator.pop(context),
+                                                    this.onQuit(props),
                                               ),
                                             ),
                                           ],
@@ -527,16 +535,15 @@ class _Props extends Equatable {
           String name,
           String topic,
           String alias,
+          List<User> invites,
         }) async {
-          final aliasFormatted = formatAlias(
-            resource: alias,
-            homeserver: store.state.authStore.user.homeserverName,
-          );
+          final invites = store.state.userStore.invites;
 
           final result = await store.dispatch(createRoom(
             name: name,
             topic: topic,
-            alias: aliasFormatted,
+            alias: alias,
+            invites: invites,
             avatarFile: avatar,
             preset: RoomPresets.public,
           ));
@@ -544,7 +551,7 @@ class _Props extends Equatable {
           if (result != null) {
             store.dispatch(clearUserInvites());
           }
-          return true;
+          return result;
         },
       );
 }
