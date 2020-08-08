@@ -20,6 +20,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
+import 'package:syphon/views/home/search/search-rooms.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
@@ -41,6 +42,17 @@ class ModalUserDetails extends StatelessWidget {
       context,
       '/home/user/details',
       arguments: UserDetailsArguments(
+        user: props.user,
+      ),
+    );
+  }
+
+  @protected
+  void onNavigateToInvite({BuildContext context, _Props props}) async {
+    Navigator.pushNamed(
+      context,
+      '/home/rooms/search',
+      arguments: RoomSearchArguments(
         user: props.user,
       ),
     );
@@ -176,6 +188,23 @@ class ModalUserDetails extends StatelessWidget {
                         ),
                       ),
                       onTap: () => this.onMessageUser(
+                        context: context,
+                        props: props,
+                      ),
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Invite To Room',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                      leading: Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.mail_outline,
+                          size: Dimensions.iconSize,
+                        ),
+                      ),
+                      onTap: () => this.onNavigateToInvite(
                         context: context,
                         props: props,
                       ),

@@ -23,6 +23,7 @@ class Strings {
   static const titleProfile = 'Set up Your Profile';
   static const titleSettings = 'Settings';
   static const titleAdvanced = 'Advanced';
+  static const titleInvite = 'Invite';
   static const titleSearchGroups = 'Explore Groups';
   static const titleSearchUsers = 'Search Users';
   static const titleInviteusers = 'Invite Users';
@@ -112,6 +113,9 @@ class Strings {
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
 
   // Confirmations
+  static const confirmationInvite =
+      'Are you sure you want to invite the following user to the following room?';
+
   static const confirmationStartChat = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +

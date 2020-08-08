@@ -437,7 +437,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                               contentPadding:
                                                   Dimensions.listPadding,
                                               title: Text(
-                                                'Message Encryption',
+                                                'Message Encryption (alpha)',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .subtitle1,

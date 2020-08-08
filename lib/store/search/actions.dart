@@ -148,6 +148,38 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
 }
 
 /** 
+ *  Search Rooms (Locally)
+ */
+ThunkAction<AppState> searchRooms({String searchText}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final rooms = store.state.roomStore.roomList;
+      List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
+
+      if (searchText.length != 0) {
+        searchResults = List.from(
+          rooms.where((room) {
+            final fulltext = room.name + room.alias + room.topic;
+            return fulltext.contains(searchText);
+          }),
+        );
+      }
+
+      store.dispatch(SetSearchResults(
+        searchText: searchText,
+        searchResults: searchResults,
+      ));
+    } catch (error) {
+      /**noop */
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/** 
  *  Search Rooms (Remote)
  */
 ThunkAction<AppState> searchPublicRooms({String searchText}) {

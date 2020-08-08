@@ -14,6 +14,7 @@ import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/profile/index.dart';
 import 'package:syphon/views/home/search/search-groups.dart';
+import 'package:syphon/views/home/search/search-rooms.dart';
 import 'package:syphon/views/home/search/search-users.dart';
 import 'package:syphon/views/home/settings/advanced.dart';
 import 'package:syphon/views/home/settings/chats.dart';
@@ -68,6 +69,7 @@ class NavigationProvider {
         '/home/user/search': (BuildContext context) => SearchUserView(),
         '/home/user/details': (BuildContext context) => UserDetailsView(),
         '/home/user/invite': (BuildContext context) => InviteUsersView(),
+        '/home/rooms/search': (BuildContext context) => RoomSearchView(),
         '/home/groups/search': (BuildContext context) => GroupSearchView(),
         '/home/groups/create': (BuildContext context) => CreateGroupView(),
         '/home/groups/create/public': (BuildContext context) =>

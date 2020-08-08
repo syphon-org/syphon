@@ -290,11 +290,10 @@ class HomeViewState extends State<Home> {
         );
         final roomSettings = props.chatSettings[room.id] ?? null;
 
-        var primaryColor =
-            room.avatarUri != null ? Colors.transparent : Colors.grey;
-        var backgroundColor;
         bool messagesNew = false;
+        var backgroundColor;
         var textStyle = TextStyle();
+        var primaryColor = Colors.grey[500];
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
@@ -336,11 +335,10 @@ class HomeViewState extends State<Home> {
           final messageRecent = messagesLatest[0];
 
           if (room.lastRead < messageRecent.timestamp) {
-            print('${room.lastRead} ${messageRecent.timestamp}');
             messagesNew = true;
             textStyle = textStyle.copyWith(
               color: Theme.of(context).textTheme.bodyText1.color,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             );
           }
         }

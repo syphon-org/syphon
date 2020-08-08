@@ -208,7 +208,6 @@ abstract class Rooms {
       body['name'] = name;
     }
 
-    print(alias);
     if (alias != null) {
       body['room_alias_name'] = alias;
     }

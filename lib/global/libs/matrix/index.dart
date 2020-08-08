@@ -39,8 +39,8 @@ abstract class MatrixApi {
   // Events
   static final sendEvent = Events.sendEvent;
   static final sendTyping = Events.sendTyping;
-  static final sendReadReceipts = Events.sendReadMarkers;
   static final sendMessage = Events.sendMessage;
+  static final sendReadReceipts = Events.sendReadMarkers;
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
@@ -54,8 +54,9 @@ abstract class MatrixApi {
   static final updateAvatarUri = Users.updateAvatarUri;
 
   // Users
-  static final fetchUserProfile = Users.fetchUserProfile;
   static final blockUser = Users.blockUser;
+  static final inviteUser = Users.inviteUser;
+  static final fetchUserProfile = Users.fetchUserProfile;
 
   // Media
   static final fetchThumbnail = Media.fetchThumbnail;

@@ -61,7 +61,6 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
 
   @protected
   void onCreateRoom(_Props props) async {
-    print('${avatar} ${name} ${topic} ${alias}');
     final roomId = await props.onCreateRoomPublic(
       avatar: this.avatar,
       name: this.name,

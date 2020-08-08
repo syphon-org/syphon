@@ -32,11 +32,13 @@ String formatPreview({Room room, List<Message> prefetched}) {
   }
 
   // Show topic if the user has joined a group but not sent anything (lurkin')
+
   if (messages == null || messages.length < 1) {
     if (room.invite) {
       return 'Invite to chat';
     }
-    if (room.direct) {
+
+    if (room.topic == null || room.topic.length < 1) {
       return 'No messages yet';
     }
 

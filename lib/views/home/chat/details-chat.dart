@@ -10,7 +10,6 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
-import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:

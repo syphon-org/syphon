@@ -79,7 +79,7 @@ ThunkAction<AppState> addConfirmation({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] $type : $message');
+    debugPrint('[$origin|confirm] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);
@@ -95,7 +95,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] $type : $error');
+    debugPrint('[$origin|error] $error');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = new Alert(type: type, message: message);

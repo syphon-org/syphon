@@ -183,6 +183,7 @@ class Room {
       id: id ?? this.id,
       name: name ?? this.name,
       alias: alias ?? this.alias,
+      topic: topic ?? this.topic,
       joinRule: joinRule ?? this.joinRule,
       avatarUri: avatarUri ?? this.avatarUri,
       homeserver: homeserver ?? this.homeserver,
@@ -586,6 +587,12 @@ class Room {
             break;
           case 'm.receipt':
             final Map<String, dynamic> receiptEventIds = event.content;
+
+            // TODO: figure out how to pull what messages have been read from read recepts
+            // // Set a new timestamp for the latest read message if it exceeds the current
+            // latestRead = latestRead < newReadStatuses.latestRead
+            //     ? newReadStatuses.latestRead
+            //     : latestRead;
 
             // Filter through every eventId to find receipts
             receiptEventIds.forEach((key, receipt) {

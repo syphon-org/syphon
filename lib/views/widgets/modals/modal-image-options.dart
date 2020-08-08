@@ -91,9 +91,6 @@ class ModalImageOptions extends StatelessWidget {
                   maxHeight: Dimensions.avatarSizeMax,
                 );
 
-                print('onTap $image');
-                print('onTap ${image.runtimeType}');
-
                 if (onSetNewAvatar != null) {
                   onSetNewAvatar(image: image);
                 }

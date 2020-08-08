@@ -748,6 +748,43 @@ ThunkAction<AppState> joinRoom({Room room}) {
 }
 
 /**
+ * Join Room (by id)
+ * 
+ * Not sure if this process is / will be any different
+ * than accepting an invite
+ */
+ThunkAction<AppState> inviteUser({
+  Room room,
+  User user,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.inviteUser(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        userId: user.userId,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+      return true;
+    } catch (error) {
+      store.dispatch(
+        addAlert(error: error, origin: 'inviteUser'),
+      );
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
  * Accept Room (by id, from invite
  * 
  * Not sure if this process is / will be any different

@@ -118,6 +118,43 @@ abstract class Users {
   }
 
   /**
+   * Ignore User (a.k.a. Block User)
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#m-ignored-user-list
+   *  
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> inviteUser({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+    String userId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final body = {
+      'user_id': userId,
+    };
+
+    final saveResponse = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+
+  /**
    * Update Display Name
    * 
    * https://matrix.org/docs/spec/client_server/latest#id260
