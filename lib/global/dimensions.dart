@@ -56,11 +56,14 @@ class Dimensions {
 
   // Badges
   static const double badgeAvatarSize = 16;
+  static const double badgeAvatarSizeSmall = 12;
+
   // Progress
   static const double progressIndicatorSize = 26;
   static const double progressIndicatorSizeLite = 12;
 
   // Text
+  static const double textSizeTiny = 12;
   static const double textInitialSize = 18;
 
   // Inputs

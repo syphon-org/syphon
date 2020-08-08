@@ -112,7 +112,7 @@ class Room {
       return 'invite';
     }
 
-    return 'Group';
+    return 'group';
   }
 
   const Room({
@@ -569,7 +569,6 @@ class Room {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
 
-    int latestRead = this.lastRead;
     var messageReads = this.messageReads != null
         ? Map<String, ReadStatus>.from(this.messageReads)
         : Map<String, ReadStatus>();
@@ -593,11 +592,6 @@ class Room {
               // convert every m.read object to a map of userIds + timestamps for read
               final newReadStatuses = ReadStatus.fromReceipt(receipt);
 
-              // // Set a new timestamp for the latest read message if it exceeds the current
-              latestRead = latestRead < newReadStatuses.latestRead
-                  ? newReadStatuses.latestRead
-                  : latestRead;
-
               // update the eventId if that event already has reads
               if (!messageReads.containsKey(key)) {
                 messageReads[key] = newReadStatuses;
@@ -617,7 +611,6 @@ class Room {
       userTyping: userTyping,
       usersTyping: usersTyping,
       messageReads: messageReads,
-      lastRead: latestRead,
     );
   }
 }

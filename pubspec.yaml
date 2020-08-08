@@ -1,5 +1,5 @@
 name: syphon
-description: Privacy focused matrix client for everyone
+description: a privacy focused matrix client
 
 # flutter commands
 # $ flutter create --org org.tether.tether

@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -19,6 +20,7 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'events/model.dart';
@@ -375,6 +377,7 @@ ThunkAction<AppState> createRoom({
   String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
+    var room;
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
@@ -397,7 +400,7 @@ ThunkAction<AppState> createRoom({
         throw data['error'];
       }
 
-      var room = Room(
+      room = Room(
         id: data['room_id'],
       );
 
@@ -423,13 +426,16 @@ ThunkAction<AppState> createRoom({
         await store.dispatch(toggleRoomEncryption(room: room));
       }
 
-      debugPrint('[createRoom] ${room.id}');
       return room.id;
     } catch (error) {
+      debugPrint(error);
       store.dispatch(
-        addAlert(message: error.toString(), origin: 'createRoom|$preset'),
+        addAlert(
+            message: error.toString(),
+            error: error,
+            origin: 'createRoom|$preset'),
       );
-      return null;
+      return room != null ? room.id : null;
     } finally {
       await store.dispatch(startSyncObserver());
       store.dispatch(SetLoading(loading: false));
@@ -438,7 +444,7 @@ ThunkAction<AppState> createRoom({
 }
 
 /**
- * Create Room 
+ * Update Room
  * 
  * stop / start the /sync session for this to run,
  * otherwise it will appear like the room does
@@ -459,6 +465,80 @@ ThunkAction<AppState> updateRoom({
     try {} catch (error) {
       debugPrint('[updateRoom] $error');
       return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * 
+ * Mark Room Read (Locally Only)
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
+ThunkAction<AppState> markRoomRead({String roomId}) {
+  return (Store<AppState> store) async {
+    try {
+      final room = store.state.roomStore.rooms[roomId];
+      if (room == null) {
+        throw 'Room not found';
+      }
+
+      // mark read locally only
+      if (!store.state.settingsStore.readReceipts) {
+        await store.dispatch(SetRoom(
+          room: room.copyWith(lastRead: DateTime.now().millisecondsSinceEpoch),
+        ));
+      }
+
+      // send read receipt remotely to mark locally on /sync
+      if (store.state.settingsStore.readReceipts) {
+        final messagesSorted = latestMessages(
+          roomSelectors.room(id: roomId, state: store.state).messages,
+        );
+
+        if (messagesSorted.isNotEmpty) {
+          store.dispatch(sendReadReceipts(
+            room: Room(id: roomId),
+            message: messagesSorted.elementAt(0),
+          ));
+        }
+      }
+    } catch (error) {
+      store.dispatch(addAlert(
+        message: 'Failed to mark room as read',
+        error: error,
+        origin: 'markRoomRead',
+      ));
+    }
+  };
+}
+
+/**
+ * 
+ * Mark Room Read (Locally Only)
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
+ThunkAction<AppState> markRoomsReadAll() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final rooms = store.state.roomStore.roomList;
+
+      rooms.forEach((room) {
+        store.dispatch(markRoomRead(roomId: room.id));
+      });
+    } catch (error) {
+      store.dispatch(addAlert(
+        message: 'Failed to mark all room as read',
+        error: error,
+        origin: 'markRoomRead',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

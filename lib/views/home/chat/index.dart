@@ -109,9 +109,7 @@ class ChatViewState extends State<ChatView> {
     final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
 
-    if (store.state.settingsStore.readReceipts) {
-      props.onSendReadReceipts();
-    }
+    props.onMarkRead();
 
     // TODO: remove after the cache is updated
     if (props.room.invite != null && props.room.invite) {
@@ -543,7 +541,31 @@ class ChatViewState extends State<ChatView> {
                       ),
                     ),
                     Visibility(
-                      visible: !props.room.direct,
+                      visible: props.roomTypeBadgesEnabled &&
+                          props.room.type == 'group' &&
+                          !props.room.invite,
+                      child: Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            width: Dimensions.badgeAvatarSize,
+                            height: Dimensions.badgeAvatarSize,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            child: Icon(
+                              Icons.group,
+                              color: Theme.of(context).iconTheme.color,
+                              size: Dimensions.badgeAvatarSizeSmall,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: props.roomTypeBadgesEnabled &&
+                          props.room.type == 'public' &&
+                          !props.room.invite,
                       child: Positioned(
                         right: 0,
                         bottom: 0,
@@ -580,10 +602,10 @@ class ChatViewState extends State<ChatView> {
               child: Text(
                 props.room.name,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    .copyWith(color: Colors.white),
               ),
             ),
           ],
@@ -897,10 +919,11 @@ class ChatViewState extends State<ChatView> {
 class _Props extends Equatable {
   final Room room;
   final String userId;
-  final List<Message> messages;
   final bool loading;
   final ThemeType theme;
+  final List<Message> messages;
   final Color roomPrimaryColor;
+  final bool roomTypeBadgesEnabled;
 
   final Function onSendTyping;
   final Function onSendMessage;
@@ -912,7 +935,7 @@ class _Props extends Equatable {
   final Function onAcceptInvite;
   final Function onToggleEncryption;
   final Function onCheatCode;
-  final Function onSendReadReceipts;
+  final Function onMarkRead;
 
   _Props({
     @required this.room,
@@ -921,6 +944,7 @@ class _Props extends Equatable {
     @required this.messages,
     @required this.loading,
     @required this.roomPrimaryColor,
+    @required this.roomTypeBadgesEnabled,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
@@ -931,7 +955,7 @@ class _Props extends Equatable {
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
     @required this.onCheatCode,
-    @required this.onSendReadReceipts,
+    @required this.onMarkRead,
   });
 
   @override
@@ -946,6 +970,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
       userId: store.state.authStore.user.userId,
       theme: store.state.settingsStore.theme,
+      roomTypeBadgesEnabled:
+          store.state.settingsStore.roomTypeBadgesEnabled ?? true,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(
         id: roomId,
@@ -1017,17 +1043,8 @@ class _Props extends Equatable {
       onSendTyping: ({typing, roomId}) => store.dispatch(
             sendTyping(typing: typing, roomId: roomId),
           ),
-      onSendReadReceipts: () {
-        final messagesSorted = latestMessages(
-          roomSelectors.room(id: roomId, state: store.state).messages,
-        );
-
-        if (messagesSorted.isNotEmpty) {
-          store.dispatch(sendReadReceipts(
-            room: Room(id: roomId),
-            message: messagesSorted.elementAt(0),
-          ));
-        }
+      onMarkRead: () {
+        store.dispatch(markRoomRead(roomId: roomId));
       },
       onLoadFirstBatch: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();

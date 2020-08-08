@@ -13,6 +13,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/widgets/buttons/button-text-opacity.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
@@ -36,32 +37,27 @@ class CreateGroupView extends StatefulWidget {
 
 class CreateGroupPublicState extends State<CreateGroupView> {
   CreateGroupPublicState({Key key}) : super();
-
-  File avatar;
-  String name;
-  String topic;
-
   final topicFocus = FocusNode();
   final nameController = TextEditingController();
   final topicController = TextEditingController();
 
+  File avatar;
+  String name;
+  String topic;
+  bool encryption = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() {
-    /** noop */
   }
 
   @protected
   void onCreateRoom(_Props props) async {
-    final roomId = await props.onCreateRoomPublic(
-      avatar: this.avatar,
+    final roomId = await props.onCreateGroup(
       name: this.name,
       topic: this.topic,
+      avatar: this.avatar,
+      encryption: this.encryption,
     );
     if (roomId != null) {
       Navigator.pop(context);
@@ -72,6 +68,22 @@ class CreateGroupPublicState extends State<CreateGroupView> {
   void onQuit(_Props props) async {
     props.onClearUserInvites();
     Navigator.pop(context);
+  }
+
+  @protected
+  void onToggleEncryption(_Props props) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: DialogEncryption(
+        content: Strings.confirmationGroupEncryption,
+        onAccept: () {
+          this.setState(() {
+            encryption = !this.encryption;
+          });
+        },
+      ),
+    );
   }
 
   @protected
@@ -370,7 +382,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  'Users',
+                                                  Strings.labelUsersSection,
                                                   textAlign: TextAlign.start,
                                                   style: Theme.of(context)
                                                       .textTheme
@@ -387,6 +399,58 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                               users: props.users,
                                               invite: true,
                                               forceOption: true,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Flexible(
+                                      flex: 0,
+                                      fit: FlexFit.loose,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                              left: 20,
+                                              right: 20,
+                                              top: 8,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Options',
+                                                  textAlign: TextAlign.start,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .subtitle2,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            width: width / 1.3,
+                                            child: ListTile(
+                                              contentPadding:
+                                                  Dimensions.listPadding,
+                                              title: Text(
+                                                'Message Encryption',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle1,
+                                              ),
+                                              trailing: Container(
+                                                child: Switch(
+                                                  value: this.encryption,
+                                                  onChanged: (value) =>
+                                                      onToggleEncryption(props),
+                                                ),
+                                              ),
+                                              onTap: () =>
+                                                  onToggleEncryption(props),
                                             ),
                                           ),
                                         ],
@@ -454,14 +518,14 @@ class _Props extends Equatable {
   final String homeserver;
   final List<User> users;
 
-  final Function onCreateRoomPublic;
+  final Function onCreateGroup;
   final Function onClearUserInvites;
 
   _Props({
     @required this.users,
     @required this.loading,
     @required this.homeserver,
-    @required this.onCreateRoomPublic,
+    @required this.onCreateGroup,
     @required this.onClearUserInvites,
   });
 
@@ -474,17 +538,16 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
+        loading: store.state.roomStore.loading,
         homeserver: store.state.authStore.user.homeserverName,
-        loading: store.state.authStore.loading,
         onClearUserInvites: () => store.dispatch(
           clearUserInvites(),
         ),
-        onCreateRoomPublic: ({
+        onCreateGroup: ({
           File avatar,
           String name,
           String topic,
           bool encryption,
-          List<User> invites,
         }) async {
           final invites = store.state.userStore.invites;
 

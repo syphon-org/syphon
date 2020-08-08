@@ -86,26 +86,17 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
-class ToggleMembershipEvents {
-  final bool membershipEventsEnabled;
-  ToggleMembershipEvents({this.membershipEventsEnabled});
-}
+class ToggleRoomTypeBadges {}
 
-class ToggleNotifications {
-  ToggleNotifications();
-}
+class ToggleMembershipEvents {}
 
-class ToggleTypingIndicators {
-  ToggleTypingIndicators();
-}
+class ToggleNotifications {}
 
-class ToggleReadReceipts {
-  ToggleReadReceipts();
-}
+class ToggleTypingIndicators {}
 
-class SetAppAgreement {
-  SetAppAgreement();
-}
+class ToggleReadReceipts {}
+
+class LogAppAgreement {}
 
 /**
  * Fetch Active Devices for account
@@ -264,7 +255,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
  */
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
-    store.dispatch(SetAppAgreement());
+    store.dispatch(LogAppAgreement());
   };
 }
 
@@ -370,14 +361,15 @@ ThunkAction<AppState> toggleEnterSend() {
   };
 }
 
+ThunkAction<AppState> toggleRoomTypeBadges() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleRoomTypeBadges());
+  };
+}
+
 ThunkAction<AppState> toggleMembershipEvents() {
   return (Store<AppState> store) async {
-    store.dispatch(
-      ToggleMembershipEvents(
-        membershipEventsEnabled:
-            !store.state.settingsStore.membershipEventsEnabled,
-      ),
-    );
+    store.dispatch(ToggleMembershipEvents());
   };
 }
 

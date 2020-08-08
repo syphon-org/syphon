@@ -31,6 +31,7 @@ class Strings {
   static const titleCreateGroupPublic = 'Create A Public Group';
 
   // Dialog Titles
+  static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
   static const titleDialogTerms = "Confirm Terms Of Service";
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
@@ -46,7 +47,8 @@ class Strings {
   // Labels
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
-  static const labelRecentUsers = 'Users';
+  static const labelUsersSection = 'Users';
+  static const labelRecentUsers = 'Recent Users';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
 
@@ -141,6 +143,9 @@ class Strings {
 
   static const confirmationEncryption =
       'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this chat?';
+
+  static const confirmationGroupEncryption =
+      'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this group chat?\n\nPlease be aware Group E2EE is still a work in progress. You may lose message data!';
 
   // Placeholders
   static const placeholderInputMatrixUnencrypted =

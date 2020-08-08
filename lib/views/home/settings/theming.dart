@@ -50,7 +50,7 @@ class Theming extends StatelessWidget {
                           width: width,
                           padding: Dimensions.listPadding,
                           child: Text(
-                            'App',
+                            'Color',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.subtitle2,
                           ),
@@ -169,6 +169,36 @@ class Theming extends StatelessWidget {
                       ],
                     ),
                   ),
+                  CardSection(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width,
+                          padding: Dimensions.listPadding,
+                          child: Text(
+                            'App',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Room Type Badges',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Container(
+                            child: Switch(
+                              value: props.roomTypeBadgesEnabled,
+                              onChanged: (value) =>
+                                  props.onToggleRoomTypeBadges(),
+                            ),
+                          ),
+                          onTap: () => props.onToggleRoomTypeBadges(),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               )),
             ),
@@ -186,12 +216,15 @@ class Props extends Equatable {
   final String fontName;
   final String fontSize;
 
+  final bool roomTypeBadgesEnabled;
+
   final Function onSelectPrimaryColor;
   final Function onSelectAccentColor;
   final Function onSelectAppBarColor;
   final Function onIncrementFontType;
   final Function onIncrementFontSize;
   final Function onIncrementTheme;
+  final Function onToggleRoomTypeBadges;
 
   Props({
     @required this.primaryColor,
@@ -201,12 +234,14 @@ class Props extends Equatable {
     @required this.language,
     @required this.fontName,
     @required this.fontSize,
+    @required this.roomTypeBadgesEnabled,
     @required this.onSelectPrimaryColor,
     @required this.onSelectAccentColor,
     @required this.onSelectAppBarColor,
     @required this.onIncrementFontType,
     @required this.onIncrementFontSize,
     @required this.onIncrementTheme,
+    @required this.onToggleRoomTypeBadges,
   });
 
   @override
@@ -218,6 +253,7 @@ class Props extends Equatable {
         language,
         fontName,
         fontSize,
+        roomTypeBadgesEnabled,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
@@ -234,6 +270,11 @@ class Props extends Equatable {
         language: store.state.settingsStore.language,
         fontName: store.state.settingsStore.fontName,
         fontSize: store.state.settingsStore.fontSize,
+        roomTypeBadgesEnabled:
+            store.state.settingsStore.roomTypeBadgesEnabled ?? true,
+        onToggleRoomTypeBadges: () => store.dispatch(
+          toggleRoomTypeBadges(),
+        ),
         onSelectPrimaryColor: (int color) => store.dispatch(
           // convert to int hex color code
           selectPrimaryColor(color),

@@ -267,6 +267,7 @@ class SearchUserState extends State<SearchUserView> {
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSizeMin,
+                      background: Colours.hashedColor(formatUsername(user)),
                     ),
                     title: Text(
                       formatUsername(user),

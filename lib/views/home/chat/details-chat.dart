@@ -220,7 +220,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   child: Row(
                                     children: [
                                       Text(
-                                        'Users',
+                                        Strings.labelUsersSection,
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme

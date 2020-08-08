@@ -277,8 +277,9 @@ class InviteUsersState extends State<InviteUsersView> {
                                     uri: user.avatarUri,
                                     alt: user.displayName ?? user.userId,
                                     size: Dimensions.avatarSizeMessage,
-                                    background:
-                                        Colours.hashedColor(user.userId),
+                                    background: Colours.hashedColor(
+                                      formatUsername(user),
+                                    ),
                                   ),
                                   label: Text(
                                     formatUsername(user),
@@ -357,7 +358,8 @@ class InviteUsersState extends State<InviteUsersView> {
                                                 attemptableUser.userId,
                                             size: Dimensions.avatarSizeMin,
                                             background: Colours.hashedColor(
-                                                attemptableUser.userId),
+                                              attemptableUser.userId,
+                                            ),
                                           ),
                                           title: Text(
                                             formatUsername(attemptableUser),
@@ -417,7 +419,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                                       user,
                                                     ),
                                                 background: Colours.hashedColor(
-                                                  user.userId,
+                                                  formatUsername(user),
                                                 ),
                                               ),
                                             ],

@@ -10,6 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
@@ -192,10 +193,10 @@ class HomeViewState extends State<Home> {
           IconButton(
             color: Colors.white,
             icon: Icon(Icons.search),
+            tooltip: 'Search Chats',
             onPressed: () {
               Navigator.pushNamed(context, '/search');
             },
-            tooltip: 'Search Chats',
           ),
           RoundedPopupMenu<Options>(
             icon: Icon(Icons.more_vert, color: Colors.white),
@@ -203,6 +204,9 @@ class HomeViewState extends State<Home> {
               switch (result) {
                 case Options.newGroup:
                   Navigator.pushNamed(context, '/home/groups/create');
+                  break;
+                case Options.markAllRead:
+                  props.onMarkAllRead();
                   break;
                 case Options.settings:
                   Navigator.pushNamed(context, '/settings');
@@ -221,7 +225,6 @@ class HomeViewState extends State<Home> {
               ),
               const PopupMenuItem<Options>(
                 value: Options.markAllRead,
-                enabled: false,
                 child: Text('Mark All Read'),
               ),
               const PopupMenuItem<Options>(
@@ -279,14 +282,19 @@ class HomeViewState extends State<Home> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final messages = room.messages;
+        final messages = room.messages ?? const [];
+        final messagesLatest = latestMessages(room.messages);
+        final messagePreview = formatPreview(
+          room: room,
+          prefetched: messagesLatest,
+        );
         final roomSettings = props.chatSettings[room.id] ?? null;
-        final roomPreview = formatPreview(room: room);
 
         var primaryColor =
             room.avatarUri != null ? Colors.transparent : Colors.grey;
         var backgroundColor;
-        var fontStyle;
+        bool messagesNew = false;
+        var textStyle = TextStyle();
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
@@ -313,7 +321,7 @@ class HomeViewState extends State<Home> {
 
         // show draft inidicator if it's an empty room
         if (messages == null || messages.length < 1) {
-          fontStyle = FontStyle.italic;
+          textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
         // it has undecrypted message contained within
@@ -321,7 +329,20 @@ class HomeViewState extends State<Home> {
             messages.length > 0 &&
             messages[0].type == EventTypes.encrypted &&
             messages[0].body.isEmpty) {
-          fontStyle = FontStyle.italic;
+          textStyle = TextStyle(fontStyle: FontStyle.italic);
+        }
+
+        if (messages != null && messages.isNotEmpty) {
+          final messageRecent = messagesLatest[0];
+
+          if (room.lastRead < messageRecent.timestamp) {
+            print('${room.lastRead} ${messageRecent.timestamp}');
+            messagesNew = true;
+            textStyle = textStyle.copyWith(
+              color: Theme.of(context).textTheme.bodyText1.color,
+              fontWeight: FontWeight.w600,
+            );
+          }
         }
 
         // GestureDetector w/ animation
@@ -364,15 +385,16 @@ class HomeViewState extends State<Home> {
                         background: primaryColor,
                       ),
                       Visibility(
-                        visible: room.encryptionEnabled,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.encryptionEnabled,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
-                                height: 16,
-                                width: 16,
+                                width: Dimensions.badgeAvatarSize,
+                                height: Dimensions.badgeAvatarSize,
                                 color: Colors.green,
                                 child: Icon(
                                   Icons.lock,
@@ -383,15 +405,15 @@ class HomeViewState extends State<Home> {
                         ),
                       ),
                       Visibility(
-                        visible: room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.invite,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
                             child: Container(
-                              height: 16,
-                              width: 16,
+                              width: Dimensions.badgeAvatarSize,
+                              height: Dimensions.badgeAvatarSize,
                               color: Colors.grey,
                               child: Icon(
                                 Icons.mail_outline,
@@ -403,7 +425,24 @@ class HomeViewState extends State<Home> {
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'group' && !room.invite,
+                        visible: messagesNew,
+                        child: Positioned(
+                          top: 0,
+                          right: 0,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: Dimensions.badgeAvatarSizeSmall,
+                              height: Dimensions.badgeAvatarSizeSmall,
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'group' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -414,16 +453,18 @@ class HomeViewState extends State<Home> {
                               height: Dimensions.badgeAvatarSize,
                               color: Theme.of(context).scaffoldBackgroundColor,
                               child: Icon(
-                                Icons.public,
+                                Icons.group,
                                 color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.badgeAvatarSize,
+                                size: Dimensions.badgeAvatarSizeSmall,
                               ),
                             ),
                           ),
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'public' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'public' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -457,10 +498,12 @@ class HomeViewState extends State<Home> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            formatRoomName(room: room),
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodyText1,
+                          Expanded(
+                            child: Text(
+                              room.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
@@ -469,13 +512,15 @@ class HomeViewState extends State<Home> {
                           ),
                         ],
                       ),
-                      Text(
-                        roomPreview,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.caption.merge(
-                              TextStyle(fontStyle: fontStyle),
-                            ),
+                      Container(
+                        child: Text(
+                          messagePreview,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.caption.merge(
+                                textStyle,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -545,6 +590,7 @@ class _Props extends Equatable {
   final bool offline;
   final bool syncing;
   final bool loadingRooms;
+  final bool roomTypeBadgesEnabled;
   final User currentUser;
   final Map<String, ChatSetting> chatSettings;
 
@@ -552,6 +598,7 @@ class _Props extends Equatable {
   final Function onDeleteChat;
   final Function onSelectHelp;
   final Function onArchiveRoom;
+  final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
   _Props({
@@ -561,10 +608,12 @@ class _Props extends Equatable {
     @required this.currentUser,
     @required this.loadingRooms,
     @required this.chatSettings,
+    @required this.roomTypeBadgesEnabled,
     @required this.onLeaveChat,
     @required this.onDeleteChat,
     @required this.onSelectHelp,
     @required this.onArchiveRoom,
+    @required this.onMarkAllRead,
     @required this.onFetchSyncForced,
   });
 
@@ -573,11 +622,16 @@ class _Props extends Equatable {
           sortedPrioritizedRooms(store.state.roomStore.rooms),
           hidden: store.state.roomStore.roomsHidden,
         ),
-        loadingRooms: store.state.roomStore.loading,
         offline: store.state.syncStore.offline,
         syncing: store.state.syncStore.syncing,
         currentUser: store.state.authStore.user,
+        loadingRooms: store.state.roomStore.loading,
+        roomTypeBadgesEnabled:
+            store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        onMarkAllRead: () {
+          store.dispatch(markRoomsReadAll());
+        },
         onArchiveRoom: ({Room room}) async {
           store.dispatch(archiveRoom(room: room));
         },

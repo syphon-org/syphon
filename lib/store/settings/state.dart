@@ -12,7 +12,7 @@ import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 17
+// Next Field ID: 18
 @HiveType(typeId: SettingsStoreHiveId)
 class SettingsStore extends Equatable {
   @HiveField(0)
@@ -21,14 +21,15 @@ class SettingsStore extends Equatable {
   final int accentColor;
   @HiveField(15)
   final int appBarColor;
-
   @HiveField(2)
   final int brightness;
-  @HiveField(3)
-  final bool smsEnabled;
+  @HiveField(10)
+  final ThemeType theme;
+
   @HiveField(4)
   final bool enterSend; // TODO: rename *enabled
-
+  @HiveField(3)
+  final bool smsEnabled;
   @HiveField(5)
   final bool readReceipts; // TODO: rename *enabled
   @HiveField(6)
@@ -37,25 +38,21 @@ class SettingsStore extends Equatable {
   final bool notificationsEnabled;
   @HiveField(8)
   final bool membershipEventsEnabled;
+  @HiveField(18)
+  final bool roomTypeBadgesEnabled;
 
   @HiveField(16)
   final String fontName;
-
   @HiveField(17)
   final String fontSize;
-
   @HiveField(9)
   final String language;
 
-  @HiveField(10)
-  final ThemeType theme;
-
-  // mapped by roomId
-  @HiveField(11)
-  final Map<String, ChatSetting> customChatSettings;
-
   @HiveField(12)
   final List<Device> devices;
+  // Map<roomId, ChatSetting>
+  @HiveField(11)
+  final Map<String, ChatSetting> customChatSettings;
 
   @HiveField(13)
   final NotificationSettings notificationSettings;
@@ -83,6 +80,7 @@ class SettingsStore extends Equatable {
     this.typingIndicators = false,
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
+    this.roomTypeBadgesEnabled = true,
     this.customChatSettings,
     this.devices = const [],
     this.loading = false,
@@ -106,6 +104,7 @@ class SettingsStore extends Equatable {
         readReceipts,
         typingIndicators,
         notificationsEnabled,
+        roomTypeBadgesEnabled,
         customChatSettings,
         devices,
         loading,
@@ -129,36 +128,38 @@ class SettingsStore extends Equatable {
     bool typingIndicators,
     bool notificationsEnabled,
     bool membershipEventsEnabled,
+    bool roomTypeBadgesEnabled,
     Map<String, ChatSetting> customChatSettings,
     NotificationSettings notificationSettings,
     List<Device> devices,
     bool loading,
     String alphaAgreement,
     String pusherToken, // NOTE: device token for APNS
-  }) {
-    return SettingsStore(
-      primaryColor: primaryColor ?? this.primaryColor,
-      accentColor: accentColor ?? this.accentColor,
-      appBarColor: appBarColor ?? this.appBarColor,
-      brightness: brightness ?? this.brightness,
-      theme: theme ?? this.theme,
-      fontName: fontName ?? this.fontName,
-      fontSize: fontSize ?? this.fontSize,
-      language: language ?? this.language,
-      smsEnabled: smsEnabled ?? this.smsEnabled,
-      enterSend: enterSend != null ? enterSend : this.enterSend,
-      readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
-      typingIndicators:
-          typingIndicators != null ? typingIndicators : this.typingIndicators,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-      membershipEventsEnabled:
-          membershipEventsEnabled ?? this.membershipEventsEnabled,
-      customChatSettings: customChatSettings ?? this.customChatSettings,
-      notificationSettings: notificationSettings ?? this.notificationSettings,
-      devices: devices ?? this.devices,
-      loading: loading ?? this.loading,
-      alphaAgreement: alphaAgreement ?? this.alphaAgreement,
-      pusherToken: pusherToken ?? this.pusherToken,
-    );
-  }
+  }) =>
+      SettingsStore(
+        primaryColor: primaryColor ?? this.primaryColor,
+        accentColor: accentColor ?? this.accentColor,
+        appBarColor: appBarColor ?? this.appBarColor,
+        brightness: brightness ?? this.brightness,
+        theme: theme ?? this.theme,
+        fontName: fontName ?? this.fontName,
+        fontSize: fontSize ?? this.fontSize,
+        language: language ?? this.language,
+        smsEnabled: smsEnabled ?? this.smsEnabled,
+        enterSend: enterSend != null ? enterSend : this.enterSend,
+        readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
+        typingIndicators:
+            typingIndicators != null ? typingIndicators : this.typingIndicators,
+        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+        membershipEventsEnabled:
+            membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled:
+            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        customChatSettings: customChatSettings ?? this.customChatSettings,
+        notificationSettings: notificationSettings ?? this.notificationSettings,
+        devices: devices ?? this.devices,
+        loading: loading ?? this.loading,
+        alphaAgreement: alphaAgreement ?? this.alphaAgreement,
+        pusherToken: pusherToken ?? this.pusherToken,
+      );
 }

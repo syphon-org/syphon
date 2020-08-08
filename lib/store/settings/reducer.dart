@@ -42,7 +42,7 @@ SettingsStore settingsReducer(
       return state.copyWith(
         pusherToken: action.token,
       );
-    case SetAppAgreement:
+    case LogAppAgreement:
       return state.copyWith(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );
@@ -84,6 +84,10 @@ SettingsStore settingsReducer(
     case ToggleMembershipEvents:
       return state.copyWith(
         membershipEventsEnabled: !state.membershipEventsEnabled,
+      );
+    case ToggleRoomTypeBadges:
+      return state.copyWith(
+        roomTypeBadgesEnabled: !(state.roomTypeBadgesEnabled ?? true),
       );
     case ToggleNotifications:
       return state.copyWith(

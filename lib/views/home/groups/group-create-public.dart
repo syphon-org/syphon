@@ -420,7 +420,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  'Users',
+                                                  Strings.labelUsersSection,
                                                   textAlign: TextAlign.start,
                                                   style: Theme.of(context)
                                                       .textTheme

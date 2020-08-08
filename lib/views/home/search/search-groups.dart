@@ -170,10 +170,12 @@ class GroupSearchState extends State<GroupSearchView> {
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text(
-                                formatRoomName(room: room),
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.subtitle1,
+                              Expanded(
+                                child: Text(
+                                  room.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
                               ),
                             ],
                           ),
@@ -183,14 +185,14 @@ class GroupSearchState extends State<GroupSearchView> {
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     formattedUserTotal.format(
                                       room.totalJoinedUsers,
                                     ),
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: Dimensions.textSizeTiny,
                                     ),
                                   ),
                                   Icon(

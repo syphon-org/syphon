@@ -23,14 +23,16 @@ String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
 
-String formatPreview({Room room}) {
+String formatPreview({Room room, List<Message> prefetched}) {
+  var messages = prefetched ?? room.messages;
+
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null && room.draft.body != null) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
   }
 
   // Show topic if the user has joined a group but not sent anything (lurkin')
-  if (room.messages == null || room.messages.length < 1) {
+  if (messages == null || messages.length < 1) {
     if (room.invite) {
       return 'Invite to chat';
     }
@@ -41,7 +43,11 @@ String formatPreview({Room room}) {
     return formatPreviewTopic(room.topic, defaultTopic: '');
   }
 
-  final messages = latestMessages(room.messages);
+  // sort messages found
+  if (prefetched == null) {
+    messages = latestMessages(messages);
+  }
+
   final recentMessage = messages[0];
   var body = formatPreviewMessage(recentMessage.body);
 
