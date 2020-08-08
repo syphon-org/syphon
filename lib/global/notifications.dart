@@ -1,10 +1,16 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+// Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /**
  * Notifications are handled by APNS when running in iOS

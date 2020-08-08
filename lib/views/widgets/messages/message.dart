@@ -1,19 +1,23 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/themes.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+// Project imports:
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class MessageWidget extends StatelessWidget {
   MessageWidget({
     Key key,
     @required this.message,
     this.onLongPress,
+    this.onPressAvatar,
     this.isUserSent,
     this.messageOnly = false,
     this.isLastSender = false,
@@ -33,18 +37,18 @@ class MessageWidget extends StatelessWidget {
   final ThemeType theme;
   final String selectedMessageId;
   final Function onLongPress;
+  final Function onPressAvatar;
   final String avatarUri;
 
   @override
   Widget build(BuildContext context) {
     final message = this.message;
-    var textColor = Colors.white;
-    double indicatorSize = 14;
 
+    var textColor = Colors.white;
     var showSender = true;
-    var indicatorColor = Colors.white;
-    var indicatorIconColor = Colors.white;
-    var bubbleColor = hashedColor(message.sender);
+    var indicatorColor = Theme.of(context).iconTheme.color;
+    var indicatorIconColor = Theme.of(context).iconTheme.color;
+    var bubbleColor = Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var messageAlignment = MainAxisAlignment.start;
     var messageTextAlignment = CrossAxisAlignment.start;
@@ -52,7 +56,7 @@ class MessageWidget extends StatelessWidget {
     var opacity = 1.0;
     var isRead = message.timestamp < lastRead;
 
-    // CURRENT USER SENT STYLING
+    // Current User Bubble Styling
     if (isUserSent) {
       if (isLastSender) {
         if (isNextSender) {
@@ -86,7 +90,7 @@ class MessageWidget extends StatelessWidget {
           bottomRight: Radius.circular(16),
         );
       }
-      // OTHER USER SENT STYLING
+      // External User Sent Styling
     } else {
       if (isLastSender) {
         if (isNextSender) {
@@ -124,13 +128,12 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      textColor =
-          theme != ThemeType.LIGHT ? Colors.white : Color(Colours.greyDark);
       if (theme == ThemeType.DARK) {
         bubbleColor = Colors.grey[700];
-      } else if (theme == ThemeType.DARKER) {
+      } else if (theme != ThemeType.LIGHT) {
         bubbleColor = Colors.grey[850];
       } else {
+        textColor = const Color(Colours.blackFull);
         bubbleColor = const Color(Colours.greyBubble);
       }
 
@@ -182,39 +185,24 @@ class MessageWidget extends StatelessWidget {
                       maintainState: !messageOnly,
                       maintainAnimation: !messageOnly,
                       maintainSize: !messageOnly,
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          right: 8,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (this.onPressAvatar != null) {
+                            HapticFeedback.lightImpact();
+                            this.onPressAvatar(message: message);
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          child: AvatarCircle(
+                            margin: EdgeInsets.zero,
+                            padding: EdgeInsets.zero,
+                            uri: avatarUri,
+                            alt: message.sender,
+                            size: Dimensions.avatarSizeMessage,
+                            background: Colours.hashedColor(message.sender),
+                          ),
                         ),
-                        child: avatarUri != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.thumbnailSizeMax,
-                                ),
-                                child: MatrixImage(
-                                  width: Dimensions.avatarSizeMessage,
-                                  height: Dimensions.avatarSizeMessage,
-                                  mxcUri: avatarUri,
-                                  fallback: Text(
-                                    formatSenderInitials(message.sender),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : CircleAvatar(
-                                radius: 14,
-                                backgroundColor: bubbleColor,
-                                child: Text(
-                                  formatSenderInitials(message.sender),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
                       ),
                     ),
                     Flexible(
@@ -270,13 +258,13 @@ class MessageWidget extends StatelessWidget {
                                   visible: !isUserSent &&
                                       message.type == EventTypes.encrypted,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(right: 4),
                                     child: Icon(
                                       Icons.lock,
-                                      color: Colors.white,
-                                      size: Dimensions.miniLockSize,
+                                      color: textColor,
+                                      size: Dimensions.iconSizeMini,
                                     ),
                                   ),
                                 ),
@@ -284,7 +272,7 @@ class MessageWidget extends StatelessWidget {
                                   margin: EdgeInsets.only(right: 4),
                                   child: Text(
                                     message.failed
-                                        ? 'Message failed to send'
+                                        ? Strings.errorMessageSendingFailed
                                         : formatTimestamp(
                                             lastUpdateMillis: message.timestamp,
                                             showTime: true,
@@ -300,21 +288,21 @@ class MessageWidget extends StatelessWidget {
                                   visible: isUserSent &&
                                       message.type == EventTypes.encrypted,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(left: 2),
                                     child: Icon(
                                       Icons.lock,
-                                      color: Colors.white,
-                                      size: Dimensions.miniLockSize,
+                                      color: textColor,
+                                      size: Dimensions.iconSizeMini,
                                     ),
                                   ),
                                 ),
                                 Visibility(
                                   visible: isUserSent && message.failed,
                                   child: Container(
-                                    width: indicatorSize,
-                                    height: indicatorSize,
+                                    width: Dimensions.indicatorSize,
+                                    height: Dimensions.indicatorSize,
                                     margin: EdgeInsets.only(left: 3),
                                     child: Icon(
                                       Icons.close,
@@ -329,8 +317,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: message.pending,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: CircularProgressIndicator(
                                           strokeWidth:
@@ -341,8 +329,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: !message.pending,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 4),
                                         child: Icon(
                                           Icons.check,
@@ -363,8 +351,8 @@ class MessageWidget extends StatelessWidget {
                                     Visibility(
                                       visible: !message.syncing,
                                       child: Container(
-                                        width: indicatorSize,
-                                        height: indicatorSize,
+                                        width: Dimensions.indicatorSize,
+                                        height: Dimensions.indicatorSize,
                                         margin: EdgeInsets.only(left: 11),
                                         child: Icon(
                                           Icons.check,

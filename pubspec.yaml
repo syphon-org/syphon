@@ -1,5 +1,5 @@
 name: syphon
-description: Privacy focused matrix client for everyone
+description: a privacy focused matrix client
 
 # flutter commands
 # $ flutter create --org org.tether.tether
@@ -42,7 +42,7 @@ description: Privacy focused matrix client for everyone
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.0.23+23
+version: 0.0.24+24
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -55,10 +55,7 @@ dependencies:
     git:
       url: https://gitlab.com/famedly/libraries/dart-olm
       ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
-
-  # Old Packages
-  # workmanager: ^0.2.0 # TODO
-
+ 
   # Domain / Store
   expandable: 3.0.1
   equatable: ^1.1.0
@@ -76,6 +73,7 @@ dependencies:
   flutter_secure_storage: 3.3.1+1 
   mime: ^0.9.6
   path_provider: ^1.6.11
+  package_info: '0.4.1'
   # steel_crypt: 1.7.1
   # cryptography: 1.2.1
 
@@ -101,6 +99,7 @@ dependencies:
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5 
+  palette_generator: 0.2.3
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
@@ -118,6 +117,7 @@ dev_dependencies:
   #   sdk: flutter
   build_runner: ^1.0.0
   hive_generator: 0.7.0
+  import_sorter: ^4.2.1
 
 dependency_overrides:
   dartx: ^0.3.0
@@ -133,13 +133,24 @@ flutter:
   uses-material-design: true
 
   fonts:
-    - family: Rubik
+    - family: Poppins
       fonts:
+        - asset: assets/fonts/Poppins-Italic.ttf 
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf 
+        - asset: assets/fonts/Poppins-Light.ttf 
+        - asset: assets/fonts/Poppins-Thin.ttf 
+    - family: Rubik
+      fonts: 
         - asset: assets/fonts/Rubik-Regular.ttf
-        - asset: assets/fonts/Rubik-Medium.ttf
-          weight: 400
-        - asset: assets/fonts/Rubik-Light.ttf
-          weight: 400
+        - asset: assets/fonts/Rubik-Medium.ttf 
+        - asset: assets/fonts/Rubik-Light.ttf 
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Italic.ttf 
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf 
+        - asset: assets/fonts/Inter-Light.ttf 
 
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
@@ -165,6 +176,21 @@ flutter:
    - assets/icons/app_icon.svg
    - assets/icons/app_icon.png
    - assets/icons/app_icon_white.png
+   - assets/icons/global/being-check.svg
+   - assets/icons/global/being-person-add.svg
+   - assets/icons/global/being-group-add.svg
+   - assets/icons/global/being-public-add.svg
+   - assets/icons/global/being-search-public.svg
+   - assets/icons/global/being-search-public-condensed.svg
+   - assets/icons/global/being-message-syphon.svg
+   - assets/icons/global/being-send.svg
+   - assets/icons/global/being-send-solid.svg
+   - assets/icons/global/being-send-lock.svg
+   - assets/icons/global/being-send-lock-solid.svg
+   - assets/icons/global/being-send-unlock.svg
+   - assets/icons/global/being-chevrons-right.svg
+   - assets/icons/global/feather-message-circle.svg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

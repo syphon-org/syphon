@@ -1,17 +1,22 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/credential/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/global/notifications.dart';
+
+// Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/store/index.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -24,6 +29,26 @@ class SetTheme {
 class SetPrimaryColor {
   final int color;
   SetPrimaryColor({this.color});
+}
+
+class SetAccentColor {
+  final int color;
+  SetAccentColor({this.color});
+}
+
+class SetAppBarColor {
+  final int color;
+  SetAppBarColor({this.color});
+}
+
+class SetFontName {
+  final String fontName;
+  SetFontName({this.fontName});
+}
+
+class SetFontSize {
+  final String fontSize;
+  SetFontSize({this.fontSize});
 }
 
 class SetRoomPrimaryColor {
@@ -51,11 +76,6 @@ class SetDevices {
   SetDevices({this.devices});
 }
 
-class SetAccentColor {
-  final int color;
-  SetAccentColor({this.color});
-}
-
 class SetLanguage {
   final String language;
   SetLanguage({this.language});
@@ -66,26 +86,17 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
-class ToggleMembershipEvents {
-  final bool membershipEventsEnabled;
-  ToggleMembershipEvents({this.membershipEventsEnabled});
-}
+class ToggleRoomTypeBadges {}
 
-class ToggleNotifications {
-  ToggleNotifications();
-}
+class ToggleMembershipEvents {}
 
-class ToggleTypingIndicators {
-  ToggleTypingIndicators();
-}
+class ToggleNotifications {}
 
-class ToggleReadReceipts {
-  ToggleReadReceipts();
-}
+class ToggleTypingIndicators {}
 
-class SetAppAgreement {
-  SetAppAgreement();
-}
+class ToggleReadReceipts {}
+
+class LogAppAgreement {}
 
 /**
  * Fetch Active Devices for account
@@ -136,8 +147,11 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[updateDevice] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error,
+        origin: 'updateDevice',
+      ));
     } finally {
       store.dispatch(fetchDevices());
       store.dispatch(SetLoading(loading: false));
@@ -146,7 +160,8 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
 }
 
 /**
- * Delete a device
+ * Delete a single device
+ * ** Fails after recent matix.org update **
  */
 ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
   return (Store<AppState> store) async {
@@ -180,8 +195,11 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      debugPrint('[deleteDevice] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error,
+        origin: 'deleteDevice',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -221,8 +239,11 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
       store.dispatch(fetchDevices());
       return true;
     } catch (error) {
-      debugPrint('[deleteDevice(s)] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(
+        error: error,
+        message: error,
+        origin: 'deleteDevice(s)',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -234,7 +255,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
  */
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
-    store.dispatch(SetAppAgreement());
+    store.dispatch(LogAppAgreement());
   };
 }
 
@@ -248,11 +269,64 @@ ThunkAction<AppState> selectPrimaryColor(int color) {
 }
 
 /**
- * Send in a hex value to be used as the primary color
+ * Send in a hex value to be used as the secondary color
  */
 ThunkAction<AppState> selectAccentColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAccentColor(color: color));
+  };
+}
+
+/**
+ * Send in a hex value to be used as the app bar color
+ */
+ThunkAction<AppState> updateAppBarColor(int color) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetAppBarColor(color: color));
+  };
+}
+
+/**
+ * Iterate over fontFamilies on action
+ */
+ThunkAction<AppState> incrementFontType() {
+  return (Store<AppState> store) async {
+    final currentFontType = store.state.settingsStore.fontName;
+    final currentIndex = Values.fontFamilies.indexOf(currentFontType);
+
+    store.dispatch(SetFontName(
+      fontName:
+          Values.fontFamilies[(currentIndex + 1) % Values.fontFamilies.length],
+    ));
+  };
+}
+
+/**
+ * Iterate over fontFamilies on action
+ */
+ThunkAction<AppState> incrementFontSize() {
+  return (Store<AppState> store) async {
+    final currentFontSize = store.state.settingsStore.fontSize;
+    final fontSizes = Values.fontSizes;
+    final currentIndex = fontSizes.indexOf(currentFontSize);
+
+    store.dispatch(SetFontSize(
+      fontSize: fontSizes[(currentIndex + 1) % fontSizes.length],
+    ));
+  };
+}
+
+/**
+ * Iterate over theme types on action
+ */
+ThunkAction<AppState> incrementTheme() {
+  return (Store<AppState> store) async {
+    final currentTheme = store.state.settingsStore.theme;
+    final themeIndex = ThemeType.values.indexOf(currentTheme);
+
+    store.dispatch(SetTheme(
+      ThemeType.values[(themeIndex + 1) % ThemeType.values.length],
+    ));
   };
 }
 
@@ -287,14 +361,15 @@ ThunkAction<AppState> toggleEnterSend() {
   };
 }
 
+ThunkAction<AppState> toggleRoomTypeBadges() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleRoomTypeBadges());
+  };
+}
+
 ThunkAction<AppState> toggleMembershipEvents() {
   return (Store<AppState> store) async {
-    store.dispatch(
-      ToggleMembershipEvents(
-        membershipEventsEnabled:
-            !store.state.settingsStore.membershipEventsEnabled,
-      ),
-    );
+    store.dispatch(ToggleMembershipEvents());
   };
 }
 
@@ -326,14 +401,5 @@ ThunkAction<AppState> toggleNotifications() {
         );
       }
     }
-  };
-}
-
-ThunkAction<AppState> incrementTheme() {
-  return (Store<AppState> store) async {
-    ThemeType currentTheme = store.state.settingsStore.theme;
-    int themeIndex = ThemeType.values.indexOf(currentTheme);
-    store.dispatch(
-        SetTheme(ThemeType.values[(themeIndex + 1) % ThemeType.values.length]));
   };
 }

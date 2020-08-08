@@ -1,24 +1,23 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
-import 'package:redux/redux.dart';
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-import 'package:syphon/store/index.dart';
-
-// Styling Widgets
-import 'package:syphon/global/dimensions.dart';
+// Project imports:
 import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-
 import './step-password.dart';
 
 final Duration nextAnimationDuration = Duration(
@@ -55,21 +54,6 @@ class PasswordUpdateState extends State<PasswordView> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
-  @protected
-  void onMounted() async {
-    final store = StoreProvider.of<AppState>(context);
-  }
-
-  @override
-  void deactivate() {
-    subscription.cancel();
-    super.deactivate();
   }
 
   @override
@@ -82,6 +66,7 @@ class PasswordUpdateState extends State<PasswordView> {
 
           return Scaffold(
             appBar: AppBar(
+              brightness: Brightness.light,
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(

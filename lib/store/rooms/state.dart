@@ -1,9 +1,12 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:hive/hive.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:syphon/global/libs/hive/type-ids.dart';
+import 'package:hive/hive.dart';
 
+// Project imports:
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import './room/model.dart';
 
 part 'state.g.dart';
@@ -26,6 +29,7 @@ class RoomStore extends Equatable {
   final Map<String, Room> rooms;
 
   // TODO: actually archive
+  final Map<String, Room> archive;
   final List<String> roomsHidden;
 
   final Timer roomObserver;
@@ -35,6 +39,7 @@ class RoomStore extends Equatable {
 
   const RoomStore({
     this.rooms = const {},
+    this.archive = const {},
     this.synced = false,
     this.loading = false,
     this.lastUpdate = 0,
@@ -47,6 +52,7 @@ class RoomStore extends Equatable {
   List<Object> get props => [
         rooms,
         synced,
+        archive,
         lastUpdate,
         lastSince,
         roomObserver,
@@ -56,6 +62,7 @@ class RoomStore extends Equatable {
   RoomStore copyWith({
     rooms,
     synced,
+    archive,
     loading,
     lastUpdate,
     lastSince,
@@ -65,6 +72,7 @@ class RoomStore extends Equatable {
     return RoomStore(
       rooms: rooms ?? this.rooms,
       synced: synced ?? this.synced,
+      archive: archive ?? this.archive,
       loading: loading ?? this.loading,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       lastSince: lastSince ?? this.lastSince,

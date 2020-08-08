@@ -1,17 +1,23 @@
+// Dart imports:
 import 'dart:io';
 
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/views/widgets/containers/card-section.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 
@@ -22,13 +28,7 @@ class NotificationSettingsView extends StatelessWidget {
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          // Static horizontal: 16, vertical: 8
           final double width = MediaQuery.of(context).size.width;
-
-          final sectionBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(Colours.blackDefault)
-                  : const Color(Colours.whiteDefault);
 
           return Scaffold(
             appBar: AppBar(
@@ -47,135 +47,120 @@ class NotificationSettingsView extends StatelessWidget {
             body: Container(
                 child: Column(
               children: <Widget>[
-                Card(
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  margin: EdgeInsets.only(top: 8, bottom: 4),
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(children: [
-                      Container(
-                        width: width,
-                        padding: Dimensions.listPadding,
-                        child: Text(
-                          'On-Device',
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.subtitle2,
-                        ),
+                CardSection(
+                  child: Column(children: [
+                    Container(
+                      width: width,
+                      padding: Dimensions.listPadding,
+                      child: Text(
+                        'On-Device',
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.subtitle2,
                       ),
-                      Container(
-                        width: width,
-                        padding: Dimensions.listPadding,
-                        child: RichText(
-                          textAlign: TextAlign.left,
-                          text: TextSpan(
-                            text:
-                                'Show notifications using a background service',
-                            style: Theme.of(context).textTheme.caption,
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: ' without ',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .caption
-                                    .copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                              TextSpan(
-                                text: 'Google Play Services',
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        enabled: Platform.isAndroid,
-                        dense: true,
-                        onTap: () => props.onToggleLocalNotifications(),
-                        contentPadding: Dimensions.listPadding,
-                        title: Text(
-                          'Notifications',
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        trailing: Container(
-                          child: Switch(
-                            value: props.localNotificationsEnabled,
-                            onChanged: !Platform.isAndroid
-                                ? null
-                                : (value) => props.onToggleLocalNotifications(),
-                          ),
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  elevation: 0.5,
-                  color: sectionBackgroundColor,
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Column(children: [
-                      Container(
-                        width: width,
-                        padding: Dimensions.listPadding,
-                        child: Text(
-                          'Matrix (Remote)',
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.subtitle2,
-                        ),
-                      ),
-                      Container(
-                        width: width,
-                        padding: Dimensions.listPadding,
-                        child: Text(
-                          'Show notifications using Apple Push Notifications through Matrix',
-                          textAlign: TextAlign.start,
+                    ),
+                    Container(
+                      width: width,
+                      padding: Dimensions.listPadding,
+                      child: RichText(
+                        textAlign: TextAlign.left,
+                        text: TextSpan(
+                          text: 'Show notifications using a background service',
                           style: Theme.of(context).textTheme.caption,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: ' without ',
+                              style:
+                                  Theme.of(context).textTheme.caption.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                            ),
+                            TextSpan(
+                              text: 'Google Play Services',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ],
                         ),
                       ),
-                      ListTile(
-                        enabled: Platform.isIOS,
-                        dense: true,
-                        onTap: () => props.onToggleRemoteNotifications(context),
-                        contentPadding: Dimensions.listPadding,
-                        title: Text(
-                          'Notifications',
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        trailing: Container(
-                          child: Switch(
-                            value: props.remoteNotificationsEnabled,
-                            onChanged: !Platform.isIOS
-                                ? null
-                                : (value) => props.onToggleRemoteNotifications(
-                                      context,
-                                    ),
-                          ),
+                    ),
+                    ListTile(
+                      enabled: Platform.isAndroid,
+                      dense: true,
+                      onTap: () => props.onToggleLocalNotifications(),
+                      contentPadding: Dimensions.listPadding,
+                      title: Text(
+                        'Notifications',
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      trailing: Container(
+                        child: Switch(
+                          value: props.localNotificationsEnabled,
+                          onChanged: !Platform.isAndroid
+                              ? null
+                              : (value) => props.onToggleLocalNotifications(),
                         ),
                       ),
-                      ListTile(
-                        enabled: props.remoteNotificationsEnabled,
-                        dense: true,
-                        onTap: () => props.onTogglePusher(),
-                        contentPadding: Dimensions.listPadding,
-                        title: Text(
-                          'Fetch Notifications',
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        trailing: Container(
-                          child: Switch(
-                            value: props.httpPusherEnabled,
-                            onChanged: !props.remoteNotificationsEnabled
-                                ? null
-                                : (value) => props.onTogglePusher(),
-                          ),
+                    ),
+                  ]),
+                ),
+                CardSection(
+                  child: Column(children: [
+                    Container(
+                      width: width,
+                      padding: Dimensions.listPadding,
+                      child: Text(
+                        'Matrix (Remote)',
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.subtitle2,
+                      ),
+                    ),
+                    Container(
+                      width: width,
+                      padding: Dimensions.listPadding,
+                      child: Text(
+                        'Show notifications using Apple Push Notifications through Matrix',
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                    ),
+                    ListTile(
+                      enabled: Platform.isIOS,
+                      dense: true,
+                      onTap: () => props.onToggleRemoteNotifications(context),
+                      contentPadding: Dimensions.listPadding,
+                      title: Text(
+                        'Notifications',
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      trailing: Container(
+                        child: Switch(
+                          value: props.remoteNotificationsEnabled,
+                          onChanged: !Platform.isIOS
+                              ? null
+                              : (value) => props.onToggleRemoteNotifications(
+                                    context,
+                                  ),
                         ),
                       ),
-                    ]),
-                  ),
+                    ),
+                    ListTile(
+                      enabled: props.remoteNotificationsEnabled,
+                      dense: true,
+                      onTap: () => props.onTogglePusher(),
+                      contentPadding: Dimensions.listPadding,
+                      title: Text(
+                        'Fetch Notifications',
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      trailing: Container(
+                        child: Switch(
+                          value: props.httpPusherEnabled,
+                          onChanged: !props.remoteNotificationsEnabled
+                              ? null
+                              : (value) => props.onTogglePusher(),
+                        ),
+                      ),
+                    ),
+                  ]),
                 ),
               ],
             )),

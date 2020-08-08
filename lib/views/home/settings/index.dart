@@ -1,18 +1,22 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
 import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({Key key, this.title}) : super(key: key);
-
-  final String title;
+  SettingsScreen({Key key}) : super(key: key);
 
   Widget buildToggledSubtitle({bool value}) {
     return Text(
@@ -35,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
                     : () => Navigator.pop(context, false),
               ),
               title: Text(
-                title,
+                Strings.titleSettings,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -51,6 +55,7 @@ class SettingsScreen extends StatelessWidget {
               child: IgnorePointer(
                 ignoring: props.authLoading,
                 child: Container(
+                  padding: Dimensions.appPaddingHorizontal,
                   child: Column(
                     children: <Widget>[
                       InkWell(
@@ -64,179 +69,179 @@ class SettingsScreen extends StatelessWidget {
                                 Navigator.pushNamed(context, '/profile');
                               },
                       ),
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              onTap: props.authLoading ? null : () {},
-                              contentPadding: Dimensions.listPadding,
+                      Column(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () => props.onDisabled(),
+                            child: ListTile(
+                              contentPadding: Dimensions.listPaddingSettings,
+                              enabled: false,
+                              title: Text(
+                                'SMS and MMS',
+                              ),
+                              subtitle: buildToggledSubtitle(value: false),
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
                                     Icons.chat,
                                     size: 28,
                                   )),
-                              title: Text(
-                                'SMS and MMS',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              subtitle: buildToggledSubtitle(value: false),
                             ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(
-                                          context, '/notifications');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.notifications,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Notifications',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              subtitle: buildToggledSubtitle(
-                                value: props.notificationsEnabled,
-                              ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/notifications',
+                                    );
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.notifications,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Notifications',
                             ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(
-                                          context, '/chat-preferences');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.only(
-                                    top: 4,
-                                    left: 4,
-                                    bottom: 4,
-                                    right: 4,
+                            subtitle: buildToggledSubtitle(
+                              value: props.notificationsEnabled,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(
+                                        context, '/chat-preferences');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.only(
+                                  top: 4,
+                                  left: 4,
+                                  bottom: 4,
+                                  right: 4,
+                                ),
+                                child: Icon(
+                                  Icons.photo_filter,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Chats And Media',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(context, '/privacy');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Security & Privacy',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(context, '/theming');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.brightness_medium,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Theming',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(context, '/devices');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.phone_android,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Devices',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(context, '/advanced');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.code,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Advanced',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () => props.onLogoutUser(),
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.exit_to_app,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              'Logout',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            trailing: Visibility(
+                              visible: props.authLoading,
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  valueColor: new AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).accentColor,
                                   ),
-                                  child: Icon(
-                                    Icons.photo_filter,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Chats And Media',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(context, '/privacy');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.lock,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Security & Privacy',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              subtitle: Text(
-                                'Screen Lock Off, Registration Lock Off',
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(context, '/theming');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.brightness_medium,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Theming',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(context, '/devices');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.phone_android,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Devices',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(context, '/advanced');
-                                    },
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.code,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Advanced',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                            ListTile(
-                              onTap: props.authLoading
-                                  ? null
-                                  : () => props.onLogoutUser(),
-                              contentPadding: Dimensions.listPadding,
-                              leading: Container(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(
-                                    Icons.exit_to_app,
-                                    size: 28,
-                                  )),
-                              title: Text(
-                                'Logout',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              trailing: Visibility(
-                                visible: props.authLoading,
-                                child: Container(
-                                  width: 28,
-                                  height: 28,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 1.5,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).accentColor,
-                                    ),
-                                    value: null,
-                                  ),
+                                  value: null,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -253,12 +258,14 @@ class _Props extends Equatable {
   final bool authLoading;
   final bool notificationsEnabled;
 
+  final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
     @required this.loading,
     @required this.authLoading,
     @required this.notificationsEnabled,
+    @required this.onDisabled,
     @required this.onLogoutUser,
   });
 
@@ -276,6 +283,9 @@ class _Props extends Equatable {
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
+        onDisabled: () => store.dispatch(
+          addInfo(message: Strings.alertFeatureInProgress),
+        ),
         onLogoutUser: () {
           store.dispatch(logoutUser());
         },

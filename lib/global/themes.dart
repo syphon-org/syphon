@@ -1,6 +1,11 @@
-import 'package:syphon/global/libs/hive/type-ids.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:hive/hive.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'colours.dart';
 
 part 'themes.g.dart';
@@ -13,6 +18,8 @@ enum ThemeType {
   DARK,
   @HiveField(2)
   DARKER,
+  @HiveField(3)
+  NIGHT,
 }
 
 class Themes {
@@ -25,34 +32,89 @@ class Themes {
   static ThemeData generateCustomTheme({
     int primaryColorHex,
     int accentColorHex,
+    int appBarColorHex,
+    String fontName,
+    String fontSize,
     ThemeType themeType,
   }) {
     int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
     int accentColor = accentColorHex ?? Colours.cyanSyphon;
-    int appBarColor = primaryColorHex ?? Colours.cyanSyphon;
+    int appBarColor = appBarColorHex;
     int scaffoldBackgroundColor = Colours.whiteDefault;
 
-    var brightness = Brightness.light;
     var appBarElevation;
+    var modalColor;
+    var brightness = Brightness.light;
+    var iconColor = Colors.grey[500];
 
     switch (themeType) {
       case ThemeType.DARK:
         brightness = Brightness.dark;
+        iconColor = Colors.white;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = primaryColorHex ?? Colours.blackDefault;
+        appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = null;
         break;
       case ThemeType.DARKER:
         brightness = Brightness.dark;
+        appBarElevation = 0.0;
+        iconColor = Colors.white;
         primaryColor = primaryColorHex ?? Colours.cyanSyphon;
         accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = primaryColorHex ?? Colours.blackDefault;
+        appBarColor = appBarColor ?? Colours.blackDefault;
         scaffoldBackgroundColor = Colours.blackDefault;
+        break;
+      case ThemeType.NIGHT:
+        brightness = Brightness.dark;
         appBarElevation = 0.0;
+        iconColor = Colors.white;
+        modalColor = Colors.grey[900];
+        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
+        accentColor = accentColorHex ?? Colours.cyanSyphon;
+        appBarColor = appBarColor ?? Colours.blackFull;
+        scaffoldBackgroundColor = Colours.blackFull;
         break;
       case ThemeType.LIGHT:
       default:
+        break;
+    }
+
+    var titleWeight = FontWeight.w400;
+    var bodyWeight = FontWeight.w400;
+
+    double letterSpacing;
+    switch (fontName) {
+      case 'Rubik':
+        titleWeight = FontWeight.w100;
+        bodyWeight = FontWeight.w400;
+        letterSpacing = 0.5;
+        break;
+      default:
+        break;
+    }
+    double subtitleSize;
+    double subtitleSizeLarge;
+    double bodySize;
+    double bodySizeLarge;
+    switch (fontSize) {
+      case 'Small':
+        subtitleSize = 12;
+        subtitleSizeLarge = 14;
+        bodySize = 16;
+        bodySizeLarge = 18;
+        break;
+      case 'Large':
+        subtitleSize = 16;
+        subtitleSizeLarge = 18;
+        bodySize = 20;
+        bodySizeLarge = 22;
+        break;
+      default:
+        subtitleSize = 14;
+        subtitleSizeLarge = 16;
+        bodySize = 18;
+        bodySizeLarge = 20;
         break;
     }
 
@@ -67,9 +129,11 @@ class Themes {
       accentColor: Color(accentColor),
       brightness: brightness,
 
-      // Core UI
+      // Core UI\
+      dialogBackgroundColor: modalColor,
       focusColor: Color(primaryColor),
       cursorColor: Color(primaryColor),
+      iconTheme: IconThemeData(color: iconColor),
       textSelectionColor: Color(primaryColor).withAlpha(100),
       textSelectionHandleColor: Color(primaryColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
@@ -78,7 +142,7 @@ class Themes {
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
-        color: Color(appBarColor),
+        color: Color(appBarColor ?? primaryColorHex),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
@@ -97,51 +161,48 @@ class Themes {
           ),
         ),
       ),
+
       // Fonts
-      fontFamily: 'Rubik',
+      fontFamily: fontName ?? 'Rubik',
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
+          fontWeight: titleWeight,
         ),
       ),
       textTheme: TextTheme(
         headline5: TextStyle(
-          fontWeight: FontWeight.w100,
+          fontWeight: titleWeight,
         ),
         headline6: TextStyle(
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         subtitle1: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontSize: subtitleSizeLarge,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         subtitle2: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.4,
+          fontSize: subtitleSize,
+          fontWeight: bodyWeight,
+          letterSpacing: letterSpacing,
           color: Color(accentColor),
         ),
-        overline: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+        caption: TextStyle(
+          fontSize: subtitleSize,
+          fontWeight: titleWeight,
+          letterSpacing: letterSpacing,
         ),
         bodyText1: TextStyle(
-          fontSize: 20,
-          letterSpacing: 0.4,
-          fontWeight: FontWeight.w400,
+          fontSize: bodySizeLarge,
+          letterSpacing: letterSpacing,
+          fontWeight: bodyWeight,
         ),
         bodyText2: TextStyle(
-          fontSize: 18,
-          letterSpacing: 0.4,
-          fontWeight: FontWeight.w100,
-        ),
-        caption: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w100,
-          letterSpacing: 0.4,
+          fontSize: bodySize,
+          letterSpacing: letterSpacing,
+          fontWeight: titleWeight,
         ),
       ),
     );

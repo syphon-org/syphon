@@ -1,11 +1,15 @@
+// Dart imports:
 import 'dart:async';
 
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 
 part 'state.g.dart';
 

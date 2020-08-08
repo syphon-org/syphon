@@ -1,16 +1,21 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/global/themes.dart';
-import 'package:syphon/views/widgets/messages/message.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/views/widgets/messages/message.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 

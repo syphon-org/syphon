@@ -1,7 +1,30 @@
 class Assets {
-  // Icons
+  // App Icons
   static const appIcon = 'assets/icons/app_icon.svg';
   static const appIconPng = 'assets/icons/app_icon.png';
+
+  // Generic Icons
+  static const iconPersonAddBeing = 'assets/icons/global/being-person-add.svg';
+  static const iconPublicAddBeing = 'assets/icons/global/being-public-add.svg';
+  static const iconGroupAddBeing = 'assets/icons/global/being-group-add.svg';
+  static const iconSearchPublicBeing =
+      'assets/icons/global/being-search-public.svg';
+  static const iconSearchPublicCondensedBeing =
+      'assets/icons/global/being-search-public-condensed.svg';
+  static const iconMessageSyphonBeing =
+      'assets/icons/global/being-message-syphon.svg';
+  static const iconSendBeing = 'assets/icons/global/being-send.svg';
+  static const iconSendSolidBeing = 'assets/icons/global/being-send-solid.svg';
+  static const iconSendLockBeing = 'assets/icons/global/being-send-lock.svg';
+  static const iconSendUnlockBeing =
+      'assets/icons/global/being-send-unlock.svg';
+  static const iconSendLockSolidBeing =
+      'assets/icons/global/being-send-lock-solid.svg';
+  static const iconCheckBeing = 'assets/icons/global/being-check.svg';
+  static const iconChevronsRightBeing =
+      'assets/icons/global/being-chevrons-right.svg';
+  static const iconMessageCircleBeing =
+      'assets/icons/global/feather-message-circle.svg';
 
   // Hero images
   static const heroAcceptTerms = 'assets/graphics/undraw_accept_terms.svg';

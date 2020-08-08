@@ -1,4 +1,7 @@
+// Package imports:
 import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
@@ -11,14 +14,16 @@ part 'model.g.dart';
 class AccountDataTypes {
   static const direct = 'm.direct';
   static const presence = 'm.presence';
+  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class EventTypes {
-  static const message = 'm.room.message';
-  static const encrypted = 'm.room.encrypted';
-  static const creation = 'm.room.create';
   static const name = 'm.room.name';
   static const topic = 'm.room.topic';
+  static const avatar = 'm.room.avatar';
+  static const creation = 'm.room.create';
+  static const message = 'm.room.message';
+  static const encrypted = 'm.room.encrypted';
 
   // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
   // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}
@@ -30,6 +35,8 @@ class EventTypes {
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
   static const roomKey = 'm.room_key';
+
+  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class MessageTypes {

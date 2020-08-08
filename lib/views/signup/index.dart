@@ -1,31 +1,35 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+// Project imports:
+import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/signup/step-captcha.dart';
 import 'package:syphon/views/signup/step-email.dart';
 import 'package:syphon/views/signup/step-terms.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-
-import 'package:syphon/store/index.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import './step-homeserver.dart';
+import './step-password.dart';
+import './step-username.dart';
 
 // Styling Widgets
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/behaviors.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
-import './step-username.dart';
-import './step-password.dart';
-import './step-homeserver.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,

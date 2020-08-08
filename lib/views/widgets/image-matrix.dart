@@ -1,15 +1,20 @@
+// Dart imports:
 import 'dart:typed_data';
 
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/media/actions.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 
 /**
  * MatrixImage
@@ -20,6 +25,7 @@ class MatrixImage extends StatefulWidget {
   final String mxcUri;
   final double width;
   final double height;
+  final double size;
   final double strokeWidth;
   final String imageType;
   final BoxFit fit;
@@ -34,6 +40,7 @@ class MatrixImage extends StatefulWidget {
     @required this.mxcUri,
     this.width = 48,
     this.height = 48,
+    this.size,
     this.strokeWidth = Dimensions.defaultStrokeWidthLite,
     this.imageType,
     this.fit = BoxFit.fill,
@@ -57,9 +64,12 @@ class MatrixImageState extends State<MatrixImage> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -108,8 +118,8 @@ class MatrixImageState extends State<MatrixImage> {
 
           if (loading) {
             return Container(
-              width: widget.width,
-              height: widget.height,
+              width: widget.size ?? widget.width,
+              height: widget.size ?? widget.height,
               child: CircularProgressIndicator(
                 strokeWidth: widget.strokeWidth * 1.5,
                 valueColor: new AlwaysStoppedAnimation<Color>(

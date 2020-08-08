@@ -1,7 +1,11 @@
+// Dart imports:
 import 'dart:async';
 
-import 'package:hive/hive.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'state.g.dart';

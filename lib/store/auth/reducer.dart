@@ -1,6 +1,7 @@
-import './state.dart';
-import './actions.dart';
+// Project imports:
 import '../user/model.dart';
+import './actions.dart';
+import './state.dart';
 
 AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
   switch (action.runtimeType) {

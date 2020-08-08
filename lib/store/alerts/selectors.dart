@@ -1,5 +1,5 @@
+// Project imports:
 import 'package:syphon/store/index.dart';
-
 import './model.dart';
 
 List<Alert> alerts(AppState state) {

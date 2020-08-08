@@ -1,5 +1,6 @@
-import './state.dart';
+// Project imports:
 import './actions.dart';
+import './state.dart';
 
 CryptoStore cryptoReducer(
     [CryptoStore state = const CryptoStore(), dynamic action]) {

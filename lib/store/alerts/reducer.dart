@@ -1,5 +1,6 @@
-import './model.dart';
+// Project imports:
 import './actions.dart';
+import './model.dart';
 
 AlertsStore alertsReducer(
     [AlertsStore state = const AlertsStore(), dynamic action]) {

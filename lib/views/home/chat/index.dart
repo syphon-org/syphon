@@ -1,41 +1,44 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
-// Store
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/global/themes.dart';
-import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/views/home/chat/chat-input.dart';
-import 'package:syphon/views/home/chat/details-message.dart';
-import 'package:syphon/views/home/chat/details-chat.dart';
-import 'package:syphon/views/home/chat/dialog-encryption.dart';
-import 'package:syphon/views/home/chat/dialog-invite.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:syphon/views/widgets/messages/message-typing.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-// Store
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
+
+// Project imports:
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
-import 'package:syphon/store/rooms/events/actions.dart';
-
-// Global widgets
+import 'package:syphon/views/home/chat/chat-input.dart';
+import 'package:syphon/views/home/chat/details-chat.dart';
+import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/chat/dialog-encryption.dart';
+import 'package:syphon/views/home/chat/dialog-invite.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/containers/menu-rounded.dart';
+import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
-
-// Styling
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/views/widgets/menu-rounded.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 enum ChatOptions {
   search,
@@ -91,12 +94,11 @@ class ChatViewState extends State<ChatView> {
         });
       }
     });
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+    // NOTE: still needed to have navigator context in dialogs
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
   @protected
@@ -107,20 +109,22 @@ class ChatViewState extends State<ChatView> {
     final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
 
-    if (store.state.settingsStore.readReceipts) {
-      props.onSendReadReceipts();
-    }
+    props.onMarkRead();
 
     // TODO: remove after the cache is updated
     if (props.room.invite != null && props.room.invite) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        child: DialogInvite(
+        builder: (context) => DialogInvite(
           onAccept: props.onAcceptInvite,
+          onCancel: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
         ),
       );
     }
+
     if (props.room.encryptionEnabled) {
       this.setState(() {
         mediumType = MediumType.encryption;
@@ -296,6 +300,21 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
+  onViewUserDetails({Message message, String userId}) {
+    final arguements =
+        ModalRoute.of(context).settings.arguments as ChatViewArguements;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        roomId: arguements.roomId,
+        userId: userId ?? message.sender,
+      ),
+    );
+  }
+
+  @protected
   onSubmitMessage(_Props props) async {
     props.onSendMessage(
       body: editorController.text,
@@ -342,22 +361,11 @@ class ChatViewState extends State<ChatView> {
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
                       backgroundColor: const Color(Colours.greyDisabled),
-                      child: Stack(children: [
-                        Positioned(
-                          right: 0,
-                          bottom: -1.5,
-                          child: Icon(
-                            Icons.lock_open,
-                            size: Dimensions.miniLockSize,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Icon(
-                          Icons.send,
-                          size: Dimensions.iconSizeLite,
-                          color: Colors.white,
-                        ),
-                      ]),
+                      child: SvgPicture.asset(
+                        Assets.iconSendUnlockBeing,
+                        color: Colors.white,
+                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                      ),
                     ),
                   ),
                   Text('Unencrypted'),
@@ -384,22 +392,11 @@ class ChatViewState extends State<ChatView> {
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: Stack(children: [
-                        Positioned(
-                          right: 0,
-                          bottom: -1.5,
-                          child: Icon(
-                            Icons.lock,
-                            size: Dimensions.miniLockSize,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Icon(
-                          Icons.send,
-                          size: Dimensions.iconSizeLite,
-                          color: Colors.white,
-                        ),
-                      ]),
+                      child: SvgPicture.asset(
+                        Assets.iconSendLockSolidBeing,
+                        color: Colors.white,
+                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                      ),
                     ),
                   ),
                   Text('Encrypted'),
@@ -435,6 +432,7 @@ class ChatViewState extends State<ChatView> {
               roomUsers: props.room.users,
               selectedMessageId:
                   this.selectedMessage != null ? this.selectedMessage.id : null,
+              onPressAvatar: onViewUserDetails,
             ),
             ListView.builder(
               reverse: true,
@@ -469,6 +467,7 @@ class ChatViewState extends State<ChatView> {
                   isNextSender: isNextSender,
                   lastRead: props.room.lastRead,
                   selectedMessageId: selectedMessageId,
+                  onPressAvatar: onViewUserDetails,
                   onLongPress: onToggleMessageOptions,
                   avatarUri: avatarUri,
                   theme: props.theme,
@@ -482,131 +481,114 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  buildRoomAppBar({
-    _Props props,
-    BuildContext context,
-  }) {
-    return AppBar(
-      brightness: Brightness.dark, // TOOD: this should inherit from theme
-      automaticallyImplyLeading: false,
-      titleSpacing: 0.0,
-      title: Row(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 8),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                if (editorController.text != null &&
-                    0 < editorController.text.length)
-                  props.onSaveDraftMessage(
-                    body: editorController.text,
-                    type: MessageTypes.TEXT,
-                  );
-                Navigator.pop(context, false);
-              },
+  buildRoomAppBar({_Props props, BuildContext context}) => AppBar(
+        titleSpacing: 0.0,
+        automaticallyImplyLeading: false,
+        brightness: Theme.of(context).appBarTheme.brightness,
+        title: Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 8),
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  if (editorController.text != null &&
+                      0 < editorController.text.length) {
+                    props.onSaveDraftMessage(
+                      body: editorController.text,
+                      type: MessageTypes.TEXT,
+                    );
+                  } else if (props.room.draft != null) {
+                    props.onClearDraftMessage();
+                  }
+
+                  Navigator.pop(context, false);
+                },
+              ),
             ),
-          ),
-          GestureDetector(
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              child: Stack(
-                children: [
-                  Hero(
+            GestureDetector(
+              child: Container(
+                margin: const EdgeInsets.only(right: 12),
+                child: Stack(
+                  children: [
+                    Hero(
                       tag: "ChatAvatar",
-                      child: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: props.roomPrimaryColor,
-                        child: props.room.avatarUri != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.thumbnailSizeMax,
-                                ),
-                                child: MatrixImage(
-                                  width: Dimensions.avatarSize,
-                                  height: Dimensions.avatarSize,
-                                  mxcUri: props.room.avatarUri,
-                                  fallback: Text(
-                                    formatRoomInitials(room: props.room),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                formatRoomInitials(room: props.room),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      )),
-                  Visibility(
-                    visible: props.room.encryptionEnabled,
-                    child: Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          Dimensions.thumbnailSizeMax,
-                        ),
-                        child: Container(
-                          height: 16,
-                          width: 16,
-                          color: Colors.green,
-                          child: Icon(
-                            Icons.lock,
-                            color: Colors.white,
-                            size: 10,
+                      child: AvatarCircle(
+                        uri: props.room.avatarUri,
+                        size: Dimensions.avatarSizeMin,
+                        alt: formatRoomInitials(room: props.room),
+                        background: props.roomPrimaryColor,
+                      ),
+                    ),
+                    Visibility(
+                      visible: props.room.encryptionEnabled,
+                      child: Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            width: Dimensions.badgeAvatarSize,
+                            height: Dimensions.badgeAvatarSize,
+                            color: Colors.green,
+                            child: Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                              size: Dimensions.badgeAvatarSize - 6,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/home/chat/settings',
-                arguments: ChatSettingsArguments(
-                  roomId: props.room.id,
-                  title: props.room.name,
+                    Visibility(
+                      visible: props.roomTypeBadgesEnabled &&
+                          props.room.type == 'group' &&
+                          !props.room.invite,
+                      child: Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            width: Dimensions.badgeAvatarSize,
+                            height: Dimensions.badgeAvatarSize,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            child: Icon(
+                              Icons.group,
+                              color: Theme.of(context).iconTheme.color,
+                              size: Dimensions.badgeAvatarSizeSmall,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: props.roomTypeBadgesEnabled &&
+                          props.room.type == 'public' &&
+                          !props.room.invite,
+                      child: Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            width: Dimensions.badgeAvatarSize,
+                            height: Dimensions.badgeAvatarSize,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            child: Icon(
+                              Icons.public,
+                              color: Theme.of(context).iconTheme.color,
+                              size: Dimensions.badgeAvatarSize,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
-          Text(
-            props.room.name,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w100,
-            ),
-          ),
-        ],
-      ),
-      actions: <Widget>[
-        Visibility(
-          maintainSize: false,
-          visible: debug == 'true',
-          child: IconButton(
-            icon: Icon(Icons.gamepad),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Debug Room Function',
-            color: Colors.white,
-            onPressed: () {
-              props.onCheatCode();
-            },
-          ),
-        ),
-        RoundedPopupMenu<ChatOptions>(
-          onSelected: (ChatOptions result) {
-            switch (result) {
-              case ChatOptions.chatSettings:
-                return Navigator.pushNamed(
+              ),
+              onTap: () {
+                Navigator.pushNamed(
                   context,
                   '/home/chat/settings',
                   arguments: ChatSettingsArguments(
@@ -614,37 +596,81 @@ class ChatViewState extends State<ChatView> {
                     title: props.room.name,
                   ),
                 );
-              default:
-                break;
-            }
-          },
-          icon: Icon(Icons.more_vert, color: Colors.white),
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<ChatOptions>>[
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.search,
-              child: Text('Search'),
+              },
             ),
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.allMedia,
-              child: Text('All Media'),
-            ),
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.chatSettings,
-              child: Text('Chat Settings'),
-            ),
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.inviteFriends,
-              child: Text('Invite Friends'),
-            ),
-            const PopupMenuItem<ChatOptions>(
-              value: ChatOptions.muteNotifications,
-              child: Text('Mute Notifications'),
+            Flexible(
+              child: Text(
+                props.room.name,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    .copyWith(color: Colors.white),
+              ),
             ),
           ],
-        )
-      ],
-    );
-  }
+        ),
+        actions: <Widget>[
+          Visibility(
+            maintainSize: false,
+            visible: debug == 'true',
+            child: IconButton(
+              icon: Icon(Icons.gamepad),
+              iconSize: Dimensions.buttonAppBarSize,
+              tooltip: 'Debug Room Function',
+              color: Colors.white,
+              onPressed: () {
+                props.onCheatCode();
+              },
+            ),
+          ),
+          RoundedPopupMenu<ChatOptions>(
+            onSelected: (ChatOptions result) {
+              switch (result) {
+                case ChatOptions.chatSettings:
+                  return Navigator.pushNamed(
+                    context,
+                    '/home/chat/settings',
+                    arguments: ChatSettingsArguments(
+                      roomId: props.room.id,
+                      title: props.room.name,
+                    ),
+                  );
+                default:
+                  break;
+              }
+            },
+            icon: Icon(Icons.more_vert, color: Colors.white),
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<ChatOptions>>[
+              const PopupMenuItem<ChatOptions>(
+                enabled: false,
+                value: ChatOptions.search,
+                child: Text('Search'),
+              ),
+              const PopupMenuItem<ChatOptions>(
+                enabled: false,
+                value: ChatOptions.allMedia,
+                child: Text('All Media'),
+              ),
+              const PopupMenuItem<ChatOptions>(
+                value: ChatOptions.chatSettings,
+                child: Text('Chat Settings'),
+              ),
+              const PopupMenuItem<ChatOptions>(
+                enabled: false,
+                value: ChatOptions.inviteFriends,
+                child: Text('Invite Friends'),
+              ),
+              const PopupMenuItem<ChatOptions>(
+                enabled: false,
+                value: ChatOptions.muteNotifications,
+                child: Text('Mute Notifications'),
+              ),
+            ],
+          )
+        ],
+      );
 
   @protected
   buildMessageOptionsBar({
@@ -804,8 +830,7 @@ class ChatViewState extends State<ChatView> {
                                 children: <Widget>[
                                   RefreshProgressIndicator(
                                     strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
                                       Theme.of(context).primaryColor,
                                     ),
                                     value: null,
@@ -894,21 +919,23 @@ class ChatViewState extends State<ChatView> {
 class _Props extends Equatable {
   final Room room;
   final String userId;
-  final List<Message> messages;
   final bool loading;
   final ThemeType theme;
+  final List<Message> messages;
   final Color roomPrimaryColor;
+  final bool roomTypeBadgesEnabled;
 
   final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onSaveDraftMessage;
+  final Function onClearDraftMessage;
   final Function onLoadMoreMessages;
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
   final Function onToggleEncryption;
   final Function onCheatCode;
-  final Function onSendReadReceipts;
+  final Function onMarkRead;
 
   _Props({
     @required this.room,
@@ -917,21 +944,34 @@ class _Props extends Equatable {
     @required this.messages,
     @required this.loading,
     @required this.roomPrimaryColor,
+    @required this.roomTypeBadgesEnabled,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
+    @required this.onClearDraftMessage,
     @required this.onLoadMoreMessages,
     @required this.onLoadFirstBatch,
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
     @required this.onCheatCode,
-    @required this.onSendReadReceipts,
+    @required this.onMarkRead,
   });
+
+  @override
+  List<Object> get props => [
+        userId,
+        messages,
+        room,
+        roomPrimaryColor,
+        loading,
+      ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
       userId: store.state.authStore.user.userId,
       theme: store.state.settingsStore.theme,
+      roomTypeBadgesEnabled:
+          store.state.settingsStore.roomTypeBadgesEnabled ?? true,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(
         id: roomId,
@@ -951,7 +991,7 @@ class _Props extends Equatable {
           return Color(customChatSettings[roomId].primaryColor);
         }
 
-        return Colors.grey;
+        return Colours.hashedColor(roomId);
       }(),
       onSaveDraftMessage: ({
         String body,
@@ -960,6 +1000,14 @@ class _Props extends Equatable {
         store.dispatch(saveDraft(
           body: body,
           type: type,
+          room: store.state.roomStore.rooms[roomId],
+        ));
+      },
+      onClearDraftMessage: ({
+        String body,
+        String type,
+      }) {
+        store.dispatch(clearDraft(
           room: store.state.roomStore.rooms[roomId],
         ));
       },
@@ -990,24 +1038,14 @@ class _Props extends Equatable {
         }
       },
       onAcceptInvite: () {
-        store.dispatch(acceptRoom(
-          room: Room(id: roomId),
-        ));
+        store.dispatch(acceptRoom(room: Room(id: roomId)));
       },
       onSendTyping: ({typing, roomId}) => store.dispatch(
-            sendTyping(
-              typing: typing,
-              roomId: roomId,
-            ),
+            sendTyping(typing: typing, roomId: roomId),
           ),
-      onSendReadReceipts: () => store.dispatch(
-            sendReadReceipts(
-              room: Room(id: roomId),
-              message: latestMessages(
-                roomSelectors.room(id: roomId, state: store.state).messages,
-              ).elementAt(0),
-            ),
-          ),
+      onMarkRead: () {
+        store.dispatch(markRoomRead(roomId: roomId));
+      },
       onLoadFirstBatch: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
         store.dispatch(
@@ -1034,13 +1072,4 @@ class _Props extends Equatable {
       onCheatCode: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
       });
-
-  @override
-  List<Object> get props => [
-        userId,
-        messages,
-        room,
-        roomPrimaryColor,
-        loading,
-      ];
 }

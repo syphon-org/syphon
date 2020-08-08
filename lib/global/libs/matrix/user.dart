@@ -1,7 +1,12 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:convert';
-import 'package:syphon/store/rooms/events/model.dart';
+
+// Package imports:
 import 'package:http/http.dart' as http;
+
+// Project imports:
+import 'package:syphon/store/rooms/events/model.dart';
 
 abstract class Users {
   /**
@@ -61,14 +66,87 @@ abstract class Users {
       'Authorization': 'Bearer $accessToken',
     };
 
-    // final body = {
-    //   invites[0].userId: [newRoomId]
-    // };
+    final saveResponse = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(accountData),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+
+  /**
+   * Ignore User (a.k.a. Block User)
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#m-ignored-user-list
+   *  
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> blockUser({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    List<String> roomIds = const [],
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${EventTypes.ignoredUserList}';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final accountData = {userId: []};
+
+    if (roomIds.isNotEmpty) {
+      accountData[userId] = roomIds;
+    }
 
     final saveResponse = await http.put(
       url,
       headers: headers,
       body: json.encode(accountData),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
+
+  /**
+   * Ignore User (a.k.a. Block User)
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#m-ignored-user-list
+   *  
+   * Set some account_data for the client. This config is only visible
+   * to the user that set the account_data. The config will be synced 
+   * to clients in the top-level account_data.
+   */
+  static Future<dynamic> inviteUser({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+    String userId,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final body = {
+      'user_id': userId,
+    };
+
+    final saveResponse = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
     );
 
     return await json.decode(

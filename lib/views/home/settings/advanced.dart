@@ -1,24 +1,56 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/user/model.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 final String protocol = DotEnv().env['PROTOCOL'];
 
-class AdvancedView extends StatelessWidget {
-  AdvancedView({Key key}) : super(key: key);
+class AdvancedView extends StatefulWidget {
+  const AdvancedView({Key key}) : super(key: key);
+
+  @override
+  AdvancedViewState createState() => AdvancedViewState();
+}
+
+class AdvancedViewState extends State<AdvancedView> {
+  AdvancedViewState({Key key});
+
+  String version;
+  String buildNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    onMounted();
+  }
+
+  @protected
+  void onMounted() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    this.setState(() {
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+    });
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -32,7 +64,7 @@ class AdvancedView extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                'Advanced',
+                Strings.titleAdvanced,
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
@@ -45,18 +77,16 @@ class AdvancedView extends StatelessWidget {
                   visible: debug == 'true',
                   child: ListTile(
                     dense: true,
-                    onTap: () {
-                      BackgroundSync.start(
-                        protocol: protocol,
-                        homeserver: props.currentUser.homeserver,
-                        accessToken: props.currentUser.accessToken,
-                        lastSince: props.lastSince,
-                      );
-                    },
+                    onTap: () => BackgroundSync.start(
+                      protocol: protocol,
+                      homeserver: props.currentUser.homeserver,
+                      accessToken: props.currentUser.accessToken,
+                      lastSince: props.lastSince,
+                    ),
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Start Background Service',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -74,7 +104,7 @@ class AdvancedView extends StatelessWidget {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Stop All Services',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -95,7 +125,7 @@ class AdvancedView extends StatelessWidget {
                     },
                     title: Text(
                       'Test Dialog',
-                      style: TextStyle(fontSize: 18.0),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -117,10 +147,8 @@ class AdvancedView extends StatelessWidget {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text(
-                      'Test Notifcations',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
+                    title: Text('Test Notifcations',
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
@@ -132,10 +160,8 @@ class AdvancedView extends StatelessWidget {
                     onTap: () {
                       props.onForceFunction();
                     },
-                    title: Text(
-                      'Force Function',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
+                    title: Text('Force Function',
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 ListTile(
@@ -155,7 +181,7 @@ class AdvancedView extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Toggle Syncing',
-                    style: TextStyle(fontSize: 18.0),
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
@@ -179,11 +205,11 @@ class AdvancedView extends StatelessWidget {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color:
-                            props.loading ? Color(Colours.greyDisabled) : null,
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            color: props.loading
+                                ? Color(Colours.greyDisabled)
+                                : null,
+                          ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
@@ -207,11 +233,11 @@ class AdvancedView extends StatelessWidget {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color:
-                            props.loading ? Color(Colours.greyDisabled) : null,
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                            color: props.loading
+                                ? Color(Colours.greyDisabled)
+                                : null,
+                          ),
                     ),
                     subtitle: Text(
                       'Perform a forced full sync of all user data and messages',
@@ -224,6 +250,19 @@ class AdvancedView extends StatelessWidget {
                     ),
                   ),
                 ),
+                ListTile(
+                  dense: true,
+                  onTap: props.loading ? null : props.onForceFullSync,
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Version',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  trailing: Text(
+                    '$version ($buildNumber)',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
               ],
             )),
           );
@@ -234,7 +273,7 @@ class AdvancedView extends StatelessWidget {
 class _Props extends Equatable {
   final bool syncing;
   final bool loading;
-  final bool roomsLoading;
+  final bool loadingForced;
   final bool roomsObserverEnabled;
   final String language;
   final String lastSince;
@@ -248,7 +287,7 @@ class _Props extends Equatable {
   _Props({
     @required this.syncing,
     @required this.loading,
-    @required this.roomsLoading,
+    @required this.loadingForced,
     @required this.language,
     @required this.roomsObserverEnabled,
     @required this.currentUser,
@@ -265,7 +304,7 @@ class _Props extends Equatable {
         loading,
         lastSince,
         currentUser,
-        roomsLoading,
+        loadingForced,
         roomsObserverEnabled,
       ];
 
@@ -275,7 +314,7 @@ class _Props extends Equatable {
       _Props(
         syncing: store.state.syncStore.syncing,
         loading: store.state.syncStore.syncing || store.state.syncStore.loading,
-        roomsLoading: store.state.syncStore.loading,
+        loadingForced: store.state.syncStore.loading,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,

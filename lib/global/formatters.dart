@@ -1,3 +1,4 @@
+// Package imports:
 import 'package:intl/intl.dart';
 
 // @again_guy:matrix.org -> again_ereio
@@ -5,8 +6,8 @@ String formatSender(String sender) {
   return sender.replaceAll('@', '').split(':')[0];
 }
 
-String formatUserId(String displayName, {String homeserver}) {
-  return '@${displayName}:${homeserver ?? 'matrix.org'}';
+String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
+  return '@${displayName}:${homeserver}';
 }
 
 // @again_guy:matrix.org -> ER
