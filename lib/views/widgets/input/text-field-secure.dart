@@ -32,6 +32,7 @@ class TextFieldSecure extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onEditingComplete,
+    this.textInputAction,
   }) : super(key: key);
 
   final bool valid;
@@ -45,6 +46,7 @@ class TextFieldSecure extends StatelessWidget {
   final TextAlign textAlign;
 
   final FocusNode focusNode;
+  final TextInputAction textInputAction;
   final TextEditingController controller;
 
   final Function onChanged;
@@ -60,6 +62,7 @@ class TextFieldSecure extends StatelessWidget {
           controller: controller,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
+          textInputAction: textInputAction,
           onEditingComplete: onEditingComplete,
           autocorrect: false,
           enableSuggestions: false,

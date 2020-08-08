@@ -44,10 +44,21 @@ String formatUsername(User user) {
 }
 
 String formatInitials(String fullword) {
+  //  -> ?
   if (fullword == null || fullword.isEmpty) {
     return '?';
   }
 
+  // example words -> EW
+  if (fullword.contains(' ') && fullword.split(' ')[1].isNotEmpty) {
+    final words = fullword.split(' ');
+    final initialOne = words.elementAt(0).substring(0, 1);
+    final initialTwo = words.elementAt(1).substring(0, 1);
+
+    return (initialOne + initialTwo).toUpperCase();
+  }
+
+  // example words -> EX
   final word = fullword.replaceAll('@', '');
   final initials =
       word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);

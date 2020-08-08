@@ -23,7 +23,6 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -50,7 +49,6 @@ class InviteUsersState extends State<InviteUsersView> {
   final searchInputFocusNode = FocusNode();
   final avatarScrollController = ScrollController();
 
-  bool searching = false;
   String searchable;
   List<User> invites = [];
   String creatingRoomDisplayName;
@@ -64,12 +62,6 @@ class InviteUsersState extends State<InviteUsersView> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-
-    if (!this.searching) {
-      this.setState(() {
-        searching = !searching;
-      });
-    }
 
     if (store.state.userStore.invites.isNotEmpty) {
       this.setState(() {
@@ -167,7 +159,10 @@ class InviteUsersState extends State<InviteUsersView> {
         title: 'Try inviting ${user.displayName}',
         content: Strings.alertInviteUnknownUser,
         action: 'try invite',
-        onStartChat: () => this.onInviteUser(user: user),
+        onStartChat: () {
+          this.onInviteUser(user: user);
+          Navigator.pop(context);
+        },
       ),
     );
   }
@@ -193,8 +188,10 @@ class InviteUsersState extends State<InviteUsersView> {
             (result) => result.userId.contains(searchText),
           );
 
-          final showManualUser =
-              searchable != null && searchable.length > 0 && foundResult < 0;
+          final showManualUser = searchable != null &&
+              searchable.length > 0 &&
+              foundResult < 0 &&
+              !props.loading;
 
           final usersList = searchable == null || searchable.isEmpty
               ? props.usersRecent
@@ -210,12 +207,11 @@ class InviteUsersState extends State<InviteUsersView> {
               label: 'Search for a user...',
               tooltip: 'Search Users',
               elevation: 0,
+              forceFocus: true,
+              focusNode: searchInputFocusNode,
               onSearch: (text) => props.onSearch(text),
               onChange: (text) => this.setState(() {
                 searchable = text;
-              }),
-              onToggleSearch: () => this.setState(() {
-                searching = !searching;
               }),
             ),
             floatingActionButton: Container(

@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -22,7 +24,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 class ProfileView extends StatefulWidget {
@@ -35,10 +36,10 @@ class ProfileView extends StatefulWidget {
 class ProfileViewState extends State<ProfileView> {
   ProfileViewState({Key key}) : super();
 
-  File newAvatarFile;
+  File avatarFileNew;
 
-  String newUserId;
-  String newDisplayName;
+  String userIdNew;
+  String displayNameNew;
   final displayNameController = TextEditingController();
   final userIdController = TextEditingController();
   final String title = Strings.titleProfile;
@@ -76,9 +77,9 @@ class ProfileViewState extends State<ProfileView> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
-        onSetNewAvatar: (File image) {
+        onSetNewAvatar: ({File image}) {
           this.setState(() {
-            newAvatarFile = image;
+            avatarFileNew = image;
           });
         },
       ),
@@ -95,37 +96,23 @@ class ProfileViewState extends State<ProfileView> {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final double imageSize = Dimensions.avatarSizeDetails;
-        final currentAvatar = props.user.avatarUri;
 
         // Space for confirming rebuilding
-        Widget avatarWidget = CircleAvatar(
-          backgroundColor: Colors.grey,
-          child: Text(
-            formatInitials(props.user.displayName ?? props.user.displayName),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32.0,
-            ),
-          ),
+        Widget avatarWidget = AvatarCircle(
+          uri: props.user.avatarUri,
+          alt: formatUsername(props.user),
+          size: imageSize,
+          background: Colours.hashedColor(formatUsername(props.user)),
         );
 
-        if (this.newAvatarFile != null) {
+        if (this.avatarFileNew != null) {
           avatarWidget = ClipRRect(
             borderRadius: BorderRadius.circular(imageSize),
             child: Image.file(
-              this.newAvatarFile ?? props.user.avatarUri,
+              this.avatarFileNew ?? props.user.avatarUri,
               width: imageSize,
               height: imageSize,
-            ),
-          );
-        } else if (currentAvatar != null) {
-          avatarWidget = ClipRRect(
-            borderRadius: BorderRadius.circular(imageSize),
-            child: MatrixImage(
-              fit: BoxFit.fill,
-              mxcUri: props.user.avatarUri,
-              width: imageSize,
-              height: imageSize,
+              fit: BoxFit.cover,
             ),
           );
         }
@@ -235,7 +222,7 @@ class ProfileViewState extends State<ProfileView> {
                                     label: 'Display Name',
                                     onChanged: (name) {
                                       this.setState(() {
-                                        newDisplayName = name;
+                                        displayNameNew = name;
                                       });
                                     },
                                     controller: displayNameController,
@@ -271,9 +258,9 @@ class ProfileViewState extends State<ProfileView> {
                                       onPressed: () async {
                                         final bool successful =
                                             await props.onSaveProfile(
-                                          newUserId: null,
-                                          newAvatarFile: this.newAvatarFile,
-                                          newDisplayName: this.newDisplayName,
+                                          userIdNew: null,
+                                          avatarFileNew: this.avatarFileNew,
+                                          displayNameNew: this.displayNameNew,
                                         );
                                         if (successful) {
                                           Navigator.pop(context);
@@ -337,23 +324,23 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
-          File newAvatarFile,
-          String newUserId,
-          String newDisplayName,
+          File avatarFileNew,
+          String userIdNew,
+          String displayNameNew,
         }) async {
           final currentUser = store.state.authStore.user;
 
-          if (newDisplayName != null &&
-              currentUser.displayName != newDisplayName) {
+          if (displayNameNew != null &&
+              currentUser.displayName != displayNameNew) {
             final bool successful = await store.dispatch(
-              updateDisplayName(newDisplayName),
+              updateDisplayName(displayNameNew),
             );
             if (!successful) return false;
           }
 
-          if (newAvatarFile != null) {
+          if (avatarFileNew != null) {
             final bool successful = await store.dispatch(
-              updateAvatarPhoto(localFile: newAvatarFile),
+              updateAvatarPhoto(localFile: avatarFileNew),
             );
             if (!successful) return false;
           }

@@ -17,6 +17,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
     this.brightness = Brightness.dark,
     this.elevation,
     this.focusNode,
+    this.onBack,
     this.onChange,
     this.onSearch,
     this.onToggleSearch,
@@ -33,6 +34,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   final Brightness brightness;
   final FocusNode focusNode;
 
+  final Function onBack;
   final Function onChange;
   final Function onSearch;
   final Function onToggleSearch;
@@ -74,6 +76,14 @@ class AppBarSearchState extends State<AppBarSearch> {
         onToggleSearch(context: context);
       }
     });
+  }
+
+  @protected
+  void onBack() {
+    if (onBack != null) {
+      onBack();
+    }
+    Navigator.pop(context);
   }
 
   @protected

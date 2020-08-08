@@ -47,19 +47,6 @@ class ModalImageOptions extends StatelessWidget {
               ),
             ),
             ListTile(
-              onTap: () async {
-                final File image = await ImagePicker.pickImage(
-                  source: ImageSource.camera,
-                  maxWidth: Dimensions.avatarSizeMax,
-                  maxHeight: Dimensions.avatarSizeMax,
-                );
-
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar(image: image);
-                }
-
-                Navigator.pop(context);
-              },
               leading: Container(
                 padding: EdgeInsets.all(4),
                 child: Icon(
@@ -71,20 +58,21 @@ class ModalImageOptions extends StatelessWidget {
                 'Take Photo',
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-            ),
-            ListTile(
               onTap: () async {
                 final File image = await ImagePicker.pickImage(
+                  source: ImageSource.camera,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                  source: ImageSource.gallery,
                 );
 
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar(image: image);
+                if (this.onSetNewAvatar != null) {
+                  this.onSetNewAvatar(image: image);
                 }
+
                 Navigator.pop(context);
               },
+            ),
+            ListTile(
               leading: Container(
                 padding: EdgeInsets.all(4),
                 child: Icon(
@@ -96,11 +84,25 @@ class ModalImageOptions extends StatelessWidget {
                 'Pick from gallery',
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-            ),
-            ListTile(
-              onTap: () {
+              onTap: () async {
+                final File image = await ImagePicker.pickImage(
+                  source: ImageSource.gallery,
+                  maxWidth: Dimensions.avatarSizeMax,
+                  maxHeight: Dimensions.avatarSizeMax,
+                );
+
+                print('onTap $image');
+                print('onTap ${image.runtimeType}');
+
+                if (onSetNewAvatar != null) {
+                  onSetNewAvatar(image: image);
+                }
                 Navigator.pop(context);
               },
+            ),
+            ListTile(
+              onTap: () => Navigator.pop(context),
+              enabled: false,
               leading: Container(
                 padding: EdgeInsets.all(4),
                 child: Icon(
