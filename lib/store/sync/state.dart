@@ -41,7 +41,7 @@ class SyncStore extends Equatable {
     this.offline = false,
     this.lastUpdate = 0,
     this.lastAttempt = 0,
-    this.backoff,
+    this.backoff = 0,
     this.lastSince,
     this.syncObserver,
   });

@@ -208,7 +208,7 @@ class ChatViewState extends State<ChatView> {
   @protected
   onUpdateMessage(String text, _Props props) {
     this.setState(() {
-      sendable = text != null && text.isNotEmpty;
+      sendable = text != null && text.trim().isNotEmpty;
     });
 
     // start an interval for updating typing status

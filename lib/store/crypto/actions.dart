@@ -886,7 +886,7 @@ ThunkAction<AppState> fetchDeviceKeys({
         users: userMap,
       );
 
-      final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
+      final Map<dynamic, dynamic> deviceKeys = data['device_keys'] ?? {};
       Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
 
       deviceKeys.forEach((userId, devices) {

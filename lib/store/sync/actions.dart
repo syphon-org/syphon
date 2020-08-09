@@ -93,7 +93,7 @@ ThunkAction<AppState> startSyncObserver() {
           store.state.syncStore.lastAttempt,
         );
 
-        if (backoff != null) {
+        if (backoff != 0) {
           final backoffs = fibonacci(backoff);
           final backoffFactor = backoffs[backoffs.length - 1];
           final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
@@ -225,7 +225,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         synced: true,
         syncing: false,
         lastSince: lastSince,
-        backoff: null,
       ));
 
       if (!kReleaseMode && isFullSync) {
@@ -245,7 +244,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       }
 
       final backoff = store.state.syncStore.backoff;
-      final nextBackoff = backoff != null ? backoff + 1 : 5;
+      final nextBackoff = backoff != 0 ? backoff + 1 : 5;
       store.dispatch(SetBackoff(backoff: nextBackoff));
     } finally {
       store.dispatch(SetSyncing(syncing: false));
