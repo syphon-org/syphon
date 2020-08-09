@@ -1,6 +1,9 @@
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
 
 class ButtonText extends StatelessWidget {
   ButtonText({
@@ -53,7 +56,7 @@ class ButtonText extends StatelessWidget {
                         if (color != null) {
                           return color;
                         }
-                        return Theme.of(context).primaryColor;
+                        return Theme.of(context).buttonColor;
                       }(),
                     ),
                   )),

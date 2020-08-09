@@ -1,9 +1,11 @@
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class AvatarAppBar extends StatelessWidget {
   AvatarAppBar({
@@ -30,25 +32,10 @@ class AvatarAppBar extends StatelessWidget {
           children: <Widget>[
             IconButton(
               padding: EdgeInsets.all(4),
-              icon: CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: user.avatarUri != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          Dimensions.thumbnailSizeMax,
-                        ),
-                        child: MatrixImage(
-                          mxcUri: user.avatarUri,
-                          thumbnail: true,
-                        ),
-                      )
-                    : Text(
-                        displayInitials(user),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
-                      ),
+              icon: AvatarCircle(
+                uri: user.avatarUri,
+                alt: user.displayName ?? user.userId,
+                background: Colors.grey,
               ),
               onPressed: onPressed,
               tooltip: tooltip,

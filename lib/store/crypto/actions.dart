@@ -4,10 +4,25 @@
  *  
  * TODO: not sure if we ever need unsigned keys 
  */
+
+// Dart imports:
 import 'dart:convert';
 import 'dart:io';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:canonical_json/canonical_json.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
+import 'package:olm/olm.dart' as olm;
+import 'package:path_provider/path_provider.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -16,14 +31,6 @@ import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:canonical_json/canonical_json.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
-import 'package:olm/olm.dart' as olm;
 
 /**
  * 
@@ -155,7 +162,7 @@ ThunkAction<AppState> deleteDeviceKeys() {
       store.dispatch(ResetDeviceKeys());
     } catch (error) {
       store.dispatch(
-        addAlert(type: 'warning', message: error, origin: 'deleteDeviceKeys'),
+        addAlert(error: error, origin: 'deleteDeviceKeys'),
       );
     }
   };
@@ -248,7 +255,7 @@ ThunkAction<AppState> saveOlmAccount() {
       store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
     } catch (error) {
       store.dispatch(
-        addAlert(type: 'warning', message: error, origin: 'saveOlmAccount'),
+        addAlert(error: error, origin: 'saveOlmAccount'),
       );
     }
   };
@@ -326,7 +333,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: deviceKeyMap,
       );
@@ -336,8 +343,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       }
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'uploadIdentityKeys',
       ));
     }
@@ -357,8 +363,7 @@ ThunkAction<AppState> generateOneTimeKeys({DeviceKey deviceKey}) {
       return json.decode(olmAccount.one_time_keys());
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'generateOneTimeKeys',
       ));
     }
@@ -439,7 +444,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
 
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: payload,
       );
@@ -456,8 +461,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'updateOneTimeKeys',
       ));
     }
@@ -572,13 +576,8 @@ ThunkAction<AppState> claimOneTimeKeys({
       });
       return true;
     } catch (error) {
-      debugPrint(error);
       store.dispatch(
-        addAlert(
-          type: 'warning',
-          message: error,
-          origin: 'claimOneTimeKeys',
-        ),
+        addAlert(error: error, origin: 'claimOneTimeKeys'),
       );
       return false;
     }
@@ -881,7 +880,7 @@ ThunkAction<AppState> fetchDeviceKeys({
 
       final data = await MatrixApi.fetchKeys(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         lastSince: store.state.syncStore.lastSince,
         users: userMap,
@@ -904,8 +903,7 @@ ThunkAction<AppState> fetchDeviceKeys({
       return newDeviceKeys;
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'fetchDeviceKeys',
       ));
       return const {};
@@ -949,8 +947,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       file = await file.writeAsString(json.encode(exportData));
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'exportDeviceKeysOwned',
       ));
     }
@@ -985,8 +982,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       );
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
+        error: error,
         origin: 'importDeviceKeysOwned',
       ));
     }

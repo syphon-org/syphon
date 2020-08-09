@@ -1,23 +1,30 @@
+// Dart imports:
 import 'dart:async';
+import 'dart:io';
+
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+
+// Package imports:
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
+import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
+import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:flutter/foundation.dart';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
-
-import 'package:syphon/store/index.dart';
-
-import 'room/model.dart';
 import 'events/model.dart';
+import 'room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -362,50 +369,176 @@ ThunkAction<AppState> createRoom({
   String name,
   String alias,
   String topic,
+  File avatarFile,
   String avatarUri,
   List<User> invites,
   bool isDirect = false,
+  bool encryption = false, // TODO: defaults without group E2EE for now
+  String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
+    var room;
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
+
+      final inviteIds = invites.map((user) => user.userId).toList();
 
       final data = await MatrixApi.createRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomName: name,
-        roomTopic: topic,
-        roomAlias: alias,
-        invites: invites.map((user) => user.userId).toList(),
+        name: name,
+        topic: topic,
+        alias: alias,
+        invites: inviteIds,
         isDirect: isDirect,
+        chatTypePreset: preset,
       );
-
-      final newRoomId = data['room_id'];
 
       if (data['errcode'] != null) {
         throw data['error'];
       }
 
+      room = Room(
+        id: data['room_id'],
+      );
+
+      if (avatarFile != null) {
+        await store.dispatch(
+          updateRoomAvatar(roomId: room.id, localFile: avatarFile),
+        );
+      }
+
       if (isDirect) {
         final directUser = invites[0];
-        final newRoom = Room(
-          id: newRoomId,
+        room = room.copyWith(
           direct: true,
           users: {directUser.userId: directUser},
         );
 
-        await store.dispatch(toggleDirectRoom(room: newRoom, enabled: true));
-        await store.dispatch(toggleRoomEncryption(room: newRoom));
+        await store.dispatch(toggleDirectRoom(room: room, enabled: true));
       }
 
-      await store.dispatch(startSyncObserver());
+      // direct chats are encrypted by default
+      // group e2ee is not done yet
+      if (encryption || isDirect) {
+        await store.dispatch(toggleRoomEncryption(room: room));
+      }
 
-      return newRoomId;
+      return room.id;
     } catch (error) {
-      debugPrint('[createRoom] $error');
+      debugPrint(error);
+      store.dispatch(
+        addAlert(
+            message: error.toString(),
+            error: error,
+            origin: 'createRoom|$preset'),
+      );
+      return room != null ? room.id : null;
+    } finally {
+      await store.dispatch(startSyncObserver());
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * Update Room
+ * 
+ * stop / start the /sync session for this to run,
+ * otherwise it will appear like the room does
+ * not exist for the seconds between the response from
+ * matrix and caching in the app
+ */
+ThunkAction<AppState> updateRoom({
+  String name,
+  String alias,
+  String topic,
+  File avatarFile,
+  String avatarUri,
+  List<User> invites,
+  bool isDirect = false,
+  String preset = RoomPresets.private,
+}) {
+  return (Store<AppState> store) async {
+    try {} catch (error) {
+      debugPrint('[updateRoom] $error');
       return null;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/**
+ * 
+ * Mark Room Read (Locally Only)
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
+ThunkAction<AppState> markRoomRead({String roomId}) {
+  return (Store<AppState> store) async {
+    try {
+      final room = store.state.roomStore.rooms[roomId];
+      if (room == null) {
+        throw 'Room not found';
+      }
+
+      // mark read locally only
+      if (!store.state.settingsStore.readReceipts) {
+        await store.dispatch(SetRoom(
+          room: room.copyWith(lastRead: DateTime.now().millisecondsSinceEpoch),
+        ));
+      }
+
+      // send read receipt remotely to mark locally on /sync
+      if (store.state.settingsStore.readReceipts) {
+        final messagesSorted = latestMessages(
+          roomSelectors.room(id: roomId, state: store.state).messages,
+        );
+
+        if (messagesSorted.isNotEmpty) {
+          store.dispatch(sendReadReceipts(
+            room: Room(id: roomId),
+            message: messagesSorted.elementAt(0),
+          ));
+        }
+      }
+    } catch (error) {
+      store.dispatch(addAlert(
+        message: 'Failed to mark room as read',
+        error: error,
+        origin: 'markRoomRead',
+      ));
+    }
+  };
+}
+
+/**
+ * 
+ * Mark Room Read (Locally Only)
+ * 
+ * Send Fully Read or just Read receipts bundled into 
+ * one http call
+ */
+ThunkAction<AppState> markRoomsReadAll() {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final rooms = store.state.roomStore.roomList;
+
+      rooms.forEach((room) {
+        store.dispatch(markRoomRead(roomId: room.id));
+      });
+    } catch (error) {
+      store.dispatch(addAlert(
+        message: 'Failed to mark all room as read',
+        error: error,
+        origin: 'markRoomRead',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -502,6 +635,45 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 }
 
 /**
+ * Update room avatar
+ */
+ThunkAction<AppState> updateRoomAvatar({String roomId, File localFile}) {
+  return (Store<AppState> store) async {
+    try {
+      final data = await store.dispatch(uploadMedia(
+        localFile: localFile,
+        mediaName: roomId,
+      ));
+
+      final content = {
+        'url': data['content_uri'],
+      };
+
+      await MatrixApi.sendEvent(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: roomId,
+        eventType: EventTypes.avatar,
+        content: content,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      await store.dispatch(fetchStateEvents(room: Room(id: roomId)));
+      return data['event_id'];
+    } catch (error) {
+      store.dispatch(
+        addAlert(error: error, origin: 'toggleRoomEncryption'),
+      );
+      return null;
+    }
+  };
+}
+
+/**
  * Toggle Room Encryption On (Only)
  */
 ThunkAction<AppState> toggleRoomEncryption({Room room}) {
@@ -530,8 +702,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
 
       await store.dispatch(fetchStateEvents(room: room));
     } catch (error) {
-      debugPrint('[toggleRoomEncryption] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'toggleRoomEncryption'));
     }
   };
 }
@@ -571,7 +742,44 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRooms());
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'joinRoom'));
+    }
+  };
+}
+
+/**
+ * Join Room (by id)
+ * 
+ * Not sure if this process is / will be any different
+ * than accepting an invite
+ */
+ThunkAction<AppState> inviteUser({
+  Room room,
+  User user,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.inviteUser(
+        protocol: protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        userId: user.userId,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+      return true;
+    } catch (error) {
+      store.dispatch(
+        addAlert(error: error, origin: 'inviteUser'),
+      );
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
     }
   };
 }
@@ -611,7 +819,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
       await store.dispatch(fetchRooms());
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(error: error, origin: 'acceptRoom'));
     }
   };
 }

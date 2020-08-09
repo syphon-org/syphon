@@ -1,34 +1,38 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/auth/credential/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:syphon/store/sync/actions.dart';
-import 'package:device_info/device_info.dart';
-import 'package:mime/mime.dart';
+
+// Package imports:
 import 'package:crypt/crypt.dart';
-
-import 'package:syphon/global/libs/matrix/media.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/global/notifications.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Store
-import 'package:syphon/store/index.dart';
+// Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 import '../user/model.dart';
+
+// Store
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -167,7 +171,7 @@ ThunkAction<AppState> startAuthObserver() {
     final Function onAuthStateChanged = (User user) async {
       debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
-        await store.dispatch(fetchUserProfile());
+        await store.dispatch(fetchUserCurrentProfile());
 
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {
@@ -280,10 +284,28 @@ ThunkAction<AppState> loginUser() {
         generateDeviceId(salt: username),
       );
 
+      var homeserver = store.state.authStore.homeserver;
+      try {
+        final check = await MatrixApi.checkHomeserver(
+              protocol: protocol,
+              homeserver: homeserver,
+            ) ??
+            {};
+
+        homeserver = (check['m.homeserver']['base_url'] as String)
+            .replaceAll('https://', '');
+
+        if (check['m.homeserver'] == null) {
+          addInfo(
+            message: Strings.errorCheckHomeserver,
+          );
+        }
+      } catch (error) {/* still attempt login */}
+
       final data = await MatrixApi.loginUser(
         protocol: protocol,
         type: "m.login.password",
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         deviceName: device.displayName,
@@ -308,8 +330,7 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      debugPrint('[loginUser] $error');
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(message: error, error: error));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -344,14 +365,17 @@ ThunkAction<AppState> logoutUser() {
 
       store.state.authStore.authObserver.add(null);
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error.message));
+      store.dispatch(addAlert(
+        error: error,
+        message: error,
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };
 }
 
-ThunkAction<AppState> fetchUserProfile() {
+ThunkAction<AppState> fetchUserCurrentProfile() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -370,7 +394,11 @@ ThunkAction<AppState> fetchUserProfile() {
         ),
       ));
     } catch (error) {
-      debugPrint('[fetchUserProfile] $error');
+      store.dispatch(addAlert(
+        error: error,
+        message: 'Failed to fetch current user profile',
+        origin: 'fetchUserCurrentProfile',
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -574,7 +602,9 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
     } catch (error) {
       debugPrint('[createUser] error $error');
       if (enableErrors) {
-        store.dispatch(addAlert(message: 'Failed to signup', error: error));
+        store.dispatch(
+          addAlert(message: 'Failed to signup', error: error),
+        );
       }
       return false;
     } finally {
@@ -621,17 +651,16 @@ ThunkAction<AppState> updatePassword(String password) {
         throw data['error'];
       }
 
-      store.dispatch(addAlert(
-        type: 'success',
+      store.dispatch(addConfirmation(
         message: 'Password updated successfully',
       ));
 
       return true;
     } catch (error) {
       store.dispatch(addAlert(
-        type: 'warning',
-        message: error,
         origin: 'updatePassword',
+        message: 'Failed to update passwod',
+        error: error,
       ));
       return false;
     } finally {
@@ -658,7 +687,7 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
       }
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(addAlert(origin: 'updateDisplayName', message: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -666,60 +695,27 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   };
 }
 
-ThunkAction<AppState> updateAvatarPhoto({File localFile}) {
+ThunkAction<AppState> updateAvatar({File localFile}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      // Extension handling
       final String displayName = store.state.authStore.user.displayName;
-      final String fileType = lookupMimeType(localFile.path);
-      final String fileExtension = fileType.split('/')[1];
 
-      // Setting up params for upload
-      final int fileLength = await localFile.length();
-      final Stream<List<int>> fileStream = localFile.openRead();
-      final String fileName = '${displayName}_profile_photo.${fileExtension}';
-
-      // Create request vars for upload
-      final mediaUploadRequest = buildMediaUploadRequest(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        fileName: fileName,
-        fileType: fileType,
-        fileLength: fileLength,
-      );
-
-      // POST StreamedRequest for uploading byteStream
-      final request = new http.StreamedRequest(
-        'POST',
-        Uri.parse(mediaUploadRequest['url']),
-      );
-      request.headers.addAll(mediaUploadRequest['headers']);
-      fileStream.listen(request.sink.add, onDone: () => request.sink.close());
-
-      // Attempting to await the upload response successfully
-      final mediaUploadResponseStream = await request.send();
-      final mediaUploadResponse = await http.Response.fromStream(
-        mediaUploadResponseStream,
-      );
-      final mediaUploadData = json.decode(
-        mediaUploadResponse.body,
-      );
-
-      // If upload fails, throw an error for the whole update
-      if (mediaUploadData['errcode'] != null) {
-        throw mediaUploadData['error'];
-      }
+      final data = await store.dispatch(uploadMedia(
+        localFile: localFile,
+        mediaName: '${displayName}_profile_photo',
+      ));
 
       await store.dispatch(updateAvatarUri(
-        mxcUri: mediaUploadData['content_uri'],
+        mxcUri: data['content_uri'],
       ));
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(type: 'warning', message: error));
+      store.dispatch(
+        addAlert(origin: 'updateAvatar', message: error.error),
+      );
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));

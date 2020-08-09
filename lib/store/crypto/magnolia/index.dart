@@ -11,18 +11,22 @@
  */
 
 /*
+
+// Dart imports:
 import 'dart:convert';
 
+// Package imports:
+import 'package:canonical_json/canonical_json.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:canonical_json/canonical_json.dart';
-import 'package:cryptography/cryptography.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> initKeyEncryption(User user) {
   return (Store<AppState> store) async {

@@ -1,7 +1,17 @@
+// Dart imports:
 import 'dart:typed_data';
 
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_persist/redux_persist.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
@@ -11,27 +21,24 @@ import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
-import 'package:equatable/equatable.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
-
-// Temporary State Store
+import 'package:syphon/store/user/reducer.dart';
+import 'package:syphon/store/user/state.dart';
 import './alerts/model.dart';
-import './search/model.dart';
-
-// Persisted State Stores
-import './media/state.dart';
-import './rooms/state.dart';
-import './settings/state.dart';
-import './auth/state.dart';
-
-// Reducers for Stores
 import './alerts/reducer.dart';
+import './auth/state.dart';
+import './media/state.dart';
 import './rooms/reducer.dart';
+import './rooms/state.dart';
+import 'search/state.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
+import './settings/state.dart';
 
-import 'package:redux_persist/redux_persist.dart';
+// Temporary State Store
+
+// Persisted State Stores
+
+// Reducers for Stores
 
 class AppState extends Equatable {
   final bool loading;
@@ -41,6 +48,7 @@ class AppState extends Equatable {
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
+  final UserStore userStore;
   final SyncStore syncStore;
   final CryptoStore cryptoStore;
 
@@ -50,6 +58,7 @@ class AppState extends Equatable {
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
     this.roomStore = const RoomStore(),
+    this.userStore = const UserStore(),
     this.mediaStore = const MediaStore(),
     this.searchStore = const SearchStore(),
     this.settingsStore = const SettingsStore(),
@@ -63,6 +72,7 @@ class AppState extends Equatable {
         authStore,
         syncStore,
         roomStore,
+        userStore,
         mediaStore,
         searchStore,
         settingsStore,
@@ -78,7 +88,8 @@ AppState appReducer(AppState state, action) {
     mediaStore: mediaReducer(state.mediaStore, action),
     roomStore: roomReducer(state.roomStore, action),
     syncStore: syncReducer(state.syncStore, action),
-    searchStore: matrixReducer(state.searchStore, action),
+    userStore: userReducer(state.userStore, action),
+    searchStore: searchReducer(state.searchStore, action),
     settingsStore: settingsReducer(state.settingsStore, action),
     cryptoStore: cryptoReducer(state.cryptoStore, action),
   );
@@ -206,6 +217,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     MediaStore mediaStoreConverted = MediaStore();
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
+    UserStore userStore = UserStore();
 
     authStoreConverted = Cache.state.get(
       authStoreConverted.runtimeType.toString(),
@@ -263,6 +275,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       syncStore: syncStoreConverted,
       cryptoStore: cryptoStoreConverted,
       roomStore: roomStoreConverted,
+      userStore: userStore, // not cached
       mediaStore: mediaStoreConverted,
       settingsStore: settingsStoreConverted,
     );

@@ -1,30 +1,36 @@
+// Dart imports:
 import 'dart:io';
 
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/settings/actions.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Store
-import 'package:redux/redux.dart';
+// Package imports:
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:syphon/store/index.dart';
-
-// Styling Widgets
+import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-import 'package:syphon/global/dimensions.dart';
 
-// Local Components
-import './landing.dart';
+// Project imports:
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import './action.dart';
 import './first.dart';
+import './landing.dart';
 import './second.dart';
 import './third.dart';
-import './action.dart';
+
+// Store
+
+// Styling Widgets
+
+// Local Components
 
 class Intro extends StatefulWidget {
   const Intro({Key key}) : super(key: key);
@@ -59,7 +65,7 @@ class IntroState extends State<Intro> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-
+    // NOTE: SchedulerBinding still needed to have navigator context in dialogs
     SchedulerBinding.instance.addPostFrameCallback((_) {
       onMounted();
     });
@@ -183,7 +189,13 @@ class IntroState extends State<Intro> {
     final double widgetWidthScaling = width * 0.725;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        brightness: Brightness.light,
+        backgroundColor: Colors.transparent,
+      ),
       body: StoreConnector<AppState, AppState>(
+        distinct: true,
         converter: (Store<AppState> store) => store.state,
         builder: (context, state) => Column(
           mainAxisAlignment: MainAxisAlignment.center,

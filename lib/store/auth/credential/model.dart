@@ -1,5 +1,8 @@
-import 'package:syphon/global/libs/matrix/auth.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
 
 class Credential extends Equatable {
   final String type;

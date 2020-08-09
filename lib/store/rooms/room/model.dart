@@ -1,25 +1,33 @@
+// Dart imports:
 import 'dart:collection';
+
+// Package imports:
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:hive/hive.dart';
 
 part 'model.g.dart';
 
-// Next Hive Field 27
+class RoomPresets {
+  static const private = 'private_chat';
+  static const privateTrusted = 'trusted_private_chat';
+  static const public = 'public_chat';
+}
+
+// Next Hive Field 30
 @HiveType(typeId: RoomHiveId)
 class Room {
   @HiveField(0)
   final String id;
   @HiveField(1)
   final String name;
-
-  @HiveField(28)
-  final int namePriority;
-
   @HiveField(2)
   final String alias;
   @HiveField(3)
@@ -28,7 +36,11 @@ class Room {
   final String avatarUri;
   @HiveField(5)
   final String topic;
+  @HiveField(29)
+  final String joinRule; // "public", "knock", "invite", "private"
 
+  @HiveField(28)
+  final int namePriority;
   @HiveField(6)
   final bool direct;
   @HiveField(7)
@@ -87,13 +99,30 @@ class Room {
   @HiveField(27)
   final bool invite;
 
+  String get type {
+    if (joinRule == 'public' || worldReadable) {
+      return 'public';
+    }
+
+    if (direct) {
+      return 'direct';
+    }
+
+    if (invite) {
+      return 'invite';
+    }
+
+    return 'group';
+  }
+
   const Room({
     this.id,
-    this.name = 'Chat',
+    this.name = 'Empty Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,
     this.topic = '',
+    this.joinRule = 'private',
     this.direct = false,
     this.syncing = false,
     this.sending = false,
@@ -116,7 +145,6 @@ class Room {
     this.prevHash,
     this.messageReads,
     this.invite = false,
-    // this.state = const [],
   });
 
   Room copyWith({
@@ -129,6 +157,7 @@ class Room {
     direct,
     syncing,
     sending,
+    joinRule,
     lastRead,
     lastUpdate,
     namePriority,
@@ -154,6 +183,8 @@ class Room {
       id: id ?? this.id,
       name: name ?? this.name,
       alias: alias ?? this.alias,
+      topic: topic ?? this.topic,
+      joinRule: joinRule ?? this.joinRule,
       avatarUri: avatarUri ?? this.avatarUri,
       homeserver: homeserver ?? this.homeserver,
       direct: direct ?? this.direct,
@@ -175,7 +206,7 @@ class Room {
       messageReads: messageReads ?? this.messageReads,
       endHash: endHash ?? this.endHash,
       startHash: startHash ?? this.startHash,
-      prevHash: prevHash, // TODO: may always need a prev hash?,z
+      prevHash: prevHash, // TODO: may always need a prev hash?
       invite: invite ?? this.invite,
       // state: state ?? this.state,
     );
@@ -212,21 +243,21 @@ class Room {
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
     List<Message> messageEvents = [];
-    List<Event> accountDataEvents = [];
+    List<Event> accountEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
-      final List<dynamic> rawStateEvents = json['state']['events'];
+      final List<dynamic> stateEventsRaw = json['state']['events'];
 
       stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
     }
 
     if (json['invite_state'] != null) {
-      final List<dynamic> rawStateEvents = json['invite_state']['events'];
+      final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
       stateEvents =
-          rawStateEvents.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
       invite = true;
     }
 
@@ -236,10 +267,10 @@ class Room {
       endHash = json['timeline']['end_batch'];
       prevHash = json['timeline']['prev_batch'];
 
-      final List<dynamic> rawTimelineEvents = json['timeline']['events'];
+      final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
       final List<Event> timelineEvents = List.from(
-        rawTimelineEvents.map((event) => Event.fromJson(event)),
+        timelineEventsRaw.map((event) => Event.fromJson(event)),
       );
 
       // TODO: make this more functional, need to split into two lists on type
@@ -256,28 +287,26 @@ class Room {
     }
 
     if (json['ephemeral'] != null) {
-      final List<dynamic> rawEphemeralEvents = json['ephemeral']['events'];
+      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
       ephemeralEvents =
-          rawEphemeralEvents.map((event) => Event.fromJson(event)).toList();
+          ephemeralEventsRaw.map((event) => Event.fromJson(event)).toList();
     }
 
     if (json['account_data'] != null) {
-      final List<dynamic> rawAccountEvents = json['account_data']['events'];
+      final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-      accountDataEvents =
-          rawAccountEvents.map((event) => Event.fromJson(event)).toList();
+      accountEvents =
+          accountEventsRaw.map((event) => Event.fromJson(event)).toList();
     }
 
     return this
-        .copyWith(
-          invite: invite,
-        )
         .fromAccountData(
-          accountDataEvents,
+          accountEvents,
         )
         .fromStateEvents(
           stateEvents,
+          invite: invite,
           currentUser: currentUser,
         )
         .fromMessageEvents(
@@ -326,11 +355,13 @@ class Room {
    */
   Room fromStateEvents(
     List<Event> stateEvents, {
+    bool invite,
     User currentUser,
   }) {
     String name;
     String avatarUri;
     String topic;
+    String joinRule;
     bool encryptionEnabled;
     bool direct = this.direct;
     int lastUpdate = this.lastUpdate;
@@ -354,6 +385,12 @@ class Room {
           case 'm.room.topic':
             topic = event.content['topic'];
             break;
+
+          case 'm.room.join_rules':
+            joinRule = event.content['join_rule'];
+            debugPrint('[Room.fromStateEvents] $joinRule');
+            break;
+
           case 'm.room.canonical_alias':
             if (namePriority > 2) {
               namePriority = 2;
@@ -393,7 +430,7 @@ class Room {
             // if nothing else takes priority
             if (namePriority == 4 && event.sender != currentUser.userId) {
               if (displayName == null) {
-                name = formatShortname(event.sender);
+                name = trimAlias(event.sender);
                 avatarUri = memberAvatarUri;
               } else {
                 name = displayName;
@@ -446,13 +483,15 @@ class Room {
 
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
-      avatarUri: avatarUri ?? this.avatarUri,
       topic: topic ?? this.topic,
       users: users ?? this.users,
-      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       direct: direct ?? this.direct,
+      avatarUri: avatarUri ?? this.avatarUri,
+      joinRule: joinRule ?? this.joinRule,
+      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
+      invite: invite ?? this.invite,
     );
   }
 
@@ -531,7 +570,6 @@ class Room {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
 
-    int latestRead = this.lastRead;
     var messageReads = this.messageReads != null
         ? Map<String, ReadStatus>.from(this.messageReads)
         : Map<String, ReadStatus>();
@@ -550,15 +588,16 @@ class Room {
           case 'm.receipt':
             final Map<String, dynamic> receiptEventIds = event.content;
 
+            // TODO: figure out how to pull what messages have been read from read recepts
+            // // Set a new timestamp for the latest read message if it exceeds the current
+            // latestRead = latestRead < newReadStatuses.latestRead
+            //     ? newReadStatuses.latestRead
+            //     : latestRead;
+
             // Filter through every eventId to find receipts
             receiptEventIds.forEach((key, receipt) {
               // convert every m.read object to a map of userIds + timestamps for read
               final newReadStatuses = ReadStatus.fromReceipt(receipt);
-
-              // // Set a new timestamp for the latest read message if it exceeds the current
-              latestRead = latestRead < newReadStatuses.latestRead
-                  ? newReadStatuses.latestRead
-                  : latestRead;
 
               // update the eventId if that event already has reads
               if (!messageReads.containsKey(key)) {
@@ -579,7 +618,6 @@ class Room {
       userTyping: userTyping,
       usersTyping: usersTyping,
       messageReads: messageReads,
-      lastRead: latestRead,
     );
   }
 }

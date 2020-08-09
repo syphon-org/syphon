@@ -1,79 +1,53 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
+import 'package:expandable/expandable.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:intl/intl.dart';
+import 'package:redux/redux.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
+
+// Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:expandable/expandable.dart';
-import 'package:intl/intl.dart';
-
-import 'package:redux/redux.dart';
 import 'package:syphon/store/search/actions.dart';
-
-import 'package:syphon/store/index.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
-// Assets
-
-class SearchScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
-  }
-}
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 
 class GroupSearchView extends StatefulWidget {
-  final String title;
-  final Store<AppState> store;
-  const GroupSearchView({Key key, this.title, this.store}) : super(key: key);
+  const GroupSearchView({Key key}) : super(key: key);
 
   @override
-  GroupSearchState createState() => GroupSearchState(
-        title: this.title,
-        store: this.store,
-      );
+  GroupSearchState createState() => GroupSearchState();
 }
 
 class GroupSearchState extends State<GroupSearchView> {
-  final String title;
-  final Store<AppState> store;
   final searchInputFocusNode = FocusNode();
 
-  GroupSearchState({
-    Key key,
-    this.title,
-    this.store,
-  });
+  GroupSearchState({Key key});
 
-  Timer searchTimeout;
-  bool searching = false;
-
+  // componentDidMount(){}
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
   void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
-
-    if (!this.searching) {
-      this.onToggleSearch(context: context);
-    }
 
     // Clear search if previous results are not from User searching
     if (searchResults.isNotEmpty && !(searchResults[0] is Room)) {
@@ -83,11 +57,6 @@ class GroupSearchState extends State<GroupSearchView> {
     if (store.state.searchStore.searchResults.isEmpty) {
       store.dispatch(searchPublicRooms(searchText: ''));
     }
-    searchInputFocusNode.addListener(() {
-      if (!searchInputFocusNode.hasFocus) {
-        searching = false;
-      }
-    });
   }
 
   @override
@@ -96,428 +65,294 @@ class GroupSearchState extends State<GroupSearchView> {
     super.dispose();
   }
 
-  @protected
-  void onToggleSearch({BuildContext context}) {
-    setState(() {
-      searching = !searching;
-    });
-    if (searching) {
-      Timer(
-        Duration(milliseconds: 1), // hack to focus after visibility change
-        () => FocusScope.of(
-          context,
-        ).requestFocus(
-          searchInputFocusNode,
-        ),
-      );
-    } else {
-      FocusScope.of(
-        context,
-      ).unfocus();
-    }
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-        builder: (context, props) {
-          // final width = MediaQuery.of(context).size.width;
-          final height = MediaQuery.of(context).size.height;
+        builder: (context, props) => Scaffold(
+          appBar: AppBarSearch(
+            title: Strings.titleSearchGroups,
+            label: 'Search a topic...',
+            tooltip: 'Search topics',
+            brightness: Brightness.dark,
+            forceFocus: true,
+            focusNode: searchInputFocusNode,
+            onChange: (text) {
+              props.onSearch(text);
+            },
+            onSearch: (text) {
+              props.onSearch(text);
+            },
+          ),
+          body: Center(
+            child: Stack(
+              children: [
+                ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: props.searchResults.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final room = (props.searchResults[index] as Room);
+                    final formattedUserTotal = NumberFormat.compact();
+                    final localUserTotal = NumberFormat();
 
-          return Scaffold(
-            appBar: AppBar(
-              brightness: Brightness.dark,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Stack(
-                children: [
-                  Visibility(
-                    visible: !searching,
-                    child: TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => onToggleSearch(context: context),
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w100,
-                        ),
+                    return Container(
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                        bottom: 8,
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    child: Visibility(
-                      visible: searching,
-                      maintainState: true,
-                      child: TextField(
-                        focusNode: searchInputFocusNode,
-                        onChanged: (text) {
-                          if (this.searchTimeout != null) {
-                            this.searchTimeout.cancel();
-                            this.searchTimeout = null;
-                          }
-                          this.setState(() {
-                            searchTimeout =
-                                new Timer(Duration(milliseconds: 400), () {
-                              props.onSearch(text);
-                            });
-                          });
-                        },
-                        cursorColor: Colors.white,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w100,
-                        ),
-                        decoration: InputDecoration(
-                          disabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.0,
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          hintText: 'Search a topic...',
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w100,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                IconButton(
-                  color: Colors.white,
-                  icon: Icon(searching ? Icons.cancel : Icons.search),
-                  onPressed: () => onToggleSearch(context: context),
-                  tooltip: 'Search Homeservers',
-                ),
-              ],
-            ),
-            body: Center(
-              child: Stack(
-                children: [
-                  ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 2,
-                      vertical: 4,
-                    ),
-                    scrollDirection: Axis.vertical,
-                    itemCount: props.searchResults.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final room = (props.searchResults[index] as Room);
-
-                      final formattedUserTotal = NumberFormat.compact();
-                      final localUserTotal = NumberFormat();
-
-                      Widget roomAvatar = Text(
-                        formatRoomInitials(room: room),
-                        style: Theme.of(context).textTheme.bodyText2.merge(
-                              TextStyle(color: Colors.white),
-                            ),
-                      );
-
-                      // Override the initials if an avatar is present
-                      if (room.avatarUri != null) {
-                        roomAvatar = ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.thumbnailSizeMax,
-                          ),
-                          child: MatrixImage(
-                            width: 52,
-                            height: 52,
-                            mxcUri: room.avatarUri,
-                          ),
-                        );
-                      }
-
-                      return Container(
-                        padding: const EdgeInsets.only(
-                          bottom: 8,
-                        ),
-                        child: ExpandablePanel(
-                          hasIcon: false,
-                          tapBodyToCollapse: true,
-                          tapHeaderToExpand: true,
-                          header: Container(
-                            padding: const EdgeInsets.only(
-                              top: 8,
-                            ),
-                            child: ListTile(
-                              leading: Stack(children: [
-                                CircleAvatar(
-                                  backgroundColor: room.avatarUri != null
-                                      ? Colors.transparent
-                                      : Colors.grey,
-                                  child: roomAvatar,
-                                ),
-                                Visibility(
-                                  visible: !room.encryptionEnabled,
-                                  child: Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.thumbnailSizeMax,
+                      child: ExpandablePanel(
+                        hasIcon: false,
+                        tapBodyToCollapse: true,
+                        tapHeaderToExpand: true,
+                        header: ListTile(
+                          leading: Stack(
+                            children: [
+                              AvatarCircle(
+                                uri: room.avatarUri,
+                                alt: room.name,
+                                size: Dimensions.avatarSizeMin,
+                              ),
+                              Visibility(
+                                visible: !room.encryptionEnabled,
+                                child: Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.thumbnailSizeMax,
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.red,
+                                            offset: Offset(8.0, 8.0),
+                                          )
+                                        ],
                                       ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.red,
-                                              offset: Offset(8.0, 8.0),
-                                            )
-                                          ],
-                                        ),
-                                        height: 16,
-                                        width: 16,
-                                        child: Icon(
-                                          Icons.lock_open,
-                                          color: Colors.white,
-                                          size: 10,
-                                        ),
+                                      height: 16,
+                                      width: 16,
+                                      child: Icon(
+                                        Icons.lock_open,
+                                        color: Colors.white,
+                                        size: 10,
                                       ),
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: room.encryptionEnabled,
-                                  child: Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.thumbnailSizeMax,
-                                      ),
-                                      child: Container(
-                                        height: 16,
-                                        width: 16,
-                                        color: Colors.green,
-                                        child: Icon(
-                                          Icons.lock,
-                                          color: Colors.white,
-                                          size: 10,
-                                        ),
+                              ),
+                              Visibility(
+                                visible: room.encryptionEnabled,
+                                child: Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.thumbnailSizeMax,
+                                    ),
+                                    child: Container(
+                                      height: 16,
+                                      width: 16,
+                                      color: Colors.green,
+                                      child: Icon(
+                                        Icons.lock,
+                                        color: Colors.white,
+                                        size: 10,
                                       ),
                                     ),
                                   ),
                                 ),
-                              ]),
-                              title: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
+                              ),
+                            ],
+                          ),
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  room.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    formatRoomName(room: room),
-                                    overflow: TextOverflow.ellipsis,
-                                    style:
-                                        Theme.of(context).textTheme.subtitle1,
+                                    formattedUserTotal.format(
+                                      room.totalJoinedUsers,
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: Dimensions.textSizeTiny,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.person,
+                                    size: 20,
                                   ),
                                 ],
                               ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          formattedUserTotal.format(
-                                            room.totalJoinedUsers,
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                          ),
+                              IconButton(
+                                padding: EdgeInsets.only(
+                                  left: 8,
+                                  top: 8,
+                                  bottom: 8,
+                                ),
+                                icon: Icon(
+                                  Icons.add_circle,
+                                  color: Colors.greenAccent,
+                                ),
+                                iconSize: Dimensions.iconSize,
+                                onPressed: () async {
+                                  await props.onJoin(room: room);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        collapsed: Container(
+                          padding: Dimensions.listPadding,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  formatPreviewTopic(room.topic),
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        expanded: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                room.topic ?? 'No Topic Available',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                            Container(
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                room.name,
+                                textAlign: TextAlign.start,
+                                softWrap: true,
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 4),
+                                          child: !room.encryptionEnabled
+                                              ? Icon(
+                                                  Icons.lock_open,
+                                                  size:
+                                                      Dimensions.iconSizeLarge,
+                                                  color: Colors.redAccent,
+                                                )
+                                              : Icon(
+                                                  Icons.lock,
+                                                  size:
+                                                      Dimensions.iconSizeLarge,
+                                                  color: Colors.greenAccent,
+                                                ),
                                         ),
-                                        Icon(
-                                          Icons.person,
-                                          size: 20,
-                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            'Encryption',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption,
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.add_circle,
-                                      color: Colors.greenAccent,
-                                      size: Dimensions.iconSize,
+                                  Expanded(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 4,
+                                          ),
+                                          child: Text(
+                                            localUserTotal
+                                                .format(room.totalJoinedUsers),
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            'Total Users',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption,
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    iconSize: Dimensions.iconSize,
-                                    onPressed: () async {
-                                      await props.onJoin(room: room);
-                                      Navigator.pop(context);
-                                    },
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                          collapsed: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    formatPreviewTopic(room.topic),
-                                    softWrap: true,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          expanded: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: Text(
-                                  room.topic ?? 'No Topic Available',
-                                  style: Theme.of(context).textTheme.caption,
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: Text(
-                                  room.name,
-                                  textAlign: TextAlign.start,
-                                  softWrap: true,
-                                  style: Theme.of(context).textTheme.caption,
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 4,
-                                            ),
-                                            child: !room.encryptionEnabled
-                                                ? Icon(
-                                                    Icons.lock_open,
-                                                    size: 24.0,
-                                                    color: Colors.redAccent,
-                                                  )
-                                                : Icon(
-                                                    Icons.lock,
-                                                    size: 24.0,
-                                                    color: Colors.greenAccent,
-                                                  ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.only(top: 4),
-                                            child: Text(
-                                              'Encryption',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .caption,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 4,
-                                            ),
-                                            child: Text(
-                                              localUserTotal.format(
-                                                  room.totalJoinedUsers),
-                                              style: TextStyle(
-                                                fontSize: 24,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.only(top: 4),
-                                            child: Text(
-                                              'Total Users',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .caption,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    child: Visibility(
-                      visible: props.loading,
-                      child: Container(
-                          margin: EdgeInsets.only(top: height * 0.02),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RefreshProgressIndicator(
-                                strokeWidth: Dimensions.defaultStrokeWidth,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor,
-                                ),
-                                value: null,
+                      ),
+                    );
+                  },
+                ),
+                Positioned(
+                  child: Visibility(
+                    visible: props.loading,
+                    child: Container(
+                        margin: EdgeInsets.only(top: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            RefreshProgressIndicator(
+                              strokeWidth: Dimensions.defaultStrokeWidth,
+                              valueColor: new AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).primaryColor,
                               ),
-                            ],
-                          )),
-                    ),
+                              value: null,
+                            ),
+                          ],
+                        )),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       );
 }
 

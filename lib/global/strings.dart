@@ -1,10 +1,10 @@
+// Project imports:
 import 'package:syphon/global/values.dart';
 
 /**
  * Will be converted to
  * i18n json soon, but a "String" 
- * class below is just a stub for this
- * for now
+ * class below is just a stub for now
  */
 class Strings {
   // Titles
@@ -16,13 +16,28 @@ class Strings {
   static const titleViewSignup = 'Signup';
   static const titleViewDevices = 'Devices';
   static const titleViewSettings = 'Settings';
+  static const titleChatPreferences = 'Chat Preferences';
+  static const titleThemeing = 'Theming';
+  static const titlePrivacy = 'Privacy';
   static const titleHomeserverSearch = 'Find Your Homeserver';
+  static const titleProfile = 'Set up Your Profile';
+  static const titleSettings = 'Settings';
+  static const titleAdvanced = 'Advanced';
+  static const titleInvite = 'Invite';
+  static const titleSearchGroups = 'Explore Groups';
+  static const titleSearchUsers = 'Search Users';
+  static const titleInviteusers = 'Invite Users';
+  static const titleRoomUsers = 'All Room Users';
+  static const titleCreateGroup = 'Create A Group Chat';
+  static const titleCreateGroupPublic = 'Create A Public Group';
+
+  // Dialog Titles
+  static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
   static const titleDialogTerms = "Confirm Terms Of Service";
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
-  static const titleProfile = 'Set up Your Profile';
 
   // Subtitles
   static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
@@ -31,24 +46,39 @@ class Strings {
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSearchForUsers = 'Search for a user...';
+  static const labelSearchedUsers = 'Matched Users';
+  static const labelUsersSection = 'Users';
+  static const labelRecentUsers = 'Recent Users';
   static const labelRoomNameDefault = 'New Chat';
+  static const labelNoMessages = 'no messages found';
 
   // Buttons
   static const buttonLogin = 'login';
-  static const buttonTextLogin = 'Login';
   static const buttonSaveGeneric = 'save';
-
-  static const buttonIntroExistQuestion = 'Already have a username?';
-  static const buttonIntroExistAction = 'Login';
-
-  static const buttonLoginCreateQuestion = 'Don\'t have a username?';
-  static const buttonLoginCreateAction = 'Create One';
-
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';
+  static const buttonCreate = 'create';
   static const buttonCancel = 'cancel';
+  static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+
+  // Text Buttons
+  static const buttonTextSeeAllUsers = 'See All Users';
+  static const buttonIntroExistQuestion = 'Already have a username?';
+  static const buttonIntroExistAction = 'Login';
+  static const buttonLoginCreateQuestion = 'Don\'t have a username?';
+  static const buttonLoginCreateAction = 'Create One';
+  static const buttonTextLogin = 'Login';
+
+  // Errors
+  static const alertInviteUnknownUser =
+      'This user doens\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
+  static const alertFeatureInProgress = '🛠 This feature is coming soon';
+  static const errorMessageSendingFailed = 'Message Failed To Send';
+  static const errorCheckHomeserver =
+      'This server failed the \'well-known\' check, make sure the server is configured correctly';
 
   // intro
   static const contentIntroFirstPartOne =
@@ -83,6 +113,9 @@ class Strings {
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
 
   // Confirmations
+  static const confirmationInvite =
+      'Are you sure you want to invite the following user to the following room?';
+
   static const confirmationStartChat = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +
@@ -115,6 +148,9 @@ class Strings {
   static const confirmationEncryption =
       'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this chat?';
 
+  static const confirmationGroupEncryption =
+      'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this group chat?\n\nPlease be aware Group E2EE is still a work in progress. You may lose message data!';
+
   // Placeholders
   static const placeholderInputMatrixUnencrypted =
       'Matrix message (unencrypted)';
@@ -130,6 +166,7 @@ class Strings {
   static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 
   // Accessibility
+  static const semanticsSendUnencrypted = 'Send unencrypted message';
   static const semanticsIntroFinal =
       'Two people different feeling confident and lookin\' good';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';

@@ -1,24 +1,30 @@
+// Dart imports:
 import 'dart:io';
 
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:equatable/equatable.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+
+// Package imports:
+import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/selectors.dart';
-
-import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
+
+// Project imports:
 import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key key}) : super(key: key);
@@ -30,20 +36,18 @@ class ProfileView extends StatefulWidget {
 class ProfileViewState extends State<ProfileView> {
   ProfileViewState({Key key}) : super();
 
-  File newAvatarFile;
-  String newDisplayName;
-  String newUserId;
+  File avatarFileNew;
+
+  String userIdNew;
+  String displayNameNew;
   final displayNameController = TextEditingController();
   final userIdController = TextEditingController();
   final String title = Strings.titleProfile;
 
   @override
-  void initState() {
-    super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
@@ -68,105 +72,16 @@ class ProfileViewState extends State<ProfileView> {
   }
 
   @protected
-  onShowBottomSheet(
-    context,
-  ) async {
+  onShowImageOptions(context) async {
     await showModalBottomSheet(
-      backgroundColor: Colors.transparent,
       context: context,
-      builder: (BuildContext context) => Container(
-        height: 250,
-        padding: EdgeInsets.symmetric(
-          vertical: 12,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: 24,
-              ),
-              child: Text(
-                'Photo Select Method',
-                textAlign: TextAlign.start,
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                final File image = await ImagePicker.pickImage(
-                  source: ImageSource.camera,
-                  maxWidth: Dimensions.avatarSizeMax,
-                  maxHeight: Dimensions.avatarSizeMax,
-                );
-
-                this.setState(() {
-                  newAvatarFile = image;
-                });
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.camera_alt,
-                  size: 30,
-                ),
-              ),
-              title: Text(
-                'Take Photo',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                final File image = await ImagePicker.pickImage(
-                  maxWidth: Dimensions.avatarSizeMax,
-                  maxHeight: Dimensions.avatarSizeMax,
-                  source: ImageSource.gallery,
-                );
-                this.setState(() {
-                  newAvatarFile = image;
-                });
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.photo_library,
-                  size: 28,
-                ),
-              ),
-              title: Text(
-                'Pick from gallery',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.delete_forever,
-                  size: 34,
-                ),
-              ),
-              title: Text(
-                'Remove photo',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-          ],
-        ),
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) => ModalImageOptions(
+        onSetNewAvatar: ({File image}) {
+          this.setState(() {
+            avatarFileNew = image;
+          });
+        },
       ),
     );
   }
@@ -180,40 +95,36 @@ class ProfileViewState extends State<ProfileView> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final double imageSize = width * 0.28;
-        final currentAvatar = props.user.avatarUri;
+        final double imageSize = Dimensions.avatarSizeDetails;
 
         // Space for confirming rebuilding
-        dynamic avatarWidget = CircleAvatar(
-          backgroundColor: Colors.grey,
-          child: Text(
-            displayInitials(props.user),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32.0,
-            ),
-          ),
+        Widget avatarWidget = AvatarCircle(
+          uri: props.user.avatarUri,
+          alt: formatUsername(props.user),
+          size: imageSize,
+          background: Colours.hashedColor(formatUsername(props.user)),
         );
 
-        if (this.newAvatarFile != null) {
+        if (this.avatarFileNew != null) {
           avatarWidget = ClipRRect(
             borderRadius: BorderRadius.circular(imageSize),
             child: Image.file(
-              this.newAvatarFile ?? props.user.avatarUri,
+              this.avatarFileNew ?? props.user.avatarUri,
               width: imageSize,
               height: imageSize,
+              fit: BoxFit.cover,
             ),
           );
-        } else if (currentAvatar != null) {
-          avatarWidget = ClipRRect(
-            borderRadius: BorderRadius.circular(imageSize),
-            child: MatrixImage(
-              fit: BoxFit.fill,
-              mxcUri: props.user.avatarUri,
-              width: imageSize,
-              height: imageSize,
-            ),
-          );
+        }
+
+        var backgroundColor = Colors.grey[500];
+        switch (props.theme) {
+          case ThemeType.LIGHT:
+            backgroundColor = Colors.grey[200];
+            break;
+          default:
+            backgroundColor = Colors.grey[700];
+            break;
         }
 
         return Scaffold(
@@ -235,7 +146,7 @@ class ProfileViewState extends State<ProfileView> {
             child: SingleChildScrollView(
               // eventually expand as profile grows
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.075),
+                padding: Dimensions.appPaddingHorizontal,
                 constraints: BoxConstraints(
                   maxHeight: height * 0.9,
                   maxWidth: width,
@@ -257,7 +168,7 @@ class ProfileViewState extends State<ProfileView> {
                                 width: imageSize,
                                 height: imageSize,
                                 child: GestureDetector(
-                                  onTap: () => onShowBottomSheet(context),
+                                  onTap: () => onShowImageOptions(context),
                                   child: avatarWidget,
                                 ),
                               ),
@@ -265,12 +176,12 @@ class ProfileViewState extends State<ProfileView> {
                                 right: 6,
                                 bottom: 2,
                                 child: Container(
-                                  width: width * 0.08,
-                                  height: width * 0.08,
+                                  width: Dimensions.iconSizeLarge,
+                                  height: Dimensions.iconSizeLarge,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: backgroundColor,
                                     borderRadius: BorderRadius.circular(
-                                      width * 0.08,
+                                      Dimensions.iconSizeLarge,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
@@ -281,11 +192,8 @@ class ProfileViewState extends State<ProfileView> {
                                   ),
                                   child: Icon(
                                     Icons.camera_alt,
-                                    color: Theme.of(context).brightness !=
-                                            Brightness.light
-                                        ? Colors.grey[200]
-                                        : Colors.grey[600],
-                                    size: width * 0.06,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: Dimensions.iconSizeLite,
                                   ),
                                 ),
                               ),
@@ -295,103 +203,99 @@ class ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     Flexible(
-                        flex: 2,
-                        fit: FlexFit.loose,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
+                      flex: 2,
+                      fit: FlexFit.loose,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.all(8.0),
+                                constraints: BoxConstraints(
+                                  maxHeight: Dimensions.inputHeight,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  label: 'Display Name',
+                                  onChanged: (name) {
+                                    this.setState(() {
+                                      displayNameNew = name;
+                                    });
+                                  },
+                                  controller: displayNameController,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.all(8.0),
+                                constraints: BoxConstraints(
+                                  maxHeight: Dimensions.inputHeight,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  disabled: true,
+                                  onChanged: null,
+                                  label: 'User ID',
+                                  controller: userIdController,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(bottom: 24),
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Container(
                                   margin: const EdgeInsets.all(8.0),
-                                  constraints: BoxConstraints(
-                                    maxHeight: Dimensions.inputHeight,
-                                    maxWidth: Dimensions.inputWidthMax,
-                                  ),
-                                  child: TextField(
-                                    onTap: () {},
-                                    onChanged: (name) {
-                                      this.setState(() {
-                                        newDisplayName = name;
-                                      });
+                                  child: ButtonSolid(
+                                    text: Strings.buttonSaveGeneric,
+                                    loading: props.loading,
+                                    disabled: props.loading,
+                                    onPressed: () async {
+                                      final bool successful =
+                                          await props.onSaveProfile(
+                                        userIdNew: null,
+                                        avatarFileNew: this.avatarFileNew,
+                                        displayNameNew: this.displayNameNew,
+                                      );
+                                      if (successful) {
+                                        Navigator.pop(context);
+                                      }
                                     },
-                                    controller: displayNameController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Display Name',
-                                    ),
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.all(8.0),
+                                  height: Dimensions.inputHeight,
+                                  margin: const EdgeInsets.all(10.0),
                                   constraints: BoxConstraints(
-                                    maxHeight: Dimensions.inputHeight,
-                                    maxWidth: Dimensions.inputWidthMax,
+                                    minWidth: Dimensions.buttonWidthMin,
+                                    minHeight: Dimensions.buttonHeightMin,
                                   ),
-                                  child: TextField(
-                                    enabled: false,
-                                    onChanged: null,
-                                    controller: userIdController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'User ID',
+                                  child: Visibility(
+                                    child: TouchableOpacity(
+                                      activeOpacity: 0.4,
+                                      onTap: () => Navigator.pop(context),
+                                      child: Text(
+                                        'quit editing',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w100,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: EdgeInsets.only(bottom: 24),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    margin: const EdgeInsets.all(8.0),
-                                    child: ButtonSolid(
-                                      text: Strings.buttonSaveGeneric,
-                                      loading: props.loading,
-                                      disabled: props.loading,
-                                      onPressed: () async {
-                                        final bool successful =
-                                            await props.onSaveProfile(
-                                          newUserId: null,
-                                          newAvatarFile: this.newAvatarFile,
-                                          newDisplayName: this.newDisplayName,
-                                        );
-                                        if (successful) {
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: Dimensions.inputHeight,
-                                    margin: const EdgeInsets.all(10.0),
-                                    constraints: BoxConstraints(
-                                        minWidth: 200, minHeight: 45),
-                                    child: Visibility(
-                                      child: TouchableOpacity(
-                                        activeOpacity: 0.4,
-                                        onTap: () => Navigator.pop(context),
-                                        child: Text(
-                                          'quit editing',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w100,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -406,40 +310,43 @@ class ProfileViewState extends State<ProfileView> {
 class _Props extends Equatable {
   final User user;
   final bool loading;
+  final ThemeType theme;
   final Function onSaveProfile;
 
   _Props({
     @required this.user,
+    @required this.theme,
     @required this.loading,
     @required this.onSaveProfile,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
+        theme: store.state.settingsStore.theme,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
-          File newAvatarFile,
-          String newUserId,
-          String newDisplayName,
+          File avatarFileNew,
+          String userIdNew,
+          String displayNameNew,
         }) async {
           final currentUser = store.state.authStore.user;
 
-          if (newDisplayName != null &&
-              currentUser.displayName != newDisplayName) {
+          if (displayNameNew != null &&
+              currentUser.displayName != displayNameNew) {
             final bool successful = await store.dispatch(
-              updateDisplayName(newDisplayName),
+              updateDisplayName(displayNameNew),
             );
             if (!successful) return false;
           }
 
-          if (newAvatarFile != null) {
+          if (avatarFileNew != null) {
             final bool successful = await store.dispatch(
-              updateAvatarPhoto(localFile: newAvatarFile),
+              updateAvatar(localFile: avatarFileNew),
             );
             if (!successful) return false;
           }
 
-          await store.dispatch(fetchUserProfile());
+          await store.dispatch(fetchUserCurrentProfile());
           return true;
         },
       );

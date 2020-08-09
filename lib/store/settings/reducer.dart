@@ -1,8 +1,7 @@
-import 'package:syphon/store/settings/chat-settings/actions.dart';
+// Project imports:
 import 'package:syphon/store/settings/chat-settings/model.dart';
-
-import './state.dart';
 import './actions.dart';
+import './state.dart';
 
 SettingsStore settingsReducer(
     [SettingsStore state = const SettingsStore(), dynamic action]) {
@@ -15,6 +14,26 @@ SettingsStore settingsReducer(
       return state.copyWith(
         primaryColor: action.color,
       );
+    case SetAccentColor:
+      return state.copyWith(
+        accentColor: action.color,
+      );
+    case SetAppBarColor:
+      return state.copyWith(
+        appBarColor: action.color,
+      );
+    case SetFontName:
+      return state.copyWith(
+        fontName: action.fontName,
+      );
+    case SetFontSize:
+      return state.copyWith(
+        fontSize: action.fontSize,
+      );
+    case SetAppBarColor:
+      return state.copyWith(
+        appBarColor: action.color,
+      );
     case SetDevices:
       return state.copyWith(
         devices: action.devices,
@@ -23,7 +42,7 @@ SettingsStore settingsReducer(
       return state.copyWith(
         pusherToken: action.token,
       );
-    case SetAppAgreement:
+    case LogAppAgreement:
       return state.copyWith(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );
@@ -41,10 +60,6 @@ SettingsStore settingsReducer(
       );
       return state.copyWith(
         customChatSettings: chatSettings,
-      );
-    case SetAccentColor:
-      return state.copyWith(
-        accentColor: action.color,
       );
     case SetLanguage:
       return state.copyWith(
@@ -69,6 +84,10 @@ SettingsStore settingsReducer(
     case ToggleMembershipEvents:
       return state.copyWith(
         membershipEventsEnabled: !state.membershipEventsEnabled,
+      );
+    case ToggleRoomTypeBadges:
+      return state.copyWith(
+        roomTypeBadgesEnabled: !(state.roomTypeBadgesEnabled ?? true),
       );
     case ToggleNotifications:
       return state.copyWith(

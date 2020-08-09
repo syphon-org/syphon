@@ -1,7 +1,12 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:convert';
-import 'package:syphon/global/libs/matrix/encryption.dart';
+
+// Package imports:
 import 'package:http/http.dart' as http;
+
+// Project imports:
+import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 
 abstract class Events {
