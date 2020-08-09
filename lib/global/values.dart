@@ -17,6 +17,7 @@ class Values {
       '${appName}_background_notification';
   static const default_channel_title = '$appName';
 
+  static const channel_group_key = 'Messages';
   static const channel_name_messages = 'Messages';
   static const channel_name_background_service = 'Background Sync';
   static const channel_description =

@@ -160,6 +160,7 @@ Future showMessageNotification({
     Values.channel_id,
     Values.channel_name_messages,
     Values.channel_description,
+    groupKey: Values.channel_group_key,
     priority: Priority.High,
     importance: Importance.Default,
     visibility: NotificationVisibility.Private,

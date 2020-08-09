@@ -483,8 +483,12 @@ ThunkAction<AppState> claimOneTimeKeys({
       final currentUser = store.state.authStore.user;
 
       final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
-          .map((user) => deviceKeys[user.userId].values)
+          .map((user) => (deviceKeys[user.userId] ?? {}).values)
           .expand((x) => x));
+
+      debugPrint(
+        '[claimOneTimeKeys] deviceKeys ${roomDeviceKeys}',
+      );
 
       // Create a map of all the oneTimeKeys to claim
       final claimKeysPayload =

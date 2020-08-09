@@ -125,7 +125,7 @@ class HomeViewState extends State<Home> {
         Visibility(
           visible: true,
           child: IconButton(
-            icon: Icon(Icons.do_not_disturb_alt),
+            icon: Icon(Icons.exit_to_app),
             iconSize: Dimensions.buttonAppBarSize,
             tooltip: 'Leave Chat',
             color: Colors.white,

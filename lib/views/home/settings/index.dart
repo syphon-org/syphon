@@ -55,7 +55,6 @@ class SettingsScreen extends StatelessWidget {
               child: IgnorePointer(
                 ignoring: props.authLoading,
                 child: Container(
-                  padding: Dimensions.appPaddingHorizontal,
                   child: Column(
                     children: <Widget>[
                       InkWell(

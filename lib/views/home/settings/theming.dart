@@ -267,9 +267,9 @@ class Props extends Equatable {
             .toString()
             .split('.')[1]
             .toLowerCase(),
-        language: store.state.settingsStore.language,
-        fontName: store.state.settingsStore.fontName,
-        fontSize: store.state.settingsStore.fontSize,
+        language: store.state.settingsStore.language ?? 'English',
+        fontName: store.state.settingsStore.fontName ?? 'Rubik',
+        fontSize: store.state.settingsStore.fontSize ?? 'Default',
         roomTypeBadgesEnabled:
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         onToggleRoomTypeBadges: () => store.dispatch(

@@ -21,7 +21,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/sync/services.dart';
+import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 

@@ -13,10 +13,12 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 final String debug = DotEnv().env['DEBUG'];
@@ -24,9 +26,19 @@ final String debug = DotEnv().env['DEBUG'];
 class NotificationSettingsView extends StatelessWidget {
   NotificationSettingsView({Key key}) : super(key: key);
 
+  @protected
+  void onToggleNotifications(_Props props) async {
+    final enabledPreviously = props.localNotificationsEnabled;
+    await props.onToggleLocalNotifications();
+    if (enabledPreviously) {
+      BackgroundSync.stop();
+      dismissAllNotifications(pluginInstance: globalNotificationPluginInstance);
+    }
+  }
+
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
-        converter: (Store<AppState> store) => Props.mapStateToProps(store),
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
@@ -89,14 +101,14 @@ class NotificationSettingsView extends StatelessWidget {
                       contentPadding: Dimensions.listPadding,
                       title: Text(
                         'Notifications',
-                        style: TextStyle(fontSize: 18.0),
+                        style: Theme.of(context).textTheme.bodyText2,
                       ),
                       trailing: Container(
                         child: Switch(
                           value: props.localNotificationsEnabled,
                           onChanged: !Platform.isAndroid
                               ? null
-                              : (value) => props.onToggleLocalNotifications(),
+                              : (value) => onToggleNotifications(props),
                         ),
                       ),
                     ),
@@ -169,7 +181,7 @@ class NotificationSettingsView extends StatelessWidget {
       );
 }
 
-class Props extends Equatable {
+class _Props extends Equatable {
   final bool httpPusherEnabled;
   final bool localNotificationsEnabled;
   final bool remoteNotificationsEnabled;
@@ -178,7 +190,7 @@ class Props extends Equatable {
   final Function onToggleRemoteNotifications;
   final Function onTogglePusher;
 
-  Props({
+  _Props({
     @required this.localNotificationsEnabled,
     @required this.remoteNotificationsEnabled,
     @required this.httpPusherEnabled,
@@ -194,10 +206,10 @@ class Props extends Equatable {
         httpPusherEnabled,
       ];
 
-  static Props mapStateToProps(
+  static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
-      Props(
+      _Props(
         localNotificationsEnabled: Platform.isAndroid &&
             store.state.settingsStore.notificationsEnabled,
         remoteNotificationsEnabled:
@@ -205,7 +217,7 @@ class Props extends Equatable {
         httpPusherEnabled:
             store.state.settingsStore.notificationSettings != null,
         onToggleLocalNotifications: () {
-          store.dispatch(toggleNotifications());
+          return store.dispatch(toggleNotifications());
         },
         onToggleRemoteNotifications: (BuildContext context) {
           try {
