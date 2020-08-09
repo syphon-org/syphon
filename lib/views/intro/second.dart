@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
 // Assets
@@ -19,7 +20,10 @@ class SecondSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    final widthScale = width * 0.825;
+    double height = MediaQuery.of(context).size.height;
+
+    final widthScale = width * 0.8;
+    final heightScale = height / 2.5;
 
     return Center(
         child: Column(
@@ -28,19 +32,19 @@ class SecondSection extends StatelessWidget {
         Container(
           width: widthScale,
           constraints: BoxConstraints(
-            maxHeight: 256,
-            maxWidth: 320,
+            maxWidth: widthScale,
+            maxHeight: heightScale,
           ),
           child: SvgPicture.asset(
             Assets.heroIntroConnection,
-            semanticsLabel: 'Two people messaging privately but leisurely',
+            semanticsLabel: Strings.semanticsPrivateMessage,
           ),
         ),
-        Container(
-          height: 88,
+        Flexible(
+          flex: 0,
           child: Flex(
             direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               RichText(
                 textAlign: TextAlign.center,

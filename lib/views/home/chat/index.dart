@@ -136,6 +136,7 @@ class ChatViewState extends State<ChatView> {
         fetchDeviceKeys(users: props.room.users),
       );
 
+      print(usersDeviceKeys)
       store.dispatch(setDeviceKeys(usersDeviceKeys));
     }
 
@@ -306,6 +307,7 @@ class ChatViewState extends State<ChatView> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         roomId: arguements.roomId,

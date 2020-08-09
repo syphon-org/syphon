@@ -78,6 +78,7 @@ class SearchUserState extends State<SearchUserView> {
   }) async {
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         user: user,

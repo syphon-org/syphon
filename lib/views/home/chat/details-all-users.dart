@@ -78,6 +78,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
   }) async {
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         roomId: roomId,

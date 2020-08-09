@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -110,12 +111,22 @@ class CreateGroupPublicState extends State<CreateGroupView> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
+          var backgroundColor = Colors.grey[500];
+          switch (props.theme) {
+            case ThemeType.LIGHT:
+              backgroundColor = Colors.grey[200];
+              break;
+            default:
+              backgroundColor = Colors.grey[700];
+              break;
+          }
+
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
-            backgroundColor: Colors.grey,
+            backgroundColor: backgroundColor,
             child: Icon(
               Icons.group,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).iconTheme.color,
               size: Dimensions.avatarSizeDetails / 1.4,
             ),
           );
@@ -221,22 +232,24 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                                   height:
                                                       Dimensions.iconSizeLarge,
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey,
+                                                    color: backgroundColor,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                       Dimensions.iconSizeLarge,
                                                     ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                          blurRadius: 6,
-                                                          offset: Offset(0, 0),
-                                                          color: Colors.black54)
+                                                        blurRadius: 6,
+                                                        offset: Offset(0, 0),
+                                                        color: Colors.black54,
+                                                      )
                                                     ],
                                                   ),
                                                   child: Icon(
                                                     Icons.camera_alt,
                                                     color: Theme.of(context)
-                                                        .indicatorColor,
+                                                        .iconTheme
+                                                        .color,
                                                     size:
                                                         Dimensions.iconSizeLite,
                                                   ),
@@ -516,6 +529,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
 class _Props extends Equatable {
   final bool loading;
   final String homeserver;
+  final ThemeType theme;
   final List<User> users;
 
   final Function onCreateGroup;
@@ -523,6 +537,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.users,
+    @required this.theme,
     @required this.loading,
     @required this.homeserver,
     @required this.onCreateGroup,
@@ -532,6 +547,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         users,
+        theme,
         loading,
         homeserver,
       ];
@@ -539,6 +555,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
         loading: store.state.roomStore.loading,
+        theme: store.state.settingsStore.theme,
         homeserver: store.state.authStore.user.homeserverName,
         onClearUserInvites: () => store.dispatch(
           clearUserInvites(),

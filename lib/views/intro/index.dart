@@ -185,8 +185,8 @@ class IntroState extends State<Intro> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    final double widgetWidthScaling = width * 0.725;
 
     return Scaffold(
       appBar: AppBar(
@@ -204,11 +204,8 @@ class IntroState extends State<Intro> {
               flex: 6,
               fit: FlexFit.tight,
               child: Container(
-                height: widgetWidthScaling,
                 constraints: BoxConstraints(
-                  minWidth: 125,
-                  minHeight: 345,
-                  maxHeight: 400,
+                  minWidth: Dimensions.mediaSizeMin,
                 ),
                 child: PageView(
                   pageSnapping: true,

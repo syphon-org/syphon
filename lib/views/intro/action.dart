@@ -17,38 +17,45 @@ class ActionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     final widthScale = width * 0.8;
+    final heightScale = height / 2.5;
 
     return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Container(
-          width: widthScale,
-          constraints: BoxConstraints(
-            maxHeight: 256,
-            maxWidth: 320,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(bottom: 16),
+            constraints: BoxConstraints(
+              maxWidth: widthScale,
+              maxHeight: heightScale,
+            ),
+            child: SvgPicture.asset(
+              Assets.heroIntroPeople,
+              semanticsLabel: Strings.semanticsIntroFinal,
+            ),
           ),
-          child: SvgPicture.asset(
-            Assets.heroIntroPeople,
-            semanticsLabel: Strings.semanticsIntroFinal,
+          Flexible(
+            flex: 0,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: width * 0.98,
+                  child: Text(
+                    Strings.contentIntroFinal,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        Container(
-          height: 88,
-          child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                Strings.contentIntroFinal,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ],
-          ),
-        )
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
