@@ -136,6 +136,7 @@ class ChatViewState extends State<ChatView> {
         fetchDeviceKeys(users: props.room.users),
       );
 
+      print(usersDeviceKeys)
       store.dispatch(setDeviceKeys(usersDeviceKeys));
     }
 

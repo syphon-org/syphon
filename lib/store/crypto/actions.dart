@@ -152,7 +152,9 @@ ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
   };
 }
 
-ThunkAction<AppState> setOneTimeKeysClaimed(Map oneTimeKeys) {
+ThunkAction<AppState> setOneTimeKeysClaimed(
+  Map<String, OneTimeKey> oneTimeKeys,
+) {
   return (Store<AppState> store) {
     store.dispatch(SetOneTimeKeysClaimed(oneTimeKeys: oneTimeKeys));
   };
@@ -567,7 +569,6 @@ ThunkAction<AppState> claimOneTimeKeys({
       await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
       return true;
     } catch (error) {
-      debugPrint(error);
       store.dispatch(
         addAlert(
           type: 'warning',
@@ -973,9 +974,7 @@ ThunkAction<AppState> exportMessageSession({String roomId}) {
  * fetches the keys uploaded to the matrix homeserver
  * by other users
  */
-ThunkAction<AppState> fetchDeviceKeys({
-  Map<String, User> users,
-}) {
+ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
   return (Store<AppState> store) async {
     try {
       final userMap = users.map((userId, user) => MapEntry(userId, const []));
@@ -994,6 +993,8 @@ ThunkAction<AppState> fetchDeviceKeys({
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
           final deviceKey = DeviceKey.fromJson(device);
+          print('[fetchDeviceKeys] ${userId} device ${deviceKey.deviceId}');
+
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
           }
