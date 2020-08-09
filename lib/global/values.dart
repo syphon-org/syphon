@@ -7,7 +7,7 @@ class Values {
   static const appName = 'Syphon';
   static const appNameLabel = 'syphon';
   static const appNameLong = 'Syphon Messenger';
-  static const appDisplayName = 'Syphon Client';
+  static const appDisplayName = 'Syphon';
 
   static const defaultLanguage = 'en-US';
 
@@ -39,11 +39,26 @@ class Values {
 
   static const homeserverDefault = 'matrix.org';
 
-  static const animationDurationDefault = 350; // millis
-
   // hello darkness, my old friend
   static const emailRegex =
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 
   static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
+
+  // Animations
+  static const animationDurationDefault = 350; // millis
+  static const animationDurationDefaultFast = 275;
+
+  static const fontFamilies = [
+    'Rubik',
+    "Roboto",
+    "Poppins",
+    "Inter",
+  ];
+
+  static const fontSizes = [
+    'Small',
+    'Default',
+    "Large",
+  ];
 }

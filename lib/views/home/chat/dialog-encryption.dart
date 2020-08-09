@@ -1,14 +1,19 @@
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
 
-class DialogEncryption extends StatelessWidget {
-  final Function onAccept;
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 
+class DialogEncryption extends StatelessWidget {
   DialogEncryption({
     Key key,
+    this.content = Strings.confirmationEncryption,
     this.onAccept,
   }) : super(key: key);
+
+  final String content;
+  final Function onAccept;
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +21,14 @@ class DialogEncryption extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: const Text('Encrypt chat?'),
+      title: Text(
+        Strings.titleDialogEncryption,
+      ),
       contentPadding: Dimensions.dialogPadding,
       children: <Widget>[
         Container(
           child: Text(
-            Strings.confirmationEncryption,
+            content,
             textAlign: TextAlign.left,
           ),
           padding: Dimensions.dialogContentPadding,

@@ -1,7 +1,8 @@
-import './events/model.dart';
+// Project imports:
 import './actions.dart';
-import './state.dart';
+import './events/model.dart';
 import './room/model.dart';
+import './state.dart';
 
 RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
   switch (action.runtimeType) {

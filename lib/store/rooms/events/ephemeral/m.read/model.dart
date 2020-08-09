@@ -1,4 +1,7 @@
+// Package imports:
 import 'package:hive/hive.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';

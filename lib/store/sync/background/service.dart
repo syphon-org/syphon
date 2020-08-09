@@ -1,10 +1,17 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
+
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/sync/services.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 /**
  * Background Sync Service (Android Only)

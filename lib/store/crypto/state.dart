@@ -1,9 +1,12 @@
-import 'package:hive/hive.dart';
+// Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
+import 'package:olm/olm.dart';
+
+// Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
-import 'package:olm/olm.dart';
 
 part 'state.g.dart';
 

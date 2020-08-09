@@ -1,32 +1,39 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/settings/state.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
+
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+
+// Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+
+// Project imports:
+import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/intro/index.dart';
+import 'package:syphon/views/navigation.dart';
 
 // Library Implimentations
-import 'package:syphon/global/libs/hive/index.dart';
 
 // Redux - State Managment - "store" - IMPORT ONLY ONCE
-import 'package:syphon/store/index.dart';
 
 // Navigation
-import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/intro/index.dart';
-import 'package:syphon/views/home/index.dart';
 
 // Styling
-import 'package:syphon/global/themes.dart';
-import 'package:redux/redux.dart';
 
 /**
  * DESKTOP ONLY
-import 'package:window_utils/window_utils.dart';
  */
 
 void _enablePlatformOverrideForDesktop() {
@@ -119,7 +126,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @protected
   void onMounted() {
-    // init authenticated navigation
+    // init auth listener
     store.state.authStore.onAuthStateChanged.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
@@ -138,21 +145,27 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       var color;
 
       switch (alert.type) {
+        case 'error':
+          color = Colors.red;
+          break;
         case 'warning':
           color = Colors.red;
           break;
-        case 'error':
-          color = Colors.red;
+        case 'success':
+          color = Colors.green;
           break;
         case 'info':
         default:
           color = Colors.grey;
       }
 
+      final alertMessage =
+          alert.message ?? alert.error ?? 'Unknown Error Occured';
+
       globalScaffold.currentState.showSnackBar(SnackBar(
         backgroundColor: color,
         content: Text(
-          alert.message,
+          alertMessage,
           style: Theme.of(context)
               .textTheme
               .subtitle1
@@ -208,12 +221,15 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           builder: (context, settings) => MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
-              themeType: settings.theme,
               primaryColorHex: settings.primaryColor,
               accentColorHex: settings.accentColor,
+              appBarColorHex: settings.appBarColor,
+              fontName: settings.fontName,
+              fontSize: settings.fontSize,
+              themeType: settings.theme,
             ),
             navigatorKey: NavigationService.navigatorKey,
-            routes: NavigationProvider.getRoutes(store),
+            routes: NavigationProvider.getRoutes(),
             home: defaultHome,
             builder: (context, child) => Scaffold(
               body: child,

@@ -1,19 +1,23 @@
-import 'dart:convert';
+// Dart imports:
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/store/index.dart';
+import 'package:syphon/global/libs/jack/index.dart';
 
-import 'package:syphon/global/libs/hello-matrix/index.dart';
+// Project imports:
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -23,6 +27,12 @@ class SetLoading {
   final bool loading;
 
   SetLoading({this.loading});
+}
+
+class SetSearchText {
+  final String text;
+
+  SetSearchText({this.text});
 }
 
 class SetHomeservers {
@@ -74,7 +84,9 @@ Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
             favicon.attributes['href']
                 .replaceAll('...', '')
                 .replaceAll('//', '/');
-  } catch (error) {}
+  } catch (error) {
+    /** noop */
+  }
   return icon;
 }
 
@@ -82,34 +94,41 @@ ThunkAction<AppState> fetchHomeserverIcons() {
   return (Store<AppState> store) async {
     final homeservers = store.state.searchStore.homeservers;
 
-    homeservers.forEach((homeserver) async {
+    final faviconFetches = homeservers.map((homeserver) async {
       final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
 
-      if (iconUrl.length <= 0) {
-        return;
+      if (iconUrl.length <= 0) return homeserver;
+
+      try {
+        final response = await http.get(iconUrl);
+        if (response.statusCode != 200) return homeserver;
+      } catch (error) {
+        /** noop */
+        return homeserver;
       }
 
-      final response = await http.get(iconUrl);
-
-      if (response.statusCode != 200) {
-        return;
-      }
-
-      homeserver['favicon'] = iconUrl;
-      store.dispatch(UpdateHomeservers(homeservers: List.from(homeservers)));
+      final homeserverUpdated = Map.from(homeserver);
+      homeserverUpdated['favicon'] = iconUrl;
+      return homeserverUpdated;
     });
+
+    final homeserversIconized = await Future.wait(faviconFetches);
+
+    store.dispatch(UpdateHomeservers(
+      homeservers: List.from(homeserversIconized),
+    ));
   };
 }
 
 ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
-    final response = await http.get(HOMESERVER_SEARCH_SERVICE);
-    final List<dynamic> homeservers = await json.decode(response.body);
 
-    store.dispatch(SetHomeservers(homeservers: homeservers));
+    final List<dynamic> homeservers = await JackApi.fetchPublicServers();
+
+    await store.dispatch(SetHomeservers(homeservers: homeservers));
+    await store.dispatch(fetchHomeserverIcons());
     store.dispatch(SetLoading(loading: false));
-    store.dispatch(fetchHomeserverIcons());
   };
 }
 
@@ -125,6 +144,38 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
       searchText: searchText,
       searchResults: searchResults,
     ));
+  };
+}
+
+/** 
+ *  Search Rooms (Locally)
+ */
+ThunkAction<AppState> searchRooms({String searchText}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final rooms = store.state.roomStore.roomList;
+      List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
+
+      if (searchText.length != 0) {
+        searchResults = List.from(
+          rooms.where((room) {
+            final fulltext = room.name + room.alias + room.topic;
+            return fulltext.contains(searchText);
+          }),
+        );
+      }
+
+      store.dispatch(SetSearchResults(
+        searchText: searchText,
+        searchResults: searchResults,
+      ));
+    } catch (error) {
+      /**noop */
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
   };
 }
 
@@ -158,7 +209,7 @@ ThunkAction<AppState> searchPublicRooms({String searchText}) {
       ));
     } catch (error) {
       store.dispatch(
-        addAlert(type: 'warning', message: 'Failed to search rooms'),
+        addAlert(message: 'Failed to search rooms'),
       );
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -200,6 +251,12 @@ ThunkAction<AppState> searchUsers({String searchText}) {
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
+  };
+}
+
+ThunkAction<AppState> setSearchText({String text}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSearchText(text: text));
   };
 }
 

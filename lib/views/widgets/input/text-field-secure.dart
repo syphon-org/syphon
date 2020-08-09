@@ -1,7 +1,12 @@
-import 'package:flutter/services.dart';
-import 'package:syphon/global/dimensions.dart';
+// Flutter imports:
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+// Project imports:
+import 'package:syphon/global/dimensions.dart';
 
 /**
  * Secured Text Field Input
@@ -27,6 +32,7 @@ class TextFieldSecure extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onEditingComplete,
+    this.textInputAction,
   }) : super(key: key);
 
   final bool valid;
@@ -40,6 +46,7 @@ class TextFieldSecure extends StatelessWidget {
   final TextAlign textAlign;
 
   final FocusNode focusNode;
+  final TextInputAction textInputAction;
   final TextEditingController controller;
 
   final Function onChanged;
@@ -49,16 +56,21 @@ class TextFieldSecure extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         child: TextField(
+          enabled: !disabled,
           maxLines: maxLines,
           focusNode: focusNode,
           controller: controller,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
+          textInputAction: textInputAction,
           onEditingComplete: onEditingComplete,
           autocorrect: false,
           enableSuggestions: false,
+          selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
-              ? null
+              ? [
+                  BlacklistingTextInputFormatter(RegExp(r"\t")),
+                ]
               : [
                   BlacklistingTextInputFormatter(RegExp(r"\s")),
                   BlacklistingTextInputFormatter(RegExp(r"\t")),

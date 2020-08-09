@@ -1,7 +1,16 @@
+// Dart imports:
 import 'dart:math';
 
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+// Project imports:
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -13,9 +22,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -137,6 +143,18 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
   };
 }
 
+ThunkAction<AppState> clearDraft({Room room}) {
+  return (Store<AppState> store) async {
+    store.dispatch(UpdateRoom(
+      id: room.id,
+      draft: Message(
+        roomId: room.id,
+        body: null,
+      ),
+    ));
+  };
+}
+
 ThunkAction<AppState> saveDraft({
   final body,
   String type = 'm.text',
@@ -232,6 +250,98 @@ ThunkAction<AppState> sendTyping({
 }
 
 /**
+ * Send Session Encryption Keys
+ * 
+ * Specifically for sending encrypted keys using olm
+ * for later use with encrypted messages using megolm
+ * sent directly to devices within the room
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id454
+ * https://matrix.org/docs/spec/client_server/latest#id461
+ */
+ThunkAction<AppState> sendSessionKeys({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
+      // Create payload of megolm session keys for message decryption
+      final messageSession = await store.dispatch(
+        exportMessageSession(roomId: room.id),
+      );
+
+      final roomKeyEventContent = {
+        'algorithm': Algorithms.megolmv1,
+        'room_id': room.id,
+        'session_id': messageSession['session_id'],
+        'session_key': messageSession['session_key'],
+      };
+
+      // manage which devices to claim oneTimeKeys for
+      // here instead of within the function, because you'll
+      // need to cycle through those necessary devices here anyway
+      // for now, we're just sending the request to all the
+      // one time keys that were saved from this call
+      // global mutatable, this is real bad
+      await store.dispatch(claimOneTimeKeys(room: room));
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
+
+      // For each one time key claimed
+      // send a m.room_key event directly to each device
+
+      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+
+      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
+        try {
+          // find the identityKey for the device
+          final deviceKey = store.state.cryptoStore
+              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+          final identityKey = deviceKey.keys[keyId];
+
+          // Poorly decided to save key sessions by deviceId at first but then
+          // realised that you may have the same identityKey for diff
+          // devices and you also don't have the device id in the
+          // toDevice event payload -__-, convert back to identity key
+          final roomKeyEventContentEncrypted = await store.dispatch(
+            encryptKeyContent(
+              roomId: room.id,
+              identityKey: identityKey,
+              eventType: EventTypes.roomKey,
+              content: roomKeyEventContent,
+            ),
+          );
+
+          final response = await MatrixApi.sendEventToDevice(
+            protocol: protocol,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver,
+            userId: deviceKey.userId,
+            deviceId: deviceKey.deviceId,
+            eventType: EventTypes.encrypted,
+            content: roomKeyEventContentEncrypted,
+            trxId: trxId,
+          );
+
+          if (response['errcode'] != null) {
+            throw response['error'];
+          }
+        } catch (error) {
+          debugPrint('[sendSessionKeys] $error');
+        }
+      });
+
+      // await all sendToDevice room key events to be sent to users
+      await Future.wait(sendToDeviceRequests);
+    } catch (error) {
+      store.dispatch(addAlert(message: error, error: error));
+    }
+  };
+}
+
+/**
  * Send Encrypted Messages
  * 
  * Specifically for sending encrypted messages using megolm
@@ -280,14 +390,8 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint(error);
-      store.dispatch(
-        addAlert(
-          type: 'warning',
-          message: error,
-          origin: 'sendMessageEncrypted',
-        ),
-      );
+      store.dispatch(addAlert(
+          error: error, message: error, origin: 'sendMessageEncrypted'));
     }
   };
 }
