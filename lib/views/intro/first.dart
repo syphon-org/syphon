@@ -18,25 +18,27 @@ class FirstSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    final widthScale = width * 0.825;
+    double height = MediaQuery.of(context).size.height;
+
+    final widthScale = width * 0.8;
+    final heightScale = height / 2.5;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Container(
-            width: widthScale,
             constraints: BoxConstraints(
-              maxHeight: 256,
-              maxWidth: 320,
+              maxWidth: widthScale,
+              maxHeight: heightScale,
             ),
             child: SvgPicture.asset(
               Assets.heroIntroHiddenMessage,
               semanticsLabel: 'User hidding behind a message',
             ),
           ),
-          Container(
-            height: 88,
+          Flexible(
+            flex: 0,
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,

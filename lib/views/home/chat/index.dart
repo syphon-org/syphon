@@ -306,6 +306,7 @@ class ChatViewState extends State<ChatView> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         roomId: arguements.roomId,
