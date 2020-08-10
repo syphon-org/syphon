@@ -261,49 +261,49 @@ ThunkAction<AppState> saveSessionKey({
   };
 }
 
-// ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
-//   return (Store<AppState> store) async {
-//     try {
-//       // Extract the new events
-//       final List<dynamic> events = dataToDevice['events'];
+ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
+  return (Store<AppState> store) async {
+    try {
+      // Extract the new events
+      final List<dynamic> events = dataToDevice['events'];
 
-//       // Parse and decrypt necessary events
-//       for (final event in events) {
-//         final eventType = event['type'];
-//         final identityKeySender = event['content']['sender_key'];
+      // Parse and decrypt necessary events
+      for (final event in events) {
+        final eventType = event['type'];
+        final identityKeySender = event['content']['sender_key'];
 
-//         switch (eventType) {
-//           case EventTypes.encrypted:
-//             final eventDecrypted = await store.dispatch(
-//               decryptKeyEvent(event: event),
-//             );
+        switch (eventType) {
+          case EventTypes.encrypted:
+            final eventDecrypted = await store.dispatch(
+              decryptKeyEvent(event: event),
+            );
 
-//             if (EventTypes.roomKey == eventDecrypted['type']) {
-//               await store.dispatch(
-//                 saveSessionKey(
-//                   event: eventDecrypted,
-//                   identityKey: identityKeySender,
-//                 ),
-//               );
-//             }
-//             break;
-//           default:
-//             // TODO: handle other to device events
-//             break;
-//         }
-//       }
-//     } catch (error) {
-//       store.dispatch(addAlert(
-//         error: error,
-//         origin: 'syncDevice',
-//       ));
-//     }
-//   };
-// }
+            if (EventTypes.roomKey == eventDecrypted['type']) {
+              await store.dispatch(
+                saveSessionKey(
+                  event: eventDecrypted,
+                  identityKey: identityKeySender,
+                ),
+              );
+            }
+            break;
+          default:
+            // TODO: handle other to device events
+            break;
+        }
+      }
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        origin: 'syncDevice',
+      ));
+    }
+  };
+}
 
 ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
-    print('[syncDevice] $dataToDevice');
+    // print('[syncDevice] $dataToDevice');
 
     try {
       // Extract the new events
