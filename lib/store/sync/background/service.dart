@@ -174,7 +174,6 @@ FutureOr<dynamic> syncLoop({
               *TODO: Need to handle group / bigger room chats differently than direct chats
               */
       rawRooms.forEach((roomId, json) {
-        print('Sync Payload $json');
         // Filter through parsers
         final room = Room().fromSync(json: json, lastSince: lastSinceNew);
 

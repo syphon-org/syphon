@@ -375,7 +375,6 @@ class Room {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
-        // print('${event.type} ${event.content}');
         switch (event.type) {
           case 'm.room.name':
             if (namePriority > 0) {

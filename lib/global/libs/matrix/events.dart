@@ -252,11 +252,15 @@ abstract class Events {
       }
     };
 
+    print('[sendEventToDevice] ${userId} ${deviceId}');
+
     final response = await http.put(
       url,
       headers: headers,
       body: json.encode(body),
     );
+
+    print('[sendEventToDevice] ${response}');
 
     return await json.decode(response.body);
   }

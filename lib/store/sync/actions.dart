@@ -116,11 +116,11 @@ ThunkAction<AppState> startSyncObserver() {
 
         // still syncing
         if (store.state.syncStore.syncing) {
-          debugPrint('[Sync Observer] still syncing');
+          // debugPrint('[Sync Observer] still syncing');
           return;
         }
 
-        debugPrint('[Sync Observer] running sync');
+        // debugPrint('[Sync Observer] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
