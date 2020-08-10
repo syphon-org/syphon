@@ -26,9 +26,11 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -37,8 +39,8 @@ import 'package:syphon/store/user/model.dart';
  * E2EE
  * https://matrix.org/docs/spec/client_server/latest#id76
  * 
- * Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
  * Outbound Key Session === Outbound Session (Algorithm.olmv1)
+ * Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
  */
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -150,7 +152,9 @@ ThunkAction<AppState> setDeviceKeys(Map deviceKeys) {
   };
 }
 
-ThunkAction<AppState> setOneTimeKeysClaimed(Map oneTimeKeys) {
+ThunkAction<AppState> setOneTimeKeysClaimed(
+  Map<String, OneTimeKey> oneTimeKeys,
+) {
   return (Store<AppState> store) {
     store.dispatch(SetOneTimeKeysClaimed(oneTimeKeys: oneTimeKeys));
   };
@@ -482,32 +486,35 @@ ThunkAction<AppState> claimOneTimeKeys({
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
       final currentUser = store.state.authStore.user;
 
+      // get deviceKeys for every user present in the chat
       final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
-          .map((user) => deviceKeys[user.userId].values)
+          .map((user) => (deviceKeys[user.userId] ?? {}).values)
           .expand((x) => x));
 
       // Create a map of all the oneTimeKeys to claim
-      final claimKeysPayload =
-          roomDeviceKeys.fold(Map.from({}), (claims, deviceKey) {
-        // don't claim your own device one time keys
-        if (deviceKey.deviceId == currentUser.deviceId) return claims;
+      final claimKeysPayload = roomDeviceKeys.fold(
+        Map.from({}),
+        (claims, deviceKey) {
+          // don't claim your own device one time keys
+          if (deviceKey.deviceId == currentUser.deviceId) return claims;
 
-        // find the identityKey for the device
-        final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
-        final identityKey = deviceKey.keys[keyId];
+          // find the identityKey for the device
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+          final identityKey = deviceKey.keys[keyId];
 
-        // don't claim one time keys for already claimed devices
-        if (outboundKeySessions.containsKey(identityKey)) return claims;
+          // don't claim one time keys for already claimed devices
+          if (outboundKeySessions.containsKey(identityKey)) return claims;
 
-        if (claims[deviceKey.userId] == null) {
-          claims[deviceKey.userId] = {};
-        }
+          if (claims[deviceKey.userId] == null) {
+            claims[deviceKey.userId] = {};
+          }
 
-        claims[deviceKey.userId][deviceKey.deviceId] =
-            Algorithms.signedcurve25519;
+          claims[deviceKey.userId][deviceKey.deviceId] =
+              Algorithms.signedcurve25519;
 
-        return claims;
-      });
+          return claims;
+        },
+      );
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
@@ -560,26 +567,220 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // cache of one time keys
       await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
+      return true;
+    } catch (error) {
+      store.dispatch(
+        addAlert(
+          type: 'warning',
+          message: error,
+          origin: 'claimOneTimeKeys',
+        ),
+      );
+      return false;
+    }
+  };
+}
+
+/**
+ * Send Session Encryption Keys
+ * 
+ * Specifically for sending encrypted keys using olm
+ * for later use with encrypted messages using megolm
+ * sent directly to devices within the room
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id454
+ * https://matrix.org/docs/spec/client_server/latest#id461
+ */
+/**
+ */
+ThunkAction<AppState> sendSessionKeys_OLD({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
+      // Create payload of megolm session keys for message decryption
+      final messageSession = await store.dispatch(
+        exportMessageSession(roomId: room.id),
+      );
+
+      final roomKeyEventContent = {
+        'algorithm': Algorithms.megolmv1,
+        'room_id': room.id,
+        'session_id': messageSession['session_id'],
+        'session_key': messageSession['session_key'],
+      };
+
+      // manage which devices to claim oneTimeKeys for
+      // here instead of within the function, because you'll
+      // need to cycle through those necessary devices here anyway
+      // for now, we're just sending the request to all the
+      // one time keys that were saved from this call
+      // global mutatable, this is real bad
+      await store.dispatch(claimOneTimeKeys(room: room));
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {};
+
+      // For each one time key claimed
+      // send a m.room_key event directly to each device
+
+      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+
+      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
+        try {
+          // find the identityKey for the device
+          final deviceKey = store.state.cryptoStore
+              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+          final identityKey = deviceKey.keys[keyId];
+
+          // Poorly decided to save key sessions by deviceId at first but then
+          // realised that you may have the same identityKey for diff
+          // devices and you also don't have the device id in the
+          // toDevice event payload -__-, convert back to identity key
+          final roomKeyEventContentEncrypted = await store.dispatch(
+            encryptKeyContent(
+              roomId: room.id,
+              identityKey: identityKey,
+              eventType: EventTypes.roomKey,
+              content: roomKeyEventContent,
+            ),
+          );
+
+          final response = await MatrixApi.sendEventToDevice(
+            protocol: protocol,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver,
+            userId: deviceKey.userId,
+            deviceId: deviceKey.deviceId,
+            eventType: EventTypes.encrypted,
+            content: roomKeyEventContentEncrypted,
+            trxId: trxId,
+          );
+
+          if (response['errcode'] != null) {
+            throw response['error'];
+          }
+        } catch (error) {
+          debugPrint('[sendSessionKeys] $error');
+        }
+      });
+
+      // await all sendToDevice room key events to be sent to users
+      await Future.wait(sendToDeviceRequests);
+      await store.dispatch(setOneTimeKeysClaimed({}));
+    } catch (error) {
+      store.dispatch(addAlert(message: error, error: error));
+    }
+  };
+}
+
+/**
+ * Send Session Encryption Keys
+ * 
+ * Specifically for sending encrypted keys using olm
+ * for later use with encrypted messages using megolm
+ * sent directly to devices within the room
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id454
+ * https://matrix.org/docs/spec/client_server/latest#id461
+ */
+/**
+ */
+ThunkAction<AppState> updateSessionKeys({
+  Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final String trxId = DateTime.now().millisecond.toString();
+
+      // Create payload of megolm session keys for message decryption
+      final messageSession = await store.dispatch(
+        exportMessageSession(roomId: room.id),
+      );
+
+      final roomKeyEventContent = {
+        'algorithm': Algorithms.megolmv1,
+        'room_id': room.id,
+        'session_id': messageSession['session_id'],
+        'session_key': messageSession['session_key'],
+      };
+
+      // manage which devices to claim oneTimeKeys for
+      // here instead of within the function, because you'll
+      // need to cycle through those necessary devices here anyway
+      // for now, we're just sending the request to all the
+      // one time keys that were saved from this call
+      // global mutatable, this is real bad
+      await store.dispatch(claimOneTimeKeys(room: room));
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {};
 
       // create sessions from new one time keys per device id
-      oneTimekeys.forEach((deviceId, oneTimeKey) {
+      oneTimeKeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
         final keyId = '${Algorithms.curve25591}:$deviceId';
         final identityKey = deviceKey.keys[keyId];
 
         store.dispatch(createOutboundKeySession(
-          deviceId: deviceId,
           identityKey: identityKey,
           oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
       });
-      return true;
+
+      // For each one time key claimed
+      // send a m.room_key event directly to each device
+      final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
+
+      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
+        try {
+          // find the identityKey for the device
+          final deviceKey = store.state.cryptoStore
+              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+          final identityKey = deviceKey.keys[keyId];
+
+          final roomKeyEventContentEncrypted = await store.dispatch(
+            encryptKeyContent(
+              roomId: room.id,
+              identityKey: identityKey,
+              eventType: EventTypes.roomKey,
+              content: roomKeyEventContent,
+            ),
+          );
+
+          final response = await MatrixApi.sendEventToDevice(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            userId: deviceKey.userId,
+            deviceId: deviceKey.deviceId,
+            eventType: EventTypes.encrypted,
+            content: roomKeyEventContentEncrypted,
+            trxId: trxId,
+          );
+
+          // print(
+          //   '[OUTSIDE sendEventToDevice] ${deviceKey.userId} ${deviceKey.deviceId} ${response}',
+          // );
+
+          if (response['errcode'] != null) {
+            throw response['error'];
+          }
+        } catch (error) {
+          debugPrint('[updateKeySessions] $error');
+        }
+      });
+
+      // await all sendToDevice room key events to be sent to users
+      await Future.wait(sendToDeviceRequests);
+      await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
       store.dispatch(
-        addAlert(error: error, origin: 'claimOneTimeKeys'),
+        addAlert(error: error, origin: 'updateSessionKeys'),
       );
-      return false;
     }
   };
 }
@@ -595,9 +796,8 @@ ThunkAction<AppState> claimOneTimeKeys({
  * 
  */
 ThunkAction<AppState> createOutboundKeySession({
-  String deviceId,
-  String identityKey,
   String oneTimeKey,
+  String identityKey,
 }) {
   return (Store<AppState> store) {
     final outboundKeySession = olm.Session();
@@ -645,8 +845,6 @@ ThunkAction<AppState> saveInboundKeySession({
 }
 
 ThunkAction<AppState> loadOutboundKeySession({
-  int type,
-  String body,
   String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
@@ -709,10 +907,10 @@ ThunkAction<AppState> loadInboundKeySession({
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
         newKeySession.create_inbound_from(account, identityKey, body);
 
-        // // // that the same one-time-key from the sender cannot be reused.
+        // that the same one-time-key from the sender cannot be reused.
         account.remove_one_time_keys(newKeySession);
 
-        // // Save sessions as needed
+        // Save sessions as needed
         await store.dispatch(saveOlmAccount());
         await store.dispatch(saveInboundKeySession(
           session: newKeySession.pickle(identityKey),
@@ -816,17 +1014,6 @@ ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
   };
 }
 
-ThunkAction<AppState> saveOutboundMessageSession({
-  String roomId,
-  String session,
-}) {
-  return (Store<AppState> store) async {
-    store.dispatch(
-      AddOutboundMessageSession(roomId: roomId, session: session),
-    );
-  };
-}
-
 /**
  * TODO:
  * one would likely need more based on identity + device, 
@@ -847,6 +1034,17 @@ ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
     final session = olm.OutboundGroupSession();
     session.unpickle(roomId, outboundMessageSessionSerialized);
     return session;
+  };
+}
+
+ThunkAction<AppState> saveOutboundMessageSession({
+  String roomId,
+  String session,
+}) {
+  return (Store<AppState> store) async {
+    store.dispatch(
+      AddOutboundMessageSession(roomId: roomId, session: session),
+    );
   };
 }
 

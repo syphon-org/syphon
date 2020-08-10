@@ -166,9 +166,12 @@ class Strings {
   static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 
   // Accessibility
+  static const semanticsPrivateMessage =
+      'A person holding up a private message';
   static const semanticsSendUnencrypted = 'Send unencrypted message';
   static const semanticsIntroFinal =
-      'Two people different feeling confident and lookin\' good';
+      'Two different people feeling confident and lookin\' good';
+  static const semanticsIntroThird = 'People lounging around and messaging';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
   static const semanticsLabelHomeEmpty =
       'Tiny cute monsters hidding behind foliage';

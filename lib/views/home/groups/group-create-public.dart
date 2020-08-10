@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -82,6 +83,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
   void onShowImageOptions() async {
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
         onSetNewAvatar: ({File image}) {
@@ -102,12 +104,22 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
+          var backgroundColor = Colors.grey[500];
+          switch (props.theme) {
+            case ThemeType.LIGHT:
+              backgroundColor = Colors.grey[200];
+              break;
+            default:
+              backgroundColor = Colors.grey[700];
+              break;
+          }
+
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
-            backgroundColor: Colors.grey,
+            backgroundColor: backgroundColor,
             child: Icon(
               Icons.public,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).iconTheme.color,
               size: Dimensions.avatarSizeDetails / 1.4,
             ),
           );
@@ -213,7 +225,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                                   height:
                                                       Dimensions.iconSizeLarge,
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey,
+                                                    color: backgroundColor,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                       Dimensions.iconSizeLarge,
@@ -228,7 +240,8 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                                   child: Icon(
                                                     Icons.camera_alt,
                                                     color: Theme.of(context)
-                                                        .indicatorColor,
+                                                        .iconTheme
+                                                        .color,
                                                     size:
                                                         Dimensions.iconSizeLite,
                                                   ),
@@ -500,6 +513,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
 
 class _Props extends Equatable {
   final bool loading;
+  final ThemeType theme;
   final String homeserver;
   final List<User> users;
 
@@ -508,6 +522,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.users,
+    @required this.theme,
     @required this.loading,
     @required this.homeserver,
     @required this.onCreateRoomPublic,
@@ -517,12 +532,14 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         users,
+        theme,
         loading,
         homeserver,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
+        theme: store.state.settingsStore.theme,
         homeserver: store.state.authStore.user.homeserverName,
         loading: store.state.authStore.loading,
         onClearUserInvites: () => store.dispatch(

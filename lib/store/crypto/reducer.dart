@@ -60,11 +60,13 @@ CryptoStore cryptoReducer(
         outboundMessageSessions: outboundMessageSessions,
       );
     case AddInboundMessageSession:
-      final messageSessionIndex =
-          Map<String, int>.from(state.messageSessionIndex);
+      final messageSessionIndex = Map<String, int>.from(
+        state.messageSessionIndex,
+      );
 
       final inboundMessageSessions = Map<String, Map<String, String>>.from(
-          state.inboundMessageSessions ?? {});
+        state.inboundMessageSessions ?? {},
+      );
 
       inboundMessageSessions.putIfAbsent(
         action.roomId,
@@ -75,14 +77,15 @@ CryptoStore cryptoReducer(
       final Map<String, String> messageSessionInboundNew = {
         action.identityKey: action.session
       };
+
       inboundMessageSessions[action.roomId].addAll(messageSessionInboundNew);
 
       // Add new index
       messageSessionIndex[action.roomId] = action.messageIndex;
 
       return state.copyWith(
-        inboundMessageSessions: inboundMessageSessions,
         messageSessionIndex: messageSessionIndex,
+        inboundMessageSessions: inboundMessageSessions,
       );
 
     case ToggleDeviceKeysExist:

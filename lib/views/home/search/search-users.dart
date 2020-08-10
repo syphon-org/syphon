@@ -78,6 +78,7 @@ class SearchUserState extends State<SearchUserView> {
   }) async {
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         user: user,
@@ -125,7 +126,7 @@ class SearchUserState extends State<SearchUserView> {
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${formatUsername(user)}}',
+        title: 'Try chatting with ${formatUsername(user)}',
         content: Strings.confirmationAttemptChat,
         onStartChat: () async {
           this.setState(() {

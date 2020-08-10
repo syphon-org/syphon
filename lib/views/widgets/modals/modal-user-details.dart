@@ -100,7 +100,7 @@ class ModalUserDetails extends StatelessWidget {
             maxHeight: Dimensions.defaultModalHeightMax,
           ),
           padding: EdgeInsets.symmetric(
-            vertical: 8,
+            vertical: 12,
             horizontal: 24,
           ),
           decoration: BoxDecoration(
@@ -115,6 +115,7 @@ class ModalUserDetails extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
+                padding: EdgeInsets.symmetric(vertical: 16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -167,7 +168,7 @@ class ModalUserDetails extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
+              Expanded(
                 child: Column(
                   children: <Widget>[
                     ListTile(

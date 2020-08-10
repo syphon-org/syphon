@@ -86,7 +86,7 @@ class Dimensions {
   // Lists
   static const heroPadding = EdgeInsets.symmetric(
     vertical: 24,
-    horizontal: 8,
+    horizontal: 12,
   );
 
   static const listPadding = EdgeInsets.symmetric(
@@ -158,7 +158,7 @@ class Dimensions {
 
   // Modals
   static const double defaultModalHeight = 256;
-  static const double defaultModalHeightMax = 800;
+  static const double defaultModalHeightMax = 456;
   static modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;

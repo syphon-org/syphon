@@ -363,7 +363,7 @@ class Room {
     String topic;
     String joinRule;
     bool encryptionEnabled;
-    bool direct = this.direct;
+    bool direct = this.direct ?? false;
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
@@ -414,7 +414,7 @@ class Room {
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
 
-            direct = direct ?? event.content['is_direct'];
+            direct = !direct ? event.content['is_direct'] ?? false : direct;
 
             // Cache user to rooms user cache if not present
             if (!users.containsKey(event.sender)) {
