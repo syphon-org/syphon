@@ -591,14 +591,11 @@ ThunkAction<AppState> claimOneTimeKeys({
  * https://matrix.org/docs/spec/client_server/latest#id454
  * https://matrix.org/docs/spec/client_server/latest#id461
  */
-ThunkAction<AppState> updateKeySessions({ 
+ThunkAction<AppState> updateKeySessions({
   Room room,
 }) {
   return (Store<AppState> store) async {
     try {
-      // if you're incredibly unlucky, and fast, you could have a problem here
-      final String trxId = DateTime.now().millisecond.toString();
-
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
         exportMessageSession(roomId: room.id),
@@ -617,15 +614,14 @@ ThunkAction<AppState> updateKeySessions({
       // for now, we're just sending the request to all the
       // one time keys that were saved from this call
       // global mutatable, this is real bad
-      await store.dispatch(claimOneTimeKeys(room: room)); 
+      await store.dispatch(claimOneTimeKeys(room: room));
       final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {};
 
       // For each one time key claimed
       // send a m.room_key event directly to each device
-
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
 
-      final sendToDeviceRequests = devicesOneTimeKeys.map((oneTimeKey) async {
+      final requestsSendToDevicee = devicesOneTimeKeys.map((oneTimeKey) async {
         try {
           // find the identityKey for the device
           final deviceKey = store.state.cryptoStore
@@ -654,7 +650,7 @@ ThunkAction<AppState> updateKeySessions({
             deviceId: deviceKey.deviceId,
             eventType: EventTypes.encrypted,
             content: roomKeyEventContentEncrypted,
-            trxId: trxId,
+            trxId: DateTime.now().millisecond.toString(),
           );
 
           if (response['errcode'] != null) {
@@ -666,7 +662,7 @@ ThunkAction<AppState> updateKeySessions({
       });
 
       // await all sendToDevice room key events to be sent to users
-      await Future.wait(sendToDeviceRequests);
+      await Future.wait(requestsSendToDevicee);
       await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
       store.dispatch(addAlert(message: error, error: error));
@@ -713,7 +709,7 @@ ThunkAction<AppState> updateSessionKeys({
       // one time keys that were saved from this call
       // global mutatable, this is real bad
       await store.dispatch(claimOneTimeKeys(room: room));
-      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {}; 
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {};
 
       // create sessions from new one time keys per device id
       oneTimeKeys.forEach((deviceId, oneTimeKey) {
@@ -739,7 +735,7 @@ ThunkAction<AppState> updateSessionKeys({
               .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
           final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
           final identityKey = deviceKey.keys[keyId];
- 
+
           final roomKeyEventContentEncrypted = await store.dispatch(
             encryptKeyContent(
               roomId: room.id,
@@ -750,16 +746,16 @@ ThunkAction<AppState> updateSessionKeys({
           );
 
           final response = await MatrixApi.sendEventToDevice(
-            protocol: protocol, 
+            protocol: protocol,
             homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken, 
+            accessToken: store.state.authStore.user.accessToken,
             userId: deviceKey.userId,
             deviceId: deviceKey.deviceId,
             eventType: EventTypes.encrypted,
             content: roomKeyEventContentEncrypted,
             trxId: trxId,
           );
- 
+
           if (response['errcode'] != null) {
             throw response['error'];
           }

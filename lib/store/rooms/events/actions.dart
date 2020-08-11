@@ -248,7 +248,8 @@ ThunkAction<AppState> sendTyping({
     }
   };
 }
- /*
+
+/**
  * Send Encrypted Messages
  * 
  * Specifically for sending encrypted messages using megolm
@@ -260,11 +261,9 @@ ThunkAction<AppState> sendMessageEncrypted({
 }) {
   return (Store<AppState> store) async {
     try {
-      // if you're incredibly fast, you could have a problem here
-      final String trxId = DateTime.now().millisecond.toString();
-
-      // send the key session if one hasn't been sent or created 
-      await store.dispatch(updateKeySessions(room: room)); 
+      // send the key session - if one hasn't been sent
+      // or created - to every user within the room
+      await store.dispatch(updateKeySessions(room: room));
 
       final messageEvent = {
         'body': body,
@@ -284,7 +283,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        trxId: trxId,
+        trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
         senderKey: encryptedEvent['sender_key'],
         ciphertext: encryptedEvent['ciphertext'],
@@ -297,7 +296,10 @@ ThunkAction<AppState> sendMessageEncrypted({
       }
     } catch (error) {
       store.dispatch(
-        addAlert(error: error, message: error, origin: 'sendMessageEncrypted'),
+        addAlert(
+            error: error,
+            message: error.toString(),
+            origin: 'sendMessageEncrypted'),
       );
     }
   };

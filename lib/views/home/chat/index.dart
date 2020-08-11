@@ -131,7 +131,7 @@ class ChatViewState extends State<ChatView> {
         mediumType = MediumType.encryption;
       });
     }
- 
+
     if (props.room.messages.length < 10) {
       props.onLoadFirstBatch();
     }
@@ -1077,5 +1077,6 @@ class _Props extends Equatable {
       },
       onCheatCode: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+        store.dispatch(updateKeySessions(room: room));
       });
 }
