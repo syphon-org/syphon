@@ -10,7 +10,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/global/themes.dart'; 
+import 'package:syphon/store/alerts/actions.dart'; 
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -444,26 +445,32 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                               ],
                                             ),
                                           ),
-                                          Container(
-                                            width: width / 1.3,
-                                            child: ListTile(
-                                              contentPadding:
-                                                  Dimensions.listPadding,
-                                              title: Text(
-                                                'Message Encryption (alpha)',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .subtitle1,
-                                              ),
-                                              trailing: Container(
-                                                child: Switch(
-                                                  value: this.encryption,
-                                                  onChanged: (value) =>
-                                                      onToggleEncryption(props),
+                                          GestureDetector(
+                                            onTap: () => props.onDisabled(),
+                                            child: Container(
+                                              width: width / 1.3,
+                                              child: ListTile(
+                                                enabled: false,
+                                                contentPadding:
+                                                    Dimensions.listPadding,
+                                                title: Text(
+                                                  'Message Encryption',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .subtitle1,
                                                 ),
+                                                trailing: Container(
+                                                  child: Switch(
+                                                    value: this.encryption,
+                                                    onChanged: null,
+                                                    // onChanged: (value) =>
+                                                    //     onToggleEncryption(
+                                                    //         props),
+                                                  ),
+                                                ),
+                                                onTap: () =>
+                                                    onToggleEncryption(props),
                                               ),
-                                              onTap: () =>
-                                                  onToggleEncryption(props),
                                             ),
                                           ),
                                         ],
@@ -532,6 +539,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final List<User> users;
 
+  final Function onDisabled;
   final Function onCreateGroup;
   final Function onClearUserInvites;
 
@@ -541,6 +549,7 @@ class _Props extends Equatable {
     @required this.loading,
     @required this.homeserver,
     @required this.onCreateGroup,
+    @required this.onDisabled,
     @required this.onClearUserInvites,
   });
 
@@ -557,6 +566,7 @@ class _Props extends Equatable {
         loading: store.state.roomStore.loading,
         theme: store.state.settingsStore.theme,
         homeserver: store.state.authStore.user.homeserverName,
+        onDisabled: () => store.dispatch(addInProgress()),
         onClearUserInvites: () => store.dispatch(
           clearUserInvites(),
         ),

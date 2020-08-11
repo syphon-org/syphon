@@ -21,7 +21,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/sync/services.dart';
+import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -93,7 +93,7 @@ ThunkAction<AppState> startSyncObserver() {
           store.state.syncStore.lastAttempt,
         );
 
-        if (backoff != null) {
+        if (backoff != 0) {
           final backoffs = fibonacci(backoff);
           final backoffFactor = backoffs[backoffs.length - 1];
           final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
@@ -116,11 +116,11 @@ ThunkAction<AppState> startSyncObserver() {
 
         // still syncing
         if (store.state.syncStore.syncing) {
-          debugPrint('[Sync Observer] still syncing');
+          // debugPrint('[Sync Observer] still syncing');
           return;
         }
 
-        debugPrint('[Sync Observer] running sync');
+        // debugPrint('[Sync Observer] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -225,7 +225,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         synced: true,
         syncing: false,
         lastSince: lastSince,
-        backoff: null,
       ));
 
       if (!kReleaseMode && isFullSync) {
@@ -245,7 +244,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       }
 
       final backoff = store.state.syncStore.backoff;
-      final nextBackoff = backoff != null ? backoff + 1 : 5;
+      final nextBackoff = backoff != 0 ? backoff + 1 : 5;
       store.dispatch(SetBackoff(backoff: nextBackoff));
     } finally {
       store.dispatch(SetSyncing(syncing: false));

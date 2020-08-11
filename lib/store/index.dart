@@ -114,10 +114,10 @@ Future<Store> initStore() async {
       switch (action.runtimeType) {
         case SetSyncing:
         case SetSynced:
-          debugPrint('[Redux Persist] cache skip');
+          // debugPrint('[Redux Persist] cache skip');
           return false;
         default:
-          debugPrint('[Redux Persist] caching');
+          // debugPrint('[Redux Persist] caching');
           return true;
       }
     },
@@ -128,7 +128,7 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    debugPrint('[Redux Persist] persist loaded successfully');
+    // debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
     debugPrint('[Redux Persist] error $error');
   }
@@ -161,7 +161,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.syncStore.runtimeType.toString(),
         state.syncStore,
       );
-      debugPrint('[Hive Storage] caching syncStore');
+      // debugPrint('[Hive Storage] caching syncStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -171,7 +171,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.roomStore.runtimeType.toString(),
         state.roomStore,
       );
-      debugPrint('[Hive Storage] caching roomStore');
+      // debugPrint('[Hive Storage] caching roomStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -181,7 +181,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.mediaStore.runtimeType.toString(),
         state.mediaStore,
       );
-      debugPrint('[Hive Storage] caching mediaStore');
+      // debugPrint('[Hive Storage] caching mediaStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -191,7 +191,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.settingsStore.runtimeType.toString(),
         state.settingsStore,
       );
-      debugPrint('[Hive Storage] caching settingsStore');
+      // debugPrint('[Hive Storage] caching settingsStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }
@@ -201,7 +201,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         state.cryptoStore.runtimeType.toString(),
         state.cryptoStore,
       );
-      debugPrint('[Hive Storage] caching cryptoStore');
+      // debugPrint('[Hive Storage] caching cryptoStore');
     } catch (error) {
       debugPrint('[Hive Storage] $error');
     }

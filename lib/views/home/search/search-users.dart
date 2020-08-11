@@ -126,7 +126,7 @@ class SearchUserState extends State<SearchUserView> {
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${formatUsername(user)}}',
+        title: 'Try chatting with ${formatUsername(user)}',
         content: Strings.confirmationAttemptChat,
         onStartChat: () async {
           this.setState(() {

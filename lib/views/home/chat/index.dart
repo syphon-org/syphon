@@ -126,20 +126,12 @@ class ChatViewState extends State<ChatView> {
     }
 
     if (props.room.encryptionEnabled) {
+      props.onUpdateDeviceKeys();
       this.setState(() {
         mediumType = MediumType.encryption;
       });
     }
-
-    if (props.room.encryptionEnabled) {
-      final usersDeviceKeys = await store.dispatch(
-        fetchDeviceKeys(users: props.room.users),
-      );
-
-      print(usersDeviceKeys)
-      store.dispatch(setDeviceKeys(usersDeviceKeys));
-    }
-
+ 
     if (props.room.messages.length < 10) {
       props.onLoadFirstBatch();
     }
@@ -189,6 +181,7 @@ class ChatViewState extends State<ChatView> {
       this.setState(() {
         mediumType = MediumType.encryption;
       });
+      props.onUpdateDeviceKeys();
     }
   }
 
@@ -209,7 +202,7 @@ class ChatViewState extends State<ChatView> {
   @protected
   onUpdateMessage(String text, _Props props) {
     this.setState(() {
-      sendable = text != null && text.isNotEmpty;
+      sendable = text != null && text.trim().isNotEmpty;
     });
 
     // start an interval for updating typing status
@@ -930,6 +923,7 @@ class _Props extends Equatable {
   final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
+  final Function onUpdateDeviceKeys;
   final Function onSaveDraftMessage;
   final Function onClearDraftMessage;
   final Function onLoadMoreMessages;
@@ -947,6 +941,7 @@ class _Props extends Equatable {
     @required this.loading,
     @required this.roomPrimaryColor,
     @required this.roomTypeBadgesEnabled,
+    @required this.onUpdateDeviceKeys,
     @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
@@ -995,6 +990,15 @@ class _Props extends Equatable {
 
         return Colours.hashedColor(roomId);
       }(),
+      onUpdateDeviceKeys: () async {
+        final room = store.state.roomStore.rooms[roomId];
+
+        final usersDeviceKeys = await store.dispatch(
+          fetchDeviceKeys(users: room.users),
+        );
+
+        store.dispatch(setDeviceKeys(usersDeviceKeys));
+      },
       onSaveDraftMessage: ({
         String body,
         String type,

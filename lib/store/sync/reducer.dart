@@ -23,8 +23,8 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
       );
     case SetSynced:
       return state.copyWith(
+        backoff: 0,
         offline: false,
-        backoff: null,
         synced: action.synced,
         syncing: action.syncing,
         lastSince: action.lastSince,

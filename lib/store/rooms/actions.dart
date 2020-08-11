@@ -428,7 +428,6 @@ ThunkAction<AppState> createRoom({
 
       return room.id;
     } catch (error) {
-      debugPrint(error);
       store.dispatch(
         addAlert(
             message: error.toString(),
