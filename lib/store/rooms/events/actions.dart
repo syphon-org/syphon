@@ -265,6 +265,23 @@ ThunkAction<AppState> sendMessageEncrypted({
       // or created - to every user within the room
       await store.dispatch(updateKeySessions(room: room));
 
+      // Save unsent message to outbox
+      final tempId = Random.secure().nextInt(1 << 32).toString();
+
+      store.dispatch(SaveOutboxMessage(
+        id: room.id,
+        pendingMessage: Message(
+          id: tempId,
+          body: body,
+          type: type,
+          sender: store.state.authStore.user.userId,
+          roomId: room.id,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          pending: true,
+          syncing: true,
+        ),
+      ));
+
       final messageEvent = {
         'body': body,
         'type': type,
@@ -292,8 +309,38 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
 
       if (data['errcode'] != null) {
+        store.dispatch(SaveOutboxMessage(
+          id: room.id,
+          tempId: tempId.toString(),
+          pendingMessage: Message(
+            id: tempId.toString(),
+            body: body,
+            type: type,
+            sender: store.state.authStore.user.userId,
+            roomId: room.id,
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            pending: false,
+            syncing: false,
+            failed: true,
+          ),
+        ));
+
         throw data['error'];
       }
+
+      store.dispatch(SaveOutboxMessage(
+        id: room.id,
+        tempId: tempId.toString(),
+        pendingMessage: Message(
+          id: data['event_id'],
+          body: body,
+          type: type,
+          sender: store.state.authStore.user.userId,
+          roomId: room.id,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          syncing: true,
+        ),
+      ));
     } catch (error) {
       store.dispatch(
         addAlert(

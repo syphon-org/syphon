@@ -104,15 +104,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          var backgroundColor = Colors.grey[500];
-          switch (props.theme) {
-            case ThemeType.LIGHT:
-              backgroundColor = Colors.grey[200];
-              break;
-            default:
-              backgroundColor = Colors.grey[700];
-              break;
-          }
+          final backgroundColor = Themes.backgroundBrightness(props.theme);
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(

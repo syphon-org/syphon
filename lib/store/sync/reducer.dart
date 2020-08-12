@@ -13,6 +13,10 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
       return state.copyWith(
         backoff: action.backoff,
       );
+    case SetUnauthed:
+      return state.copyWith(
+        unauthed: action.unauthed,
+      );
     case SetOffline:
       return state.copyWith(
         offline: action.offline,

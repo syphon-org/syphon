@@ -10,8 +10,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart'; 
-import 'package:syphon/store/alerts/actions.dart'; 
+import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -112,15 +112,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          var backgroundColor = Colors.grey[500];
-          switch (props.theme) {
-            case ThemeType.LIGHT:
-              backgroundColor = Colors.grey[200];
-              break;
-            default:
-              backgroundColor = Colors.grey[700];
-              break;
-          }
+          final backgroundColor = Themes.backgroundBrightness(props.theme);
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
@@ -462,10 +454,9 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                                 trailing: Container(
                                                   child: Switch(
                                                     value: this.encryption,
-                                                    onChanged: null,
-                                                    // onChanged: (value) =>
-                                                    //     onToggleEncryption(
-                                                    //         props),
+                                                    onChanged: (value) =>
+                                                        onToggleEncryption(
+                                                            props),
                                                   ),
                                                 ),
                                                 onTap: () =>

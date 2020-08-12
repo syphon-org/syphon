@@ -28,6 +28,11 @@ class SetBackoff {
   SetBackoff({this.backoff});
 }
 
+class SetUnauthed {
+  final bool unauthed;
+  SetUnauthed({this.unauthed});
+}
+
 class SetOffline {
   final bool offline;
   SetOffline({this.offline});
@@ -99,7 +104,7 @@ ThunkAction<AppState> startSyncObserver() {
 
           if (backoffLimit == 1) {
             debugPrint('[Sync Observer] forced retry timeout');
-            store.dispatch(fetchSync(
+            await store.dispatch(fetchSync(
               since: store.state.syncStore.lastSince,
             ));
           }
@@ -183,6 +188,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
+          store.dispatch(SetUnauthed(unauthed: true));
           // TODO: signin prompt needed here
         } else {
           throw data['error'];

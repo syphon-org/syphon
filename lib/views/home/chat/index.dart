@@ -683,7 +683,10 @@ class ChatViewState extends State<ChatView> {
           Container(
             margin: EdgeInsets.only(left: 8),
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
+              icon: Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
               onPressed: onDismissMessageOptions,
             ),
           ),

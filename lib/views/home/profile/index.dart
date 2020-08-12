@@ -117,15 +117,7 @@ class ProfileViewState extends State<ProfileView> {
           );
         }
 
-        var backgroundColor = Colors.grey[500];
-        switch (props.theme) {
-          case ThemeType.LIGHT:
-            backgroundColor = Colors.grey[200];
-            break;
-          default:
-            backgroundColor = Colors.grey[700];
-            break;
-        }
+        final backgroundColor = Themes.backgroundBrightness(props.theme);
 
         return Scaffold(
           appBar: AppBar(

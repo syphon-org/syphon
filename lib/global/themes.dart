@@ -23,6 +23,17 @@ enum ThemeType {
 }
 
 class Themes {
+  static Color backgroundBrightness(ThemeType type) {
+    switch (type) {
+      case ThemeType.LIGHT:
+        return Colors.grey[200];
+      case ThemeType.NIGHT:
+        return Colors.grey[500];
+      default:
+        return Colors.grey[700];
+    }
+  }
+
   static Color invertedPrimaryColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? Theme.of(context).primaryColor

@@ -245,14 +245,13 @@ class AdvancedViewState extends State<AdvancedView> {
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: CircularProgressIndicator(
-                        value: props.loading ? null : 0,
+                        value: props.syncing ? null : 0,
                       ),
                     ),
                   ),
                 ),
                 ListTile(
                   dense: true,
-                  onTap: props.loading ? null : props.onForceFullSync,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Version',
