@@ -8,6 +8,7 @@
 // Dart imports:
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -513,48 +514,51 @@ ThunkAction<AppState> updateKeySessions({
       // send a m.room_key event directly to each device
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
 
-      final requestsSendToDevicee = devicesOneTimeKeys.map((oneTimeKey) async {
-        try {
-          // find the identityKey for the device
-          final deviceKey = store.state.cryptoStore
-              .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
-          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
-          final identityKey = deviceKey.keys[keyId];
+      final requestsSendToDevicee = devicesOneTimeKeys.map(
+        (oneTimeKey) async {
+          try {
+            // find the identityKey for the device
+            final deviceKey = store.state.cryptoStore
+                .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
+            final keyId = Keys.identity(deviceId: deviceKey.deviceId);
+            final identityKey = deviceKey.keys[keyId];
 
-          print(identityKey);
-          return;
+            // Poorly decided to save key sessions by deviceId at first but then
+            // realised that you may have the same identityKey for diff
+            // devices and you also don't have the device id in the
+            // toDevice event payload -__-, convert back to identity key
+            final roomKeyEventContentEncrypted = await store.dispatch(
+              encryptKeyContent(
+                roomId: room.id,
+                identityKey: identityKey,
+                eventType: EventTypes.roomKey,
+                content: roomKeyEventContent,
+              ),
+            );
 
-          // Poorly decided to save key sessions by deviceId at first but then
-          // realised that you may have the same identityKey for diff
-          // devices and you also don't have the device id in the
-          // toDevice event payload -__-, convert back to identity key
-          final roomKeyEventContentEncrypted = await store.dispatch(
-            encryptKeyContent(
-              roomId: room.id,
-              identityKey: identityKey,
-              eventType: EventTypes.roomKey,
-              content: roomKeyEventContent,
-            ),
-          );
+            final randomNumber = Random.secure().nextInt(1 << 31).toString();
+            debugPrint(
+              '[sendSessionKeys] trxId: $randomNumber, ${deviceKey.deviceId}',
+            );
+            final response = await MatrixApi.sendEventToDevice(
+              protocol: protocol,
+              accessToken: store.state.authStore.user.accessToken,
+              homeserver: store.state.authStore.user.homeserver,
+              userId: deviceKey.userId,
+              deviceId: deviceKey.deviceId,
+              eventType: EventTypes.encrypted,
+              content: roomKeyEventContentEncrypted,
+              trxId: randomNumber,
+            );
 
-          final response = await MatrixApi.sendEventToDevice(
-            protocol: protocol,
-            accessToken: store.state.authStore.user.accessToken,
-            homeserver: store.state.authStore.user.homeserver,
-            userId: deviceKey.userId,
-            deviceId: deviceKey.deviceId,
-            eventType: EventTypes.encrypted,
-            content: roomKeyEventContentEncrypted,
-            trxId: DateTime.now().millisecond.toString(),
-          );
-
-          if (response['errcode'] != null) {
-            throw response['error'];
+            if (response['errcode'] != null) {
+              throw response['error'];
+            }
+          } catch (error) {
+            debugPrint('[sendSessionKeys] $error');
           }
-        } catch (error) {
-          debugPrint('[sendSessionKeys] $error');
-        }
-      });
+        },
+      );
 
       // await all sendToDevice room key events to be sent to users
       await Future.wait(requestsSendToDevicee);
@@ -609,10 +613,6 @@ ThunkAction<AppState> claimOneTimeKeys({
         },
       );
 
-      print(claimKeysPayload);
-
-      return;
-
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
         debugPrint(
@@ -661,9 +661,21 @@ ThunkAction<AppState> claimOneTimeKeys({
           );
         });
       });
-
       // cache of one time keys
       await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
+
+      // create sessions from new one time keys per device id
+      oneTimekeys.forEach((deviceId, oneTimeKey) {
+        final userId = oneTimeKey.userId;
+        final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
+        final keyId = '${Algorithms.curve25591}:$deviceId';
+        final identityKey = deviceKey.keys[keyId];
+
+        store.dispatch(createOutboundKeySession(
+          identityKey: identityKey,
+          oneTimeKey: oneTimeKey.keys.values.elementAt(0),
+        ));
+      });
       return true;
     } catch (error) {
       store.dispatch(

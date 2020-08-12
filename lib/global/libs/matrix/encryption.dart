@@ -13,6 +13,11 @@ class Algorithms {
   static const megolmv1 = 'm.megolm.v1.aes-sha2';
 }
 
+class Keys {
+  static fingerprint({String deviceId}) => '${Algorithms.ed25519}:$deviceId';
+  static identity({String deviceId}) => '${Algorithms.curve25591}:$deviceId';
+}
+
 abstract class Encryption {
   /**
    * Fetch Encryption Keys
