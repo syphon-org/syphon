@@ -6,11 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.X.X]()
 
-## [0.1.0](https://github.com/syphon-org/syphon/releases/tag/0.1.0) - 2020-08-07
+## [0.1.2](https://github.com/syphon-org/syphon/releases/tag/0.1.2) - 2020-08-11
 ### Added 
-- E2EE Group Creation
-- E2EE Existing Group Handling
-- Color Assignment for Public Rooms without Avatars
+- 👥 Private group E2EE encryption*
+- 🌐 Create public and private groups - w/ photos
+- 💁🏻‍♂️ User Profiles (both quick view and fullscreen
+- 💌 Invite users to any joined room
+- ✅ mark all messages read (locally or remotely)
+- 🛠 tons of code refactoring to help dev and performance
+- 🔮 a lot more (new fonts, colors, etc)
 
 ### Changed
 - Confirmation Alert Improvements
