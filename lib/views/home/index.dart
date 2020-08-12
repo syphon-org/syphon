@@ -173,7 +173,6 @@ class HomeViewState extends State<Home> {
             AvatarAppBar(
               user: props.currentUser,
               offline: props.offline,
-              // show syncing if offline and refresh or initial sync
               syncing: (props.syncing && props.offline) || props.loadingRooms,
               tooltip: 'Profile and Settings',
               onPressed: () {
@@ -621,7 +620,32 @@ class _Props extends Equatable {
           hidden: store.state.roomStore.roomsHidden,
         ),
         offline: store.state.syncStore.offline,
-        syncing: store.state.syncStore.syncing,
+        syncing: () {
+          final syncing = store.state.syncStore.syncing;
+          final offline = store.state.syncStore.offline;
+          final loadingRooms = store.state.roomStore.loading;
+
+          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+              store.state.syncStore.lastAttempt);
+
+          // See if the last attempted sync is older than 60 seconds
+          final isLastAttemptOld = DateTime.now()
+              .difference(lastAttempt)
+              .compareTo(Duration(seconds: 60));
+
+          if (syncing && offline) {
+            return true;
+          }
+          if (loadingRooms) {
+            return true;
+          }
+
+          if (syncing && 0 < isLastAttemptOld) {
+            return true;
+          }
+
+          return false;
+        }(),
         currentUser: store.state.authStore.user,
         loadingRooms: store.state.roomStore.loading,
         roomTypeBadgesEnabled:

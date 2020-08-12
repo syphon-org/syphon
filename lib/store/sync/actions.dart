@@ -14,21 +14,14 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/algos.dart';
-import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
-
-class SetLoading {
-  final bool loading;
-  SetLoading({this.loading});
-}
 
 class SetBackoff {
   final int backoff;
@@ -114,13 +107,12 @@ ThunkAction<AppState> startSyncObserver() {
           return;
         }
 
-        // still syncing
         if (store.state.syncStore.syncing) {
-          // debugPrint('[Sync Observer] still syncing');
+          debugPrint('[Sync Observer] still syncing');
           return;
         }
 
-        // debugPrint('[Sync Observer] running sync');
+        debugPrint('[Sync Observer] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -249,51 +241,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
     } finally {
       store.dispatch(SetSyncing(syncing: false));
     }
-  };
-}
-
-/**
- * Save Cold Storage Data
- *   
- * Will update the cold storage block of data
- * from the full_state /sync call
- */
-ThunkAction<AppState> saveSync(
-  Map syncData,
-) {
-  return (Store<AppState> store) async {
-    // Offload the full state save
-    Cache.sync.close();
-    final storageLocation = await initStorageLocation();
-
-    debugPrint('[saveSync] started $storageLocation');
-
-    compute(saveSyncIsolate, {
-      'location': storageLocation,
-      'sync': syncData,
-    });
-
-    debugPrint('[saveSync] completed');
-
-    Cache.sync = await openHiveSync();
-  };
-}
-
-/**
- * Load Cold Storage Data
- * 
- * Will update the cold storage block of data
- * from the full_state /sync call
- */
-ThunkAction<AppState> loadSync() {
-  return (Store<AppState> store) async {
-    final storageLocation = await initStorageLocation();
-
-    final syncData = await compute(loadSyncIsolate, {
-      'location': storageLocation,
-    });
-
-    debugPrint('[loadSync] $syncData');
   };
 }
 

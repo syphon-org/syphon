@@ -537,9 +537,6 @@ ThunkAction<AppState> updateKeySessions({
             );
 
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
-            debugPrint(
-              '[sendSessionKeys] trxId: $randomNumber, ${deviceKey.deviceId}',
-            );
             final response = await MatrixApi.sendEventToDevice(
               protocol: protocol,
               accessToken: store.state.authStore.user.accessToken,
@@ -596,7 +593,7 @@ ThunkAction<AppState> claimOneTimeKeys({
           if (deviceKey.deviceId == currentUser.deviceId) return claims;
 
           // find the identityKey for the device
-          final keyId = '${Algorithms.curve25591}:${deviceKey.deviceId}';
+          final keyId = Keys.identity(deviceId: deviceKey.deviceId);
           final identityKey = deviceKey.keys[keyId];
 
           // don't claim one time keys for already claimed devices
@@ -668,7 +665,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId][deviceId];
-        final keyId = '${Algorithms.curve25591}:$deviceId';
+        final keyId = Keys.identity(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys[keyId];
 
         store.dispatch(createOutboundKeySession(
@@ -993,7 +990,6 @@ ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
           final deviceKey = DeviceKey.fromJson(device);
-          print('[fetchDeviceKeys] ${userId} device ${deviceKey.deviceId}');
 
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};

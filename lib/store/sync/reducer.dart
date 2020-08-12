@@ -4,18 +4,14 @@ import './state.dart';
 
 SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetLoading:
-      return state.copyWith(
-        loading: action.loading,
-      );
-    case SetBackoff:
-      return state.copyWith(
-        backoff: action.backoff,
-      );
     case SetSyncing:
       return state.copyWith(
         syncing: action.syncing,
         lastAttempt: DateTime.now().millisecondsSinceEpoch,
+      );
+    case SetBackoff:
+      return state.copyWith(
+        backoff: action.backoff,
       );
     case SetOffline:
       return state.copyWith(

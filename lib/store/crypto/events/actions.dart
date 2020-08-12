@@ -303,8 +303,6 @@ ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
 
 ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
-    print('[syncDevice] $dataToDevice');
-
     try {
       // Extract the new events
       final List<dynamic> events = dataToDevice['events'];
