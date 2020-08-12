@@ -50,6 +50,7 @@ class Cache {
   static const backgroundKeyUNSAFE =
       '${Values.appNameLabel}_background_cache_unsafe_alt';
 
+  static const roomNames = 'room_names';
   static const syncData = 'sync_data';
   static const protocol = 'protocol';
   static const homeserver = 'homeserver';

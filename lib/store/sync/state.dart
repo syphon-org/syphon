@@ -27,9 +27,9 @@ class SyncStore extends Equatable {
   final int interval = default_interval;
 
   final int backoff;
-  final bool loading;
   final bool syncing;
   final bool offline;
+  final bool unauthed;
   final Timer syncObserver;
 
   final int lastAttempt; // last attempt to sync
@@ -37,7 +37,7 @@ class SyncStore extends Equatable {
   const SyncStore({
     this.synced = false,
     this.syncing = false,
-    this.loading = false,
+    this.unauthed = false,
     this.offline = false,
     this.lastUpdate = 0,
     this.lastAttempt = 0,
@@ -48,11 +48,11 @@ class SyncStore extends Equatable {
 
   @override
   List<Object> get props => [
-        loading,
-        syncing,
         synced,
+        syncing,
         offline,
         backoff,
+        unauthed,
         lastUpdate,
         lastAttempt,
         lastSince,
@@ -61,10 +61,10 @@ class SyncStore extends Equatable {
 
   SyncStore copyWith({
     synced,
-    loading,
     syncing,
     offline,
     backoff,
+    unauthed,
     lastUpdate,
     lastAttempt,
     syncObserver,
@@ -72,9 +72,9 @@ class SyncStore extends Equatable {
   }) {
     return SyncStore(
       synced: synced ?? this.synced,
-      loading: loading ?? this.loading,
       syncing: syncing ?? this.syncing,
       offline: offline ?? this.offline,
+      unauthed: unauthed ?? this.unauthed,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       lastAttempt: lastAttempt ?? this.lastAttempt,
       lastSince: lastSince ?? this.lastSince,

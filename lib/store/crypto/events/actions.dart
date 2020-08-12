@@ -110,7 +110,7 @@ ThunkAction<AppState> decryptMessageEvent({
 }
 
 /**
- * Encrypt event content with loaded outbound session for a device
+ * Encrypt key sharing event content with loaded outbound session for a device
  * 
  * NOTE: Utilizes available one time keys pre-fetched 
  * and claimed by the current user
@@ -303,8 +303,6 @@ ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
 
 ThunkAction<AppState> syncDevice(Map dataToDevice) {
   return (Store<AppState> store) async {
-    // print('[syncDevice] $dataToDevice');
-
     try {
       // Extract the new events
       final List<dynamic> events = dataToDevice['events'];

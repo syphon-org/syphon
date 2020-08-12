@@ -10,7 +10,7 @@ import 'package:syphon/store/crypto/model.dart';
 
 part 'state.g.dart';
 
-// Next Hive Field Number: 12
+// Next Hive Field Number: 14
 @HiveType(typeId: CryptoStoreHiveId)
 class CryptoStore extends Equatable {
   // Active olm account
@@ -20,23 +20,23 @@ class CryptoStore extends Equatable {
   @HiveField(3)
   final String olmAccountKey;
 
-  // Map<roomId, serializedSession> // megolm - messages
-  @HiveField(5)
-  final Map<String, String> outboundMessageSessions;
-
-  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages
-  @HiveField(11)
-  final Map<String, Map<String, String>> inboundMessageSessions;
-
   // Map<roomId, index(int)> // megolm - message index
   @HiveField(10)
   final Map<String, int> messageSessionIndex;
 
-  // Map<identityKey, serializedSession> // olmv1 - key-sharing
+  // Map<roomId, serializedSession> // megolm - messages
+  @HiveField(5)
+  final Map<String, String> outboundMessageSessions;
+
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
+  @HiveField(11)
+  final Map<String, Map<String, String>> inboundMessageSessions;
+
+  // Map<identityKey, serializedSession> // olmv1 - key-sharing per identity
   @HiveField(8)
   final Map<String, String> inboundKeySessions;
 
-  // Map<identityKey, serializedSession>  // olmv1 - key-sharing
+  // Map<identityKey, serializedSession>  // olmv1 - key-sharing per identity
   @HiveField(6)
   final Map<String, String> outboundKeySessions;
 

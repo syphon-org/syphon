@@ -10,6 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -171,10 +172,11 @@ class HomeViewState extends State<Home> {
         title: Row(
           children: <Widget>[
             AvatarAppBar(
+              theme: props.theme,
               user: props.currentUser,
               offline: props.offline,
-              // show syncing if offline and refresh or initial sync
-              syncing: (props.syncing && props.offline) || props.loadingRooms,
+              syncing: props.syncing,
+              unauthed: props.unauthed,
               tooltip: 'Profile and Settings',
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');
@@ -412,10 +414,10 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Colors.grey,
+                              color: Themes.backgroundBrightness(props.theme),
                               child: Icon(
                                 Icons.mail_outline,
-                                color: Colors.white,
+                                color: Theme.of(context).iconTheme.color,
                                 size: Dimensions.iconSizeMini,
                               ),
                             ),
@@ -449,7 +451,7 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                              color: Themes.backgroundBrightness(props.theme),
                               child: Icon(
                                 Icons.group,
                                 color: Theme.of(context).iconTheme.color,
@@ -471,7 +473,7 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                              color: Themes.backgroundBrightness(props.theme),
                               child: Icon(
                                 Icons.public,
                                 color: Theme.of(context).iconTheme.color,
@@ -587,9 +589,10 @@ class _Props extends Equatable {
   final List<Room> rooms;
   final bool offline;
   final bool syncing;
-  final bool loadingRooms;
+  final bool unauthed;
   final bool roomTypeBadgesEnabled;
   final User currentUser;
+  final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
 
   final Function onLeaveChat;
@@ -601,10 +604,11 @@ class _Props extends Equatable {
 
   _Props({
     @required this.rooms,
+    @required this.theme,
     @required this.offline,
     @required this.syncing,
+    @required this.unauthed,
     @required this.currentUser,
-    @required this.loadingRooms,
     @required this.chatSettings,
     @required this.roomTypeBadgesEnabled,
     @required this.onLeaveChat,
@@ -615,15 +619,52 @@ class _Props extends Equatable {
     @required this.onFetchSyncForced,
   });
 
+  @override
+  List<Object> get props => [
+        rooms,
+        theme,
+        syncing,
+        offline,
+        unauthed,
+        currentUser,
+        chatSettings,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        theme: store.state.settingsStore.theme,
         rooms: availableRooms(
           sortedPrioritizedRooms(store.state.roomStore.rooms),
           hidden: store.state.roomStore.roomsHidden,
         ),
+        unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
-        syncing: store.state.syncStore.syncing,
+        syncing: () {
+          final syncing = store.state.syncStore.syncing;
+          final offline = store.state.syncStore.offline;
+          final loadingRooms = store.state.roomStore.loading;
+
+          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+              store.state.syncStore.lastAttempt);
+
+          // See if the last attempted sync is older than 60 seconds
+          final isLastAttemptOld = DateTime.now()
+              .difference(lastAttempt)
+              .compareTo(Duration(seconds: 60));
+
+          if (syncing && offline) {
+            return true;
+          }
+          if (loadingRooms) {
+            return true;
+          }
+
+          if (syncing && 0 < isLastAttemptOld) {
+            return true;
+          }
+
+          return false;
+        }(),
         currentUser: store.state.authStore.user,
-        loadingRooms: store.state.roomStore.loading,
         roomTypeBadgesEnabled:
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
@@ -659,13 +700,4 @@ class _Props extends Equatable {
           } catch (error) {}
         },
       );
-
-  @override
-  List<Object> get props => [
-        rooms,
-        offline,
-        currentUser,
-        loadingRooms,
-        chatSettings,
-      ];
 }

@@ -13,6 +13,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
 
 // Project imports:
@@ -682,7 +683,10 @@ class ChatViewState extends State<ChatView> {
           Container(
             margin: EdgeInsets.only(left: 8),
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
+              icon: Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
               onPressed: onDismissMessageOptions,
             ),
           ),
@@ -1075,7 +1079,14 @@ class _Props extends Equatable {
           startHash: room.endHash,
         ));
       },
-      onCheatCode: () {
+      onCheatCode: () async {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+
+        store.dispatch(updateKeySessions(room: room));
+
+        final usersDeviceKeys = await store.dispatch(
+          fetchDeviceKeys(users: room.users),
+        );
+        printJson(usersDeviceKeys);
       });
 }

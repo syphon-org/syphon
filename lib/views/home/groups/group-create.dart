@@ -112,15 +112,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          var backgroundColor = Colors.grey[500];
-          switch (props.theme) {
-            case ThemeType.LIGHT:
-              backgroundColor = Colors.grey[200];
-              break;
-            default:
-              backgroundColor = Colors.grey[700];
-              break;
-          }
+          final backgroundColor = Themes.backgroundBrightness(props.theme);
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
@@ -445,32 +437,26 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                               ],
                                             ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () => props.onDisabled(),
-                                            child: Container(
-                                              width: width / 1.3,
-                                              child: ListTile(
-                                                enabled: false,
-                                                contentPadding:
-                                                    Dimensions.listPadding,
-                                                title: Text(
-                                                  'Message Encryption',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .subtitle1,
-                                                ),
-                                                trailing: Container(
-                                                  child: Switch(
-                                                    value: this.encryption,
-                                                    onChanged: null,
-                                                    // onChanged: (value) =>
-                                                    //     onToggleEncryption(
-                                                    //         props),
-                                                  ),
-                                                ),
-                                                onTap: () =>
-                                                    onToggleEncryption(props),
+                                          Container(
+                                            width: width / 1.3,
+                                            child: ListTile(
+                                              contentPadding:
+                                                  Dimensions.listPadding,
+                                              title: Text(
+                                                'Message Encryption',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle1,
                                               ),
+                                              trailing: Container(
+                                                child: Switch(
+                                                  value: this.encryption,
+                                                  onChanged: (value) =>
+                                                      onToggleEncryption(props),
+                                                ),
+                                              ),
+                                              onTap: () =>
+                                                  onToggleEncryption(props),
                                             ),
                                           ),
                                         ],

@@ -47,19 +47,21 @@ class BackgroundSync {
     String accessToken,
     String lastSince,
     String currentUser,
+    Map<String, String> roomNames,
   }) async {
     // android only background sync
-    if (!Platform.isAndroid) {
-      return;
-    }
+    if (!Platform.isAndroid) return;
 
-    final backgroundServiceHive = await openHiveBackgroundUnsafe();
+    final box = await openHiveBackgroundUnsafe();
 
-    await backgroundServiceHive.put(Cache.protocol, protocol);
-    await backgroundServiceHive.put(Cache.homeserver, homeserver);
-    await backgroundServiceHive.put(Cache.accessTokenKey, accessToken);
-    await backgroundServiceHive.put(Cache.lastSinceKey, lastSince);
-    await backgroundServiceHive.put(Cache.currentUser, currentUser);
+    await box.put(Cache.protocol, protocol);
+    await box.put(Cache.homeserver, homeserver);
+    await box.put(Cache.accessTokenKey, accessToken);
+    await box.put(Cache.lastSinceKey, lastSince);
+    await box.put(Cache.currentUser, currentUser);
+    await box.put(Cache.roomNames, roomNames);
+
+    await box.close();
 
     await AndroidAlarmManager.periodic(
       Duration(seconds: serviceTimeout),
@@ -78,44 +80,12 @@ class BackgroundSync {
       debugPrint('[BackgroundSync] Failed To Stop $error');
     }
   }
-}
 
-/** 
- *  Save Full Sync
- * 
- *  https://github.com/hivedb/hive/issues/122
- */
-FutureOr<void> saveSyncIsolate(dynamic params) async {
-  // print('[saveSyncIsolate] ${Isolate.current.hashCode} ${params['location']}');
-
-  Hive.init(params['location']);
-
-  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
-
-  // final encryptionKey = await unlockEncryptionKey();
-
-  // final syncBox = await Hive.openBox(
-  //   Cache.syncKey,
-  //   encryptionCipher: HiveAesCipher(encryptionKey),
-  //   compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-  // );
-
-  await syncBox.put(Cache.syncData, params['sync']);
-  await syncBox.close();
-}
-
-/** 
- *  Save Full Sync
- */
-FutureOr<dynamic> loadSyncIsolate(dynamic params) async {
-  Hive.init(params['location']);
-
-  Box syncBox = await Hive.openBox(Cache.syncKeyUNSAFE);
-
-  final syncData = await syncBox.get(Cache.syncData);
-  await syncBox.close();
-
-  return syncData;
+  static void updateRooms({Map<String, String> roomNames}) async {
+    final box = await openHiveBackgroundUnsafe();
+    await box.put(Cache.roomNames, roomNames);
+    await box.close();
+  }
 }
 
 /** 
@@ -170,9 +140,6 @@ FutureOr<dynamic> syncLoop({
     try {
       await cache.put(Cache.lastSinceKey, lastSinceNew);
 
-      /**
-              *TODO: Need to handle group / bigger room chats differently than direct chats
-              */
       rawRooms.forEach((roomId, json) {
         // Filter through parsers
         final room = Room().fromSync(json: json, lastSince: lastSinceNew);
@@ -243,10 +210,6 @@ void notificationSyncIsolate() async {
       notificationId: BackgroundSync.service_id,
       pluginInstance: pluginInstance,
     );
-
-    /**
-     *  TODO: explain this a bit
-     */
 
     final cutoff = DateTime.now().add(
       Duration(seconds: BackgroundSync.serviceTimeout),

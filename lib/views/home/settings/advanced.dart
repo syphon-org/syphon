@@ -186,27 +186,27 @@ class AdvancedViewState extends State<AdvancedView> {
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
                     style: TextStyle(
-                      color: props.loading ? Color(Colours.greyDisabled) : null,
+                      color: props.syncing ? Color(Colours.greyDisabled) : null,
                     ),
                   ),
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      props.roomsObserverEnabled ? 'Syncing' : 'Stopped',
+                      props.syncObserverActive ? 'Syncing' : 'Stopped',
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
                 ),
                 Opacity(
-                  opacity: props.loading ? 0.5 : 1,
+                  opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.loading ? null : props.onManualSync,
+                    onTap: props.syncing ? null : props.onManualSync,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
                       style: Theme.of(context).textTheme.subtitle1.copyWith(
-                            color: props.loading
+                            color: props.syncing
                                 ? Color(Colours.greyDisabled)
                                 : null,
                           ),
@@ -215,26 +215,26 @@ class AdvancedViewState extends State<AdvancedView> {
                       'Perform a forced matrix sync based on last sync timestamp',
                       style: TextStyle(
                         color:
-                            props.loading ? Color(Colours.greyDisabled) : null,
+                            props.syncing ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: CircularProgressIndicator(
-                          value: props.loading ? null : 0),
+                          value: props.syncing ? null : 0),
                     ),
                   ),
                 ),
                 Opacity(
-                  opacity: props.loading ? 0.5 : 1,
+                  opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.loading ? null : props.onForceFullSync,
+                    onTap: props.syncing ? null : props.onForceFullSync,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
                       style: Theme.of(context).textTheme.subtitle1.copyWith(
-                            color: props.loading
+                            color: props.syncing
                                 ? Color(Colours.greyDisabled)
                                 : null,
                           ),
@@ -245,14 +245,13 @@ class AdvancedViewState extends State<AdvancedView> {
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: CircularProgressIndicator(
-                        value: props.loading ? null : 0,
+                        value: props.syncing ? null : 0,
                       ),
                     ),
                   ),
                 ),
                 ListTile(
                   dense: true,
-                  onTap: props.loading ? null : props.onForceFullSync,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Version',
@@ -272,9 +271,7 @@ class AdvancedViewState extends State<AdvancedView> {
 
 class _Props extends Equatable {
   final bool syncing;
-  final bool loading;
-  final bool loadingForced;
-  final bool roomsObserverEnabled;
+  final bool syncObserverActive;
   final String language;
   final String lastSince;
   final User currentUser;
@@ -286,10 +283,8 @@ class _Props extends Equatable {
 
   _Props({
     @required this.syncing,
-    @required this.loading,
-    @required this.loadingForced,
     @required this.language,
-    @required this.roomsObserverEnabled,
+    @required this.syncObserverActive,
     @required this.currentUser,
     @required this.lastSince,
     @required this.onManualSync,
@@ -301,11 +296,9 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         syncing,
-        loading,
         lastSince,
         currentUser,
-        loadingForced,
-        roomsObserverEnabled,
+        syncObserverActive,
       ];
 
   static _Props mapStateToProps(
@@ -313,12 +306,10 @@ class _Props extends Equatable {
   ) =>
       _Props(
         syncing: store.state.syncStore.syncing,
-        loading: store.state.syncStore.syncing || store.state.syncStore.loading,
-        loadingForced: store.state.syncStore.loading,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,
-        roomsObserverEnabled: store.state.syncStore.syncObserver != null &&
+        syncObserverActive: store.state.syncStore.syncObserver != null &&
             store.state.syncStore.syncObserver.isActive,
         onToggleSyncing: () {
           final observer = store.state.syncStore.syncObserver;
