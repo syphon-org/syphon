@@ -437,31 +437,26 @@ class CreateGroupPublicState extends State<CreateGroupView> {
                                               ],
                                             ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () => props.onDisabled(),
-                                            child: Container(
-                                              width: width / 1.3,
-                                              child: ListTile(
-                                                enabled: false,
-                                                contentPadding:
-                                                    Dimensions.listPadding,
-                                                title: Text(
-                                                  'Message Encryption',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .subtitle1,
-                                                ),
-                                                trailing: Container(
-                                                  child: Switch(
-                                                    value: this.encryption,
-                                                    onChanged: (value) =>
-                                                        onToggleEncryption(
-                                                            props),
-                                                  ),
-                                                ),
-                                                onTap: () =>
-                                                    onToggleEncryption(props),
+                                          Container(
+                                            width: width / 1.3,
+                                            child: ListTile(
+                                              contentPadding:
+                                                  Dimensions.listPadding,
+                                              title: Text(
+                                                'Message Encryption',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle1,
                                               ),
+                                              trailing: Container(
+                                                child: Switch(
+                                                  value: this.encryption,
+                                                  onChanged: (value) =>
+                                                      onToggleEncryption(props),
+                                                ),
+                                              ),
+                                              onTap: () =>
+                                                  onToggleEncryption(props),
                                             ),
                                           ),
                                         ],
