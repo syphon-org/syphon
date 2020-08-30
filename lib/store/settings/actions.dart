@@ -94,6 +94,8 @@ class ToggleNotifications {}
 
 class ToggleTypingIndicators {}
 
+class ToggleTimeFormat {}
+
 class ToggleReadReceipts {}
 
 class LogAppAgreement {}
@@ -348,6 +350,12 @@ ThunkAction<AppState> toggleReadReceipts() {
 ThunkAction<AppState> toggleTypingIndicators() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleTypingIndicators());
+  };
+}
+
+ThunkAction<AppState> toggleTimeFormat() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleTimeFormat());
   };
 }
 

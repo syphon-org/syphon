@@ -403,76 +403,74 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
-  Widget buildMessageList(
-    BuildContext context,
-    _Props props,
-  ) {
-    final messages = props.messages;
-
-    return GestureDetector(
-      onTap: onDismissMessageOptions,
-      child: Container(
-        child: ListView(
-          reverse: true,
-          padding: EdgeInsets.only(bottom: 12),
-          physics: selectedMessage != null
-              ? const NeverScrollableScrollPhysics()
-              : null,
-          controller: messagesController,
-          children: [
-            MessageTypingWidget(
-              typing: props.room.userTyping,
-              usersTyping: props.room.usersTyping,
-              roomUsers: props.room.users,
-              selectedMessageId:
-                  this.selectedMessage != null ? this.selectedMessage.id : null,
-              onPressAvatar: onViewUserDetails,
-            ),
-            ListView.builder(
-              reverse: true,
-              shrinkWrap: true,
-              padding: EdgeInsets.only(bottom: 4),
-              addRepaintBoundaries: true,
-              addAutomaticKeepAlives: true,
-              itemCount: messages.length,
-              scrollDirection: Axis.vertical,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                final message = messages[index];
-                final lastMessage = index != 0 ? messages[index - 1] : null;
-                final nextMessage =
-                    index + 1 < messages.length ? messages[index + 1] : null;
-
-                final isLastSender =
-                    lastMessage != null && lastMessage.sender == message.sender;
-                final isNextSender =
-                    nextMessage != null && nextMessage.sender == message.sender;
-                final isUserSent = props.userId == message.sender;
-                final selectedMessageId = this.selectedMessage != null
+  @protected
+  Widget buildMessageList(BuildContext context, _Props props) =>
+      GestureDetector(
+        onTap: onDismissMessageOptions,
+        child: Container(
+          child: ListView(
+            reverse: true,
+            padding: EdgeInsets.only(bottom: 12),
+            physics: selectedMessage != null
+                ? const NeverScrollableScrollPhysics()
+                : null,
+            controller: messagesController,
+            children: [
+              MessageTypingWidget(
+                typing: props.room.userTyping,
+                usersTyping: props.room.usersTyping,
+                roomUsers: props.room.users,
+                selectedMessageId: this.selectedMessage != null
                     ? this.selectedMessage.id
-                    : null;
+                    : null,
+                onPressAvatar: onViewUserDetails,
+              ),
+              ListView.builder(
+                reverse: true,
+                shrinkWrap: true,
+                padding: EdgeInsets.only(bottom: 4),
+                addRepaintBoundaries: true,
+                addAutomaticKeepAlives: true,
+                itemCount: props.messages.length,
+                scrollDirection: Axis.vertical,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  final message = props.messages[index];
+                  final lastMessage =
+                      index != 0 ? props.messages[index - 1] : null;
+                  final nextMessage = index + 1 < props.messages.length
+                      ? props.messages[index + 1]
+                      : null;
 
-                final avatarUri = props.room.users[message.sender]?.avatarUri;
+                  final isLastSender = lastMessage != null &&
+                      lastMessage.sender == message.sender;
+                  final isNextSender = nextMessage != null &&
+                      nextMessage.sender == message.sender;
+                  final isUserSent = props.userId == message.sender;
+                  final selectedMessageId = this.selectedMessage != null
+                      ? this.selectedMessage.id
+                      : null;
 
-                return MessageWidget(
-                  message: message,
-                  isUserSent: isUserSent,
-                  isLastSender: isLastSender,
-                  isNextSender: isNextSender,
-                  lastRead: props.room.lastRead,
-                  selectedMessageId: selectedMessageId,
-                  onPressAvatar: onViewUserDetails,
-                  onLongPress: onToggleMessageOptions,
-                  avatarUri: avatarUri,
-                  theme: props.theme,
-                );
-              },
-            ),
-          ],
+                  final avatarUri = props.room.users[message.sender]?.avatarUri;
+
+                  return MessageWidget(
+                      message: message,
+                      isUserSent: isUserSent,
+                      isLastSender: isLastSender,
+                      isNextSender: isNextSender,
+                      lastRead: props.room.lastRead,
+                      selectedMessageId: selectedMessageId,
+                      onPressAvatar: onViewUserDetails,
+                      onLongPress: onToggleMessageOptions,
+                      avatarUri: avatarUri,
+                      theme: props.theme,
+                      timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr');
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -658,6 +656,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final List<Message> messages;
   final Color roomPrimaryColor;
+  final bool timeFormat24Enabled;
   final bool roomTypeBadgesEnabled;
 
   final Function onSendTyping;
@@ -680,6 +679,7 @@ class _Props extends Equatable {
     @required this.messages,
     @required this.loading,
     @required this.roomPrimaryColor,
+    @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
     @required this.onUpdateDeviceKeys,
     @required this.onSendTyping,
@@ -709,6 +709,8 @@ class _Props extends Equatable {
       theme: store.state.settingsStore.theme,
       roomTypeBadgesEnabled:
           store.state.settingsStore.roomTypeBadgesEnabled ?? true,
+      timeFormat24Enabled:
+          store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(
         id: roomId,

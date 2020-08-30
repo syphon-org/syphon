@@ -125,6 +125,22 @@ class ChatPreferences extends StatelessWidget {
                                     props.onToggleEnterSend(),
                               ),
                             ),
+                            ListTile(
+                              onTap: () => props.onToggleTimeFormat(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                '24 Hour Time Format',
+                              ),
+                              subtitle: Text(
+                                'Show message timestamps using 24 hour format',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.timeFormat24,
+                                onChanged: (enterSend) =>
+                                    props.onToggleTimeFormat(),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -225,17 +241,21 @@ class ChatPreferences extends StatelessWidget {
 class Props extends Equatable {
   final String language;
   final bool enterSend;
+  final bool timeFormat24;
   final String chatFontSize;
 
   final Function onDisabled;
   final Function onToggleEnterSend;
+  final Function onToggleTimeFormat;
 
   Props({
     @required this.language,
     @required this.enterSend,
     @required this.chatFontSize,
-    @required this.onToggleEnterSend,
+    @required this.timeFormat24,
     @required this.onDisabled,
+    @required this.onToggleEnterSend,
+    @required this.onToggleTimeFormat,
   });
 
   @override
@@ -243,12 +263,15 @@ class Props extends Equatable {
         language,
         enterSend,
         chatFontSize,
+        timeFormat24,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         chatFontSize: 'Default',
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,
+        timeFormat24: store.state.settingsStore.timeFormat24Enabled,
+        onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
         onDisabled: () => store.dispatch(addInProgress()),
       );

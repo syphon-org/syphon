@@ -19,24 +19,29 @@ String formatSenderInitials(String sender) {
 }
 
 // 1237597223894 -> 30m, now, etc
-String formatTimestamp({int lastUpdateMillis, bool showTime = false}) {
+String formatTimestamp({
+  int lastUpdateMillis,
+  bool showTime = false,
+  String timeFormat,
+}) {
   if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
+  final hourFormat = timeFormat == '24hr' ? 'H:mm' : 'h:mm';
 
   if (sinceLastUpdate.inDays > 365) {
     return DateFormat(
-      showTime ? 'MMM d h:mm a' : 'MMM d yyyy',
+      showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
     return DateFormat(
-      showTime ? 'MMM d h:mm a' : 'MMM d',
+      showTime ? 'MMM d $hourFormat a' : 'MMM d',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat(showTime ? 'E h:mm a' : 'E').format(timestamp);
+    return DateFormat(showTime ? 'E $hourFormat a' : 'E').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';
