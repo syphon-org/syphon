@@ -28,15 +28,13 @@ import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/views/home/chat/chat-input.dart';
-import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
-import 'package:syphon/views/widgets/containers/menu-rounded.dart';
+import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
+import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -476,291 +474,6 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
-  @protected
-  buildRoomAppBar({_Props props, BuildContext context}) => AppBar(
-        titleSpacing: 0.0,
-        automaticallyImplyLeading: false,
-        brightness: Theme.of(context).appBarTheme.brightness,
-        title: Row(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 8),
-              child: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  if (editorController.text != null &&
-                      0 < editorController.text.length) {
-                    props.onSaveDraftMessage(
-                      body: editorController.text,
-                      type: MessageTypes.TEXT,
-                    );
-                  } else if (props.room.draft != null) {
-                    props.onClearDraftMessage();
-                  }
-
-                  Navigator.pop(context, false);
-                },
-              ),
-            ),
-            GestureDetector(
-              child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                child: Stack(
-                  children: [
-                    Hero(
-                      tag: "ChatAvatar",
-                      child: AvatarCircle(
-                        uri: props.room.avatarUri,
-                        size: Dimensions.avatarSizeMin,
-                        alt: formatRoomInitials(room: props.room),
-                        background: props.roomPrimaryColor,
-                      ),
-                    ),
-                    Visibility(
-                      visible: props.room.encryptionEnabled,
-                      child: Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            width: Dimensions.badgeAvatarSize,
-                            height: Dimensions.badgeAvatarSize,
-                            color: Colors.green,
-                            child: Icon(
-                              Icons.lock,
-                              color: Colors.white,
-                              size: Dimensions.badgeAvatarSize - 6,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: props.roomTypeBadgesEnabled &&
-                          props.room.type == 'group' &&
-                          !props.room.invite,
-                      child: Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            width: Dimensions.badgeAvatarSize,
-                            height: Dimensions.badgeAvatarSize,
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            child: Icon(
-                              Icons.group,
-                              color: Theme.of(context).iconTheme.color,
-                              size: Dimensions.badgeAvatarSizeSmall,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: props.roomTypeBadgesEnabled &&
-                          props.room.type == 'public' &&
-                          !props.room.invite,
-                      child: Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            width: Dimensions.badgeAvatarSize,
-                            height: Dimensions.badgeAvatarSize,
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            child: Icon(
-                              Icons.public,
-                              color: Theme.of(context).iconTheme.color,
-                              size: Dimensions.badgeAvatarSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/home/chat/settings',
-                  arguments: ChatSettingsArguments(
-                    roomId: props.room.id,
-                    title: props.room.name,
-                  ),
-                );
-              },
-            ),
-            Flexible(
-              child: Text(
-                props.room.name,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    .copyWith(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          Visibility(
-            maintainSize: false,
-            visible: debug == 'true',
-            child: IconButton(
-              icon: Icon(Icons.gamepad),
-              iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Debug Room Function',
-              color: Colors.white,
-              onPressed: () {
-                props.onCheatCode();
-              },
-            ),
-          ),
-          RoundedPopupMenu<ChatOptions>(
-            onSelected: (ChatOptions result) {
-              switch (result) {
-                case ChatOptions.chatSettings:
-                  return Navigator.pushNamed(
-                    context,
-                    '/home/chat/settings',
-                    arguments: ChatSettingsArguments(
-                      roomId: props.room.id,
-                      title: props.room.name,
-                    ),
-                  );
-                default:
-                  break;
-              }
-            },
-            icon: Icon(Icons.more_vert, color: Colors.white),
-            itemBuilder: (BuildContext context) =>
-                <PopupMenuEntry<ChatOptions>>[
-              const PopupMenuItem<ChatOptions>(
-                enabled: false,
-                value: ChatOptions.search,
-                child: Text('Search'),
-              ),
-              const PopupMenuItem<ChatOptions>(
-                enabled: false,
-                value: ChatOptions.allMedia,
-                child: Text('All Media'),
-              ),
-              const PopupMenuItem<ChatOptions>(
-                value: ChatOptions.chatSettings,
-                child: Text('Chat Settings'),
-              ),
-              const PopupMenuItem<ChatOptions>(
-                enabled: false,
-                value: ChatOptions.inviteFriends,
-                child: Text('Invite Friends'),
-              ),
-              const PopupMenuItem<ChatOptions>(
-                enabled: false,
-                value: ChatOptions.muteNotifications,
-                child: Text('Mute Notifications'),
-              ),
-            ],
-          )
-        ],
-      );
-
-  @protected
-  buildMessageOptionsBar({
-    _Props props,
-    BuildContext context,
-  }) {
-    return AppBar(
-      brightness: Brightness.dark, // TOOD: this should inherit from theme
-      backgroundColor: Colors.grey[500],
-      automaticallyImplyLeading: false,
-      titleSpacing: 0.0,
-      title: Row(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 8),
-            child: IconButton(
-              icon: Icon(
-                Icons.close,
-                color: Colors.white,
-              ),
-              onPressed: onDismissMessageOptions,
-            ),
-          ),
-        ],
-      ),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.info),
-          tooltip: 'Message Details',
-          color: Colors.white,
-          onPressed: () => {
-            Navigator.pushNamed(
-              context,
-              '/home/chat/details',
-              arguments: MessageDetailArguments(
-                roomId: props.room.id,
-                message: selectedMessage,
-              ),
-            ),
-            this.setState(() {
-              selectedMessage = null;
-            })
-          },
-        ),
-        IconButton(
-            icon: Icon(Icons.delete),
-            iconSize: 28.0,
-            tooltip: 'Delete Message',
-            color: Colors.white,
-            onPressed: () {
-              props.onDeleteMessage(
-                message: this.selectedMessage,
-              );
-              this.setState(() {
-                selectedMessage = null;
-              });
-            }),
-        Visibility(
-          visible: isTextMessage(message: selectedMessage),
-          child: IconButton(
-            icon: Icon(Icons.content_copy),
-            iconSize: 22.0,
-            tooltip: 'Copy Message Content',
-            color: Colors.white,
-            onPressed: () {
-              Clipboard.setData(
-                ClipboardData(
-                  text: selectedMessage.formattedBody ?? selectedMessage.body,
-                ),
-              );
-              this.setState(() {
-                selectedMessage = null;
-              });
-            },
-          ),
-        ),
-        IconButton(
-          icon: Icon(Icons.reply),
-          iconSize: 28.0,
-          tooltip: 'Quote and Reply',
-          color: Colors.white,
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: Icon(Icons.share),
-          iconSize: 24.0,
-          tooltip: 'Share Chats',
-          color: Colors.white,
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -785,20 +498,43 @@ class ChatViewState extends State<ChatView> {
             inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
           }
 
-          var currentAppBar = buildRoomAppBar(
-            props: props,
-            context: context,
+          Widget appBar = AppBarChat(
+            room: props.room,
+            color: props.roomPrimaryColor,
+            badgesEnabled: props.roomTypeBadgesEnabled,
+            onDebug: () {
+              props.onCheatCode();
+            },
+            onBack: () {
+              if (editorController.text != null &&
+                  0 < editorController.text.length) {
+                props.onSaveDraftMessage(
+                  body: editorController.text,
+                  type: MessageTypes.TEXT,
+                );
+              } else if (props.room.draft != null) {
+                props.onClearDraftMessage();
+              }
+
+              Navigator.pop(context, false);
+            },
           );
 
           if (this.selectedMessage != null) {
-            currentAppBar = buildMessageOptionsBar(
-              props: props,
-              context: context,
+            appBar = AppBarMessageOptions(
+              room: props.room,
+              message: selectedMessage,
+              onDismiss: () => this.setState(() {
+                selectedMessage = null;
+              }),
+              onDelete: () => props.onDeleteMessage(
+                message: this.selectedMessage,
+              ),
             );
           }
 
           return Scaffold(
-            appBar: currentAppBar,
+            appBar: appBar,
             backgroundColor: selectedMessage != null
                 ? Theme.of(context).scaffoldBackgroundColor.withAlpha(64)
                 : Theme.of(context).scaffoldBackgroundColor,

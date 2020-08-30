@@ -414,7 +414,7 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Themes.backgroundBrightness(props.theme),
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               child: Icon(
                                 Icons.mail_outline,
                                 color: Theme.of(context).iconTheme.color,
@@ -451,7 +451,7 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Themes.backgroundBrightness(props.theme),
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               child: Icon(
                                 Icons.group,
                                 color: Theme.of(context).iconTheme.color,
@@ -473,7 +473,7 @@ class HomeViewState extends State<Home> {
                             child: Container(
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
-                              color: Themes.backgroundBrightness(props.theme),
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               child: Icon(
                                 Icons.public,
                                 color: Theme.of(context).iconTheme.color,

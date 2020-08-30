@@ -74,6 +74,7 @@ ThunkAction<AppState> fetchMessageEvents({
       final String end = messagesJson['end'];
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String start = messagesJson['start'];
+      // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
       // If there's a gap in messages fetched, run a sync again
