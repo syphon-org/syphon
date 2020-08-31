@@ -371,13 +371,15 @@ class ChatViewState extends State<ChatView> {
         PopupMenuItem<String>(
           enabled: props.room.direct,
           child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-              this.onChangeMediumType(
-                newMediumType: MediumType.encryption,
-                props: props,
-              );
-            },
+            onTap: !props.room.direct
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    this.onChangeMediumType(
+                      newMediumType: MediumType.encryption,
+                      props: props,
+                    );
+                  },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Row(
@@ -577,9 +579,7 @@ class ChatViewState extends State<ChatView> {
                               maintainSize: false,
                               maintainAnimation: false,
                               maintainState: false,
-                              visible:
-                                  props.room.endHash == props.room.prevHash ||
-                                      props.room.endHash == null,
+                              visible: props.room.lastHash == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -799,7 +799,7 @@ class _Props extends Equatable {
         store.dispatch(
           fetchMessageEvents(
             room: room,
-            startHash: room.startHash,
+            from: room.nextHash,
           ),
         );
       },
@@ -814,7 +814,8 @@ class _Props extends Equatable {
 
         store.dispatch(fetchMessageEvents(
           room: room,
-          startHash: room.endHash,
+          from: room.lastHash,
+          oldest: true,
         ));
       },
       onCheatCode: () async {

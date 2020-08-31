@@ -51,11 +51,11 @@ class Room {
   final bool isDraftRoom;
 
   @HiveField(11)
-  final String endHash; // end of last message fetch
-  @HiveField(10)
-  final String startHash; // start of last messages fetch (usually prev_batch)
+  final String lastHash; // oldest hash in timeline
   @HiveField(26)
-  final String prevHash; // fromHash but from /sync only
+  final String prevHash; // most recent prev_batch (not the lastHash)
+  @HiveField(10)
+  final String nextHash; // most recent next_batch
 
   @HiveField(12)
   final int lastUpdate;
@@ -99,6 +99,8 @@ class Room {
   @HiveField(27)
   final bool invite;
 
+  final bool limited;
+
   String get type {
     if (joinRule == 'public' || worldReadable) {
       return 'public';
@@ -123,9 +125,11 @@ class Room {
     this.avatarUri,
     this.topic = '',
     this.joinRule = 'private',
+    this.invite = false,
     this.direct = false,
     this.syncing = false,
     this.sending = false,
+    this.limited = false,
     this.draft,
     this.users,
     this.outbox = const [],
@@ -140,11 +144,10 @@ class Room {
     this.userTyping = false,
     this.usersTyping = const [],
     this.isDraftRoom = false,
-    this.endHash,
-    this.startHash,
+    this.lastHash,
+    this.nextHash,
     this.prevHash,
     this.messageReads,
-    this.invite = false,
   });
 
   Room copyWith({
@@ -154,7 +157,9 @@ class Room {
     avatar,
     avatarUri,
     topic,
+    invite,
     direct,
+    limited,
     syncing,
     sending,
     joinRule,
@@ -173,10 +178,9 @@ class Room {
     outbox,
     messages,
     messageReads,
-    endHash,
-    startHash,
+    lastHash,
     prevHash,
-    invite,
+    nextHash,
     // state,
   }) {
     return Room(
@@ -187,10 +191,12 @@ class Room {
       joinRule: joinRule ?? this.joinRule,
       avatarUri: avatarUri ?? this.avatarUri,
       homeserver: homeserver ?? this.homeserver,
-      direct: direct ?? this.direct,
       draft: draft ?? this.draft,
+      invite: invite ?? this.invite,
+      direct: direct ?? this.direct,
       sending: sending ?? this.sending,
       syncing: syncing ?? this.syncing,
+      limited: limited ?? this.limited,
       lastRead: lastRead ?? this.lastRead,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       namePriority: namePriority ?? this.namePriority,
@@ -204,10 +210,9 @@ class Room {
       messages: messages ?? this.messages,
       users: users ?? this.users,
       messageReads: messageReads ?? this.messageReads,
-      endHash: endHash ?? this.endHash,
-      startHash: startHash ?? this.startHash,
-      prevHash: prevHash, // TODO: may always need a prev hash?
-      invite: invite ?? this.invite,
+      lastHash: lastHash ?? this.lastHash,
+      prevHash: prevHash ?? this.prevHash,
+      nextHash: nextHash ?? this.nextHash,
       // state: state ?? this.state,
     );
   }
@@ -236,9 +241,10 @@ class Room {
     String lastSince,
     Map<String, dynamic> json,
   }) {
-    String endHash;
-    String prevHash = this.prevHash;
     bool invite;
+    bool limited;
+    String lastHash;
+    String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
     List<Event> ephemeralEvents = [];
@@ -264,7 +270,8 @@ class Room {
     // Find state and message updates from timeline
     // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
-      endHash = json['timeline']['end_batch'];
+      limited = json['timeline']['limited'];
+      lastHash = json['timeline']['last_hash'];
       prevHash = json['timeline']['prev_batch'];
 
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
@@ -305,18 +312,19 @@ class Room {
           accountEvents,
         )
         .fromStateEvents(
-          stateEvents,
+          events: stateEvents,
           invite: invite,
+          limited: limited,
           currentUser: currentUser,
         )
         .fromMessageEvents(
-          messageEvents,
-          endHash: endHash,
+          events: messageEvents,
+          lastHash: lastHash,
           prevHash: prevHash,
-          startHash: lastSince,
+          nextHash: lastSince,
         )
         .fromEphemeralEvents(
-          ephemeralEvents,
+          events: ephemeralEvents,
           currentUser: currentUser,
         );
   }
@@ -353,10 +361,11 @@ class Room {
    * Find details of room based on state events
    * follows spec naming priority and thumbnail downloading
    */
-  Room fromStateEvents(
-    List<Event> stateEvents, {
+  Room fromStateEvents({
     bool invite,
+    bool limited,
     User currentUser,
+    List<Event> events,
   }) {
     String name;
     String avatarUri;
@@ -371,7 +380,7 @@ class Room {
 
     // room state event filter
     try {
-      stateEvents.forEach((event) {
+      events.forEach((event) {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
@@ -488,12 +497,13 @@ class Room {
       topic: topic ?? this.topic,
       users: users ?? this.users,
       direct: direct ?? this.direct,
+      invite: invite ?? this.invite,
+      limited: limited ?? this.limited,
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
-      invite: invite ?? this.invite,
     );
   }
 
@@ -504,34 +514,50 @@ class Room {
    * message events have side effects on room data
    * outside displaying messages
    */
-  Room fromMessageEvents(
-    List<Message> messageEvents, {
-    String endHash, // oldest hash in timeline
+  Room fromMessageEvents({
+    List<Message> events,
+    String lastHash,
     String prevHash, // previously fetched hash
-    String startHash,
+    String nextHash,
   }) {
     try {
+      bool limited;
+      bool isUpdated = false;
       int lastUpdate = this.lastUpdate;
-
-      List<Message> newMessages = messageEvents ?? [];
+      List<Message> messagesNew = events ?? [];
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
-      List<Message> existingMessages = List<Message>.from(this.messages ?? []);
+      List<Message> messagesExisting = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final hasEncrypted = newMessages.firstWhere(
+      final hasEncrypted = messagesNew.firstWhere(
         (msg) => msg.type == EventTypes.encrypted,
         orElse: () => null,
       );
 
       // See if the newest message has a greater timestamp
-      if (newMessages.isNotEmpty && lastUpdate < newMessages[0].timestamp) {
-        lastUpdate = newMessages[0].timestamp;
+      if (messagesNew.isNotEmpty && lastUpdate < messagesNew[0].timestamp) {
+        lastUpdate = messagesNew[0].timestamp;
+      }
+
+      // Check to see if the new messages contain those existing in cache
+      if (messagesNew.isNotEmpty) {
+        final messageLatest = messagesExisting.firstWhere(
+          (msg) => msg.id == messagesNew[0].id,
+          orElse: () => null,
+        );
+        isUpdated = messageLatest != null;
+      }
+
+      // Set limited to false if new messages contains old ones
+      // this is due to limited being used to fill message gaps
+      if (isUpdated != null || messagesNew.length == 0) {
+        limited = false;
       }
 
       // Combine current and existing messages on unique ids
-      existingMessages.addAll(newMessages);
+      messagesExisting.addAll(messagesNew);
       final messagesMap = HashMap.fromIterable(
-        existingMessages,
+        messagesExisting,
         key: (message) => message.id,
         value: (message) => message,
       );
@@ -542,21 +568,29 @@ class Room {
       );
 
       // Filter to find startTime and endTime
-      final allMessages = List<Message>.from(messagesMap.values);
+      final messagesAll = List<Message>.from(messagesMap.values);
+
+      print('[fromMessageEvents] ${this.name}');
+      print('[limited] ${limited}');
+      print('[lastHash] ${lastHash}');
+      print('[lastHash - Cached] ${this.lastHash}');
+      print('[prevHash] ${prevHash}');
 
       return this.copyWith(
         outbox: outbox,
-        messages: allMessages,
+        messages: messagesAll,
+        limited: limited ?? this.limited,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
-        // hash of last batch of messages in timeline
-        endHash: endHash ?? this.endHash ?? prevHash,
-        // hash of the latest batch messages in timeline
-        startHash: startHash ?? this.startHash,
-        // most recent previous batch from the last /sync
-        prevHash: prevHash,
+        // oldest hash in the timeline
+        lastHash: lastHash ?? this.lastHash ?? prevHash,
+        // most recent prev_batch from the last /sync
+        prevHash: prevHash ?? this.prevHash,
+        // next hash in the timeline
+        nextHash: nextHash ?? this.nextHash,
       );
     } catch (error) {
+      debugPrint('[fromMessageEvents] $error');
       return this;
     }
   }
@@ -565,8 +599,8 @@ class Room {
    * Appends ephemeral events (mostly read receipts) to a
    * hashmap of eventIds linking them to users and timestamps
    */
-  Room fromEphemeralEvents(
-    List<Event> events, {
+  Room fromEphemeralEvents({
+    List<Event> events,
     User currentUser,
   }) {
     bool userTyping = false;

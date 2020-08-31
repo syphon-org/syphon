@@ -195,7 +195,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         }
       }
 
-      final lastSince = data['next_batch'];
+      final nextBatch = data['next_batch'];
       final oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
       final Map<String, dynamic> rawInvites = data['rooms']['invite'];
@@ -222,7 +222,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(SetSynced(
         synced: true,
         syncing: false,
-        lastSince: lastSince,
+        lastSince: nextBatch,
       ));
 
       if (!kReleaseMode && isFullSync) {

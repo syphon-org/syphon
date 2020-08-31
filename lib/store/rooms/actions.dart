@@ -170,15 +170,18 @@ ThunkAction<AppState> syncRooms(
 
       // fetch previous messages since last /sync if
       // more than one batch needs to be fetched (a gap)
-      // and is not already at the end of the hash
-      // the end would be room.prevHash == room.endHash
-      // TODO: make this work with an explicit call
-      if (room.prevHash != null && room.prevHash != room.endHash) {
+      // and is not already at the end of the last known batch
+      // the end would be room.prevHash == room.lastHash
+      final roomUpdated = store.state.roomStore.rooms[room.id];
+
+      if (roomUpdated.limited &&
+          room.prevHash != null &&
+          room.prevHash != room.lastHash) {
         store.dispatch(
           fetchMessageEvents(
             room: room,
-            endHash: room.endHash,
-            startHash: room.prevHash,
+            to: room.lastHash,
+            from: room.prevHash,
           ),
         );
       }
