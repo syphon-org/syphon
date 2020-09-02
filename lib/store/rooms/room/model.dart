@@ -548,9 +548,10 @@ class Room {
         isUpdated = messageLatest != null;
       }
 
-      // Set limited to false if new messages contains old ones
-      // this is due to limited being used to fill message gaps
-      if (isUpdated != null || messagesNew.length == 0) {
+      // Set limited (used to recursively sync) to false if
+      // - new messages contains old ones
+      // - it's the first full /sync (lastHash == null)
+      if (isUpdated != null || this.lastHash == null) {
         limited = false;
       }
 
@@ -572,6 +573,7 @@ class Room {
 
       print('[fromMessageEvents] ${this.name}');
       print('[limited] ${limited}');
+      print('[limited - cached] ${this.limited}');
       print('[lastHash] ${lastHash}');
       print('[lastHash - Cached] ${this.lastHash}');
       print('[prevHash] ${prevHash}');
