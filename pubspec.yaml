@@ -97,7 +97,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   url_launcher: 5.5.0
   flutter_svg: 0.18.1
-  file_picker: 1.10.0
+  file_picker: 1.13.3
   image_picker: ^0.6.7+7
   flutter_swiper : 1.1.6
   webview_flutter: ^0.3.21 
@@ -110,8 +110,7 @@ dependencies:
   palette_generator: 0.2.3
 
 dev_dependencies:
-  # flutter_test:
-  #   sdk: flutter
+  flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
   hive_generator: 0.7.1
   # TODO: build fixes - remove later
@@ -122,9 +121,13 @@ dependency_overrides:
   path: 1.7.0
   analyzer: 0.39.14
   dart_style: 1.3.4
-  # dartx: ^0.3.0
-  # characters: ^0.3.0
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/current/app_icon_ios.png"
+  adaptive_icon_background: "#34C7B5"
+  adaptive_icon_foreground: "assets/icons/current/app_icon_foreground.png"
 
 # The following section is specific to Flutter.
 flutter:
@@ -175,9 +178,9 @@ flutter:
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
    - assets/graphics/undraw_not_found.svg
-   - assets/icons/app_icon.svg
-   - assets/icons/app_icon.png
-   - assets/icons/app_icon_white.png
+   - assets/icons/current/app_icon_cyan.svg
+   - assets/icons/current/app_icon_cyan.png
+   - assets/icons/current/app_icon_white.png
    - assets/icons/global/being-check.svg
    - assets/icons/global/being-person-add.svg
    - assets/icons/global/being-group-add.svg

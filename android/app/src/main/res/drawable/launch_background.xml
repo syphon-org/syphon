@@ -2,11 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/primary" /> 
     <item     
-    android:width="192dp"
-    android:height="192dp"
+    android:width="112dp"
+    android:height="112dp"
       android:gravity="center">
       <bitmap
           android:gravity="fill"
-          android:src="@drawable/app_icon" /> 
+          android:src="@drawable/ic_launcher_foreground" /> 
     </item>
 </layer-list>
