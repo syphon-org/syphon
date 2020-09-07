@@ -32,6 +32,7 @@ class Strings {
   static const titleCreateGroupPublic = 'Create A Public Group';
 
   // Dialog Titles
+  static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
   static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
   static const titleDialogTerms = "Confirm Terms Of Service";
@@ -63,6 +64,7 @@ class Strings {
   static const buttonCancel = 'cancel';
   static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+  static const buttonDeleteKeys = 'delete keys';
 
   // Text Buttons
   static const buttonTextSeeAllUsers = 'See All Users';
@@ -113,6 +115,9 @@ class Strings {
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
 
   // Confirmations
+  static const confirmationDeleteKeys =
+      "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.";
+
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
 

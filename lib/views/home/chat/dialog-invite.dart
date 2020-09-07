@@ -33,21 +33,6 @@ class DialogInvite extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // SimpleDialogOption(
-              //   padding: EdgeInsets.symmetric(
-              //     horizontal: 12,
-              //     vertical: 12,
-              //   ),
-              //   onPressed: () {
-              //     if (onCancel != null) {
-              //       onCancel();
-              //     }
-              //   },
-              //   child: Text(
-              //     'block',
-              //     style: Theme.of(context).textTheme.subtitle1,
-              //   ),
-              // ),
               Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

@@ -458,6 +458,10 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         throw data['error'];
       }
 
+      debugPrint(
+        '[uploadIdentityKeys] one time key count: ${data['one_time_key_counts']}',
+      );
+
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
       await store.dispatch(saveOlmAccount());

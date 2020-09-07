@@ -233,14 +233,21 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
       if (Platform.isAndroid) {
         final info = await deviceInfoPlugin.androidInfo;
         final deviceIdentifier = info.androidId;
-        final hashedDeviceId = Crypt.sha256(
+        final deviceIdHashed = Crypt.sha256(
           deviceIdentifier,
           rounds: 1000,
           salt: salt,
         );
 
+        final deviceIdHashedFriendly = deviceIdHashed.hash
+            .toUpperCase()
+            .substring(0, 10)
+            .replaceAll(RegExp(r'^[a-zA-Z0-9]+$'), '');
+
+        debugPrint('[generateDeviceId] ${generateDeviceId}');
+
         device = Device(
-          deviceId: hashedDeviceId.hash,
+          deviceId: deviceIdHashedFriendly,
           deviceIdPrivate: info.androidId,
           displayName: Values.appDisplayName,
         );
@@ -248,14 +255,17 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
         final info = await deviceInfoPlugin.iosInfo;
         final deviceIdentifier = info.identifierForVendor;
 
-        final hashedDeviceId = Crypt.sha256(
+        final deviceIdHashed = Crypt.sha256(
           deviceIdentifier,
           rounds: 1000,
           salt: salt,
         );
 
+        final deviceIdHashedFriendly =
+            deviceIdHashed.hash.toUpperCase().substring(0, 10);
+
         device = Device(
-          deviceId: hashedDeviceId.hash,
+          deviceId: deviceIdHashedFriendly,
           deviceIdPrivate: info.identifierForVendor,
           displayName: Values.appDisplayName,
         );
