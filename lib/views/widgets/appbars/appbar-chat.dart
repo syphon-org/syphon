@@ -151,7 +151,7 @@ class AppBarChatState extends State<AppBarChat> {
                           child: Container(
                             width: Dimensions.badgeAvatarSize,
                             height: Dimensions.badgeAvatarSize,
-                            color: Colors.green,
+                            color: Colors.green[700],
                             child: Icon(
                               Icons.lock,
                               color: Colors.white,

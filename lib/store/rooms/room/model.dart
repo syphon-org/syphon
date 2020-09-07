@@ -571,12 +571,15 @@ class Room {
       // Filter to find startTime and endTime
       final messagesAll = List<Message>.from(messagesMap.values);
 
-      print('[fromMessageEvents] ${this.name}');
-      print('[limited] ${limited}');
-      print('[limited - cached] ${this.limited}');
-      print('[lastHash] ${lastHash}');
-      print('[lastHash - Cached] ${this.lastHash}');
-      print('[prevHash] ${prevHash}');
+      // TODO: after message catchup works, remove this
+      if (true) {
+        // print('[fromMessageEvents] ${this.name}');
+        // print('[limited] ${limited}');
+        // print('[limited - cached] ${this.limited}');
+        // print('[lastHash] ${lastHash}');
+        // print('[lastHash - Cached] ${this.lastHash}');
+        // print('[prevHash] ${prevHash}');
+      }
 
       return this.copyWith(
         outbox: outbox,

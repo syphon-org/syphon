@@ -395,10 +395,11 @@ class HomeViewState extends State<Home> {
                               child: Container(
                                 width: Dimensions.badgeAvatarSize,
                                 height: Dimensions.badgeAvatarSize,
-                                color: Colors.green,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 child: Icon(
                                   Icons.lock,
-                                  color: Colors.white,
+                                  color: Colors.green[700],
                                   size: Dimensions.iconSizeMini,
                                 ),
                               )),

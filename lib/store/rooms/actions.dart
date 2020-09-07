@@ -174,7 +174,8 @@ ThunkAction<AppState> syncRooms(
       // the end would be room.prevHash == room.lastHash
       final roomUpdated = store.state.roomStore.rooms[room.id];
 
-      if (roomUpdated.limited &&
+      if (roomUpdated != null &&
+          room.limited &&
           room.prevHash != null &&
           room.prevHash != room.lastHash) {
         store.dispatch(
