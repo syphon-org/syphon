@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -37,7 +39,7 @@ class ChatPreferences extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                Strings.titleChatPreferences,
+                tr(StringKeys.titleViewPreferencesChat),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,

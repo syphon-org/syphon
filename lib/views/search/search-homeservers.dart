@@ -2,6 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -71,8 +73,8 @@ class SearchHomeserversState extends State<SearchHomeservers> {
           final height = MediaQuery.of(context).size.height;
           return Scaffold(
             appBar: AppBarSearch(
-              title: Strings.titleHomeserverSearch,
-              label: Strings.placeholderHomeserverSearch,
+              title: tr(StringKeys.titleViewHomeserverSearch),
+              label: tr(StringKeys.labelSearchHomeservers),
               tooltip: 'Search Homeservers',
               brightness: Brightness.dark,
               focusNode: searchInputFocusNode,

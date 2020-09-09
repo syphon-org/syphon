@@ -2,6 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -165,7 +166,7 @@ class DeviceViewState extends State<DevicesView> {
         onPressed: () => Navigator.pop(context, false),
       ),
       title: Text(
-        Strings.titleViewDevices,
+        tr('title-view-devices'),
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,

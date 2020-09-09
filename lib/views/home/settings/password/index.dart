@@ -2,6 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -31,8 +32,6 @@ class PasswordView extends StatefulWidget {
 }
 
 class PasswordUpdateState extends State<PasswordView> {
-  final String title = Strings.titleViewSignup;
-
   int currentStep = 0;
   bool onboarding = false;
   bool validStep = false;

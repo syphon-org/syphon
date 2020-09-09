@@ -8,13 +8,6 @@ import 'package:syphon/global/values.dart';
  */
 class Strings {
   // View Titles
-  static const titleViewSignup = 'Signup';
-  static const titleViewDevices = 'Devices';
-  static const titleViewSettings = 'Settings';
-  static const titleChatPreferences = 'Chat Preferences';
-  static const titleThemeing = 'Theming';
-  static const titlePrivacy = 'Privacy';
-  static const titleHomeserverSearch = 'Find Your Homeserver';
   static const titleProfile = 'Set up Your Profile';
   static const titleSettings = 'Settings';
   static const titleAdvanced = 'Advanced';
