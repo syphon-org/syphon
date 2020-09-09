@@ -83,6 +83,7 @@ dependencies:
   html: ^0.13.3+3
   intl: ^0.16.1
   http_parser: 3.1.4
+  easy_localization: 2.3.3
   flutter_dotenv: 2.1.0
   android_alarm_manager: 0.4.5+11
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
@@ -162,6 +163,7 @@ flutter:
   assets: 
    - ./.env.debug
    - ./.env.release
+   - assets/translations/en.json
    - assets/graphics/undraw_sync_files.svg
    - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -82,7 +83,15 @@ void main() async {
   final store = await initStore();
 
   // the main thing
-  runApp(Syphon(store: store));
+  runApp(
+    EasyLocalization(
+        path: 'assets/translations',
+        fallbackLocale: Locale('en'),
+        supportedLocales: [
+          Locale('en'),
+        ],
+        child: Syphon(store: store)),
+  );
 }
 
 class Syphon extends StatefulWidget {
@@ -219,6 +228,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           distinct: true,
           converter: (store) => store.state.settingsStore,
           builder: (context, settings) => MaterialApp(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
             debugShowCheckedModeBanner: false,
             theme: Themes.generateCustomTheme(
               primaryColorHex: settings.primaryColor,

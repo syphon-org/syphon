@@ -22,6 +22,7 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -422,6 +423,9 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
         oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
 
     // the last check is because im scared
+    debugPrint(
+      '[updateOneTimeKeyCounts] total: ${signedCurveCount}, max: ${maxKeyCount}',
+    );
     if ((signedCurveCount < maxKeyCount / 3) && signedCurveCount < 100) {
       store.dispatch(updateOneTimeKeys());
     }
@@ -447,6 +451,9 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
+      debugPrint('[updateOneTimeKeys] json:');
+      printJson(payload);
+
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -455,6 +462,10 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       );
 
       if (data['errcode'] != null) {
+        debugPrint(
+          '[uploadIdentityKeys] error: ${data}',
+        );
+
         throw data['error'];
       }
 

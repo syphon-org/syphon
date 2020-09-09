@@ -21,6 +21,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -819,6 +820,10 @@ class _Props extends Equatable {
         ));
       },
       onCheatCode: () async {
+        // await store.dispatch(store.dispatch(generateDeviceId(
+        //   salt: store.state.authStore.username,
+        // )));
+
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
         store.dispatch(updateKeySessions(room: room));

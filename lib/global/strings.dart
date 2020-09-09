@@ -7,11 +7,6 @@ import 'package:syphon/global/values.dart';
  * class below is just a stub for now
  */
 class Strings {
-  // Titles
-  static const titleIntro = 'Welcome to ${Values.appName}';
-  static const titleLogin = 'take back the chat';
-  static const titleDeleteDevices = 'Confirm Removing Devices';
-
   // View Titles
   static const titleViewSignup = 'Signup';
   static const titleViewDevices = 'Devices';
@@ -40,13 +35,11 @@ class Strings {
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
 
-  // Subtitles
-  static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
-
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSearchForHomeservers = "Search for homeservers...";
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelUsersSection = 'Users';
@@ -67,6 +60,8 @@ class Strings {
   static const buttonDeleteKeys = 'delete keys';
 
   // Text Buttons
+  static const buttonTextSignup = "button-text-signup";
+
   static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';

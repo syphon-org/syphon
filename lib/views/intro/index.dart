@@ -316,11 +316,10 @@ class IntroState extends State<Intro> {
                                           .textTheme
                                           .bodyText2
                                           .copyWith(
-                                            color: Theme.of(context)
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.white,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                     ),
                                   ),

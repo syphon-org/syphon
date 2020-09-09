@@ -274,6 +274,8 @@ class Room {
       lastHash = json['timeline']['last_hash'];
       prevHash = json['timeline']['prev_batch'];
 
+      debugPrint('[LIMITED from /sync] ${limited}');
+
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
       final List<Event> timelineEvents = List.from(

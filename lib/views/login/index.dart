@@ -2,6 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -118,7 +119,7 @@ class LoginState extends State<Login> {
                           FittedBox(
                             fit: BoxFit.fitWidth,
                             child: Text(
-                              Strings.titleLogin,
+                              tr('title-login'),
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme
