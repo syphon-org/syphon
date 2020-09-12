@@ -142,20 +142,22 @@ class AppBarChatState extends State<AppBarChat> {
                       ),
                     ),
                     Visibility(
-                      visible: widget.room.encryptionEnabled,
+                      visible: !widget.room.encryptionEnabled,
                       child: Positioned(
                         right: 0,
                         bottom: 0,
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            Dimensions.badgeAvatarSize,
+                          ),
                           child: Container(
                             width: Dimensions.badgeAvatarSize,
                             height: Dimensions.badgeAvatarSize,
-                            color: Colors.green[700],
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             child: Icon(
-                              Icons.lock,
-                              color: Colors.white,
-                              size: Dimensions.badgeAvatarSize - 6,
+                              Icons.lock_open,
+                              color: Theme.of(context).iconTheme.color,
+                              size: Dimensions.iconSizeMini,
                             ),
                           ),
                         ),

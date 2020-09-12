@@ -61,8 +61,8 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      debugPrint('[to] $to');
-      debugPrint('[from] $from');
+      // debugPrint('[to] $to');
+      // debugPrint('[from] $from');
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
         "protocol": protocol,
@@ -83,8 +83,11 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      printJson(messagesJson);
-      debugPrint('[OLDEST] ${oldest}');
+      // TODO: remove after 0.1.3 is merged
+      // messages.forEach((element) {
+      //   printJson(element);
+      // });
+      // debugPrint('[OLDEST] ${oldest}');
 
       // reuse the logic for syncing
       await store.dispatch(

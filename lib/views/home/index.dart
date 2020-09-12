@@ -385,24 +385,25 @@ class HomeViewState extends State<Home> {
                         background: primaryColor,
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.encryptionEnabled,
+                        visible: !room.encryptionEnabled,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                width: Dimensions.badgeAvatarSize,
-                                height: Dimensions.badgeAvatarSize,
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                child: Icon(
-                                  Icons.lock,
-                                  color: Colors.green[700],
-                                  size: Dimensions.iconSizeMini,
-                                ),
-                              )),
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.badgeAvatarSize,
+                            ),
+                            child: Container(
+                              width: Dimensions.badgeAvatarSize,
+                              height: Dimensions.badgeAvatarSize,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Icon(
+                                Icons.lock_open,
+                                color: Theme.of(context).iconTheme.color,
+                                size: Dimensions.iconSizeMini,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       Visibility(
@@ -596,6 +597,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
 
+  final Function onDebug;
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onSelectHelp;
@@ -612,6 +614,7 @@ class _Props extends Equatable {
     @required this.currentUser,
     @required this.chatSettings,
     @required this.roomTypeBadgesEnabled,
+    @required this.onDebug,
     @required this.onLeaveChat,
     @required this.onDeleteChat,
     @required this.onSelectHelp,
@@ -669,6 +672,9 @@ class _Props extends Equatable {
         roomTypeBadgesEnabled:
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        onDebug: () async {
+          print('[onDebug] trigged debug function @ home');
+        },
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },

@@ -1,7 +1,7 @@
 {
   "title-intro": "Welcome to {}",
   "title-login": "take back the chat",
-  "subtitle-intro": "Privacy and freedom\nwithout the hassle",
+  "subtitle-intro": "Privacy and freedom\nwithout the hassle.",
   "title-view-delete-devices": "Confirm Device Removal",
   "title-view-search-groups": "Explore Groups",
   "title-view-search-users": "Search Users",
@@ -73,7 +73,7 @@
   "confirmation-terms-of-service": "THIS SOFTWARE ({}) IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
   "confirmation-notifications": "Your device will prompt you to turn on notifications for {}.\n\nDo you want to turn on message notifications?",
   "confirmation-auth-verification": "In order to perform this action, you'll need to enter your password again",
-  "confirmation-thanks": "Thanks for trying out ${Values.appName}!\n\n",
+  "confirmation-thanks": "Thanks for trying out {}!\n\n",
   "confirmation-alpha-version": "Please be aware this app is still very much in Alpha.\n",
   "confirmation-alpha-warning": "Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n",
   "confirmation-alpha-warning-alt": "You may lose data using this application as features and bugs are worked out.\n",

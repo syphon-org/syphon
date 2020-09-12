@@ -274,6 +274,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       final olmAccount = store.state.cryptoStore.olmAccount;
 
       final identityKeysString = olmAccount.identity_keys();
+
       final identityKeys = await json.decode(identityKeysString);
       // fingerprint keypair - ed25519
       final fingerprintKeyName = '${Algorithms.ed25519}:${authUser.deviceId}';
@@ -283,34 +284,34 @@ ThunkAction<AppState> generateIdentityKeys() {
 
       // formatting json for the signature required by matrix
       var deviceIdentityKeys = {
-        'device_keys': {
-          'algorithms': [
-            Algorithms.olmv1,
-            Algorithms.megolmv1,
-          ],
-          'device_id': authUser.deviceId,
-          'keys': {
-            identityKeyName: identityKeys[Algorithms.curve25591],
-            fingerprintKeyName: identityKeys[Algorithms.ed25519],
-          },
-          'user_id': authUser.userId,
-        }
+        'algorithms': [
+          Algorithms.olmv1,
+          Algorithms.megolmv1,
+        ],
+        'device_id': authUser.deviceId,
+        'keys': {
+          fingerprintKeyName: identityKeys[Algorithms.ed25519],
+          identityKeyName: identityKeys[Algorithms.curve25591],
+        },
+        'user_id': authUser.userId,
       };
 
       // figerprint signature key pair generation for upload
-      final identityKeyJsonBytes = canonicalJson.encode(deviceIdentityKeys);
-      final identityKeyJsonString = utf8.decode(identityKeyJsonBytes);
-      final signedIdentityKey = olmAccount.sign(identityKeyJsonString);
+      final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
+      final deviceKeysDecoded = utf8.decode(deviceKeysEncoded);
+      final deviceKeysSigned = olmAccount.sign(deviceKeysDecoded);
 
-      deviceIdentityKeys['device_keys']['signatures'] = {
+      var deviceKeysPayload = {'device_keys': deviceIdentityKeys};
+
+      deviceKeysPayload['device_keys']['signatures'] = {
         authUser.userId: {
-          fingerprintKeyName: signedIdentityKey,
+          fingerprintKeyName: deviceKeysSigned,
         }
       };
 
       // cache current device key for authed user
       final deviceKeysOwned = DeviceKey.fromJson(
-        deviceIdentityKeys['device_keys'],
+        deviceKeysPayload['device_keys'],
       );
 
       store.dispatch(SetDeviceKeysOwned(
@@ -319,7 +320,6 @@ ThunkAction<AppState> generateIdentityKeys() {
         },
       ));
 
-      debugPrint('[generateIdentityKeys] $deviceIdentityKeys');
       // return the generated keys
       return deviceIdentityKeys;
     } catch (error) {
@@ -335,6 +335,9 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       final deviceKeyMap = {
         'device_keys': deviceKey.toMap(),
       };
+
+      debugPrint('[uploadIdentityKeys] uploaded keys json object below');
+      printJson(deviceKeyMap);
 
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
@@ -423,9 +426,6 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
         oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
 
     // the last check is because im scared
-    debugPrint(
-      '[updateOneTimeKeyCounts] total: ${signedCurveCount}, max: ${maxKeyCount}',
-    );
     if ((signedCurveCount < maxKeyCount / 3) && signedCurveCount < 100) {
       store.dispatch(updateOneTimeKeys());
     }
@@ -451,8 +451,8 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
-      debugPrint('[updateOneTimeKeys] json:');
-      printJson(payload);
+      // debugPrint('[updateOneTimeKeys] json:');
+      // printJson(payload);
 
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,

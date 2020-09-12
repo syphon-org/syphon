@@ -25,18 +25,6 @@ import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
 
-// Library Implimentations
-
-// Redux - State Managment - "store" - IMPORT ONLY ONCE
-
-// Navigation
-
-// Styling
-
-/**
- * DESKTOP ONLY
- */
-
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
@@ -85,12 +73,13 @@ void main() async {
   // the main thing
   runApp(
     EasyLocalization(
-        path: 'assets/translations',
-        fallbackLocale: Locale('en'),
-        supportedLocales: [
-          Locale('en'),
-        ],
-        child: Syphon(store: store)),
+      path: 'assets/translations',
+      fallbackLocale: Locale('en'),
+      supportedLocales: [
+        Locale('en'),
+      ],
+      child: Syphon(store: store),
+    ),
   );
 }
 
