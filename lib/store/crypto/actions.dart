@@ -283,7 +283,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       final identityKeyName = '${Algorithms.curve25591}:${authUser.deviceId}';
 
       // formatting json for the signature required by matrix
-      var deviceIdentityKeys = {
+      final deviceIdentityKeys = {
         'algorithms': [
           Algorithms.olmv1,
           Algorithms.megolmv1,
@@ -298,8 +298,8 @@ ThunkAction<AppState> generateIdentityKeys() {
 
       // figerprint signature key pair generation for upload
       final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
-      final deviceKeysDecoded = utf8.decode(deviceKeysEncoded);
-      final deviceKeysSigned = olmAccount.sign(deviceKeysDecoded);
+      final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
+      final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
       var deviceKeysPayload = {'device_keys': deviceIdentityKeys};
 
@@ -384,29 +384,31 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
     final olmAccount = store.state.cryptoStore.olmAccount;
     final authUser = store.state.authStore.user;
 
-    final signedKeysMap = {};
+    final oneTimeKeysSignedAll = {};
 
     // Signing Keys
     oneTimeKeys.forEach((key, value) {
-      var oneTimeKey = {'$key': '$value'};
-      final identityKeyJsonBytes = canonicalJson.encode(oneTimeKey);
-      final identityKeyJsonString = utf8.decode(identityKeyJsonBytes);
-      final signedIdentityKey = olmAccount.sign(identityKeyJsonString);
+      final oneTimeKey = {'key': value};
 
-      // Update key id in new keys map only
+      // sign one time keys
+      final oneTimeKeyEncoded = canonicalJson.encode(oneTimeKey);
+      final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
+      final oneTimeKeySigned = olmAccount.sign(oneTimeKeySerialized);
+
+      // add one time key in new keys map only
       final keyId = key.split(':')[0];
-      final newKey = '${Algorithms.signedcurve25519}:$keyId';
-      signedKeysMap[newKey] = {'key': value};
+      final oneTimeKeyId = '${Algorithms.signedcurve25519}:$keyId';
+      oneTimeKeysSignedAll[oneTimeKeyId] = {'key': value};
 
-      // appending signature for new signed key
-      signedKeysMap[newKey]['signatures'] = {
+      // append signature for new signed key
+      oneTimeKeysSignedAll[oneTimeKeyId]['signatures'] = {
         authUser.userId: {
-          '${Algorithms.ed25519}:${authUser.deviceId}': signedIdentityKey,
+          '${Algorithms.ed25519}:${authUser.deviceId}': oneTimeKeySigned,
         }
       };
     });
 
-    return signedKeysMap;
+    return oneTimeKeysSignedAll;
   };
 }
 

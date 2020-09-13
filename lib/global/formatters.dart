@@ -11,7 +11,6 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
 }
 
 String formatLanguageCode(String language) {
-  print('[formatLanguageCode] $language');
   switch (language.toLowerCase()) {
     case 'english':
       return 'us';

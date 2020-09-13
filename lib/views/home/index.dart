@@ -673,7 +673,7 @@ class _Props extends Equatable {
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onDebug: () async {
-          print('[onDebug] trigged debug function @ home');
+          debugPrint('[onDebug] trigged debug function @ home');
         },
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());

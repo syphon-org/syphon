@@ -9,6 +9,7 @@ import 'package:canonical_json/canonical_json.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -247,7 +248,7 @@ ThunkAction<AppState> saveSessionKey({
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
-    final String roomId = event['room_id'];
+    final String roomId = content['room_id'];
     final String sessionKey = content['session_key'];
 
     // Load and deserialize or create session
@@ -301,11 +302,11 @@ ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
   };
 }
 
-ThunkAction<AppState> syncDevice(Map dataToDevice) {
+ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
   return (Store<AppState> store) async {
     try {
       // Extract the new events
-      final List<dynamic> events = dataToDevice['events'];
+      final List<dynamic> events = toDeviceRaw['events'];
 
       // Parse and decrypt necessary events
       await Future.wait(
