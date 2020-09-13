@@ -164,6 +164,7 @@ flutter:
    - ./.env.debug
    - ./.env.release
    - assets/translations/en.json
+   - assets/translations/ru.json
    - assets/graphics/undraw_sync_files.svg
    - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg

@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -332,12 +333,16 @@ ThunkAction<AppState> incrementTheme() {
   };
 }
 
-/**
- * Send in a hex value to be used as the primary color
- */
-ThunkAction<AppState> updateLanguage(String language) {
+final languages = ['English', "Russian"];
+
+ThunkAction<AppState> incrementLanguage(context) {
   return (Store<AppState> store) async {
-    store.dispatch(SetLanguage(language: language));
+    final languageIndex = languages.indexWhere(
+      (name) => name == store.state.settingsStore.language,
+    );
+    final languageNameNew = languages[(languageIndex + 1) % languages.length];
+
+    store.dispatch(SetLanguage(language: languageNameNew));
   };
 }
 

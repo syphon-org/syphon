@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -290,9 +291,7 @@ class _Props extends Equatable {
           }
           return null;
         }(),
-        onDisabled: () => store.dispatch(
-          addInfo(message: Strings.alertFeatureInProgress),
-        ),
+        onDisabled: () => store.dispatch(addInProgress()),
         onCreateChatDirect: ({User user}) async => store.dispatch(
           createRoom(
             isDirect: true,

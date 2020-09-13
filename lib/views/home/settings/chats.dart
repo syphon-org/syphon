@@ -12,7 +12,6 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -28,7 +27,8 @@ class ChatPreferences extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store),
+        converter: (Store<AppState> store) =>
+            Props.mapStateToProps(store, context),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
 
@@ -66,8 +66,7 @@ class ChatPreferences extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                enabled: false,
-                                onTap: () => props.onDisabled(),
+                                onTap: () => props.onIncrementLanguage(),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
@@ -247,6 +246,7 @@ class Props extends Equatable {
   final String chatFontSize;
 
   final Function onDisabled;
+  final Function onIncrementLanguage;
   final Function onToggleEnterSend;
   final Function onToggleTimeFormat;
 
@@ -256,6 +256,7 @@ class Props extends Equatable {
     @required this.chatFontSize,
     @required this.timeFormat24,
     @required this.onDisabled,
+    @required this.onIncrementLanguage,
     @required this.onToggleEnterSend,
     @required this.onToggleTimeFormat,
   });
@@ -268,11 +269,16 @@ class Props extends Equatable {
         timeFormat24,
       ];
 
-  static Props mapStateToProps(Store<AppState> store) => Props(
+  static Props mapStateToProps(Store<AppState> store, BuildContext context) =>
+      Props(
         chatFontSize: 'Default',
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
+        onIncrementLanguage: () {
+          store.dispatch(addInfo(message: tr('alert-restart-app-effect')));
+          store.dispatch(incrementLanguage(context));
+        },
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
         onDisabled: () => store.dispatch(addInProgress()),

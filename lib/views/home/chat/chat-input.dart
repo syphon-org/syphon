@@ -9,11 +9,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 
-/**
- * RoundedPopupMenu
- * Mostly an example for myself on how to override styling or other options on
- * existing components app wide
- */
 class ChatInput extends StatelessWidget {
   final bool sendable;
   final String mediumType;

@@ -10,6 +10,18 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
   return '@${displayName}:${homeserver}';
 }
 
+String formatLanguageCode(String language) {
+  print('[formatLanguageCode] $language');
+  switch (language.toLowerCase()) {
+    case 'english':
+      return 'us';
+    case 'russian':
+      return 'ru';
+    default:
+      return 'us';
+  }
+}
+
 // @again_guy:matrix.org -> ER
 String formatSenderInitials(String sender) {
   var formattedSender = formatSender(sender).toUpperCase();
