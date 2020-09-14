@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -245,11 +246,7 @@ abstract class Events {
 
     // Use astrick to send to all known devices for user
     Map body = {
-      "messages": {
-        '$userId': {
-          '$deviceId': content,
-        },
-      }
+      "messages": content,
     };
 
     final response = await http.put(

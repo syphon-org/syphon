@@ -54,40 +54,51 @@ CryptoStore cryptoReducer(
         state.outboundMessageSessions,
       );
 
+      // outboundMessageSessions.update(
+      //   action.roomId,
+      //   (sessionCurrent) => action.session,
+      //   ifAbsent: () => action.session,
+      // );
+
       outboundMessageSessions.putIfAbsent(action.roomId, () => action.session);
 
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
       );
     case AddInboundMessageSession:
-      final messageSessionIndex = Map<String, int>.from(
-        state.messageSessionIndex,
+      final messageSessionIndex = Map<String, Map<String, int>>.from(
+        state.messageSessionIndexNEW ?? {},
       );
 
-      final inboundMessageSessions = Map<String, Map<String, String>>.from(
+      final messageSessionsInbound = Map<String, Map<String, String>>.from(
         state.inboundMessageSessions ?? {},
       );
 
-      inboundMessageSessions.putIfAbsent(
+      // safety functions to catch newly cached store
+      messageSessionIndex.putIfAbsent(action.roomId, () => Map<String, int>());
+      messageSessionsInbound.putIfAbsent(
         action.roomId,
         () => Map<String, String>(),
       );
 
-      // Add new inbound message session by roomId + identity
+      // add or update inbound message session by roomId + identity
       final Map<String, String> messageSessionInboundNew = {
         action.identityKey: action.session
       };
 
-      inboundMessageSessions[action.roomId].addAll(messageSessionInboundNew);
+      messageSessionsInbound[action.roomId].addAll(messageSessionInboundNew);
 
-      // Add new index
-      messageSessionIndex[action.roomId] = action.messageIndex;
+      // add or update inbound message index by roomId + identity
+      final Map<String, int> messageSessionIndexUpdated = {
+        action.identityKey: action.messageIndex
+      };
+
+      messageSessionIndex[action.roomId].addAll(messageSessionIndexUpdated);
 
       return state.copyWith(
-        messageSessionIndex: messageSessionIndex,
-        inboundMessageSessions: inboundMessageSessions,
+        messageSessionIndexNEW: messageSessionIndex,
+        inboundMessageSessions: messageSessionsInbound,
       );
-
     case ToggleDeviceKeysExist:
       return state.copyWith(
         deviceKeysExist: action.existence,

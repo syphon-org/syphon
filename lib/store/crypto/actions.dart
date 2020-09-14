@@ -1,7 +1,5 @@
 /**
  * 
- * 
- *  
  * TODO: not sure if we ever need unsigned keys 
  */
 
@@ -102,7 +100,22 @@ class AddInboundKeySession {
 class AddOutboundMessageSession {
   String roomId;
   String session;
-  AddOutboundMessageSession({this.roomId, this.session});
+  AddOutboundMessageSession({
+    this.roomId,
+    this.session,
+  });
+}
+
+class UpdateMessageSessionOutbound {
+  String roomId;
+  String session;
+  int messageIndex;
+
+  UpdateMessageSessionOutbound({
+    this.roomId,
+    this.session,
+    this.messageIndex,
+  });
 }
 
 class AddInboundMessageSession {
@@ -273,9 +286,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       final authUser = store.state.authStore.user;
       final olmAccount = store.state.cryptoStore.olmAccount;
 
-      final identityKeysString = olmAccount.identity_keys();
-
-      final identityKeys = await json.decode(identityKeysString);
+      final identityKeys = await json.decode(olmAccount.identity_keys());
       // fingerprint keypair - ed25519
       final fingerprintKeyName = '${Algorithms.ed25519}:${authUser.deviceId}';
 
@@ -335,9 +346,6 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
       final deviceKeyMap = {
         'device_keys': deviceKey.toMap(),
       };
-
-      debugPrint('[uploadIdentityKeys] uploaded keys json object below');
-      printJson(deviceKeyMap);
 
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
@@ -536,32 +544,36 @@ ThunkAction<AppState> updateKeySessions({
             // find the identityKey for the device
             final deviceKey = store.state.cryptoStore
                 .deviceKeys[oneTimeKey.userId][oneTimeKey.deviceId];
-            final keyId = Keys.identity(deviceId: deviceKey.deviceId);
-            final identityKey = deviceKey.keys[keyId];
 
             // Poorly decided to save key sessions by deviceId at first but then
             // realised that you may have the same identityKey for diff
             // devices and you also don't have the device id in the
             // toDevice event payload -__-, convert back to identity key
-            final roomKeyEventContentEncrypted = await store.dispatch(
+            final roomKeyEventEncrypted = await store.dispatch(
               encryptKeyContent(
                 roomId: room.id,
-                identityKey: identityKey,
+                recipient: deviceKey.userId,
+                recipientKeys: deviceKey,
                 eventType: EventTypes.roomKey,
                 content: roomKeyEventContent,
               ),
             );
 
+            // format payload for toDevice events
+            final payload = {
+              '${deviceKey.userId}': {
+                '${deviceKey.deviceId}': roomKeyEventEncrypted,
+              },
+            };
+
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
             final response = await MatrixApi.sendEventToDevice(
+              trxId: randomNumber,
               protocol: protocol,
               accessToken: store.state.authStore.user.accessToken,
               homeserver: store.state.authStore.user.homeserver,
-              userId: deviceKey.userId,
-              deviceId: deviceKey.deviceId,
               eventType: EventTypes.encrypted,
-              content: roomKeyEventContentEncrypted,
-              trxId: randomNumber,
+              content: payload,
             );
 
             if (response['errcode'] != null) {
@@ -684,7 +696,7 @@ ThunkAction<AppState> claimOneTimeKeys({
         final keyId = Keys.identity(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys[keyId];
 
-        store.dispatch(createOutboundKeySession(
+        store.dispatch(createKeySessionOutbound(
           identityKey: identityKey,
           oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
@@ -713,7 +725,7 @@ ThunkAction<AppState> claimOneTimeKeys({
  * https://matrix.org/docs/spec/client_server/r0.4.0#m-olm-v1-curve25519-aes-sha2
  * 
  */
-ThunkAction<AppState> createOutboundKeySession({
+ThunkAction<AppState> createKeySessionOutbound({
   String oneTimeKey,
   String identityKey,
 }) {
@@ -728,7 +740,7 @@ ThunkAction<AppState> createOutboundKeySession({
     final serializedKeySession = outboundKeySession.pickle(identityKey);
 
     // sychronous
-    store.dispatch(saveOutboundKeySession(
+    store.dispatch(saveKeySessionOutbound(
       identityKey: identityKey,
       session: serializedKeySession,
     ));
@@ -738,7 +750,7 @@ ThunkAction<AppState> createOutboundKeySession({
   };
 }
 
-ThunkAction<AppState> saveOutboundKeySession({
+ThunkAction<AppState> saveKeySessionOutbound({
   String identityKey,
   String session,
 }) {
@@ -750,9 +762,9 @@ ThunkAction<AppState> saveOutboundKeySession({
   };
 }
 
-ThunkAction<AppState> saveInboundKeySession({
-  String identityKey,
+ThunkAction<AppState> saveKeySessionInbound({
   String session,
+  String identityKey,
 }) {
   return (Store<AppState> store) {
     store.dispatch(AddInboundKeySession(
@@ -762,7 +774,7 @@ ThunkAction<AppState> saveInboundKeySession({
   };
 }
 
-ThunkAction<AppState> loadOutboundKeySession({
+ThunkAction<AppState> loadKeySessionOutbound({
   String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
@@ -781,7 +793,7 @@ ThunkAction<AppState> loadOutboundKeySession({
         return session;
       }
     } catch (error) {
-      debugPrint('[loadOutboundKeySession] $error');
+      debugPrint('[loadKeySessionOutbound] $error');
       return null;
     }
   };
@@ -791,7 +803,7 @@ ThunkAction<AppState> loadOutboundKeySession({
  * 
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
  */
-ThunkAction<AppState> loadInboundKeySession({
+ThunkAction<AppState> loadKeySessionInbound({
   int type,
   String body,
   String identityKey, // sender_key
@@ -814,7 +826,7 @@ ThunkAction<AppState> loadInboundKeySession({
         }
       }
     } catch (error) {
-      debugPrint('[loadInboundKeySession] $error');
+      debugPrint('[loadKeySessionInbound] $error');
     }
 
     try {
@@ -830,7 +842,7 @@ ThunkAction<AppState> loadInboundKeySession({
 
         // Save sessions as needed
         await store.dispatch(saveOlmAccount());
-        await store.dispatch(saveInboundKeySession(
+        await store.dispatch(saveKeySessionInbound(
           session: newKeySession.pickle(identityKey),
           identityKey: identityKey,
         ));
@@ -839,7 +851,7 @@ ThunkAction<AppState> loadInboundKeySession({
         return newKeySession;
       }
     } catch (error) {
-      debugPrint('[loadInboundKeySession] $error');
+      debugPrint('[loadKeySessionInbound] $error');
     }
 
     return null;
@@ -851,7 +863,7 @@ ThunkAction<AppState> loadInboundKeySession({
  *  
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
  */
-ThunkAction<AppState> createInboundMessageSession({
+ThunkAction<AppState> createMessageSessionInbound({
   String roomId,
   String identityKey,
   String sessionKey,
@@ -871,7 +883,7 @@ ThunkAction<AppState> createInboundMessageSession({
   };
 }
 
-ThunkAction<AppState> loadMessageSession({
+ThunkAction<AppState> loadMessageSessionInbound({
   String roomId,
   String identityKey,
 }) {
@@ -891,11 +903,33 @@ ThunkAction<AppState> loadMessageSession({
 
 /**
  * 
+ * Save Message Session Inbound
+ * 
+ * Saves the message session and index after encrypting and sending an event
+ */
+ThunkAction<AppState> saveMessageSessionInbound({
+  String roomId,
+  String identityKey,
+  olm.InboundGroupSession session,
+  int messageIndex,
+}) {
+  return (Store<AppState> store) async {
+    return await store.dispatch(AddInboundMessageSession(
+      roomId: roomId,
+      identityKey: identityKey,
+      session: session.pickle(roomId),
+      messageIndex: messageIndex,
+    ));
+  };
+}
+
+/**
+ * 
  * Outbound Message Session Functionality
  * 
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
  */
-ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
+ThunkAction<AppState> createMessageSessionOutbound({String roomId}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
@@ -937,7 +971,7 @@ ThunkAction<AppState> createOutboundMessageSession({String roomId}) {
  * one would likely need more based on identity + device, 
  * assuming you've imported keys but lets keep it simple for alpha
  */
-ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
+ThunkAction<AppState> loadMessageSessionOutbound({String roomId}) {
   return (Store<AppState> store) async {
     // Load session for identity
     var outboundMessageSessionSerialized =
@@ -945,7 +979,7 @@ ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
 
     if (outboundMessageSessionSerialized == null) {
       outboundMessageSessionSerialized = await store.dispatch(
-        createOutboundMessageSession(roomId: roomId),
+        createMessageSessionOutbound(roomId: roomId),
       );
     }
 
@@ -955,13 +989,16 @@ ThunkAction<AppState> loadOutboundMessageSession({String roomId}) {
   };
 }
 
-ThunkAction<AppState> saveOutboundMessageSession({
+ThunkAction<AppState> saveMessageSessionOutbound({
   String roomId,
   String session,
 }) {
   return (Store<AppState> store) async {
     store.dispatch(
-      AddOutboundMessageSession(roomId: roomId, session: session),
+      AddOutboundMessageSession(
+        roomId: roomId,
+        session: session,
+      ),
     );
   };
 }
@@ -970,7 +1007,7 @@ ThunkAction<AppState> exportMessageSession({String roomId}) {
   return (Store<AppState> store) async {
     final olm.OutboundGroupSession outboundMessageSession =
         await store.dispatch(
-      loadOutboundMessageSession(roomId: roomId),
+      loadMessageSessionOutbound(roomId: roomId),
     );
 
     return {
