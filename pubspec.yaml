@@ -8,6 +8,7 @@ description: a privacy focused matrix client
 # $ flutter pub global run devtools 
 # $ flutter pub run build_runner build
 # $ flutter pub run build_runner watch 
+# $ flutter pub run build_runner build --delete-conflicting-outputs
 
 # troubleshooting
 # $ pub cache repair
@@ -42,10 +43,10 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +. 
-version: 0.1.2+102
+version: 0.1.3+103
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner 
 
 dependencies:
   flutter:
@@ -58,22 +59,22 @@ dependencies:
  
   # Domain / Store
   expandable: 3.0.1
-  equatable: ^1.1.0
-  crypt: ^3.0.0
+  equatable: 1.2.4
+  crypt: 3.0.1
   canonical_json: 1.0.0
-  convert: ^2.1.1
+  convert: 2.1.1
   device_info: ^0.4.2
   redux: 4.0.0
   redux_thunk: 0.3.0
   redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
   flutter_redux: 0.6.0
-  hive: ^1.4.0
-  hive_flutter:  ^0.3.0
-  flutter_secure_storage: 3.3.1+1 
-  mime: ^0.9.6
-  path_provider: ^1.6.11
-  package_info: '0.4.1'
+  hive: 1.4.4
+  hive_flutter:  0.3.1
+  flutter_secure_storage: 3.3.3
+  mime: 0.9.7
+  path_provider: 1.6.14
+  package_info: 0.4.3
   # steel_crypt: 1.7.1
   # cryptography: 1.2.1
 
@@ -82,15 +83,23 @@ dependencies:
   html: ^0.13.3+3
   intl: ^0.16.1
   http_parser: 3.1.4
-  flutter_dotenv: ^2.0.3
-  android_alarm_manager: 0.4.5+8
+  easy_localization: 2.3.3
+  flutter_dotenv: 2.1.0
+  android_alarm_manager: 0.4.5+11
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
   
+  # Converters
+  # json_serializable: 3.3.0
+
+  # Desktop UI Only - UNCOMMENT FOR BUILDS
+  # window_utils: 1.0.2
+
   # UI Only
-  url_launcher: ^5.4.7
-  flutter_svg: 0.17.4
-  file_picker: 1.10.0
-  image_picker: ^0.6.5
+  cupertino_icons: ^0.1.2
+  url_launcher: 5.5.0
+  flutter_svg: 0.18.1
+  file_picker: 1.13.3
+  image_picker: ^0.6.7+7
   flutter_swiper : 1.1.6
   webview_flutter: ^0.3.21 
   touchable_opacity: 1.0.2
@@ -101,28 +110,25 @@ dependencies:
   flutter_material_color_picker: ^1.0.5 
   palette_generator: 0.2.3
 
-  # Desktop UI Only - UNCOMMENT FOR BUILDS
-  # window_utils: 1.0.2
-
-  # Converters
-  dart_json_mapper: 1.3.3
-  # json_serializable: 3.3.0
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-
 dev_dependencies:
-  # flutter_test:
-  #   sdk: flutter
-  build_runner: ^1.0.0
-  hive_generator: 0.7.0
-  import_sorter: ^4.2.1
+  flutter_launcher_icons: "^0.7.5"
+  build_runner: ^1.10.1
+  hive_generator: 0.7.1
+  # TODO: build fixes - remove later
+  build_resolvers: 1.3.10 # <- modified to solve build_runner  
 
+  # TODO: build fixes - remove later
 dependency_overrides:
-  dartx: ^0.3.0
-  characters: ^0.3.0
+  path: 1.7.0
+  analyzer: 0.39.14
+  dart_style: 1.3.4
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/current/app_icon_ios.png"
+  adaptive_icon_background: "#34C7B5"
+  adaptive_icon_foreground: "assets/icons/current/app_icon_foreground.png"
 
 # The following section is specific to Flutter.
 flutter:
@@ -157,6 +163,8 @@ flutter:
   assets: 
    - ./.env.debug
    - ./.env.release
+   - assets/translations/en.json
+   - assets/translations/ru.json
    - assets/graphics/undraw_sync_files.svg
    - assets/graphics/undraw_accept_terms.svg
    - assets/graphics/undraw_mobile_user.svg
@@ -173,9 +181,9 @@ flutter:
    - assets/graphics/undraw_profile_data.svg
    - assets/graphics/undraw_mention.svg
    - assets/graphics/undraw_not_found.svg
-   - assets/icons/app_icon.svg
-   - assets/icons/app_icon.png
-   - assets/icons/app_icon_white.png
+   - assets/icons/current/app_icon_cyan.svg
+   - assets/icons/current/app_icon_cyan.png
+   - assets/icons/current/app_icon_white.png
    - assets/icons/global/being-check.svg
    - assets/icons/global/being-person-add.svg
    - assets/icons/global/being-group-add.svg

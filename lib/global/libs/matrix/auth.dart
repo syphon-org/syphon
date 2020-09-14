@@ -38,8 +38,8 @@ abstract class Auth {
     String type = "m.login.password",
     String username,
     String password,
-    String deviceName,
     String deviceId,
+    String deviceName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
@@ -47,9 +47,15 @@ abstract class Auth {
       'type': type,
       "identifier": {"type": "m.id.user", "user": username},
       'password': password,
-      'device_id': deviceId,
-      "initial_device_display_name": "$username's $deviceName",
     };
+
+    if (deviceId != null) {
+      body['device_id'] = deviceId;
+    }
+
+    if (deviceName != null) {
+      body['initial_device_display_name'] = deviceName;
+    }
 
     final response = await http.post(
       url,
@@ -159,7 +165,7 @@ abstract class Auth {
     }
 
     if (deviceId != null) {
-      body['initial_device_display_name'] = "$username's $deviceName";
+      body['initial_device_display_name'] = "$deviceName";
     }
 
     final response = await http.post(

@@ -9,11 +9,13 @@ import 'package:canonical_json/canonical_json.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 
@@ -31,7 +33,7 @@ ThunkAction<AppState> encryptMessageContent({
     // Load and deserialize session
     final olm.OutboundGroupSession outboundMessageSession =
         await store.dispatch(
-      loadOutboundMessageSession(roomId: roomId),
+      loadMessageSessionOutbound(roomId: roomId),
     );
 
     // Create payload for encryption per spec
@@ -45,8 +47,9 @@ ThunkAction<AppState> encryptMessageContent({
     final encodedPayload = canonicalJson.encode(payload);
     final serializedPayload = utf8.decode(encodedPayload);
     final encryptedPayload = outboundMessageSession.encrypt(serializedPayload);
-    // Save the outbound session after processing content
-    await store.dispatch(saveOutboundMessageSession(
+
+    // save the outbound session after processing content
+    await store.dispatch(saveMessageSessionOutbound(
       roomId: roomId,
       session: outboundMessageSession.pickle(roomId),
     ));
@@ -79,6 +82,7 @@ ThunkAction<AppState> decryptMessageEvent({
     try {
       // Pull out event data
       final Map content = event['content'];
+      final identityKey = content['sender_key'];
 
       // return already decrypted events
       if (content['ciphertext'] == null) {
@@ -87,20 +91,30 @@ ThunkAction<AppState> decryptMessageEvent({
 
       // Load and deserialize session
       final olm.InboundGroupSession messageSession = await store.dispatch(
-        loadMessageSession(
+        loadMessageSessionInbound(
           roomId: roomId,
-          identityKey: content['sender_key'],
+          identityKey: identityKey,
         ),
       );
 
       // Decrypt the payload with the session
-      final decryptedPayload = messageSession.decrypt(content['ciphertext']);
-      final bodyScrubbed = decryptedPayload.plaintext
+      final payloadDecrypted = messageSession.decrypt(content['ciphertext']);
+      final payloadScrubbed = payloadDecrypted.plaintext
           .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
           .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
 
       // Return the content to be sent or processed
-      event['content'] = json.decode(bodyScrubbed)['content'];
+      event['content'] = json.decode(payloadScrubbed)['content'];
+
+      if (messageSession != null) {
+        await store.dispatch(saveMessageSessionInbound(
+          roomId: roomId,
+          identityKey: identityKey,
+          session: messageSession,
+          messageIndex: payloadDecrypted.message_index,
+        ));
+      }
+
       return event;
     } catch (error) {
       debugPrint('[decryptMessageEvent] $error');
@@ -119,59 +133,76 @@ ThunkAction<AppState> decryptMessageEvent({
  */
 ThunkAction<AppState> encryptKeyContent({
   String roomId,
-  String identityKey, // recipient
+  String recipient,
+  DeviceKey recipientKeys, // recipient
   String eventType = EventTypes.roomKey,
   Map content,
 }) {
   return (Store<AppState> store) async {
-    // Create payload for encryption per spe
+    // pull current user identity keys out of olm account
+    final userCurrent = store.state.authStore.user;
+    final userOlmAccount = store.state.cryptoStore.olmAccount;
+    final userIdentityKeys = await json.decode(userOlmAccount.identity_keys());
+    final userFingerprintKey = userIdentityKeys[Algorithms.ed25519];
+
+    // pull recipient key data and id
+    final fingerprintKeyId = Keys.fingerprint(deviceId: recipientKeys.deviceId);
+    final identityKeyId = Keys.identity(deviceId: recipientKeys.deviceId);
+    final fingerprintKey = recipientKeys.keys[fingerprintKeyId]; // recipient
+    final identityKey = recipientKeys.keys[identityKeyId]; // recipient
+
+    // create payload for olm key sharing per spec
     final payload = {
+      'sender': userCurrent.userId,
+      'sender_device': userCurrent.deviceId,
+      'recipient': recipient,
+      "recipient_keys": {
+        Algorithms.ed25519: fingerprintKey,
+      },
+      "keys": {
+        Algorithms.ed25519: userFingerprintKey,
+      },
       'type': eventType,
       'content': content,
-      'room_id': roomId,
     };
 
-    // All olm sessions should already be created
+    // all olm sessions should already be created
     // before sending a room key event to devices
-    // Load and deserialize session
+    // load and deserialize session
     final olm.Session outboundKeySession = await store.dispatch(
-      loadOutboundKeySession(identityKey: identityKey),
+      loadKeySessionOutbound(identityKey: identityKey),
     );
 
-    // Canoncially encode the json for encryption
-    final encodedPayload = canonicalJson.encode(payload);
-    final serializedPayload = utf8.decode(encodedPayload);
-    final encryptedPayload = outboundKeySession.encrypt(serializedPayload);
+    // canoncially encode the json for encryption
+    final payloadEncoded = canonicalJson.encode(payload);
+    final payloadSerialized = utf8.decode(payloadEncoded);
+    final payloadEncrypted = outboundKeySession.encrypt(payloadSerialized);
 
-    // Save the outbound session after processing content
-    await store.dispatch(saveOutboundKeySession(
+    // save the outbound session after processing content
+    await store.dispatch(saveKeySessionOutbound(
       identityKey: identityKey,
       session: outboundKeySession.pickle(identityKey),
     ));
 
-    // Pull current user identity keys out of olm account
-    final olmAccount = store.state.cryptoStore.olmAccount;
-    final keys = json.decode(olmAccount.identity_keys());
-
-    // Return the content to be sent or processed
-    if (encryptedPayload.type == 0) {
+    // return the content to be sent or processed
+    if (payloadEncrypted.type == 0) {
       return {
-        'sender_key': keys[Algorithms.curve25591], // current user identity key
+        'algorithm': Algorithms.olmv1,
+        'sender_key': userIdentityKeys[Algorithms.curve25591],
         'ciphertext': {
           // receiver identity key
           identityKey: {
-            'body': encryptedPayload.body,
-            'type': encryptedPayload.type,
+            'body': payloadEncrypted.body,
+            'type': payloadEncrypted.type,
           }
         },
-        'session_id': outboundKeySession.session_id()
       };
     }
 
     return {
-      'sender_key': keys[Algorithms.curve25591],
-      'ciphertext': encryptedPayload.body,
-      'session_id': outboundKeySession.session_id()
+      'algorithm': Algorithms.olmv1,
+      'sender_key': userIdentityKeys[Algorithms.curve25591],
+      'ciphertext': payloadEncrypted.body,
     };
   };
 }
@@ -203,7 +234,7 @@ ThunkAction<AppState> decryptKeyEvent({
 
     // Load and deserialize or create session
     final olm.Session keySession = await store.dispatch(
-      loadInboundKeySession(
+      loadKeySessionInbound(
         identityKey: identityKeySender,
         type: ciphertextContent['type'],
         body: ciphertextContent['body'],
@@ -247,17 +278,70 @@ ThunkAction<AppState> saveSessionKey({
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
-    final String roomId = event['room_id'];
+    final String roomId = content['room_id'];
     final String sessionKey = content['session_key'];
 
     // Load and deserialize or create session
     await store.dispatch(
-      createInboundMessageSession(
+      createMessageSessionInbound(
         roomId: roomId,
         identityKey: identityKey,
         sessionKey: sessionKey,
       ),
     );
+  };
+}
+
+ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
+  return (Store<AppState> store) async {
+    try {
+      // Extract the new events
+      final List<dynamic> events = toDeviceRaw['events'];
+
+      // Parse and decrypt necessary events
+      await Future.wait(
+        events.map((event) async {
+          final eventType = event['type'];
+          final identityKeySender = event['content']['sender_key'];
+
+          switch (eventType) {
+            case EventTypes.encrypted:
+              try {
+                print('[syncDevice] olm payload before decryption');
+                printJson(event);
+
+                final eventDecrypted = await store.dispatch(
+                  decryptKeyEvent(event: event),
+                );
+
+                print('[syncDevice] megolm payload after decryption received');
+                printJson(eventDecrypted);
+
+                if (EventTypes.roomKey == eventDecrypted['type']) {
+                  return await store.dispatch(
+                    saveSessionKey(
+                      event: eventDecrypted,
+                      identityKey: identityKeySender,
+                    ),
+                  );
+                }
+              } catch (error) {
+                debugPrint('[decryptKeyEvent|error] $error');
+              }
+
+              break;
+            default:
+              // TODO: handle other to device events
+              break;
+          }
+        }),
+      );
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        origin: 'syncDevice',
+      ));
+    }
   };
 }
 
@@ -292,48 +376,6 @@ ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
             break;
         }
       }
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'syncDevice',
-      ));
-    }
-  };
-}
-
-ThunkAction<AppState> syncDevice(Map dataToDevice) {
-  return (Store<AppState> store) async {
-    try {
-      // Extract the new events
-      final List<dynamic> events = dataToDevice['events'];
-
-      // Parse and decrypt necessary events
-      await Future.wait(
-        events.map((event) async {
-          final eventType = event['type'];
-          final identityKeySender = event['content']['sender_key'];
-
-          switch (eventType) {
-            case EventTypes.encrypted:
-              final eventDecrypted = await store.dispatch(
-                decryptKeyEvent(event: event),
-              );
-
-              if (EventTypes.roomKey == eventDecrypted['type']) {
-                return await store.dispatch(
-                  saveSessionKey(
-                    event: eventDecrypted,
-                    identityKey: identityKeySender,
-                  ),
-                );
-              }
-              break;
-            default:
-              // TODO: handle other to device events
-              break;
-          }
-        }),
-      );
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

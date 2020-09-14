@@ -184,156 +184,154 @@ class IntroState extends State<Intro> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        brightness: Brightness.light,
-        backgroundColor: Colors.transparent,
-      ),
-      body: StoreConnector<AppState, AppState>(
-        distinct: true,
-        converter: (Store<AppState> store) => store.state,
-        builder: (context, state) => Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Flexible(
-              flex: 6,
-              fit: FlexFit.tight,
-              child: Container(
-                constraints: BoxConstraints(
-                  minWidth: Dimensions.mediaSizeMin,
-                ),
-                child: PageView(
-                  pageSnapping: true,
-                  allowImplicitScrolling: true,
-                  controller: pageController,
-                  children: sections,
-                  onPageChanged: (index) {
-                    setState(() {
-                      currentStep = index;
-                      onboarding = index != 0 && index != sections.length - 1;
-                    });
-                  },
-                ),
-              ),
-            ),
-            Flexible(
-              flex: 2,
-              child: Flex(
-                direction: Axis.vertical,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    child: ButtonSolid(
-                      text: buildButtonString(),
-                      onPressed: () {
-                        if (currentStep == 0) {
-                          setState(() {
-                            onboarding = true;
-                          });
-                        }
-
-                        if (currentStep == sections.length - 2) {
-                          setState(() {
-                            loginText = Strings.buttonIntroExistQuestion;
-                            onboarding = false;
-                          });
-                        }
-
-                        if (currentStep == sections.length - 1) {
-                          Navigator.pushNamed(
-                            context,
-                            '/signup',
-                          );
-                        }
-
-                        pageController.nextPage(
-                          duration: Duration(
-                            milliseconds: Values.animationDurationDefault,
-                          ),
-                          curve: Curves.ease,
-                        );
-                      },
-                    ),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          brightness: Brightness.light,
+          backgroundColor: Colors.transparent,
+        ),
+        body: StoreConnector<AppState, AppState>(
+          distinct: true,
+          converter: (Store<AppState> store) => store.state,
+          builder: (context, state) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Flexible(
+                flex: 6,
+                fit: FlexFit.tight,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: Dimensions.mediaSizeMin,
                   ),
-                ],
+                  child: PageView(
+                    pageSnapping: true,
+                    allowImplicitScrolling: true,
+                    controller: pageController,
+                    children: sections,
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentStep = index;
+                        onboarding = index != 0 && index != sections.length - 1;
+                      });
+                    },
+                  ),
+                ),
               ),
-            ),
-            Flexible(
-              flex: 1,
-              child: Flex(
-                mainAxisAlignment: MainAxisAlignment.center,
-                direction: Axis.vertical,
-                children: <Widget>[
-                  Container(
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minHeight: Dimensions.inputHeight,
-                    ),
-                    child: onboarding
-                        ? Flex(
-                            direction: Axis.horizontal,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SmoothPageIndicator(
-                                controller: pageController, // PageController
-                                count: sections.length,
-                                effect: WormEffect(
-                                  spacing: 16,
-                                  dotHeight: 12,
-                                  dotWidth: 12,
-                                  paintStyle: PaintingStyle.fill,
-                                  strokeWidth: 12,
-                                  activeDotColor:
-                                      Theme.of(context).primaryColor,
-                                ), // your preferred effect
-                              ),
-                            ],
-                          )
-                        : TouchableOpacity(
-                            activeOpacity: 0.4,
-                            onTap: () => Navigator.pushNamed(
+              Flexible(
+                flex: 2,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      child: ButtonSolid(
+                        text: buildButtonString(),
+                        onPressed: () {
+                          if (currentStep == 0) {
+                            setState(() {
+                              onboarding = true;
+                            });
+                          }
+
+                          if (currentStep == sections.length - 2) {
+                            setState(() {
+                              loginText = Strings.buttonIntroExistQuestion;
+                              onboarding = false;
+                            });
+                          }
+
+                          if (currentStep == sections.length - 1) {
+                            Navigator.pushNamed(
                               context,
-                              '/login',
+                              '/signup',
+                            );
+                          }
+
+                          pageController.nextPage(
+                            duration: Duration(
+                              milliseconds: Values.animationDurationDefault,
                             ),
-                            child: Row(
+                            curve: Curves.ease,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Flex(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    Container(
+                      height: Dimensions.inputHeight,
+                      constraints: BoxConstraints(
+                        minHeight: Dimensions.inputHeight,
+                      ),
+                      child: onboarding
+                          ? Flex(
+                              direction: Axis.horizontal,
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  loginText,
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.bodyText2,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    Strings.buttonIntroExistAction,
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .copyWith(
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.white,
-                                        ),
-                                  ),
+                              children: [
+                                SmoothPageIndicator(
+                                  controller: pageController, // PageController
+                                  count: sections.length,
+                                  effect: WormEffect(
+                                    spacing: 16,
+                                    dotHeight: 12,
+                                    dotWidth: 12,
+                                    paintStyle: PaintingStyle.fill,
+                                    strokeWidth: 12,
+                                    activeDotColor:
+                                        Theme.of(context).primaryColor,
+                                  ), // your preferred effect
                                 ),
                               ],
+                            )
+                          : TouchableOpacity(
+                              activeOpacity: 0.4,
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                '/login',
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    loginText,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w100,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: Text(
+                                      Strings.buttonIntroExistAction,
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          .copyWith(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

@@ -7,19 +7,7 @@ import 'package:syphon/global/values.dart';
  * class below is just a stub for now
  */
 class Strings {
-  // Titles
-  static const titleIntro = 'Welcome to ${Values.appName}';
-  static const titleLogin = 'take back the chat';
-  static const titleDeleteDevices = 'Confirm Removing Devices';
-
   // View Titles
-  static const titleViewSignup = 'Signup';
-  static const titleViewDevices = 'Devices';
-  static const titleViewSettings = 'Settings';
-  static const titleChatPreferences = 'Chat Preferences';
-  static const titleThemeing = 'Theming';
-  static const titlePrivacy = 'Privacy';
-  static const titleHomeserverSearch = 'Find Your Homeserver';
   static const titleProfile = 'Set up Your Profile';
   static const titleSettings = 'Settings';
   static const titleAdvanced = 'Advanced';
@@ -32,6 +20,7 @@ class Strings {
   static const titleCreateGroupPublic = 'Create A Public Group';
 
   // Dialog Titles
+  static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
   static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
   static const titleDialogTerms = "Confirm Terms Of Service";
@@ -39,13 +28,11 @@ class Strings {
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
 
-  // Subtitles
-  static const subtitleIntro = 'Privacy and freedom\nwithout the hassle';
-
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSearchForHomeservers = "Search for homeservers...";
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelUsersSection = 'Users';
@@ -63,8 +50,11 @@ class Strings {
   static const buttonCancel = 'cancel';
   static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+  static const buttonDeleteKeys = 'delete keys';
 
   // Text Buttons
+  static const buttonTextSignup = "button-text-signup";
+
   static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';
@@ -75,7 +65,6 @@ class Strings {
   // Errors
   static const alertInviteUnknownUser =
       'This user doens\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
-  static const alertFeatureInProgress = '🛠 This feature is coming soon';
   static const errorMessageSendingFailed = 'Message Failed To Send';
   static const errorCheckHomeserver =
       'This server failed the \'well-known\' check, make sure the server is configured correctly';
@@ -113,6 +102,9 @@ class Strings {
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
 
   // Confirmations
+  static const confirmationDeleteKeys =
+      "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.";
+
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
 

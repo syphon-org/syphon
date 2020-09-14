@@ -30,7 +30,6 @@ import './step-username.dart';
 
 // Styling Widgets
 
-
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
@@ -42,8 +41,6 @@ class SignupView extends StatefulWidget {
 }
 
 class SignupViewState extends State<SignupView> {
-  final String title = Strings.titleViewSignup;
-
   int currentStep = 0;
   bool onboarding = false;
   bool validStep = false;

@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +49,7 @@ class DialogConfirmPassword extends StatelessWidget {
             bottom: 16,
           ),
           title: Text(
-            Strings.titleDeleteDevices,
+            tr('title-delete-devices'),
           ),
           children: <Widget>[
             Column(

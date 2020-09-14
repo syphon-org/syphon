@@ -52,40 +52,42 @@ ThunkAction<AppState> loadMessageEvents({Room room}) {
  */
 ThunkAction<AppState> fetchMessageEvents({
   Room room,
-  String endHash,
-  String startHash,
+  String to,
+  String from,
+  bool oldest = false,
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
+      // debugPrint('[to] $to');
+      // debugPrint('[from] $from');
+
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
         "protocol": protocol,
         "homeserver": store.state.authStore.user.homeserver,
         "accessToken": store.state.authStore.user.accessToken,
         "roomId": room.id,
-        "to": endHash,
-        "from": startHash,
+        "to": to,
+        "from": from,
         "limit": limit,
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       final String end = messagesJson['end'];
+
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
       final String start = messagesJson['start'];
+
+      // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      // If there's a gap in messages fetched, run a sync again
-      // which will fetch the next batch with the same endHash
-      // the following is probably not needed due to the
-      // inequality check for prevHash and endHash in syncRooms
-      // NOTE: nextPrevBatch by end hash is just to load more
-      // should be refactored
-      var nextPrevBatch;
-      if ((end != start && end != endHash)) {
-        nextPrevBatch = end;
-      }
+      // TODO: remove after 0.1.3 is merged
+      // messages.forEach((element) {
+      //   printJson(element);
+      // });
+      // debugPrint('[OLDEST] ${oldest}');
 
       // reuse the logic for syncing
       await store.dispatch(
@@ -93,8 +95,8 @@ ThunkAction<AppState> fetchMessageEvents({
           '${room.id}': {
             'timeline': {
               'events': messages,
-              'end_batch': end,
-              'prev_batch': nextPrevBatch,
+              'last_hash': oldest ? end : null,
+              'prev_batch': end,
             }
           },
         }),

@@ -34,8 +34,10 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   Function onResume,
   Function onMessage,
 }) async {
-// initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+// ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
+  var initializationSettingsAndroid = AndroidInitializationSettings(
+    'ic_launcher_foreground',
+  );
 
   var initializationSettingsIOS = IOSInitializationSettings(
     requestSoundPermission: false,

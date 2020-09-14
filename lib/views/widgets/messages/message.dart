@@ -26,6 +26,7 @@ class MessageWidget extends StatelessWidget {
     this.selectedMessageId,
     this.avatarUri,
     this.theme = ThemeType.LIGHT,
+    this.timeFormat = '12hr',
   }) : super(key: key);
 
   final Message message;
@@ -34,6 +35,7 @@ class MessageWidget extends StatelessWidget {
   final bool isUserSent;
   final bool messageOnly;
   final int lastRead;
+  final String timeFormat;
   final ThemeType theme;
   final String selectedMessageId;
   final Function onLongPress;
@@ -275,6 +277,7 @@ class MessageWidget extends StatelessWidget {
                                         ? Strings.errorMessageSendingFailed
                                         : formatTimestamp(
                                             lastUpdateMillis: message.timestamp,
+                                            timeFormat: timeFormat,
                                             showTime: true,
                                           ),
                                     style: TextStyle(

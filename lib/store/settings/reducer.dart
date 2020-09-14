@@ -77,6 +77,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         typingIndicators: !state.typingIndicators,
       );
+    case ToggleTimeFormat:
+      return state.copyWith(
+        timeFormat24Enabled: !state.timeFormat24Enabled,
+      );
     case ToggleReadReceipts:
       return state.copyWith(
         readReceipts: !state.readReceipts,

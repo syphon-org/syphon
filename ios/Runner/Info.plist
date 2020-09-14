@@ -24,6 +24,10 @@
 	<true/>
 	<key>UIFileSharingEnabled</key>
 	<true/>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+  </array>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
 	<key>NSCameraUsageDescription</key>

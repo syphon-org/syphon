@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 
 class LandingSection extends StatelessWidget {
   LandingSection({Key key, this.title}) : super(key: key);
@@ -47,7 +49,7 @@ class LandingSection extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.only(bottom: 14),
                   child: Text(
-                    Strings.titleIntro,
+                    tr('title-intro', args: [Values.appName]),
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
@@ -64,7 +66,7 @@ class LandingSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  Strings.subtitleIntro,
+                  tr('subtitle-intro'),
                   textAlign: TextAlign.center,
                   style: Theme.of(context)
                       .textTheme

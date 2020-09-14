@@ -12,7 +12,7 @@ import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 18
+// Next Field ID: 20
 @HiveType(typeId: SettingsStoreHiveId)
 class SettingsStore extends Equatable {
   @HiveField(0)
@@ -40,6 +40,8 @@ class SettingsStore extends Equatable {
   final bool membershipEventsEnabled;
   @HiveField(18)
   final bool roomTypeBadgesEnabled;
+  @HiveField(19)
+  final bool timeFormat24Enabled;
 
   @HiveField(16)
   final String fontName;
@@ -81,6 +83,7 @@ class SettingsStore extends Equatable {
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
+    this.timeFormat24Enabled = false,
     this.customChatSettings,
     this.devices = const [],
     this.loading = false,
@@ -105,6 +108,7 @@ class SettingsStore extends Equatable {
         typingIndicators,
         notificationsEnabled,
         roomTypeBadgesEnabled,
+        timeFormat24Enabled,
         customChatSettings,
         devices,
         loading,
@@ -129,6 +133,7 @@ class SettingsStore extends Equatable {
     bool notificationsEnabled,
     bool membershipEventsEnabled,
     bool roomTypeBadgesEnabled,
+    bool timeFormat24Enabled,
     Map<String, ChatSetting> customChatSettings,
     NotificationSettings notificationSettings,
     List<Device> devices,
@@ -151,6 +156,7 @@ class SettingsStore extends Equatable {
         typingIndicators:
             typingIndicators != null ? typingIndicators : this.typingIndicators,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+        timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         membershipEventsEnabled:
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:

@@ -217,7 +217,10 @@ ThunkAction<AppState> stopAuthObserver() {
 }
 
 /**
+ * Generate Device Id
  * 
+ * Used in matrix to distinguish devices
+ * for encryption and verification
  */
 ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
@@ -227,47 +230,44 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
       displayName: Values.appDisplayName,
     );
 
+    var deviceId;
+
     try {
       final deviceInfoPlugin = new DeviceInfoPlugin();
 
+      // Find a unique value for the type of device
       if (Platform.isAndroid) {
         final info = await deviceInfoPlugin.androidInfo;
-        final deviceIdentifier = info.androidId;
-        final hashedDeviceId = Crypt.sha256(
-          deviceIdentifier,
-          rounds: 1000,
-          salt: salt,
-        );
-
-        device = Device(
-          deviceId: hashedDeviceId.hash,
-          deviceIdPrivate: info.androidId,
-          displayName: Values.appDisplayName,
-        );
+        deviceId = info.androidId;
       } else if (Platform.isIOS) {
         final info = await deviceInfoPlugin.iosInfo;
-        final deviceIdentifier = info.identifierForVendor;
-
-        final hashedDeviceId = Crypt.sha256(
-          deviceIdentifier,
-          rounds: 1000,
-          salt: salt,
-        );
-
-        device = Device(
-          deviceId: hashedDeviceId.hash,
-          deviceIdPrivate: info.identifierForVendor,
-          displayName: Values.appDisplayName,
-        );
-      } else if (Platform.isMacOS) {
-        device = Device(
-          deviceId: defaultId,
-          displayName: Values.appDisplayName,
-        );
+        deviceId = info.identifierForVendor;
+      } else {
+        deviceId = Random.secure().nextInt(1 << 31).toString();
       }
+
+      // hash it
+      final deviceIdHashed = Crypt.sha256(
+        deviceId,
+        rounds: 1000,
+        salt: salt,
+      );
+
+      // make it easier to read
+      final deviceIdFriendly = deviceIdHashed.hash
+          .toUpperCase()
+          .replaceAll(RegExp(r'[^\w]'), '')
+          .substring(0, 10);
+
+      device = Device(
+        deviceId: deviceIdFriendly,
+        deviceIdPrivate: deviceId,
+        displayName: Values.appDisplayName,
+      );
+
       return device;
     } catch (error) {
-      debugPrint('[loginUser] $error');
+      debugPrint('[generateDeviceId] $error');
       return device;
     }
   };
@@ -308,8 +308,8 @@ ThunkAction<AppState> loginUser() {
         homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
-        deviceName: device.displayName,
         deviceId: device.deviceId,
+        deviceName: device.displayName,
       );
 
       if (data['errcode'] == 'M_FORBIDDEN') {

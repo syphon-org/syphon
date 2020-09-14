@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/formatters.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
@@ -18,23 +20,12 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
-
-// Library Implimentations
-
-// Redux - State Managment - "store" - IMPORT ONLY ONCE
-
-// Navigation
-
-// Styling
-
-/**
- * DESKTOP ONLY
- */
 
 void _enablePlatformOverrideForDesktop() {
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
@@ -82,7 +73,11 @@ void main() async {
   final store = await initStore();
 
   // the main thing
-  runApp(Syphon(store: store));
+  runApp(
+    Syphon(
+      store: store,
+    ),
+  );
 }
 
 class Syphon extends StatefulWidget {
@@ -215,26 +210,39 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => StoreProvider<AppState>(
         store: store,
-        child: StoreConnector<AppState, SettingsStore>(
-          distinct: true,
-          converter: (store) => store.state.settingsStore,
-          builder: (context, settings) => MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: Themes.generateCustomTheme(
-              primaryColorHex: settings.primaryColor,
-              accentColorHex: settings.accentColor,
-              appBarColorHex: settings.appBarColor,
-              fontName: settings.fontName,
-              fontSize: settings.fontSize,
-              themeType: settings.theme,
-            ),
-            navigatorKey: NavigationService.navigatorKey,
-            routes: NavigationProvider.getRoutes(),
-            home: defaultHome,
-            builder: (context, child) => Scaffold(
-              body: child,
-              appBar: null,
-              key: globalScaffold,
+        child: EasyLocalization(
+          path: 'assets/translations',
+          useOnlyLangCode: true,
+          // startLocale: store.state.settingsStore.language == languages[0]
+          //     ? null
+          //     : Locale(formatLanguageCode(store.state.settingsStore.language)),
+          startLocale:
+              Locale(formatLanguageCode(store.state.settingsStore.language)),
+          fallbackLocale: Locale('en'),
+          supportedLocales: [Locale('en'), Locale('ru')],
+          child: StoreConnector<AppState, SettingsStore>(
+            distinct: true,
+            converter: (store) => store.state.settingsStore,
+            builder: (context, settings) => MaterialApp(
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              debugShowCheckedModeBanner: false,
+              theme: Themes.generateCustomTheme(
+                primaryColorHex: settings.primaryColor,
+                accentColorHex: settings.accentColor,
+                appBarColorHex: settings.appBarColor,
+                fontName: settings.fontName,
+                fontSize: settings.fontSize,
+                themeType: settings.theme,
+              ),
+              navigatorKey: NavigationService.navigatorKey,
+              routes: NavigationProvider.getRoutes(),
+              home: defaultHome,
+              builder: (context, child) => Scaffold(
+                body: child,
+                appBar: null,
+                key: globalScaffold,
+              ),
             ),
           ),
         ),
