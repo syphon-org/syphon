@@ -65,7 +65,6 @@ class Strings {
   // Errors
   static const alertInviteUnknownUser =
       'This user doens\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
-  static const alertFeatureInProgress = '🛠 This feature is coming soon';
   static const errorMessageSendingFailed = 'Message Failed To Send';
   static const errorCheckHomeserver =
       'This server failed the \'well-known\' check, make sure the server is configured correctly';

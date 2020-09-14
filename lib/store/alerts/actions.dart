@@ -2,6 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -52,7 +53,7 @@ ThunkAction<AppState> startAlertsObserver() {
 
 ThunkAction<AppState> addInProgress() {
   return (Store<AppState> store) async {
-    store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
+    store.dispatch(addInfo(message: tr('alert-feature-in-progress')));
   };
 }
 

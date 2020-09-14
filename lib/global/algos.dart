@@ -1,6 +1,16 @@
 // Dart imports:
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
+/**
+ * Clock functions in code
+ * 
+ * final stopwatch = Stopwatch()..start();
+ * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
+ * stopwatch.stop();
+ */
+
 List<int> fibonacci(int n) {
   if (n == 0) {
     return [0];
@@ -16,13 +26,5 @@ List<int> fibonacci(int n) {
 void printJson(Map jsonMap) {
   JsonEncoder encoder = new JsonEncoder.withIndent('  ');
   String prettyEvent = encoder.convert(jsonMap);
-  print(prettyEvent);
+  debugPrint(prettyEvent, wrapWidth: 2048);
 }
-
-/**
- * Clock functions in code
- * 
- * final stopwatch = Stopwatch()..start();
- * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
- * stopwatch.stop();
- */

@@ -24,6 +24,10 @@ class CryptoStore extends Equatable {
   @HiveField(10)
   final Map<String, int> messageSessionIndex;
 
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
+  @HiveField(15)
+  final Map<String, Map<String, int>> messageSessionIndexNEW;
+
   // Map<roomId, serializedSession> // megolm - messages
   @HiveField(5)
   final Map<String, String> outboundMessageSessions;
@@ -71,6 +75,7 @@ class CryptoStore extends Equatable {
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
     this.messageSessionIndex = const {},
+    this.messageSessionIndexNEW = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
@@ -83,6 +88,7 @@ class CryptoStore extends Equatable {
   List<Object> get props => [
         olmAccount,
         olmAccountKey,
+        messageSessionIndexNEW,
         inboundMessageSessions,
         outboundMessageSessions,
         inboundKeySessions,
@@ -99,6 +105,7 @@ class CryptoStore extends Equatable {
   CryptoStore copyWith({
     olmAccount,
     olmAccountKey,
+    messageSessionIndexNEW,
     inboundMessageSessions,
     outboundMessageSessions,
     inboundKeySessions,
@@ -118,6 +125,8 @@ class CryptoStore extends Equatable {
           inboundMessageSessions ?? this.inboundMessageSessions,
       outboundMessageSessions:
           outboundMessageSessions ?? this.outboundMessageSessions,
+      messageSessionIndexNEW:
+          messageSessionIndexNEW ?? this.messageSessionIndexNEW,
       messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
       inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
       outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,

@@ -215,8 +215,8 @@ ThunkAction<AppState> fetchRooms() {
       }
 
       // Convert joined_rooms to Room objects
-      final List<dynamic> rawJoinedRooms = data['joined_rooms'];
-      final joinedRooms = rawJoinedRooms.map((id) => Room(id: id)).toList();
+      final List<dynamic> joinedRoomsRaw = data['joined_rooms'];
+      final joinedRooms = joinedRoomsRaw.map((id) => Room(id: id)).toList();
       final fullJoinedRooms = joinedRooms.map((room) async {
         try {
           final stateEvents = await MatrixApi.fetchStateEvents(

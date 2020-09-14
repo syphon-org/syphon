@@ -1,4 +1,5 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +77,7 @@ class SettingsScreen extends StatelessWidget {
                               contentPadding: Dimensions.listPaddingSettings,
                               enabled: false,
                               title: Text(
-                                'SMS and MMS',
+                                tr('list-item-settings-sms'),
                               ),
                               subtitle: buildToggledSubtitle(value: false),
                               leading: Container(
@@ -104,7 +105,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Notifications',
+                              tr('list-item-settings-notification'),
                             ),
                             subtitle: buildToggledSubtitle(
                               value: props.notificationsEnabled,
@@ -130,7 +131,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Chats And Media',
+                              tr('list-item-settings-chat'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
@@ -148,7 +149,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Security & Privacy',
+                              tr('list-item-settings-privacy'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
@@ -170,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Theming',
+                              tr('title-view-theming'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
@@ -188,7 +189,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Devices',
+                              tr('title-view-devices'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
@@ -206,7 +207,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Advanced',
+                              tr('title-view-advanced'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
@@ -222,7 +223,7 @@ class SettingsScreen extends StatelessWidget {
                                   size: 28,
                                 )),
                             title: Text(
-                              'Logout',
+                              tr('list-item-settings-logout'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             trailing: Visibility(
@@ -282,9 +283,7 @@ class _Props extends Equatable {
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
-        onDisabled: () => store.dispatch(
-          addInfo(message: Strings.alertFeatureInProgress),
-        ),
+        onDisabled: () => store.dispatch(addInProgress()),
         onLogoutUser: () {
           store.dispatch(logoutUser());
         },
