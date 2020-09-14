@@ -54,13 +54,11 @@ CryptoStore cryptoReducer(
         state.outboundMessageSessions,
       );
 
-      // outboundMessageSessions.update(
-      //   action.roomId,
-      //   (sessionCurrent) => action.session,
-      //   ifAbsent: () => action.session,
-      // );
-
-      outboundMessageSessions.putIfAbsent(action.roomId, () => action.session);
+      outboundMessageSessions.update(
+        action.roomId,
+        (sessionCurrent) => action.session,
+        ifAbsent: () => action.session,
+      );
 
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
