@@ -1,7 +1,7 @@
 // Flutter imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
@@ -12,12 +12,8 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
-import 'package:syphon/views/widgets/captcha.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 
 // Store
@@ -61,8 +57,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroAcceptTerms,
-                    semanticsLabel:
-                        'Hand holding phone with checked terms of service input',
+                    semanticsLabel: tr('semantics-image-terms-of-service'),
                   ),
                 ),
               ),
@@ -75,7 +70,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                     Container(
                       padding: EdgeInsets.only(bottom: 8, top: 8),
                       child: Text(
-                        'This homeserver requires a captcha\n before you can create an account.',
+                        tr('content-signup-captcha-requirement'),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.caption,
                       ),
@@ -128,7 +123,9 @@ class CaptchaStepState extends State<CaptchaStep> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ButtonText(
-                      text: props.completed ? 'Confirmed' : 'Load Captcha',
+                      text: props.completed
+                          ? tr('button-text-confirmed')
+                          : tr('button-text-load-captcha'),
                       color: props.completed ? Color(0xff49c489) : null,
                       loading: props.loading,
                       disabled: props.completed,

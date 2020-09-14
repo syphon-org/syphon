@@ -50,6 +50,8 @@
   "button-text-new-user": "Don't have a username?",
   "button-text-login": "Login",
   "button-text-signup": "Create One",
+  "button-text-load-captcha": "Load Captcha",
+  "button-text-confirmed": "Confirmed",
   "list-item-settings-notification": "Notifications",
   "list-item-settings-chat": "Chats and Media",
   "list-item-settings-privacy": "Security & Privacy",
@@ -72,6 +74,7 @@
   "content-notification-background": "Backgound connection enabled",
   "content-signup-email-requirement": "This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information",
   "content-signup-email-verification": "This homeserver requires a verified email to complete registration, you'll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.",
+  "content-signup-captcha-requirement": "This homeserver requires a captcha\n before you can create an account.",
   "confirmation-delete-keys": "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.",
   "confirmation-invite": "Are you sure you want to invite the following user to the following room?",
   "confirmation-start-chat": "Even if you don't send a message, the user will still see your invite to chat.",
@@ -92,5 +95,6 @@
   "semnatics-image-intro-section-two": "A person holding up a private message bubble",
   "semnatics-image-intro-section-third": "People lounging around and messaging each other",
   "semnatics-image-intro-section-four": "Two different people feeling confident and lookin' their best",
-  "semantics-image-empty-chat-list": "Several tiny, cute monsters peering out behind foliage"
+  "semantics-image-empty-chat-list": "Several tiny, cute monsters peering out behind foliage",
+  "semantics-image-terms-of-service": "Hand holding a phone with a terms of service checkbox checked"
 }
