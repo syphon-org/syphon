@@ -233,7 +233,7 @@ class LoginState extends State<Login> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         Container(
-                          padding: const EdgeInsets.only(top: 8, bottom: 12),
+                          padding: const EdgeInsets.only(top: 24, bottom: 12),
                           child: ButtonSolid(
                             text: Strings.buttonLogin,
                             loading: props.loading,
