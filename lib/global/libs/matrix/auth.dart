@@ -301,4 +301,33 @@ abstract class Auth {
 
     return await json.decode(response.body);
   }
+
+  /**
+   * Register New User
+   * 
+   * inhibit_login automatically logs in the user after creation 
+   */
+  static FutureOr<dynamic> resetPassword({
+    String protocol,
+    String homeserver,
+    String clientSecret,
+    String email,
+    int sendAttempt = 1,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+
+    Map body = {
+      "email": email,
+      "client_secret": clientSecret,
+      "send_attempt": sendAttempt,
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
 }
