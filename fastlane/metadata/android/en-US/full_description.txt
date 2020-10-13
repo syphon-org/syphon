@@ -1,0 +1,8 @@
+Please be aware Syphon is in Open Alpha.
+
+Syphon is a privacy centric matrix chat client built on the foundations of privacy, branding, and user experience 
+in an effort to pull others away from proprietary chat clients to the matrix protocol. 
+
+Syphon is a not for profit effort, and will always be a community driven application with a mission to help others communicate freely.
+
+Email us with any questions, concerns, or to get involved for hello@syphon.org.
