@@ -645,24 +645,29 @@ class _Props extends Equatable {
         syncing: () {
           final syncing = store.state.syncStore.syncing;
           final offline = store.state.syncStore.offline;
+          final backgrounded = store.state.syncStore.backgrounded;
           final loadingRooms = store.state.roomStore.loading;
 
           final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-              store.state.syncStore.lastAttempt);
+              store.state.syncStore.lastAttempt ?? 0);
 
           // See if the last attempted sync is older than 60 seconds
           final isLastAttemptOld = DateTime.now()
               .difference(lastAttempt)
               .compareTo(Duration(seconds: 60));
 
+          // syncing for the first time since going offline
           if (syncing && offline) {
             return true;
           }
+
+          // joining or removing a room
           if (loadingRooms) {
             return true;
           }
 
-          if (syncing && 0 < isLastAttemptOld) {
+          // syncing for the first time in a while or restarting the app
+          if (syncing && (0 < isLastAttemptOld || backgrounded)) {
             return true;
           }
 

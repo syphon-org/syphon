@@ -32,13 +32,18 @@ class SyncStore extends Equatable {
   final bool unauthed;
   final Timer syncObserver;
 
+  @HiveField(6)
   final int lastAttempt; // last attempt to sync
+
+  @HiveField(7)
+  final bool backgrounded;
 
   const SyncStore({
     this.synced = false,
     this.syncing = false,
     this.unauthed = false,
     this.offline = false,
+    this.backgrounded = false,
     this.lastUpdate = 0,
     this.lastAttempt = 0,
     this.backoff = 0,
@@ -53,6 +58,7 @@ class SyncStore extends Equatable {
         offline,
         backoff,
         unauthed,
+        backgrounded,
         lastUpdate,
         lastAttempt,
         lastSince,
@@ -60,12 +66,13 @@ class SyncStore extends Equatable {
       ];
 
   SyncStore copyWith({
-    synced,
-    syncing,
-    offline,
-    backoff,
-    unauthed,
-    lastUpdate,
+    int backoff,
+    bool synced,
+    bool syncing,
+    bool offline,
+    bool unauthed,
+    bool backgrounded,
+    int lastUpdate,
     lastAttempt,
     syncObserver,
     lastSince,
@@ -76,9 +83,14 @@ class SyncStore extends Equatable {
       offline: offline ?? this.offline,
       unauthed: unauthed ?? this.unauthed,
       lastUpdate: lastUpdate ?? this.lastUpdate,
-      lastAttempt: lastAttempt ?? this.lastAttempt,
+      lastAttempt: lastAttempt ??
+          this.lastAttempt ??
+          0, // TODO: remove after version 0.1.4
       lastSince: lastSince ?? this.lastSince,
       syncObserver: syncObserver ?? this.syncObserver,
+      backgrounded: backgrounded ??
+          this.backgrounded ??
+          false, // TODO: remove after version 0.1.4
       backoff: backoff ?? this.backoff,
     );
   }

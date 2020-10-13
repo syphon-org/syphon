@@ -22,6 +22,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
@@ -72,12 +73,8 @@ void main() async {
   // init state cache (hot)
   final store = await initStore();
 
-  // the main thing
-  runApp(
-    Syphon(
-      store: store,
-    ),
-  );
+  // the app
+  runApp(Syphon(store: store));
 }
 
 class Syphon extends StatefulWidget {
@@ -117,6 +114,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void didChangeDependencies() {
     super.didChangeDependencies();
     onMounted();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+      case AppLifecycleState.inactive:
+        break;
+        break;
+      case AppLifecycleState.paused:
+        store.dispatch(setBackgrounded(true));
+        break;
+      case AppLifecycleState.detached:
+        store.dispatch(setBackgrounded(true));
+        break;
+    }
   }
 
   @protected

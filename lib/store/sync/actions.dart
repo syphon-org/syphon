@@ -38,6 +38,11 @@ class SetOffline {
   SetOffline({this.offline});
 }
 
+class SetBackgrounded {
+  final bool backgrounded;
+  SetBackgrounded({this.backgrounded});
+}
+
 class SetSyncing {
   final bool syncing;
   SetSyncing({this.syncing});
@@ -162,6 +167,20 @@ ThunkAction<AppState> initialSync() {
 
 /**
  * 
+ * Set Backgrounded
+ * 
+ * Mark when the app has been backgrounded to visualize loading feedback
+ *  
+ */
+ThunkAction<AppState> setBackgrounded(bool backgrounded) {
+  return (Store<AppState> store) async {
+    print('set backgrounded ${backgrounded}');
+    store.dispatch(SetBackgrounded(backgrounded: backgrounded));
+  };
+}
+
+/**
+ * 
  * Fetch Sync
  * 
  * Responsible for updates based on differences from Matrix
@@ -245,6 +264,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
       store.dispatch(SetBackoff(backoff: nextBackoff));
     } finally {
+      store.dispatch(setBackgrounded(false));
       store.dispatch(SetSyncing(syncing: false));
     }
   };
