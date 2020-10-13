@@ -57,10 +57,9 @@ dependencies:
       url: https://gitlab.com/famedly/libraries/dart-olm
       ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
  
-  # Domain / Store
+  # State Management
   expandable: 3.0.1
   equatable: 1.2.4
-  crypt: 3.0.1
   canonical_json: 1.0.0
   convert: 2.1.1
   device_info: ^0.4.2
@@ -69,14 +68,20 @@ dependencies:
   redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
   flutter_redux: 0.6.0
-  hive: 1.4.4
-  hive_flutter:  0.3.1
-  flutter_secure_storage: 3.3.3
   mime: 0.9.7
   path_provider: 1.6.14
   package_info: 0.4.3
+
+  # Encryption
+  crypt: 3.0.1
   # steel_crypt: 1.7.1
   # cryptography: 1.2.1
+
+  # Cache
+  hive: 1.4.4
+  hive_flutter:  0.3.1
+  flutter_secure_storage: 3.3.3
+  json_serializable: 3.3.0
 
   # Services
   http: ^0.12.0+2
@@ -87,9 +92,6 @@ dependencies:
   flutter_dotenv: 2.1.0
   android_alarm_manager: 0.4.5+11
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
-  
-  # Converters
-  json_annotation: ^3.1.0
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
@@ -109,21 +111,18 @@ dependencies:
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5 
   palette_generator: 0.2.3
-  
 
 dev_dependencies:
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
   hive_generator: 0.7.1
-  json_serializable: ^3.5.0
-
   # TODO: build fixes - remove later
   build_resolvers: 1.3.10 # <- modified to solve build_runner  
 
   # TODO: build fixes - remove later
 dependency_overrides:
   path: 1.7.0
-  analyzer: 0.39.14
+  analyzer: 0.39.16
   dart_style: 1.3.4
 
 flutter_icons:
