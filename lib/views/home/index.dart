@@ -654,7 +654,7 @@ class _Props extends Equatable {
           // See if the last attempted sync is older than 60 seconds
           final isLastAttemptOld = DateTime.now()
               .difference(lastAttempt)
-              .compareTo(Duration(seconds: 60));
+              .compareTo(Duration(seconds: 90));
 
           // syncing for the first time since going offline
           if (syncing && offline) {
