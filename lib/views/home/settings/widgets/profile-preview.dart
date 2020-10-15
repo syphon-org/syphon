@@ -12,7 +12,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ProfilePreview extends StatelessWidget {
   ProfilePreview({Key key}) : super(key: key);
@@ -28,7 +28,7 @@ class ProfilePreview extends StatelessWidget {
                 width: Dimensions.avatarSize,
                 height: Dimensions.avatarSize,
                 margin: EdgeInsets.only(right: 16),
-                child: AvatarCircle(
+                child: Avatar(
                   uri: props.avatarUri,
                   alt: props.user.displayName ?? props.user.userId,
                   size: Dimensions.avatarSize,

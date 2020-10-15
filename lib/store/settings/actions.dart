@@ -1,5 +1,4 @@
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -30,6 +29,11 @@ class SetTheme {
 class SetPrimaryColor {
   final int color;
   SetPrimaryColor({this.color});
+}
+
+class SetAvatarShape {
+  final String avatarShape;
+  SetAvatarShape({this.avatarShape});
 }
 
 class SetAccentColor {
@@ -330,6 +334,24 @@ ThunkAction<AppState> incrementTheme() {
     store.dispatch(SetTheme(
       ThemeType.values[(themeIndex + 1) % ThemeType.values.length],
     ));
+  };
+}
+
+ThunkAction<AppState> incrementAvatarShape() {
+  return (Store<AppState> store) async {
+    final currentShape = store.state.settingsStore.avatarShape;
+    var newShape;
+
+    switch (currentShape) {
+      case "Circle":
+        newShape = 'Square';
+        break;
+      default:
+        newShape = "Circle";
+        break;
+    }
+
+    store.dispatch(SetAvatarShape(avatarShape: newShape));
   };
 }
 

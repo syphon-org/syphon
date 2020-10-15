@@ -26,7 +26,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class RoomSearchArguments {
@@ -190,7 +190,7 @@ class RoomSearchState extends State<RoomSearchView> {
                   margin: const EdgeInsets.only(right: 12),
                   child: Stack(
                     children: [
-                      AvatarCircle(
+                      Avatar(
                         uri: room.avatarUri,
                         size: Dimensions.avatarSizeMin,
                         alt: formatRoomInitials(room: room),

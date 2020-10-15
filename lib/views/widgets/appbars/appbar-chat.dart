@@ -10,7 +10,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 
 class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
@@ -134,7 +134,7 @@ class AppBarChatState extends State<AppBarChat> {
                   children: [
                     Hero(
                       tag: "ChatAvatar",
-                      child: AvatarCircle(
+                      child: Avatar(
                         uri: widget.room.avatarUri,
                         size: Dimensions.avatarSizeMin,
                         alt: formatRoomInitials(room: widget.room),

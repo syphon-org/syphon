@@ -14,7 +14,7 @@ import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 /**
@@ -167,7 +167,7 @@ class UserDetailsState extends State<UserDetailsView> {
                       children: [
                         Opacity(
                           opacity: headerOpacity,
-                          child: AvatarCircle(
+                          child: Avatar(
                             size: height * 0.15,
                             uri: user.avatarUri,
                             alt: user.displayName ?? user.userId ?? '',

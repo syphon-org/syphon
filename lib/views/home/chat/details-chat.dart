@@ -24,7 +24,7 @@ import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 class ChatSettingsArguments {
@@ -185,7 +185,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       children: [
                         Opacity(
                           opacity: headerOpacity,
-                          child: AvatarCircle(
+                          child: Avatar(
                             size: height * 0.15,
                             uri: props.room.avatarUri,
                             alt: props.room.name,

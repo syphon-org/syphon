@@ -1,8 +1,3 @@
-/**
- * 
- * TODO: not sure if we ever need unsigned keys 
- */
-
 // Dart imports:
 import 'dart:convert';
 import 'dart:io';
@@ -20,7 +15,6 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -422,10 +416,19 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
 
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
-    store.dispatch(
-      SetOneTimeKeysCounts(oneTimeKeysCounts: oneTimeKeysCounts),
-    );
+    final accessToken = store.state.authStore.user.accessToken;
 
+    // Confirm user is authenticated still
+    if (accessToken == null) {
+      return;
+    }
+
+    // Confirm user is authenticated still
+    store.dispatch(SetOneTimeKeysCounts(
+      oneTimeKeysCounts: oneTimeKeysCounts,
+    ));
+
+    // Confirm user has generated an olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     if (olmAccount == null) {
       return;

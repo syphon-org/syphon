@@ -22,7 +22,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/search/search-rooms.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class ModalUserDetails extends StatelessWidget {
@@ -125,7 +125,7 @@ class ModalUserDetails extends StatelessWidget {
                       children: <Widget>[
                         Container(
                           padding: EdgeInsets.only(bottom: 16),
-                          child: AvatarCircle(
+                          child: Avatar(
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,

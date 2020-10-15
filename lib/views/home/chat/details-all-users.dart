@@ -23,7 +23,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ChatUsersDetailArguments {
   final String roomId;
@@ -106,7 +106,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
               elevation: 0,
               child: Container(
                 child: ListTile(
-                  leading: AvatarCircle(
+                  leading: Avatar(
                     uri: user.avatarUri,
                     alt: user.displayName ?? user.userId,
                     size: Dimensions.avatarSizeMin,

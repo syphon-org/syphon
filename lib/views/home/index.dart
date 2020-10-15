@@ -32,7 +32,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/containers/ring-actions.dart';
 
@@ -75,94 +75,92 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext context, _Props props}) {
-    return AppBar(
-      backgroundColor: Colors.grey[500],
-      automaticallyImplyLeading: false,
-      titleSpacing: 0.0,
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 8),
+  Widget buildAppBarRoomOptions({BuildContext context, _Props props}) => AppBar(
+        backgroundColor: Colors.grey[500],
+        automaticallyImplyLeading: false,
+        titleSpacing: 0.0,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 8),
+              child: IconButton(
+                icon: Icon(Icons.close),
+                color: Colors.white,
+                iconSize: Dimensions.buttonAppBarSize,
+                onPressed: onDismissMessageOptions,
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Chat Details',
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/home/chat/settings',
+                arguments: ChatSettingsArguments(
+                  roomId: selectedRoom.id,
+                  title: selectedRoom.name,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.archive),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Archive Room',
+            color: Colors.white,
+            onPressed: () async {
+              await props.onArchiveRoom(room: this.selectedRoom);
+              this.setState(() {
+                selectedRoom = null;
+              });
+            },
+          ),
+          Visibility(
+            visible: true,
             child: IconButton(
-              icon: Icon(Icons.close),
-              color: Colors.white,
+              icon: Icon(Icons.exit_to_app),
               iconSize: Dimensions.buttonAppBarSize,
-              onPressed: onDismissMessageOptions,
+              tooltip: 'Leave Chat',
+              color: Colors.white,
+              onPressed: () async {
+                await props.onLeaveChat(room: this.selectedRoom);
+                this.setState(() {
+                  selectedRoom = null;
+                });
+              },
             ),
           ),
+          Visibility(
+            visible: this.selectedRoom.direct,
+            child: IconButton(
+              icon: Icon(Icons.delete_outline),
+              iconSize: Dimensions.buttonAppBarSize,
+              tooltip: 'Delete Chat',
+              color: Colors.white,
+              onPressed: () async {
+                await props.onDeleteChat(room: this.selectedRoom);
+                this.setState(() {
+                  selectedRoom = null;
+                });
+              },
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.select_all),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: 'Select All',
+            color: Colors.white,
+            onPressed: () {},
+          ),
         ],
-      ),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.info_outline),
-          iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Chat Details',
-          color: Colors.white,
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              '/home/chat/settings',
-              arguments: ChatSettingsArguments(
-                roomId: selectedRoom.id,
-                title: selectedRoom.name,
-              ),
-            );
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.archive),
-          iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Archive Room',
-          color: Colors.white,
-          onPressed: () async {
-            await props.onArchiveRoom(room: this.selectedRoom);
-            this.setState(() {
-              selectedRoom = null;
-            });
-          },
-        ),
-        Visibility(
-          visible: true,
-          child: IconButton(
-            icon: Icon(Icons.exit_to_app),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Leave Chat',
-            color: Colors.white,
-            onPressed: () async {
-              await props.onLeaveChat(room: this.selectedRoom);
-              this.setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
-        ),
-        Visibility(
-          visible: this.selectedRoom.direct,
-          child: IconButton(
-            icon: Icon(Icons.delete_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Delete Chat',
-            color: Colors.white,
-            onPressed: () async {
-              await props.onDeleteChat(room: this.selectedRoom);
-              this.setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
-        ),
-        IconButton(
-          icon: Icon(Icons.select_all),
-          iconSize: Dimensions.buttonAppBarSize,
-          tooltip: 'Select All',
-          color: Colors.white,
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
+      );
 
   @protected
   Widget buildAppBar({BuildContext context, _Props props}) => AppBar(
@@ -378,7 +376,7 @@ class HomeViewState extends State<Home> {
                   margin: const EdgeInsets.only(right: 12),
                   child: Stack(
                     children: [
-                      AvatarCircle(
+                      Avatar(
                         uri: room.avatarUri,
                         size: Dimensions.avatarSizeMin,
                         alt: formatRoomInitials(room: room),

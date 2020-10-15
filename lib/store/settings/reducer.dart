@@ -30,6 +30,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         fontSize: action.fontSize,
       );
+    case SetAvatarShape:
+      return state.copyWith(
+        avatarShape: action.avatarShape,
+      );
     case SetAppBarColor:
       return state.copyWith(
         appBarColor: action.color,

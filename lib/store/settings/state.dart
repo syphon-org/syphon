@@ -12,7 +12,7 @@ import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 20
+// Next Field ID: 21
 @HiveType(typeId: SettingsStoreHiveId)
 class SettingsStore extends Equatable {
   @HiveField(0)
@@ -49,6 +49,8 @@ class SettingsStore extends Equatable {
   final String fontSize;
   @HiveField(9)
   final String language;
+  @HiveField(20)
+  final String avatarShape;
 
   @HiveField(12)
   final List<Device> devices;
@@ -76,6 +78,7 @@ class SettingsStore extends Equatable {
     this.fontName = 'Rubik',
     this.fontSize = 'Default',
     this.language = 'English',
+    this.avatarShape = 'Circle',
     this.enterSend = false,
     this.smsEnabled = false,
     this.readReceipts = false,
@@ -102,6 +105,7 @@ class SettingsStore extends Equatable {
         fontName,
         fontSize,
         language,
+        avatarShape,
         smsEnabled,
         enterSend,
         readReceipts,
@@ -126,6 +130,7 @@ class SettingsStore extends Equatable {
     String fontName,
     String fontSize,
     String language,
+    String avatarShape,
     bool smsEnabled,
     bool enterSend,
     bool readReceipts,
@@ -150,6 +155,7 @@ class SettingsStore extends Equatable {
         fontName: fontName ?? this.fontName,
         fontSize: fontSize ?? this.fontSize,
         language: language ?? this.language,
+        avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSend: enterSend != null ? enterSend : this.enterSend,
         readReceipts: readReceipts != null ? readReceipts : this.readReceipts,

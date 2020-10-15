@@ -10,7 +10,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class MessageWidget extends StatelessWidget {
   MessageWidget({
@@ -196,7 +196,7 @@ class MessageWidget extends StatelessWidget {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 8),
-                          child: AvatarCircle(
+                          child: Avatar(
                             margin: EdgeInsets.zero,
                             padding: EdgeInsets.zero,
                             uri: avatarUri,

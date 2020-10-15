@@ -9,7 +9,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/home/groups/invite-users.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 /**
@@ -73,7 +73,7 @@ class ListUserBubbles extends StatelessWidget {
                       left: index == 0 ? 12 : 4,
                       right: index == users.length ? 12 : 4,
                     ),
-                    child: AvatarCircle(
+                    child: Avatar(
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSize,

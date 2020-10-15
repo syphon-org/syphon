@@ -26,7 +26,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -272,7 +272,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                   labelPadding: EdgeInsets.only(left: 8),
                                   padding: EdgeInsets.zero,
                                   visualDensity: VisualDensity.comfortable,
-                                  avatar: AvatarCircle(
+                                  avatar: Avatar(
                                     margin: EdgeInsets.zero,
                                     padding: EdgeInsets.zero,
                                     uri: user.avatarUri,
@@ -353,7 +353,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                         child: ListTile(
                                           enabled: creatingRoomDisplayName !=
                                               searchable,
-                                          leading: AvatarCircle(
+                                          leading: Avatar(
                                             uri: attemptableUser.avatarUri,
                                             alt: attemptableUser.displayName ??
                                                 attemptableUser.userId,
@@ -411,7 +411,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                           ),
                                           child: Stack(
                                             children: [
-                                              AvatarCircle(
+                                              Avatar(
                                                 uri: user.avatarUri,
                                                 alt: user.displayName ??
                                                     user.userId,
