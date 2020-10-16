@@ -169,7 +169,6 @@ ThunkAction<AppState> startAuthObserver() {
 
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
-      debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserCurrentProfile());
 
@@ -348,11 +347,12 @@ ThunkAction<AppState> logoutUser() {
       if (store.state.authStore.user.homeserver == null) {
         throw Exception('Unavailable user data');
       }
-
+      final temp = '${store.state.authStore.user.accessToken}';
+      store.state.authStore.authObserver.add(null);
       final data = await MatrixApi.logoutUser(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
+        accessToken: temp,
       );
 
       if (data['errcode'] != null) {

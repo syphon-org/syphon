@@ -153,6 +153,8 @@ ThunkAction<AppState> stopSyncObserver() {
  * initial syncing terribly. It's incredibly cumbersome to load thousands of events
  * for multiple rooms all at once in order to show the user just some room names
  * and timestamps. Lazy loading isn't always supported, so it's not a solid solution
+ * 
+ * TODO: potentially re-enable the fetch rooms function if lazy_load fails
  */
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
@@ -174,7 +176,6 @@ ThunkAction<AppState> initialSync() {
  */
 ThunkAction<AppState> setBackgrounded(bool backgrounded) {
   return (Store<AppState> store) async {
-    print('set backgrounded ${backgrounded}');
     store.dispatch(SetBackgrounded(backgrounded: backgrounded));
   };
 }
@@ -189,19 +190,23 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
+      debugPrint('[fetchSync] starting sync');
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
+      var filterId;
+
       if (isFullSync) {
-        debugPrint('[fetchSync] fetching full sync');
+        debugPrint('[fetchSync] running full sync');
       }
 
-      // Matrix Sync to homeserver
+      // Normal matrix /sync call to the homeserver (Threaded)
       final data = await compute(MatrixApi.syncBackground, {
         'protocol': protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
         'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+        'filter': filterId,
         'timeout': 10000
       });
 
@@ -209,9 +214,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
           store.dispatch(SetUnauthed(unauthed: true));
           // TODO: signin prompt needed here
-        } else {
-          throw data['error'];
         }
+
+        throw data['error'];
       }
 
       final nextBatch = data['next_batch'];
@@ -244,7 +249,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         lastSince: nextBatch,
       ));
 
-      if (!kReleaseMode && isFullSync) {
+      if (isFullSync) {
         debugPrint('[fetchSync] full sync completed');
       }
     } catch (error) {
@@ -253,7 +258,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       try {
         // try to understand the error message
         message = (error.message as String);
-      } catch (error) {}
+      } catch (error) {
+        debugPrint(error);
+      }
 
       if (message.contains('SocketException')) {
         debugPrint('[fetchSync] IOException $error');

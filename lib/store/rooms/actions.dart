@@ -274,8 +274,8 @@ ThunkAction<AppState> fetchRooms() {
  * Fetches both state and message of direct rooms
  * found from account_data of current authed user
  * 
- * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org],
- * alekseyparfyonov@gmail.com: [!muTrhMUMwdJSrYlqic:matrix.org] 
+ * Have to account for multiple direct rooms with one user
+ * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org, !124:matrix.org]
  */
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
@@ -292,67 +292,80 @@ ThunkAction<AppState> fetchDirectRooms() {
       }
 
       // Mark specified rooms as direct chats
-      final directRooms = data as Map<String, dynamic>;
+      final directRoomMap = data as Map<String, dynamic>;
+      final List<Map> directRoomList = [];
 
-      // TODO: refactor more functional
-      // Fetch room state and messages by roomId
-      directRooms.forEach((userId, roomIds) {
-        roomIds.forEach((roomId) async {
-          try {
-            final stateEvents = await MatrixApi.fetchStateEvents(
-              protocol: protocol,
-              homeserver: store.state.authStore.user.homeserver,
-              accessToken: store.state.authStore.user.accessToken,
-              roomId: roomId,
-            );
-
-            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-              throw stateEvents['error'];
-            }
-
-            final messageEvents = await compute(
-              MatrixApi.fetchMessageEventsMapped,
-              {
-                "protocol": protocol,
-                "homeserver": store.state.authStore.user.homeserver,
-                "accessToken": store.state.authStore.user.accessToken,
-                "roomId": roomId,
-                "limit": 20,
-              },
-            );
-
-            if (messageEvents['errcode'] != null) {
-              throw messageEvents['error'];
-            }
-
-            // Format response like /sync request
-            // Hacked together to provide isDirect data
-            await store.dispatch(syncRooms({
-              '$roomId': {
-                'state': {
-                  'events': stateEvents,
-                },
-                'timeline': {
-                  'events': messageEvents['chunk'],
-                  'prev_batch': messageEvents['from'],
-                },
-                'account_data': {
-                  'events': [
-                    {
-                      "type": 'm.direct',
-                      'content': {
-                        '$userId',
-                      }
-                    }
-                  ],
-                }
-              },
-            }));
-          } catch (error) {
-            debugPrint('[fetchDirectRooms] $error');
-          }
+      // Parse room map to allow for pulling by roomId (keeping userId)
+      directRoomMap.forEach((userId, roomIds) {
+        roomIds.forEach((roomId) {
+          directRoomList.add({userId: roomId});
         });
       });
+
+      // Fetch room state and messages by userId/roomId
+      final directRoomData = directRoomList.map((directRoom) async {
+        print('[fetchDirectRooms]');
+        print(directRoom);
+
+        final userId = directRoom.keys.elementAt(0);
+        final roomId = directRoom.values.elementAt(0);
+        try {
+          final stateEvents = await MatrixApi.fetchStateEvents(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            roomId: roomId,
+          );
+
+          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+            throw stateEvents['error'];
+          }
+
+          final messageEvents = await compute(
+            MatrixApi.fetchMessageEventsMapped,
+            {
+              "protocol": protocol,
+              "homeserver": store.state.authStore.user.homeserver,
+              "accessToken": store.state.authStore.user.accessToken,
+              "roomId": roomId,
+              "limit": 20,
+            },
+          );
+
+          if (messageEvents['errcode'] != null) {
+            throw messageEvents['error'];
+          }
+
+          // Format response like /sync request
+          // Hacked together to provide isDirect data
+          await store.dispatch(syncRooms({
+            '$roomId': {
+              'state': {
+                'events': stateEvents,
+              },
+              'timeline': {
+                'events': messageEvents['chunk'],
+                'prev_batch': messageEvents['from'],
+              },
+              'account_data': {
+                'events': [
+                  {
+                    "type": 'm.direct',
+                    'content': {
+                      '$userId',
+                    }
+                  }
+                ],
+              }
+            },
+          }));
+        } catch (error) {
+          debugPrint('[fetchDirectRooms] $error');
+        }
+      });
+
+      // Wait for all room data to be pulled
+      await Future.wait(directRoomData);
     } catch (error) {
       debugPrint('[fetchDirectRooms] $error');
     } finally {

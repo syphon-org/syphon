@@ -416,23 +416,21 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
 
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
+    // Confirm user has generated an olm account
     final accessToken = store.state.authStore.user.accessToken;
-
-    // Confirm user is authenticated still
     if (accessToken == null) {
       return;
     }
-
-    // Confirm user is authenticated still
-    store.dispatch(SetOneTimeKeysCounts(
-      oneTimeKeysCounts: oneTimeKeysCounts,
-    ));
 
     // Confirm user has generated an olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     if (olmAccount == null) {
       return;
     }
+
+    store.dispatch(SetOneTimeKeysCounts(
+      oneTimeKeysCounts: oneTimeKeysCounts,
+    ));
 
     final int maxKeyCount = olmAccount.max_number_of_one_time_keys();
     final int signedCurveCount =
@@ -464,9 +462,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
-      // debugPrint('[updateOneTimeKeys] json:');
-      // printJson(payload);
-
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -474,17 +469,10 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         data: payload,
       );
 
+      // Recoverable error from matrix
       if (data['errcode'] != null) {
-        debugPrint(
-          '[uploadIdentityKeys] error: ${data}',
-        );
-
         throw data['error'];
       }
-
-      debugPrint(
-        '[uploadIdentityKeys] one time key count: ${data['one_time_key_counts']}',
-      );
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -493,10 +481,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       // register new key counts
       store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
     } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'updateOneTimeKeys',
-      ));
+      store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
     }
   };
 }

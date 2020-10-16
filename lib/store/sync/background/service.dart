@@ -122,10 +122,10 @@ FutureOr<dynamic> syncLoop({
     }
 
     /**
-             * Check last since and see if any new messages arrived in the payload
-             * No need to update the hive store for now, just do not save the lastSince
-             * to the store and the next foreground fetchSync will update the state
-             */
+     * Check last since and see if any new messages arrived in the payload
+     * No need to update the hive store for now, just do not save the lastSince
+     * to the store and the next foreground fetchSync will update the state
+     */
     final data = await MatrixApi.sync(
       protocol: protocol,
       homeserver: homeserver,

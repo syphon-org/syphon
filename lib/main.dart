@@ -20,7 +20,6 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
@@ -39,7 +38,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
 
-  //
+  // disable debugPrint when running in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
   }

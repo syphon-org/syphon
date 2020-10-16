@@ -274,7 +274,9 @@ class Room {
       lastHash = json['timeline']['last_hash'];
       prevHash = json['timeline']['prev_batch'];
 
-      debugPrint('[LIMITED from /sync] ${limited}');
+      if (limited != null) {
+        debugPrint('[fromSync] LIMITED IS NOT NULL ${limited}');
+      }
 
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
@@ -399,7 +401,6 @@ class Room {
 
           case 'm.room.join_rules':
             joinRule = event.content['join_rule'];
-            debugPrint('[Room.fromStateEvents] $joinRule');
             break;
 
           case 'm.room.canonical_alias':
@@ -474,8 +475,7 @@ class Room {
       if (namePriority != 0 && users.isNotEmpty && (direct || badRoomName)) {
         namePriority = 0;
 
-        // Filter out number of non current users to show preview of total and who
-
+        // Filter out number of non current users to show preview of total and wh
         final nonCurrentUsers = users.values.where(
           (user) =>
               user.displayName != currentUser.displayName &&
