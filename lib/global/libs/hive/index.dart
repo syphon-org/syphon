@@ -274,7 +274,7 @@ Future<Box> openHiveState() async {
 
     return await Hive.openBox(
       Cache.stateKey,
-      crashRecovery: true,
+      crashRecovery: false,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
