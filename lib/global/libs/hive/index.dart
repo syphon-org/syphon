@@ -33,6 +33,7 @@ import 'package:syphon/store/user/model.dart';
 // Global cache
 class Cache {
   static Box state;
+  static Box stateUnsafe;
   static Box stateRooms;
   static Box stateMedia;
   static String ivKey;
@@ -215,10 +216,17 @@ Future<Box> openHiveStateRoomsUnsafe() async {
  * For testing purposes only - should be encrypting hive
  */
 Future<Box> openHiveStateUnsafe() async {
-  return await Hive.openBox(
-    Cache.stateKeyRoomsUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
+  try {
+    return await Hive.openBox(
+      Cache.stateKeyRoomsUNSAFE,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
+    );
+  } catch (error) {
+    debugPrint('[openHiveStateUnsafe] $error');
+    return await Hive.openBox(
+      Cache.stateKeyUNSAFE,
+    );
+  }
 }
 
 /**
@@ -266,12 +274,12 @@ Future<Box> openHiveState() async {
 
     return await Hive.openBox(
       Cache.stateKey,
-      crashRecovery: false,
+      crashRecovery: true,
       encryptionCipher: HiveAesCipher(encryptionKey),
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
+    debugPrint('[openHiveState] $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -294,7 +302,7 @@ Future<Box> openHiveStateRooms() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
+    debugPrint('[openHiveStateRooms] open failure: $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -317,7 +325,7 @@ Future<LazyBox> openHiveSync() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] failure $error');
+    debugPrint('[openHiveSync] failure $error');
     return await Hive.openLazyBox(
       Cache.syncKeyUNSAFE,
     );

@@ -48,9 +48,17 @@ Future<String> encryptJsonBackground(Map params) async {
   String cryptKey = params['cryptKey'];
   String json = params['json'];
 
+  Stopwatch stopwatchNew = new Stopwatch()..start();
+
+  print('[encryptJsonBackground] ${ivKey} ${cryptKey} ${json}');
+
   final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
 
   final encryptedJson = cryptor.gcm.encrypt(inp: json, iv: ivKey);
 
+  final endTime = stopwatchNew.elapsed;
+  print(
+    '[encryptJsonBackground] encryption took $endTime',
+  );
   return encryptedJson;
 }

@@ -52,11 +52,13 @@ void main() async {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
     Cache.stateRooms = await openHiveStateRooms();
+    Cache.stateUnsafe = await openHiveStateUnsafe();
   }
 
   if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
     Cache.state = await openHiveStateUnsafe();
     Cache.stateRooms = await openHiveStateRoomsUnsafe();
+    Cache.stateUnsafe = await openHiveStateUnsafe();
   }
 
   if (Platform.isAndroid) {

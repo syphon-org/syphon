@@ -10,13 +10,14 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 
 @HiveType(typeId: AuthStoreHiveId)
 @JsonSerializable(ignoreUnannotated: true)
-class AuthStore extends Equatable {
+class AuthStore extends Equatable implements JsonStore {
   @HiveField(0)
   @JsonKey(name: 'user')
   final User user;

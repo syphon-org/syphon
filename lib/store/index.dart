@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:steel_crypt/steel_crypt.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
@@ -35,6 +36,10 @@ import 'search/state.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
+
+abstract class JsonStore {
+  JsonStore.fromJson(Map<String, dynamic> json);
+}
 
 class AppState extends Equatable {
   final bool loading;
@@ -154,55 +159,58 @@ class HiveSerializer implements StateSerializer<AppState> {
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
 
-    // final stores = [
-    //   state.authStore,
-    //   state.syncStore,
-    //   state.cryptoStore,
-    //   state.roomStore,
-    //   state.mediaStore,
-    //   state.settingsStore,
-    //   state.userStore,
-    // ];
+    final stores = [
+      state.authStore,
+      // state.syncStore,
+      // state.cryptoStore,
+      // state.roomStore,
+      // state.mediaStore,
+      // state.settingsStore,
+      // state.userStore,
+    ];
 
     // Cache each store asyncronously
-    // Future.wait(stores.map((store) async {
-    //   try {
-    //     Cache.state.put(
-    //       store.runtimeType.toString(),
-    //       json.encode(store),
-    //     );
-    //   } catch (error) {
-    //     debugPrint('[Hive Serializer Encode] $error');
-    //   }
-    // }));
+    Future.wait(stores.map((store) async {
+      try {
+        // TODO: remove - testing time elapsed
+        Stopwatch stopwatchNew = new Stopwatch()..start();
 
-    try {
-      final plaintextJson = json.encode(state.authStore);
+        // Encrypt json off the main thread
+        final encryptedStore = await compute(encryptJsonBackground, {
+          'ivKey': Cache.ivKey,
+          'cryptKey': Cache.cryptKey,
+          'json': json.encode(store),
+        });
 
-      Cache.state.put(
-        state.authStore.runtimeType.toString(),
-        plaintextJson,
-      );
+        // Cache the encrypted string of data
+        await Cache.stateUnsafe.put(
+          store.runtimeType.toString(),
+          encryptedStore,
+        );
 
-      debugPrint(
-        '[Hive Serializer Encode] keys - ${Cache.cryptKey} ${Cache.ivKey}',
-      );
-      debugPrint(
-        '[Hive Serializer Encode] plaintext - ${plaintextJson}',
-      );
+        // TODO: remove - testing time elapsed
+        final endTime = stopwatchNew.elapsed;
+        print(
+          '[Hive Serializer Encode] MANUAL ${store.runtimeType.toString()} $endTime',
+        );
+      } catch (error) {
+        debugPrint('[Hive Serializer Encode] MANUAL $error');
+      }
+    }));
 
-      final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
+    // TODO: working! remove after codeblock above proves positive
+    // try {
+    //   final plaintextJson = json.encode(state.authStore);
 
-      final encryptedJson = aes.gcm.encrypt(
-        inp: plaintextJson,
-        iv: Cache.ivKey,
-      );
+    //   Cache.state.put(state.authStore.runtimeType.toString(), plaintextJson);
 
-      debugPrint('[Hive Serializer Encode] encrypted - $encryptedJson');
-      Cache.state.put('testing', encryptedJson);
-    } catch (error) {
-      debugPrint('[Hive Serializer Encode] $error');
-    }
+    //   final encryptedJson =
+    //       aes.gcm.encrypt(inp: plaintextJson, iv: Cache.ivKey);
+
+    //   Cache.state.put('testing', encryptedJson);
+    // } catch (error) {
+    //   debugPrint('[Hive Serializer Encode] $error');
+    // }
 
     try {
       Cache.state.put(
@@ -259,84 +267,83 @@ class HiveSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
+    final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
+
     AuthStore authStoreConverted = AuthStore();
-    SyncStore syncStoreConverted = SyncStore();
-    CryptoStore cryptoStoreConverted = CryptoStore();
-    MediaStore mediaStoreConverted = MediaStore();
-    RoomStore roomStoreConverted = RoomStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
-    UserStore userStore = UserStore();
+    SyncStore syncStoreConverted;
+    CryptoStore cryptoStoreConverted;
+    MediaStore mediaStoreConverted;
+    RoomStore roomStoreConverted;
+    SettingsStore settingsStoreConverted;
+    UserStore userStore;
 
-    // final types = [
-    //   AuthStore,
-    //   SyncStore,
-    //   CryptoStore,
-    //   RoomStore,
-    //   MediaStore,
-    //   SettingsStore,
-    //   UserStore,
-    // ];
+    final List<JsonStore> stores = [
+      authStoreConverted,
+      // syncStoreConverted,
+      // cryptoStoreConverted,
+      // mediaStoreConverted,
+      // roomStoreConverted,
+      // settingsStoreConverted,
+      // userStore,
+    ];
 
-    // final stores = [
-    //   authStoreConverted,
-    //   syncStoreConverted,
-    //   cryptoStoreConverted,
-    //   mediaStoreConverted,
-    //   roomStoreConverted,
-    //   settingsStoreConverted,
-    //   userStore,
-    // ];
+    // Decode each store cache synchronously
+    stores.forEach((store) {
+      try {
+        var decodedJson = {};
 
-    // // // Decode each store cache synchronously
-    // types.forEach((type) {
-    //   try {
-    //     final index = types.indexOf(type);
-    //     final dynamic store = stores[index];
-    //     stores[index] = store.fromJson(
-    //       json.decode(
-    //         Cache.state.get(
-    //           store.runtimeType.toString(),
-    //           defaultValue: store[index](),
-    //         ),
+        // pull encrypted state from cache
+        final encryptedJson = Cache.stateUnsafe.get(
+          store.runtimeType.toString(),
+          defaultValue: null,
+        );
+
+        if (encryptedJson != null) {
+          // decrypt encrypted state after loaded from RAM
+          final decryptedJson = aes.gcm.decrypt(
+            enc: encryptedJson,
+            iv: Cache.ivKey,
+          );
+          // decode json to a Map<String, dynamic>
+          decodedJson = json.decode(decryptedJson);
+        }
+
+        print(
+          '[Hive Serializer Decode] MANUAL ${decodedJson}',
+        );
+        // this stinks, but dart doesn't allow reflection for factories/contructors
+        switch (store.runtimeType.toString()) {
+          case 'AuthStore':
+            authStoreConverted = AuthStore.fromJson(decodedJson);
+            break;
+          default:
+            break;
+        }
+
+        // decode json after decrypted and set to store
+      } catch (error) {
+        debugPrint('[Hive Serializer Decode] $error');
+      }
+    });
+
+    // TODO: working! remove after codeblock above proves positive
+    // try {
+    //   authStoreConverted = AuthStore.fromJson(
+    //     json.decode(
+    //       Cache.state.get(
+    //         authStoreConverted.runtimeType.toString(),
+    //         defaultValue: AuthStore(),
     //       ),
-    //     );
-    //   } catch (error) {
-    //     debugPrint('[Hive Serializer Decode] $error');
-    //   }
-    // });
-
-    try {
-      authStoreConverted = AuthStore.fromJson(
-        json.decode(
-          Cache.state.get(
-            authStoreConverted.runtimeType.toString(),
-            defaultValue: AuthStore(),
-          ),
-        ),
-      );
-
-      final encryptedJson = Cache.state.get(
-        'testing',
-        defaultValue: AuthStore(),
-      );
-
-      final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
-
-      debugPrint('[Hive Serializer Decode] encrypted - $encryptedJson');
-
-      final decrpytedJsonString = aes.gcm.decrypt(
-        enc: encryptedJson,
-        iv: Cache.ivKey,
-      );
-      debugPrint('[Hive Serializer Decode] plaintext - $decrpytedJsonString');
-    } catch (error) {
-      debugPrint('[Hive Serializer Decode] $error');
-    }
+    //     ),
+    //   );
+    // } catch (error) {
+    //   debugPrint('[Hive Serializer Decode] $error');
+    // }
 
     try {
       syncStoreConverted = Cache.state.get(
         syncStoreConverted.runtimeType.toString(),
-        defaultValue: SyncStore(),
+        defaultValue: null,
       );
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
@@ -345,7 +352,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     try {
       cryptoStoreConverted = Cache.state.get(
         cryptoStoreConverted.runtimeType.toString(),
-        defaultValue: CryptoStore(),
+        defaultValue: null,
       );
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
@@ -354,7 +361,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     try {
       roomStoreConverted = Cache.stateRooms.get(
         roomStoreConverted.runtimeType.toString(),
-        defaultValue: RoomStore(),
+        defaultValue: null,
       );
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
@@ -363,7 +370,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     try {
       mediaStoreConverted = Cache.state.get(
         mediaStoreConverted.runtimeType.toString(),
-        defaultValue: MediaStore(),
+        defaultValue: null,
       );
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
@@ -372,7 +379,7 @@ class HiveSerializer implements StateSerializer<AppState> {
     try {
       settingsStoreConverted = Cache.state.get(
         settingsStoreConverted.runtimeType.toString(),
-        defaultValue: SettingsStore(),
+        defaultValue: null,
       );
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
@@ -380,13 +387,13 @@ class HiveSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStoreConverted,
-      syncStore: syncStoreConverted,
-      cryptoStore: cryptoStoreConverted,
-      roomStore: roomStoreConverted,
-      userStore: userStore, // not cached
-      mediaStore: mediaStoreConverted,
-      settingsStore: settingsStoreConverted,
+      authStore: authStoreConverted ?? AuthStore(),
+      syncStore: syncStoreConverted ?? SyncStore(),
+      cryptoStore: cryptoStoreConverted ?? CryptoStore(),
+      roomStore: roomStoreConverted ?? RoomStore(),
+      userStore: userStore ?? UserStore(), // not cached
+      mediaStore: mediaStoreConverted ?? MediaStore(),
+      settingsStore: settingsStoreConverted ?? SettingsStore(),
     );
   }
 }
