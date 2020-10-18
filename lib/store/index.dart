@@ -153,6 +153,27 @@ class HiveSerializer implements StateSerializer<AppState> {
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
 
+    // final stores = [
+    //   state.authStore,
+    //   state.syncStore,
+    //   state.roomStore,
+    //   state.mediaStore,
+    //   state.settingsStore,
+    //   state.cryptoStore,
+    // ];
+
+    // Cache each store asyncronously
+    // Future.wait(stores.map((store) async {
+    //   try {
+    //     Cache.state.put(
+    //       store.runtimeType.toString(),
+    //       json.encode(store),
+    //     );
+    //   } catch (error) {
+    //     debugPrint('[Hive Serializer Encode] $error');
+    //   }
+    // }));
+
     try {
       Cache.state.put(
         state.authStore.runtimeType.toString(),
