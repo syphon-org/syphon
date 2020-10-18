@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:convert';
 import 'dart:io';
 
 // Flutter imports:
@@ -9,6 +10,7 @@ import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
@@ -33,9 +35,13 @@ class Cache {
   static Box state;
   static Box stateRooms;
   static Box stateMedia;
+  static String ivKey;
+  static String cryptKey;
   static LazyBox sync;
 
   static const group_id = '${Values.appNameLabel}';
+  static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
+  static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
   static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
   static const syncKey = '${Values.appNameLabel}_sync';
@@ -149,6 +155,46 @@ Future<List<int>> unlockEncryptionKey() async {
   }
 
   return hex.decode(encryptionKey);
+}
+
+Future<String> unlockCryptKey() async {
+  // Check if storage has been created before
+  final storageEngine = FlutterSecureStorage();
+
+  var cryptKey = await storageEngine.read(
+    key: Cache.encryptionKeyLocation,
+  );
+  // Create a encryptionKey if a serialized one is not found
+  if (cryptKey == null) {
+    cryptKey = CryptKey().genFortuna();
+
+    await storageEngine.write(
+      key: Cache.encryptionKeyLocation,
+      value: cryptKey,
+    );
+  }
+
+  return cryptKey;
+}
+
+Future<String> unlockIVKey() async {
+  // Check if storage has been created before
+  final storageEngine = FlutterSecureStorage();
+
+  var ivKey = await storageEngine.read(key: Cache.ivKeyLocation);
+
+  // Create a encryptionKey if a serialized one is not found
+  if (ivKey == null) {
+    ivKey = CryptKey().genDart();
+
+    debugPrint(ivKey);
+    await storageEngine.write(
+      key: Cache.ivKeyLocation,
+      value: ivKey,
+    );
+  }
+
+  return ivKey;
 }
 
 /**

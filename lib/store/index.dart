@@ -11,6 +11,7 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
@@ -34,12 +35,6 @@ import 'search/state.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
-
-// Temporary State Store
-
-// Persisted State Stores
-
-// Reducers for Stores
 
 class AppState extends Equatable {
   final bool loading;
@@ -107,6 +102,7 @@ AppState appReducer(AppState state, action) {
  * the Hive Serializer has been impliemented
  */
 Future<Store> initStore() async {
+  // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
     serializer: HiveSerializer(),
@@ -123,6 +119,11 @@ Future<Store> initStore() async {
       }
     },
   );
+
+  // Configure cache encryption/decryption instance
+  // TODO: offload init to thread and cache keys in RAM
+  Cache.ivKey = await unlockIVKey();
+  Cache.cryptKey = await unlockCryptKey();
 
   // Finally load persisted store
   var initialState;
@@ -176,10 +177,29 @@ class HiveSerializer implements StateSerializer<AppState> {
     // }));
 
     try {
+      final plaintextJson = json.encode(state.authStore);
+
       Cache.state.put(
         state.authStore.runtimeType.toString(),
-        json.encode(state.authStore),
+        plaintextJson,
       );
+
+      debugPrint(
+        '[Hive Serializer Encode] keys - ${Cache.cryptKey} ${Cache.ivKey}',
+      );
+      debugPrint(
+        '[Hive Serializer Encode] plaintext - ${plaintextJson}',
+      );
+
+      final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
+
+      final encryptedJson = aes.gcm.encrypt(
+        inp: plaintextJson,
+        iv: Cache.ivKey,
+      );
+
+      debugPrint('[Hive Serializer Encode] encrypted - $encryptedJson');
+      Cache.state.put('testing', encryptedJson);
     } catch (error) {
       debugPrint('[Hive Serializer Encode] $error');
     }
@@ -267,17 +287,19 @@ class HiveSerializer implements StateSerializer<AppState> {
     //   userStore,
     // ];
 
-    // // Decode each store cache synchronously
+    // // // Decode each store cache synchronously
     // types.forEach((type) {
     //   try {
     //     final index = types.indexOf(type);
     //     final dynamic store = stores[index];
-    //     stores[index] = store.fromJson(json.decode(
-    //       Cache.state.get(
-    //         store.runtimeType.toString(),
-    //         defaultValue: store[index](),
+    //     stores[index] = store.fromJson(
+    //       json.decode(
+    //         Cache.state.get(
+    //           store.runtimeType.toString(),
+    //           defaultValue: store[index](),
+    //         ),
     //       ),
-    //     ));
+    //     );
     //   } catch (error) {
     //     debugPrint('[Hive Serializer Decode] $error');
     //   }
@@ -292,6 +314,21 @@ class HiveSerializer implements StateSerializer<AppState> {
           ),
         ),
       );
+
+      final encryptedJson = Cache.state.get(
+        'testing',
+        defaultValue: AuthStore(),
+      );
+
+      final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
+
+      debugPrint('[Hive Serializer Decode] encrypted - $encryptedJson');
+
+      final decrpytedJsonString = aes.gcm.decrypt(
+        enc: encryptedJson,
+        iv: Cache.ivKey,
+      );
+      debugPrint('[Hive Serializer Decode] plaintext - $decrpytedJsonString');
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
     }

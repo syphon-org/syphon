@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 /**
  * Clock functions in code
@@ -27,4 +28,29 @@ void printJson(Map jsonMap) {
   JsonEncoder encoder = new JsonEncoder.withIndent('  ');
   String prettyEvent = encoder.convert(jsonMap);
   debugPrint(prettyEvent, wrapWidth: 2048);
+}
+
+// TODO: not sure if needed because the decryption of the cache will always be needed synchonously
+Future<String> decryptJsonBackground(Map params) async {
+  String ivKey = params['ivKey'];
+  String cryptKey = params['cryptKey'];
+  String json = params['json'];
+
+  final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+
+  final decryptedJson = cryptor.gcm.decrypt(enc: json, iv: ivKey);
+
+  return jsonDecode(decryptedJson);
+}
+
+Future<String> encryptJsonBackground(Map params) async {
+  String ivKey = params['ivKey'];
+  String cryptKey = params['cryptKey'];
+  String json = params['json'];
+
+  final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+
+  final encryptedJson = cryptor.gcm.encrypt(inp: json, iv: ivKey);
+
+  return encryptedJson;
 }
