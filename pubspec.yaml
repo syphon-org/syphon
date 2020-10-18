@@ -74,7 +74,8 @@ dependencies:
 
   # Encryption
   crypt: 3.0.1
-  # steel_crypt: 1.7.1
+  crypto: ^2.1.5
+  steel_crypt: ^2.2.2+1
   # cryptography: 1.2.1
 
   # Cache
