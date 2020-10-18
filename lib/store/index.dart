@@ -156,10 +156,11 @@ class HiveSerializer implements StateSerializer<AppState> {
     // final stores = [
     //   state.authStore,
     //   state.syncStore,
+    //   state.cryptoStore,
     //   state.roomStore,
     //   state.mediaStore,
     //   state.settingsStore,
-    //   state.cryptoStore,
+    //   state.userStore,
     // ];
 
     // Cache each store asyncronously
@@ -245,6 +246,42 @@ class HiveSerializer implements StateSerializer<AppState> {
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
     UserStore userStore = UserStore();
+
+    // final types = [
+    //   AuthStore,
+    //   SyncStore,
+    //   CryptoStore,
+    //   RoomStore,
+    //   MediaStore,
+    //   SettingsStore,
+    //   UserStore,
+    // ];
+
+    // final stores = [
+    //   authStoreConverted,
+    //   syncStoreConverted,
+    //   cryptoStoreConverted,
+    //   mediaStoreConverted,
+    //   roomStoreConverted,
+    //   settingsStoreConverted,
+    //   userStore,
+    // ];
+
+    // // Decode each store cache synchronously
+    // types.forEach((type) {
+    //   try {
+    //     final index = types.indexOf(type);
+    //     final dynamic store = stores[index];
+    //     stores[index] = store.fromJson(json.decode(
+    //       Cache.state.get(
+    //         store.runtimeType.toString(),
+    //         defaultValue: store[index](),
+    //       ),
+    //     ));
+    //   } catch (error) {
+    //     debugPrint('[Hive Serializer Decode] $error');
+    //   }
+    // });
 
     try {
       authStoreConverted = AuthStore.fromJson(
