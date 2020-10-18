@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:convert';
 import 'dart:typed_data';
 
 // Flutter imports:
@@ -130,7 +131,7 @@ Future<Store> initStore() async {
     initialState = await persistor.load();
     // debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    debugPrint('[Redux Persist] error $error');
+    debugPrint('[Redux Persist] $error');
   }
 
   final Store<AppState> store = Store<AppState>(
@@ -151,10 +152,15 @@ class HiveSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
     // Fail whole conversion if user fails
-    Cache.state.put(
-      state.authStore.runtimeType.toString(),
-      state.authStore,
-    );
+
+    try {
+      Cache.state.put(
+        state.authStore.runtimeType.toString(),
+        json.encode(state.authStore),
+      );
+    } catch (error) {
+      debugPrint('[Hive Serializer Encode] $error');
+    }
 
     try {
       Cache.state.put(
@@ -163,7 +169,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
       // debugPrint('[Hive Storage] caching syncStore');
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Encode] $error');
     }
 
     try {
@@ -173,7 +179,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
       // debugPrint('[Hive Storage] caching roomStore');
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Encode] $error');
     }
 
     try {
@@ -183,7 +189,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
       // debugPrint('[Hive Storage] caching mediaStore');
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Encode] $error');
     }
 
     try {
@@ -193,7 +199,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
       // debugPrint('[Hive Storage] caching settingsStore');
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Encode] $error');
     }
 
     try {
@@ -203,7 +209,7 @@ class HiveSerializer implements StateSerializer<AppState> {
       );
       // debugPrint('[Hive Storage] caching cryptoStore');
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Encode] $error');
     }
 
     // Disregard redux persist storage saving
@@ -219,10 +225,18 @@ class HiveSerializer implements StateSerializer<AppState> {
     SettingsStore settingsStoreConverted = SettingsStore();
     UserStore userStore = UserStore();
 
-    authStoreConverted = Cache.state.get(
-      authStoreConverted.runtimeType.toString(),
-      defaultValue: AuthStore(),
-    );
+    try {
+      authStoreConverted = AuthStore.fromJson(
+        json.decode(
+          Cache.state.get(
+            authStoreConverted.runtimeType.toString(),
+            defaultValue: AuthStore(),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('[Hive Serializer Decode] $error');
+    }
 
     try {
       syncStoreConverted = Cache.state.get(
@@ -230,7 +244,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: SyncStore(),
       );
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Decode] $error');
     }
 
     try {
@@ -239,7 +253,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: CryptoStore(),
       );
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Decode] $error');
     }
 
     try {
@@ -248,7 +262,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: RoomStore(),
       );
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Decode] $error');
     }
 
     try {
@@ -257,7 +271,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: MediaStore(),
       );
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Decode] $error');
     }
 
     try {
@@ -266,7 +280,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         defaultValue: SettingsStore(),
       );
     } catch (error) {
-      debugPrint('[Hive Storage] $error');
+      debugPrint('[Hive Serializer Decode] $error');
     }
 
     return AppState(

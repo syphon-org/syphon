@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -9,6 +10,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: UserHiveId)
+@JsonSerializable()
 class User extends Equatable {
   @HiveField(0)
   final String userId;
@@ -69,7 +71,11 @@ class User extends Equatable {
         avatarUri,
       ];
 
-  factory User.fromJson(dynamic json) {
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
+  factory User.fromMatrix(dynamic json) {
     try {
       var idserver;
       var homeserver;
@@ -97,7 +103,7 @@ class User extends Equatable {
         avatarUri: json['avatar_url'] as String,
       );
     } catch (error) {
-      debugPrint('[User.fromJson] $error');
+      debugPrint('[User.fromMatrix] $error');
       return User();
     }
   }

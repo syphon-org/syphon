@@ -320,7 +320,7 @@ ThunkAction<AppState> loginUser() {
       }
 
       await store.dispatch(SetUser(
-        user: User.fromJson(data),
+        user: User.fromMatrix(data),
       ));
 
       store.state.authStore.authObserver.add(
@@ -591,7 +591,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         return completedAll;
       }
 
-      store.dispatch(SetUser(user: User.fromJson(data)));
+      store.dispatch(SetUser(user: User.fromMatrix(data)));
 
       store.state.authStore.authObserver.add(
         store.state.authStore.user,

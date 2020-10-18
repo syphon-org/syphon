@@ -1,9 +1,13 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 
+part 'model.g.dart';
+
+@JsonSerializable()
 class Credential extends Equatable {
   final String type;
   final String value;
@@ -25,22 +29,26 @@ class Credential extends Equatable {
         ['url'];
   }
 
-  Credential copyWith({
-    type,
-    value,
-    params,
-  }) {
-    return Credential(
-      type: type ?? this.type,
-      value: value ?? this.value,
-      params: params ?? this.params,
-    );
-  }
-
   @override
   List<Object> get props => [
         type,
         value,
         params,
       ];
+
+  Credential copyWith({
+    type,
+    value,
+    params,
+  }) =>
+      Credential(
+        type: type ?? this.type,
+        value: value ?? this.value,
+        params: params ?? this.params,
+      );
+
+  Map<String, dynamic> toJson() => _$CredentialToJson(this);
+
+  factory Credential.fromJson(Map<String, dynamic> json) =>
+      _$CredentialFromJson(json);
 }
