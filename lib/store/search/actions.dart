@@ -200,7 +200,7 @@ ThunkAction<AppState> searchPublicRooms({String searchText}) {
 
       final List<dynamic> rawPublicRooms = data['chunk'];
       final List<Room> convertedRooms =
-          rawPublicRooms.map((room) => Room.fromJson(room)).toList();
+          rawPublicRooms.map((room) => Room.fromMatrix(room)).toList();
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],

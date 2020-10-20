@@ -11,11 +11,11 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: MediaStoreHiveId)
 // NOTE: custom json converter to allow Uint8List when in cache
 // TODO: figure out how to make image-matrix.dart play nice with in component coonversions
 // Would repeatedly update even if a locally cached version matched
 // @JsonSerializable(nullable: true, includeIfNull: true)
+@HiveType(typeId: MediaStoreHiveId)
 class MediaStore extends Equatable {
   @HiveField(0)
   final bool fetching;

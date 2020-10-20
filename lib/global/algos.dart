@@ -56,7 +56,7 @@ Future<String> encryptJsonBackground(Map params) async {
 
   final encryptedJson = cryptor.gcm.encrypt(inp: json, iv: ivKey);
 
-  final endTime = stopwatchNew.elapsed;
+  final endTime = stopwatchNew.elapsed.inSeconds;
   print(
     '[encryptJsonBackground] encryption took $endTime',
   );

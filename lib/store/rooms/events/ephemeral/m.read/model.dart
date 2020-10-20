@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -7,6 +8,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: ReadStatusHiveId)
+@JsonSerializable()
 class ReadStatus {
   @HiveField(0)
   final int latestRead;
@@ -44,10 +46,13 @@ class ReadStatus {
   ReadStatus copyWith({
     usersRead,
     latestRead,
-  }) {
-    return ReadStatus(
-      userReads: usersRead ?? this.userReads,
-      latestRead: latestRead ?? this.latestRead,
-    );
-  }
+  }) =>
+      ReadStatus(
+        userReads: usersRead ?? this.userReads,
+        latestRead: latestRead ?? this.latestRead,
+      );
+
+  Map<String, dynamic> toJson() => _$ReadStatusToJson(this);
+  factory ReadStatus.fromJson(Map<String, dynamic> json) =>
+      _$ReadStatusFromJson(json);
 }

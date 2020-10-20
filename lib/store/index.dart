@@ -170,9 +170,9 @@ class HiveSerializer implements StateSerializer<AppState> {
       state.authStore,
       state.syncStore,
       // state.cryptoStore,
-      // state.roomStore,
+      state.roomStore,
       state.mediaStore,
-      // state.settingsStore,
+      state.settingsStore,
       state.userStore,
     ];
 
@@ -198,10 +198,10 @@ class HiveSerializer implements StateSerializer<AppState> {
         // TODO: remove - testing time elapsed
         final endTime = stopwatchNew.elapsed;
         print(
-          '[Hive Serializer Encode] MANUAL ${store.runtimeType.toString()} $endTime',
+          '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $endTime',
         );
       } catch (error) {
-        debugPrint('[Hive Serializer Encode] MANUAL $error');
+        debugPrint('[Hive Serializer ENCODE] $error');
       }
     }));
 
@@ -265,28 +265,28 @@ class HiveSerializer implements StateSerializer<AppState> {
         }
 
         print(
-          '[Hive Serializer Decode] MANUAL ${decodedJson}',
+          '[Hive Serializer DECODE] ${store.runtimeType.toString().toUpperCase()}',
         );
         // this stinks, but dart doesn't allow reflection for factories/contructors
         switch (store.runtimeType.toString()) {
           case 'AuthStore':
             authStore = AuthStore.fromJson(decodedJson);
             break;
-          // case 'SyncStore':
-          //   syncStore = SyncStore.fromJson(decodedJson);
-          //   break;
+          case 'SyncStore':
+            syncStore = SyncStore.fromJson(decodedJson);
+            break;
           // case 'CryptoStore':
           //   cryptoStore = CryptoStore.fromJson(decodedJson);
           //   break;
           case 'MediaStore':
             mediaStore = MediaStore.fromJson(decodedJson);
             break;
-          // case 'RoomStore':
-          //   roomStore = RoomStore.fromJson(decodedJson);
-          //   break;
-          // case 'SettingsStore':
-          //   settingsStore = SettingsStore.fromJson(decodedJson);
-          //   break;
+          case 'RoomStore':
+            roomStore = RoomStore.fromJson(decodedJson);
+            break;
+          case 'SettingsStore':
+            settingsStore = SettingsStore.fromJson(decodedJson);
+            break;
           case 'UserStore':
             userStore = UserStore.fromJson(decodedJson);
             break;
