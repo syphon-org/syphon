@@ -106,8 +106,9 @@ Future<Store> initStore() async {
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
+    transforms: Transforms(),
     serializer: HiveSerializer(),
-    throttleDuration: Duration(seconds: 6),
+    throttleDuration: Duration(seconds: 4),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:
@@ -145,24 +146,6 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-/**
- * Hive Serializer
- * 
- * Only reliance on redux is when too save state
- */
-// TODO: working! remove after codeblock above proves positive
-// try {
-//   final plaintextJson = json.encode(state.authStore);
-
-//   Cache.state.put(state.authStore.runtimeType.toString(), plaintextJson);
-
-//   final encryptedJson =
-//       aes.gcm.encrypt(inp: plaintextJson, iv: Cache.ivKey);
-
-//   Cache.state.put('testing', encryptedJson);
-// } catch (error) {
-//   debugPrint('[Hive Serializer Encode] $error');
-// }
 class HiveSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
@@ -179,23 +162,37 @@ class HiveSerializer implements StateSerializer<AppState> {
     // Cache each store asyncronously
     Future.wait(stores.map((store) async {
       try {
-        // TODO: remove - testing time elapsed
         Stopwatch stopwatchNew = new Stopwatch()..start();
 
         // Encrypt json off the main thread
         final encryptedStore = await compute(encryptJsonBackground, {
           'ivKey': Cache.ivKey,
           'cryptKey': Cache.cryptKey,
+          'type': store.runtimeType.toString(),
           'json': json.encode(store),
         });
 
         // Cache the encrypted string of data
-        await Cache.stateUnsafe.put(
+        if (store.runtimeType == RoomStore) {
+          // TODO: change to cacheRooms
+          await Cache.cacheMain.put(
+            store.runtimeType.toString(),
+            encryptedStore,
+          );
+        }
+
+        if (store.runtimeType == CryptoStore) {
+          await Cache.cacheCrypto.put(
+            store.runtimeType.toString(),
+            encryptedStore,
+          );
+        }
+
+        await Cache.cacheMain.put(
           store.runtimeType.toString(),
           encryptedStore,
         );
 
-        // TODO: remove - testing time elapsed
         final endTime = stopwatchNew.elapsed;
         print(
           '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $endTime',
@@ -209,19 +206,6 @@ class HiveSerializer implements StateSerializer<AppState> {
     return null;
   }
 
-  // TODO: working! remove after codeblock above proves positive
-  // try {
-  //   authStore = AuthStore.fromJson(
-  //     json.decode(
-  //       Cache.state.get(
-  //         authStore.runtimeType.toString(),
-  //         defaultValue: AuthStore(),
-  //       ),
-  //     ),
-  //   );
-  // } catch (error) {
-  //   debugPrint('[Hive Serializer Decode] $error');
-  // }
   AppState decode(Uint8List data) {
     final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
 
@@ -248,8 +232,25 @@ class HiveSerializer implements StateSerializer<AppState> {
       try {
         Map<String, dynamic> decodedJson = {};
 
+        var encryptedJson;
+
+        if (store.runtimeType == RoomStore) {
+          // TODO: change to cacheRooms
+          encryptedJson = Cache.cacheMain.get(
+            store.runtimeType.toString(),
+            defaultValue: null,
+          );
+        }
+
+        if (store.runtimeType == CryptoStore) {
+          encryptedJson = Cache.cacheCrypto.get(
+            store.runtimeType.toString(),
+            defaultValue: null,
+          );
+        }
+
         // pull encrypted state from cache
-        final encryptedJson = Cache.stateUnsafe.get(
+        encryptedJson = Cache.cacheMain.get(
           store.runtimeType.toString(),
           defaultValue: null,
         );
@@ -260,7 +261,6 @@ class HiveSerializer implements StateSerializer<AppState> {
             enc: encryptedJson,
             iv: Cache.ivKey,
           );
-          // decode json to a Map<String, dynamic>
           decodedJson = json.decode(decryptedJson);
         }
 

@@ -49,6 +49,7 @@ void main() async {
   await initHive();
 
   if (Platform.isAndroid || Platform.isIOS) {
+    // TODO: deprecate after conversion
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
     Cache.stateRooms = await openHiveStateRooms();
@@ -60,6 +61,11 @@ void main() async {
     Cache.stateRooms = await openHiveStateRoomsUnsafe();
     Cache.stateUnsafe = await openHiveStateUnsafe();
   }
+
+  // NOTE: new state cache containers - compat with any plat
+  Cache.cacheMain = await unlockMainCache();
+  Cache.cacheRooms = await unlockRoomCache();
+  Cache.cacheCrypto = await unlockCryptoCache();
 
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();

@@ -162,6 +162,7 @@ dependency_overrides:
 - [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
 - [changing transition styles](https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter)
 - [animations](https://flutter.dev/docs/development/ui/animations)
+- [serialize Uint8List bytes](https://stackoverflow.com/questions/63716036/how-to-serialize-uint8list-to-json-with-json-annotation-in-dart)
 - adding a border without needing ctrl-p
 ```dart
 decoration: BoxDecoration(
