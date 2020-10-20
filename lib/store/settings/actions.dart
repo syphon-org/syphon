@@ -124,8 +124,9 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices =
-          jsonDevices.map((jsonDevice) => Device.fromJson(jsonDevice)).toList();
+      final List<Device> devices = jsonDevices
+          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
+          .toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {

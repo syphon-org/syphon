@@ -104,4 +104,9 @@ class SyncStore extends Equatable {
       backoff: backoff ?? this.backoff,
     );
   }
+
+  Map<String, dynamic> toJson() => _$SyncStoreToJson(this);
+
+  factory SyncStore.fromJson(Map<String, dynamic> json) =>
+      _$SyncStoreFromJson(json);
 }

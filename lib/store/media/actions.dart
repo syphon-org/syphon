@@ -126,9 +126,11 @@ ThunkAction<AppState> fetchThumbnail(
 
       final bodyBytes = data['bodyBytes'];
 
+      debugPrint("FETCH THUMBNAIL ${bodyBytes.runtimeType.toString()}");
+      debugPrint(bodyBytes.runtimeType.toString());
       store.dispatch(UpdateMediaCache(
         mxcUri: mxcUri,
-        data: bodyBytes,
+        data: bodyBytes as List<int>,
       ));
     } catch (error) {
       debugPrint('[fetchThumbnail] $mxcUri $error');

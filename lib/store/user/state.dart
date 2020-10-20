@@ -12,6 +12,7 @@ part 'state.g.dart';
 @HiveType(typeId: UserStoreHiveId)
 @JsonSerializable(nullable: true, includeIfNull: true)
 class UserStore extends Equatable {
+  @JsonKey(ignore: true)
   final bool loading;
 
   @HiveField(0)

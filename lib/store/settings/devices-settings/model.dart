@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -8,6 +9,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: DevicesHiveId)
+@JsonSerializable()
 class Device extends Equatable {
   @HiveField(0)
   final String deviceId;
@@ -43,17 +45,16 @@ class Device extends Equatable {
     String displayName,
     String lastSeenIp,
     int lastSeenTs,
-  }) {
-    return Device(
-      deviceId: deviceId ?? this.deviceId,
-      deviceIdPrivate: deviceIdPrivate ?? this.deviceIdPrivate,
-      displayName: displayName ?? this.displayName,
-      lastSeenIp: lastSeenIp ?? this.lastSeenIp,
-      lastSeenTs: lastSeenTs ?? this.lastSeenTs,
-    );
-  }
+  }) =>
+      Device(
+        deviceId: deviceId ?? this.deviceId,
+        deviceIdPrivate: deviceIdPrivate ?? this.deviceIdPrivate,
+        displayName: displayName ?? this.displayName,
+        lastSeenIp: lastSeenIp ?? this.lastSeenIp,
+        lastSeenTs: lastSeenTs ?? this.lastSeenTs,
+      );
 
-  factory Device.fromJson(dynamic json) {
+  factory Device.fromMatrix(dynamic json) {
     try {
       return Device(
         deviceId: json['device_id'],
@@ -65,4 +66,8 @@ class Device extends Equatable {
       return Device();
     }
   }
+
+  Map<String, dynamic> toJson() => _$DeviceToJson(this);
+
+  factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 }
