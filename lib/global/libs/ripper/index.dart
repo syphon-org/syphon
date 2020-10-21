@@ -136,6 +136,4 @@ class Ripper {
       debugPrint('[Hive Serializer Decode] $error');
     }
   }
-
-  static Future<dynamic> convertToManual() async {}
 }

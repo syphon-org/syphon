@@ -233,9 +233,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         child: EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          // startLocale: store.state.settingsStore.language == languages[0]
-          //     ? null
-          //     : Locale(formatLanguageCode(store.state.settingsStore.language)),
           startLocale:
               Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),

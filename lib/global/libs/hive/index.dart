@@ -185,18 +185,14 @@ String createIVKey() => CryptKey().genDart();
 
 Future<void> saveIVKey(String ivKey) async {
   // Check if storage has been created before
-  return await FlutterSecureStorage().write(
-    key: Cache.ivKeyLocation,
-    value: ivKey,
-  );
+  return await FlutterSecureStorage()
+      .write(key: Cache.ivKeyLocation, value: ivKey);
 }
 
 Future<void> saveIVKeyNext(String ivKey) async {
   // Check if storage has been created before
-  return await FlutterSecureStorage().write(
-    key: Cache.ivKeyNextLocation,
-    value: ivKey,
-  );
+  return await FlutterSecureStorage()
+      .write(key: Cache.ivKeyNextLocation, value: ivKey);
 }
 
 Future<String> unlockIVKey() async {
