@@ -36,6 +36,7 @@ import 'package:syphon/store/user/model.dart';
 class Cache {
   // encryption references
   static String ivKey;
+  static String ivKeyNext;
   static String cryptKey;
 
   // cache refrences
@@ -51,6 +52,7 @@ class Cache {
 
   // cache key identifiers
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
+  static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
   static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
@@ -179,24 +181,42 @@ Future<String> unlockCryptKey() async {
   return cryptKey;
 }
 
+String createIVKey() => CryptKey().genDart();
+
+Future<void> saveIVKey(String ivKey) async {
+  // Check if storage has been created before
+  return await FlutterSecureStorage().write(
+    key: Cache.ivKeyLocation,
+    value: ivKey,
+  );
+}
+
+Future<void> saveIVKeyNext(String ivKey) async {
+  // Check if storage has been created before
+  return await FlutterSecureStorage().write(
+    key: Cache.ivKeyNextLocation,
+    value: ivKey,
+  );
+}
+
 Future<String> unlockIVKey() async {
   // Check if storage has been created before
   final storageEngine = FlutterSecureStorage();
 
-  var ivKey = await storageEngine.read(key: Cache.ivKeyLocation);
+  final ivKeyStored = await storageEngine.read(key: Cache.ivKeyLocation);
 
   // Create a encryptionKey if a serialized one is not found
-  if (ivKey == null) {
-    ivKey = CryptKey().genDart();
+  return ivKeyStored == null ? createIVKey() : ivKeyStored;
+}
 
-    debugPrint(ivKey);
-    await storageEngine.write(
-      key: Cache.ivKeyLocation,
-      value: ivKey,
-    );
-  }
+Future<String> unlockIVKeyNext() async {
+  // Check if storage has been created before
+  final storageEngine = FlutterSecureStorage();
 
-  return ivKey;
+  final ivKeyStored = await storageEngine.read(key: Cache.ivKeyNextLocation);
+
+  // Create a encryptionKey if a serialized one is not found
+  return ivKeyStored == null ? createIVKey() : ivKeyStored;
 }
 
 Future<Box> unlockMainCache() async {

@@ -77,20 +77,18 @@ class AppState extends Equatable {
       ];
 }
 
-AppState appReducer(AppState state, action) {
-  return AppState(
-    loading: state.loading,
-    authStore: authReducer(state.authStore, action),
-    alertsStore: alertsReducer(state.alertsStore, action),
-    mediaStore: mediaReducer(state.mediaStore, action),
-    roomStore: roomReducer(state.roomStore, action),
-    syncStore: syncReducer(state.syncStore, action),
-    userStore: userReducer(state.userStore, action),
-    searchStore: searchReducer(state.searchStore, action),
-    settingsStore: settingsReducer(state.settingsStore, action),
-    cryptoStore: cryptoReducer(state.cryptoStore, action),
-  );
-}
+AppState appReducer(AppState state, action) => AppState(
+      loading: state.loading,
+      authStore: authReducer(state.authStore, action),
+      alertsStore: alertsReducer(state.alertsStore, action),
+      mediaStore: mediaReducer(state.mediaStore, action),
+      roomStore: roomReducer(state.roomStore, action),
+      syncStore: syncReducer(state.syncStore, action),
+      userStore: userReducer(state.userStore, action),
+      searchStore: searchReducer(state.searchStore, action),
+      settingsStore: settingsReducer(state.settingsStore, action),
+      cryptoStore: cryptoReducer(state.cryptoStore, action),
+    );
 
 /**
  * Initialize Store
@@ -106,9 +104,8 @@ Future<Store> initStore() async {
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
-    transforms: Transforms(),
-    serializer: HiveSerializer(),
-    throttleDuration: Duration(seconds: 4),
+    serializer: CacheSerializer(),
+    throttleDuration: Duration(milliseconds: 2500),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:
@@ -123,8 +120,8 @@ Future<Store> initStore() async {
   );
 
   // Configure cache encryption/decryption instance
-  // TODO: offload init to thread and cache keys in RAM
   Cache.ivKey = await unlockIVKey();
+  Cache.ivKeyNext = await unlockIVKeyNext();
   Cache.cryptKey = await unlockCryptKey();
 
   // Finally load persisted store
@@ -146,61 +143,91 @@ Future<Store> initStore() async {
   return Future.value(store);
 }
 
-class HiveSerializer implements StateSerializer<AppState> {
+/**
+ * Cache Serializer
+ * 
+ * Handles serialization, encryption, and storage for caching redux stores
+ */
+class CacheSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
     final stores = [
       state.authStore,
       state.syncStore,
-      // state.cryptoStore,
+      state.cryptoStore,
       state.roomStore,
       state.mediaStore,
       state.settingsStore,
       state.userStore,
     ];
 
-    // Cache each store asyncronously
-    Future.wait(stores.map((store) async {
-      try {
-        Stopwatch stopwatchNew = new Stopwatch()..start();
+    // Queue up a cache saving will wait
+    // if the previously schedule task has not finished
+    Future.microtask(() async {
+      // create a new IV for the encrypted cache
+      Cache.ivKey = createIVKey();
+      // backup the IV in case the app is force closed before caching finishes
+      await saveIVKeyNext(Cache.ivKey);
 
-        // Encrypt json off the main thread
-        final encryptedStore = await compute(encryptJsonBackground, {
-          'ivKey': Cache.ivKey,
-          'cryptKey': Cache.cryptKey,
-          'type': store.runtimeType.toString(),
-          'json': json.encode(store),
-        });
+      // run through all redux stores for encryption and encoding
+      await Future.wait(stores.map((store) async {
+        try {
+          Stopwatch stopwatchNew = new Stopwatch()..start();
 
-        // Cache the encrypted string of data
-        if (store.runtimeType == RoomStore) {
-          // TODO: change to cacheRooms
+          var jsonData;
+
+          // encode the store contents to json
+          // HACK: unable to pass both listed stores direct to an isolate
+          final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
+          if (!sensitiveStorage.contains(store.runtimeType)) {
+            jsonData = await compute(jsonEncode, store);
+          } else {
+            jsonData = json.encode(store);
+          }
+
+          // encrypt the store contents previously converted to json
+          final encryptedStore = await compute(encryptJsonBackground, {
+            'ivKey': Cache.ivKey,
+            'cryptKey': Cache.cryptKey,
+            'type': store.runtimeType.toString(),
+            'json': jsonData,
+          });
+
+          // cache the encrypted json representation of the redux store
+          if (store.runtimeType == RoomStore) {
+            await Cache.cacheRooms.put(
+              store.runtimeType.toString(),
+              encryptedStore,
+            );
+          }
+
+          // cache the encrypted json representation of the redux store
+          if (store.runtimeType == CryptoStore) {
+            await Cache.cacheCrypto.put(
+              store.runtimeType.toString(),
+              encryptedStore,
+            );
+          }
+
+          // cache the encrypted json representation of the redux store
           await Cache.cacheMain.put(
             store.runtimeType.toString(),
             encryptedStore,
           );
-        }
 
-        if (store.runtimeType == CryptoStore) {
-          await Cache.cacheCrypto.put(
-            store.runtimeType.toString(),
-            encryptedStore,
+          final endTime = stopwatchNew.elapsed;
+          print(
+            '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $endTime',
           );
+        } catch (error) {
+          debugPrint(
+              '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $error');
         }
+      }));
 
-        await Cache.cacheMain.put(
-          store.runtimeType.toString(),
-          encryptedStore,
-        );
-
-        final endTime = stopwatchNew.elapsed;
-        print(
-          '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $endTime',
-        );
-      } catch (error) {
-        debugPrint('[Hive Serializer ENCODE] $error');
-      }
-    }));
+      // Rotate encryption for the next save
+      await saveIVKey(Cache.ivKey);
+    });
 
     // Disregard redux persist storage saving
     return null;
@@ -235,8 +262,7 @@ class HiveSerializer implements StateSerializer<AppState> {
         var encryptedJson;
 
         if (store.runtimeType == RoomStore) {
-          // TODO: change to cacheRooms
-          encryptedJson = Cache.cacheMain.get(
+          encryptedJson = Cache.cacheRooms.get(
             store.runtimeType.toString(),
             defaultValue: null,
           );
@@ -255,17 +281,35 @@ class HiveSerializer implements StateSerializer<AppState> {
           defaultValue: null,
         );
 
+        // attempt to decrypt encrypted state after loaded from RAM
         if (encryptedJson != null) {
-          // decrypt encrypted state after loaded from RAM
-          final decryptedJson = aes.gcm.decrypt(
-            enc: encryptedJson,
-            iv: Cache.ivKey,
-          );
-          decodedJson = json.decode(decryptedJson);
+          try {
+            final decryptedJson = aes.ctr.decrypt(
+              enc: encryptedJson,
+              iv: Cache.ivKey,
+            );
+            decodedJson = json.decode(decryptedJson);
+          } catch (error) {
+            print('[Hive Serializer DECODE] ${store.runtimeType.toString()}');
+          }
+        }
+
+        // decryption may fail if force closed, attempt with new iv generated before close
+        if (decodedJson == null) {
+          try {
+            // decrypt encrypted state after loaded from RAM
+            final decryptedJson = aes.ctr.decrypt(
+              enc: encryptedJson,
+              iv: Cache.ivKeyNext,
+            );
+            decodedJson = json.decode(decryptedJson);
+          } catch (error) {
+            print('[Hive Serializer DECODE] ${store.runtimeType.toString()}');
+          }
         }
 
         print(
-          '[Hive Serializer DECODE] ${store.runtimeType.toString().toUpperCase()}',
+          '[Hive Serializer DECODE] ${store.runtimeType.toString()}',
         );
         // this stinks, but dart doesn't allow reflection for factories/contructors
         switch (store.runtimeType.toString()) {
