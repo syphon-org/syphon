@@ -38,7 +38,7 @@ Future<String> decryptJsonBackground(Map params) async {
 
   final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
 
-  final decryptedJson = cryptor.gcm.decrypt(enc: json, iv: ivKey);
+  final decryptedJson = cryptor.ctr.decrypt(enc: json, iv: ivKey);
 
   return jsonDecode(decryptedJson);
 }
@@ -49,27 +49,14 @@ Future<String> encryptJsonBackground(Map params) async {
   String json = params['json'];
   String type = params['type'];
 
-  final keyGen = CryptKey();
-  final iv8 = keyGen.genDart(len: 8);
-  final key32 = keyGen.genFortuna();
-
-  Stopwatch stopwatchOne = new Stopwatch()..start();
-  final encryptor = LightCrypt(key: key32, algo: StreamAlgo.chacha20_12);
-  final encyptedPayload = encryptor.encrypt(inp: json, iv: iv8);
-  final stopwatchOneTime = stopwatchOne.elapsed.inSeconds;
-
-  print(
-    '[encryptJsonBackground] ENCRYPTION CHACHA-POLY ${type} $stopwatchOneTime',
-  );
-
   Stopwatch stopwatchTwo = new Stopwatch()..start();
 
   final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
-  final encryptedJson = cryptor.gcm.encrypt(inp: json, iv: ivKey);
+  final encryptedJson = cryptor.ctr.encrypt(inp: json, iv: ivKey);
 
-  final stopwatchTwoTime = stopwatchTwo.elapsed.inSeconds;
-  print(
-    '[encryptJsonBackground] ENCRYPTION AES ${type}  $stopwatchTwoTime',
-  );
+  final stopwatchTwoTime = stopwatchTwo.elapsed;
+
+  print('[encryptJsonBackground] ENCRYPTION AES ${type}  $stopwatchTwoTime');
+
   return encryptedJson;
 }

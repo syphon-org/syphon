@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:olm/olm.dart';
 
 // Project imports:
@@ -12,11 +13,13 @@ part 'state.g.dart';
 
 // Next Hive Field Number: 14
 @HiveType(typeId: CryptoStoreHiveId)
+@JsonSerializable()
 class CryptoStore extends Equatable {
-  // Active olm account
+  // Active olm account (loaded from olmAccountKey)
+  @JsonKey(ignore: true)
   final Account olmAccount;
 
-  // Serialized old account
+  // Serialized olm account
   @HiveField(3)
   final String olmAccountKey;
 
@@ -65,6 +68,7 @@ class CryptoStore extends Equatable {
   // @HiveField(?) TODO: consider saving generated keys?
   // the private key for one time keys is saved in olm?
   // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
+  @JsonKey(ignore: true)
   final Map oneTimeKeysOwned;
 
   const CryptoStore({
@@ -117,26 +121,29 @@ class CryptoStore extends Equatable {
     oneTimeKeysOwned,
     oneTimeKeysClaimed,
     oneTimeKeysCounts,
-  }) {
-    return CryptoStore(
-      olmAccount: olmAccount ?? this.olmAccount,
-      olmAccountKey: olmAccountKey ?? this.olmAccountKey,
-      inboundMessageSessions:
-          inboundMessageSessions ?? this.inboundMessageSessions,
-      outboundMessageSessions:
-          outboundMessageSessions ?? this.outboundMessageSessions,
-      messageSessionIndexNEW:
-          messageSessionIndexNEW ?? this.messageSessionIndexNEW,
-      messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
-      inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
-      outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
-      deviceKeys: deviceKeys ?? this.deviceKeys,
-      deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
-      oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,
-      oneTimeKeysClaimed: oneTimeKeysClaimed ?? this.oneTimeKeysClaimed,
-      deviceKeysExist:
-          deviceKeysExist != null ? deviceKeysExist : this.deviceKeysExist,
-      oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
-    );
-  }
+  }) =>
+      CryptoStore(
+        olmAccount: olmAccount ?? this.olmAccount,
+        olmAccountKey: olmAccountKey ?? this.olmAccountKey,
+        inboundMessageSessions:
+            inboundMessageSessions ?? this.inboundMessageSessions,
+        outboundMessageSessions:
+            outboundMessageSessions ?? this.outboundMessageSessions,
+        messageSessionIndexNEW:
+            messageSessionIndexNEW ?? this.messageSessionIndexNEW,
+        messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
+        inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
+        outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
+        deviceKeys: deviceKeys ?? this.deviceKeys,
+        deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
+        oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,
+        oneTimeKeysClaimed: oneTimeKeysClaimed ?? this.oneTimeKeysClaimed,
+        deviceKeysExist:
+            deviceKeysExist != null ? deviceKeysExist : this.deviceKeysExist,
+        oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
+      );
+
+  Map<String, dynamic> toJson() => _$CryptoStoreToJson(this);
+  factory CryptoStore.fromJson(Map<String, dynamic> json) =>
+      _$CryptoStoreFromJson(json);
 }
