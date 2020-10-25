@@ -7,15 +7,15 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/media/reducer.dart';
-import 'package:syphon/store/serializer.dart';
+import 'package:syphon/global/cache/serializer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
@@ -115,9 +115,9 @@ Future<Store> initStore() async {
   );
 
   // Configure cache encryption/decryption instance
-  Cache.ivKey = await unlockIVKey();
-  Cache.ivKeyNext = await unlockIVKeyNext();
-  Cache.cryptKey = await unlockCryptKey();
+  CacheSecure.ivKey = await unlockIVKey();
+  CacheSecure.ivKeyNext = await unlockIVKeyNext();
+  CacheSecure.cryptKey = await unlockCryptKey();
 
   // Finally load persisted store
   var initialState;

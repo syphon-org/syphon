@@ -9,18 +9,18 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
 import 'package:steel_crypt/steel_crypt.dart';
-import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/cache/threadables.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/state.dart';
-import './auth/state.dart';
-import './media/state.dart';
-import './rooms/state.dart';
-import './settings/state.dart';
+import 'package:syphon/store/auth/state.dart';
+import 'package:syphon/store/media/state.dart';
+import 'package:syphon/store/rooms/state.dart';
+import 'package:syphon/store/settings/state.dart';
 
 /**
  * Cache Serializer
@@ -67,41 +67,43 @@ class CacheSerializer implements StateSerializer<AppState> {
 
           // encrypt the store contents previously converted to json
           final encryptedStore = await compute(encryptJsonBackground, {
-            'ivKey': Cache.ivKey,
-            'cryptKey': Cache.cryptKey,
+            'ivKey': CacheSecure.ivKey,
+            'cryptKey': CacheSecure.cryptKey,
             'type': store.runtimeType.toString(),
             'json': jsonData,
           });
 
-          // cache the encrypted json representation of the redux store
-          if (store.runtimeType == RoomStore) {
-            await Cache.cacheRooms.put(
-              store.runtimeType.toString(),
-              encryptedStore,
-            );
+          // cache redux store to main cache storage
+          // caching room and crypto stores with additional hive level error handling
+          switch (store.runtimeType) {
+            case RoomStore:
+              await CacheSecure.cacheRooms.put(
+                store.runtimeType.toString(),
+                encryptedStore,
+              );
+              break;
+            case CryptoStore:
+              await CacheSecure.cacheCrypto.put(
+                store.runtimeType.toString(),
+                encryptedStore,
+              );
+              break;
+            default:
+              await CacheSecure.cacheMain.put(
+                store.runtimeType.toString(),
+                encryptedStore,
+              );
+              break;
           }
-
-          // cache the encrypted json representation of the redux store
-          if (store.runtimeType == CryptoStore) {
-            await Cache.cacheCrypto.put(
-              store.runtimeType.toString(),
-              encryptedStore,
-            );
-          }
-
-          // cache the encrypted json representation of the redux store
-          await Cache.cacheMain.put(
-            store.runtimeType.toString(),
-            encryptedStore,
-          );
 
           final endTime = stopwatchNew.elapsed;
           print(
-            '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $endTime',
+            '[Hive Serializer Encode] ${store.runtimeType.toString()} $endTime',
           );
         } catch (error) {
           debugPrint(
-              '[Hive Serializer ENCODE] ${store.runtimeType.toString().toUpperCase()} $error');
+            '[Hive Serializer Encode] ${store.runtimeType.toString()} $error',
+          );
         }
       }));
 
@@ -115,7 +117,7 @@ class CacheSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
-    final aes = AesCrypt(key: Cache.cryptKey, padding: PaddingAES.pkcs7);
+    final aes = AesCrypt(key: CacheSecure.cryptKey, padding: PaddingAES.pkcs7);
 
     AuthStore authStore = AuthStore();
     SyncStore syncStore = SyncStore();
@@ -135,43 +137,48 @@ class CacheSerializer implements StateSerializer<AppState> {
       userStore,
     ];
 
-    // Decode each store cache synchronously
+    // decode each store cache synchronously
     stores.forEach((store) {
       try {
         Map<String, dynamic> decodedJson = {};
 
         var encryptedJson;
 
-        if (store.runtimeType == RoomStore) {
-          encryptedJson = Cache.cacheRooms.get(
-            store.runtimeType.toString(),
-            defaultValue: null,
-          );
+        // fetch from main cache storage
+        // fetching room and crypto store has additional hive level error handling
+        switch (store.runtimeType) {
+          case RoomStore:
+            encryptedJson = CacheSecure.cacheRooms.get(
+              store.runtimeType.toString(),
+              defaultValue: null,
+            );
+            break;
+          case CryptoStore:
+            encryptedJson = CacheSecure.cacheCrypto.get(
+              store.runtimeType.toString(),
+              defaultValue: null,
+            );
+            break;
+          default:
+            encryptedJson = CacheSecure.cacheMain.get(
+              store.runtimeType.toString(),
+              defaultValue: null,
+            );
+            break;
         }
-
-        if (store.runtimeType == CryptoStore) {
-          encryptedJson = Cache.cacheCrypto.get(
-            store.runtimeType.toString(),
-            defaultValue: null,
-          );
-        }
-
-        // pull encrypted state from cache
-        encryptedJson = Cache.cacheMain.get(
-          store.runtimeType.toString(),
-          defaultValue: null,
-        );
 
         // attempt to decrypt encrypted state after loaded from RAM
         if (encryptedJson != null) {
           try {
             final decryptedJson = aes.ctr.decrypt(
               enc: encryptedJson,
-              iv: Cache.ivKey,
+              iv: CacheSecure.ivKey,
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            print('[Hive Serializer DECODE] ${store.runtimeType.toString()}');
+            print(
+              '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
+            );
             decodedJson = {};
           }
         }
@@ -182,11 +189,13 @@ class CacheSerializer implements StateSerializer<AppState> {
             // decrypt encrypted state after loaded from RAM
             final decryptedJson = aes.ctr.decrypt(
               enc: encryptedJson,
-              iv: Cache.ivKeyNext,
+              iv: CacheSecure.ivKeyNext,
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            print('[Hive Serializer DECODE] ${store.runtimeType.toString()}');
+            print(
+              '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
+            );
             decodedJson = {};
           }
         }
@@ -195,26 +204,26 @@ class CacheSerializer implements StateSerializer<AppState> {
         if (decodedJson.isEmpty) return;
 
         // this stinks, but dart doesn't allow reflection for factories/contructors
-        switch (store.runtimeType.toString()) {
-          case 'AuthStore':
+        switch (store.runtimeType) {
+          case AuthStore:
             authStore = AuthStore.fromJson(decodedJson);
             break;
-          case 'SyncStore':
+          case SyncStore:
             syncStore = SyncStore.fromJson(decodedJson);
             break;
-          case 'CryptoStore':
+          case CryptoStore:
             cryptoStore = CryptoStore.fromJson(decodedJson);
             break;
-          case 'MediaStore':
+          case MediaStore:
             mediaStore = MediaStore.fromJson(decodedJson);
             break;
-          case 'RoomStore':
+          case RoomStore:
             roomStore = RoomStore.fromJson(decodedJson);
             break;
-          case 'SettingsStore':
+          case SettingsStore:
             settingsStore = SettingsStore.fromJson(decodedJson);
             break;
-          case 'UserStore':
+          case UserStore:
             userStore = UserStore.fromJson(decodedJson);
             break;
           default:

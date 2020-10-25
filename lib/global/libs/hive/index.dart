@@ -1,5 +1,4 @@
 // Dart imports:
-import 'dart:convert';
 import 'dart:io';
 
 // Flutter imports:
@@ -10,7 +9,6 @@ import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:steel_crypt/steel_crypt.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
@@ -30,56 +28,20 @@ import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/model.dart';
 
-/**
- * Global Cache References
- */
+// Global cache
 class Cache {
-  // encryption references
-  static String ivKey;
-  static String ivKeyNext;
-  static String cryptKey;
-
-  // cache refrences
-  static Box cacheMain;
-  static Box cacheRooms;
-  static Box cacheCrypto;
-  static Box cacheSync;
-
-  // cache storage identifiers
-  static const mainCacheKey = '${Values.appNameLabel}-main-cache';
-  static const roomCacheKey = '${Values.appNameLabel}-room-cache';
-  static const cryptoCacheKey = '${Values.appNameLabel}-crypto-cache';
-
-  // cache key identifiers
-  static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
-  static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
-  static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
-  static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
-
-  // background data identifiers
-  static const roomNames = 'room_names';
-  static const syncData = 'sync_data';
-  static const protocol = 'protocol';
-  static const homeserver = 'homeserver';
-  static const accessTokenKey = 'accessToken';
-  static const lastSinceKey = 'lastSince';
-  static const currentUser = 'currentUser';
-
-  // DEPRRECATE - after version 0.1.4
   static Box state;
-  static Box stateUnsafe;
   static Box stateRooms;
   static Box stateMedia;
   static LazyBox sync;
 
   static const group_id = '${Values.appNameLabel}';
+  static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
-  // DEPRRECATE - ENCRYPTED - HIVE DEPENDENT
   static const syncKey = '${Values.appNameLabel}_sync';
   static const stateKey = '${Values.appNameLabel}_cache';
   static const stateRoomKey = '${Values.appNameLabel}_cache_2';
 
-  // DEPRRECATE - UNENCRYPTED - HIVE DEPENDENT
   static const syncKeyUNSAFE = '${Values.appNameLabel}_sync_unsafe';
   static const stateKeyUNSAFE = '${Values.appNameLabel}_cache_unsafe';
   static const stateKeyRoomsUNSAFE =
@@ -87,10 +49,23 @@ class Cache {
 
   static const backgroundKeyUNSAFE =
       '${Values.appNameLabel}_background_cache_unsafe_alt';
+
+  static const roomNames = 'room_names';
+  static const syncData = 'sync_data';
+  static const protocol = 'protocol';
+  static const homeserver = 'homeserver';
+  static const accessTokenKey = 'accessToken';
+  static const lastSinceKey = 'lastSince';
+  static const currentUser = 'currentUser';
 }
 
 /**
- * openHiveState UNSAFE
+ * TODO: Whole cache with this configuration will be deprecated after 0.1.4
+ */
+
+/**
+ * 
+ * Init Hive
  * 
  * For testing purposes only - should be encrypting hive
  */
@@ -98,8 +73,22 @@ Future<void> initHive() async {
   // Init storage location
   final storageLocation = await initStorageLocation();
 
+  // Init hive cache
+  // Hive.init(storageLocation);
+
   // Init configuration
-  await initHiveConfiguration(storageLocation);
+  await initHiveConfiguration();
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    Cache.sync = await openHiveSync();
+    Cache.state = await openHiveState();
+    Cache.stateRooms = await openHiveStateRooms();
+  }
+
+  if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
+    Cache.state = await openHiveStateUnsafe();
+    Cache.stateRooms = await openHiveStateRoomsUnsafe();
+  }
 }
 
 Future<dynamic> initStorageLocation() async {
@@ -135,9 +124,8 @@ Future<dynamic> initStorageLocation() async {
   }
 }
 
-Future<void> initHiveConfiguration(String storageLocationPath) async {
-  // Init hive cache
-  Hive.init(storageLocationPath);
+Future<void> initHiveConfiguration() async {
+// Future<void> initHiveConfiguration(String storageLocationPath) async {
 
   // Init Custom Models
   Hive.registerAdapter(ThemeTypeAdapter());
@@ -161,107 +149,10 @@ Future<void> initHiveConfiguration(String storageLocationPath) async {
   Hive.registerAdapter(SettingsStoreAdapter());
 }
 
-Future<String> unlockCryptKey() async {
-  final storageEngine = FlutterSecureStorage();
-
-  // Check if storage has been created before
-  var cryptKey = await storageEngine.read(
-    key: Cache.encryptionKeyLocation,
-  );
-  // Create a encryptionKey if a serialized one is not found
-  if (cryptKey == null) {
-    cryptKey = CryptKey().genFortuna();
-
-    await storageEngine.write(
-      key: Cache.encryptionKeyLocation,
-      value: cryptKey,
-    );
-  }
-
-  return cryptKey;
-}
-
-String createIVKey() => CryptKey().genDart();
-
-Future<void> saveIVKey(String ivKey) async {
-  // Check if storage has been created before
-  return await FlutterSecureStorage()
-      .write(key: Cache.ivKeyLocation, value: ivKey);
-}
-
-Future<void> saveIVKeyNext(String ivKey) async {
-  // Check if storage has been created before
-  return await FlutterSecureStorage()
-      .write(key: Cache.ivKeyNextLocation, value: ivKey);
-}
-
-Future<String> unlockIVKey() async {
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
-
-  final ivKeyStored = await storageEngine.read(key: Cache.ivKeyLocation);
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivKeyStored == null ? createIVKey() : ivKeyStored;
-}
-
-Future<String> unlockIVKeyNext() async {
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
-
-  final ivKeyStored = await storageEngine.read(key: Cache.ivKeyNextLocation);
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivKeyStored == null ? createIVKey() : ivKeyStored;
-}
-
-Future<Box> unlockMainCache() async {
-  try {
-    return await Hive.openBox(
-      Cache.mainCacheKey,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[Unlock Main Cache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockRoomCache() async {
-  try {
-    return await Hive.openBox(
-      Cache.roomCacheKey,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[Unlock Room Cache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockCryptoCache() async {
-  try {
-    return await Hive.openBox(
-      Cache.cryptoCacheKey,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[Unlock Crypto Cache] $error');
-    return null;
-  }
-}
-
-/**
- * DEPRERCATED
- * 
- * original secure key reference for Hive
- */
 Future<List<int>> unlockEncryptionKey() async {
+  // Check if storage has been created before
   final storageEngine = FlutterSecureStorage();
 
-  // Check if storage has been created before
   var encryptionKey = await storageEngine.read(
     key: Cache.encryptionKeyLocation,
   );
@@ -296,17 +187,22 @@ Future<Box> openHiveStateRoomsUnsafe() async {
  * For testing purposes only - should be encrypting hive
  */
 Future<Box> openHiveStateUnsafe() async {
-  try {
-    return await Hive.openBox(
-      Cache.stateKeyRoomsUNSAFE,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-    );
-  } catch (error) {
-    debugPrint('[openHiveStateUnsafe] $error');
-    return await Hive.openBox(
-      Cache.stateKeyUNSAFE,
-    );
-  }
+  return await Hive.openBox(
+    Cache.stateKeyRoomsUNSAFE,
+    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
+  );
+}
+
+/**
+ * openHiveState UNSAFE
+ * 
+ * For testing purposes only - should be encrypting hive
+ */
+Future<LazyBox> openHiveSyncUnsafe() async {
+  return await Hive.openLazyBox(
+    Cache.syncKeyUNSAFE,
+    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
+  );
 }
 
 /**
@@ -347,7 +243,7 @@ Future<Box> openHiveState() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] $error');
+    debugPrint('[openHiveState] open failure: $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -370,7 +266,7 @@ Future<Box> openHiveStateRooms() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveStateRooms] open failure: $error');
+    debugPrint('[openHiveState] open failure: $error');
     return await Hive.openBox(
       Cache.stateKeyUNSAFE,
     );
@@ -393,7 +289,7 @@ Future<LazyBox> openHiveSync() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveSync] failure $error');
+    debugPrint('[openHiveState] failure $error');
     return await Hive.openLazyBox(
       Cache.syncKeyUNSAFE,
     );

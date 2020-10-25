@@ -20,7 +20,7 @@ import 'package:syphon/store/user/state.dart';
  *  
  * One way convertion of the Hive cache to a manually encrypted / encoded state cache
  */
-class Ripper {
+class LegacyEncoder {
   static Future<dynamic> encodeHive(AppState state) async {
     try {
       Cache.state.put(
@@ -80,7 +80,6 @@ class Ripper {
     MediaStore mediaStoreConverted = MediaStore();
     RoomStore roomStoreConverted = RoomStore();
     SettingsStore settingsStoreConverted = SettingsStore();
-    UserStore userStore = UserStore();
 
     try {
       authStoreConverted = Cache.state.get(

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/index.dart';
@@ -24,7 +25,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/selectors.dart';
 
 /**
@@ -85,6 +85,57 @@ class BackgroundSync {
     final box = await openHiveBackgroundUnsafe();
     await box.put(Cache.roomNames, roomNames);
     await box.close();
+  }
+}
+
+/**
+ * Background Sync Job (Android Only)
+ * 
+ * Fetches data from matrix in background and displays
+ * notifications without needing google play services
+ * 
+ * NOTE: https://github.com/flutter/flutter/issues/32164
+ */
+void notificationSyncIsolate() async {
+  try {
+    // Init storage location
+    var storageLocation;
+    try {
+      storageLocation = await getApplicationDocumentsDirectory();
+    } catch (error) {
+      print('[notificationSyncIsolate] storage location failure - $error');
+    }
+
+    // init cache in background mode
+    // initCacheBackground();
+
+    // Init hive cache + adapters
+    Hive.init(storageLocation.path);
+    Box backgroundCache = await Hive.openBox(Cache.backgroundKeyUNSAFE);
+
+    // Init notifiations for background service and new messages/events
+    FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
+
+    showBackgroundServiceNotification(
+      notificationId: BackgroundSync.service_id,
+      pluginInstance: pluginInstance,
+    );
+
+    final cutoff = DateTime.now().add(
+      Duration(seconds: BackgroundSync.serviceTimeout),
+    );
+
+    while (DateTime.now().isBefore(cutoff)) {
+      await Future.delayed(Duration(seconds: 2));
+      print('[notificationSyncIsolate] syncing');
+      await syncLoop(
+        cache: backgroundCache,
+        pluginInstance: pluginInstance,
+      );
+      print('[notificationSyncIsolate] sync completed - waiting');
+    }
+  } catch (error) {
+    print('[notificationSyncIsolate] init failed $error');
   }
 }
 
@@ -178,53 +229,5 @@ FutureOr<dynamic> syncLoop({
     }
   } catch (error) {
     print('[notificationSyncIsolate] sync failed $error');
-  }
-}
-
-/**
- * Background Sync Job (Android Only)
- * 
- * Fetches data from matrix in background and displays
- * notifications without needing google play services
- * 
- * NOTE: https://github.com/flutter/flutter/issues/32164
- */
-void notificationSyncIsolate() async {
-  try {
-    // Init storage location
-    var storageLocation;
-    try {
-      storageLocation = await getApplicationDocumentsDirectory();
-    } catch (error) {
-      print('[notificationSyncIsolate] storage location failure - $error');
-    }
-
-    // Init hive cache + adapters
-    Hive.init(storageLocation.path);
-    Box backgroundCache = await Hive.openBox(Cache.backgroundKeyUNSAFE);
-
-    // Init notifiations for background service and new messages/events
-    FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
-
-    showBackgroundServiceNotification(
-      notificationId: BackgroundSync.service_id,
-      pluginInstance: pluginInstance,
-    );
-
-    final cutoff = DateTime.now().add(
-      Duration(seconds: BackgroundSync.serviceTimeout),
-    );
-
-    while (DateTime.now().isBefore(cutoff)) {
-      await Future.delayed(Duration(seconds: 2));
-      print('[notificationSyncIsolate] syncing');
-      await syncLoop(
-        cache: backgroundCache,
-        pluginInstance: pluginInstance,
-      );
-      print('[notificationSyncIsolate] sync completed - waiting');
-    }
-  } catch (error) {
-    print('[notificationSyncIsolate] init failed $error');
   }
 }

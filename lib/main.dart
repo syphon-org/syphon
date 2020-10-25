@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 
 // Project imports:
@@ -36,51 +37,39 @@ void _enablePlatformOverrideForDesktop() {
 void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // load correct environment configurations
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
 
-  // disable debugPrint when running in release mode
+  // disable debugPrint when in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
   }
 
+  // init platform overrides for compatability with dart libs
   _enablePlatformOverrideForDesktop();
 
-  // init cold cache (mobile only)
-  await initHive();
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    // TODO: deprecate after conversion
-    Cache.sync = await openHiveSync();
-    Cache.state = await openHiveState();
-    Cache.stateRooms = await openHiveStateRooms();
-    Cache.stateUnsafe = await openHiveStateUnsafe();
+  // init window mangment for desktop builds
+  if (Platform.isMacOS) {
+    // await WindowUtils.setSize(Size(720, 720));
   }
 
-  if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
-    Cache.state = await openHiveStateUnsafe();
-    Cache.stateRooms = await openHiveStateRoomsUnsafe();
-    Cache.stateUnsafe = await openHiveStateUnsafe();
-  }
-
-  // NOTE: new state cache containers - compat with any plat
-  Cache.cacheMain = await unlockMainCache();
-  Cache.cacheRooms = await unlockRoomCache();
-  Cache.cacheCrypto = await unlockCryptoCache();
-
+  // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
     debugPrint('[main] background service started $backgroundSyncStatus');
   }
 
-  //  * DESKTOP ONLY
-  if (Platform.isMacOS) {
-    // await WindowUtils.setSize(Size(720, 720));
-  }
+  // init cold cache (mobile only)
+  await initCache();
 
-  // init state cache (hot)
+  // TODO: remove after 0.1.4
+  await initHive();
+
+  // init hot cache
   final store = await initStore();
 
-  // the app
+  // start!
   runApp(Syphon(store: store));
 }
 
@@ -209,6 +198,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void deactivate() {
     closeStorage();
+    closeCache();
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());
