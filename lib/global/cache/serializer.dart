@@ -5,13 +5,14 @@ import 'dart:typed_data';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:isolate_handler/isolate_handler.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
+import 'package:syphon/global/libs/hive/encoder.dart';
+import 'package:syphon/global/libs/hive/index.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
@@ -44,14 +45,12 @@ class CacheSerializer implements StateSerializer<AppState> {
     // Queue up a cache saving will wait
     // if the previously schedule task has not finished
     Future.microtask(() async {
-      // TODO: re-enable IV rotation
       // // create a new IV for the encrypted cache
       CacheSecure.ivKey = createIVKey();
       // // backup the IV in case the app is force closed before caching finishes
       await saveIVKeyNext(CacheSecure.ivKey);
 
       CacheSecure.ivKeyNext = await unlockIVKeyNext();
-      debugPrint('[New Iv Key Next] ${CacheSecure.ivKeyNext}');
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
@@ -112,7 +111,7 @@ class CacheSerializer implements StateSerializer<AppState> {
         }
       }));
 
-      // // Rotate encryption for the next save
+      // Rotate encryption for the next save
       await saveIVKey(CacheSecure.ivKey);
     });
 
@@ -140,6 +139,16 @@ class CacheSerializer implements StateSerializer<AppState> {
       settingsStore,
       userStore,
     ];
+
+    // TODO: remove after most have upgraded to 0.1.4/0.1.5
+    if (Cache.state != null || Cache.stateRooms != null) {
+      debugPrint(
+        '[Legacy Cache Found] ***** FOUND ****** loading and removing cache',
+      );
+      final legacyAppState = LegacyEncoder.decodeHive();
+      deleteLegacyStorage();
+      return legacyAppState;
+    }
 
     // decode each store cache synchronously
     stores.forEach((store) {

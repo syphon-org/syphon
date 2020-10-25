@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/auth/state.dart';
 // Project imports:
@@ -73,7 +72,7 @@ class LegacyEncoder {
     }
   }
 
-  static Future<dynamic> decodeHive() async {
+  static AppState decodeHive() {
     AuthStore authStoreConverted = AuthStore();
     SyncStore syncStoreConverted = SyncStore();
     CryptoStore cryptoStoreConverted = CryptoStore();
@@ -134,5 +133,16 @@ class LegacyEncoder {
     } catch (error) {
       debugPrint('[Hive Serializer Decode] $error');
     }
+
+    return AppState(
+      loading: false,
+      authStore: authStoreConverted ?? AuthStore(),
+      syncStore: syncStoreConverted ?? SyncStore(),
+      cryptoStore: cryptoStoreConverted ?? CryptoStore(),
+      roomStore: roomStoreConverted ?? RoomStore(),
+      mediaStore: mediaStoreConverted ?? MediaStore(),
+      settingsStore: settingsStoreConverted ?? SettingsStore(),
+      userStore: UserStore(),
+    );
   }
 }

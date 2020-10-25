@@ -39,8 +39,6 @@ PODS:
     - Flutter
   - FLAnimatedImage (1.0.12)
   - Flutter (1.0.0)
-  - flutter_isolate (0.0.1):
-    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_plugin_android_lifecycle (0.0.1):
@@ -92,7 +90,6 @@ DEPENDENCIES:
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
-  - flutter_isolate (from `.symlinks/plugins/flutter_isolate/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_plugin_android_lifecycle (from `.symlinks/plugins/flutter_plugin_android_lifecycle/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
@@ -130,8 +127,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
-  flutter_isolate:
-    :path: ".symlinks/plugins/flutter_isolate/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_plugin_android_lifecycle:
@@ -175,7 +170,6 @@ SPEC CHECKSUMS:
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_isolate: 0edf5081826d071adf21759d1eb10ff5c24503b5
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_plugin_android_lifecycle: dc0b544e129eebb77a6bfb1239d4d1c673a60a35
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec

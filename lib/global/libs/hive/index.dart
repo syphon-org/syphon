@@ -306,3 +306,54 @@ void closeStorage() async {
     Cache.sync.close();
   }
 }
+
+// Wipe all old cached files to deprecate old storage caches
+Future<void> deleteLegacyStorage() async {
+  try {
+    (await Hive.openBox(Cache.syncKeyUNSAFE)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKeyUNSAFE)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKeyRoomsUNSAFE)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.backgroundKeyUNSAFE)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.syncKey)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKey)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateRoomKey)).deleteFromDisk();
+  } catch (error) {
+    debugPrint('[deleteStorage] deleting Cache.state');
+  }
+
+  Cache.sync = null;
+  Cache.state = null;
+  Cache.stateRooms = null;
+
+  return true;
+}
