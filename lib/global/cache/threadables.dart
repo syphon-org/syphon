@@ -1,5 +1,13 @@
 import 'dart:convert';
 
+import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
+import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 
@@ -34,13 +42,20 @@ Future<String> encryptJsonBackground(Map params) async {
   return encryptedJson;
 }
 
-// responsibile for json serialization and encryption
+// responsibile for both json serialization and encryption
 Future<String> serializeJsonBackground(Object store) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  window.onPlatformMessage = BinaryMessages.handlePlatformMessage;
+
   try {
     Stopwatch stopwatch = new Stopwatch()..start();
 
-    final ivKey = await unlockIVKey();
-    final cryptKey = await unlockCryptKey();
+    final storageEngine = FlutterSecureStorage();
+
+    final ivKey = await storageEngine.read(key: CacheSecure.ivKeyLocation);
+    final cryptKey =
+        await storageEngine.read(key: CacheSecure.encryptionKeyLocation);
+
     final jsonEncoded = jsonEncode(store);
 
     final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);

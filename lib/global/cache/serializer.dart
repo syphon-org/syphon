@@ -5,6 +5,7 @@ import 'dart:typed_data';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
@@ -45,9 +46,12 @@ class CacheSerializer implements StateSerializer<AppState> {
     Future.microtask(() async {
       // TODO: re-enable IV rotation
       // // create a new IV for the encrypted cache
-      // Cache.ivKey = createIVKey();
+      CacheSecure.ivKey = createIVKey();
       // // backup the IV in case the app is force closed before caching finishes
-      // await saveIVKeyNext(Cache.ivKey);
+      await saveIVKeyNext(CacheSecure.ivKey);
+
+      CacheSecure.ivKeyNext = await unlockIVKeyNext();
+      debugPrint('[New Iv Key Next] ${CacheSecure.ivKeyNext}');
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
@@ -108,9 +112,8 @@ class CacheSerializer implements StateSerializer<AppState> {
         }
       }));
 
-      // TODO: re-enable IV rotation
       // // Rotate encryption for the next save
-      // await saveIVKey(Cache.ivKey);
+      await saveIVKey(CacheSecure.ivKey);
     });
 
     // Disregard redux persist storage saving
@@ -176,6 +179,10 @@ class CacheSerializer implements StateSerializer<AppState> {
               iv: CacheSecure.ivKey,
             );
             decodedJson = json.decode(decryptedJson);
+
+            print(
+              '[Hive Serializer Decode] ${store.runtimeType.toString()} used CacheSecure.ivKey',
+            );
           } catch (error) {
             print(
               '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
@@ -193,6 +200,10 @@ class CacheSerializer implements StateSerializer<AppState> {
               iv: CacheSecure.ivKeyNext,
             );
             decodedJson = json.decode(decryptedJson);
+
+            print(
+              '[Hive Serializer Decode] ${store.runtimeType.toString()} used CacheSecure.ivKeyNext',
+            );
           } catch (error) {
             print(
               '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
@@ -232,6 +243,9 @@ class CacheSerializer implements StateSerializer<AppState> {
         }
 
         // decode json after decrypted and set to store
+        print(
+          '[Hive Serializer Decode] ${store.runtimeType.toString()} success',
+        );
       } catch (error) {
         debugPrint('[Hive Serializer Decode] $error');
       }

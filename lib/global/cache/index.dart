@@ -29,7 +29,8 @@ class CacheSecure {
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
   static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
-  static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
+  static const encryptionKeyLocation =
+      '${Values.appNameLabel}@publicKey'; // TODO: remove
 
   // background data identifiers
   static const roomNames = 'room_names';
@@ -197,6 +198,7 @@ Future<Box> unlockRoomCache() async {
   try {
     return await Hive.openBox(
       CacheSecure.cacheKeyRooms,
+      crashRecovery: true,
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
