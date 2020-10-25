@@ -54,23 +54,24 @@ class CacheSerializer implements StateSerializer<AppState> {
         try {
           Stopwatch stopwatchNew = new Stopwatch()..start();
 
-          var jsonData;
+          var jsonEncoded;
+          var jsonEncrypted;
 
           // encode the store contents to json
           // HACK: unable to pass both listed stores direct to an isolate
           final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
           if (!sensitiveStorage.contains(store.runtimeType)) {
-            jsonData = await compute(jsonEncode, store);
+            jsonEncoded = await compute(jsonEncode, store);
           } else {
-            jsonData = json.encode(store);
+            jsonEncoded = json.encode(store);
           }
 
           // encrypt the store contents previously converted to json
-          final encryptedStore = await compute(encryptJsonBackground, {
+          jsonEncrypted = await compute(encryptJsonBackground, {
             'ivKey': CacheSecure.ivKey,
             'cryptKey': CacheSecure.cryptKey,
             'type': store.runtimeType.toString(),
-            'json': jsonData,
+            'json': jsonEncoded,
           });
 
           // cache redux store to main cache storage
@@ -79,19 +80,19 @@ class CacheSerializer implements StateSerializer<AppState> {
             case RoomStore:
               await CacheSecure.cacheRooms.put(
                 store.runtimeType.toString(),
-                encryptedStore,
+                jsonEncrypted,
               );
               break;
             case CryptoStore:
               await CacheSecure.cacheCrypto.put(
                 store.runtimeType.toString(),
-                encryptedStore,
+                jsonEncrypted,
               );
               break;
             default:
               await CacheSecure.cacheMain.put(
                 store.runtimeType.toString(),
-                encryptedStore,
+                jsonEncrypted,
               );
               break;
           }

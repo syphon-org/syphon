@@ -28,12 +28,6 @@ import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
 
-void _enablePlatformOverrideForDesktop() {
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +41,9 @@ void main() async {
   }
 
   // init platform overrides for compatability with dart libs
-  _enablePlatformOverrideForDesktop();
+  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  }
 
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
@@ -66,11 +62,8 @@ void main() async {
   // TODO: remove after 0.1.4
   await initHive();
 
-  // init hot cache
-  final store = await initStore();
-
-  // start!
-  runApp(Syphon(store: store));
+  // init hot cache and start
+  runApp(Syphon(store: await initStore()));
 }
 
 class Syphon extends StatefulWidget {

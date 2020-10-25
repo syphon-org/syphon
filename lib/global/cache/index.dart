@@ -8,7 +8,7 @@ import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/values.dart';
 
 class CacheSecure {
-  // encryption references
+  // encryption references (in memory only)
   static String ivKey;
   static String ivKeyNext;
   static String cryptKey;
