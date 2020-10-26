@@ -42,6 +42,7 @@ class AuthStore extends Equatable {
 
   // temp state statuses for signup
   final bool loading;
+  final bool stopgap;
   final bool creating;
   final bool verificationNeeded;
   final bool isEmailValid;
@@ -73,6 +74,7 @@ class AuthStore extends Equatable {
     this.isPasswordValid = false,
     this.isHomeserverValid = true,
     this.credential,
+    this.stopgap = false,
     this.creating = false,
     this.loading = false,
     this.verificationNeeded = false,
@@ -129,6 +131,7 @@ class AuthStore extends Equatable {
       interactiveAuths: interactiveAuths ?? this.interactiveAuths,
       credential: credential ?? this.credential,
       creating: creating ?? this.creating,
+      stopgap: stopgap ?? this.stopgap,
       verificationNeeded: verificationNeeded ?? this.verificationNeeded,
     );
   }

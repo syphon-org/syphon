@@ -327,7 +327,8 @@ class _Props extends Equatable {
       password: store.state.authStore.password,
       isLoginAttemptable: store.state.authStore.isPasswordValid &&
           store.state.authStore.isUsernameValid &&
-          !store.state.authStore.loading,
+          !store.state.authStore.loading &&
+          !store.state.authStore.stopgap,
       usernameHint: Strings.formatUsernameHint(
         store.state.authStore.homeserver,
       ),
@@ -351,9 +352,7 @@ class _Props extends Equatable {
         }
       },
       onChangePassword: (String text) {
-        store.dispatch(
-          setPassword(password: text, ignoreConfirm: true),
-        );
+        store.dispatch(setLoginPassword(password: text));
       },
       onIncrementTheme: () {
         store.dispatch(incrementTheme());

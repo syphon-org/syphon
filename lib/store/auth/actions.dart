@@ -71,6 +71,11 @@ class SetUsernameValid {
   SetUsernameValid({this.valid});
 }
 
+class SetStopgap {
+  final bool stopgap;
+  SetStopgap({this.stopgap});
+}
+
 class SetPassword {
   final String password;
   SetPassword({this.password});
@@ -223,6 +228,15 @@ ThunkAction<AppState> stopAuthObserver() {
  */
 ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
+    // Wait at least 2 seconds until you can attempt to login again
+    // includes processing time by authenticating matrix server
+    store.dispatch(SetStopgap(stopgap: true));
+
+    // prevents people spamming the login if it were to fail repeatedly
+    Timer(Duration(seconds: 2), () {
+      store.dispatch(SetStopgap(stopgap: false));
+    });
+
     final defaultId = Random.secure().nextInt(1 << 31).toString();
     var device = Device(
       deviceId: defaultId,
@@ -298,6 +312,9 @@ ThunkAction<AppState> loginUser() {
           addInfo(
             message: Strings.errorCheckHomeserver,
           );
+          // sometimes, people leave an extra forward slash in the m.homeserver field
+        } else if (homeserver.endsWith('/')) {
+          homeserver = homeserver.replaceRange(homeserver.length - 1, null, '');
         }
       } catch (error) {/* still attempt login */}
 
@@ -329,7 +346,11 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      store.dispatch(addAlert(message: error, error: error));
+      store.dispatch(addAlert(
+        origin: "loginUser",
+        message: error,
+        error: error,
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -828,6 +849,15 @@ ThunkAction<AppState> setUsername({String username}) {
     store.dispatch(SetUsername(username: username.trim()));
   };
 }
+
+ThunkAction<AppState> setLoginPassword({String password}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetPassword(password: password));
+
+      store.dispatch(SetPasswordValid(
+        valid: password != null && password.length > 0,
+      ));
+    };
 
 ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
   return (Store<AppState> store) {
