@@ -87,6 +87,8 @@ Future<void> initHive() async {
   final storageEngine = FlutterSecureStorage();
   Cache.migration = await storageEngine.read(key: Cache.migrationKey);
 
+  print('[initHive] ${Cache.migration}');
+
   if ((Platform.isAndroid || Platform.isIOS) && Cache.migration == null) {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
@@ -326,6 +328,8 @@ Future<void> deleteLegacyStorage() async {
 
   final storageEngine = FlutterSecureStorage();
   await storageEngine.write(key: Cache.migrationKey, value: 'yes');
+
+  print('[deleteLegacyStorage] ran and saved migration status');
 
   return true;
 }

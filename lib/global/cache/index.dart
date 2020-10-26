@@ -29,8 +29,6 @@ class CacheSecure {
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
   static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
-  static const encryptionKeyLocation =
-      '${Values.appNameLabel}@publicKey'; // TODO: remove
 
   // background data identifiers
   static const roomNames = 'room_names';
@@ -166,7 +164,7 @@ Future<String> unlockCryptKey() async {
 
   // Check if storage has been created before
   var cryptKey = await storageEngine.read(
-    key: CacheSecure.encryptionKeyLocation,
+    key: CacheSecure.cryptKeyLocation,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -174,7 +172,7 @@ Future<String> unlockCryptKey() async {
     cryptKey = CryptKey().genFortuna(len: 32); // 256 bits
 
     await storageEngine.write(
-      key: CacheSecure.encryptionKeyLocation,
+      key: CacheSecure.cryptKeyLocation,
       value: cryptKey,
     );
   }

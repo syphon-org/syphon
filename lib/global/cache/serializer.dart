@@ -140,6 +140,9 @@ class CacheSerializer implements StateSerializer<AppState> {
       userStore,
     ];
 
+    print(
+      '[CacheSecure.decode] ${Cache.state} || ${Cache.stateRooms} && ${Cache.migration}',
+    );
     // TODO: remove after most have upgraded to 0.1.4/0.1.5
     if ((Cache.state != null || Cache.stateRooms != null) &&
         Cache.migration == null) {
