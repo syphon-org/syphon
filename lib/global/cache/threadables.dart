@@ -56,7 +56,7 @@ Future<String> serializeJsonBackground(Object store) async {
 
     final ivKey = await storageEngine.read(key: CacheSecure.ivKeyLocation);
     final cryptKey =
-        await storageEngine.read(key: CacheSecure.encryptionKeyLocation);
+        await storageEngine.read(key: CacheSecure.cryptKeyLocation);
 
     final jsonEncoded = jsonEncode(store);
 
