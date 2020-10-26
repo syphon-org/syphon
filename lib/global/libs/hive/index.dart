@@ -76,7 +76,7 @@ class Cache {
 Future<void> initHive() async {
   // NOTE: done in initCache
   // Init storage location
-  // final storageLocation = await initStorageLocation();
+  final storageLocation = await initStorageLocation();
 
   // Init hive cache
   // Hive.init(storageLocation);
@@ -84,12 +84,13 @@ Future<void> initHive() async {
   // Init configuration
   await initHiveConfiguration();
 
+  // ignore if already migrated cache
   final storageEngine = FlutterSecureStorage();
   Cache.migration = await storageEngine.read(key: Cache.migrationKey);
-
   print('[initHive] ${Cache.migration}');
+  if (Cache.migration != null) return;
 
-  if ((Platform.isAndroid || Platform.isIOS) && Cache.migration == null) {
+  if ((Platform.isAndroid || Platform.isIOS)) {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
     Cache.stateRooms = await openHiveStateRooms();
@@ -213,7 +214,7 @@ Future<Box> openHiveState() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
+    debugPrint('[openHiveState] $error');
     return null;
   }
 }
@@ -234,7 +235,7 @@ Future<Box> openHiveStateRooms() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
+    debugPrint('[openHiveState] $error');
     return null;
   }
 }
@@ -255,7 +256,7 @@ Future<LazyBox> openHiveSync() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] failure $error');
+    debugPrint('[openHiveState] $error');
     return null;
   }
 }
