@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -8,6 +9,8 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
@@ -24,7 +27,10 @@ import 'package:path_provider/path_provider.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 
 /**
@@ -99,11 +105,53 @@ class BackgroundSync {
 void notificationSyncIsolate() async {
   try {
     // Init storage location
+    var ivKey;
+    var cryptKey;
     var storageLocation;
+    var storageSecured;
+
+    AuthStore authStore;
+    SyncStore syncStore;
+
     try {
+      storageSecured = FlutterSecureStorage();
       storageLocation = await getApplicationDocumentsDirectory();
     } catch (error) {
-      print('[notificationSyncIsolate] storage location failure - $error');
+      print('[notificationSyncIsolate] $error');
+    }
+
+    try {
+      // Pull encryption key and iv
+      ivKey = await storageSecured.read(
+        key: CacheSecure.ivKeyLocation,
+      );
+
+      cryptKey = await storageSecured.read(
+        key: CacheSecure.cryptKeyLocation,
+      );
+
+      // Configure getters
+      Box cacheMain = await Hive.openBox(CacheSecure.cacheKeyMain);
+      final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+
+      final authStoreEncrypted = cacheMain.get((AuthStore).toString());
+      final syncStoreEncrypted = cacheMain.get((SyncStore).toString());
+
+      final authStoreDecrypted =
+          cryptor.ctr.decrypt(enc: authStoreEncrypted, iv: ivKey);
+      final syncStoreDecrypted =
+          cryptor.ctr.decrypt(enc: syncStoreEncrypted, iv: ivKey);
+
+      authStore = jsonDecode(authStoreDecrypted);
+      syncStore = jsonDecode(syncStoreDecrypted);
+    } catch (error) {
+      print('[notificationSyncIsolate] $error');
+    }
+
+    try {
+      authStore.user.accessToken;
+    } catch (error) {
+      print('[notificationSyncIsolate] $error');
     }
 
     // Init hive cache + adapters
@@ -125,9 +173,17 @@ void notificationSyncIsolate() async {
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
       print('[notificationSyncIsolate] syncing');
+
       await syncLoop(
         cache: backgroundCache,
         pluginInstance: pluginInstance,
+        params: {
+          'protocol': 'https://',
+          'homeserver': (authStore.user ?? User()).homeserver,
+          'accessToken': (authStore.user ?? User()).accessToken,
+          'lastSince': syncStore.lastSince,
+          'currentUser': (authStore.user ?? User()).userId,
+        },
       );
       print('[notificationSyncIsolate] sync completed - waiting');
     }
@@ -142,28 +198,14 @@ void notificationSyncIsolate() async {
 FutureOr<dynamic> syncLoop({
   Box cache,
   FlutterLocalNotificationsPlugin pluginInstance,
+  Map params,
 }) async {
   try {
-    // Check isolate id and maybe see if a new one is created
-    final String protocol = cache.get(
-      CacheSecure.protocol,
-    );
-
-    final String homeserver = cache.get(
-      CacheSecure.homeserver,
-    );
-
-    final String accessToken = cache.get(
-      CacheSecure.accessTokenKey,
-    );
-
-    final String lastSince = cache.get(
-      CacheSecure.lastSinceKey,
-    );
-
-    final String currentUser = cache.get(
-      CacheSecure.currentUser,
-    );
+    final protocol = params['protocol'];
+    final homeserver = params['homeserver'];
+    final accessToken = params['accessToken'];
+    final lastSince = params['lastSince'];
+    final currentUser = params['currentUser'];
 
     if (accessToken == null || lastSince == null) {
       return;

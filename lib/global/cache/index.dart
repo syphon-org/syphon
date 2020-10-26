@@ -128,21 +128,27 @@ String createIVKey() {
 
 Future<void> saveIVKey(String ivKey) async {
   // Check if storage has been created before
-  return await FlutterSecureStorage()
-      .write(key: CacheSecure.ivKeyLocation, value: ivKey);
+  return await FlutterSecureStorage().write(
+    key: CacheSecure.ivKeyLocation,
+    value: ivKey,
+  );
 }
 
 Future<void> saveIVKeyNext(String ivKey) async {
   // Check if storage has been created before
-  return await FlutterSecureStorage()
-      .write(key: CacheSecure.ivKeyNextLocation, value: ivKey);
+  return await FlutterSecureStorage().write(
+    key: CacheSecure.ivKeyNextLocation,
+    value: ivKey,
+  );
 }
 
 Future<String> unlockIVKey() async {
   // Check if storage has been created before
   final storageEngine = FlutterSecureStorage();
 
-  final ivKeyStored = await storageEngine.read(key: CacheSecure.ivKeyLocation);
+  final ivKeyStored = await storageEngine.read(
+    key: CacheSecure.ivKeyLocation,
+  );
 
   // Create a encryptionKey if a serialized one is not found
   return ivKeyStored == null ? createIVKey() : ivKeyStored;
@@ -152,8 +158,9 @@ Future<String> unlockIVKeyNext() async {
   // Check if storage has been created before
   final storageEngine = FlutterSecureStorage();
 
-  final ivKeyStored =
-      await storageEngine.read(key: CacheSecure.ivKeyNextLocation);
+  final ivKeyStored = await storageEngine.read(
+    key: CacheSecure.ivKeyNextLocation,
+  );
 
   // Create a encryptionKey if a serialized one is not found
   return ivKeyStored == null ? createIVKey() : ivKeyStored;
@@ -191,7 +198,7 @@ Future<Box> unlockMainCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyMain,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
     );
   } catch (error) {
     debugPrint('[Unlock Main CacheSecure] $error');
@@ -204,7 +211,7 @@ Future<Box> unlockRoomCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyRooms,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
     );
   } catch (error) {
     debugPrint('[Unlock Room CacheSecure] $error');
@@ -217,7 +224,7 @@ Future<Box> unlockCryptoCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyCrypto,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
     );
   } catch (error) {
     debugPrint('[Unlock Crypto CacheSecure] $error');
@@ -230,7 +237,7 @@ Future<Box> unlockBackgroundCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyBackground,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
     );
   } catch (error) {
     debugPrint('[Unlock Crypto CacheSecure] $error');

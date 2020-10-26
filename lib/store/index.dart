@@ -100,7 +100,7 @@ Future<Store> initStore() async {
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
     serializer: CacheSerializer(),
-    throttleDuration: Duration(milliseconds: 2500),
+    throttleDuration: Duration(milliseconds: 4500),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:
