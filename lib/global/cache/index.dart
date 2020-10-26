@@ -168,9 +168,10 @@ Future<String> unlockCryptKey() async {
   var cryptKey = await storageEngine.read(
     key: CacheSecure.encryptionKeyLocation,
   );
+
   // Create a encryptionKey if a serialized one is not found
   if (cryptKey == null) {
-    cryptKey = CryptKey().genFortuna();
+    cryptKey = CryptKey().genFortuna(len: 32); // 256 bits
 
     await storageEngine.write(
       key: CacheSecure.encryptionKeyLocation,

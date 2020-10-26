@@ -50,8 +50,8 @@ class CacheSerializer implements StateSerializer<AppState> {
       // // backup the IV in case the app is force closed before caching finishes
       await saveIVKeyNext(CacheSecure.ivKey);
 
-      CacheSecure.ivKeyNext = await unlockIVKeyNext();
-
+      print(CacheSecure.ivKey);
+      print(CacheSecure.cryptKey);
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
@@ -141,7 +141,8 @@ class CacheSerializer implements StateSerializer<AppState> {
     ];
 
     // TODO: remove after most have upgraded to 0.1.4/0.1.5
-    if (Cache.state != null || Cache.stateRooms != null) {
+    if ((Cache.state != null || Cache.stateRooms != null) &&
+        Cache.migration == null) {
       debugPrint(
         '[Legacy Cache Found] ***** FOUND ****** loading and removing cache',
       );
