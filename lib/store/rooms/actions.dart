@@ -304,9 +304,6 @@ ThunkAction<AppState> fetchDirectRooms() {
 
       // Fetch room state and messages by userId/roomId
       final directRoomData = directRoomList.map((directRoom) async {
-        print('[fetchDirectRooms]');
-        print(directRoom);
-
         final userId = directRoom.keys.elementAt(0);
         final roomId = directRoom.values.elementAt(0);
         try {

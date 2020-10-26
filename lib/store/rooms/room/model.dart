@@ -580,7 +580,7 @@ class Room {
       // Filter to find startTime and endTime
       final messagesAll = List<Message>.from(messagesMap.values);
 
-      // TODO: remove after 0.1.4 - message catchup works
+      // TODO: remove after 0.1.5 :( - message catchup works
       if (true) {
         // print('[fromMessageEvents] ${this.name}');
         // print('[limited] ${limited}');

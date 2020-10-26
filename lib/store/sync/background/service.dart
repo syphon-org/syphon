@@ -54,12 +54,12 @@ class BackgroundSync {
 
     final box = await openHiveBackgroundUnsafe();
 
-    await box.put(Cache.protocol, protocol);
-    await box.put(Cache.homeserver, homeserver);
-    await box.put(Cache.accessTokenKey, accessToken);
-    await box.put(Cache.lastSinceKey, lastSince);
-    await box.put(Cache.currentUser, currentUser);
-    await box.put(Cache.roomNames, roomNames);
+    await box.put(CacheSecure.protocol, protocol);
+    await box.put(CacheSecure.homeserver, homeserver);
+    await box.put(CacheSecure.accessTokenKey, accessToken);
+    await box.put(CacheSecure.lastSinceKey, lastSince);
+    await box.put(CacheSecure.currentUser, currentUser);
+    await box.put(CacheSecure.roomNames, roomNames);
 
     await box.close();
 
@@ -83,7 +83,7 @@ class BackgroundSync {
 
   static void updateRooms({Map<String, String> roomNames}) async {
     final box = await openHiveBackgroundUnsafe();
-    await box.put(Cache.roomNames, roomNames);
+    await box.put(CacheSecure.roomNames, roomNames);
     await box.close();
   }
 }
@@ -106,12 +106,9 @@ void notificationSyncIsolate() async {
       print('[notificationSyncIsolate] storage location failure - $error');
     }
 
-    // init cache in background mode
-    // initCacheBackground();
-
     // Init hive cache + adapters
     Hive.init(storageLocation.path);
-    Box backgroundCache = await Hive.openBox(Cache.backgroundKeyUNSAFE);
+    Box backgroundCache = await Hive.openBox(CacheSecure.cacheKeyBackground);
 
     // Init notifiations for background service and new messages/events
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
@@ -149,23 +146,23 @@ FutureOr<dynamic> syncLoop({
   try {
     // Check isolate id and maybe see if a new one is created
     final String protocol = cache.get(
-      Cache.protocol,
+      CacheSecure.protocol,
     );
 
     final String homeserver = cache.get(
-      Cache.homeserver,
+      CacheSecure.homeserver,
     );
 
     final String accessToken = cache.get(
-      Cache.accessTokenKey,
+      CacheSecure.accessTokenKey,
     );
 
     final String lastSince = cache.get(
-      Cache.lastSinceKey,
+      CacheSecure.lastSinceKey,
     );
 
     final String currentUser = cache.get(
-      Cache.currentUser,
+      CacheSecure.currentUser,
     );
 
     if (accessToken == null || lastSince == null) {
@@ -189,7 +186,7 @@ FutureOr<dynamic> syncLoop({
     final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
     try {
-      await cache.put(Cache.lastSinceKey, lastSinceNew);
+      await cache.put(CacheSecure.lastSinceKey, lastSinceNew);
 
       rawRooms.forEach((roomId, json) {
         // Filter through parsers

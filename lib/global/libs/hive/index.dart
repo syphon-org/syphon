@@ -87,9 +87,9 @@ Future<void> initHive() async {
   // ignore if already migrated cache
   final storageEngine = FlutterSecureStorage();
   Cache.migration = await storageEngine.read(key: Cache.migrationKey);
-  print('[initHive] ${Cache.migration}');
   if (Cache.migration != null) return;
 
+  // otherwise, open and load the previous hive cache
   if ((Platform.isAndroid || Platform.isIOS)) {
     Cache.sync = await openHiveSync();
     Cache.state = await openHiveState();
@@ -303,7 +303,7 @@ Future<void> deleteLegacyStorage() async {
   }
 
   try {
-    (await Hive.openBox(Cache.syncKey)).deleteFromDisk();
+    (await Hive.openLazyBox(Cache.syncKey)).deleteFromDisk();
     debugPrint('[deleteStorage] deleting Cache.syncKey');
   } catch (error) {
     debugPrint('[deleteStorage] ${error}');
@@ -330,7 +330,7 @@ Future<void> deleteLegacyStorage() async {
   final storageEngine = FlutterSecureStorage();
   await storageEngine.write(key: Cache.migrationKey, value: 'yes');
 
-  print('[deleteLegacyStorage] ran and saved migration status');
+  debugPrint('[deleteLegacyStorage] ran and saved migration status');
 
   return true;
 }

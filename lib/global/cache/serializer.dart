@@ -50,13 +50,9 @@ class CacheSerializer implements StateSerializer<AppState> {
       // // backup the IV in case the app is force closed before caching finishes
       await saveIVKeyNext(CacheSecure.ivKey);
 
-      print(CacheSecure.ivKey);
-      print(CacheSecure.cryptKey);
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
-          Stopwatch stopwatchNew = new Stopwatch()..start();
-
           var jsonEncoded;
           var jsonEncrypted;
 
@@ -99,14 +95,9 @@ class CacheSerializer implements StateSerializer<AppState> {
               );
               break;
           }
-
-          final endTime = stopwatchNew.elapsed;
-          print(
-            '[Hive Serializer Encode] ${store.runtimeType.toString()} $endTime',
-          );
         } catch (error) {
           debugPrint(
-            '[Hive Serializer Encode] ${store.runtimeType.toString()} $error',
+            '[Cache Serializer Encode] $error',
           );
         }
       }));
@@ -140,9 +131,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       userStore,
     ];
 
-    print(
-      '[CacheSecure.decode] ${Cache.state} || ${Cache.stateRooms} && ${Cache.migration}',
-    );
     // TODO: remove after most have upgraded to 0.1.4/0.1.5
     if ((Cache.state != null || Cache.stateRooms != null) &&
         Cache.migration == null) {
@@ -192,14 +180,8 @@ class CacheSerializer implements StateSerializer<AppState> {
               iv: CacheSecure.ivKey,
             );
             decodedJson = json.decode(decryptedJson);
-
-            print(
-              '[Hive Serializer Decode] ${store.runtimeType.toString()} used CacheSecure.ivKey',
-            );
           } catch (error) {
-            print(
-              '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
-            );
+            debugPrint('[Cache Serializer Decode] $error');
             decodedJson = {};
           }
         }
@@ -213,14 +195,8 @@ class CacheSerializer implements StateSerializer<AppState> {
               iv: CacheSecure.ivKeyNext,
             );
             decodedJson = json.decode(decryptedJson);
-
-            print(
-              '[Hive Serializer Decode] ${store.runtimeType.toString()} used CacheSecure.ivKeyNext',
-            );
           } catch (error) {
-            print(
-              '[Hive Serializer Decode] ${store.runtimeType.toString()} ${error}',
-            );
+            debugPrint('[Cache Serializer Decode] $error');
             decodedJson = {};
           }
         }
@@ -254,13 +230,8 @@ class CacheSerializer implements StateSerializer<AppState> {
           default:
             break;
         }
-
-        // decode json after decrypted and set to store
-        print(
-          '[Hive Serializer Decode] ${store.runtimeType.toString()} success',
-        );
       } catch (error) {
-        debugPrint('[Hive Serializer Decode] $error');
+        debugPrint('[Cache Serializer Decode] $error');
       }
     });
 

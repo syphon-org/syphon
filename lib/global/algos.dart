@@ -3,14 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-/**
- * Clock functions in code
- * 
- * final stopwatch = Stopwatch()..start();
- * print('[fetchRooms] TIMESTAMP ${stopwatch.elapsed}');
- * stopwatch.stop();
- */
-
 List<int> fibonacci(int n) {
   if (n == 0) {
     return [0];
@@ -27,4 +19,20 @@ void printJson(Map jsonMap) {
   JsonEncoder encoder = new JsonEncoder.withIndent('  ');
   String prettyEvent = encoder.convert(jsonMap);
   debugPrint(prettyEvent, wrapWidth: 2048);
+}
+
+// time functions by wrapping them here - needs testing
+Future<void> timeWrapper(
+  Future<dynamic> Function() function, {
+  String name,
+}) async {
+  Stopwatch stopwatch = new Stopwatch()..start();
+
+  dynamic result = await function();
+
+  final stoptime = stopwatch.elapsed;
+
+  debugPrint('[$name TIMER] ${function.runtimeType} $stoptime');
+
+  return result;
 }

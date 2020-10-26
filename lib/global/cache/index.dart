@@ -162,10 +162,16 @@ Future<String> unlockIVKeyNext() async {
 Future<String> unlockCryptKey() async {
   final storageEngine = FlutterSecureStorage();
 
-  // Check if storage has been created before
-  var cryptKey = await storageEngine.read(
-    key: CacheSecure.cryptKeyLocation,
-  );
+  var cryptKey;
+
+  try {
+    // Check if crypt key already exists
+    cryptKey = await storageEngine.read(
+      key: CacheSecure.cryptKeyLocation,
+    );
+  } catch (error) {
+    debugPrint('[unlockCryptKey] ${error}');
+  }
 
   // Create a encryptionKey if a serialized one is not found
   if (cryptKey == null) {

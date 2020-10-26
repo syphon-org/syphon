@@ -307,15 +307,9 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
           switch (eventType) {
             case EventTypes.encrypted:
               try {
-                print('[syncDevice] olm payload before decryption');
-                printJson(event);
-
                 final eventDecrypted = await store.dispatch(
                   decryptKeyEvent(event: event),
                 );
-
-                print('[syncDevice] megolm payload after decryption received');
-                printJson(eventDecrypted);
 
                 if (EventTypes.roomKey == eventDecrypted['type']) {
                   return await store.dispatch(
