@@ -9,10 +9,12 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:crypt/crypt.dart';
+import 'package:crypto/crypto.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -260,20 +262,16 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
       }
 
       // hash it
-      final deviceIdHashed = Crypt.sha256(
-        deviceId,
-        rounds: 1000,
-        salt: salt,
-      );
+      final cryptHash = Crypt.sha256(deviceId, rounds: 1000, salt: salt).hash;
 
       // make it easier to read
-      final deviceIdFriendly = deviceIdHashed.hash
+      final deviceIdHash = cryptHash
           .toUpperCase()
           .replaceAll(RegExp(r'[^\w]'), '')
           .substring(0, 10);
 
       device = Device(
-        deviceId: deviceIdFriendly,
+        deviceId: deviceIdHash,
         deviceIdPrivate: deviceId,
         displayName: Values.appDisplayName,
       );
@@ -337,7 +335,7 @@ ThunkAction<AppState> loginUser() {
       }
 
       await store.dispatch(SetUser(
-        user: User.fromJson(data),
+        user: User.fromMatrix(data),
       ));
 
       store.state.authStore.authObserver.add(
@@ -612,7 +610,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         return completedAll;
       }
 
-      store.dispatch(SetUser(user: User.fromJson(data)));
+      store.dispatch(SetUser(user: User.fromMatrix(data)));
 
       store.state.authStore.authObserver.add(
         store.state.authStore.user,

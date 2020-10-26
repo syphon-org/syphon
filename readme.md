@@ -44,18 +44,18 @@ a privacy centric matrix client - now in open alpha*
 </p>
 <br>
 
-## why
+## 🤔 Why
 
 **Syphon aims to be built on the foundations of privacy, branding, and user experience** 
-<br>in an effort to pull others away from proprietary chat clients to the matrix protocol.
+<br>in an effort to pull others away from proprietary chat platforms to the matrix protocol.
 
-We need to decentralize the web, but also provide a means of freedom within that system. Matrix has the potential to be a standardized peer-to-peer chat protocol, [and in a way already is,](https://matrix.org/blog/2020/06/02/introducing-p-2-p-matrix) that will allow people to communicate and transfer their data at will. Email has been standardized this way for a long time, as you can always email someone regardless of their provider. Most popular proprietary chat clients do not adhere to a publically available protocol and have too much control over users data.
+Matrix has the potential to be a standardized peer-to-peer chat protocol, [and in a way already is,](https://matrix.org/blog/2020/06/02/introducing-p-2-p-matrix) that allows people to communicate and control their conversation data. Email has been standardized in this way for a long time. For example, someone using Outlook can still email someone using Gmail. Most popular proprietary chat platforms do not adhere to a federated or decentralized protocol, and as a result have too much control over users data.
 
-Additionally, if the goal for Matrix is adoption to make instant messaging communication go the way of email, a network effect is required for this paradigm shift. Syphon makes the bet that the best way to attract new users is through strong branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
+If the goal for Matrix is adoption, a network effect is required for this paradigm shift. Syphon makes the bet that the best way to attract new users is through strong branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
 
 Syphon will always be a not for profit, community driven application.
 
-## features
+## ✨ Features
 - no analytics. period.
 - no proprietary third party services
     - iOS will have APNS support, but will be made clear to the user
@@ -65,14 +65,14 @@ Syphon will always be a not for profit, community driven application.
 - all indicators of presence are opt-in only (typing indicators, read receipts, etc)
 - customize themes and colors throughout the app
 
-## goals
+## 🚀 Goals
 - [ ] desktop clients meet parity with mobile
 - [ ] screen lock and pin protected cache features
 - [ ] P2P messaging through a locally run server on the client
 - [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
 - [ ] cli client using ncurses and the same redux store contained here (common)
 
-## getting started
+## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
 ### environment
@@ -93,7 +93,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub get```
         - ```flutter pub run build_runner build```
 
-## building
+### configuration
 - ios and android should follow normal flutter building instructions
 - linux:
 
@@ -123,36 +123,38 @@ dependency_overrides:
 6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
 
 
+## 📐 Architecture
+
 ### store (current)
 - state (redux)
-- state cache (redux_persist + hive) 
-- cold storage (hive)
+- state cache (redux_persist + [hive](https://github.com/hivedb/hive)) 
+- cold storage ([hive](https://github.com/hivedb/hive))
 
 ### store (future)
 - state (redux)
-- state cache (redux_persist + json_serializable + sembast)
-- cold storage (sqlcipher)
+- state cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
+- cold storage ([sqlcipher](https://pub.dev/packages/sqflite_sqlcipher))
 
-### store references
-- [hive](https://github.com/hivedb/hive)
-- [sembast](https://pub.dev/packages/sembast)
-- [sqlcipher](https://pub.dev/packages/sqflite_sqlcipher) 
+### assets
+- Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.
+
+### integrations
+- Notifications
+  - utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
+  - no third party notification provider will ever be used outside Apples APNS for iOS only
+- Equatable
+  - This library allows comparisons of objects within Flutter to tell if they have changed.
+- JsonSerializable
+  - Unfortunately, Json is not integrated directly in Dart/Flutter for your own objects. Code generation is required, for now, and will convert Syphon's custom objects to a 'Map' of respective json fields
+- Freezed (future)
+  - Because every object in Syphon is immutable, freezed will help create objects doing the same thing all the 'copyWith' helper functions do today, with the improvement of allowing 'null' values to overwrite non-null values
+- Fastline Directory
+  - fastline is not used as tool, but is there to provide a schema of metadata to FDroid
+
+### references
 - [Redux vs. Bloc](https://github.com/ereio/state)
 - [Redux Tutorial](https://www.netguru.com/codestories/-implement-redux-with-flutter-app)
 - [Redux Examples](https://github.com/brianegan/flutter_architecture_samples/blob/master/firestore_redux/)
-
-### local notifications (android only)
-- utitlizes [android_alarm_manager](https://pub.dev/packages?q=background_alarm_manager) on Android to run the matrix /sync requests in a background thread and display notifications with [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
-- no third party notification provider will ever be used outside Apples APNS for iOS only
-
-### quirks
-- fastlane is not used, it's there for f-droid
-
-### assets
-- [paid icon](https://thenounproject.com/search/?q=polygon&i=2596282)
-- [iOS icons](https://github.com/smallmuou/ios-icon-generator)
-
-### generic references
 - [End-To-End Encryption implimentation guide from Matrix.org](https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide)
 - [iOS file management flutter](https://stackoverflow.com/questions/55220612/how-to-save-a-text-file-in-external-storage-in-ios-using-flutter)
 - [scrolling With Text Inputs](https://github.com/flutter/flutter/issues/13339)
@@ -160,6 +162,7 @@ dependency_overrides:
 - [keyboard dismissal](https://stackoverflow.com/questions/55863766/how-to-prevent-keyboard-from-dismissing-on-pressing-submit-key-in-flutter)
 - [changing transition styles](https://stackoverflow.com/questions/50196913/how-to-change-navigation-animation-using-flutter)
 - [animations](https://flutter.dev/docs/development/ui/animations)
+- [serialize Uint8List bytes](https://stackoverflow.com/questions/63716036/how-to-serialize-uint8list-to-json-with-json-annotation-in-dart)
 - adding a border without needing ctrl-p
 ```dart
 decoration: BoxDecoration(
@@ -169,7 +172,7 @@ decoration: BoxDecoration(
 - understanding why olm chose the world 'pickle' for serialization, [its from python](https://gitlab.matrix.org/matrix-org/olm/-/tree/master/python)
 
 
-## contributing
+## 📝 contributing
 - email contact@syphon.org if you'd like to get involved. there's a lot to do.
 - donations are welcome, but not required. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 

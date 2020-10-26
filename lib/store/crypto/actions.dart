@@ -315,7 +315,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // cache current device key for authed user
-      final deviceKeysOwned = DeviceKey.fromJson(
+      final deviceKeysOwned = DeviceKey.fromMatrix(
         deviceKeysPayload['device_keys'],
       );
 
@@ -338,7 +338,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
   return (Store<AppState> store) async {
     try {
       final deviceKeyMap = {
-        'device_keys': deviceKey.toMap(),
+        'device_keys': deviceKey.toMatrix(),
       };
 
       // upload the public device keys
@@ -1030,7 +1030,7 @@ ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          final deviceKey = DeviceKey.fromJson(device);
+          final deviceKey = DeviceKey.fromMatrix(device);
 
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
@@ -1081,7 +1081,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 
       var exportData = {
         'account_key': store.state.cryptoStore.olmAccountKey,
-        'device_keys': deviceKey.toMap(),
+        'device_keys': deviceKey.toMatrix(),
       };
 
       file = await file.writeAsString(json.encode(exportData));
@@ -1114,7 +1114,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       store.dispatch(
         SetDeviceKeysOwned(
           deviceKeysOwned: {
-            authUser.deviceId: DeviceKey.fromJson(
+            authUser.deviceId: DeviceKey.fromMatrix(
               importData['device_keys'],
             ),
           },

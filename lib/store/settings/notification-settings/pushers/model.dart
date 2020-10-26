@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -8,6 +9,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: PusherHiveId)
+@JsonSerializable()
 class Pusher extends Equatable {
   @HiveField(0)
   final String key;
@@ -18,7 +20,12 @@ class Pusher extends Equatable {
   @HiveField(3)
   final String appDisplayName;
 
-  const Pusher({this.key, this.kind, this.appId, this.appDisplayName});
+  const Pusher({
+    this.key,
+    this.kind,
+    this.appId,
+    this.appDisplayName,
+  });
 
   @override
   List<Object> get props => [
@@ -33,16 +40,15 @@ class Pusher extends Equatable {
     kind,
     appId,
     appDisplayName,
-  }) {
-    return Pusher(
-      key: key ?? this.key,
-      kind: kind ?? this.kind,
-      appId: appId ?? this.appId,
-      appDisplayName: appDisplayName ?? this.appDisplayName,
-    );
-  }
+  }) =>
+      Pusher(
+        key: key ?? this.key,
+        kind: kind ?? this.kind,
+        appId: appId ?? this.appId,
+        appDisplayName: appDisplayName ?? this.appDisplayName,
+      );
 
-  factory Pusher.fromJson(dynamic json) {
+  factory Pusher.fromMatrix(dynamic json) {
     try {
       return Pusher(
         key: json['pushkey'],
@@ -56,4 +62,8 @@ class Pusher extends Equatable {
       );
     }
   }
+
+  Map<String, dynamic> toJson() => _$PusherToJson(this);
+
+  factory Pusher.fromJson(Map<String, dynamic> json) => _$PusherFromJson(json);
 }

@@ -74,14 +74,18 @@ dependencies:
 
   # Encryption
   crypt: 3.0.1
-  # steel_crypt: 1.7.1
+  crypto: ^2.1.5
+  steel_crypt: ^2.2.2+1
   # cryptography: 1.2.1
 
   # Cache
   hive: 1.4.4
   hive_flutter: 0.3.1
   flutter_secure_storage: 3.3.3
-  json_serializable: 3.3.0
+  json_annotation: ^3.1.0
+  checked_yaml: 1.0.2
+  # isolate_handler: 0.3.1
+  # flutter_isolate: 1.0.0+14
 
   # Services
   http: ^0.12.0+2
@@ -113,6 +117,7 @@ dependencies:
   palette_generator: 0.2.3
 
 dev_dependencies:
+  json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
   hive_generator: 0.8.1

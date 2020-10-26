@@ -4,6 +4,7 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -21,8 +22,8 @@ class RoomPresets {
   static const public = 'public_chat';
 }
 
-// Next Hive Field 30
 @HiveType(typeId: RoomHiveId)
+@JsonSerializable()
 class Room {
   @HiveField(0)
   final String id;
@@ -84,7 +85,9 @@ class Room {
   final List<Message> outbox;
 
   // Not cached
+  @JsonKey(ignore: true)
   final bool userTyping;
+  @JsonKey(ignore: true)
   final List<String> usersTyping;
 
   @HiveField(23)
@@ -99,8 +102,10 @@ class Room {
   @HiveField(27)
   final bool invite;
 
+  @JsonKey(ignore: true)
   final bool limited;
 
+  @JsonKey(ignore: true)
   String get type {
     if (joinRule == 'public' || worldReadable) {
       return 'public';
@@ -217,7 +222,9 @@ class Room {
     );
   }
 
-  factory Room.fromJson(Map<String, dynamic> json) {
+  Map<String, dynamic> toJson() => _$RoomToJson(this);
+  factory Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);
+  factory Room.fromMatrix(Map<String, dynamic> json) {
     try {
       return Room(
         id: json['room_id'],
@@ -256,14 +263,14 @@ class Room {
       final List<dynamic> stateEventsRaw = json['state']['events'];
 
       stateEvents =
-          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['invite_state'] != null) {
       final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
       stateEvents =
-          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
     }
 
@@ -281,7 +288,7 @@ class Room {
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
       final List<Event> timelineEvents = List.from(
-        timelineEventsRaw.map((event) => Event.fromJson(event)),
+        timelineEventsRaw.map((event) => Event.fromMatrix(event)),
       );
 
       // TODO: make this more functional, need to split into two lists on type
@@ -301,14 +308,14 @@ class Room {
       final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
       ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromJson(event)).toList();
+          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['account_data'] != null) {
       final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
       accountEvents =
-          accountEventsRaw.map((event) => Event.fromJson(event)).toList();
+          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     return this
@@ -573,7 +580,7 @@ class Room {
       // Filter to find startTime and endTime
       final messagesAll = List<Message>.from(messagesMap.values);
 
-      // TODO: remove after 0.1.4 - message catchup works
+      // TODO: remove after 0.1.5 :( - message catchup works
       if (true) {
         // print('[fromMessageEvents] ${this.name}');
         // print('[limited] ${limited}');

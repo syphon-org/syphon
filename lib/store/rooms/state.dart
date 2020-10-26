@@ -4,6 +4,7 @@ import 'dart:async';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -12,7 +13,9 @@ import './room/model.dart';
 part 'state.g.dart';
 
 @HiveType(typeId: RoomStoreHiveId)
+@JsonSerializable()
 class RoomStore extends Equatable {
+  @JsonKey(ignore: true)
   final bool loading;
 
   @HiveField(0)
@@ -28,10 +31,12 @@ class RoomStore extends Equatable {
   @HiveField(5)
   final Map<String, Room> rooms;
 
-  // TODO: actually archive
-  final Map<String, Room> archive;
+  @JsonKey(ignore: true)
+  final Map<String, Room> archive; // TODO: actually archive
+  @JsonKey(ignore: true)
   final List<String> roomsHidden;
 
+  @JsonKey(ignore: true)
   final Timer roomObserver;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
@@ -68,16 +73,19 @@ class RoomStore extends Equatable {
     lastSince,
     roomObserver,
     roomsHidden,
-  }) {
-    return RoomStore(
-      rooms: rooms ?? this.rooms,
-      synced: synced ?? this.synced,
-      archive: archive ?? this.archive,
-      loading: loading ?? this.loading,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
-      lastSince: lastSince ?? this.lastSince,
-      roomObserver: roomObserver ?? this.roomObserver,
-      roomsHidden: roomsHidden ?? this.roomsHidden,
-    );
-  }
+  }) =>
+      RoomStore(
+        rooms: rooms ?? this.rooms,
+        synced: synced ?? this.synced,
+        archive: archive ?? this.archive,
+        loading: loading ?? this.loading,
+        lastUpdate: lastUpdate ?? this.lastUpdate,
+        lastSince: lastSince ?? this.lastSince,
+        roomObserver: roomObserver ?? this.roomObserver,
+        roomsHidden: roomsHidden ?? this.roomsHidden,
+      );
+
+  Map<String, dynamic> toJson() => _$RoomStoreToJson(this);
+  factory RoomStore.fromJson(Map<String, dynamic> json) =>
+      _$RoomStoreFromJson(json);
 }

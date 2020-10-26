@@ -1,6 +1,3 @@
-// Dart imports:
-import 'dart:typed_data';
-
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +7,15 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/media/reducer.dart';
+import 'package:syphon/global/cache/serializer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
@@ -29,16 +27,10 @@ import './auth/state.dart';
 import './media/state.dart';
 import './rooms/reducer.dart';
 import './rooms/state.dart';
-import 'search/state.dart';
+import './search/state.dart';
 import './search/reducer.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
-
-// Temporary State Store
-
-// Persisted State Stores
-
-// Reducers for Stores
 
 class AppState extends Equatable {
   final bool loading;
@@ -80,20 +72,18 @@ class AppState extends Equatable {
       ];
 }
 
-AppState appReducer(AppState state, action) {
-  return AppState(
-    loading: state.loading,
-    authStore: authReducer(state.authStore, action),
-    alertsStore: alertsReducer(state.alertsStore, action),
-    mediaStore: mediaReducer(state.mediaStore, action),
-    roomStore: roomReducer(state.roomStore, action),
-    syncStore: syncReducer(state.syncStore, action),
-    userStore: userReducer(state.userStore, action),
-    searchStore: searchReducer(state.searchStore, action),
-    settingsStore: settingsReducer(state.settingsStore, action),
-    cryptoStore: cryptoReducer(state.cryptoStore, action),
-  );
-}
+AppState appReducer(AppState state, action) => AppState(
+      loading: state.loading,
+      authStore: authReducer(state.authStore, action),
+      alertsStore: alertsReducer(state.alertsStore, action),
+      mediaStore: mediaReducer(state.mediaStore, action),
+      roomStore: roomReducer(state.roomStore, action),
+      syncStore: syncReducer(state.syncStore, action),
+      userStore: userReducer(state.userStore, action),
+      searchStore: searchReducer(state.searchStore, action),
+      settingsStore: settingsReducer(state.settingsStore, action),
+      cryptoStore: cryptoReducer(state.cryptoStore, action),
+    );
 
 /**
  * Initialize Store
@@ -106,10 +96,11 @@ AppState appReducer(AppState state, action) {
  * the Hive Serializer has been impliemented
  */
 Future<Store> initStore() async {
+  // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: MemoryStorage(),
-    serializer: HiveSerializer(),
-    throttleDuration: Duration(seconds: 6),
+    serializer: CacheSerializer(),
+    throttleDuration: Duration(milliseconds: 2500),
     shouldSave: (Store<AppState> store, dynamic action) {
       switch (action.runtimeType) {
         case SetSyncing:
@@ -123,6 +114,11 @@ Future<Store> initStore() async {
     },
   );
 
+  // Configure cache encryption/decryption instance
+  CacheSecure.ivKey = await unlockIVKey();
+  CacheSecure.ivKeyNext = await unlockIVKeyNext();
+  CacheSecure.cryptKey = await unlockCryptKey();
+
   // Finally load persisted store
   var initialState;
 
@@ -130,7 +126,7 @@ Future<Store> initStore() async {
     initialState = await persistor.load();
     // debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
-    debugPrint('[Redux Persist] error $error');
+    debugPrint('[Redux Persist] $error');
   }
 
   final Store<AppState> store = Store<AppState>(
@@ -140,144 +136,4 @@ Future<Store> initStore() async {
   );
 
   return Future.value(store);
-}
-
-/**
- * Hive Serializer
- * 
- * Only reliance on redux is when too save state
- */
-class HiveSerializer implements StateSerializer<AppState> {
-  @override
-  Uint8List encode(AppState state) {
-    // Fail whole conversion if user fails
-    Cache.state.put(
-      state.authStore.runtimeType.toString(),
-      state.authStore,
-    );
-
-    try {
-      Cache.state.put(
-        state.syncStore.runtimeType.toString(),
-        state.syncStore,
-      );
-      // debugPrint('[Hive Storage] caching syncStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.stateRooms.put(
-        state.roomStore.runtimeType.toString(),
-        state.roomStore,
-      );
-      // debugPrint('[Hive Storage] caching roomStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.state.put(
-        state.mediaStore.runtimeType.toString(),
-        state.mediaStore,
-      );
-      // debugPrint('[Hive Storage] caching mediaStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.state.put(
-        state.settingsStore.runtimeType.toString(),
-        state.settingsStore,
-      );
-      // debugPrint('[Hive Storage] caching settingsStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      Cache.state.put(
-        state.cryptoStore.runtimeType.toString(),
-        state.cryptoStore,
-      );
-      // debugPrint('[Hive Storage] caching cryptoStore');
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    // Disregard redux persist storage saving
-    return null;
-  }
-
-  AppState decode(Uint8List data) {
-    AuthStore authStoreConverted = AuthStore();
-    SyncStore syncStoreConverted = SyncStore();
-    CryptoStore cryptoStoreConverted = CryptoStore();
-    MediaStore mediaStoreConverted = MediaStore();
-    RoomStore roomStoreConverted = RoomStore();
-    SettingsStore settingsStoreConverted = SettingsStore();
-    UserStore userStore = UserStore();
-
-    authStoreConverted = Cache.state.get(
-      authStoreConverted.runtimeType.toString(),
-      defaultValue: AuthStore(),
-    );
-
-    try {
-      syncStoreConverted = Cache.state.get(
-        syncStoreConverted.runtimeType.toString(),
-        defaultValue: SyncStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      cryptoStoreConverted = Cache.state.get(
-        cryptoStoreConverted.runtimeType.toString(),
-        defaultValue: CryptoStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      roomStoreConverted = Cache.stateRooms.get(
-        roomStoreConverted.runtimeType.toString(),
-        defaultValue: RoomStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      mediaStoreConverted = Cache.state.get(
-        mediaStoreConverted.runtimeType.toString(),
-        defaultValue: MediaStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    try {
-      settingsStoreConverted = Cache.state.get(
-        settingsStoreConverted.runtimeType.toString(),
-        defaultValue: SettingsStore(),
-      );
-    } catch (error) {
-      debugPrint('[Hive Storage] $error');
-    }
-
-    return AppState(
-      loading: false,
-      authStore: authStoreConverted,
-      syncStore: syncStoreConverted,
-      cryptoStore: cryptoStoreConverted,
-      roomStore: roomStoreConverted,
-      userStore: userStore, // not cached
-      mediaStore: mediaStoreConverted,
-      settingsStore: settingsStoreConverted,
-    );
-  }
 }

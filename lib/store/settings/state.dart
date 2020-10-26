@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import "package:syphon/global/themes.dart";
@@ -14,6 +15,7 @@ part 'state.g.dart';
 
 // Next Field ID: 21
 @HiveType(typeId: SettingsStoreHiveId)
+@JsonSerializable()
 class SettingsStore extends Equatable {
   @HiveField(0)
   final int primaryColor;
@@ -54,6 +56,7 @@ class SettingsStore extends Equatable {
 
   @HiveField(12)
   final List<Device> devices;
+
   // Map<roomId, ChatSetting>
   @HiveField(11)
   final Map<String, ChatSetting> customChatSettings;
@@ -64,9 +67,10 @@ class SettingsStore extends Equatable {
   @HiveField(14)
   final String alphaAgreement; // a timestamp of agreement for alpha TOS
 
+  @JsonKey(ignore: true) // temp
   final String pusherToken; // NOTE: can be device token for APNS
 
-  // Temporary
+  @JsonKey(ignore: true) // temp
   final bool loading;
 
   const SettingsStore({
@@ -174,4 +178,9 @@ class SettingsStore extends Equatable {
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
       );
+
+  Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
+
+  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
+      _$SettingsStoreFromJson(json);
 }

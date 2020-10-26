@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -9,6 +10,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: DeviceKeyHiveId)
+@JsonSerializable()
 class DeviceKey extends Equatable {
   @HiveField(0)
   final String userId;
@@ -48,7 +50,20 @@ class DeviceKey extends Equatable {
         privateKeys,
       ];
 
-  factory DeviceKey.fromJson(dynamic json) {
+  Map<String, dynamic> toMatrix() {
+    return {
+      'algorithms': [
+        Algorithms.olmv1,
+        Algorithms.megolmv1,
+      ],
+      'device_id': deviceId,
+      'keys': keys,
+      'signatures': signatures,
+      'user_id': userId,
+    };
+  }
+
+  factory DeviceKey.fromMatrix(dynamic json) {
     try {
       return DeviceKey(
         userId: json['user_id'],
@@ -63,28 +78,7 @@ class DeviceKey extends Equatable {
     }
   }
 
-  toMap() {
-    return {
-      'algorithms': [
-        Algorithms.olmv1,
-        Algorithms.megolmv1,
-      ],
-      'device_id': deviceId,
-      'keys': keys,
-      'signatures': signatures,
-      'user_id': userId,
-    };
-  }
-
-  @override
-  String toString() {
-    return '{' +
-        'user_id: $userId,' +
-        'device_id: $deviceId,' +
-        'algorithms: $algorithms,' +
-        'keys: $keys,' +
-        'signatures: $signatures,' +
-        'extras: $extras,' +
-        '}\n';
-  }
+  Map<String, dynamic> toJson() => _$DeviceKeyToJson(this);
+  factory DeviceKey.fromJson(Map<String, dynamic> json) =>
+      _$DeviceKeyFromJson(json);
 }
