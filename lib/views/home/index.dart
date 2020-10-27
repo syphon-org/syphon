@@ -302,7 +302,6 @@ class HomeViewState extends State<Home> {
         } else if (roomColorDefaults.containsKey(room.id)) {
           primaryColor = roomColorDefaults[room.id];
         } else {
-          debugPrint('[ListView.builder] generating new color');
           primaryColor = Colours.hashedColor(room.id);
           roomColorDefaults.putIfAbsent(
             room.id,
@@ -310,6 +309,7 @@ class HomeViewState extends State<Home> {
           );
         }
 
+        // highlight selected rooms if necessary
         if (selectedRoom != null) {
           if (selectedRoom.id != room.id) {
             backgroundColor = Theme.of(context).scaffoldBackgroundColor;

@@ -58,12 +58,12 @@ class CacheSerializer implements StateSerializer<AppState> {
 
           // encode the store contents to json
           // HACK: unable to pass both listed stores direct to an isolate
-          final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
-          if (!sensitiveStorage.contains(store.runtimeType)) {
-            jsonEncoded = await compute(jsonEncode, store);
-          } else {
-            jsonEncoded = json.encode(store);
-          }
+          // final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
+          // if (!sensitiveStorage.contains(store.runtimeType)) {
+          //   jsonEncoded = await compute(jsonEncode, store);
+          // } else {
+          jsonEncoded = json.encode(store);
+          // }
 
           // encrypt the store contents previously converted to json
           jsonEncrypted = await compute(encryptJsonBackground, {

@@ -17,7 +17,6 @@ class CacheSecure {
   static Box cacheMain;
   static Box cacheRooms;
   static Box cacheCrypto;
-  static Box cacheBackground;
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
@@ -31,13 +30,12 @@ class CacheSecure {
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
-  static const roomNames = 'room_names';
-  static const syncData = 'sync_data';
-  static const protocol = 'protocol';
-  static const homeserver = 'homeserver';
+  static const roomNamesKey = 'roomNamesKey';
+  static const protocolKey = 'protocol';
+  static const homeserverKey = 'homeserver';
   static const accessTokenKey = 'accessToken';
   static const lastSinceKey = 'lastSince';
-  static const currentUser = 'currentUser';
+  static const userIdKey = 'userId';
 }
 
 Future<void> initCache() async {
@@ -50,43 +48,6 @@ Future<void> initCache() async {
   CacheSecure.cacheMain = await unlockMainCache();
   CacheSecure.cacheRooms = await unlockRoomCache();
   CacheSecure.cacheCrypto = await unlockCryptoCache();
-  CacheSecure.cacheBackground = await unlockBackgroundCache();
-}
-
-Future<Box> initCacheBackground() async {
-  try {
-    // Init storage location
-    final storageLocation = await getApplicationDocumentsDirectory();
-
-    // Init hive cache + adapters
-    Hive.init(storageLocation.path);
-
-    return await Hive.openBox(CacheSecure.cacheKeyBackground);
-  } catch (error) {
-    debugPrint('[initCacheBackground] $error');
-    return null;
-  }
-}
-
-// // Closes and saves storage
-void closeCache() async {
-  if (CacheSecure.cacheMain != null && CacheSecure.cacheMain.isOpen) {
-    CacheSecure.cacheMain.close();
-  }
-
-  if (CacheSecure.cacheRooms != null && CacheSecure.cacheRooms.isOpen) {
-    CacheSecure.cacheRooms.close();
-  }
-
-  if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
-    CacheSecure.cacheCrypto.close();
-  }
-
-  // shouldn't be open on main thread
-  if (CacheSecure.cacheBackground != null &&
-      CacheSecure.cacheBackground.isOpen) {
-    CacheSecure.cacheBackground.close();
-  }
 }
 
 Future<dynamic> initStorageLocation() async {
@@ -119,6 +80,21 @@ Future<dynamic> initStorageLocation() async {
   } catch (error) {
     debugPrint('[initStorageLocation] $error');
     return null;
+  }
+}
+
+// // Closes and saves storage
+void closeCache() async {
+  if (CacheSecure.cacheMain != null && CacheSecure.cacheMain.isOpen) {
+    CacheSecure.cacheMain.close();
+  }
+
+  if (CacheSecure.cacheRooms != null && CacheSecure.cacheRooms.isOpen) {
+    CacheSecure.cacheRooms.close();
+  }
+
+  if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
+    CacheSecure.cacheCrypto.close();
   }
 }
 
@@ -198,7 +174,7 @@ Future<Box> unlockMainCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyMain,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
     debugPrint('[Unlock Main CacheSecure] $error');
@@ -211,7 +187,7 @@ Future<Box> unlockRoomCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyRooms,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
     debugPrint('[Unlock Room CacheSecure] $error');
@@ -224,20 +200,7 @@ Future<Box> unlockCryptoCache() async {
     return await Hive.openBox(
       CacheSecure.cacheKeyCrypto,
       crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
-    );
-  } catch (error) {
-    debugPrint('[Unlock Crypto CacheSecure] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockBackgroundCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyBackground,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 3,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
     debugPrint('[Unlock Crypto CacheSecure] $error');

@@ -416,6 +416,9 @@ ThunkAction<AppState> toggleNotifications() {
     )) {
       store.dispatch(ToggleNotifications());
       final enabled = store.state.settingsStore.notificationsEnabled;
+      final Map<String, String> roomNames = store.state.roomStore.rooms.map(
+        (roomId, room) => MapEntry(roomId, room.name),
+      );
       if (enabled) {
         await BackgroundSync.init();
         BackgroundSync.start(
@@ -424,6 +427,7 @@ ThunkAction<AppState> toggleNotifications() {
           accessToken: store.state.authStore.user.accessToken,
           lastSince: store.state.syncStore.lastSince,
           currentUser: store.state.authStore.user.userId,
+          roomNames: roomNames,
         );
 
         showBackgroundServiceNotification(
