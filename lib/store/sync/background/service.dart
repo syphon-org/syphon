@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -8,10 +9,9 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/global/cache/index.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/index.dart';
 
 // Dart imports:
 import 'dart:math';
@@ -19,13 +19,14 @@ import 'dart:math';
 // Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+
+final protocol = DotEnv().env['PROTOCOL'];
 
 /**
  * Background Sync Service (Android Only)
@@ -52,16 +53,34 @@ class BackgroundSync {
     // android only background sync
     if (!Platform.isAndroid) return;
 
-    final box = await openHiveBackgroundUnsafe();
+    final secureStorage = FlutterSecureStorage();
 
-    await box.put(CacheSecure.protocol, protocol);
-    await box.put(CacheSecure.homeserver, homeserver);
-    await box.put(CacheSecure.accessTokenKey, accessToken);
-    await box.put(CacheSecure.lastSinceKey, lastSince);
-    await box.put(CacheSecure.currentUser, currentUser);
-    await box.put(CacheSecure.roomNames, roomNames);
-
-    await box.close();
+    await Future.wait([
+      secureStorage.write(
+        key: CacheSecure.protocolKey,
+        value: protocol,
+      ),
+      secureStorage.write(
+        key: CacheSecure.homeserverKey,
+        value: homeserver,
+      ),
+      secureStorage.write(
+        key: CacheSecure.accessTokenKey,
+        value: accessToken,
+      ),
+      secureStorage.write(
+        key: CacheSecure.lastSinceKey,
+        value: lastSince,
+      ),
+      secureStorage.write(
+        key: CacheSecure.userIdKey,
+        value: currentUser,
+      ),
+      secureStorage.write(
+        key: CacheSecure.roomNamesKey,
+        value: jsonEncode(roomNames),
+      )
+    ]);
 
     await AndroidAlarmManager.periodic(
       Duration(seconds: serviceTimeout),
@@ -77,14 +96,8 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      debugPrint('[BackgroundSync] Failed To Stop $error');
+      debugPrint('[BackgroundSync] $error');
     }
-  }
-
-  static void updateRooms({Map<String, String> roomNames}) async {
-    final box = await openHiveBackgroundUnsafe();
-    await box.put(CacheSecure.roomNames, roomNames);
-    await box.close();
   }
 }
 
@@ -98,17 +111,30 @@ class BackgroundSync {
  */
 void notificationSyncIsolate() async {
   try {
-    // Init storage location
-    var storageLocation;
-    try {
-      storageLocation = await getApplicationDocumentsDirectory();
-    } catch (error) {
-      print('[notificationSyncIsolate] storage location failure - $error');
-    }
+    String protocol;
+    String homeserver;
+    String accessToken;
+    String lastSince;
+    String userId;
+    Map<String, dynamic> roomNames;
 
-    // Init hive cache + adapters
-    Hive.init(storageLocation.path);
-    Box backgroundCache = await Hive.openBox(CacheSecure.cacheKeyBackground);
+    try {
+      final secureStorage = FlutterSecureStorage();
+
+      protocol = await secureStorage.read(key: CacheSecure.protocolKey);
+      homeserver = await secureStorage.read(key: CacheSecure.homeserverKey);
+      accessToken = await secureStorage.read(key: CacheSecure.accessTokenKey);
+      lastSince = await secureStorage.read(key: CacheSecure.lastSinceKey);
+      userId = await secureStorage.read(key: CacheSecure.userIdKey);
+
+      roomNames = jsonDecode(
+        await secureStorage.read(key: CacheSecure.roomNamesKey),
+      );
+
+      // Init hive cache + adapters
+    } catch (error) {
+      print('[notificationSyncIsolate] $error');
+    }
 
     // Init notifiations for background service and new messages/events
     FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
@@ -122,17 +148,25 @@ void notificationSyncIsolate() async {
       Duration(seconds: BackgroundSync.serviceTimeout),
     );
 
+    print('[notificationSyncIsolate] enabled background sync');
+
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
-      print('[notificationSyncIsolate] syncing');
+
       await syncLoop(
-        cache: backgroundCache,
         pluginInstance: pluginInstance,
+        params: {
+          'protocol': protocol,
+          'homeserver': homeserver,
+          'accessToken': accessToken,
+          'lastSince': lastSince,
+          'userId': userId,
+          'roomNames': roomNames,
+        },
       );
-      print('[notificationSyncIsolate] sync completed - waiting');
     }
   } catch (error) {
-    print('[notificationSyncIsolate] init failed $error');
+    print('[notificationSyncIsolate] $error');
   }
 }
 
@@ -142,31 +176,32 @@ void notificationSyncIsolate() async {
 FutureOr<dynamic> syncLoop({
   Box cache,
   FlutterLocalNotificationsPlugin pluginInstance,
+  Map params,
 }) async {
   try {
-    // Check isolate id and maybe see if a new one is created
-    final String protocol = cache.get(
-      CacheSecure.protocol,
-    );
-
-    final String homeserver = cache.get(
-      CacheSecure.homeserver,
-    );
-
-    final String accessToken = cache.get(
-      CacheSecure.accessTokenKey,
-    );
-
-    final String lastSince = cache.get(
-      CacheSecure.lastSinceKey,
-    );
-
-    final String currentUser = cache.get(
-      CacheSecure.currentUser,
-    );
+    final protocol = params['protocol'];
+    final homeserver = params['homeserver'];
+    final accessToken = params['accessToken'];
+    final lastSince = params['lastSince'];
+    final userId = params['userId'] ?? params['currentUser'];
+    final Map<String, dynamic> roomNames = params['roomNames'];
 
     if (accessToken == null || lastSince == null) {
       return;
+    }
+
+    var lastSinceNew;
+
+    // Try to pull new lastSince if available
+    try {
+      final secureStorage = FlutterSecureStorage();
+
+      lastSinceNew = await secureStorage.read(
+        key: CacheSecure.lastSinceKey,
+      );
+      // Init hive cache + adapters
+    } catch (error) {
+      print('[syncLoop] $error');
     }
 
     /**
@@ -178,53 +213,62 @@ FutureOr<dynamic> syncLoop({
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
-      since: lastSince,
+      since: lastSinceNew ?? lastSince,
       timeout: 10000,
     );
 
-    final lastSinceNew = data['next_batch'];
+    // Parse sync response
+    lastSinceNew = data['next_batch'];
     final Map<String, dynamic> rawRooms = data['rooms']['join'];
 
+    // Save new 'since' value for the next sync
     try {
-      await cache.put(CacheSecure.lastSinceKey, lastSinceNew);
+      final secureStorage = FlutterSecureStorage();
 
-      rawRooms.forEach((roomId, json) {
-        // Filter through parsers
-        final room = Room().fromSync(json: json, lastSince: lastSinceNew);
+      await secureStorage.write(
+        key: CacheSecure.lastSinceKey,
+        value: lastSinceNew,
+      );
+      // Init hive cache + adapters
+    } catch (error) {
+      print('[syncLoop] $error');
+    }
 
-        if (room.messages.length == 1) {
-          final String messageSender = room.messages[0].sender;
-          final formattedSender = trimAlias(messageSender);
+    // Filter each room through the parser
+    rawRooms.forEach((roomId, json) {
+      final room = Room().fromSync(json: json, lastSince: lastSinceNew);
 
-          if (!formattedSender.contains(currentUser)) {
-            if (room.direct) {
-              return showMessageNotification(
-                messageHash: Random.secure().nextInt(20000),
-                body: '$formattedSender sent a new message.',
-                pluginInstance: pluginInstance,
-              );
-            }
+      if (room.messages.length == 1) {
+        final String messageSender = room.messages[0].sender;
+        final String formattedSender = trimAlias(messageSender);
 
-            if (room.invite) {
-              return showMessageNotification(
-                messageHash: Random.secure().nextInt(20000),
-                body: '$formattedSender invited you to chat',
-                pluginInstance: pluginInstance,
-              );
-            }
-
+        if (!formattedSender.contains(userId)) {
+          if (room.direct) {
             return showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
-              body: '$formattedSender sent a new message',
+              body: '$formattedSender sent a new message.',
               pluginInstance: pluginInstance,
             );
           }
+
+          if (room.invite) {
+            return showMessageNotification(
+              messageHash: Random.secure().nextInt(20000),
+              body: '$formattedSender invited you to chat',
+              pluginInstance: pluginInstance,
+            );
+          }
+
+          final roomName = roomNames[roomId];
+          return showMessageNotification(
+            messageHash: Random.secure().nextInt(20000),
+            body: '$formattedSender sent a new message in $roomName',
+            pluginInstance: pluginInstance,
+          );
         }
-      });
-    } catch (error) {
-      print('[notificationSyncIsolate] to cache new lastSince');
-    }
+      }
+    });
   } catch (error) {
-    print('[notificationSyncIsolate] sync failed $error');
+    print('[syncLoop] $error');
   }
 }

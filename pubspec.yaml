@@ -81,6 +81,7 @@ dependencies:
   # Cache
   hive: 1.4.4
   hive_flutter: 0.3.1
+  sembast: 2.4.7+7
   flutter_secure_storage: 3.3.3
   json_annotation: ^3.1.0
   checked_yaml: 1.0.2
@@ -94,7 +95,7 @@ dependencies:
   http_parser: 3.1.4
   easy_localization: 2.3.3
   flutter_dotenv: 2.1.0
-  android_alarm_manager: 0.4.5+11
+  android_alarm_manager: 0.4.5+15
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS

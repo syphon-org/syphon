@@ -87,7 +87,7 @@ ThunkAction<AppState> startSyncObserver() {
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
-          debugPrint('[Sync Observer] skipping sync, needs full sync');
+          debugPrint('[startSyncObserver] skipping sync, needs full sync');
           return;
         }
 
@@ -104,7 +104,7 @@ ThunkAction<AppState> startSyncObserver() {
               );
 
           debugPrint(
-            '[Sync Observer] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
+            '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
           );
 
           if (backoffLimit == 1) {
@@ -118,11 +118,11 @@ ThunkAction<AppState> startSyncObserver() {
         }
 
         if (store.state.syncStore.syncing) {
-          debugPrint('[Sync Observer] still syncing');
+          debugPrint('[startSyncObserver] still syncing');
           return;
         }
 
-        debugPrint('[Sync Observer] running sync');
+        debugPrint('[startSyncObserver] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
