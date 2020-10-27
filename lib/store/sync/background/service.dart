@@ -39,7 +39,11 @@ class BackgroundSync {
   static Isolate backgroundIsolate;
 
   static Future<bool> init() async {
-    return await AndroidAlarmManager.initialize();
+    try {
+      return await AndroidAlarmManager.initialize();
+    } catch (error) {
+      debugPrint('[BackgroundSync.init] ${error}');
+    }
   }
 
   static void start({
