@@ -81,10 +81,10 @@ dependencies:
   # Cache
   hive: 1.4.4
   hive_flutter: 0.3.1
-  sembast: 2.4.7+7
   flutter_secure_storage: 3.3.3
   json_annotation: ^3.1.0
   checked_yaml: 1.0.2
+  # sembast: 2.4.7+7
   # isolate_handler: 0.3.1
   # flutter_isolate: 1.0.0+14
 
