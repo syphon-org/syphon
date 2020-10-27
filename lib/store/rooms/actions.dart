@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
@@ -391,7 +392,7 @@ ThunkAction<AppState> createRoom({
   String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
-    var room;
+    Room room;
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
@@ -414,9 +415,19 @@ ThunkAction<AppState> createRoom({
         throw data['error'];
       }
 
-      room = Room(
-        id: data['room_id'],
+      // Create a room object with a new room id
+      room = Room(id: data['room_id']);
+
+      // Add invites to the user list beforehand
+      final userInviteMap = Map<String, User>.fromIterable(
+        invites,
+        key: (user) => user.userId,
+        value: (user) => user,
       );
+
+      room = room.copyWith(users: userInviteMap);
+
+      printJson(userInviteMap);
 
       if (avatarFile != null) {
         await store.dispatch(
@@ -439,6 +450,8 @@ ThunkAction<AppState> createRoom({
       if (encryption || isDirect) {
         await store.dispatch(toggleRoomEncryption(room: room));
       }
+
+      await store.dispatch(SetRoom(room: room));
 
       return room.id;
     } catch (error) {

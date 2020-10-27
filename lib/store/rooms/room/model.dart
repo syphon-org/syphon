@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -187,40 +188,39 @@ class Room {
     prevHash,
     nextHash,
     // state,
-  }) {
-    return Room(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      alias: alias ?? this.alias,
-      topic: topic ?? this.topic,
-      joinRule: joinRule ?? this.joinRule,
-      avatarUri: avatarUri ?? this.avatarUri,
-      homeserver: homeserver ?? this.homeserver,
-      draft: draft ?? this.draft,
-      invite: invite ?? this.invite,
-      direct: direct ?? this.direct,
-      sending: sending ?? this.sending,
-      syncing: syncing ?? this.syncing,
-      limited: limited ?? this.limited,
-      lastRead: lastRead ?? this.lastRead,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
-      namePriority: namePriority ?? this.namePriority,
-      totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
-      guestEnabled: guestEnabled ?? this.guestEnabled,
-      encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
-      userTyping: userTyping ?? this.userTyping,
-      usersTyping: usersTyping ?? this.usersTyping,
-      isDraftRoom: isDraftRoom ?? this.isDraftRoom,
-      outbox: outbox ?? this.outbox,
-      messages: messages ?? this.messages,
-      users: users ?? this.users,
-      messageReads: messageReads ?? this.messageReads,
-      lastHash: lastHash ?? this.lastHash,
-      prevHash: prevHash ?? this.prevHash,
-      nextHash: nextHash ?? this.nextHash,
-      // state: state ?? this.state,
-    );
-  }
+  }) =>
+      Room(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        alias: alias ?? this.alias,
+        topic: topic ?? this.topic,
+        joinRule: joinRule ?? this.joinRule,
+        avatarUri: avatarUri ?? this.avatarUri,
+        homeserver: homeserver ?? this.homeserver,
+        draft: draft ?? this.draft,
+        invite: invite ?? this.invite,
+        direct: direct ?? this.direct,
+        sending: sending ?? this.sending,
+        syncing: syncing ?? this.syncing,
+        limited: limited ?? this.limited,
+        lastRead: lastRead ?? this.lastRead,
+        lastUpdate: lastUpdate ?? this.lastUpdate,
+        namePriority: namePriority ?? this.namePriority,
+        totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
+        guestEnabled: guestEnabled ?? this.guestEnabled,
+        encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
+        userTyping: userTyping ?? this.userTyping,
+        usersTyping: usersTyping ?? this.usersTyping,
+        isDraftRoom: isDraftRoom ?? this.isDraftRoom,
+        outbox: outbox ?? this.outbox,
+        messages: messages ?? this.messages,
+        users: users ?? this.users,
+        messageReads: messageReads ?? this.messageReads,
+        lastHash: lastHash ?? this.lastHash,
+        prevHash: prevHash ?? this.prevHash,
+        nextHash: nextHash ?? this.nextHash,
+        // state: state ?? this.state,
+      );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
   factory Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);
@@ -395,6 +395,10 @@ class Room {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
+        print("[event.id] sender ${event.sender}");
+        print("[event.id] content");
+        printJson(event.content);
+
         switch (event.type) {
           case 'm.room.name':
             if (namePriority > 0) {
@@ -444,21 +448,6 @@ class Room {
               );
             }
 
-            // likely an invite room
-            // attempt to show a name from whoever sent membership events
-            // if nothing else takes priority
-            if (namePriority == 4 && event.sender != currentUser.userId) {
-              if (displayName == null) {
-                namePriority = 4;
-                name = trimAlias(event.sender);
-                avatarUri = memberAvatarUri;
-              } else if (displayName != currentUser.displayName) {
-                namePriority = 4;
-                name = displayName;
-                avatarUri = memberAvatarUri;
-              }
-            }
-
             break;
           case 'm.room.encryption':
             encryptionEnabled = true;
@@ -471,33 +460,37 @@ class Room {
       });
     } catch (error) {}
 
-    // direct room naming check
     try {
-      final badRoomName =
-          name == currentUser.displayName || name == currentUser.userId;
-
       // what happens if you name a direct chat after the
       // person you're sending it to? bad stuff, this tries
       // to force the senders name on the room just in case
-      if (namePriority != 0 && users.isNotEmpty && (direct || badRoomName)) {
-        namePriority = 0;
+      final badRoomName =
+          name == currentUser.displayName || name == currentUser.userId;
 
-        // Filter out number of non current users to show preview of total and wh
-        final nonCurrentUsers = users.values.where(
+      // no name room check
+      if ((namePriority > 3 && users.isNotEmpty && direct) || badRoomName) {
+        // Filter out number of non current users to show preview of total
+        final otherUsers = users.values.where(
           (user) =>
-              user.displayName != currentUser.displayName &&
-              user.userId != currentUser.userId,
+              user.userId != currentUser.userId &&
+              user.displayName != currentUser.displayName,
         );
 
-        final hasMultipleUsers =
-            nonCurrentUsers.isNotEmpty && nonCurrentUsers.length > 1;
-        final shownUser = users.values.elementAt(0);
+        if (otherUsers.isNotEmpty) {
+          // check naming options when direct/group without room name
+          final shownUser = otherUsers.elementAt(0);
+          final hasMultipleUsers = otherUsers.length > 1;
 
-        // set name and avi to first non user or that + total others
-        name = hasMultipleUsers
-            ? '${shownUser.displayName} and ${users.values.length - 1}'
-            : shownUser.displayName;
-        avatarUri = shownUser.avatarUri;
+          // set name and avi to first non user or that + total others
+          name = hasMultipleUsers
+              ? '${shownUser.displayName} and ${users.values.length - 1}'
+              : shownUser.displayName;
+
+          // set avatar if one has not been assigned
+          if (avatarUri == null) {
+            avatarUri = shownUser.avatarUri;
+          }
+        }
       }
     } catch (error) {}
 
