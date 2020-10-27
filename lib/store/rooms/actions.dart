@@ -788,7 +788,7 @@ ThunkAction<AppState> inviteUser({
       return true;
     } catch (error) {
       store.dispatch(
-        addAlert(error: error, origin: 'inviteUser'),
+        addAlert(error: error, message: error, origin: 'inviteUser'),
       );
       return false;
     } finally {

@@ -96,7 +96,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      debugPrint('[BackgroundSync] Failed To Stop $error');
+      debugPrint('[BackgroundSync] $error');
     }
   }
 }
@@ -147,6 +147,8 @@ void notificationSyncIsolate() async {
     final cutoff = DateTime.now().add(
       Duration(seconds: BackgroundSync.serviceTimeout),
     );
+
+    print('[notificationSyncIsolate] enabled background sync');
 
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
