@@ -129,7 +129,7 @@ class Strings {
       'Please be aware this app is still very much in Alpha.\n';
 
   static const confirmationAlphaWarning =
-      'Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n';
+      'Do not use, nor do I recommend using, Syphon where proven and independently verified security is required.\n';
 
   static const confirmationAlphaWarningAlt =
       'You may lose data using this application as features and bugs are worked out.\n';

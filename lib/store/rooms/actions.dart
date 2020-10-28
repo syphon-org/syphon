@@ -169,21 +169,18 @@ ThunkAction<AppState> syncRooms(
         ));
       }
 
-      // fetch previous messages since last /sync if
-      // more than one batch needs to be fetched (a gap)
       // and is not already at the end of the last known batch
       // the end would be room.prevHash == room.lastHash
       final roomUpdated = store.state.roomStore.rooms[room.id];
 
-      if (roomUpdated != null &&
-          room.limited &&
-          room.prevHash != null &&
-          room.prevHash != room.lastHash) {
+      // fetch previous messages since last /sync (a gap)
+      // determined by the fromSync function of room
+      if (roomUpdated != null && room.limited) {
+        debugPrint('[syncRooms] fetchMessageEvents called due to limited');
         store.dispatch(
           fetchMessageEvents(
             room: room,
-            to: room.lastHash,
-            from: room.prevHash,
+            from: room.lastHash,
           ),
         );
       }

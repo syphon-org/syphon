@@ -22,7 +22,6 @@ class CacheSecure {
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
   static const cacheKeyRooms = '${Values.appNameLabel}-room-cache';
   static const cacheKeyCrypto = '${Values.appNameLabel}-crypto-cache';
-  static const cacheKeyBackground = '${Values.appNameLabel}-background-cache';
 
   // cache key identifiers
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';

@@ -283,7 +283,9 @@ class Room {
       prevHash = json['timeline']['prev_batch'];
 
       if (limited != null) {
-        debugPrint('[fromSync] LIMITED IS NOT NULL ${limited}');
+        debugPrint(
+          '[fromSync] LIMITED ${limited} ${lastHash} ${prevHash}',
+        );
       }
 
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
@@ -484,7 +486,9 @@ class Room {
               : shownUser.displayName;
 
           // set avatar if one has not been assigned
-          if (avatarUri == null && this.avatarUri == null) {
+          if (avatarUri == null &&
+              this.avatarUri == null &&
+              otherUsers.length == 1) {
             avatarUri = shownUser.avatarUri;
           }
         }
@@ -521,7 +525,6 @@ class Room {
   }) {
     try {
       bool limited;
-      bool isUpdated = false;
       int lastUpdate = this.lastUpdate;
       List<Message> messagesNew = events ?? [];
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
@@ -539,19 +542,18 @@ class Room {
       }
 
       // Check to see if the new messages contain those existing in cache
-      if (messagesNew.isNotEmpty) {
+      if (messagesNew.isNotEmpty &&
+          messagesExisting.isNotEmpty &&
+          this.limited) {
         final messageLatest = messagesExisting.firstWhere(
           (msg) => msg.id == messagesNew[0].id,
           orElse: () => null,
         );
-        isUpdated = messageLatest != null;
-      }
 
-      // Set limited (used to recursively sync) to false if
-      // - new messages contains old ones
-      // - it's the first full /sync (lastHash == null)
-      if (isUpdated != null || this.lastHash == null) {
-        limited = false;
+        // Set limited (used to recursively sync) to false if
+        // - new messages contains old ones
+        // - it's the first full /sync (lastHash == null)
+        limited = messageLatest != null || this.lastHash == null ? false : null;
       }
 
       // Combine current and existing messages on unique ids
@@ -572,12 +574,10 @@ class Room {
 
       // TODO: remove after 0.1.5 :( - message catchup works
       if (true) {
-        // print('[fromMessageEvents] ${this.name}');
-        // print('[limited] ${limited}');
-        // print('[limited - cached] ${this.limited}');
-        // print('[lastHash] ${lastHash}');
-        // print('[lastHash - Cached] ${this.lastHash}');
-        // print('[prevHash] ${prevHash}');
+        // print('[fromMessageEvents] *** ${this.name} *** ');
+        // print('[limited] now ${limited}, before ${this.limited}');
+        // print('[lastHash] now ${lastHash}, before ${this.lastHash}');
+        // print('[prevHash] now ${prevHash}');
       }
 
       return this.copyWith(

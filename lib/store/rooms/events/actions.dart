@@ -87,7 +87,7 @@ ThunkAction<AppState> fetchMessageEvents({
       // messages.forEach((element) {
       //   printJson(element);
       // });
-      // debugPrint('[OLDEST] ${oldest}');
+      debugPrint('[OLDEST] ${oldest}');
 
       // reuse the logic for syncing
       await store.dispatch(
