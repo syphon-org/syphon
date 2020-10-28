@@ -22,6 +22,7 @@ description: a privacy focused matrix client
 # $ emulator -list-avds
 # $ emulator -avd Pixel_3a_API_29
 # $ adb shell && run-as org.tether.tether # cache inspection
+# $ adb logcat ActivityManager:I flutter:I *:S
 
 # desktop support options
 # $ flutter config --enable-macos-desktop

@@ -97,25 +97,6 @@ AppState appReducer(AppState state, action) => AppState(
  * this is why the "storage: MemoryStore()" property is set and
  * the Hive Serializer has been impliemented
  */
-// Future<Store> initStore() async {
-//   // Configure redux persist instance
-//   final persistor = Persistor<AppState>(
-//     storage: MemoryStorage(),
-//     serializer: CacheSerializer(),
-//     throttleDuration: Duration(milliseconds: 4500),
-//     shouldSave: (Store<AppState> store, dynamic action) {
-//       switch (action.runtimeType) {
-//         case SetSyncing:
-//         case SetSynced:
-//           // debugPrint('[Redux Persist] cache skip');
-//           return false;
-//         default:
-//           // debugPrint('[Redux Persist] caching');
-//           return true;
-//       }
-//     },
-//   );
-
 Future<Store> initStore() async {
   // Configure redux persist instance
   final persistor = Persistor<AppState>(

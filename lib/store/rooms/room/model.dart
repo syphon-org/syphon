@@ -76,8 +76,7 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: removed until state timeline work can be done
-  // @HiveField(19)
+  // TODO: removed until state timeline work can be done 
   // final List<Event> state;
 
   @HiveField(20)
@@ -326,9 +325,9 @@ class Room {
           accountEvents,
         )
         .fromStateEvents(
-          events: stateEvents,
           invite: invite,
           limited: limited,
+          events: stateEvents,
           currentUser: currentUser,
         )
         .fromMessageEvents(
@@ -389,10 +388,8 @@ class Room {
     bool direct = this.direct ?? false;
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
-
     Map<String, User> users = this.users ?? Map<String, User>();
 
-    // room state event filter
     try {
       events.forEach((event) {
         final timestamp = event.timestamp ?? 0;
@@ -541,19 +538,27 @@ class Room {
         lastUpdate = messagesNew[0].timestamp;
       }
 
-      // Check to see if the new messages contain those existing in cache
-      if (messagesNew.isNotEmpty &&
-          messagesExisting.isNotEmpty &&
-          this.limited) {
-        final messageLatest = messagesExisting.firstWhere(
-          (msg) => msg.id == messagesNew[0].id,
-          orElse: () => null,
-        );
+      // limited indicates need to fetch additional data for room timelines
+      if (this.limited) {
+        // Check to see if the new messages contain those existing in cache
+        if (messagesNew.isNotEmpty && messagesExisting.isNotEmpty) {
+          final messageLatest = messagesExisting.firstWhere(
+            (msg) => msg.id == messagesNew[0].id,
+            orElse: () => null,
+          );
+          // Set limited to false if they now exist
+          limited = messageLatest != null;
+        }
 
-        // Set limited (used to recursively sync) to false if
-        // - new messages contains old ones
-        // - it's the first full /sync (lastHash == null)
-        limited = messageLatest != null || this.lastHash == null ? false : null;
+        // Set limited to false false if
+        // - the oldest hash (lastHash) is non-existant
+        // - the previous hash (most recent) is non-existant
+        // - the oldest hash equals the previously fetched hash
+        if (this.lastHash == null ||
+            this.prevHash == null ||
+            this.lastHash == this.prevHash) {
+          limited = false;
+        }
       }
 
       // Combine current and existing messages on unique ids
@@ -572,14 +577,7 @@ class Room {
       // Filter to find startTime and endTime
       final messagesAll = List<Message>.from(messagesMap.values);
 
-      // TODO: remove after 0.1.5 :( - message catchup works
-      if (true) {
-        // print('[fromMessageEvents] *** ${this.name} *** ');
-        // print('[limited] now ${limited}, before ${this.limited}');
-        // print('[lastHash] now ${lastHash}, before ${this.lastHash}');
-        // print('[prevHash] now ${prevHash}');
-      }
-
+      // Save values to room
       return this.copyWith(
         outbox: outbox,
         messages: messagesAll,

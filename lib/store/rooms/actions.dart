@@ -109,9 +109,7 @@ class AddArchive {
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncRooms(
-  Map roomData,
-) {
+ThunkAction<AppState> syncRooms(Map roomData) {
   return (Store<AppState> store) async {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
@@ -171,20 +169,17 @@ ThunkAction<AppState> syncRooms(
 
       // and is not already at the end of the last known batch
       // the end would be room.prevHash == room.lastHash
-      final roomUpdated = store.state.roomStore.rooms[room.id];
-
       // fetch previous messages since last /sync (a gap)
       // determined by the fromSync function of room
+      final roomUpdated = store.state.roomStore.rooms[room.id];
       if (roomUpdated != null && room.limited) {
-        debugPrint('[syncRooms] fetchMessageEvents called due to limited');
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            from: room.lastHash,
-          ),
-        );
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.prevHash,
+        ));
       }
 
+      // update room
       store.dispatch(SetRoom(room: room));
     });
   };

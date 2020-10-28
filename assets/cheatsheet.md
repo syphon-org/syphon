@@ -27,3 +27,39 @@
  */
 ThunkAction<AppState> createUser({enableErrors = false}) {}
 ```
+
+```dart
+
+// needed to test the recursive messaging 'catch-up'
+if (true) {
+  printError('[fromMessageEvents] *** ${this.name} *** ');
+  print('[limited] now ${limited}, before ${this.limited}');
+  print('[lastHash] now ${lastHash}, before ${this.lastHash}');
+  print('[prevHash] now ${prevHash}');
+}
+
+```
+
+```dart
+ // original initStore function without much regar
+ // for action types. Ideally, it would have none.
+ Future<Store> initStore() async {
+   // Configure redux persist instance
+   final persistor = Persistor<AppState>(
+     storage: MemoryStorage(),
+     serializer: CacheSerializer(),
+     throttleDuration: Duration(milliseconds: 4500),
+     shouldSave: (Store<AppState> store, dynamic action) {
+       switch (action.runtimeType) {
+         case SetSyncing:
+         case SetSynced:
+           // debugPrint('[Redux Persist] cache skip');
+           return false;
+         default:
+           // debugPrint('[Redux Persist] caching');
+           return true;
+       }
+     },
+   );
+
+```

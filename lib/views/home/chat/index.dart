@@ -810,6 +810,7 @@ class _Props extends Equatable {
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
+        // fetch messages beyond the oldest known message - lastHash
         store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,
