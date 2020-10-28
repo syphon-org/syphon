@@ -99,7 +99,7 @@ class ListUserBubbles extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           '/home/user/invite',
-                          arguments: InviteUsersArguments(roomId: roomId),
+                          arguments: InviteUsersArguments(roomId: null),
                         );
                       } else {
                         Navigator.pushNamed(

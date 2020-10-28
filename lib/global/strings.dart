@@ -108,6 +108,9 @@ class Strings {
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
 
+  static const confirmationInvites =
+      'Are you sure you want to invite the selected users to the following room?';
+
   static const confirmationStartChat = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +

@@ -10,6 +10,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/views/home/chat/details-chat.dart';
 import 'package:syphon/views/home/chat/index.dart';
+import 'package:syphon/views/home/groups/invite-users.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 
@@ -240,6 +241,14 @@ class AppBarChatState extends State<AppBarChat> {
           RoundedPopupMenu<ChatOptions>(
             onSelected: (ChatOptions result) {
               switch (result) {
+                case ChatOptions.inviteFriends:
+                  return Navigator.pushNamed(
+                    context,
+                    '/home/user/invite',
+                    arguments: InviteUsersArguments(
+                      roomId: widget.room.id,
+                    ),
+                  );
                 case ChatOptions.chatSettings:
                   return Navigator.pushNamed(
                     context,
@@ -271,7 +280,6 @@ class AppBarChatState extends State<AppBarChat> {
                 child: Text('Chat Settings'),
               ),
               const PopupMenuItem<ChatOptions>(
-                enabled: false,
                 value: ChatOptions.inviteFriends,
                 child: Text('Invite Friends'),
               ),

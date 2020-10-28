@@ -12,7 +12,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
@@ -27,6 +30,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -85,12 +89,12 @@ class InviteUsersState extends State<InviteUsersView> {
 
   /**
    * 
-   * User Invite
+   * Toggle User Invite
    * 
-   * add user to invite list
+   * add/remove user to invite list
    */
   @protected
-  void onInviteUser({User user}) async {
+  void onToggleInvite({User user}) async {
     final List<User> invitesUpdated = List.from(this.invites);
     final userIndex = invitesUpdated.indexWhere((u) => u.userId == user.userId);
 
@@ -117,35 +121,6 @@ class InviteUsersState extends State<InviteUsersView> {
 
   /**
    * 
-   * User Invite
-   * 
-   * add user to invite list
-   */
-  @protected
-  void onSubmitUsers(_Props props) async {
-    await props.onSubmitInvites(
-      users: this.invites,
-    );
-    Navigator.pop(context);
-  }
-
-  @protected
-  onShowUserDetails({
-    BuildContext context,
-    User user,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ModalUserDetails(
-        user: user,
-      ),
-    );
-  }
-
-  /**
-   * 
    * Attempt User Invite
    * 
    * attempt chating with a user 
@@ -161,9 +136,79 @@ class InviteUsersState extends State<InviteUsersView> {
         content: Strings.alertInviteUnknownUser,
         action: 'try invite',
         onStartChat: () {
-          this.onInviteUser(user: user);
+          this.onToggleInvite(user: user);
           Navigator.pop(context);
         },
+      ),
+    );
+  }
+
+  /**
+   * 
+   * Confirm and save invite list
+   * 
+   * also attempts to invite users directly if a room id already exists
+   */
+  @protected
+  void onConfirmInvites(_Props props) async {
+    final InviteUsersArguments arguments =
+        ModalRoute.of(context).settings.arguments;
+    final roomId = arguments.roomId;
+
+    if (roomId != null && this.invites.length > 0) {
+      await this.onSendInvites(props);
+    } else {
+      await props.onAddInvites(users: this.invites);
+      Navigator.pop(context);
+    }
+  }
+
+  /**
+   * Actually send invites to all listed users
+   */
+  Future<void> onSendInvites(_Props props) async {
+    FocusScope.of(context).unfocus();
+    final InviteUsersArguments arguments =
+        ModalRoute.of(context).settings.arguments;
+    final store = StoreProvider.of<AppState>(context);
+
+    final roomId = arguments.roomId;
+    final room = store.state.roomStore.rooms[roomId];
+
+    final multiple = this.invites.length > 1;
+    final invitePlurialized = multiple ? 'Invites' : 'Invite';
+
+    // Confirm sending the invites with a dialog
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => DialogInviteUsers(
+        users: this.invites,
+        title: 'Invite To ${room.name}',
+        content: Strings.confirmationInvites +
+            '\n\nSend ${this.invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?',
+        action: 'send ${invitePlurialized.toLowerCase()}',
+        onInviteUsers: () async {
+          await Future.wait(this.invites.map((user) async {
+            return props.onSendInvite(room: Room(id: roomId), user: user);
+          }));
+
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  void onShowUserDetails({
+    BuildContext context,
+    User user,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        user: user,
       ),
     );
   }
@@ -210,7 +255,7 @@ class InviteUsersState extends State<InviteUsersView> {
               elevation: 0,
               forceFocus: true,
               focusNode: searchInputFocusNode,
-              onBack: () => onSubmitUsers(props),
+              onBack: () => onConfirmInvites(props),
               onSearch: (text) => props.onSearch(text),
               onChange: (text) => this.setState(() {
                 searchable = text;
@@ -222,7 +267,7 @@ class InviteUsersState extends State<InviteUsersView> {
                 heroTag: 'fab5',
                 tooltip: 'Add User Invites',
                 backgroundColor: Theme.of(context).accentColor,
-                onPressed: () => onSubmitUsers(props),
+                onPressed: () => onConfirmInvites(props),
                 child: Container(
                   padding: EdgeInsets.only(left: 2),
                   child: SvgPicture.asset(
@@ -302,7 +347,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                         .bodyText1
                                         .color,
                                   ),
-                                  onDeleted: () => onInviteUser(user: user),
+                                  onDeleted: () => onToggleInvite(user: user),
                                 ),
                               ),
                             ),
@@ -399,7 +444,8 @@ class InviteUsersState extends State<InviteUsersView> {
                                   padding: EdgeInsets.symmetric(vertical: 4),
                                   elevation: 0,
                                   child: InkWell(
-                                    onTap: () => this.onInviteUser(user: user),
+                                    onTap: () =>
+                                        this.onToggleInvite(user: user),
                                     child: Container(
                                       child: ListTile(
                                         enabled: creatingRoomDisplayName !=
@@ -495,7 +541,8 @@ class _Props extends Equatable {
   final List<dynamic> searchResults;
 
   final Function onSearch;
-  final Function onSubmitInvites;
+  final Function onAddInvites;
+  final Function onSendInvite;
 
   _Props({
     @required this.theme,
@@ -504,7 +551,8 @@ class _Props extends Equatable {
     @required this.creatingRoom,
     @required this.searchResults,
     @required this.onSearch,
-    @required this.onSubmitInvites,
+    @required this.onAddInvites,
+    @required this.onSendInvite,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -516,8 +564,13 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onSubmitInvites: ({List<User> users}) async {
+        onAddInvites: ({List<User> users}) async {
           return store.dispatch(setUserInvites(users: users));
+        },
+        onSendInvite: ({Room room, User user}) {
+          store.dispatch(
+            inviteUser(room: room, user: user),
+          );
         },
       );
 

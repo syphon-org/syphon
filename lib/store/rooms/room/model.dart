@@ -2,6 +2,7 @@
 import 'dart:collection';
 
 // Package imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -454,12 +455,12 @@ class Room {
             break;
         }
       });
-    } catch (error) {}
+    } catch (error) {
+      debugPrint('[Room.fromStateEvents] ${error}');
+    }
 
     try {
-      // what happens if you name a direct chat after the
-      // person you're sending it to? bad stuff, this tries
-      // to force the senders name on the room just in case
+      // checks to make sure someone didn't name the room after the authed user
       final badRoomName =
           name == currentUser.displayName || name == currentUser.userId;
 

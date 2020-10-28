@@ -19,6 +19,7 @@ class UserStore extends Equatable {
   final Map<String, User> users;
 
   @HiveField(1)
+  @JsonKey(ignore: true)
   final List<User> invites;
 
   const UserStore({

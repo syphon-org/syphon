@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -213,7 +213,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => StoreProvider<AppState>(
         store: store,
-        child: EasyLocalization(
+        child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
           startLocale:

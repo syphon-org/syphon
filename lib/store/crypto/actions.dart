@@ -130,7 +130,7 @@ class DEBUGSetOutboundMessageSessionMap {
   DEBUGSetOutboundMessageSessionMap({this.nothing});
 }
 
-class ResetDeviceKeys {}
+class ResetCrypto {}
 
 /**
  * Helper Actions
@@ -172,7 +172,7 @@ ThunkAction<AppState> setOneTimeKeysClaimed(
 ThunkAction<AppState> deleteDeviceKeys() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(ResetDeviceKeys());
+      store.dispatch(ResetCrypto());
     } catch (error) {
       store.dispatch(
         addAlert(error: error, origin: 'deleteDeviceKeys'),

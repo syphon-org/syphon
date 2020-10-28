@@ -101,7 +101,7 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         deviceKeysExist: action.existence,
       );
-    case ResetDeviceKeys:
+    case ResetCrypto:
       return CryptoStore();
     default:
       return state;

@@ -11,7 +11,9 @@ import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/reducer.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/media/reducer.dart';
@@ -121,16 +123,22 @@ Future<Store> initStore() async {
     serializer: CacheSerializer(),
     throttleDuration: Duration(milliseconds: 4500),
     shouldSave: (Store<AppState> store, dynamic action) {
+      // TODO: can remove once sqlcipher storage is in place
       switch (action.runtimeType) {
         case SetSynced:
           if (action.synced) {
             return true;
           }
           return false;
-        // debugPrint('[Redux Persist] cache skip');
+        case SetOlmAccount:
+        case SetOlmAccountBackup:
+        case SetDeviceKeysOwned:
+        case SetUser:
+        case ResetCrypto:
+        case ResetUser:
+          return true;
         case SetSyncing:
         default:
-          // debugPrint('[Redux Persist] caching');
           return false;
       }
     },
@@ -146,7 +154,6 @@ Future<Store> initStore() async {
 
   try {
     initialState = await persistor.load();
-    // debugPrint('[Redux Persist] persist loaded successfully');
   } catch (error) {
     debugPrint('[Redux Persist] $error');
   }

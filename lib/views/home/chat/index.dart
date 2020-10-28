@@ -713,10 +713,7 @@ class _Props extends Equatable {
       timeFormat24Enabled:
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
-      room: roomSelectors.room(
-        id: roomId,
-        state: store.state,
-      ),
+      room: roomSelectors.room(id: roomId, state: store.state),
       messages: latestMessages(
         wrapOutboxMessages(
           messages: roomSelectors.room(id: roomId, state: store.state).messages,

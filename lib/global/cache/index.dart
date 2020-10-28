@@ -177,7 +177,7 @@ Future<Box> unlockMainCache() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[Unlock Main CacheSecure] $error');
+    debugPrint('[unlockMainCache] $error');
     return null;
   }
 }
@@ -190,7 +190,7 @@ Future<Box> unlockRoomCache() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[Unlock Room CacheSecure] $error');
+    debugPrint('[unlockRoomCache] $error');
     return null;
   }
 }
@@ -203,7 +203,7 @@ Future<Box> unlockCryptoCache() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[Unlock Crypto CacheSecure] $error');
+    debugPrint('[unlockCryptoCache] $error');
     return null;
   }
 }

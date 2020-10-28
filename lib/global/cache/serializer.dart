@@ -97,7 +97,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           }
         } catch (error) {
           debugPrint(
-            '[Cache Serializer Encode] $error',
+            '[CacheSerializer.encode] $error',
           );
         }
       }));
@@ -181,7 +181,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            debugPrint('[Cache Serializer Decode] $error');
+            debugPrint('[CacheSerializer.decode] $error');
             decodedJson = {};
           }
         }
@@ -196,7 +196,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            debugPrint('[Cache Serializer Decode] $error');
+            debugPrint('[CacheSerializer.decode] $error');
             decodedJson = {};
           }
         }
@@ -231,7 +231,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
         }
       } catch (error) {
-        debugPrint('[Cache Serializer Decode] $error');
+        debugPrint('[CacheSerializer.decode] $error');
       }
     });
 

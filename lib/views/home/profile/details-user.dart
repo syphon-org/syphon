@@ -8,7 +8,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
-import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';

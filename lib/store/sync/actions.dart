@@ -259,11 +259,11 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         // try to understand the error message
         message = (error.message as String);
       } catch (error) {
-        debugPrint(error);
+        debugPrint('[fetchSync] $error');
       }
 
       if (message.contains('SocketException')) {
-        debugPrint('[fetchSync] IOException $error');
+        debugPrint('[fetchSync] $error');
         store.dispatch(SetOffline(offline: true));
       }
 
@@ -275,32 +275,4 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: false));
     }
   };
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-
-  return directory.path;
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<File> get _localFile async {
-  final path = await _localPath;
-  return File('$path/matrix.json');
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<dynamic> readFullSyncJson() async {
-  try {
-    final file = await _localFile;
-    String contents = await file.readAsString();
-    return await jsonDecode(contents);
-  } catch (error) {
-    // If encountering an error, return 0.
-    debugPrint('[readFullSyncJson] $error');
-    return null;
-  } finally {
-    debugPrint('** Read State From Disk Successfully **');
-  }
 }

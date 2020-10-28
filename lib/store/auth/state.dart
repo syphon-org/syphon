@@ -136,36 +136,35 @@ class AuthStore extends Equatable {
     creating,
     verificationNeeded,
     authObserver,
-  }) {
-    return AuthStore(
-      user: user ?? this.user,
-      email: email ?? this.email,
-      loading: loading ?? this.loading,
-      authObserver: authObserver ?? this.authObserver,
-      username: username ?? this.username,
-      password: password ?? this.password,
-      agreement: agreement ?? this.agreement,
-      passwordCurrent: passwordCurrent ?? this.passwordCurrent,
-      passwordConfirm: passwordConfirm ?? this.passwordConfirm,
-      homeserver: homeserver ?? this.homeserver,
-      completed: completed ?? this.completed,
-      captcha: captcha ?? this.captcha,
-      session: session ?? this.session,
-      isEmailValid: isEmailValid ?? this.isEmailValid,
-      isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
-      isUsernameValid: isUsernameValid ?? this.isUsernameValid,
-      isUsernameAvailable: isUsernameAvailable != null
-          ? isUsernameAvailable
-          : this.isUsernameAvailable,
-      isPasswordValid: isPasswordValid ?? this.isPasswordValid,
-      isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
-      interactiveAuths: interactiveAuths ?? this.interactiveAuths,
-      credential: credential ?? this.credential,
-      creating: creating ?? this.creating,
-      stopgap: stopgap ?? this.stopgap,
-      verificationNeeded: verificationNeeded ?? this.verificationNeeded,
-    );
-  }
+  }) =>
+      AuthStore(
+        user: user ?? this.user,
+        email: email ?? this.email,
+        loading: loading ?? this.loading,
+        authObserver: authObserver ?? this.authObserver,
+        username: username ?? this.username,
+        password: password ?? this.password,
+        agreement: agreement ?? this.agreement,
+        passwordCurrent: passwordCurrent ?? this.passwordCurrent,
+        passwordConfirm: passwordConfirm ?? this.passwordConfirm,
+        homeserver: homeserver ?? this.homeserver,
+        completed: completed ?? this.completed,
+        captcha: captcha ?? this.captcha,
+        session: session ?? this.session,
+        isEmailValid: isEmailValid ?? this.isEmailValid,
+        isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
+        isUsernameValid: isUsernameValid ?? this.isUsernameValid,
+        isUsernameAvailable: isUsernameAvailable != null
+            ? isUsernameAvailable
+            : this.isUsernameAvailable,
+        isPasswordValid: isPasswordValid ?? this.isPasswordValid,
+        isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
+        interactiveAuths: interactiveAuths ?? this.interactiveAuths,
+        credential: credential ?? this.credential,
+        creating: creating ?? this.creating,
+        stopgap: stopgap ?? this.stopgap,
+        verificationNeeded: verificationNeeded ?? this.verificationNeeded,
+      );
 
   Map<String, dynamic> toJson() => _$AuthStoreToJson(this);
 
