@@ -23,7 +23,9 @@ import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'events/model.dart';
 import 'room/model.dart';
 
@@ -166,6 +168,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           mxcUri: room.avatarUri,
         ));
       }
+
+      // Offload and save user map to cache
+      await store.dispatch(syncUsers(room.users));
 
       // and is not already at the end of the last known batch
       // the end would be room.prevHash == room.lastHash
@@ -590,7 +595,8 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 
       // Find the other user in the direct room
       final currentUser = store.state.authStore.user;
-      final otherUser = room.users.values.firstWhere(
+      final roomUsers = roomUsersSelector(room, store.state.userStore.users);
+      final otherUser = roomUsers.values.firstWhere(
         (user) => user.userId != currentUser.userId,
       );
 

@@ -29,6 +29,8 @@ import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
@@ -421,7 +423,7 @@ class ChatViewState extends State<ChatView> {
               MessageTypingWidget(
                 typing: props.room.userTyping,
                 usersTyping: props.room.usersTyping,
-                roomUsers: props.room.users,
+                roomUsers: props.roomUsers,
                 selectedMessageId: this.selectedMessage != null
                     ? this.selectedMessage.id
                     : null,
@@ -654,6 +656,7 @@ class _Props extends Equatable {
   final String userId;
   final bool loading;
   final ThemeType theme;
+  final Map<String, User> roomUsers;
   final List<Message> messages;
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
@@ -678,6 +681,7 @@ class _Props extends Equatable {
     @required this.userId,
     @required this.messages,
     @required this.loading,
+    @required this.roomUsers,
     @required this.roomPrimaryColor,
     @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
@@ -700,6 +704,7 @@ class _Props extends Equatable {
         userId,
         messages,
         room,
+        roomUsers,
         roomPrimaryColor,
         loading,
       ];
@@ -713,6 +718,10 @@ class _Props extends Equatable {
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(id: roomId, state: store.state),
+      roomUsers: roomUsersSelector(
+        roomSelectors.room(id: roomId, state: store.state),
+        store.state.userStore.users,
+      ),
       messages: latestMessages(
         wrapOutboxMessages(
           messages: roomSelectors.room(id: roomId, state: store.state).messages,

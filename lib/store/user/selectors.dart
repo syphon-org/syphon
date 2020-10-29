@@ -77,3 +77,11 @@ List<User> searchUsersLocal(List<User> users, {String searchText = ''}) {
         (user.userId ?? '').contains(searchText),
   ));
 }
+
+Map<String, User> roomUsersSelector(Room room, Map<String, User> users) {
+  return Map.fromIterable(
+    room.userIds,
+    key: (userId) => userId,
+    value: (userId) => users[userId],
+  );
+}

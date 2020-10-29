@@ -76,7 +76,7 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: removed until state timeline work can be done 
+  // TODO: removed until state timeline work can be done
   // final List<Event> state;
 
   @HiveField(20)
@@ -98,7 +98,10 @@ class Room {
   final Map<String, ReadStatus> messageReads;
 
   @HiveField(25)
+  @JsonKey(ignore: true)
   final Map<String, User> users;
+
+  final List<String> userIds;
 
   @HiveField(27)
   final bool invite;
@@ -150,6 +153,7 @@ class Room {
     this.userTyping = false,
     this.usersTyping = const [],
     this.isDraftRoom = false,
+    this.userIds = const [],
     this.lastHash,
     this.nextHash,
     this.prevHash,
@@ -180,6 +184,7 @@ class Room {
     isDraftRoom,
     draft,
     users,
+    userIds,
     events,
     outbox,
     messages,
@@ -215,6 +220,7 @@ class Room {
         outbox: outbox ?? this.outbox,
         messages: messages ?? this.messages,
         users: users ?? this.users,
+        userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
@@ -280,12 +286,6 @@ class Room {
       limited = json['timeline']['limited'];
       lastHash = json['timeline']['last_hash'];
       prevHash = json['timeline']['prev_batch'];
-
-      if (limited != null) {
-        debugPrint(
-          '[fromSync] LIMITED ${limited} ${lastHash} ${prevHash}',
-        );
-      }
 
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
@@ -388,7 +388,8 @@ class Room {
     bool direct = this.direct ?? false;
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
-    Map<String, User> users = this.users ?? Map<String, User>();
+    Set<String> usersSet = Set.from(this.userIds ?? List<String>());
+    Map<String, User> users = Map.from(this.users ?? Map<String, User>());
 
     try {
       events.forEach((event) {
@@ -455,7 +456,7 @@ class Room {
         }
       });
     } catch (error) {
-      debugPrint('[Room.fromStateEvents] ${error}');
+      debugPrint('[Room.fromStateEvents] event block ${error}');
     }
 
     try {
@@ -490,12 +491,23 @@ class Room {
           }
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      debugPrint('[Room.fromStateEvents] naming block ${error}');
+    }
+    try {
+      usersSet.addAll(users.keys);
+      debugPrint(
+        '[Room.fromStateEvents] userSet ${this.name} ${usersSet.length}',
+      );
+    } catch (error) {
+      debugPrint('[Room.fromStateEvents] userSet  ${error}');
+    }
 
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
       users: users ?? this.users,
+      userIds: usersSet.toList() ?? this.userIds,
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,

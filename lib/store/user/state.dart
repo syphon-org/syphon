@@ -22,18 +22,18 @@ class UserStore extends Equatable {
   @JsonKey(ignore: true)
   final List<User> invites;
 
+  @JsonKey(ignore: true)
+  final DateTime throttle;
+
   const UserStore({
     this.users = const {},
     this.invites = const [],
     this.loading = false,
+    this.throttle,
   });
 
   @override
-  List<Object> get props => [
-        users,
-        invites,
-        loading,
-      ];
+  List<Object> get props => [users, invites, loading, throttle];
 
   Map<String, dynamic> toJson() => _$UserStoreToJson(this);
 
@@ -44,10 +44,12 @@ class UserStore extends Equatable {
     bool loading,
     List<User> invites,
     Map<String, User> users,
+    DateTime throttle,
   }) =>
       UserStore(
         users: users ?? this.users,
         invites: invites ?? this.invites,
         loading: loading ?? this.loading,
+        throttle: throttle ?? this.throttle,
       );
 }

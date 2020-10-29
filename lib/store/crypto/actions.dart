@@ -19,6 +19,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -27,6 +28,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 
 /**
  * 
@@ -586,18 +588,20 @@ ThunkAction<AppState> updateKeySessions({
  * Claims keys for devices and creates key sharing session
  * 
  *  */
-ThunkAction<AppState> claimOneTimeKeys({
-  Room room,
-}) {
+ThunkAction<AppState> claimOneTimeKeys({Room room}) {
   return (Store<AppState> store) async {
     try {
-      final roomUsers = room.users.values;
+      final users = store.state.userStore.users;
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
       final currentUser = store.state.authStore.user;
 
+      final roomUsers = roomUsersSelector(room, users);
+
+      printError('[NUMBER OF USERS IN ROOM] ${roomUsers.length}');
+
       // get deviceKeys for every user present in the chat
-      final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
+      final List<DeviceKey> roomDeviceKeys = List.from(roomUsers.values
           .map((user) => (deviceKeys[user.userId] ?? {}).values)
           .expand((x) => x));
 

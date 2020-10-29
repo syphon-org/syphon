@@ -13,20 +13,30 @@ class CacheSecure {
   static String ivKeyNext;
   static String cryptKey;
 
+  // encryption references (custom)
+  static String ivKeyUsers;
+  static String ivKeyUsersNext;
+
   // cache refrences
   static Box cacheMain;
   static Box cacheRooms;
   static Box cacheCrypto;
+  static Box cacheUsers;
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
   static const cacheKeyRooms = '${Values.appNameLabel}-room-cache';
   static const cacheKeyCrypto = '${Values.appNameLabel}-crypto-cache';
+  static const cacheKeyUsers = '${Values.appNameLabel}-crypto-users';
 
   // cache key identifiers
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
   static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
+
+  // caceh key identifiers (custom)
+  static const ivKeyUsersLocation = '${Values.appNameLabel}@ivKeyUsers';
+  static const ivKeyUsersNextLocation = '${Values.appNameLabel}@ivKeyUsersNext';
 
   // background data identifiers
   static const roomNamesKey = 'roomNamesKey';
@@ -47,6 +57,7 @@ Future<void> initCache() async {
   CacheSecure.cacheMain = await unlockMainCache();
   CacheSecure.cacheRooms = await unlockRoomCache();
   CacheSecure.cacheCrypto = await unlockCryptoCache();
+  CacheSecure.cacheUsers = await unlockUsersCache();
 }
 
 Future<dynamic> initStorageLocation() async {
@@ -95,34 +106,31 @@ void closeCache() async {
   if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
     CacheSecure.cacheCrypto.close();
   }
+
+  if (CacheSecure.cacheUsers != null && CacheSecure.cacheUsers.isOpen) {
+    CacheSecure.cacheUsers.close();
+  }
 }
 
 String createIVKey() {
   return CryptKey().genDart();
 }
 
-Future<void> saveIVKey(String ivKey) async {
-  // Check if storage has been created before
+Future<void> saveIVKey(
+  String ivKey, {
+  String ivKeyLocation = CacheSecure.ivKeyLocation,
+}) async {
   return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyLocation,
+    key: ivKeyLocation,
     value: ivKey,
   );
 }
 
-Future<void> saveIVKeyNext(String ivKey) async {
-  // Check if storage has been created before
-  return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyNextLocation,
-    value: ivKey,
-  );
-}
-
-Future<String> unlockIVKey() async {
-  // Check if storage has been created before
+Future<String> unlockIVKey({location = CacheSecure.ivKeyLocation}) async {
   final storageEngine = FlutterSecureStorage();
 
   final ivKeyStored = await storageEngine.read(
-    key: CacheSecure.ivKeyLocation,
+    key: location,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -195,6 +203,19 @@ Future<Box> unlockRoomCache() async {
 }
 
 Future<Box> unlockCryptoCache() async {
+  try {
+    return await Hive.openBox(
+      CacheSecure.cacheKeyCrypto,
+      crashRecovery: true,
+      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
+    );
+  } catch (error) {
+    debugPrint('[unlockCryptoCache] $error');
+    return null;
+  }
+}
+
+Future<Box> unlockUsersCache() async {
   try {
     return await Hive.openBox(
       CacheSecure.cacheKeyCrypto,

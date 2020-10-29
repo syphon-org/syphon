@@ -29,6 +29,12 @@ ThunkAction<AppState> createUser({enableErrors = false}) {}
 ```
 
 ```dart
+// needed to check if recursive calls should be made / stopped
+if (limited != null) {
+  debugPrint(
+    '[fromSync] LIMITED ${limited} ${lastHash} ${prevHash}',
+  );
+}
 
 // needed to test the recursive messaging 'catch-up'
 if (true) {
@@ -61,5 +67,26 @@ if (true) {
        }
      },
    );
+
+```
+
+```dart
+// save users reducer from the userStore
+
+case SaveUser:
+  final user = action.user as User;
+  final users = Map<String, User>.from(state.users);
+
+  if (users[user.userId] != null) {
+    final existingUser = users[user.userId];
+    users[user.userId] = existingUser.copyWith(
+      avatarUri: user.avatarUri,
+      displayName: user.displayName,
+    );
+  } else {
+    users[user.userId] = user;
+  }
+
+  return state.copyWith(users: action.users);
 
 ```

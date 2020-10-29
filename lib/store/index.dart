@@ -127,8 +127,16 @@ Future<Store> initStore() async {
 
   // Configure cache encryption/decryption instance
   CacheSecure.ivKey = await unlockIVKey();
-  CacheSecure.ivKeyNext = await unlockIVKeyNext();
   CacheSecure.cryptKey = await unlockCryptKey();
+
+  // Unlock unqiue or fallback ivKeys
+  CacheSecure.ivKeyNext = await unlockIVKeyNext();
+  CacheSecure.ivKeyUsers = await unlockIVKey(
+    location: CacheSecure.ivKeyUsersLocation,
+  );
+  CacheSecure.ivKeyUsersNext = await unlockIVKey(
+    location: CacheSecure.ivKeyUsersNextLocation,
+  );
 
   // Finally load persisted store
   var initialState;

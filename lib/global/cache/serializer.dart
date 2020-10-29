@@ -47,8 +47,12 @@ class CacheSerializer implements StateSerializer<AppState> {
     Future.microtask(() async {
       // // create a new IV for the encrypted cache
       CacheSecure.ivKey = createIVKey();
+
       // // backup the IV in case the app is force closed before caching finishes
-      await saveIVKeyNext(CacheSecure.ivKey);
+      await saveIVKey(
+        CacheSecure.ivKey,
+        ivKeyLocation: CacheSecure.ivKeyNextLocation,
+      );
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
@@ -103,7 +107,10 @@ class CacheSerializer implements StateSerializer<AppState> {
       }));
 
       // Rotate encryption for the next save
-      await saveIVKey(CacheSecure.ivKey);
+      await saveIVKey(
+        CacheSecure.ivKey,
+        ivKeyLocation: CacheSecure.ivKeyLocation,
+      );
     });
 
     // Disregard redux persist storage saving
@@ -164,6 +171,12 @@ class CacheSerializer implements StateSerializer<AppState> {
               defaultValue: null,
             );
             break;
+          case UserStore:
+            encryptedJson = CacheSecure.cacheUsers.get(
+              store.runtimeType.toString(),
+              defaultValue: null,
+            );
+            break;
           default:
             encryptedJson = CacheSecure.cacheMain.get(
               store.runtimeType.toString(),
@@ -172,8 +185,40 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
         }
 
+        // if all else fails, just pass back a fresh store to avoid a crash
+        if (encryptedJson == null) return;
+
+        // HACK: to stop the user madness
+        // attempt to decrypt encrypted state as User Store after loaded from RAM
+        if (store.runtimeType == UserStore) {
+          try {
+            final decryptedJson = aes.ctr.decrypt(
+              enc: encryptedJson,
+              iv: CacheSecure.ivKeyUsers,
+            );
+            decodedJson = json.decode(decryptedJson);
+          } catch (error) {
+            debugPrint('[CacheSerializer.decode] ${store.runtimeType}  $error');
+            decodedJson = {};
+          }
+          if (decodedJson.isEmpty) {
+            try {
+              final decryptedJson = aes.ctr.decrypt(
+                enc: encryptedJson,
+                iv: CacheSecure.ivKeyUsersNext,
+              );
+              decodedJson = json.decode(decryptedJson);
+            } catch (error) {
+              debugPrint(
+                '[CacheSerializer.decode] ${store.runtimeType} $error',
+              );
+              decodedJson = {};
+            }
+          }
+        }
+
         // attempt to decrypt encrypted state after loaded from RAM
-        if (encryptedJson != null) {
+        if (decodedJson.isEmpty) {
           try {
             final decryptedJson = aes.ctr.decrypt(
               enc: encryptedJson,
@@ -181,7 +226,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            debugPrint('[CacheSerializer.decode] $error');
+            debugPrint('[CacheSerializer.decode]${store.runtimeType}   $error');
             decodedJson = {};
           }
         }
@@ -196,7 +241,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
             decodedJson = json.decode(decryptedJson);
           } catch (error) {
-            debugPrint('[CacheSerializer.decode] $error');
+            debugPrint('[CacheSerializer.decode] ${store.runtimeType}  $error');
             decodedJson = {};
           }
         }
@@ -226,12 +271,17 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
           case UserStore:
             userStore = UserStore.fromJson(decodedJson);
+            if (userStore.users != null) {
+              debugPrint(
+                '[CacheSerializer.decode] USERS ${userStore.users.length}',
+              );
+            }
             break;
           default:
             break;
         }
       } catch (error) {
-        debugPrint('[CacheSerializer.decode] $error');
+        debugPrint('[CacheSerializer.decode] ${store.runtimeType} $error');
       }
     });
 
