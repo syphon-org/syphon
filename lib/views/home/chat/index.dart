@@ -21,7 +21,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
-import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -31,7 +30,6 @@ import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/views/home/chat/chat-input.dart';
-import 'package:syphon/views/home/chat/details-message.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
@@ -144,13 +142,11 @@ class ChatViewState extends State<ChatView> {
       final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
 
       if (atLimit && !loadMore) {
-        debugPrint('[messagesController.addListener] loading set to true');
         this.setState(() {
           loadMore = true;
         });
         props.onLoadMoreMessages();
       } else if (!atLimit && loadMore && !props.loading) {
-        debugPrint('[messagesController.addListener] loading set to false');
         this.setState(() {
           loadMore = false;
         });
@@ -317,6 +313,9 @@ class ChatViewState extends State<ChatView> {
     );
     editorController.clear();
     FocusScope.of(context).unfocus();
+    this.setState(() {
+      sendable = false;
+    });
   }
 
   @protected
@@ -713,10 +712,7 @@ class _Props extends Equatable {
       timeFormat24Enabled:
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
-      room: roomSelectors.room(
-        id: roomId,
-        state: store.state,
-      ),
+      room: roomSelectors.room(id: roomId, state: store.state),
       messages: latestMessages(
         wrapOutboxMessages(
           messages: roomSelectors.room(id: roomId, state: store.state).messages,
@@ -813,6 +809,7 @@ class _Props extends Equatable {
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
+        // fetch messages beyond the oldest known message - lastHash
         store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,

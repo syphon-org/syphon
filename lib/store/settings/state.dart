@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import "package:syphon/global/themes.dart";
@@ -12,8 +13,9 @@ import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 20
+// Next Field ID: 21
 @HiveType(typeId: SettingsStoreHiveId)
+@JsonSerializable()
 class SettingsStore extends Equatable {
   @HiveField(0)
   final int primaryColor;
@@ -49,9 +51,12 @@ class SettingsStore extends Equatable {
   final String fontSize;
   @HiveField(9)
   final String language;
+  @HiveField(20)
+  final String avatarShape;
 
   @HiveField(12)
   final List<Device> devices;
+
   // Map<roomId, ChatSetting>
   @HiveField(11)
   final Map<String, ChatSetting> customChatSettings;
@@ -62,9 +67,10 @@ class SettingsStore extends Equatable {
   @HiveField(14)
   final String alphaAgreement; // a timestamp of agreement for alpha TOS
 
+  @JsonKey(ignore: true) // temp
   final String pusherToken; // NOTE: can be device token for APNS
 
-  // Temporary
+  @JsonKey(ignore: true) // temp
   final bool loading;
 
   const SettingsStore({
@@ -76,6 +82,7 @@ class SettingsStore extends Equatable {
     this.fontName = 'Rubik',
     this.fontSize = 'Default',
     this.language = 'English',
+    this.avatarShape = 'Circle',
     this.enterSend = false,
     this.smsEnabled = false,
     this.readReceipts = false,
@@ -102,6 +109,7 @@ class SettingsStore extends Equatable {
         fontName,
         fontSize,
         language,
+        avatarShape,
         smsEnabled,
         enterSend,
         readReceipts,
@@ -126,6 +134,7 @@ class SettingsStore extends Equatable {
     String fontName,
     String fontSize,
     String language,
+    String avatarShape,
     bool smsEnabled,
     bool enterSend,
     bool readReceipts,
@@ -150,6 +159,7 @@ class SettingsStore extends Equatable {
         fontName: fontName ?? this.fontName,
         fontSize: fontSize ?? this.fontSize,
         language: language ?? this.language,
+        avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSend: enterSend != null ? enterSend : this.enterSend,
         readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
@@ -168,4 +178,9 @@ class SettingsStore extends Equatable {
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
       );
+
+  Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
+
+  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
+      _$SettingsStoreFromJson(json);
 }

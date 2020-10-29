@@ -108,6 +108,9 @@ class Strings {
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
 
+  static const confirmationInvites =
+      'Are you sure you want to invite the selected users to the following room?';
+
   static const confirmationStartChat = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat.';
   static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +
@@ -126,7 +129,7 @@ class Strings {
       'Please be aware this app is still very much in Alpha.\n';
 
   static const confirmationAlphaWarning =
-      'Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n';
+      'Do not use, nor do I recommend using, Syphon where proven and independently verified security is required.\n';
 
   static const confirmationAlphaWarningAlt =
       'You may lose data using this application as features and bugs are worked out.\n';

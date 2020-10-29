@@ -7,7 +7,7 @@ import 'package:syphon/global/colours.dart';
 // Project imports:
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class MessageTypingWidget extends StatefulWidget {
   final bool typing;
@@ -123,7 +123,7 @@ class MessageTypingState extends State<MessageTypingWidget>
                           margin: const EdgeInsets.only(right: 8),
                           child: userTyping.userId == null
                               ? null
-                              : AvatarCircle(
+                              : Avatar(
                                   uri: userTyping.avatarUri,
                                   alt: userTyping.displayName ??
                                       userTyping.userId,

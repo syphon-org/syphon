@@ -17,6 +17,10 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
       return state.copyWith(
         unauthed: action.unauthed,
       );
+    case SetBackgrounded:
+      return state.copyWith(
+        backgrounded: action.backgrounded,
+      );
     case SetOffline:
       return state.copyWith(
         offline: action.offline,
@@ -28,6 +32,7 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
         synced: action.synced,
         syncing: action.syncing,
         lastSince: action.lastSince,
+        lastAttempt: DateTime.now().millisecondsSinceEpoch,
         lastUpdate: action.synced
             ? DateTime.now().millisecondsSinceEpoch
             : state.lastUpdate,

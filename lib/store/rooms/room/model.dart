@@ -2,8 +2,11 @@
 import 'dart:collection';
 
 // Package imports:
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -21,8 +24,8 @@ class RoomPresets {
   static const public = 'public_chat';
 }
 
-// Next Hive Field 30
 @HiveType(typeId: RoomHiveId)
+@JsonSerializable()
 class Room {
   @HiveField(0)
   final String id;
@@ -73,8 +76,7 @@ class Room {
   @HiveField(17)
   final Message draft;
 
-  // TODO: removed until state timeline work can be done
-  // @HiveField(19)
+  // TODO: removed until state timeline work can be done 
   // final List<Event> state;
 
   @HiveField(20)
@@ -84,7 +86,9 @@ class Room {
   final List<Message> outbox;
 
   // Not cached
+  @JsonKey(ignore: true)
   final bool userTyping;
+  @JsonKey(ignore: true)
   final List<String> usersTyping;
 
   @HiveField(23)
@@ -99,8 +103,10 @@ class Room {
   @HiveField(27)
   final bool invite;
 
+  @JsonKey(ignore: true)
   final bool limited;
 
+  @JsonKey(ignore: true)
   String get type {
     if (joinRule == 'public' || worldReadable) {
       return 'public';
@@ -182,42 +188,43 @@ class Room {
     prevHash,
     nextHash,
     // state,
-  }) {
-    return Room(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      alias: alias ?? this.alias,
-      topic: topic ?? this.topic,
-      joinRule: joinRule ?? this.joinRule,
-      avatarUri: avatarUri ?? this.avatarUri,
-      homeserver: homeserver ?? this.homeserver,
-      draft: draft ?? this.draft,
-      invite: invite ?? this.invite,
-      direct: direct ?? this.direct,
-      sending: sending ?? this.sending,
-      syncing: syncing ?? this.syncing,
-      limited: limited ?? this.limited,
-      lastRead: lastRead ?? this.lastRead,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
-      namePriority: namePriority ?? this.namePriority,
-      totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
-      guestEnabled: guestEnabled ?? this.guestEnabled,
-      encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
-      userTyping: userTyping ?? this.userTyping,
-      usersTyping: usersTyping ?? this.usersTyping,
-      isDraftRoom: isDraftRoom ?? this.isDraftRoom,
-      outbox: outbox ?? this.outbox,
-      messages: messages ?? this.messages,
-      users: users ?? this.users,
-      messageReads: messageReads ?? this.messageReads,
-      lastHash: lastHash ?? this.lastHash,
-      prevHash: prevHash ?? this.prevHash,
-      nextHash: nextHash ?? this.nextHash,
-      // state: state ?? this.state,
-    );
-  }
+  }) =>
+      Room(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        alias: alias ?? this.alias,
+        topic: topic ?? this.topic,
+        joinRule: joinRule ?? this.joinRule,
+        avatarUri: avatarUri ?? this.avatarUri,
+        homeserver: homeserver ?? this.homeserver,
+        draft: draft ?? this.draft,
+        invite: invite ?? this.invite,
+        direct: direct ?? this.direct,
+        sending: sending ?? this.sending,
+        syncing: syncing ?? this.syncing,
+        limited: limited ?? this.limited,
+        lastRead: lastRead ?? this.lastRead,
+        lastUpdate: lastUpdate ?? this.lastUpdate,
+        namePriority: namePriority ?? this.namePriority,
+        totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
+        guestEnabled: guestEnabled ?? this.guestEnabled,
+        encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
+        userTyping: userTyping ?? this.userTyping,
+        usersTyping: usersTyping ?? this.usersTyping,
+        isDraftRoom: isDraftRoom ?? this.isDraftRoom,
+        outbox: outbox ?? this.outbox,
+        messages: messages ?? this.messages,
+        users: users ?? this.users,
+        messageReads: messageReads ?? this.messageReads,
+        lastHash: lastHash ?? this.lastHash,
+        prevHash: prevHash ?? this.prevHash,
+        nextHash: nextHash ?? this.nextHash,
+        // state: state ?? this.state,
+      );
 
-  factory Room.fromJson(Map<String, dynamic> json) {
+  Map<String, dynamic> toJson() => _$RoomToJson(this);
+  factory Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);
+  factory Room.fromMatrix(Map<String, dynamic> json) {
     try {
       return Room(
         id: json['room_id'],
@@ -256,14 +263,14 @@ class Room {
       final List<dynamic> stateEventsRaw = json['state']['events'];
 
       stateEvents =
-          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['invite_state'] != null) {
       final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
       stateEvents =
-          stateEventsRaw.map((event) => Event.fromJson(event)).toList();
+          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
     }
 
@@ -274,12 +281,16 @@ class Room {
       lastHash = json['timeline']['last_hash'];
       prevHash = json['timeline']['prev_batch'];
 
-      debugPrint('[LIMITED from /sync] ${limited}');
+      if (limited != null) {
+        debugPrint(
+          '[fromSync] LIMITED ${limited} ${lastHash} ${prevHash}',
+        );
+      }
 
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
       final List<Event> timelineEvents = List.from(
-        timelineEventsRaw.map((event) => Event.fromJson(event)),
+        timelineEventsRaw.map((event) => Event.fromMatrix(event)),
       );
 
       // TODO: make this more functional, need to split into two lists on type
@@ -299,14 +310,14 @@ class Room {
       final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
       ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromJson(event)).toList();
+          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['account_data'] != null) {
       final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
       accountEvents =
-          accountEventsRaw.map((event) => Event.fromJson(event)).toList();
+          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     return this
@@ -314,9 +325,9 @@ class Room {
           accountEvents,
         )
         .fromStateEvents(
-          events: stateEvents,
           invite: invite,
           limited: limited,
+          events: stateEvents,
           currentUser: currentUser,
         )
         .fromMessageEvents(
@@ -377,10 +388,8 @@ class Room {
     bool direct = this.direct ?? false;
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
-
     Map<String, User> users = this.users ?? Map<String, User>();
 
-    // room state event filter
     try {
       events.forEach((event) {
         final timestamp = event.timestamp ?? 0;
@@ -399,7 +408,6 @@ class Room {
 
           case 'm.room.join_rules':
             joinRule = event.content['join_rule'];
-            debugPrint('[Room.fromStateEvents] $joinRule');
             break;
 
           case 'm.room.canonical_alias':
@@ -436,21 +444,6 @@ class Room {
               );
             }
 
-            // likely an invite room
-            // attempt to show a name from whoever sent membership events
-            // if nothing else takes priority
-            if (namePriority == 4 && event.sender != currentUser.userId) {
-              if (displayName == null) {
-                namePriority = 4;
-                name = trimAlias(event.sender);
-                avatarUri = memberAvatarUri;
-              } else if (displayName != currentUser.displayName) {
-                namePriority = 4;
-                name = displayName;
-                avatarUri = memberAvatarUri;
-              }
-            }
-
             break;
           case 'm.room.encryption':
             encryptionEnabled = true;
@@ -461,36 +454,41 @@ class Room {
             break;
         }
       });
-    } catch (error) {}
+    } catch (error) {
+      debugPrint('[Room.fromStateEvents] ${error}');
+    }
 
-    // direct room naming check
     try {
+      // checks to make sure someone didn't name the room after the authed user
       final badRoomName =
           name == currentUser.displayName || name == currentUser.userId;
 
-      // what happens if you name a direct chat after the
-      // person you're sending it to? bad stuff, this tries
-      // to force the senders name on the room just in case
-      if (namePriority != 0 && users.isNotEmpty && (direct || badRoomName)) {
-        namePriority = 0;
-
-        // Filter out number of non current users to show preview of total and who
-
-        final nonCurrentUsers = users.values.where(
+      // no name room check
+      if ((namePriority > 3 && users.isNotEmpty && direct) || badRoomName) {
+        // Filter out number of non current users to show preview of total
+        final otherUsers = users.values.where(
           (user) =>
-              user.displayName != currentUser.displayName &&
-              user.userId != currentUser.userId,
+              user.userId != currentUser.userId &&
+              user.displayName != currentUser.displayName,
         );
 
-        final hasMultipleUsers =
-            nonCurrentUsers.isNotEmpty && nonCurrentUsers.length > 1;
-        final shownUser = users.values.elementAt(0);
+        if (otherUsers.isNotEmpty) {
+          // check naming options when direct/group without room name
+          final shownUser = otherUsers.elementAt(0);
+          final hasMultipleUsers = otherUsers.length > 1;
 
-        // set name and avi to first non user or that + total others
-        name = hasMultipleUsers
-            ? '${shownUser.displayName} and ${users.values.length - 1}'
-            : shownUser.displayName;
-        avatarUri = shownUser.avatarUri;
+          // set name and avi to first non user or that + total others
+          name = hasMultipleUsers
+              ? '${shownUser.displayName} and ${users.values.length - 1}'
+              : shownUser.displayName;
+
+          // set avatar if one has not been assigned
+          if (avatarUri == null &&
+              this.avatarUri == null &&
+              otherUsers.length == 1) {
+            avatarUri = shownUser.avatarUri;
+          }
+        }
       }
     } catch (error) {}
 
@@ -524,7 +522,6 @@ class Room {
   }) {
     try {
       bool limited;
-      bool isUpdated = false;
       int lastUpdate = this.lastUpdate;
       List<Message> messagesNew = events ?? [];
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
@@ -541,20 +538,27 @@ class Room {
         lastUpdate = messagesNew[0].timestamp;
       }
 
-      // Check to see if the new messages contain those existing in cache
-      if (messagesNew.isNotEmpty) {
-        final messageLatest = messagesExisting.firstWhere(
-          (msg) => msg.id == messagesNew[0].id,
-          orElse: () => null,
-        );
-        isUpdated = messageLatest != null;
-      }
+      // limited indicates need to fetch additional data for room timelines
+      if (this.limited) {
+        // Check to see if the new messages contain those existing in cache
+        if (messagesNew.isNotEmpty && messagesExisting.isNotEmpty) {
+          final messageLatest = messagesExisting.firstWhere(
+            (msg) => msg.id == messagesNew[0].id,
+            orElse: () => null,
+          );
+          // Set limited to false if they now exist
+          limited = messageLatest != null;
+        }
 
-      // Set limited (used to recursively sync) to false if
-      // - new messages contains old ones
-      // - it's the first full /sync (lastHash == null)
-      if (isUpdated != null || this.lastHash == null) {
-        limited = false;
+        // Set limited to false false if
+        // - the oldest hash (lastHash) is non-existant
+        // - the previous hash (most recent) is non-existant
+        // - the oldest hash equals the previously fetched hash
+        if (this.lastHash == null ||
+            this.prevHash == null ||
+            this.lastHash == this.prevHash) {
+          limited = false;
+        }
       }
 
       // Combine current and existing messages on unique ids
@@ -573,16 +577,7 @@ class Room {
       // Filter to find startTime and endTime
       final messagesAll = List<Message>.from(messagesMap.values);
 
-      // TODO: remove after 0.1.4 - message catchup works
-      if (true) {
-        // print('[fromMessageEvents] ${this.name}');
-        // print('[limited] ${limited}');
-        // print('[limited - cached] ${this.limited}');
-        // print('[lastHash] ${lastHash}');
-        // print('[lastHash - Cached] ${this.lastHash}');
-        // print('[prevHash] ${prevHash}');
-      }
-
+      // Save values to room
       return this.copyWith(
         outbox: outbox,
         messages: messagesAll,

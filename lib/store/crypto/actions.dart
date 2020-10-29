@@ -1,8 +1,3 @@
-/**
- * 
- * TODO: not sure if we ever need unsigned keys 
- */
-
 // Dart imports:
 import 'dart:convert';
 import 'dart:io';
@@ -20,7 +15,6 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -136,7 +130,7 @@ class DEBUGSetOutboundMessageSessionMap {
   DEBUGSetOutboundMessageSessionMap({this.nothing});
 }
 
-class ResetDeviceKeys {}
+class ResetCrypto {}
 
 /**
  * Helper Actions
@@ -178,7 +172,7 @@ ThunkAction<AppState> setOneTimeKeysClaimed(
 ThunkAction<AppState> deleteDeviceKeys() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(ResetDeviceKeys());
+      store.dispatch(ResetCrypto());
     } catch (error) {
       store.dispatch(
         addAlert(error: error, origin: 'deleteDeviceKeys'),
@@ -321,7 +315,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // cache current device key for authed user
-      final deviceKeysOwned = DeviceKey.fromJson(
+      final deviceKeysOwned = DeviceKey.fromMatrix(
         deviceKeysPayload['device_keys'],
       );
 
@@ -344,7 +338,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
   return (Store<AppState> store) async {
     try {
       final deviceKeyMap = {
-        'device_keys': deviceKey.toMap(),
+        'device_keys': deviceKey.toMatrix(),
       };
 
       // upload the public device keys
@@ -422,14 +416,21 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
 
 ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
   return (Store<AppState> store) async {
-    store.dispatch(
-      SetOneTimeKeysCounts(oneTimeKeysCounts: oneTimeKeysCounts),
-    );
+    // Confirm user has generated an olm account
+    final accessToken = store.state.authStore.user.accessToken;
+    if (accessToken == null) {
+      return;
+    }
 
+    // Confirm user has generated an olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     if (olmAccount == null) {
       return;
     }
+
+    store.dispatch(SetOneTimeKeysCounts(
+      oneTimeKeysCounts: oneTimeKeysCounts,
+    ));
 
     final int maxKeyCount = olmAccount.max_number_of_one_time_keys();
     final int signedCurveCount =
@@ -461,9 +462,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
-      // debugPrint('[updateOneTimeKeys] json:');
-      // printJson(payload);
-
       final data = await MatrixApi.uploadKeys(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -471,17 +469,10 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         data: payload,
       );
 
+      // Recoverable error from matrix
       if (data['errcode'] != null) {
-        debugPrint(
-          '[uploadIdentityKeys] error: ${data}',
-        );
-
         throw data['error'];
       }
-
-      debugPrint(
-        '[uploadIdentityKeys] one time key count: ${data['one_time_key_counts']}',
-      );
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -490,10 +481,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       // register new key counts
       store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
     } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'updateOneTimeKeys',
-      ));
+      store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
     }
   };
 }
@@ -1042,7 +1030,7 @@ ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
-          final deviceKey = DeviceKey.fromJson(device);
+          final deviceKey = DeviceKey.fromMatrix(device);
 
           if (newDeviceKeys[userId] == null) {
             newDeviceKeys[userId] = {};
@@ -1093,7 +1081,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 
       var exportData = {
         'account_key': store.state.cryptoStore.olmAccountKey,
-        'device_keys': deviceKey.toMap(),
+        'device_keys': deviceKey.toMatrix(),
       };
 
       file = await file.writeAsString(json.encode(exportData));
@@ -1126,7 +1114,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       store.dispatch(
         SetDeviceKeysOwned(
           deviceKeysOwned: {
-            authUser.deviceId: DeviceKey.fromJson(
+            authUser.deviceId: DeviceKey.fromMatrix(
               importData['device_keys'],
             ),
           },

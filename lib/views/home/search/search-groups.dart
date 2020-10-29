@@ -19,7 +19,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class GroupSearchView extends StatefulWidget {
   const GroupSearchView({Key key}) : super(key: key);
@@ -103,7 +103,7 @@ class GroupSearchState extends State<GroupSearchView> {
                         header: ListTile(
                           leading: Stack(
                             children: [
-                              AvatarCircle(
+                              Avatar(
                                 uri: room.avatarUri,
                                 alt: room.name,
                                 size: Dimensions.avatarSizeMin,

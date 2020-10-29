@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
@@ -9,6 +10,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: ChatSettingsHiveId)
+@JsonSerializable()
 class ChatSetting extends Equatable {
   @HiveField(0)
   final String roomId;
@@ -52,4 +54,8 @@ class ChatSetting extends Equatable {
         primaryColor: primaryColor ?? this.primaryColor,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       );
+  Map<String, dynamic> toJson() => _$ChatSettingToJson(this);
+
+  factory ChatSetting.fromJson(Map<String, dynamic> json) =>
+      _$ChatSettingFromJson(json);
 }

@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -8,6 +9,7 @@ import 'package:syphon/global/libs/hive/type-ids.dart';
 part 'model.g.dart';
 
 @HiveType(typeId: RuleHiveId)
+@JsonSerializable()
 class Rule extends Equatable {
   @HiveField(0)
   final String id; // rule_id
@@ -39,23 +41,26 @@ class Rule extends Equatable {
         actions,
       ];
 
+  Map<String, dynamic> toJson() => _$RuleToJson(this);
+
+  factory Rule.fromJson(Map<String, dynamic> json) => _$RuleFromJson(json);
+
   Rule copyWith({
     id,
     enabled,
     isDefault,
     conditions,
     actions,
-  }) {
-    return Rule(
-      id: id ?? this.id,
-      enabled: enabled ?? this.enabled,
-      isDefault: isDefault ?? this.isDefault,
-      conditions: conditions ?? this.conditions,
-      actions: actions ?? this.actions,
-    );
-  }
+  }) =>
+      Rule(
+        id: id ?? this.id,
+        enabled: enabled ?? this.enabled,
+        isDefault: isDefault ?? this.isDefault,
+        conditions: conditions ?? this.conditions,
+        actions: actions ?? this.actions,
+      );
 
-  factory Rule.fromJson(dynamic json) {
+  factory Rule.fromMatrix(dynamic json) {
     try {
       return Rule(
         id: json['rule_id'],

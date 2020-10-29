@@ -14,7 +14,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
@@ -109,7 +109,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                             hasIcon: true,
                             tapHeaderToExpand: false,
                             header: ListTile(
-                              leading: AvatarCircle(
+                              leading: Avatar(
                                 size: Dimensions.avatarSizeMin,
                                 url: homeserver['favicon'],
                                 alt: homeserver['hostname'],
@@ -222,7 +222,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                           Navigator.pop(context);
                         },
                         child: ListTile(
-                          leading: AvatarCircle(
+                          leading: Avatar(
                             alt: props.searchText ?? '',
                             size: Dimensions.avatarSizeMin,
                             background: props.searchText.length > 0

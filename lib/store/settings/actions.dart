@@ -1,5 +1,4 @@
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -30,6 +29,11 @@ class SetTheme {
 class SetPrimaryColor {
   final int color;
   SetPrimaryColor({this.color});
+}
+
+class SetAvatarShape {
+  final String avatarShape;
+  SetAvatarShape({this.avatarShape});
 }
 
 class SetAccentColor {
@@ -120,8 +124,9 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices =
-          jsonDevices.map((jsonDevice) => Device.fromJson(jsonDevice)).toList();
+      final List<Device> devices = jsonDevices
+          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
+          .toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
@@ -333,6 +338,24 @@ ThunkAction<AppState> incrementTheme() {
   };
 }
 
+ThunkAction<AppState> incrementAvatarShape() {
+  return (Store<AppState> store) async {
+    final currentShape = store.state.settingsStore.avatarShape;
+    var newShape;
+
+    switch (currentShape) {
+      case "Circle":
+        newShape = 'Square';
+        break;
+      default:
+        newShape = "Circle";
+        break;
+    }
+
+    store.dispatch(SetAvatarShape(avatarShape: newShape));
+  };
+}
+
 final languages = ['English', "Russian"];
 
 ThunkAction<AppState> incrementLanguage(context) {
@@ -393,6 +416,9 @@ ThunkAction<AppState> toggleNotifications() {
     )) {
       store.dispatch(ToggleNotifications());
       final enabled = store.state.settingsStore.notificationsEnabled;
+      final Map<String, String> roomNames = store.state.roomStore.rooms.map(
+        (roomId, room) => MapEntry(roomId, room.name),
+      );
       if (enabled) {
         await BackgroundSync.init();
         BackgroundSync.start(
@@ -401,6 +427,7 @@ ThunkAction<AppState> toggleNotifications() {
           accessToken: store.state.authStore.user.accessToken,
           lastSince: store.state.syncStore.lastSince,
           currentUser: store.state.authStore.user.userId,
+          roomNames: roomNames,
         );
 
         showBackgroundServiceNotification(

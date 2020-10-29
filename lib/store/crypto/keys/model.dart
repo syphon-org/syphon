@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -32,6 +33,7 @@ part 'model.g.dart';
   }
  */
 @HiveType(typeId: OneTimeKeyHiveId)
+@JsonSerializable()
 class OneTimeKey extends Equatable {
   @HiveField(0)
   final String userId;
@@ -60,4 +62,8 @@ class OneTimeKey extends Equatable {
         keys,
         signatures,
       ];
+
+  Map<String, dynamic> toJson() => _$OneTimeKeyToJson(this);
+  factory OneTimeKey.fromJson(Map<String, dynamic> json) =>
+      _$OneTimeKeyFromJson(json);
 }

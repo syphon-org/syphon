@@ -1,6 +1,5 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -69,6 +68,11 @@ class SetUsername {
 class SetUsernameValid {
   final bool valid;
   SetUsernameValid({this.valid});
+}
+
+class SetStopgap {
+  final bool stopgap;
+  SetStopgap({this.stopgap});
 }
 
 class SetPassword {
@@ -169,7 +173,6 @@ ThunkAction<AppState> startAuthObserver() {
 
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
-      debugPrint('[startAuthObserver] $user');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserCurrentProfile());
 
@@ -198,6 +201,7 @@ ThunkAction<AppState> startAuthObserver() {
         store.dispatch(ResetSync());
         store.dispatch(ResetRooms());
         store.dispatch(ResetUser());
+        store.dispatch(ResetCrypto());
       }
     };
 
@@ -224,6 +228,15 @@ ThunkAction<AppState> stopAuthObserver() {
  */
 ThunkAction<AppState> generateDeviceId({String salt}) {
   return (Store<AppState> store) async {
+    // Wait at least 2 seconds until you can attempt to login again
+    // includes processing time by authenticating matrix server
+    store.dispatch(SetStopgap(stopgap: true));
+
+    // prevents people spamming the login if it were to fail repeatedly
+    Timer(Duration(seconds: 2), () {
+      store.dispatch(SetStopgap(stopgap: false));
+    });
+
     final defaultId = Random.secure().nextInt(1 << 31).toString();
     var device = Device(
       deviceId: defaultId,
@@ -247,20 +260,16 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
       }
 
       // hash it
-      final deviceIdHashed = Crypt.sha256(
-        deviceId,
-        rounds: 1000,
-        salt: salt,
-      );
+      final cryptHash = Crypt.sha256(deviceId, rounds: 1000, salt: salt).hash;
 
       // make it easier to read
-      final deviceIdFriendly = deviceIdHashed.hash
+      final deviceIdHash = cryptHash
           .toUpperCase()
           .replaceAll(RegExp(r'[^\w]'), '')
           .substring(0, 10);
 
       device = Device(
-        deviceId: deviceIdFriendly,
+        deviceId: deviceIdHash,
         deviceIdPrivate: deviceId,
         displayName: Values.appDisplayName,
       );
@@ -299,6 +308,9 @@ ThunkAction<AppState> loginUser() {
           addInfo(
             message: Strings.errorCheckHomeserver,
           );
+          // sometimes, people leave an extra forward slash in the m.homeserver field
+        } else if (homeserver.endsWith('/')) {
+          homeserver = homeserver.replaceRange(homeserver.length - 1, null, '');
         }
       } catch (error) {/* still attempt login */}
 
@@ -321,7 +333,7 @@ ThunkAction<AppState> loginUser() {
       }
 
       await store.dispatch(SetUser(
-        user: User.fromJson(data),
+        user: User.fromMatrix(data),
       ));
 
       store.state.authStore.authObserver.add(
@@ -330,7 +342,11 @@ ThunkAction<AppState> loginUser() {
 
       store.dispatch(ResetOnboarding());
     } catch (error) {
-      store.dispatch(addAlert(message: error, error: error));
+      store.dispatch(addAlert(
+        origin: "loginUser",
+        message: error,
+        error: error,
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -348,11 +364,12 @@ ThunkAction<AppState> logoutUser() {
       if (store.state.authStore.user.homeserver == null) {
         throw Exception('Unavailable user data');
       }
-
+      final temp = '${store.state.authStore.user.accessToken}';
+      store.state.authStore.authObserver.add(null);
       final data = await MatrixApi.logoutUser(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
+        accessToken: temp,
       );
 
       if (data['errcode'] != null) {
@@ -517,25 +534,9 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
 
 /**
  * 
- * https://matrix.org/docs/spec/client_server/latest#id204
+ * Create a user / Attempt creation
  * 
- * 
- * Email Request (?)
- * https://matrix-client.matrix.org/_matrix/client/r0/register/email/requestToken
- * 
- * Request Token + SID
- * {"email":"syphon+testing@ere.io","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN","send_attempt":1,"next_link":"https://app.element.io/#/register?client_secret=MDWVwN79p5xIz7bgazVXvO8aabbVD0LN&hs_url=https%3A%2F%2Fmatrix-client.matrix.org&is_url=https%3A%2F%2Fvector.im&session_id=yGElwHyWRFHwVkChpyWIJqMO"}
- * 
- * Response Token + SID
- * {"sid": "UTWiabjnSXWWTAPs"}
- * 
- * 
- * Send Terms (?)
- * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.terms"},"inhibit_login":true}
- * 
- * Send Email Auth (?)
- * {"username":"syphon2","password":"testing again to see","initial_device_display_name":"app.element.io (Chrome, macOS)","auth":{"session":"yGElwHyWRFHwVkChpyWIJqMO","type":"m.login.email.identity","threepid_creds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"},"threepidCreds":{"sid":"UTWiabjnSXWWTAPs","client_secret":"MDWVwN79p5xIz7bgazVXvO8aabbVD0LN"}},"inhibit_login":true}
- * 
+ * process references are in assets/cheatsheet.md
  */
 ThunkAction<AppState> createUser({enableErrors = false}) {
   return (Store<AppState> store) async {
@@ -591,7 +592,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         return completedAll;
       }
 
-      store.dispatch(SetUser(user: User.fromJson(data)));
+      store.dispatch(SetUser(user: User.fromMatrix(data)));
 
       store.state.authStore.authObserver.add(
         store.state.authStore.user,
@@ -828,6 +829,15 @@ ThunkAction<AppState> setUsername({String username}) {
     store.dispatch(SetUsername(username: username.trim()));
   };
 }
+
+ThunkAction<AppState> setLoginPassword({String password}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetPassword(password: password));
+
+      store.dispatch(SetPasswordValid(
+        valid: password != null && password.length > 0,
+      ));
+    };
 
 ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
   return (Store<AppState> store) {

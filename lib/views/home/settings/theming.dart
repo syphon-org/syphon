@@ -197,6 +197,17 @@ class Theming extends StatelessWidget {
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
                         ),
+                        ListTile(
+                          onTap: () => props.onIncrementAvatarShape(),
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Avatar Shape',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.avatarShape,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -216,6 +227,7 @@ class Props extends Equatable {
   final String language;
   final String fontName;
   final String fontSize;
+  final String avatarShape;
 
   final bool roomTypeBadgesEnabled;
 
@@ -226,6 +238,7 @@ class Props extends Equatable {
   final Function onIncrementFontSize;
   final Function onIncrementTheme;
   final Function onToggleRoomTypeBadges;
+  final Function onIncrementAvatarShape;
 
   Props({
     @required this.primaryColor,
@@ -235,6 +248,7 @@ class Props extends Equatable {
     @required this.language,
     @required this.fontName,
     @required this.fontSize,
+    @required this.avatarShape,
     @required this.roomTypeBadgesEnabled,
     @required this.onSelectPrimaryColor,
     @required this.onSelectAccentColor,
@@ -243,6 +257,7 @@ class Props extends Equatable {
     @required this.onIncrementFontSize,
     @required this.onIncrementTheme,
     @required this.onToggleRoomTypeBadges,
+    @required this.onIncrementAvatarShape,
   });
 
   @override
@@ -254,6 +269,7 @@ class Props extends Equatable {
         language,
         fontName,
         fontSize,
+        avatarShape,
         roomTypeBadgesEnabled,
       ];
 
@@ -271,6 +287,7 @@ class Props extends Equatable {
         language: store.state.settingsStore.language ?? 'English',
         fontName: store.state.settingsStore.fontName ?? 'Rubik',
         fontSize: store.state.settingsStore.fontSize ?? 'Default',
+        avatarShape: store.state.settingsStore.avatarShape ?? 'Circle',
         roomTypeBadgesEnabled:
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         onToggleRoomTypeBadges: () => store.dispatch(
@@ -296,6 +313,9 @@ class Props extends Equatable {
         ),
         onIncrementTheme: () => store.dispatch(
           incrementTheme(),
+        ),
+        onIncrementAvatarShape: () => store.dispatch(
+          incrementAvatarShape(),
         ),
       );
 }

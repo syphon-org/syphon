@@ -5,9 +5,9 @@ description: a privacy focused matrix client
 # $ flutter create --org org.tether.tether
 # $ flutter run --no-fast-start
 # $ flutter pub get
-# $ flutter pub global run devtools 
+# $ flutter pub global run devtools
 # $ flutter pub run build_runner build
-# $ flutter pub run build_runner watch 
+# $ flutter pub run build_runner watch --delete-conflicting-outputs
 # $ flutter pub run build_runner build --delete-conflicting-outputs
 
 # troubleshooting
@@ -22,6 +22,7 @@ description: a privacy focused matrix client
 # $ emulator -list-avds
 # $ emulator -avd Pixel_3a_API_29
 # $ adb shell && run-as org.tether.tether # cache inspection
+# $ adb logcat ActivityManager:I flutter:I *:S
 
 # desktop support options
 # $ flutter config --enable-macos-desktop
@@ -42,25 +43,24 @@ description: a privacy focused matrix client
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +. 
-version: 0.1.3+104
+# followed by an optional build number separated by a +.
+version: 0.1.4+140
 
 environment:
-  sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner 
+  sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner
 
 dependencies:
   flutter:
     sdk: flutter
 
-  olm: 
+  olm:
     git:
       url: https://gitlab.com/famedly/libraries/dart-olm
       ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
- 
-  # Domain / Store
+
+  # State Management
   expandable: 3.0.1
   equatable: 1.2.4
-  crypt: 3.0.1
   canonical_json: 1.0.0
   convert: 2.1.1
   device_info: ^0.4.2
@@ -69,14 +69,25 @@ dependencies:
   redux_persist: 0.8.3
   redux_persist_flutter: 0.8.2
   flutter_redux: 0.6.0
-  hive: 1.4.4
-  hive_flutter:  0.3.1
-  flutter_secure_storage: 3.3.3
   mime: 0.9.7
   path_provider: 1.6.14
   package_info: 0.4.3
-  # steel_crypt: 1.7.1
+
+  # Encryption
+  crypt: 3.0.1
+  crypto: ^2.1.5
+  steel_crypt: ^2.2.2+1
   # cryptography: 1.2.1
+
+  # Cache
+  hive: 1.4.4
+  hive_flutter: 0.3.1
+  flutter_secure_storage: 3.3.3
+  json_annotation: ^3.1.0
+  checked_yaml: 1.0.2
+  # sembast: 2.4.7+7
+  # isolate_handler: 0.3.1
+  # flutter_isolate: 1.0.0+14
 
   # Services
   http: ^0.12.0+2
@@ -85,11 +96,8 @@ dependencies:
   http_parser: 3.1.4
   easy_localization: 2.3.3
   flutter_dotenv: 2.1.0
-  android_alarm_manager: 0.4.5+11
+  android_alarm_manager: 0.4.5+15
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
-  
-  # Converters
-  # json_serializable: 3.3.0
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
   # window_utils: 1.0.2
@@ -100,27 +108,28 @@ dependencies:
   flutter_svg: 0.18.1
   file_picker: 1.13.3
   image_picker: ^0.6.7+7
-  flutter_swiper : 1.1.6
-  webview_flutter: ^0.3.21 
+  flutter_swiper: 1.1.6
+  webview_flutter: ^0.3.21
   touchable_opacity: 1.0.2
   fab_circular_menu: ^1.0.0
   flutter_recaptcha_v2: 0.1.0
   smooth_page_indicator: 0.1.1
   flutter_local_notifications: 1.4.0
-  flutter_material_color_picker: ^1.0.5 
+  flutter_material_color_picker: ^1.0.5
   palette_generator: 0.2.3
 
 dev_dependencies:
+  json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
-  hive_generator: 0.7.1
+  hive_generator: 0.8.1
   # TODO: build fixes - remove later
-  build_resolvers: 1.3.10 # <- modified to solve build_runner  
+  build_resolvers: 1.3.10 # <- modified to solve build_runner
 
   # TODO: build fixes - remove later
 dependency_overrides:
   path: 1.7.0
-  analyzer: 0.39.14
+  analyzer: 0.39.16
   dart_style: 1.3.4
 
 flutter_icons:
@@ -132,7 +141,6 @@ flutter_icons:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -141,71 +149,67 @@ flutter:
   fonts:
     - family: Poppins
       fonts:
-        - asset: assets/fonts/Poppins-Italic.ttf 
+        - asset: assets/fonts/Poppins-Italic.ttf
         - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf 
-        - asset: assets/fonts/Poppins-Light.ttf 
-        - asset: assets/fonts/Poppins-Thin.ttf 
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-Light.ttf
+        - asset: assets/fonts/Poppins-Thin.ttf
     - family: Rubik
-      fonts: 
+      fonts:
         - asset: assets/fonts/Rubik-Regular.ttf
-        - asset: assets/fonts/Rubik-Medium.ttf 
-        - asset: assets/fonts/Rubik-Light.ttf 
+        - asset: assets/fonts/Rubik-Medium.ttf
+        - asset: assets/fonts/Rubik-Light.ttf
     - family: Inter
       fonts:
-        - asset: assets/fonts/Inter-Italic.ttf 
+        - asset: assets/fonts/Inter-Italic.ttf
         - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf 
-        - asset: assets/fonts/Inter-Light.ttf 
+        - asset: assets/fonts/Inter-Medium.ttf
+        - asset: assets/fonts/Inter-Light.ttf
 
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
-  assets: 
-   - ./.env.debug
-   - ./.env.release
-   - assets/translations/en.json
-   - assets/translations/ru.json
-   - assets/graphics/undraw_sync_files.svg
-   - assets/graphics/undraw_accept_terms.svg
-   - assets/graphics/undraw_mobile_user.svg
-   - assets/graphics/undraw_messaging_fun.svg
-   - assets/graphics/undraw_connection.svg
-   - assets/graphics/undraw_group_chat.svg
-   - assets/graphics/undraw_people.svg
-   - assets/graphics/undraw_site_content.svg
-   - assets/graphics/undraw_escaping.svg
-   - assets/graphics/undraw_message_sent.svg
-   - assets/graphics/undraw_new_message.svg
+  assets:
+    - ./.env.debug
+    - ./.env.release
+    - assets/translations/en.json
+    - assets/translations/ru.json
+    - assets/graphics/undraw_sync_files.svg
+    - assets/graphics/undraw_accept_terms.svg
+    - assets/graphics/undraw_mobile_user.svg
+    - assets/graphics/undraw_messaging_fun.svg
+    - assets/graphics/undraw_connection.svg
+    - assets/graphics/undraw_group_chat.svg
+    - assets/graphics/undraw_people.svg
+    - assets/graphics/undraw_site_content.svg
+    - assets/graphics/undraw_escaping.svg
+    - assets/graphics/undraw_message_sent.svg
+    - assets/graphics/undraw_new_message.svg
 
-   - assets/graphics/undraw_in_thought.svg
-   - assets/graphics/undraw_profile_data.svg
-   - assets/graphics/undraw_mention.svg
-   - assets/graphics/undraw_not_found.svg
-   - assets/icons/current/app_icon_cyan.svg
-   - assets/icons/current/app_icon_cyan.png
-   - assets/icons/current/app_icon_white.png
-   - assets/icons/global/being-check.svg
-   - assets/icons/global/being-person-add.svg
-   - assets/icons/global/being-group-add.svg
-   - assets/icons/global/being-public-add.svg
-   - assets/icons/global/being-search-public.svg
-   - assets/icons/global/being-search-public-condensed.svg
-   - assets/icons/global/being-message-syphon.svg
-   - assets/icons/global/being-send.svg
-   - assets/icons/global/being-send-solid.svg
-   - assets/icons/global/being-send-lock.svg
-   - assets/icons/global/being-send-lock-solid.svg
-   - assets/icons/global/being-send-unlock.svg
-   - assets/icons/global/being-chevrons-right.svg
-   - assets/icons/global/feather-message-circle.svg
-
-
+    - assets/graphics/undraw_in_thought.svg
+    - assets/graphics/undraw_profile_data.svg
+    - assets/graphics/undraw_mention.svg
+    - assets/graphics/undraw_not_found.svg
+    - assets/icons/current/app_icon_cyan.svg
+    - assets/icons/current/app_icon_cyan.png
+    - assets/icons/current/app_icon_white.png
+    - assets/icons/global/being-check.svg
+    - assets/icons/global/being-person-add.svg
+    - assets/icons/global/being-group-add.svg
+    - assets/icons/global/being-public-add.svg
+    - assets/icons/global/being-search-public.svg
+    - assets/icons/global/being-search-public-condensed.svg
+    - assets/icons/global/being-message-syphon.svg
+    - assets/icons/global/being-send.svg
+    - assets/icons/global/being-send-solid.svg
+    - assets/icons/global/being-send-lock.svg
+    - assets/icons/global/being-send-lock-solid.svg
+    - assets/icons/global/being-send-unlock.svg
+    - assets/icons/global/being-chevrons-right.svg
+    - assets/icons/global/feather-message-circle.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
-
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
-
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

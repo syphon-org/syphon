@@ -35,6 +35,8 @@ class Cache {
   static Box stateMedia;
   static LazyBox sync;
 
+  static String migration;
+
   static const group_id = '${Values.appNameLabel}';
   static const encryptionKeyLocation = '${Values.appNameLabel}@publicKey';
 
@@ -57,19 +59,42 @@ class Cache {
   static const accessTokenKey = 'accessToken';
   static const lastSinceKey = 'lastSince';
   static const currentUser = 'currentUser';
+
+  static const migrationKey = 'migrationKey';
 }
 
 /**
- * openHiveState UNSAFE
+ * TODO: Whole cache with this configuration will be deprecated after 0.1.4
+ */
+
+/**
+ * 
+ * Init Hive
  * 
  * For testing purposes only - should be encrypting hive
  */
 Future<void> initHive() async {
+  // NOTE: done in initCache
   // Init storage location
   final storageLocation = await initStorageLocation();
 
+  // Init hive cache
+  // Hive.init(storageLocation);
+
   // Init configuration
-  await initHiveConfiguration(storageLocation);
+  await initHiveConfiguration();
+
+  // ignore if already migrated cache
+  final storageEngine = FlutterSecureStorage();
+  Cache.migration = await storageEngine.read(key: Cache.migrationKey);
+  if (Cache.migration != null) return;
+
+  // otherwise, open and load the previous hive cache
+  if ((Platform.isAndroid || Platform.isIOS)) {
+    Cache.sync = await openHiveSync();
+    Cache.state = await openHiveState();
+    Cache.stateRooms = await openHiveStateRooms();
+  }
 }
 
 Future<dynamic> initStorageLocation() async {
@@ -105,9 +130,8 @@ Future<dynamic> initStorageLocation() async {
   }
 }
 
-Future<void> initHiveConfiguration(String storageLocationPath) async {
-  // Init hive cache
-  Hive.init(storageLocationPath);
+Future<void> initHiveConfiguration() async {
+// Future<void> initHiveConfiguration(String storageLocationPath) async {
 
   // Init Custom Models
   Hive.registerAdapter(ThemeTypeAdapter());
@@ -138,6 +162,7 @@ Future<List<int>> unlockEncryptionKey() async {
   var encryptionKey = await storageEngine.read(
     key: Cache.encryptionKeyLocation,
   );
+
   // Create a encryptionKey if a serialized one is not found
   if (encryptionKey == null) {
     encryptionKey = hex.encode(Hive.generateSecureKey());
@@ -149,42 +174,6 @@ Future<List<int>> unlockEncryptionKey() async {
   }
 
   return hex.decode(encryptionKey);
-}
-
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
-Future<Box> openHiveStateRoomsUnsafe() async {
-  return await Hive.openBox(
-    Cache.stateKeyUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
-}
-
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
-Future<Box> openHiveStateUnsafe() async {
-  return await Hive.openBox(
-    Cache.stateKeyRoomsUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
-}
-
-/**
- * openHiveState UNSAFE
- * 
- * For testing purposes only - should be encrypting hive
- */
-Future<LazyBox> openHiveSyncUnsafe() async {
-  return await Hive.openLazyBox(
-    Cache.syncKeyUNSAFE,
-    compactionStrategy: (entries, deletedEntries) => deletedEntries > 2,
-  );
 }
 
 /**
@@ -225,10 +214,8 @@ Future<Box> openHiveState() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
-    return await Hive.openBox(
-      Cache.stateKeyUNSAFE,
-    );
+    debugPrint('[openHiveState] $error');
+    return null;
   }
 }
 
@@ -248,10 +235,8 @@ Future<Box> openHiveStateRooms() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] open failure: $error');
-    return await Hive.openBox(
-      Cache.stateKeyUNSAFE,
-    );
+    debugPrint('[openHiveState] $error');
+    return null;
   }
 }
 
@@ -271,10 +256,8 @@ Future<LazyBox> openHiveSync() async {
       compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
     );
   } catch (error) {
-    debugPrint('[openHiveState] failure $error');
-    return await Hive.openLazyBox(
-      Cache.syncKeyUNSAFE,
-    );
+    debugPrint('[openHiveState] $error');
+    return null;
   }
 }
 
@@ -287,4 +270,67 @@ void closeStorage() async {
   if (Cache.state != null && Cache.state.isOpen) {
     Cache.sync.close();
   }
+}
+
+// Wipe all old cached files to deprecate old storage caches
+Future<void> deleteLegacyStorage() async {
+  try {
+    (await Hive.openBox(Cache.syncKeyUNSAFE)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.state');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKeyUNSAFE)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.stateKeyUNSAFE');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKeyRoomsUNSAFE)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.stateKeyRoomsUNSAFE');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openBox(Cache.backgroundKeyUNSAFE)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.backgroundKeyUNSAFE');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openLazyBox(Cache.syncKey)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.syncKey');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateKey)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.stateKey');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  try {
+    (await Hive.openBox(Cache.stateRoomKey)).deleteFromDisk();
+    debugPrint('[deleteStorage] deleting Cache.stateRoomKey');
+  } catch (error) {
+    debugPrint('[deleteStorage] ${error}');
+  }
+
+  Cache.sync = null;
+  Cache.state = null;
+  Cache.stateRooms = null;
+
+  final storageEngine = FlutterSecureStorage();
+  await storageEngine.write(key: Cache.migrationKey, value: 'yes');
+
+  debugPrint('[deleteLegacyStorage] ran and saved migration status');
+
+  return true;
 }

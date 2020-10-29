@@ -38,6 +38,11 @@ class SetOffline {
   SetOffline({this.offline});
 }
 
+class SetBackgrounded {
+  final bool backgrounded;
+  SetBackgrounded({this.backgrounded});
+}
+
 class SetSyncing {
   final bool syncing;
   SetSyncing({this.syncing});
@@ -82,7 +87,7 @@ ThunkAction<AppState> startSyncObserver() {
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
-          debugPrint('[Sync Observer] skipping sync, needs full sync');
+          debugPrint('[startSyncObserver] skipping sync, needs full sync');
           return;
         }
 
@@ -99,7 +104,7 @@ ThunkAction<AppState> startSyncObserver() {
               );
 
           debugPrint(
-            '[Sync Observer] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
+            '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
           );
 
           if (backoffLimit == 1) {
@@ -113,11 +118,11 @@ ThunkAction<AppState> startSyncObserver() {
         }
 
         if (store.state.syncStore.syncing) {
-          debugPrint('[Sync Observer] still syncing');
+          debugPrint('[startSyncObserver] still syncing');
           return;
         }
 
-        debugPrint('[Sync Observer] running sync');
+        debugPrint('[startSyncObserver] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -148,6 +153,8 @@ ThunkAction<AppState> stopSyncObserver() {
  * initial syncing terribly. It's incredibly cumbersome to load thousands of events
  * for multiple rooms all at once in order to show the user just some room names
  * and timestamps. Lazy loading isn't always supported, so it's not a solid solution
+ * 
+ * TODO: potentially re-enable the fetch rooms function if lazy_load fails
  */
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
@@ -162,6 +169,19 @@ ThunkAction<AppState> initialSync() {
 
 /**
  * 
+ * Set Backgrounded
+ * 
+ * Mark when the app has been backgrounded to visualize loading feedback
+ *  
+ */
+ThunkAction<AppState> setBackgrounded(bool backgrounded) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetBackgrounded(backgrounded: backgrounded));
+  };
+}
+
+/**
+ * 
  * Fetch Sync
  * 
  * Responsible for updates based on differences from Matrix
@@ -170,19 +190,23 @@ ThunkAction<AppState> initialSync() {
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
+      debugPrint('[fetchSync] starting sync');
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
+      var filterId;
+
       if (isFullSync) {
-        debugPrint('[fetchSync] fetching full sync');
+        debugPrint('[fetchSync] running full sync');
       }
 
-      // Matrix Sync to homeserver
+      // Normal matrix /sync call to the homeserver (Threaded)
       final data = await compute(MatrixApi.syncBackground, {
         'protocol': protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
         'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+        'filter': filterId,
         'timeout': 10000
       });
 
@@ -190,9 +214,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
           store.dispatch(SetUnauthed(unauthed: true));
           // TODO: signin prompt needed here
-        } else {
-          throw data['error'];
         }
+
+        throw data['error'];
       }
 
       final nextBatch = data['next_batch'];
@@ -225,7 +249,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         lastSince: nextBatch,
       ));
 
-      if (!kReleaseMode && isFullSync) {
+      if (isFullSync) {
         debugPrint('[fetchSync] full sync completed');
       }
     } catch (error) {
@@ -234,10 +258,12 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       try {
         // try to understand the error message
         message = (error.message as String);
-      } catch (error) {}
+      } catch (error) {
+        debugPrint('[fetchSync] $error');
+      }
 
       if (message.contains('SocketException')) {
-        debugPrint('[fetchSync] IOException $error');
+        debugPrint('[fetchSync] $error');
         store.dispatch(SetOffline(offline: true));
       }
 
@@ -245,35 +271,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
       store.dispatch(SetBackoff(backoff: nextBackoff));
     } finally {
+      store.dispatch(setBackgrounded(false));
       store.dispatch(SetSyncing(syncing: false));
     }
   };
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-
-  return directory.path;
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<File> get _localFile async {
-  final path = await _localPath;
-  return File('$path/matrix.json');
-}
-
-// WARNING: ONLY FOR TESTING OUTPUT
-Future<dynamic> readFullSyncJson() async {
-  try {
-    final file = await _localFile;
-    String contents = await file.readAsString();
-    return await jsonDecode(contents);
-  } catch (error) {
-    // If encountering an error, return 0.
-    debugPrint('[readFullSyncJson] $error');
-    return null;
-  } finally {
-    debugPrint('** Read State From Disk Successfully **');
-  }
 }

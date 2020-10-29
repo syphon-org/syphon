@@ -28,7 +28,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class SearchUserView extends StatefulWidget {
@@ -204,7 +204,7 @@ class SearchUserState extends State<SearchUserView> {
               child: Container(
                 child: ListTile(
                   enabled: creatingRoomDisplayName != searchable,
-                  leading: AvatarCircle(
+                  leading: Avatar(
                     uri: attemptableUser.avatarUri,
                     alt: attemptableUser.displayName ?? attemptableUser.userId,
                     size: Dimensions.avatarSizeMin,
@@ -264,7 +264,7 @@ class SearchUserState extends State<SearchUserView> {
                 child: Container(
                   child: ListTile(
                     enabled: creatingRoomDisplayName != user.displayName,
-                    leading: AvatarCircle(
+                    leading: Avatar(
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSizeMin,

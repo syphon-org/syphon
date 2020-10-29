@@ -35,6 +35,8 @@ abstract class MatrixApi {
   static final joinRoom = Rooms.joinRoom;
   static final leaveRoom = Rooms.leaveRoom;
   static final forgetRoom = Rooms.forgetRoom;
+  static final fetchFilter = Rooms.fetchFilter;
+  static final createFilter = Rooms.createFilter;
 
   // Events
   static final sendEvent = Events.sendEvent;

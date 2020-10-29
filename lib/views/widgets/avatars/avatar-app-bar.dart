@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class AvatarAppBar extends StatelessWidget {
   AvatarAppBar({
@@ -36,7 +36,7 @@ class AvatarAppBar extends StatelessWidget {
           children: <Widget>[
             IconButton(
               padding: EdgeInsets.all(4),
-              icon: AvatarCircle(
+              icon: Avatar(
                 uri: user.avatarUri,
                 alt: user.displayName ?? user.userId,
                 background: Colors.grey,

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
@@ -108,9 +109,7 @@ class AddArchive {
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncRooms(
-  Map roomData,
-) {
+ThunkAction<AppState> syncRooms(Map roomData) {
   return (Store<AppState> store) async {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
@@ -168,25 +167,19 @@ ThunkAction<AppState> syncRooms(
         ));
       }
 
-      // fetch previous messages since last /sync if
-      // more than one batch needs to be fetched (a gap)
       // and is not already at the end of the last known batch
       // the end would be room.prevHash == room.lastHash
+      // fetch previous messages since last /sync (a gap)
+      // determined by the fromSync function of room
       final roomUpdated = store.state.roomStore.rooms[room.id];
-
-      if (roomUpdated != null &&
-          room.limited &&
-          room.prevHash != null &&
-          room.prevHash != room.lastHash) {
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            to: room.lastHash,
-            from: room.prevHash,
-          ),
-        );
+      if (roomUpdated != null && room.limited) {
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.prevHash,
+        ));
       }
 
+      // update room
       store.dispatch(SetRoom(room: room));
     });
   };
@@ -274,8 +267,8 @@ ThunkAction<AppState> fetchRooms() {
  * Fetches both state and message of direct rooms
  * found from account_data of current authed user
  * 
- * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org],
- * alekseyparfyonov@gmail.com: [!muTrhMUMwdJSrYlqic:matrix.org] 
+ * Have to account for multiple direct rooms with one user
+ * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org, !124:matrix.org]
  */
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
@@ -292,67 +285,77 @@ ThunkAction<AppState> fetchDirectRooms() {
       }
 
       // Mark specified rooms as direct chats
-      final directRooms = data as Map<String, dynamic>;
+      final directRoomMap = data as Map<String, dynamic>;
+      final List<Map> directRoomList = [];
 
-      // TODO: refactor more functional
-      // Fetch room state and messages by roomId
-      directRooms.forEach((userId, roomIds) {
-        roomIds.forEach((roomId) async {
-          try {
-            final stateEvents = await MatrixApi.fetchStateEvents(
-              protocol: protocol,
-              homeserver: store.state.authStore.user.homeserver,
-              accessToken: store.state.authStore.user.accessToken,
-              roomId: roomId,
-            );
-
-            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-              throw stateEvents['error'];
-            }
-
-            final messageEvents = await compute(
-              MatrixApi.fetchMessageEventsMapped,
-              {
-                "protocol": protocol,
-                "homeserver": store.state.authStore.user.homeserver,
-                "accessToken": store.state.authStore.user.accessToken,
-                "roomId": roomId,
-                "limit": 20,
-              },
-            );
-
-            if (messageEvents['errcode'] != null) {
-              throw messageEvents['error'];
-            }
-
-            // Format response like /sync request
-            // Hacked together to provide isDirect data
-            await store.dispatch(syncRooms({
-              '$roomId': {
-                'state': {
-                  'events': stateEvents,
-                },
-                'timeline': {
-                  'events': messageEvents['chunk'],
-                  'prev_batch': messageEvents['from'],
-                },
-                'account_data': {
-                  'events': [
-                    {
-                      "type": 'm.direct',
-                      'content': {
-                        '$userId',
-                      }
-                    }
-                  ],
-                }
-              },
-            }));
-          } catch (error) {
-            debugPrint('[fetchDirectRooms] $error');
-          }
+      // Parse room map to allow for pulling by roomId (keeping userId)
+      directRoomMap.forEach((userId, roomIds) {
+        roomIds.forEach((roomId) {
+          directRoomList.add({userId: roomId});
         });
       });
+
+      // Fetch room state and messages by userId/roomId
+      final directRoomData = directRoomList.map((directRoom) async {
+        final userId = directRoom.keys.elementAt(0);
+        final roomId = directRoom.values.elementAt(0);
+        try {
+          final stateEvents = await MatrixApi.fetchStateEvents(
+            protocol: protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            roomId: roomId,
+          );
+
+          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+            throw stateEvents['error'];
+          }
+
+          final messageEvents = await compute(
+            MatrixApi.fetchMessageEventsMapped,
+            {
+              "protocol": protocol,
+              "homeserver": store.state.authStore.user.homeserver,
+              "accessToken": store.state.authStore.user.accessToken,
+              "roomId": roomId,
+              "limit": 20,
+            },
+          );
+
+          if (messageEvents['errcode'] != null) {
+            throw messageEvents['error'];
+          }
+
+          // Format response like /sync request
+          // Hacked together to provide isDirect data
+          await store.dispatch(syncRooms({
+            '$roomId': {
+              'state': {
+                'events': stateEvents,
+              },
+              'timeline': {
+                'events': messageEvents['chunk'],
+                'prev_batch': messageEvents['from'],
+              },
+              'account_data': {
+                'events': [
+                  {
+                    "type": 'm.direct',
+                    'content': {
+                      '$userId',
+                    }
+                  }
+                ],
+              }
+            },
+          }));
+        } catch (error) {
+          debugPrint('[fetchDirectRooms] $error');
+        }
+      });
+
+      // Wait for all room data to be pulled
+      await Future.wait(directRoomData);
     } catch (error) {
       debugPrint('[fetchDirectRooms] $error');
     } finally {
@@ -381,7 +384,7 @@ ThunkAction<AppState> createRoom({
   String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
-    var room;
+    Room room;
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
@@ -404,9 +407,19 @@ ThunkAction<AppState> createRoom({
         throw data['error'];
       }
 
-      room = Room(
-        id: data['room_id'],
+      // Create a room object with a new room id
+      room = Room(id: data['room_id']);
+
+      // Add invites to the user list beforehand
+      final userInviteMap = Map<String, User>.fromIterable(
+        invites,
+        key: (user) => user.userId,
+        value: (user) => user,
       );
+
+      room = room.copyWith(users: userInviteMap);
+
+      printJson(userInviteMap);
 
       if (avatarFile != null) {
         await store.dispatch(
@@ -429,6 +442,8 @@ ThunkAction<AppState> createRoom({
       if (encryption || isDirect) {
         await store.dispatch(toggleRoomEncryption(room: room));
       }
+
+      await store.dispatch(SetRoom(room: room));
 
       return room.id;
     } catch (error) {
@@ -778,7 +793,7 @@ ThunkAction<AppState> inviteUser({
       return true;
     } catch (error) {
       store.dispatch(
-        addAlert(error: error, origin: 'inviteUser'),
+        addAlert(error: error, message: error, origin: 'inviteUser'),
       );
       return false;
     } finally {

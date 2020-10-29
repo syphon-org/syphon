@@ -11,7 +11,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/themes.dart';
-import 'package:syphon/views/widgets/avatars/avatar-circle.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -98,7 +98,7 @@ class ProfileViewState extends State<ProfileView> {
         final double imageSize = Dimensions.avatarSizeDetails;
 
         // Space for confirming rebuilding
-        Widget avatarWidget = AvatarCircle(
+        Widget avatarWidget = Avatar(
           uri: props.user.avatarUri,
           alt: formatUsername(props.user),
           size: imageSize,

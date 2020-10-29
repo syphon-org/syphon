@@ -24,6 +24,7 @@ abstract class Rooms {
     bool fullState = false,
     String setPresence,
     int timeout = 10000,
+    String filter,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
@@ -32,6 +33,10 @@ abstract class Rooms {
     url += since != null ? '&since=$since' : '';
     url += setPresence != null ? '&set_presence=$setPresence' : '';
     url += timeout != null ? '&timeout=$timeout' : '';
+    url += filter != null ? '&filter=$filter' : '';
+    url += since == null && filter == null
+        ? '&filter={"room":{"state": {"lazy_load_members":true}, "timeline": {"lazy_load_members":true}}}'
+        : '';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -57,6 +62,7 @@ abstract class Rooms {
     String since = params['since'];
     bool fullState = params['fullState'];
     int timeout = params['timeout'];
+    String filter = params['filter'];
 
     return await sync(
       protocol: protocol,
@@ -65,6 +71,7 @@ abstract class Rooms {
       since: since,
       fullState: fullState,
       timeout: timeout,
+      filter: filter,
     );
   }
 
@@ -219,9 +226,7 @@ abstract class Rooms {
     final response = await http.post(
       url,
       headers: headers,
-      body: json.encode(
-        body,
-      ),
+      body: json.encode(body),
     );
 
     return await json.decode(
@@ -336,5 +341,77 @@ abstract class Rooms {
     return await json.decode(
       reponse.body,
     );
+  }
+
+  /**
+   * Create Room Filter (Lazy Loading) - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter
+   * 
+   * Create a filter to use when fetching room state, messages, or /sync'ing
+   * 
+   * TODO: failing, giving a too many requests error (?) won't return from matrix
+   */
+  static Future<dynamic> createFilter({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String userId,
+    bool lazyLoading = false,
+    Map filters,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = filters;
+
+    if (lazyLoading) {
+      body = {
+        "room": {
+          "state": {"lazy_load_members": true},
+        }
+      };
+    }
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Create Room Filter (Lazy Loading) - POST
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter
+   * 
+   * Create a filter to use when fetching room state, messages, or /sync'ing
+   */
+  static Future<dynamic> fetchFilter({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomAlias,
+    String filterId,
+    String userId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final reponse = await http.post(
+      url,
+      headers: headers,
+    );
+
+    return await json.decode(reponse.body);
   }
 }

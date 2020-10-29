@@ -11,13 +11,10 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
-import 'package:syphon/global/algos.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
-import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/events/model.dart';
@@ -61,9 +58,6 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      // debugPrint('[to] $to');
-      // debugPrint('[from] $from');
-
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
         "protocol": protocol,
         "homeserver": store.state.authStore.user.homeserver,
@@ -82,12 +76,6 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
-
-      // TODO: remove after 0.1.3 is merged
-      // messages.forEach((element) {
-      //   printJson(element);
-      // });
-      // debugPrint('[OLDEST] ${oldest}');
 
       // reuse the logic for syncing
       await store.dispatch(

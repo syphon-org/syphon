@@ -111,172 +111,179 @@ class LoginState extends State<Login> {
                     ),
                   ),
                   Flexible(
-                    flex: 2,
-                    child: Flex(
-                        direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: Text(
-                              tr('title-login'),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4
-                                  .copyWith(
-                                    color: Colors.white,
-                                  ),
-                            ),
-                          ),
-                        ]),
-                  ),
-                  Flexible(
-                    flex: 3,
+                    flex: 4,
                     fit: FlexFit.loose,
                     child: Flex(
                         direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            width: Dimensions.contentWidth(context),
-                            height: Dimensions.inputHeight,
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 8,
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: Dimensions.inputWidthMin,
-                              maxWidth: Dimensions.inputWidthMax,
-                            ),
-                            child: TextFieldSecure(
-                              maxLines: 1,
-                              label: 'username',
-                              disableSpacing: true,
-                              hint: props.usernameHint,
-                              controller: usernameController,
-                              onSubmitted: (text) {
-                                FocusScope.of(context)
-                                    .requestFocus(passwordFocus);
-                              },
-                              onChanged: (username) {
-                                props.onChangeUsername(username);
-                              },
-                              suffix: IconButton(
-                                highlightColor: Theme.of(context).primaryColor,
-                                icon: Icon(Icons.help_outline),
-                                tooltip: Strings.tooltipSelectHomeserver,
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/search/homeservers',
-                                  );
-                                },
+                            margin: const EdgeInsets.only(top: 64),
+                            child: FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Text(
+                                tr('title-login'),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline4
+                                    .copyWith(
+                                      color: Colors.white,
+                                    ),
                               ),
                             ),
                           ),
-                          Container(
-                            width: Dimensions.contentWidth(context),
-                            height: Dimensions.inputHeight,
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 8,
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: Dimensions.inputWidthMin,
-                              maxWidth: Dimensions.inputWidthMax,
-                            ),
-                            child: TextFieldSecure(
-                              label: 'password',
-                              focusNode: passwordFocus,
-                              obscureText: !visibility,
-                              textAlign: TextAlign.left,
-                              onChanged: (password) {
-                                props.onChangePassword(password);
-                              },
-                              suffix: GestureDetector(
-                                onTap: () {
-                                  if (!passwordFocus.hasFocus) {
-                                    // Unfocus all focus nodes
-                                    passwordFocus.unfocus();
-
-                                    // Disable text field's focus node request
-                                    passwordFocus.canRequestFocus = false;
-                                  }
-
-                                  // Do your stuff
-                                  this.setState(() {
-                                    visibility = !this.visibility;
-                                  });
-
-                                  if (!passwordFocus.hasFocus) {
-                                    //Enable the text field's focus node request after some delay
-                                    Future.delayed(Duration(milliseconds: 100),
-                                        () {
-                                      passwordFocus.canRequestFocus = true;
-                                    });
-                                  }
-                                },
-                                child: Icon(
-                                  visibility
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
+                          Column(
+                            children: [
+                              Container(
+                                width: Dimensions.contentWidth(context),
+                                height: Dimensions.inputHeight,
+                                margin: const EdgeInsets.only(
+                                  bottom: 8,
+                                ),
+                                constraints: BoxConstraints(
+                                  minWidth: Dimensions.inputWidthMin,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  maxLines: 1,
+                                  label: 'username',
+                                  disableSpacing: true,
+                                  hint: props.usernameHint,
+                                  controller: usernameController,
+                                  onSubmitted: (text) {
+                                    FocusScope.of(context)
+                                        .requestFocus(passwordFocus);
+                                  },
+                                  onChanged: (username) {
+                                    props.onChangeUsername(username);
+                                  },
+                                  suffix: IconButton(
+                                    highlightColor:
+                                        Theme.of(context).primaryColor,
+                                    icon: Icon(Icons.help_outline),
+                                    tooltip: Strings.tooltipSelectHomeserver,
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/search/homeservers',
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                              Container(
+                                width: Dimensions.contentWidth(context),
+                                height: Dimensions.inputHeight,
+                                margin: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 16,
+                                ),
+                                constraints: BoxConstraints(
+                                  minWidth: Dimensions.inputWidthMin,
+                                  maxWidth: Dimensions.inputWidthMax,
+                                ),
+                                child: TextFieldSecure(
+                                  label: 'password',
+                                  focusNode: passwordFocus,
+                                  obscureText: !visibility,
+                                  textAlign: TextAlign.left,
+                                  onChanged: (password) {
+                                    props.onChangePassword(password);
+                                  },
+                                  suffix: GestureDetector(
+                                    onTap: () {
+                                      if (!passwordFocus.hasFocus) {
+                                        // Unfocus all focus nodes
+                                        passwordFocus.unfocus();
+
+                                        // Disable text field's focus node request
+                                        passwordFocus.canRequestFocus = false;
+                                      }
+
+                                      // Do your stuff
+                                      this.setState(() {
+                                        visibility = !this.visibility;
+                                      });
+
+                                      if (!passwordFocus.hasFocus) {
+                                        //Enable the text field's focus node request after some delay
+                                        Future.delayed(
+                                            Duration(milliseconds: 100), () {
+                                          passwordFocus.canRequestFocus = true;
+                                        });
+                                      }
+                                    },
+                                    child: Icon(
+                                      visibility
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                         ]),
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 24),
-                    child: ButtonSolid(
-                      text: Strings.buttonLogin,
-                      loading: props.loading,
-                      disabled: !props.isLoginAttemptable,
-                      onPressed: () => props.onLoginUser(),
+                  Flexible(
+                    flex: 0,
+                    child: Flex(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(top: 24, bottom: 12),
+                          child: ButtonSolid(
+                            text: Strings.buttonLogin,
+                            loading: props.loading,
+                            disabled: !props.isLoginAttemptable,
+                            onPressed: () => props.onLoginUser(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Container(
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minHeight: Dimensions.inputHeight,
-                    ),
-                    margin: const EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      top: 16,
-                      bottom: 24,
-                    ),
-                    child: TouchableOpacity(
-                      activeOpacity: 0.4,
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/signup',
+                  Flexible(
+                    flex: 1,
+                    child: Container(
+                      height: Dimensions.inputHeight,
+                      constraints: BoxConstraints(
+                        minHeight: Dimensions.inputHeight,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            Strings.buttonLoginCreateQuestion,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w100,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Text(
-                              Strings.buttonLoginCreateAction,
+                      child: TouchableOpacity(
+                        activeOpacity: 0.4,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          '/signup',
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              Strings.buttonLoginCreateQuestion,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w100,
+                              ),
                             ),
-                          ),
-                        ],
+                            Container(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Text(
+                                Strings.buttonLoginCreateAction,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2
+                                    .copyWith(
+                                      color: Theme.of(context).primaryColor,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -320,7 +327,8 @@ class _Props extends Equatable {
       password: store.state.authStore.password,
       isLoginAttemptable: store.state.authStore.isPasswordValid &&
           store.state.authStore.isUsernameValid &&
-          !store.state.authStore.loading,
+          !store.state.authStore.loading &&
+          !store.state.authStore.stopgap,
       usernameHint: Strings.formatUsernameHint(
         store.state.authStore.homeserver,
       ),
@@ -344,9 +352,7 @@ class _Props extends Equatable {
         }
       },
       onChangePassword: (String text) {
-        store.dispatch(
-          setPassword(password: text, ignoreConfirm: true),
-        );
+        store.dispatch(setLoginPassword(password: text));
       },
       onIncrementTheme: () {
         store.dispatch(incrementTheme());

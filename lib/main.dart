@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 
 // Project imports:
@@ -20,64 +21,49 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
 
-void _enablePlatformOverrideForDesktop() {
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // load correct environment configurations
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
 
-  //
+  // disable debugPrint when in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
   }
 
-  _enablePlatformOverrideForDesktop();
-
-  // init cold cache (mobile only)
-  await initHive();
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    Cache.sync = await openHiveSync();
-    Cache.state = await openHiveState();
-    Cache.stateRooms = await openHiveStateRooms();
+  // init platform overrides for compatability with dart libs
+  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
-  if (Platform.isLinux || Platform.isWindows || Platform.isLinux) {
-    Cache.state = await openHiveStateUnsafe();
-    Cache.stateRooms = await openHiveStateRoomsUnsafe();
+  // init window mangment for desktop builds
+  if (Platform.isMacOS) {
+    // await WindowUtils.setSize(Size(720, 720));
   }
 
+  // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
     debugPrint('[main] background service started $backgroundSyncStatus');
   }
 
-  //  * DESKTOP ONLY
-  if (Platform.isMacOS) {
-    // await WindowUtils.setSize(Size(720, 720));
-  }
+  // init cold cache (mobile only)
+  await initCache();
 
-  // init state cache (hot)
-  final store = await initStore();
+  // TODO: remove after 0.1.4
+  await initHive();
 
-  // the main thing
-  runApp(
-    Syphon(
-      store: store,
-    ),
-  );
+  // init hot cache and start
+  runApp(Syphon(store: await initStore()));
 }
 
 class Syphon extends StatefulWidget {
@@ -117,6 +103,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void didChangeDependencies() {
     super.didChangeDependencies();
     onMounted();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+      case AppLifecycleState.inactive:
+        break;
+        break;
+      case AppLifecycleState.paused:
+        store.dispatch(setBackgrounded(true));
+        break;
+      case AppLifecycleState.detached:
+        store.dispatch(setBackgrounded(true));
+        break;
+    }
   }
 
   @protected
@@ -189,6 +191,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void deactivate() {
     closeStorage();
+    closeCache();
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());
@@ -210,12 +213,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => StoreProvider<AppState>(
         store: store,
-        child: EasyLocalization(
+        child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          // startLocale: store.state.settingsStore.language == languages[0]
-          //     ? null
-          //     : Locale(formatLanguageCode(store.state.settingsStore.language)),
           startLocale:
               Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),

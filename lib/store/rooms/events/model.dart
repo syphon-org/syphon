@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/hive/type-ids.dart';
@@ -58,6 +59,7 @@ class MediumType {
 }
 
 @HiveType(typeId: EventHiveId)
+@JsonSerializable()
 class Event {
   @HiveField(0)
   final String id; // event_id
@@ -99,34 +101,34 @@ class Event {
     stateKey,
     content,
     timestamp,
-  }) {
-    return Event(
-      id: id ?? this.id,
-      type: type ?? this.type,
-      sender: sender ?? this.sender,
-      roomId: roomId ?? this.roomId,
-      stateKey: stateKey ?? this.stateKey,
-      timestamp: timestamp ?? this.timestamp,
-      content: content ?? this.content,
-    );
-  }
+  }) =>
+      Event(
+        id: id ?? this.id,
+        type: type ?? this.type,
+        sender: sender ?? this.sender,
+        roomId: roomId ?? this.roomId,
+        stateKey: stateKey ?? this.stateKey,
+        timestamp: timestamp ?? this.timestamp,
+        content: content ?? this.content,
+      );
 
-  factory Event.fromJson(Map<String, dynamic> json) {
-    return Event(
-      id: json['event_id'] as String,
-      userId: json['user_id'] as String,
-      roomId: json['room_id'] as String,
-      type: json['type'] as String,
-      sender: json['sender'] as String,
-      stateKey: json['state_key'] as String,
-      timestamp: json['origin_server_ts'] as int,
-      content: json['content'] as dynamic,
-    );
-  }
+  Map<String, dynamic> toJson() => _$EventToJson(this);
+  factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
+  factory Event.fromMatrix(Map<String, dynamic> json) => Event(
+        id: json['event_id'] as String,
+        userId: json['user_id'] as String,
+        roomId: json['room_id'] as String,
+        type: json['type'] as String,
+        sender: json['sender'] as String,
+        stateKey: json['state_key'] as String,
+        timestamp: json['origin_server_ts'] as int,
+        content: json['content'] as dynamic,
+      );
 }
 
 // TODO: make this actually inherit Event but also allow immutability (dart says no?)
 @HiveType(typeId: MessageHiveId)
+@JsonSerializable()
 class Message {
   @HiveField(0)
   final String id; // event_id
@@ -175,6 +177,7 @@ class Message {
   * TODO: content will not always be a string? configure parsing data
   * or more complex objects
   */
+  @JsonKey(ignore: true)
   final dynamic content;
 
   const Message({
@@ -198,6 +201,10 @@ class Message {
     this.pending = false,
     this.failed = false,
   });
+
+  Map<String, dynamic> toJson() => _$MessageToJson(this);
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
@@ -237,15 +244,5 @@ class Message {
         failed: false,
       );
     }
-  }
-  @override
-  String toString() {
-    return '${this.runtimeType}{ \n' +
-        'id: $id,\n' +
-        'userId: $userId,\n' +
-        'roomId: $roomId,\n' +
-        'type: $type,\n' +
-        'content: $content,\n' +
-        'body: $body,\n';
   }
 }
