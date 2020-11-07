@@ -53,11 +53,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  olm:
-    git:
-      url: https://gitlab.com/famedly/libraries/dart-olm
-      ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
-
   # State Management
   expandable: 3.0.1
   equatable: 1.2.4
@@ -77,6 +72,12 @@ dependencies:
   crypt: 3.0.1
   crypto: ^2.1.5
   steel_crypt: ^2.2.2+1
+  olm: 1.2.1
+  # flutter_olm: 1.0.1
+  # olm:
+  #   git:
+  #     url: https://gitlab.com/famedly/libraries/dart-olm
+  #     ref: 4853b5301519a50866a81b58ac3730830a4fe547
   # cryptography: 1.2.1
 
   # Cache

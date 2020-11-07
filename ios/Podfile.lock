@@ -43,6 +43,11 @@ PODS:
     - Flutter
   - image_picker (0.0.1):
     - Flutter
+  - OLMKit (3.1.0):
+    - OLMKit/olmc (= 3.1.0)
+    - OLMKit/olmcpp (= 3.1.0)
+  - OLMKit/olmc (3.1.0)
+  - OLMKit/olmcpp (3.1.0)
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
@@ -67,6 +72,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - OLMKit
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -78,6 +84,7 @@ SPEC REPOS:
     - DKImagePickerController
     - DKPhotoGallery
     - FLAnimatedImage
+    - OLMKit
     - SDWebImage
     - SDWebImageFLPlugin
 
@@ -115,6 +122,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
+  OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   SDWebImage: 84000f962cbfa70c07f19d2234cbfcf5d779b5dc
@@ -123,6 +131,6 @@ SPEC CHECKSUMS:
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 
-PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
+PODFILE CHECKSUM: 30c35595b5989aa4b33d6db5a2de98d2a6490157
 
 COCOAPODS: 1.10.0
