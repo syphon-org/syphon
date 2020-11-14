@@ -565,12 +565,10 @@ packages:
   olm:
     dependency: "direct main"
     description:
-      path: "."
-      ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
-      resolved-ref: f66975bd1b5cb1865eba5efe6e3a392aa5e396a5
-      url: "https://gitlab.com/famedly/libraries/dart-olm"
-    source: git
-    version: "1.1.1"
+      name: olm
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
   package_config:
     dependency: transitive
     description:
