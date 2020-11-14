@@ -1,23 +1,13 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: RuleHiveId)
 @JsonSerializable()
 class Rule extends Equatable {
-  @HiveField(0)
   final String id; // rule_id
-
-  @HiveField(1)
   final bool enabled;
-
-  @HiveField(2)
   final bool isDefault;
 
   // determine if these can be saved without being parsed

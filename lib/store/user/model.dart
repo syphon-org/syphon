@@ -1,32 +1,19 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: UserHiveId)
 @JsonSerializable()
 class User extends Equatable {
-  @HiveField(0)
   final String userId;
-  @HiveField(1)
   final String deviceId; // current device id
-  @HiveField(7)
   final String idserver;
-  @HiveField(2)
   final String homeserver;
-  @HiveField(6)
   final String homeserverName;
-  @HiveField(3)
   final String accessToken;
-  @HiveField(4)
   final String displayName;
-  @HiveField(5)
   final String avatarUri;
 
   const User({

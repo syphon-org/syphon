@@ -2,19 +2,14 @@
 import 'dart:collection';
 
 // Package imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 
 part 'model.g.dart';
 
@@ -24,84 +19,50 @@ class RoomPresets {
   static const public = 'public_chat';
 }
 
-@HiveType(typeId: RoomHiveId)
 @JsonSerializable()
 class Room {
-  @HiveField(0)
   final String id;
-  @HiveField(1)
   final String name;
-  @HiveField(2)
   final String alias;
-  @HiveField(3)
   final String homeserver;
-  @HiveField(4)
   final String avatarUri;
-  @HiveField(5)
   final String topic;
-  @HiveField(29)
   final String joinRule; // "public", "knock", "invite", "private"
 
-  @HiveField(28)
   final int namePriority;
-  @HiveField(6)
+  final int lastRead;
   final bool direct;
-  @HiveField(7)
   final bool syncing;
-  @HiveField(8)
   final bool sending;
-  @HiveField(9)
   final bool isDraftRoom;
-
-  @HiveField(11)
-  final String lastHash; // oldest hash in timeline
-  @HiveField(26)
-  final String prevHash; // most recent prev_batch (not the lastHash)
-  @HiveField(10)
-  final String nextHash; // most recent next_batch
-
-  @HiveField(12)
-  final int lastUpdate;
-  @HiveField(13)
-  final int totalJoinedUsers;
-
-  @HiveField(14)
+  final bool invite;
   final bool guestEnabled;
-  @HiveField(15)
   final bool encryptionEnabled;
-  @HiveField(16)
   final bool worldReadable;
 
+  final String lastHash; // oldest hash in timeline
+  final String prevHash; // most recent prev_batch (not the lastHash)
+  final String nextHash; // most recent next_batch
+
+  final int lastUpdate;
+  final int totalJoinedUsers;
+
   // Event lists and handlers
-  @HiveField(17)
   final Message draft;
 
-  // TODO: removed until state timeline work can be done 
+  // TODO: removed until state timeline work can be done
   // final List<Event> state;
-
-  @HiveField(20)
   final List<Message> messages;
-
-  @HiveField(21)
   final List<Message> outbox;
 
-  // Not cached
-  @JsonKey(ignore: true)
-  final bool userTyping;
-  @JsonKey(ignore: true)
-  final List<String> usersTyping;
-
-  @HiveField(23)
-  final int lastRead;
-
-  @HiveField(24)
+  final Map<String, User> users;
   final Map<String, ReadStatus> messageReads;
 
-  @HiveField(25)
-  final Map<String, User> users;
+  @JsonKey(ignore: true)
+  final bool userTyping;
 
-  @HiveField(27)
-  final bool invite;
+  @JsonKey(ignore: true)
+  final List<String> usersTyping;
 
   @JsonKey(ignore: true)
   final bool limited;

@@ -1,33 +1,18 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: DeviceKeyHiveId)
 @JsonSerializable()
 class DeviceKey extends Equatable {
-  @HiveField(0)
   final String userId;
-  @HiveField(1)
   final String deviceId;
-  @HiveField(2)
   final List<String> algorithms;
-  @HiveField(3)
   final Map<String, String> keys;
-  @HiveField(4)
   final Map<String, dynamic> signatures;
-  @HiveField(5)
   final Map<String, String> extras;
-
-  // DEPRRECATED
-  @HiveField(6)
-  final Map<String, String> privateKeys;
 
   const DeviceKey({
     this.userId,
@@ -36,7 +21,6 @@ class DeviceKey extends Equatable {
     this.keys,
     this.signatures,
     this.extras,
-    this.privateKeys,
   });
 
   @override
@@ -47,7 +31,6 @@ class DeviceKey extends Equatable {
         keys,
         signatures,
         extras,
-        privateKeys,
       ];
 
   Map<String, dynamic> toMatrix() {

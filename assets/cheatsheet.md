@@ -63,3 +63,37 @@ if (true) {
    );
 
 ```
+
+```dart
+  // invite and membership events are different
+
+  // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
+  // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}
+
+```
+
+```dart
+
+/** 
+ * OneTimeKey Data Model
+ * 
+ * https://matrix.org/docs/spec/client_server/latest#id468
+ * {
+  "failures": {},
+    "one_time_keys": {
+      "@alice:example.com": {
+        "JLAFKJWSCS": {
+          "signed_curve25519:AAAAHg": {
+            "key": "zKbLg+NrIjpnagy+pIY6uPL4ZwEG2v+8F9lmgsnlZzs",
+            "signatures": {
+              "@alice:example.com": {
+                "ed25519:JLAFKJWSCS": "FLWxXqGbwrb8SM3Y795eB6OA8bwBcoMZFXBqnTn58AYWZSqiD45tlBVcDa2L7RwdKXebW/VzDlnfVJ+9jok1Bw"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+ */
+ ```

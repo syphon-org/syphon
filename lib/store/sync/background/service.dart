@@ -18,7 +18,6 @@ import 'dart:math';
 
 // Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:hive/hive.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -178,9 +177,8 @@ void notificationSyncIsolate() async {
  *  Save Full Sync
  */
 FutureOr<dynamic> syncLoop({
-  Box cache,
-  FlutterLocalNotificationsPlugin pluginInstance,
   Map params,
+  FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
     final protocol = params['protocol'];

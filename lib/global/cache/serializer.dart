@@ -11,8 +11,6 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
-import 'package:syphon/global/libs/hive/encoder.dart';
-import 'package:syphon/global/libs/hive/index.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
@@ -130,17 +128,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       settingsStore,
       userStore,
     ];
-
-    // TODO: remove after most have upgraded to 0.1.4/0.1.5
-    if ((Cache.state != null || Cache.stateRooms != null) &&
-        Cache.migration == null) {
-      debugPrint(
-        '[Legacy Cache Found] ***** FOUND ****** loading and removing cache',
-      );
-      final legacyAppState = LegacyEncoder.decodeHive();
-      deleteLegacyStorage();
-      return legacyAppState;
-    }
 
     // decode each store cache synchronously
     stores.forEach((store) {

@@ -1,23 +1,14 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: PusherHiveId)
 @JsonSerializable()
 class Pusher extends Equatable {
-  @HiveField(0)
   final String key;
-  @HiveField(1)
   final String kind;
-  @HiveField(2)
   final String appId;
-  @HiveField(3)
   final String appDisplayName;
 
   const Pusher({

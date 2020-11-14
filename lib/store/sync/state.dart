@@ -3,32 +3,23 @@ import 'dart:async';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: SyncStoreHiveId)
 @JsonSerializable(ignoreUnannotated: true)
 class SyncStore extends Equatable {
-  @HiveField(0)
   @JsonKey(name: 'synced')
   final bool synced;
 
-  @HiveField(3)
   @JsonKey(name: 'lastUpdate')
   final int lastUpdate; // Last timestamp for actual new info
 
-  @HiveField(4)
   @JsonKey(name: 'lastSince')
   final String lastSince; // Since we last checked for new info
 
   static const default_interval = 1;
 
-  @HiveField(5)
   @JsonKey(name: 'interval')
   final int interval = default_interval;
 
@@ -40,11 +31,9 @@ class SyncStore extends Equatable {
   final bool unauthed;
   final Timer syncObserver;
 
-  @HiveField(6)
   @JsonKey(name: 'lastAttempt')
   final int lastAttempt; // last attempt to sync
 
-  @HiveField(7)
   @JsonKey(name: 'backgrounded')
   final bool backgrounded;
 

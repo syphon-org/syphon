@@ -1,12 +1,10 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import "package:syphon/global/themes.dart";
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
@@ -14,63 +12,41 @@ import './chat-settings/model.dart';
 part 'state.g.dart';
 
 // Next Field ID: 21
-@HiveType(typeId: SettingsStoreHiveId)
 @JsonSerializable()
 class SettingsStore extends Equatable {
-  @HiveField(0)
   final int primaryColor;
-  @HiveField(1)
   final int accentColor;
-  @HiveField(15)
   final int appBarColor;
-  @HiveField(2)
   final int brightness;
-  @HiveField(10)
   final ThemeType theme;
 
-  @HiveField(4)
   final bool enterSend; // TODO: rename *enabled
-  @HiveField(3)
   final bool smsEnabled;
-  @HiveField(5)
   final bool readReceipts; // TODO: rename *enabled
-  @HiveField(6)
   final bool typingIndicators; // TODO: rename *enabled
-  @HiveField(7)
   final bool notificationsEnabled;
-  @HiveField(8)
   final bool membershipEventsEnabled;
-  @HiveField(18)
   final bool roomTypeBadgesEnabled;
-  @HiveField(19)
   final bool timeFormat24Enabled;
 
-  @HiveField(16)
   final String fontName;
-  @HiveField(17)
   final String fontSize;
-  @HiveField(9)
   final String language;
-  @HiveField(20)
   final String avatarShape;
 
-  @HiveField(12)
   final List<Device> devices;
 
   // Map<roomId, ChatSetting>
-  @HiveField(11)
   final Map<String, ChatSetting> customChatSettings;
 
-  @HiveField(13)
   final NotificationSettings notificationSettings;
 
-  @HiveField(14)
   final String alphaAgreement; // a timestamp of agreement for alpha TOS
 
-  @JsonKey(ignore: true) // temp
+  @JsonKey(ignore: true)
   final String pusherToken; // NOTE: can be device token for APNS
 
-  @JsonKey(ignore: true) // temp
+  @JsonKey(ignore: true)
   final bool loading;
 
   const SettingsStore({

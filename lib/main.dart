@@ -16,7 +16,6 @@ import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -58,9 +57,6 @@ void main() async {
 
   // init cold cache (mobile only)
   await initCache();
-
-  // TODO: remove after 0.1.4
-  await initHive();
 
   // init hot cache and start
   runApp(Syphon(store: await initStore()));
@@ -190,7 +186,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void deactivate() {
-    closeStorage();
     closeCache();
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());

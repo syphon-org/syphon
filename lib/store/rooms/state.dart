@@ -3,33 +3,21 @@ import 'dart:async';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import './room/model.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: RoomStoreHiveId)
 @JsonSerializable()
 class RoomStore extends Equatable {
-  @JsonKey(ignore: true)
-  final bool loading;
-
-  @HiveField(0)
   final bool synced;
-
-  @HiveField(3)
   final int lastUpdate; // Last timestamp for actual new info
+  final Map<String, Room> rooms;
 
   // consider renaming to nextBatch
-  @HiveField(4)
-  final String lastSince; // Since we last checked for new info
-
-  @HiveField(5)
-  final Map<String, Room> rooms;
+  // Since we last checked for new info
+  final String lastSince;
 
   @JsonKey(ignore: true)
   final Map<String, Room> archive; // TODO: actually archive
@@ -38,6 +26,9 @@ class RoomStore extends Equatable {
 
   @JsonKey(ignore: true)
   final Timer roomObserver;
+
+  @JsonKey(ignore: true)
+  final bool loading;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
   List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
