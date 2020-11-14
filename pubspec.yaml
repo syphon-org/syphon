@@ -44,7 +44,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.4+141
+version: 0.1.5+150
 
 environment:
   sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner
@@ -74,11 +74,11 @@ dependencies:
   steel_crypt: ^2.2.2+1
   olm: 1.2.1
   # flutter_olm: 1.0.1
+  # cryptography: 1.2.1
   # olm:
   #   git:
   #     url: https://gitlab.com/famedly/libraries/dart-olm
   #     ref: 4853b5301519a50866a81b58ac3730830a4fe547
-  # cryptography: 1.2.1
 
   # Cache
   hive: 1.4.4
@@ -123,15 +123,10 @@ dev_dependencies:
   json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
-  hive_generator: 0.8.1
-  # TODO: build fixes - remove later
-  build_resolvers: 1.3.10 # <- modified to solve build_runner
+  # build_resolvers: 1.3.10 # <- modified to solve build_runner
 
-  # TODO: build fixes - remove later
 dependency_overrides:
-  path: 1.7.0
-  analyzer: 0.39.16
-  dart_style: 1.3.4
+  analyzer: 0.39.16 # <- override to solve build_runner
 
 flutter_icons:
   android: true
