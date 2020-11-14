@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast.dart';
+import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/values.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:syphon/store/auth/state.dart';
 
 class CacheSecure {
   // encryption references (in memory only)
@@ -17,6 +22,11 @@ class CacheSecure {
   static Box cacheMain;
   static Box cacheRooms;
   static Box cacheCrypto;
+
+  // cache database references
+  static Database cacheMainSql;
+  static Database cacheRoomSql;
+  static Database cacheCryptoSql;
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
@@ -40,6 +50,27 @@ class CacheSecure {
 Future<void> initCache() async {
   // Init storage location
   final String storageLocation = await initStorageLocation();
+
+  /// Supports iOS/Android/MacOS for now.
+  final factory = getDatabaseFactorySqflite(sqflite.databaseFactory);
+
+  // Open sqlflit
+  final sqlite = await factory.openDatabase('${CacheSecure.cacheKeyMain}.db');
+
+  // Define the store, key is a string, value is a string
+  final store = StoreRef<String, String>.main();
+
+  // Define the record
+  final record = store.record(AuthStore().runtimeType.toString());
+
+  // Write a record
+  await record.put(sqlite, json.encode(AuthStore()));
+
+  // print store content
+  print(await store.stream(sqlite).first);
+
+  // Close the database
+  await sqlite.close();
 
   // Init configuration
   Hive.init(storageLocation);
