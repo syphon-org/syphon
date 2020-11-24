@@ -11,6 +11,7 @@ import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:syphon/store/auth/state.dart';
+import 'package:syphon/store/user/model.dart';
 
 class CacheSecure {
   // encryption references (in memory only)
@@ -54,23 +55,27 @@ Future<void> initCache() async {
   /// Supports iOS/Android/MacOS for now.
   final factory = getDatabaseFactorySqflite(sqflite.databaseFactory);
 
-  // Open sqlflit
-  final sqlite = await factory.openDatabase('${CacheSecure.cacheKeyMain}.db');
+  // Example
+  // final example = AuthStore(user: User(userId: 'testing123'));
 
   // Define the store, key is a string, value is a string
-  final store = StoreRef<String, String>.main();
+  // final store = StoreRef<String, String>.main();
 
-  // Define the record
-  final record = store.record(AuthStore().runtimeType.toString());
-
-  // Write a record
-  await record.put(sqlite, json.encode(AuthStore()));
+  // Define and write a record
+  // final record = await store
+  //     .record(example.runtimeType.toString())
+  //     .put(sqlite, json.encode(example));
 
   // print store content
-  print(await store.stream(sqlite).first);
+  // print('[CacheSecure] database read');
+  // print(await store.stream(sqlite).first);
 
   // Close the database
-  await sqlite.close();
+  // await sqlite.close();
+
+  // Open sqlflit
+  CacheSecure.cacheMainSql =
+      await factory.openDatabase('${CacheSecure.cacheKeyMain}.db');
 
   // Init configuration
   Hive.init(storageLocation);
@@ -125,6 +130,10 @@ void closeCache() async {
 
   if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
     CacheSecure.cacheCrypto.close();
+  }
+
+  if (CacheSecure.cacheMainSql != null) {
+    CacheSecure.cacheMainSql.close();
   }
 }
 

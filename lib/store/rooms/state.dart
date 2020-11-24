@@ -25,9 +25,6 @@ class RoomStore extends Equatable {
   final List<String> roomsHidden;
 
   @JsonKey(ignore: true)
-  final Timer roomObserver;
-
-  @JsonKey(ignore: true)
   final bool loading;
 
   bool get isSynced => lastUpdate != null && lastUpdate != 0;
@@ -40,7 +37,6 @@ class RoomStore extends Equatable {
     this.loading = false,
     this.lastUpdate = 0,
     this.lastSince,
-    this.roomObserver,
     this.roomsHidden = const [],
   });
 
@@ -51,7 +47,6 @@ class RoomStore extends Equatable {
         archive,
         lastUpdate,
         lastSince,
-        roomObserver,
         roomsHidden,
       ];
 
@@ -62,7 +57,6 @@ class RoomStore extends Equatable {
     loading,
     lastUpdate,
     lastSince,
-    roomObserver,
     roomsHidden,
   }) =>
       RoomStore(
@@ -72,7 +66,6 @@ class RoomStore extends Equatable {
         loading: loading ?? this.loading,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         lastSince: lastSince ?? this.lastSince,
-        roomObserver: roomObserver ?? this.roomObserver,
         roomsHidden: roomsHidden ?? this.roomsHidden,
       );
 

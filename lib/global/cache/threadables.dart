@@ -4,8 +4,11 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sembast/sembast.dart';
+import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 
@@ -51,6 +54,41 @@ Future<String> serializeJsonBackground(Object store) async {
     final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
 
     return cryptor.ctr.encrypt(inp: jsonEncoded, iv: ivKey);
+  } catch (error) {
+    debugPrint('[serializeJsonBackground] $error');
+    return null;
+  }
+}
+
+// responsibile for both json serialization and encryption
+Future<String> encryptSerializeObjectBackground(Object store) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  window.onPlatformMessage =
+      ServicesBinding.instance.defaultBinaryMessenger.handlePlatformMessage;
+
+  try {
+    final storageEngine = FlutterSecureStorage();
+
+    final ivKey = await storageEngine.read(key: CacheSecure.ivKeyLocation);
+    final cryptKey =
+        await storageEngine.read(key: CacheSecure.cryptKeyLocation);
+
+    final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+
+    final jsonEncrypted = cryptor.ctr.encrypt(inp: store, iv: ivKey);
+
+    /// Supports iOS/Android/MacOS for now.
+    final factory = getDatabaseFactorySqflite(sqflite.databaseFactory);
+
+    // Open sqlflite
+    final cacheSql =
+        await factory.openDatabase('${CacheSecure.cacheKeyMain}.db');
+
+    // Define and write a record
+    final storeRef = StoreRef<String, String>.main();
+    await storeRef.record(store.runtimeType.toString()).put(cacheSql, store);
+
+    //
   } catch (error) {
     debugPrint('[serializeJsonBackground] $error');
     return null;

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
+import 'package:sembast/sembast.dart';
 import 'package:steel_crypt/steel_crypt.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
@@ -30,7 +31,7 @@ import 'package:syphon/store/settings/state.dart';
 class CacheSerializer implements StateSerializer<AppState> {
   @override
   Uint8List encode(AppState state) {
-    final stores = [
+    final List<Object> stores = [
       state.authStore,
       state.syncStore,
       state.cryptoStore,
@@ -45,6 +46,7 @@ class CacheSerializer implements StateSerializer<AppState> {
     Future.microtask(() async {
       // // create a new IV for the encrypted cache
       CacheSecure.ivKey = createIVKey();
+
       // // backup the IV in case the app is force closed before caching finishes
       await saveIVKeyNext(CacheSecure.ivKey);
 
@@ -54,16 +56,34 @@ class CacheSerializer implements StateSerializer<AppState> {
           var jsonEncoded;
           var jsonEncrypted;
 
-          // encode the store contents to json
-          // HACK: unable to pass both listed stores direct to an isolate
-          // final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
-          // if (!sensitiveStorage.contains(store.runtimeType)) {
-          //   jsonEncoded = await compute(jsonEncode, store);
-          // } else {
-          jsonEncoded = json.encode(store);
-          // }
+          // serialize the store contents
+          try {
+            // HACK: unable to pass both listed stores direct to an isolate
+            final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
+            if (!sensitiveStorage.contains(store.runtimeType)) {
+              jsonEncoded = await compute(jsonEncode, store);
+            } else {
+              jsonEncoded = json.encode(store);
+            }
+          } catch (error) {
+            jsonEncoded = json.encode(store);
+            print(
+              '[Cache] Background Encoding Failed ${store.runtimeType.toString()} $error',
+            );
+          }
 
-          // encrypt the store contents previously converted to json
+          // encrypt the store contents
+          try {
+            final cache = CacheSecure.cacheMainSql;
+            final storeRef = StoreRef<String, String>.main();
+            final jsonEncrypted = json.encode(store);
+            await storeRef
+                .record(store.runtimeType.toString())
+                .put(cache, jsonEncrypted);
+          } catch (error) {
+            print('[Cache] ERROR $error');
+          }
+
           jsonEncrypted = await compute(encryptJsonBackground, {
             'ivKey': CacheSecure.ivKey,
             'cryptKey': CacheSecure.cryptKey,
