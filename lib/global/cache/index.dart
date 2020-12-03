@@ -22,9 +22,6 @@ class CacheSecure {
   // hot cachee refrences
   static Database cacheMain;
 
-  // cold storage references
-  static Database storageMain;
-
   // inital store caches for reload
   static Map<String, Map> cacheStores = {};
 
@@ -51,6 +48,10 @@ class CacheSecure {
  * (needs cold storage extracted as it's own entity)
  */
 Future<void> initCache() async {
+  // Configure cache encryption/decryption instance
+  CacheSecure.ivKey = await unlockIVKey();
+  CacheSecure.ivKeyNext = await unlockIVKeyNext();
+  CacheSecure.cryptKey = await unlockCryptKey();
   try {
     var cacheFactory;
 
@@ -80,16 +81,10 @@ Future<void> initCache() async {
     CacheSecure.cacheMain = await cacheFactory.openDatabase(
       cachePath,
     );
-    printDebug('CacheSecure.cacheMain');
     return Future.sync(() => null);
   } catch (error) {
     debugPrint('[initCache] ${error}');
   }
-
-  // Configure cache encryption/decryption instance
-  CacheSecure.ivKey = await unlockIVKey();
-  CacheSecure.ivKeyNext = await unlockIVKeyNext();
-  CacheSecure.cryptKey = await unlockCryptKey();
 }
 
 // // Closes and saves storage

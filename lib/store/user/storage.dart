@@ -26,16 +26,14 @@ Future<Map<String, User>> loadUsers({
   Database storage,
 }) async {
   final Map<String, User> userMap = {};
+
   try {
     final store = StoreRef<String, String>('users');
-    printDebug('store');
     final allUsers = await store.find(storage);
-    printDebug('allUsers');
 
     if (allUsers.isEmpty) {
       return userMap;
     }
-    printDebug('allUsers.isEmpty');
 
     for (RecordSnapshot<String, String> record in allUsers) {
       userMap[record.key] = json.decode(record.value);

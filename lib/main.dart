@@ -58,15 +58,12 @@ void main() async {
     debugPrint('[main] background service started $backgroundSyncStatus');
   }
 
-  printDebug('await initCache();');
   // init hot cache and cold storage
   await initCache();
 
-  printDebug('await initStorage();');
   // init cold storage and load to data
   await initStorage();
 
-  printDebug('await loadStorage();');
   // actually load storage to memory (to rehydrate cache for now)
   await loadStorage();
 

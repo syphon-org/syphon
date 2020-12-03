@@ -9,9 +9,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/cache/index.dart';
-import 'package:syphon/store/rooms/events/parsers.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
@@ -27,7 +26,6 @@ import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/parsers.dart';
 import 'events/model.dart';
 import 'room/model.dart';
 
@@ -167,7 +165,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       // -- COLD STORAGE --
       await saveUsers(
         room.users,
-        storage: CacheSecure.storageMain,
+        storage: StorageSecure.storageMain,
       );
 
       // fetch avatar if a uri was found

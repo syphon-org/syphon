@@ -54,7 +54,9 @@ Future<void> initStorage() async {
 }
 
 Future<void> loadStorage() async {
-  StorageSecure.storageData['users'] = await loadUsers();
+  StorageSecure.storageData['users'] = await loadUsers(
+    storage: StorageSecure.storageMain,
+  );
 }
 
 // // Closes and saves storage
