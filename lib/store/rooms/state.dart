@@ -21,6 +21,7 @@ class RoomStore extends Equatable {
 
   @JsonKey(ignore: true)
   final Map<String, Room> archive; // TODO: actually archive
+
   @JsonKey(ignore: true)
   final List<String> roomsHidden;
 

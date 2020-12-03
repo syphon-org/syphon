@@ -10,6 +10,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/store/rooms/events/parsers.dart';
 
 // Project imports:
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
@@ -23,7 +25,9 @@ import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/parsers.dart';
 import 'events/model.dart';
 import 'room/model.dart';
 
@@ -153,11 +157,17 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         json['timeline']['events'] = decryptedTimelineEvents;
       }
 
-      // Filter through parsers
+      // filter through parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
         lastSince: lastSince,
+      );
+
+      // -- COLD STORAGE --
+      await saveUsers(
+        room.users,
+        storage: CacheSecure.storageMain,
       );
 
       // fetch avatar if a uri was found

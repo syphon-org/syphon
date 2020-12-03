@@ -7,7 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/storage.dart';
 
 // Project imports:
@@ -90,22 +89,17 @@ AppState appReducer(AppState state, action) => AppState(
 
 /**
  * Initialize Store
- * - Hot redux state cache for top level data
- * * Consider still using hive here
- * 
- * PLEASE NOTE redux persist manages when the store
- * should persist and if it can, not where it's persisting too
- * this is why the "storage: MemoryStore()" property is set and
- * the Hive Serializer has been impliemented
+ * - Hot redux state cache for top level data 
  */
 Future<Store> initStore() async {
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: CacheStorage(),
     serializer: CacheSerializer(),
+    // TODO: can remove once cold storage is in place
     throttleDuration: Duration(milliseconds: 4500),
     shouldSave: (Store<AppState> store, dynamic action) {
-      // TODO: can remove once sqlcipher storage is in place
+      // TODO: can remove once cold storage is in place
       switch (action.runtimeType) {
         case SetSynced:
           if (action.synced) {

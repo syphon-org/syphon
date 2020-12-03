@@ -31,7 +31,7 @@ class CacheStorage implements StorageEngine {
     try {
       Stopwatch stopwatchTotal = new Stopwatch()..start();
 
-      final cache = CacheSecure.cacheMainSql;
+      final cache = CacheSecure.cacheMain;
 
       await Future.wait(stores.map((store) async {
         Stopwatch stopwatchStore = new Stopwatch()..start();
@@ -59,16 +59,16 @@ class CacheStorage implements StorageEngine {
         debugPrint('[CacheStorage] decrypt ${stopwatchStore.elapsed}');
 
         // Load for CacheSerializer to use later
-        CacheSecure.cacheStoreDecoded[type] = jsonDecoded;
+        CacheSecure.cacheStores[type] = jsonDecoded;
       }));
 
-      debugPrint('[CacheStorage] load total time ${stopwatchTotal.elapsed} ');
+      debugPrint('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
     } catch (error) {
-      printError(error, title: 'CacheStorage.load');
+      printError(error, title: 'CacheStorage');
     }
 
     // unlock redux_persist after cache loaded from sqflite
-    return null;
+    return Uint8List(0);
   }
 
   @override
@@ -77,7 +77,7 @@ class CacheStorage implements StorageEngine {
   }
 
   static Future<void> saveOffload(String jsonEncrypted, {String type}) async {
-    final cache = CacheSecure.cacheMainSql;
+    final cache = CacheSecure.cacheMain;
     final table = StoreRef<String, String>.main();
     final record = table.record(type);
     await record.put(cache, jsonEncrypted);

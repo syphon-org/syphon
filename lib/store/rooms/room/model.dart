@@ -50,15 +50,18 @@ class Room {
   // Event lists and handlers
   final Message draft;
 
+  // Associated user ids
+  final List<String> userIds;
+
   // TODO: removed until state timeline work can be done
   // final List<Event> state;
   final List<Message> messages;
   final List<Message> outbox;
 
+  final Map<String, ReadStatus> messageReads;
+
   @JsonKey(ignore: true)
   final Map<String, User> users;
-
-  final Map<String, ReadStatus> messageReads;
 
   @JsonKey(ignore: true)
   final bool userTyping;
@@ -101,6 +104,7 @@ class Room {
     this.limited = false,
     this.draft,
     this.users,
+    this.userIds = const [],
     this.outbox = const [],
     this.messages = const [],
     this.lastRead = 0,
@@ -143,6 +147,7 @@ class Room {
     isDraftRoom,
     draft,
     users,
+    userIds,
     events,
     outbox,
     messages,
@@ -178,6 +183,7 @@ class Room {
         outbox: outbox ?? this.outbox,
         messages: messages ?? this.messages,
         users: users ?? this.users,
+        userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
@@ -459,6 +465,7 @@ class Room {
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
       users: users ?? this.users,
+      userIds: users.keys.toList(),
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,

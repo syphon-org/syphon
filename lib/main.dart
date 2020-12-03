@@ -14,6 +14,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
@@ -37,6 +39,7 @@ void main() async {
   // disable debugPrint when in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
+    printDebug = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -55,8 +58,17 @@ void main() async {
     debugPrint('[main] background service started $backgroundSyncStatus');
   }
 
-  // init cold cache (mobile only)
+  printDebug('await initCache();');
+  // init hot cache and cold storage
   await initCache();
+
+  printDebug('await initStorage();');
+  // init cold storage and load to data
+  await initStorage();
+
+  printDebug('await loadStorage();');
+  // actually load storage to memory (to rehydrate cache for now)
+  await loadStorage();
 
   // init hot cache and start
   runApp(Syphon(store: await initStore()));

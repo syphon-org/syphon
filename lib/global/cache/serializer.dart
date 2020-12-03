@@ -11,6 +11,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
@@ -96,7 +97,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
           try {
             Stopwatch stopwatchSave = new Stopwatch()..start();
-            final cache = CacheSecure.cacheMainSql;
+            final cache = CacheSecure.cacheMain;
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache, jsonEncrypted);
 
@@ -132,11 +133,9 @@ class CacheSerializer implements StateSerializer<AppState> {
     SettingsStore settingsStore = SettingsStore();
     UserStore userStore = UserStore();
 
-    // final aes = AesCrypt(key: CacheSecure.cryptKey, padding: PaddingAES.pkcs7);
-
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
-    final stores = CacheSecure.cacheStoreDecoded;
+    final stores = CacheSecure.cacheStores;
 
     // decode each store cache synchronously
     stores.forEach((type, store) {
@@ -166,6 +165,10 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
           case 'UserStore':
             userStore = UserStore.fromJson(store);
+            // TODO: rehydrating users from cold storage
+            userStore = userStore.copyWith(
+              users: StorageSecure.storageData['users'] ?? {},
+            );
             break;
           default:
             break;

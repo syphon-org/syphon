@@ -5,14 +5,12 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:steel_crypt/steel_crypt.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class CacheSecure {
@@ -21,22 +19,17 @@ class CacheSecure {
   static String ivKeyNext;
   static String cryptKey;
 
-  // cache refrences
-  static Box cacheMain;
-  static Box cacheRooms;
-  static Box cacheCrypto;
+  // hot cachee refrences
+  static Database cacheMain;
 
-  // cache database references
-  static Database cacheMainSql;
+  // cold storage references
+  static Database storageMain;
 
   // inital store caches for reload
-  static Map<String, Map> cacheStoreDecoded = {};
+  static Map<String, Map> cacheStores = {};
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
-  static const cacheKeyMainAlt = '${Values.appNameLabel}-main-cache-alt';
-  static const cacheKeyRooms = '${Values.appNameLabel}-room-cache';
-  static const cacheKeyCrypto = '${Values.appNameLabel}-crypto-cache';
 
   // cache key identifiers
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
@@ -44,30 +37,38 @@ class CacheSecure {
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
-  static const roomNamesKey = 'roomNamesKey';
-  static const protocolKey = 'protocol';
-  static const homeserverKey = 'homeserver';
-  static const accessTokenKey = 'accessToken';
-  static const lastSinceKey = 'lastSince';
   static const userIdKey = 'userId';
+  static const protocolKey = 'protocol';
+  static const lastSinceKey = 'lastSince';
+  static const homeserverKey = 'homeserver';
+  static const roomNamesKey = 'roomNamesKey';
+  static const accessTokenKey = 'accessToken';
 }
 
+/**
+ * Init Cache
+ * 
+ * (needs cold storage extracted as it's own entity)
+ */
 Future<void> initCache() async {
   try {
-    var factory;
-    var databasePath = '${CacheSecure.cacheKeyMainAlt}.db';
+    var cacheFactory;
+
+    var cachePath = '${CacheSecure.cacheKeyMain}.db';
 
     if (Platform.isAndroid || Platform.isIOS) {
       var directory = await getApplicationDocumentsDirectory();
-      await directory.create(recursive: true);
-      databasePath = join(directory.path, '${CacheSecure.cacheKeyMain}.db');
-      factory = databaseFactoryIo;
-      // factory = getDatabaseFactorySqflite(sqflite.databaseFactory);
+      await directory.create();
+      cachePath = join(directory.path, '${CacheSecure.cacheKeyMain}.db');
+      cacheFactory = databaseFactoryIo;
     }
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      factory = getDatabaseFactorySqflite(sqflite_ffi.databaseFactoryFfi);
+      // open cache w/ sqflite ffi for desktop compat
+      cacheFactory = getDatabaseFactorySqflite(
+        sqflite_ffi.databaseFactoryFfi,
+      );
     }
 
     if (factory == null) {
@@ -76,10 +77,11 @@ Future<void> initCache() async {
       );
     }
 
-    // open sqlflite
-    CacheSecure.cacheMainSql = await factory.openDatabase(
-      databasePath,
+    CacheSecure.cacheMain = await cacheFactory.openDatabase(
+      cachePath,
     );
+    printDebug('CacheSecure.cacheMain');
+    return Future.sync(() => null);
   } catch (error) {
     debugPrint('[initCache] ${error}');
   }
@@ -92,20 +94,8 @@ Future<void> initCache() async {
 
 // // Closes and saves storage
 void closeCache() async {
-  if (CacheSecure.cacheMain != null && CacheSecure.cacheMain.isOpen) {
+  if (CacheSecure.cacheMain != null) {
     CacheSecure.cacheMain.close();
-  }
-
-  if (CacheSecure.cacheRooms != null && CacheSecure.cacheRooms.isOpen) {
-    CacheSecure.cacheRooms.close();
-  }
-
-  if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
-    CacheSecure.cacheCrypto.close();
-  }
-
-  if (CacheSecure.cacheMainSql != null) {
-    CacheSecure.cacheMainSql.close();
   }
 }
 
@@ -178,43 +168,4 @@ Future<String> unlockCryptKey() async {
   }
 
   return cryptKey;
-}
-
-Future<Box> unlockMainCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyMain,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockMainCache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockRoomCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyRooms,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockRoomCache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockCryptoCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyCrypto,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockCryptoCache] $error');
-    return null;
-  }
 }

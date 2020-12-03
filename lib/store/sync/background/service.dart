@@ -133,8 +133,6 @@ void notificationSyncIsolate() async {
       roomNames = jsonDecode(
         await secureStorage.read(key: CacheSecure.roomNamesKey),
       );
-
-      // Init hive cache + adapters
     } catch (error) {
       print('[notificationSyncIsolate] $error');
     }
@@ -201,15 +199,14 @@ FutureOr<dynamic> syncLoop({
       lastSinceNew = await secureStorage.read(
         key: CacheSecure.lastSinceKey,
       );
-      // Init hive cache + adapters
     } catch (error) {
       print('[syncLoop] $error');
     }
 
     /**
      * Check last since and see if any new messages arrived in the payload
-     * No need to update the hive store for now, just do not save the lastSince
-     * to the store and the next foreground fetchSync will update the state
+     * do not save the lastSince to the store and 
+     * the next foreground fetchSync will update the state
      */
     final data = await MatrixApi.sync(
       protocol: protocol,
@@ -231,7 +228,6 @@ FutureOr<dynamic> syncLoop({
         key: CacheSecure.lastSinceKey,
         value: lastSinceNew,
       );
-      // Init hive cache + adapters
     } catch (error) {
       print('[syncLoop] $error');
     }
