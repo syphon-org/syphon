@@ -8,6 +8,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/cache/storage.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
@@ -100,7 +101,7 @@ AppState appReducer(AppState state, action) => AppState(
 Future<Store> initStore() async {
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
-    storage: MemoryStorage(),
+    storage: CacheStorage(),
     serializer: CacheSerializer(),
     throttleDuration: Duration(milliseconds: 4500),
     shouldSave: (Store<AppState> store, dynamic action) {
@@ -124,11 +125,6 @@ Future<Store> initStore() async {
       }
     },
   );
-
-  // Configure cache encryption/decryption instance
-  CacheSecure.ivKey = await unlockIVKey();
-  CacheSecure.ivKeyNext = await unlockIVKeyNext();
-  CacheSecure.cryptKey = await unlockCryptKey();
 
   // Finally load persisted store
   var initialState;

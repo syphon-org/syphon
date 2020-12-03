@@ -417,9 +417,8 @@ ThunkAction<AppState> createRoom({
         value: (user) => user,
       );
 
+      // generate user invite map to cache recent users
       room = room.copyWith(users: userInviteMap);
-
-      printJson(userInviteMap);
 
       if (avatarFile != null) {
         await store.dispatch(

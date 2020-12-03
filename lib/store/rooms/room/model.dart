@@ -55,7 +55,9 @@ class Room {
   final List<Message> messages;
   final List<Message> outbox;
 
+  @JsonKey(ignore: true)
   final Map<String, User> users;
+
   final Map<String, ReadStatus> messageReads;
 
   @JsonKey(ignore: true)
