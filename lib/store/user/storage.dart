@@ -84,5 +84,6 @@ Future<Map<String, User>> loadUsers({
   } catch (error) {
     printDebug(error.toString());
   }
+  printDebug('[userMap] loaded ${userMap.length.toString()}');
   return userMap;
 }

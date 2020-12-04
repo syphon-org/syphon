@@ -130,7 +130,6 @@ class CacheSerializer implements StateSerializer<AppState> {
     MediaStore mediaStore = MediaStore();
     RoomStore roomStore = RoomStore();
     SettingsStore settingsStore = SettingsStore();
-    UserStore userStore = UserStore();
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
@@ -163,11 +162,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             settingsStore = SettingsStore.fromJson(store);
             break;
           case 'UserStore':
-            // --- cold storage only ---
-            userStore = userStore.copyWith(
-              users: StorageSecure.storageData['users'] ?? {},
-            );
-            break;
+          // --- cold storage only ---
           default:
             break;
         }
@@ -182,9 +177,11 @@ class CacheSerializer implements StateSerializer<AppState> {
       syncStore: syncStore ?? SyncStore(),
       cryptoStore: cryptoStore ?? CryptoStore(),
       roomStore: roomStore ?? RoomStore(),
-      userStore: userStore ?? UserStore(),
       mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
+      userStore: UserStore().copyWith(
+        users: StorageSecure.storageData['users'] ?? {},
+      ),
     );
   }
 }

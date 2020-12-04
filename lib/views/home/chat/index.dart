@@ -19,6 +19,7 @@ import 'package:syphon/global/assets.dart';
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -29,6 +30,7 @@ import 'package:syphon/store/rooms/events/model.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
@@ -453,7 +455,9 @@ class ChatViewState extends State<ChatView> {
                       ? this.selectedMessage.id
                       : null;
 
-                  final avatarUri = props.room.users[message.sender]?.avatarUri;
+                  printDebug(message.sender);
+                  printDebug(props.users[message.sender]?.avatarUri);
+                  final avatarUri = props.users[message.sender]?.avatarUri;
 
                   return MessageWidget(
                       message: message,
@@ -654,6 +658,7 @@ class _Props extends Equatable {
   final String userId;
   final bool loading;
   final ThemeType theme;
+  final Map<String, User> users;
   final List<Message> messages;
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
@@ -676,6 +681,7 @@ class _Props extends Equatable {
     @required this.room,
     @required this.theme,
     @required this.userId,
+    @required this.users,
     @required this.messages,
     @required this.loading,
     @required this.roomPrimaryColor,
@@ -698,6 +704,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         userId,
+        users,
         messages,
         room,
         roomPrimaryColor,
@@ -713,6 +720,7 @@ class _Props extends Equatable {
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(id: roomId, state: store.state),
+      users: store.state.userStore.users,
       messages: latestMessages(
         wrapOutboxMessages(
           messages: roomSelectors.room(id: roomId, state: store.state).messages,
