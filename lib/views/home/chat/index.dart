@@ -455,8 +455,6 @@ class ChatViewState extends State<ChatView> {
                       ? this.selectedMessage.id
                       : null;
 
-                  printDebug(message.sender);
-                  printDebug(props.users[message.sender]?.avatarUri);
                   final avatarUri = props.users[message.sender]?.avatarUri;
 
                   return MessageWidget(

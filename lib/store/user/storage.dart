@@ -51,7 +51,7 @@ Future<Map<String, User>> loadUsers({
   final Map<String, User> userMap = {};
 
   try {
-    const limit = 2000;
+    const limit = 5000;
     final store = StoreRef<String, String>('users');
     final count = await store.count(storage);
 
@@ -74,8 +74,6 @@ Future<Map<String, User>> loadUsers({
     }
 
     if (offset < count) {
-      printDebug(
-          '[userMap] cur ${userMap.length.toString()} off ${offset} total ${count}');
       userMap.addAll(await loadUsers(
         offset: offset + limit,
         storage: storage,
