@@ -38,7 +38,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.roomStore,
       state.mediaStore,
       state.settingsStore,
-      state.userStore,
     ];
 
     // Queue up a cache saving will wait
@@ -164,8 +163,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             settingsStore = SettingsStore.fromJson(store);
             break;
           case 'UserStore':
-            userStore = UserStore.fromJson(store);
-            // TODO: rehydrating users from cold storage
+            // --- cold storage only ---
             userStore = userStore.copyWith(
               users: StorageSecure.storageData['users'] ?? {},
             );

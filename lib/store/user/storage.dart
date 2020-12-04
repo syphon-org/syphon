@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/user/model.dart';
 
 Future<void> saveUsers(
@@ -21,25 +22,67 @@ Future<void> saveUsers(
   return Future.value();
 }
 
+Future<User> loadUser(
+  String userId, {
+  Database cache,
+  Database storage,
+}) async {
+  try {
+    final store = StoreRef<String, String>('users');
+    final user = await store.findKey(
+      storage,
+      finder: Finder(
+        filter: Filter.byKey(userId),
+      ),
+    );
+
+    return jsonDecode(user);
+  } catch (error) {
+    printDebug(error);
+  }
+  return null;
+}
+
 Future<Map<String, User>> loadUsers({
   Database cache,
   Database storage,
+  int offset = 0,
 }) async {
   final Map<String, User> userMap = {};
 
   try {
+    const limit = 2000;
     final store = StoreRef<String, String>('users');
-    final allUsers = await store.find(storage);
+    final count = await store.count(storage);
 
-    if (allUsers.isEmpty) {
+    final finder = Finder(
+      limit: limit,
+      offset: offset,
+    );
+
+    final usersPaginated = await store.find(
+      storage,
+      finder: finder,
+    );
+
+    if (usersPaginated.isEmpty) {
       return userMap;
     }
 
-    for (RecordSnapshot<String, String> record in allUsers) {
-      userMap[record.key] = json.decode(record.value);
+    for (RecordSnapshot<String, String> record in usersPaginated) {
+      userMap[record.key] = User.fromJson(json.decode(record.value));
+    }
+
+    if (offset < count) {
+      printDebug(
+          '[userMap] cur ${userMap.length.toString()} off ${offset} total ${count}');
+      userMap.addAll(await loadUsers(
+        offset: offset + limit,
+        storage: storage,
+      ));
     }
   } catch (error) {
-    printDebug(error);
+    printDebug(error.toString());
   }
   return userMap;
 }
