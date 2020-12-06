@@ -423,7 +423,7 @@ class ChatViewState extends State<ChatView> {
               MessageTypingWidget(
                 typing: props.room.userTyping,
                 usersTyping: props.room.usersTyping,
-                roomUsers: props.room.users,
+                roomUsers: props.users,
                 selectedMessageId: this.selectedMessage != null
                     ? this.selectedMessage.id
                     : null,
@@ -739,7 +739,7 @@ class _Props extends Equatable {
         final room = store.state.roomStore.rooms[roomId];
 
         final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(users: room.users),
+          fetchDeviceKeys(userIds: room.userIds),
         );
 
         store.dispatch(setDeviceKeys(usersDeviceKeys));
@@ -832,8 +832,9 @@ class _Props extends Equatable {
         store.dispatch(updateKeySessions(room: room));
 
         final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(users: room.users),
+          fetchDeviceKeys(userIds: room.userIds),
         );
+
         printJson(usersDeviceKeys);
       });
 }

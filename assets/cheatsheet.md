@@ -137,3 +137,15 @@ if (true) {
 }
 
 ```
+
+```dart
+ // reduce several maps to one map
+ final allDirectUsers = roomsDirectUsers.fold(
+   {},
+   (usersAll, users) {
+     (usersAll as Map).addAll(users);
+     return usersAll;
+   },
+ );
+  
+  ```

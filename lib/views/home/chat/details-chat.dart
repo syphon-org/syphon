@@ -247,7 +247,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                       ),
                                       Container(
                                         child: Text(
-                                          ' (${props.room.users.length})',
+                                          ' (${props.room.userIds.length})',
                                           textAlign: TextAlign.start,
                                         ),
                                       ),

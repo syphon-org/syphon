@@ -461,14 +461,16 @@ class Room {
       }
     } catch (error) {}
 
+    final userIds = this.userIds..addAll(users.keys ?? []);
+
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
       users: users ?? this.users,
-      userIds: users.keys.toList(),
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
+      userIds: userIds ?? this.userIds,
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,

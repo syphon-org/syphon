@@ -12,19 +12,14 @@ dynamic homeserver(AppState state) {
 
 // Users the authed user has dm'ed
 List<User> friendlyUsers(AppState state) {
-  final rooms = state.roomStore.rooms.values as Iterable<Room>;
+  final rooms = state.roomStore.rooms.values;
+  final users = state.userStore.users;
   final roomsDirect = rooms.where((room) => room.direct);
-  final roomsDirectUsers = roomsDirect.map((room) => room.users);
+  final roomUserIdsList = roomsDirect.map((room) => room.userIds);
+  final roomDirectUserIds = roomUserIdsList.expand((pair) => pair).toList();
+  final roomsDirectUsers = roomDirectUserIds.map((userId) => users[userId]);
 
-  final allDirectUsers = roomsDirectUsers.fold(
-    {},
-    (usersAll, users) {
-      (usersAll as Map).addAll(users);
-      return usersAll;
-    },
-  );
-
-  return List.from(allDirectUsers.values);
+  return List.from(roomsDirectUsers);
 }
 
 /*

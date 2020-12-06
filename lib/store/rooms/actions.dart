@@ -597,27 +597,29 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 
       // Find the other user in the direct room
       final currentUser = store.state.authStore.user;
-      final otherUser = room.users.values.firstWhere(
-        (user) => user.userId != currentUser.userId,
+
+      // only the other user id, and not the user object, is needed here
+      final otherUserId = room.userIds.firstWhere(
+        (userId) => userId != currentUser.userId,
       );
 
-      if (otherUser == null) {
+      if (otherUserId == null) {
         throw 'Cannot toggle room to direct without other users';
       }
 
       // Pull the direct room for that specific user
       Map directRoomUsers = data as Map<String, dynamic>;
-      final usersDirectRooms = directRoomUsers[otherUser.userId] ?? [];
+      final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
       if (usersDirectRooms.isEmpty && enabled) {
-        directRoomUsers[otherUser.userId] = [room.id];
+        directRoomUsers[otherUserId] = [room.id];
       }
 
       // Toggle the direct room data based on user actions
       directRoomUsers = directRoomUsers.map((userId, rooms) {
         List<dynamic> updatedRooms = List.from(rooms ?? []);
 
-        if (userId != otherUser.userId) {
+        if (userId != otherUserId) {
           return MapEntry(userId, updatedRooms);
         }
 
@@ -1030,7 +1032,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 //         createRoom(
 //           name: room.name,
 //           topic: room.topic,
-//           invites: room.users,
+//           invites: room.userIds,
 //           isDirect: room.direct,
 //         ),
 //       );

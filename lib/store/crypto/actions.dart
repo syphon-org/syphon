@@ -591,14 +591,14 @@ ThunkAction<AppState> claimOneTimeKeys({
 }) {
   return (Store<AppState> store) async {
     try {
-      final roomUsers = room.users.values;
+      final roomUserIds = room.userIds;
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
       final currentUser = store.state.authStore.user;
 
       // get deviceKeys for every user present in the chat
-      final List<DeviceKey> roomDeviceKeys = List.from(roomUsers
-          .map((user) => (deviceKeys[user.userId] ?? {}).values)
+      final List<DeviceKey> roomDeviceKeys = List.from(roomUserIds
+          .map((userId) => (deviceKeys[userId] ?? {}).values)
           .expand((x) => x));
 
       // Create a map of all the oneTimeKeys to claim
@@ -1012,17 +1012,22 @@ ThunkAction<AppState> exportMessageSession({String roomId}) {
  * fetches the keys uploaded to the matrix homeserver
  * by other users
  */
-ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
+ThunkAction<AppState> fetchDeviceKeys(
+    {Map<String, User> users, List<String> userIds}) {
   return (Store<AppState> store) async {
     try {
-      final userMap = users.map((userId, user) => MapEntry(userId, const []));
+      final Map<String, dynamic> userIdMap = Map.fromIterable(
+        userIds,
+        key: (userId) => userId,
+        value: (userId) => const [],
+      );
 
       final data = await MatrixApi.fetchKeys(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         lastSince: store.state.syncStore.lastSince,
-        users: userMap,
+        users: userIdMap,
       );
 
       final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
@@ -1054,9 +1059,7 @@ ThunkAction<AppState> fetchDeviceKeys({Map<String, User> users}) {
 ThunkAction<AppState> fetchDeviceKeysOwned(User user) {
   return (Store<AppState> store) async {
     final deviceKeys = await store.dispatch(
-      fetchDeviceKeys(users: {
-        user.userId: user,
-      }),
+      fetchDeviceKeys(userIds: [user.userId]),
     );
     return deviceKeys[user.userId];
   };
