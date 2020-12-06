@@ -43,6 +43,8 @@ PODS:
     - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
+  - FMDB/SQLCipher (2.7.5):
+    - SQLCipher
   - FMDB/standard (2.7.5)
   - image_picker (0.0.1):
     - Flutter
@@ -66,6 +68,15 @@ PODS:
   - sqflite (0.0.2):
     - Flutter
     - FMDB (>= 2.7.5)
+  - sqflite_sqlcipher (0.0.1):
+    - Flutter
+    - FMDB/SQLCipher (~> 2.7.5)
+    - SQLCipher (= 4.4.1)
+  - SQLCipher (4.4.1):
+    - SQLCipher/standard (= 4.4.1)
+  - SQLCipher/common (4.4.1)
+  - SQLCipher/standard (4.4.1):
+    - SQLCipher/common
   - url_launcher (0.0.1):
     - Flutter
   - webview_flutter (0.0.1):
@@ -83,6 +94,7 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
+  - sqflite_sqlcipher (from `.symlinks/plugins/sqflite_sqlcipher/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
@@ -95,6 +107,7 @@ SPEC REPOS:
     - OLMKit
     - SDWebImage
     - SDWebImageFLPlugin
+    - SQLCipher
 
 EXTERNAL SOURCES:
   device_info:
@@ -117,6 +130,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
+  sqflite_sqlcipher:
+    :path: ".symlinks/plugins/sqflite_sqlcipher/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
   webview_flutter:
@@ -140,6 +155,8 @@ SPEC CHECKSUMS:
   SDWebImageFLPlugin: 6c2295fb1242d44467c6c87dc5db6b0a13228fd8
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
+  sqflite_sqlcipher: cc00ecef02643b799857eb5c66c7074660aa658a
+  SQLCipher: 0b81a39b21247c559c52c3bd2234808e626c008b
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 

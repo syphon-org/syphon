@@ -358,6 +358,7 @@ class Room {
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
     Map<String, User> users = this.users ?? Map<String, User>();
+    Set<String> userIds = Set.from(this.userIds) ?? Set<String>();
 
     try {
       events.forEach((event) {
@@ -461,7 +462,7 @@ class Room {
       }
     } catch (error) {}
 
-    final userIds = this.userIds..addAll(users.keys ?? []);
+    userIds = userIds..addAll(users.keys ?? []);
 
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
@@ -470,7 +471,7 @@ class Room {
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
-      userIds: userIds ?? this.userIds,
+      userIds: userIds.toList() ?? this.userIds,
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
