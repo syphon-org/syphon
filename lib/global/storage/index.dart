@@ -1,31 +1,29 @@
 import 'dart:io';
 
+import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/global/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite_sqlcipher;
 import 'package:syphon/store/user/storage.dart';
 
 class StorageSecure {
   // cold storage references
   static Database storageMain;
-  static sqflite_sqlcipher.Database storageMainEncrypted;
 
   // preloaded cold storage data
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const storageKeyMain = '${Values.appNameLabel}-main-storage';
+  static const storageKeyMain = '${Values.appNameLabel}-main-storage.db';
 }
 
 Future<void> initStorage() async {
   try {
-    var storageFactory;
-
-    var storagePath = '${StorageSecure.storageKeyMain}.db';
+    DatabaseFactory storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       // always open cold storage as sqflite
@@ -47,8 +45,13 @@ Future<void> initStorage() async {
       );
     }
 
+    var codec = getEncryptSembastCodec(password: 'testing123');
+
+    await storageFactory.deleteDatabase(StorageSecure.storageKeyMain);
+
     StorageSecure.storageMain = await storageFactory.openDatabase(
-      storagePath,
+      StorageSecure.storageKeyMain,
+      codec: codec,
     );
   } catch (error) {
     debugPrint('[initCache] ${error}');

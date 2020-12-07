@@ -28,15 +28,14 @@ final List<Object> stores = [
 class CacheStorage implements StorageEngine {
   @override
   Future<Uint8List> load() async {
-    try {
-      // Stopwatch stopwatchTotal = new Stopwatch()..start();
+    final cache = CacheSecure.cacheMain;
 
-      final cache = CacheSecure.cacheMain;
-
-      await Future.wait(stores.map((store) async {
+    await Future.wait(stores.map((store) async {
+      final type = store.runtimeType.toString();
+      try {
+        // Stopwatch stopwatchTotal = new Stopwatch()..start();
         // Stopwatch stopwatchStore = new Stopwatch()..start();
         // Fetch from database
-        final type = store.runtimeType.toString();
         final table = StoreRef<String, String>.main();
         final record = table.record(store.runtimeType.toString());
         final jsonEncrypted = await record.get(cache);
@@ -60,12 +59,11 @@ class CacheStorage implements StorageEngine {
 
         // Load for CacheSerializer to use later
         CacheSecure.cacheStores[type] = jsonDecoded;
-      }));
-
-      // printDebug('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
-    } catch (error) {
-      printError(error, title: 'CacheStorage');
-    }
+        // printDebug('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
+      } catch (error) {
+        printError(error.toString(), title: 'CacheStorage|$type');
+      }
+    }));
 
     // unlock redux_persist after cache loaded from sqflite
     return Uint8List(0);

@@ -360,8 +360,8 @@ class Room {
     Map<String, User> users = this.users ?? Map<String, User>();
     Set<String> userIds = Set.from(this.userIds) ?? Set<String>();
 
-    try {
-      events.forEach((event) {
+    events.forEach((event) {
+      try {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
@@ -423,10 +423,10 @@ class Room {
           default:
             break;
         }
-      });
-    } catch (error) {
-      debugPrint('[Room.fromStateEvents] ${error}');
-    }
+      } catch (error) {
+        debugPrint('[Room.fromStateEvents] ${error} ${event.type}');
+      }
+    });
 
     try {
       // checks to make sure someone didn't name the room after the authed user
