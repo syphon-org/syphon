@@ -2,33 +2,33 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
-Future<void> saveUsers(
-  Map<String, User> users, {
+Future<void> saveRooms(
+  Map<String, Room> rooms, {
   Database cache,
   Database storage,
 }) async {
-  final store = StoreRef<String, String>('users');
+  final store = StoreRef<String, String>('rooms');
 
   await storage.transaction((txn) async {
-    for (User user in users.values) {
-      final record = store.record(user.userId);
-      await record.put(txn, jsonEncode(user));
+    for (Room room in rooms.values) {
+      final record = store.record(room.id);
+      await record.put(txn, jsonEncode(room));
     }
   });
 }
 
-Future<Map<String, User>> loadUsers({
+Future<Map<String, Room>> loadRooms({
   Database cache,
   Database storage,
   int offset = 0,
 }) async {
-  final Map<String, User> userMap = {};
+  final Map<String, Room> rooms = {};
 
   try {
-    const limit = 5000;
-    final store = StoreRef<String, String>('users');
+    const limit = 10;
+    final store = StoreRef<String, String>('rooms');
     final count = await store.count(storage);
 
     final finder = Finder(
@@ -42,15 +42,15 @@ Future<Map<String, User>> loadUsers({
     );
 
     if (usersPaginated.isEmpty) {
-      return userMap;
+      return rooms;
     }
 
     for (RecordSnapshot<String, String> record in usersPaginated) {
-      userMap[record.key] = User.fromJson(json.decode(record.value));
+      rooms[record.key] = Room.fromJson(json.decode(record.value));
     }
 
     if (offset < count) {
-      userMap.addAll(await loadUsers(
+      rooms.addAll(await loadRooms(
         offset: offset + limit,
         storage: storage,
       ));
@@ -58,6 +58,6 @@ Future<Map<String, User>> loadUsers({
   } catch (error) {
     printDebug(error.toString());
   }
-  printDebug('[userMap] loaded ${userMap.length.toString()}');
-  return userMap;
+  printDebug('[rooms] loaded ${rooms.length.toString()}');
+  return rooms;
 }

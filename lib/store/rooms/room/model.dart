@@ -58,6 +58,8 @@ class Room {
   final List<Message> messages;
   final List<Message> outbox;
 
+  // TODO: offload messageReads, for large rooms these are ridiculously large
+  @JsonKey(ignore: true)
   final Map<String, ReadStatus> messageReads;
 
   @JsonKey(ignore: true)
@@ -358,7 +360,7 @@ class Room {
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
     Map<String, User> users = this.users ?? Map<String, User>();
-    Set<String> userIds = Set.from(this.userIds) ?? Set<String>();
+    Set<String> userIds = Set<String>.from(this.userIds ?? []);
 
     events.forEach((event) {
       try {

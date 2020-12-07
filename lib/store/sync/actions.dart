@@ -205,7 +205,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
-        'since': forceFull ? null : since ?? store.state.roomStore.lastSince,
+        'since': forceFull ? null : since ?? store.state.syncStore.lastSince,
         'filter': filterId,
         'timeout': 10000
       });

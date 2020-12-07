@@ -23,6 +23,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/events/actions.dart';
 import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
@@ -162,11 +163,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         lastSince: lastSince,
       );
 
-      // -- COLD STORAGE --
-      await saveUsers(
-        room.users,
-        storage: StorageSecure.storageMain,
-      );
+      // save cold storage objects
+      saveUsers(room.users, storage: StorageSecure.storageMain);
+      saveRooms({room.id: room}, storage: StorageSecure.storageMain);
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {

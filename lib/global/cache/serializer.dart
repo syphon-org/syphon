@@ -35,7 +35,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.authStore,
       state.syncStore,
       state.cryptoStore,
-      state.roomStore,
       state.mediaStore,
       state.settingsStore,
     ];
@@ -128,7 +127,6 @@ class CacheSerializer implements StateSerializer<AppState> {
     SyncStore syncStore = SyncStore();
     CryptoStore cryptoStore = CryptoStore();
     MediaStore mediaStore = MediaStore();
-    RoomStore roomStore = RoomStore();
     SettingsStore settingsStore = SettingsStore();
 
     // Load stores previously fetched from cache,
@@ -155,12 +153,10 @@ class CacheSerializer implements StateSerializer<AppState> {
           case 'MediaStore':
             mediaStore = MediaStore.fromJson(store);
             break;
-          case 'RoomStore':
-            roomStore = RoomStore.fromJson(store);
-            break;
           case 'SettingsStore':
             settingsStore = SettingsStore.fromJson(store);
             break;
+          case 'RoomStore':
           case 'UserStore':
           // --- cold storage only ---
           default:
@@ -176,9 +172,11 @@ class CacheSerializer implements StateSerializer<AppState> {
       authStore: authStore ?? AuthStore(),
       syncStore: syncStore ?? SyncStore(),
       cryptoStore: cryptoStore ?? CryptoStore(),
-      roomStore: roomStore ?? RoomStore(),
       mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
+      roomStore: RoomStore().copyWith(
+        rooms: StorageSecure.storageData['rooms'] ?? {},
+      ),
       userStore: UserStore().copyWith(
         users: StorageSecure.storageData['users'] ?? {},
       ),

@@ -4,10 +4,12 @@ import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class StorageSecure {
@@ -45,23 +47,26 @@ Future<void> initStorage() async {
       );
     }
 
-    var codec = getEncryptSembastCodec(password: 'testing123');
-
-    await storageFactory.deleteDatabase(StorageSecure.storageKeyMain);
+    final codec = getEncryptSembastCodec(password: CacheSecure.cryptKey);
 
     StorageSecure.storageMain = await storageFactory.openDatabase(
       StorageSecure.storageKeyMain,
       codec: codec,
     );
   } catch (error) {
-    debugPrint('[initCache] ${error}');
+    debugPrint('[initStorage] $error');
   }
 }
 
 Future<void> loadStorage() async {
-  StorageSecure.storageData['users'] = await loadUsers(
-    storage: StorageSecure.storageMain,
-  );
+  StorageSecure.storageData = {
+    'users': await loadUsers(
+      storage: StorageSecure.storageMain,
+    ),
+    'rooms': await loadRooms(
+      storage: StorageSecure.storageMain,
+    )
+  };
 }
 
 // // Closes and saves storage
