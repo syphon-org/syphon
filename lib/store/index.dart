@@ -16,6 +16,8 @@ import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/reducer.dart';
+import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/global/cache/serializer.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -42,6 +44,7 @@ class AppState extends Equatable {
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
+  final EventStore eventStore;
   final UserStore userStore;
   final SyncStore syncStore;
   final CryptoStore cryptoStore;
@@ -52,6 +55,7 @@ class AppState extends Equatable {
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
     this.roomStore = const RoomStore(),
+    this.eventStore = const EventStore(),
     this.userStore = const UserStore(),
     this.mediaStore = const MediaStore(),
     this.searchStore = const SearchStore(),
@@ -68,6 +72,7 @@ class AppState extends Equatable {
         roomStore,
         userStore,
         mediaStore,
+        eventStore,
         searchStore,
         settingsStore,
         cryptoStore,
@@ -80,6 +85,7 @@ AppState appReducer(AppState state, action) => AppState(
       alertsStore: alertsReducer(state.alertsStore, action),
       mediaStore: mediaReducer(state.mediaStore, action),
       roomStore: roomReducer(state.roomStore, action),
+      eventStore: eventReducer(state.eventStore, action),
       syncStore: syncReducer(state.syncStore, action),
       userStore: userReducer(state.userStore, action),
       searchStore: searchReducer(state.searchStore, action),

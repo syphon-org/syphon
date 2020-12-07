@@ -51,6 +51,7 @@ Future<void> initCache() async {
   CacheSecure.ivKey = await unlockIVKey();
   CacheSecure.ivKeyNext = await unlockIVKeyNext();
   CacheSecure.cryptKey = await unlockCryptKey();
+
   try {
     var cachePath = '${CacheSecure.cacheKeyMain}.db';
     var cacheFactory;

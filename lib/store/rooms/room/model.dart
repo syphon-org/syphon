@@ -7,8 +7,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';

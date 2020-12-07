@@ -1,6 +1,6 @@
 // Project imports:
 import './actions.dart';
-import './events/model.dart';
+import '../events/model.dart';
 import './room/model.dart';
 import './state.dart';
 

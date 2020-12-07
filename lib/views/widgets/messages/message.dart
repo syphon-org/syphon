@@ -9,7 +9,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class MessageWidget extends StatelessWidget {

@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:sembast/sembast.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/print.dart';
@@ -72,8 +73,12 @@ void main() async {
 }
 
 class Syphon extends StatefulWidget {
+  final Database cache;
+  final Database storage;
   final Store<AppState> store;
-  const Syphon({Key key, this.store}) : super(key: key);
+
+  const Syphon({Key key, this.store, this.cache, this.storage})
+      : super(key: key);
 
   @override
   SyphonState createState() => SyphonState(store: store);

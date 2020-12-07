@@ -1,5 +1,5 @@
 // Project imports:
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 List<Message> latestMessages(List<Message> messages) {

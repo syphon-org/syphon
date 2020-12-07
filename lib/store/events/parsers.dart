@@ -1,5 +1,5 @@
 import 'package:sembast/sembast.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 Future<List<Event>> parseStateEvents(

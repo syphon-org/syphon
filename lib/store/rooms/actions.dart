@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
@@ -21,13 +22,13 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/rooms/events/actions.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
-import 'events/model.dart';
+import '../events/model.dart';
 import 'room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -166,6 +167,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       // save cold storage objects
       saveUsers(room.users, storage: StorageSecure.storageMain);
       saveRooms({room.id: room}, storage: StorageSecure.storageMain);
+      saveEvents(room.messages, storage: StorageSecure.storageMain);
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {

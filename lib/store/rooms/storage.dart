@@ -23,11 +23,11 @@ Future<Map<String, Room>> loadRooms({
   Database cache,
   Database storage,
   int offset = 0,
+  int limit = 10,
 }) async {
   final Map<String, Room> rooms = {};
 
   try {
-    const limit = 10;
     final store = StoreRef<String, String>('rooms');
     final count = await store.count(storage);
 
@@ -36,16 +36,16 @@ Future<Map<String, Room>> loadRooms({
       offset: offset,
     );
 
-    final usersPaginated = await store.find(
+    final roomsPaginated = await store.find(
       storage,
       finder: finder,
     );
 
-    if (usersPaginated.isEmpty) {
+    if (roomsPaginated.isEmpty) {
       return rooms;
     }
 
-    for (RecordSnapshot<String, String> record in usersPaginated) {
+    for (RecordSnapshot<String, String> record in roomsPaginated) {
       rooms[record.key] = Room.fromJson(json.decode(record.value));
     }
 

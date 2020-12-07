@@ -12,27 +12,57 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
+class ResetEvents {}
+
+class SetMessages {
+  final String roomId;
+  final List<Message> messages;
+  SetMessages({this.roomId, this.messages});
+}
+
+class SetState {
+  final String roomId;
+  final List<Event> states;
+  SetState({this.roomId, this.states});
+}
+
 /**
- * Load Message Events
+ * Init Messages
  * 
- * Pulls next message events from cold storage 
+ * Pulls initial messages from storage or paginates through
+ * those existing in cold storage
  */
-ThunkAction<AppState> loadMessageEvents({Room room}) {
+ThunkAction<AppState> loadMessageEvents({
+  Room room,
+  int offset = 0,
+  int limit = 20,
+}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
+      final messages = await loadMessages(
+        storage: StorageSecure.storageMain,
+        offset: offset,
+        limit: !room.encryptionEnabled ? limit : null,
+      );
+
+      store.dispatch(SetMessages(roomId: room.id, messages: messages.values));
     } catch (error) {
-      debugPrint('[fetchMessageEvents] $error');
+      printDebug('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }

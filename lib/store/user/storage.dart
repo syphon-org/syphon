@@ -23,11 +23,11 @@ Future<Map<String, User>> loadUsers({
   Database cache,
   Database storage,
   int offset = 0,
+  int limit = 5000,
 }) async {
-  final Map<String, User> userMap = {};
+  final Map<String, User> users = {};
 
   try {
-    const limit = 5000;
     final store = StoreRef<String, String>('users');
     final count = await store.count(storage);
 
@@ -42,15 +42,15 @@ Future<Map<String, User>> loadUsers({
     );
 
     if (usersPaginated.isEmpty) {
-      return userMap;
+      return users;
     }
 
     for (RecordSnapshot<String, String> record in usersPaginated) {
-      userMap[record.key] = User.fromJson(json.decode(record.value));
+      users[record.key] = User.fromJson(json.decode(record.value));
     }
 
     if (offset < count) {
-      userMap.addAll(await loadUsers(
+      users.addAll(await loadUsers(
         offset: offset + limit,
         storage: storage,
       ));
@@ -58,6 +58,6 @@ Future<Map<String, User>> loadUsers({
   } catch (error) {
     printDebug(error.toString());
   }
-  printDebug('[userMap] loaded ${userMap.length.toString()}');
-  return userMap;
+  printDebug('[users] loaded ${users.length.toString()}');
+  return users;
 }
