@@ -1,22 +1,23 @@
 import 'dart:convert';
-
-import 'dart:ui';
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:steel_crypt/steel_crypt.dart';
+import 'package:encrypt/encrypt.dart';
 import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/print.dart';
 
 Future<String> encryptJsonBackground(Map params) async {
   String ivKey = params['ivKey'];
   String cryptKey = params['cryptKey'];
   String json = params['json'];
 
-  final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+  final iv = IV.fromBase64(ivKey);
+  final key = Key.fromBase64(cryptKey);
 
-  return cryptor.ctr.encrypt(inp: json, iv: ivKey);
+  final encrypter = Encrypter(AES(key, mode: AESMode.ctr, padding: null));
+  final encrypted = encrypter.encrypt(json, iv: iv);
+
+  return encrypted.base64;
 }
 
 Future<Map> decryptJsonBackground(Map params) async {
@@ -29,41 +30,45 @@ Future<Map> decryptJsonBackground(Map params) async {
   String jsonDecrypted;
   Map<String, dynamic> jsonDecoded = {};
 
-  final aes = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+  final iv = IV.fromBase64(ivKey);
+  final ivNext = IV.fromBase64(ivKeyNext);
+  final key = Key.fromBase64(cryptKey);
+
+  final encrypter = Encrypter(AES(key, mode: AESMode.ctr, padding: null));
 
   if (jsonEncrypted == null) return null;
 
   try {
-    jsonDecrypted = aes.ctr.decrypt(
-      enc: jsonEncrypted,
-      iv: ivKey,
+    jsonDecrypted = encrypter.decrypt64(
+      jsonEncrypted,
+      iv: iv,
     );
   } catch (error) {
-    debugPrint('[decryptJsonBackground] error $error');
+    printDebug('[decryptJsonBackground] error $error');
   }
 
   if (jsonDecoded.isEmpty) {
     try {
-      jsonDecrypted = aes.ctr.decrypt(
-        enc: jsonEncrypted,
-        iv: ivKeyNext,
+      jsonDecrypted = encrypter.decrypt64(
+        jsonEncrypted,
+        iv: ivNext,
       );
     } catch (error) {
-      debugPrint('[decryptJsonBackground] error $error');
+      printDebug('[decryptJsonBackground] error $error');
       jsonDecoded = {};
     }
   }
 
   // Failed to decrypt data
   if (jsonDecrypted == null) {
-    debugPrint('[decryptJsonBackground] decryption failed ${type}');
+    printDebug('[decryptJsonBackground] decryption failed ${type}');
     return null;
   }
 
   // decode serialized object
   jsonDecoded = json.decode(jsonDecrypted);
 
-  debugPrint('[decryptJsonBackground] decryption succeed ${type}');
+  printDebug('[decryptJsonBackground] decryption succeed ${type}');
   return jsonDecoded;
 }
 
@@ -73,23 +78,27 @@ Future<Map> decryptJsonBackground(Map params) async {
 // to the isolate
 // responsibile for both json serialization and encryption
 Future<String> serializeJsonBackground(Object store) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  window.onPlatformMessage = BinaryMessages.handlePlatformMessage;
-
   try {
     final storageEngine = FlutterSecureStorage();
 
-    final ivKey = await storageEngine.read(key: CacheSecure.ivKeyLocation);
-    final cryptKey =
-        await storageEngine.read(key: CacheSecure.cryptKeyLocation);
+    final ivKey = await storageEngine.read(
+      key: CacheSecure.ivKeyLocation,
+    );
+    final cryptKey = await storageEngine.read(
+      key: CacheSecure.cryptKeyLocation,
+    );
+
+    final iv = IV.fromBase64(ivKey);
+    final key = Key.fromBase64(cryptKey);
 
     final jsonEncoded = jsonEncode(store);
 
-    final cryptor = AesCrypt(key: cryptKey, padding: PaddingAES.pkcs7);
+    final encrypter = Encrypter(AES(key, mode: AESMode.ctr));
+    final encrypted = encrypter.encrypt(jsonEncoded, iv: iv);
 
-    return cryptor.ctr.encrypt(inp: jsonEncoded, iv: ivKey);
+    return encrypted.base64;
   } catch (error) {
-    debugPrint('[serializeJsonBackground] $error');
+    printDebug('[serializeJsonBackground] $error');
     return null;
   }
 }

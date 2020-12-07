@@ -57,7 +57,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           String type = store.runtimeType.toString();
 
           // serialize the store contents
-          Stopwatch stopwatchSerialize = new Stopwatch()..start();
+          // Stopwatch stopwatchSerialize = new Stopwatch()..start();
           try {
             // HACK: unable to pass certain stores directly to an isolate
             final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
@@ -73,11 +73,11 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
           }
 
-          debugPrint(
-            '[CacheSerializer] ${stopwatchSerialize.elapsed} ${type} serialize',
-          );
+          // debugPrint(
+          //   '[CacheSerializer] ${stopwatchSerialize.elapsed} ${type} serialize',
+          // );
 
-          Stopwatch stopwatchEncrypt = new Stopwatch()..start();
+          // Stopwatch stopwatchEncrypt = new Stopwatch()..start();
           // encrypt the store contents
           jsonEncrypted = await compute(
             encryptJsonBackground,
@@ -90,19 +90,19 @@ class CacheSerializer implements StateSerializer<AppState> {
             debugLabel: 'encryptJsonBackground',
           );
 
-          debugPrint(
-            '[CacheSerializer] ${stopwatchEncrypt.elapsed} ${type} encrypt',
-          );
+          // debugPrint(
+          //   '[CacheSerializer] ${stopwatchEncrypt.elapsed} ${type} encrypt',
+          // );
 
           try {
-            Stopwatch stopwatchSave = new Stopwatch()..start();
+            // Stopwatch stopwatchSave = new Stopwatch()..start();
             final cache = CacheSecure.cacheMain;
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache, jsonEncrypted);
 
-            debugPrint(
-              '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
-            );
+            // debugPrint(
+            //   '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
+            // );
           } catch (error) {
             print('[CacheSerializer] ERROR $error');
           }

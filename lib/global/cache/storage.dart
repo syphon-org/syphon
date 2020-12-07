@@ -29,19 +29,19 @@ class CacheStorage implements StorageEngine {
   @override
   Future<Uint8List> load() async {
     try {
-      Stopwatch stopwatchTotal = new Stopwatch()..start();
+      // Stopwatch stopwatchTotal = new Stopwatch()..start();
 
       final cache = CacheSecure.cacheMain;
 
       await Future.wait(stores.map((store) async {
-        Stopwatch stopwatchStore = new Stopwatch()..start();
+        // Stopwatch stopwatchStore = new Stopwatch()..start();
         // Fetch from database
         final type = store.runtimeType.toString();
         final table = StoreRef<String, String>.main();
         final record = table.record(store.runtimeType.toString());
         final jsonEncrypted = await record.get(cache);
 
-        debugPrint('[CacheStorage] load ${stopwatchStore.elapsed}');
+        // printDebug('[CacheStorage] load ${stopwatchStore.elapsed}');
 
         // Decrypt from database
         final jsonDecoded = await compute(
@@ -56,13 +56,13 @@ class CacheStorage implements StorageEngine {
           debugLabel: 'decryptJsonBackground',
         );
 
-        debugPrint('[CacheStorage] decrypt ${stopwatchStore.elapsed}');
+        // printDebug('[CacheStorage] decrypt ${stopwatchStore.elapsed}');
 
         // Load for CacheSerializer to use later
         CacheSecure.cacheStores[type] = jsonDecoded;
       }));
 
-      debugPrint('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
+      // printDebug('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
     } catch (error) {
       printError(error, title: 'CacheStorage');
     }

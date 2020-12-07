@@ -71,7 +71,7 @@ dependencies:
   # Encryption
   crypt: 3.0.1
   crypto: ^2.1.5
-  steel_crypt: ^2.2.2+1
+  encrypt: 4.1.0
   olm: 1.2.1
   # flutter_olm: 1.0.1
   # cryptography: 1.2.1

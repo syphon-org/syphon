@@ -42,7 +42,7 @@ packages:
       name: asn1lib
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.5"
+    version: "0.8.1"
   async:
     dependency: transitive
     description:
@@ -148,6 +148,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
+  clock:
+    dependency: transitive
+    description:
+      name: clock
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   code_builder:
     dependency: transitive
     description:
@@ -232,6 +239,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.3.3"
+  encrypt:
+    dependency: "direct main"
+    description:
+      name: encrypt
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.0"
   equatable:
     dependency: "direct main"
     description:
@@ -625,13 +639,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  pc_steelcrypt:
-    dependency: transitive
-    description:
-      name: pc_steelcrypt
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.1"
   pedantic:
     dependency: transitive
     description:
@@ -667,6 +674,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   pool:
     dependency: transitive
     description:
@@ -889,13 +903,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.9.5"
-  steel_crypt:
-    dependency: "direct main"
-    description:
-      name: steel_crypt
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.2.2+1"
   stream_channel:
     dependency: transitive
     description:

@@ -6,11 +6,13 @@ import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite_sqlcipher;
 import 'package:syphon/store/user/storage.dart';
 
 class StorageSecure {
   // cold storage references
   static Database storageMain;
+  static sqflite_sqlcipher.Database storageMainEncrypted;
 
   // preloaded cold storage data
   static Map<String, dynamic> storageData = {};
