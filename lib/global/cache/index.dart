@@ -12,7 +12,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
-class CacheSecure {
+class Cache {
   // encryption references (in memory only)
   static String ivKey;
   static String ivKeyNext;
@@ -46,20 +46,20 @@ class CacheSecure {
  * 
  * (needs cold storage extracted as it's own entity)
  */
-Future<void> initCache() async {
+Future<Database> initCache() async {
   // Configure cache encryption/decryption instance
-  CacheSecure.ivKey = await unlockIVKey();
-  CacheSecure.ivKeyNext = await unlockIVKeyNext();
-  CacheSecure.cryptKey = await unlockCryptKey();
+  Cache.ivKey = await unlockIVKey();
+  Cache.ivKeyNext = await unlockIVKeyNext();
+  Cache.cryptKey = await unlockCryptKey();
 
   try {
-    var cachePath = '${CacheSecure.cacheKeyMain}.db';
+    var cachePath = '${Cache.cacheKeyMain}.db';
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       var directory = await getApplicationDocumentsDirectory();
       await directory.create();
-      cachePath = join(directory.path, '${CacheSecure.cacheKeyMain}.db');
+      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
     }
 
@@ -77,19 +77,21 @@ Future<void> initCache() async {
       );
     }
 
-    CacheSecure.cacheMain = await cacheFactory.openDatabase(
+    Cache.cacheMain = await cacheFactory.openDatabase(
       cachePath,
     );
-    return Future.sync(() => null);
+
+    return Cache.cacheMain;
   } catch (error) {
     printDebug('[initCache] ${error}');
+    return null;
   }
 }
 
 // // Closes and saves storage
-void closeCache() async {
-  if (CacheSecure.cacheMain != null) {
-    CacheSecure.cacheMain.close();
+void closeCache(Database cache) async {
+  if (cache != null) {
+    cache.close();
   }
 }
 
@@ -100,7 +102,7 @@ String createIVKey() {
 Future<void> saveIVKey(String ivKey) async {
   // Check if storage has been created before
   return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyLocation,
+    key: Cache.ivKeyLocation,
     value: ivKey,
   );
 }
@@ -108,7 +110,7 @@ Future<void> saveIVKey(String ivKey) async {
 Future<void> saveIVKeyNext(String ivKey) async {
   // Check if storage has been created before
   return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyNextLocation,
+    key: Cache.ivKeyNextLocation,
     value: ivKey,
   );
 }
@@ -118,7 +120,7 @@ Future<String> unlockIVKey() async {
   final storageEngine = FlutterSecureStorage();
 
   final ivKeyStored = await storageEngine.read(
-    key: CacheSecure.ivKeyLocation,
+    key: Cache.ivKeyLocation,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -130,7 +132,7 @@ Future<String> unlockIVKeyNext() async {
   final storageEngine = FlutterSecureStorage();
 
   final ivKeyStored = await storageEngine.read(
-    key: CacheSecure.ivKeyNextLocation,
+    key: Cache.ivKeyNextLocation,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -145,7 +147,7 @@ Future<String> unlockCryptKey() async {
   try {
     // Check if crypt key already exists
     cryptKey = await storageEngine.read(
-      key: CacheSecure.cryptKeyLocation,
+      key: Cache.cryptKeyLocation,
     );
   } catch (error) {
     printDebug('[unlockCryptKey] ${error}');
@@ -156,7 +158,7 @@ Future<String> unlockCryptKey() async {
     cryptKey = Key.fromSecureRandom(32).base64;
 
     await storageEngine.write(
-      key: CacheSecure.cryptKeyLocation,
+      key: Cache.cryptKeyLocation,
       value: cryptKey,
     );
   }

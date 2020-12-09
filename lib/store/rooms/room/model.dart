@@ -52,11 +52,15 @@ class Room {
 
   // Associated user ids
   final List<String> userIds;
+  final List<String> messageIds;
+  final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
-  // final List<Event> state;
+  @JsonKey(ignore: true)
+  final List<Event> state;
+
+  @JsonKey(ignore: true)
   final List<Message> messages;
-  final List<Message> outbox;
 
   // TODO: offload messageReads, for large rooms these are ridiculously large
   @JsonKey(ignore: true)
@@ -109,6 +113,7 @@ class Room {
     this.userIds = const [],
     this.outbox = const [],
     this.messages = const [],
+    this.messageIds = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -123,6 +128,7 @@ class Room {
     this.nextHash,
     this.prevHash,
     this.messageReads,
+    this.state,
   });
 
   Room copyWith({
@@ -153,11 +159,12 @@ class Room {
     events,
     outbox,
     messages,
+    messageIds,
     messageReads,
     lastHash,
     prevHash,
     nextHash,
-    // state,
+    state,
   }) =>
       Room(
         id: id ?? this.id,
@@ -183,6 +190,7 @@ class Room {
         usersTyping: usersTyping ?? this.usersTyping,
         isDraftRoom: isDraftRoom ?? this.isDraftRoom,
         outbox: outbox ?? this.outbox,
+        messageIds: messageIds ?? this.messageIds,
         messages: messages ?? this.messages,
         users: users ?? this.users,
         userIds: userIds ?? this.userIds,
@@ -190,7 +198,7 @@ class Room {
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
-        // state: state ?? this.state,
+        state: state ?? this.state,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -550,12 +558,14 @@ class Room {
       );
 
       // Filter to find startTime and endTime
+      final messageIds = List<String>.from(messagesMap.keys);
       final messagesAll = List<Message>.from(messagesMap.values);
 
       // Save values to room
       return this.copyWith(
         outbox: outbox,
         messages: messagesAll,
+        messageIds: messageIds,
         limited: limited ?? this.limited,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,

@@ -815,8 +815,18 @@ class _Props extends Equatable {
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
+        // load message from cold storage
+        if (room.messages.length < room.messageIds.length) {
+          return store.dispatch(
+            loadMessageEvents(
+              room: room,
+              offset: room.messages.length,
+            ),
+          );
+        }
+
         // fetch messages beyond the oldest known message - lastHash
-        store.dispatch(fetchMessageEvents(
+        return store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,
           oldest: true,

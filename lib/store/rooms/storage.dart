@@ -55,9 +55,15 @@ Future<Map<String, Room>> loadRooms({
         storage: storage,
       ));
     }
+
+    if (rooms.isEmpty) {
+      return null;
+    }
+
+    printDebug('[rooms] loaded ${rooms.length.toString()}');
+    return rooms;
   } catch (error) {
-    printDebug(error.toString());
+    printDebug(error.toString(), title: 'loadRooms');
+    return null;
   }
-  printDebug('[rooms] loaded ${rooms.length.toString()}');
-  return rooms;
 }

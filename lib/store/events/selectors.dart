@@ -1,6 +1,14 @@
 // Project imports:
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+
+// TODO: replaces latestMessages() selectors with this
+List<Message> latestRoomMessages(AppState state, String roomId) {
+  final messagesAll = state.eventStore.messages;
+
+  return messagesAll[roomId] ?? [];
+}
 
 List<Message> latestMessages(List<Message> messages) {
   final sortedList = messages ?? [];
@@ -24,8 +32,10 @@ List<Message> latestMessages(List<Message> messages) {
   return sortedList;
 }
 
-List<Message> wrapOutboxMessages(
-    {List<Message> messages, List<Message> outbox}) {
+List<Message> wrapOutboxMessages({
+  List<Message> messages,
+  List<Message> outbox,
+}) {
   return [outbox, messages].expand((x) => x).toList();
 }
 

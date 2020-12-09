@@ -19,11 +19,16 @@ Future<void> saveUsers(
   });
 }
 
+/**
+ * Load Users (Cold Storage)
+ * 
+ * Example of useful recursion
+ */
 Future<Map<String, User>> loadUsers({
   Database cache,
   Database storage,
   int offset = 0,
-  int limit = 5000,
+  int page = 5000,
 }) async {
   final Map<String, User> users = {};
 
@@ -32,7 +37,7 @@ Future<Map<String, User>> loadUsers({
     final count = await store.count(storage);
 
     final finder = Finder(
-      limit: limit,
+      limit: page,
       offset: offset,
     );
 
@@ -51,13 +56,19 @@ Future<Map<String, User>> loadUsers({
 
     if (offset < count) {
       users.addAll(await loadUsers(
-        offset: offset + limit,
+        offset: offset + page,
         storage: storage,
       ));
     }
+
+    if (users.isEmpty) {
+      return null;
+    }
+
+    printDebug('[users] loaded ${users.length}');
+    return users;
   } catch (error) {
-    printDebug(error.toString());
+    printDebug(error.toString(), title: 'loadUsers');
+    return null;
   }
-  printDebug('[users] loaded ${users.length.toString()}');
-  return users;
 }

@@ -165,9 +165,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       );
 
       // save cold storage objects
-      saveUsers(room.users, storage: StorageSecure.storageMain);
-      saveRooms({room.id: room}, storage: StorageSecure.storageMain);
-      saveEvents(room.messages, storage: StorageSecure.storageMain);
+      saveUsers(room.users, storage: Storage.main);
+      saveRooms({room.id: room}, storage: Storage.main);
+      saveMessages(room.messages, storage: Storage.main);
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {

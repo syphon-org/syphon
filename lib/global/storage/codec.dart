@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:meta/meta.dart';
 import 'package:sembast/src/api/v2/sembast.dart';
+import 'package:syphon/global/print.dart';
 
 var _random = Random.secure();
 

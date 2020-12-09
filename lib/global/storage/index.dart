@@ -9,21 +9,24 @@ import 'package:syphon/global/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/user/storage.dart';
 
-class StorageSecure {
+class Storage {
   // cold storage references
-  static Database storageMain;
+  static Database main;
 
   // preloaded cold storage data
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const storageKeyMain = '${Values.appNameLabel}-main-storage.db';
+  static const mainKey = '${Values.appNameLabel}-main-storage.db';
 }
 
-Future<void> initStorage() async {
+Future<Database> initStorage() async {
   try {
     DatabaseFactory storageFactory;
 
@@ -47,31 +50,52 @@ Future<void> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: CacheSecure.cryptKey);
+    final codec = getEncryptSembastCodec(password: Cache.cryptKey);
 
-    StorageSecure.storageMain = await storageFactory.openDatabase(
-      StorageSecure.storageKeyMain,
+    // TODO: make actions have reference to the storage/cache through state
+    Storage.main = await storageFactory.openDatabase(
+      Storage.mainKey,
       codec: codec,
     );
+
+    return Storage.main;
   } catch (error) {
     debugPrint('[initStorage] $error');
+    return null;
   }
-}
-
-Future<void> loadStorage() async {
-  StorageSecure.storageData = {
-    'users': await loadUsers(
-      storage: StorageSecure.storageMain,
-    ),
-    'rooms': await loadRooms(
-      storage: StorageSecure.storageMain,
-    )
-  };
 }
 
 // // Closes and saves storage
 void closeStorage() async {
-  if (StorageSecure.storageMain != null) {
-    StorageSecure.storageMain.close();
+  if (Storage.main != null) {
+    Storage.main.close();
   }
+}
+
+Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
+  // load all rooms from cold storages
+  final rooms = await loadRooms(
+    storage: storage,
+  );
+
+  final users = await loadUsers(
+    storage: storage,
+  );
+
+  // load message using rooms loaded from cold storage
+  Map<String, List<Message>> messages = new Map();
+  for (Room room in rooms.values) {
+    messages[room.id] = await loadMessages(
+      room.messageIds,
+      storage: storage,
+      encrypted: room.encryptionEnabled,
+      limit: 20,
+    );
+  }
+
+  return {
+    'users': users,
+    'rooms': rooms,
+    'messages': messages.isNotEmpty ? messages : null,
+  };
 }

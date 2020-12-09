@@ -15,6 +15,8 @@ import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/state.dart';
@@ -29,6 +31,11 @@ import 'package:syphon/store/settings/state.dart';
  * Handles serialization, encryption, and storage for caching redux stores
  */
 class CacheSerializer implements StateSerializer<AppState> {
+  final Database cache;
+  final Map<String, Map<dynamic, dynamic>> preloaded;
+
+  CacheSerializer({this.cache, this.preloaded});
+
   @override
   Uint8List encode(AppState state) {
     final List<Object> stores = [
@@ -43,10 +50,10 @@ class CacheSerializer implements StateSerializer<AppState> {
     // if the previously schedule task has not finished
     Future.microtask(() async {
       // // create a new IV for the encrypted cache
-      CacheSecure.ivKey = createIVKey();
+      Cache.ivKey = createIVKey();
 
       // // backup the IV in case the app is force closed before caching finishes
-      await saveIVKeyNext(CacheSecure.ivKey);
+      await saveIVKeyNext(Cache.ivKey);
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
@@ -81,8 +88,8 @@ class CacheSerializer implements StateSerializer<AppState> {
           jsonEncrypted = await compute(
             encryptJsonBackground,
             {
-              'ivKey': CacheSecure.ivKey,
-              'cryptKey': CacheSecure.cryptKey,
+              'ivKey': Cache.ivKey,
+              'cryptKey': Cache.cryptKey,
               'type': type,
               'json': jsonEncoded,
             },
@@ -95,7 +102,6 @@ class CacheSerializer implements StateSerializer<AppState> {
 
           try {
             // Stopwatch stopwatchSave = new Stopwatch()..start();
-            final cache = CacheSecure.cacheMain;
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache, jsonEncrypted);
 
@@ -113,7 +119,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       }));
 
       // Rotate encryption for the next save
-      await saveIVKey(CacheSecure.ivKey);
+      await saveIVKey(Cache.ivKey);
 
       return Future.value(null);
     });
@@ -131,7 +137,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
-    final stores = CacheSecure.cacheStores;
+    final stores = Cache.cacheStores;
 
     // decode each store cache synchronously
     stores.forEach((type, store) {
@@ -175,10 +181,13 @@ class CacheSerializer implements StateSerializer<AppState> {
       mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
       roomStore: RoomStore().copyWith(
-        rooms: StorageSecure.storageData['rooms'] ?? {},
+        rooms: preloaded['rooms'] ?? {},
       ),
       userStore: UserStore().copyWith(
-        users: StorageSecure.storageData['users'] ?? {},
+        users: preloaded['users'] ?? {},
+      ),
+      eventStore: EventStore().copyWith(
+        messages: preloaded['messages'] ?? Map<String, List<Message>>(),
       ),
     );
   }

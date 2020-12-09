@@ -8,7 +8,6 @@ const String MESSAGES = 'messages';
 
 Future<void> saveMessages(
   List<Message> messages, {
-  Database cache,
   Database storage,
 }) async {
   final store = StoreRef<String, String>(MESSAGES);
@@ -21,48 +20,37 @@ Future<void> saveMessages(
   });
 }
 
-Future<Map<String, Message>> loadMessages({
-  List<String> eventIds,
-  bool encrypted,
-  Database cache,
+/**
+ * Load Messages (Cold Storage)
+ * 
+ * In storage, messages are indexed by eventId
+ * In redux, they're indexed by RoomID and placed in a list
+ */
+Future<List<Message>> loadMessages(
+  List<String> eventIds, {
   Database storage,
+  bool encrypted,
   int offset = 0,
-  int page = 20, // default amount loaded
-  int limit,
+  int limit = 20, // default amount loaded
 }) async {
-  final Map<String, Message> messages = {};
+  final List<Message> messages = [];
 
   try {
     final store = StoreRef<String, String>(MESSAGES);
-    final count = limit ?? await store.count(storage);
 
-    final finder = Finder(
-      limit: page,
-      offset: offset,
-    );
+    final eventIdsPaginated = eventIds.skip(offset).take(limit).toList();
 
-    final messagesPaginated = await store.find(
-      storage,
-      finder: finder,
-    );
+    final messagesPaginated =
+        await store.records(eventIdsPaginated).get(storage);
 
-    if (messagesPaginated.isEmpty) {
-      return messages;
+    for (String message in messagesPaginated) {
+      messages.add(Message.fromJson(json.decode(message)));
     }
 
-    for (RecordSnapshot<String, String> record in messagesPaginated) {
-      messages[record.key] = Message.fromJson(json.decode(record.value));
-    }
-
-    if (offset < count) {
-      messages.addAll(await loadMessages(
-        offset: offset + limit,
-        storage: storage,
-      ));
-    }
+    printDebug('[messages] loaded ${messages.length.toString()}');
+    return messages;
   } catch (error) {
-    printDebug(error.toString());
+    printDebug(error.toString(), title: 'loadMessages');
+    return null;
   }
-  printDebug('[messages] loaded ${messages.length.toString()}');
-  return messages;
 }

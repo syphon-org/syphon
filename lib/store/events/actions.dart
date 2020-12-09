@@ -40,10 +40,12 @@ class SetState {
 }
 
 /**
- * Init Messages
+ * Load Message Events
  * 
  * Pulls initial messages from storage or paginates through
- * those existing in cold storage
+ * those existing in cold storage depending on requests from client
+ * 
+ * Make sure these have been exhausted before calling fetchMessageEvents
  */
 ThunkAction<AppState> loadMessageEvents({
   Room room,
@@ -54,13 +56,18 @@ ThunkAction<AppState> loadMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      final messages = await loadMessages(
-        storage: StorageSecure.storageMain,
-        offset: offset,
+      printDebug('[loadMessageEvents]');
+      final messagesStored = await loadMessages(
+        room.messageIds,
+        storage: Storage.main,
+        offset: offset, // offset from the most recent eventId found
         limit: !room.encryptionEnabled ? limit : null,
       );
 
-      store.dispatch(SetMessages(roomId: room.id, messages: messages.values));
+      store.dispatch(SetMessages(
+        roomId: room.id,
+        messages: room.messages + messagesStored,
+      ));
     } catch (error) {
       printDebug('[fetchMessageEvents] $error');
     } finally {

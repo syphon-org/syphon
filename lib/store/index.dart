@@ -7,7 +7,10 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:sembast/sembast.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/cache/storage.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
@@ -97,11 +100,16 @@ AppState appReducer(AppState state, action) => AppState(
  * Initialize Store
  * - Hot redux state cache for top level data 
  */
-Future<Store> initStore() async {
+Future<Store> initStore(Database cache, Database storage) async {
+  // partially load storage to memory to rehydrate cache
+  final data = await loadStorage(storage);
+
+  printJson(data);
+
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
-    storage: CacheStorage(),
-    serializer: CacheSerializer(),
+    storage: CacheStorage(cache: cache),
+    serializer: CacheSerializer(cache: cache, preloaded: data),
     // TODO: can remove once cold storage is in place
     throttleDuration: Duration(milliseconds: 4500),
     shouldSave: (Store<AppState> store, dynamic action) {

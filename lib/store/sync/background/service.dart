@@ -60,27 +60,27 @@ class BackgroundSync {
 
     await Future.wait([
       secureStorage.write(
-        key: CacheSecure.protocolKey,
+        key: Cache.protocolKey,
         value: protocol,
       ),
       secureStorage.write(
-        key: CacheSecure.homeserverKey,
+        key: Cache.homeserverKey,
         value: homeserver,
       ),
       secureStorage.write(
-        key: CacheSecure.accessTokenKey,
+        key: Cache.accessTokenKey,
         value: accessToken,
       ),
       secureStorage.write(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
         value: lastSince,
       ),
       secureStorage.write(
-        key: CacheSecure.userIdKey,
+        key: Cache.userIdKey,
         value: currentUser,
       ),
       secureStorage.write(
-        key: CacheSecure.roomNamesKey,
+        key: Cache.roomNamesKey,
         value: jsonEncode(roomNames),
       )
     ]);
@@ -124,14 +124,14 @@ void notificationSyncIsolate() async {
     try {
       final secureStorage = FlutterSecureStorage();
 
-      protocol = await secureStorage.read(key: CacheSecure.protocolKey);
-      homeserver = await secureStorage.read(key: CacheSecure.homeserverKey);
-      accessToken = await secureStorage.read(key: CacheSecure.accessTokenKey);
-      lastSince = await secureStorage.read(key: CacheSecure.lastSinceKey);
-      userId = await secureStorage.read(key: CacheSecure.userIdKey);
+      protocol = await secureStorage.read(key: Cache.protocolKey);
+      homeserver = await secureStorage.read(key: Cache.homeserverKey);
+      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
+      userId = await secureStorage.read(key: Cache.userIdKey);
 
       roomNames = jsonDecode(
-        await secureStorage.read(key: CacheSecure.roomNamesKey),
+        await secureStorage.read(key: Cache.roomNamesKey),
       );
     } catch (error) {
       print('[notificationSyncIsolate] $error');
@@ -197,7 +197,7 @@ FutureOr<dynamic> syncLoop({
       final secureStorage = FlutterSecureStorage();
 
       lastSinceNew = await secureStorage.read(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
       );
     } catch (error) {
       print('[syncLoop] $error');
@@ -225,7 +225,7 @@ FutureOr<dynamic> syncLoop({
       final secureStorage = FlutterSecureStorage();
 
       await secureStorage.write(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
         value: lastSinceNew,
       );
     } catch (error) {

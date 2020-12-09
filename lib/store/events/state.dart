@@ -13,16 +13,19 @@ part 'state.g.dart';
 class EventStore extends Equatable {
   final Map<String, List<Event>> states; // indexed by roomId
   final Map<String, List<Message>> messages; // indexed by roomId
+  final Map<String, List<Event>> receipts;
 
   const EventStore({
     this.states = const {},
     this.messages = const {},
+    this.receipts = const {},
   });
 
   @override
   List<Object> get props => [
         states,
         messages,
+        receipts,
       ];
 
   EventStore copyWith({
@@ -32,6 +35,7 @@ class EventStore extends Equatable {
       EventStore(
         states: states ?? this.states,
         messages: messages ?? this.messages,
+        receipts: receipts ?? this.receipts,
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);

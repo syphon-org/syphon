@@ -23,10 +23,12 @@ final List<Object> stores = [
 ];
 
 class CacheStorage implements StorageEngine {
+  final Database cache;
+
+  CacheStorage({this.cache});
+
   @override
   Future<Uint8List> load() async {
-    final cache = CacheSecure.cacheMain;
-
     await Future.wait(stores.map((store) async {
       final type = store.runtimeType.toString();
       try {
@@ -43,9 +45,9 @@ class CacheStorage implements StorageEngine {
         final jsonDecoded = await compute(
           decryptJsonBackground,
           {
-            'ivKey': CacheSecure.ivKey,
-            'ivKeyNext': CacheSecure.ivKeyNext,
-            'cryptKey': CacheSecure.cryptKey,
+            'ivKey': Cache.ivKey,
+            'ivKeyNext': Cache.ivKeyNext,
+            'cryptKey': Cache.cryptKey,
             'type': type,
             'json': jsonEncrypted,
           },
@@ -55,7 +57,7 @@ class CacheStorage implements StorageEngine {
         // printDebug('[CacheStorage] decrypt ${stopwatchStore.elapsed}');
 
         // Load for CacheSerializer to use later
-        CacheSecure.cacheStores[type] = jsonDecoded;
+        Cache.cacheStores[type] = jsonDecoded;
         // printDebug('[CacheStorage] total time ${stopwatchTotal.elapsed} ');
       } catch (error) {
         printError(error.toString(), title: 'CacheStorage|$type');
@@ -71,8 +73,7 @@ class CacheStorage implements StorageEngine {
     return null;
   }
 
-  static Future<void> saveOffload(String jsonEncrypted, {String type}) async {
-    final cache = CacheSecure.cacheMain;
+  Future<void> saveOffload(String jsonEncrypted, {String type}) async {
     final table = StoreRef<String, String>.main();
     final record = table.record(type);
     await record.put(cache, jsonEncrypted);

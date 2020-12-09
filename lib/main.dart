@@ -22,6 +22,7 @@ import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -60,16 +61,16 @@ void main() async {
   }
 
   // init hot cache and cold storage
-  await initCache();
+  final cache = await initCache();
 
   // init cold storage and load to data
-  await initStorage();
+  final storage = await initStorage();
 
-  // actually load storage to memory (to rehydrate cache for now)
-  await loadStorage();
+  // init redux store
+  final store = await initStore(cache, storage);
 
   // init hot cache and start
-  runApp(Syphon(store: await initStore()));
+  runApp(Syphon(store: store, cache: cache, storage: storage));
 }
 
 class Syphon extends StatefulWidget {
@@ -77,21 +78,35 @@ class Syphon extends StatefulWidget {
   final Database storage;
   final Store<AppState> store;
 
-  const Syphon({Key key, this.store, this.cache, this.storage})
-      : super(key: key);
+  const Syphon({
+    Key key,
+    this.store,
+    this.cache,
+    this.storage,
+  }) : super(key: key);
 
   @override
-  SyphonState createState() => SyphonState(store: store);
+  SyphonState createState() => SyphonState(
+        store: store,
+        cache: cache,
+        storage: storage,
+      );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  SyphonState({this.store});
-
+  final Database cache;
+  final Database storage;
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
   Widget defaultHome = Home();
   StreamSubscription alertsListener;
+
+  SyphonState({
+    this.store,
+    this.cache,
+    this.storage,
+  });
 
   @override
   void initState() {
@@ -200,7 +215,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void deactivate() {
-    closeCache();
+    closeCache(cache);
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());
