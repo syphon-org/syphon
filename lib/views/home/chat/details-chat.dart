@@ -533,9 +533,7 @@ class _Props extends Equatable {
       userList: List.from(
         roomSelectors.room(id: roomId, state: store.state).users.values,
       ),
-      messages: latestMessages(
-        roomSelectors.room(id: roomId, state: store.state).messages,
-      ),
+      messages: latestRoomMessages(store.state, roomId),
       onLeaveChat: () async {
         await store.dispatch(removeRoom(room: Room(id: roomId)));
       },

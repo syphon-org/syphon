@@ -104,8 +104,6 @@ Future<Store> initStore(Database cache, Database storage) async {
   // partially load storage to memory to rehydrate cache
   final data = await loadStorage(storage);
 
-  printJson(data);
-
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: CacheStorage(cache: cache),

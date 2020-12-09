@@ -5,16 +5,14 @@ import 'package:syphon/store/rooms/room/model.dart';
 
 // TODO: replaces latestMessages() selectors with this
 List<Message> latestRoomMessages(AppState state, String roomId) {
-  final messagesAll = state.eventStore.messages;
-
-  return messagesAll[roomId] ?? [];
+  return state.eventStore.messages[roomId] ?? [];
 }
 
 List<Message> latestMessages(List<Message> messages) {
-  final sortedList = messages ?? [];
+  final sortedList = List<Message>.from(messages ?? []);
 
   // sort descending
-  messages.sort((a, b) {
+  sortedList.sort((a, b) {
     if (a.pending && !b.pending) {
       return -1;
     }

@@ -282,8 +282,8 @@ class HomeViewState extends State<Home> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final messages = room.messages ?? const [];
-        final messagesLatest = latestMessages(room.messages);
+        final messages = props.messages[room.id] ?? const [];
+        final messagesLatest = latestMessages(messages);
         final messagePreview = formatPreview(
           room: room,
           prefetched: messagesLatest,
@@ -594,6 +594,7 @@ class _Props extends Equatable {
   final User currentUser;
   final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
+  final Map<String, List<Message>> messages;
 
   final Function onDebug;
   final Function onLeaveChat;
@@ -609,6 +610,7 @@ class _Props extends Equatable {
     @required this.offline,
     @required this.syncing,
     @required this.unauthed,
+    @required this.messages,
     @required this.currentUser,
     @required this.chatSettings,
     @required this.roomTypeBadgesEnabled,
@@ -638,6 +640,7 @@ class _Props extends Equatable {
           sortedPrioritizedRooms(store.state.roomStore.rooms),
           hidden: store.state.roomStore.roomsHidden,
         ),
+        messages: store.state.eventStore.messages,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
         syncing: () {
