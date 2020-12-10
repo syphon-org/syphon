@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -72,6 +73,30 @@ void closeStorage() async {
   }
 }
 
+Future<void> deleteStorage() async {
+  try {
+    DatabaseFactory storageFactory;
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      storageFactory = getDatabaseFactorySqflite(
+        sqflite.databaseFactory,
+      );
+    }
+
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      storageFactory = getDatabaseFactorySqflite(
+        sqflite_ffi.databaseFactoryFfi,
+      );
+    }
+
+    Storage.main = await storageFactory.deleteDatabase(
+      Storage.mainKey,
+    );
+  } catch (error) {
+    printDebug(error.toString());
+  }
+}
+
 Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
   // load all rooms from cold storages
   final rooms = await loadRooms(
@@ -90,6 +115,9 @@ Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
       storage: storage,
       encrypted: room.encryptionEnabled,
       limit: 20,
+    );
+    printDebug(
+      '[loadMessages] ${messages[room.id].length.toString()} ${room.name} loaded',
     );
   }
 

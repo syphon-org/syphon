@@ -132,7 +132,7 @@ class ChatViewState extends State<ChatView> {
       });
     }
 
-    if (props.room.messages.length < 10) {
+    if (props.messages.length < 10) {
       props.onLoadFirstBatch();
     }
 
@@ -721,7 +721,7 @@ class _Props extends Equatable {
       users: store.state.userStore.users,
       messages: latestMessages(
         wrapOutboxMessages(
-          messages: roomSelectors.room(id: roomId, state: store.state).messages,
+          messages: roomMessages(store.state, roomId),
           outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
         ),
       ),
@@ -814,18 +814,21 @@ class _Props extends Equatable {
       },
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+        final messages = roomMessages(store.state, roomId);
 
         // load message from cold storage
-        if (room.messages.length < room.messageIds.length) {
+        if (messages.length < room.messageIds.length) {
+          printDebug('[onLoadMoreMessages] loading from cold storage');
           return store.dispatch(
             loadMessageEvents(
               room: room,
-              offset: room.messages.length,
+              offset: messages.length,
             ),
           );
         }
 
         // fetch messages beyond the oldest known message - lastHash
+        printDebug('[onLoadMoreMessages] loading from remote server');
         return store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,

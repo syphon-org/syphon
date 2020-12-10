@@ -23,9 +23,7 @@ String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
 
-String formatPreview({Room room, List<Message> prefetched}) {
-  var messages = prefetched ?? room.messages;
-
+String formatPreview({Room room, List<Message> messages}) {
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null && room.draft.body != null) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
@@ -46,10 +44,6 @@ String formatPreview({Room room, List<Message> prefetched}) {
   }
 
   // sort messages found
-  if (prefetched == null) {
-    messages = latestMessages(messages);
-  }
-
   final recentMessage = messages[0];
   var body = formatPreviewMessage(recentMessage.body);
 

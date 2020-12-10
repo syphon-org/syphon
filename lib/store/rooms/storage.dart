@@ -11,7 +11,7 @@ Future<void> saveRooms(
 }) async {
   final store = StoreRef<String, String>('rooms');
 
-  await storage.transaction((txn) async {
+  return await storage.transaction((txn) async {
     for (Room room in rooms.values) {
       final record = store.record(room.id);
       await record.put(txn, jsonEncode(room));

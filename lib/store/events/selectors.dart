@@ -1,10 +1,8 @@
 // Project imports:
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/room/model.dart';
 
-// TODO: replaces latestMessages() selectors with this
-List<Message> latestRoomMessages(AppState state, String roomId) {
+List<Message> roomMessages(AppState state, String roomId) {
   return state.eventStore.messages[roomId] ?? [];
 }
 

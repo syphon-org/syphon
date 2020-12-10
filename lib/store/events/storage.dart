@@ -6,13 +6,11 @@ import 'package:syphon/store/events/model.dart';
 
 const String MESSAGES = 'messages';
 
-Future<void> saveMessages(
-  List<Message> messages, {
-  Database storage,
-}) async {
+Future<void> saveMessages(List<Message> messages, {Database storage}) async {
+  printDebug('[saveMessages] saving ${messages.length}');
   final store = StoreRef<String, String>(MESSAGES);
 
-  await storage.transaction((txn) async {
+  return await storage.transaction((txn) async {
     for (Message message in messages) {
       final record = store.record(message.id);
       await record.put(txn, json.encode(message));
@@ -47,7 +45,6 @@ Future<List<Message>> loadMessages(
       messages.add(Message.fromJson(json.decode(message)));
     }
 
-    printDebug('[messages] loaded ${messages.length.toString()}');
     return messages;
   } catch (error) {
     printDebug(error.toString(), title: 'loadMessages');

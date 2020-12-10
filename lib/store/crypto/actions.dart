@@ -1012,8 +1012,9 @@ ThunkAction<AppState> exportMessageSession({String roomId}) {
  * fetches the keys uploaded to the matrix homeserver
  * by other users
  */
-ThunkAction<AppState> fetchDeviceKeys(
-    {Map<String, User> users, List<String> userIds}) {
+ThunkAction<AppState> fetchDeviceKeys({
+  List<String> userIds,
+}) {
   return (Store<AppState> store) async {
     try {
       final Map<String, dynamic> userIdMap = Map.fromIterable(

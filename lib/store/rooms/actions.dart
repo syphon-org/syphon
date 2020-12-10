@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/events/storage.dart';
 
@@ -26,6 +27,7 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
 import '../events/model.dart';
@@ -157,17 +159,40 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         json['timeline']['events'] = decryptedTimelineEvents;
       }
 
-      // filter through parsers
+      // TODO: eventually remove the need for this with modular parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
         lastSince: lastSince,
       );
 
-      // save cold storage objects
-      saveUsers(room.users, storage: Storage.main);
-      saveRooms({room.id: room}, storage: Storage.main);
-      saveMessages(room.messages, storage: Storage.main);
+      printDebug(
+        '[fromSync] ${room.name} after sync msg count ${room.messages.length}',
+      );
+      printDebug(
+        '[fromSync] ${room.name} msg id count ${room.messageIds.length}',
+      );
+
+      // update store
+      await store.dispatch(
+        setUsers(room.users),
+      );
+      await store.dispatch(
+        setMessageEvents(room: room, messages: room.messages),
+      );
+
+      // update cold storage
+      await Future.wait([
+        saveUsers(room.users, storage: Storage.main),
+        saveRooms({room.id: room}, storage: Storage.main),
+        saveMessages(room.messages, storage: Storage.main),
+      ]);
+
+      // TODO: remove with parsers - clear users from parsed room objects
+      room = room.copyWith(
+        users: Map<String, User>(),
+        messages: List<Message>(),
+      );
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {
@@ -521,9 +546,8 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted = latestMessages(
-          roomSelectors.room(id: roomId, state: store.state).messages,
-        );
+        final messagesSorted =
+            latestMessages(roomMessages(store.state, roomId));
 
         if (messagesSorted.isNotEmpty) {
           store.dispatch(sendReadReceipts(

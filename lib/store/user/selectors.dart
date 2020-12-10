@@ -61,7 +61,17 @@ String formatInitials(String fullword) {
   return initials.toUpperCase();
 }
 
-List<User> searchUsersLocal(List<User> users, {String searchText = ''}) {
+List<User> roomUsers(AppState state, String roomId) {
+  final room = state.roomStore.rooms[roomId] ?? Room(id: roomId);
+  return room.userIds.map((userId) => state.userStore.users[userId]).toList();
+}
+
+List<User> searchUsersLocal(
+  AppState state, {
+  String roomId,
+  String searchText = '',
+}) {
+  var users = roomUsers(state, roomId);
   if (searchText == null || searchText.isEmpty) {
     return users;
   }

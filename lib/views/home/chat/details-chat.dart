@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
@@ -530,10 +531,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
       room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
-      userList: List.from(
-        roomSelectors.room(id: roomId, state: store.state).users.values,
-      ),
-      messages: latestRoomMessages(store.state, roomId),
+      userList: roomUsers(store.state, roomId),
+      messages: roomMessages(store.state, roomId),
       onLeaveChat: () async {
         await store.dispatch(removeRoom(room: Room(id: roomId)));
       },

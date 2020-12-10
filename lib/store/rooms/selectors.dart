@@ -2,13 +2,13 @@
 import 'package:syphon/store/index.dart';
 import './room/model.dart';
 
-List<Room> rooms(AppState state) {
-  return state.roomStore.roomList;
-}
-
 Room room({AppState state, String id}) {
   if (state.roomStore.rooms == null) return Room();
   return state.roomStore.rooms[id] ?? Room();
+}
+
+List<Room> rooms(AppState state) {
+  return state.roomStore.roomList;
 }
 
 List<Room> sortedPrioritizedRooms(Map rooms) {

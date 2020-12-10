@@ -4,6 +4,7 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
@@ -504,6 +505,9 @@ class Room {
     String nextHash,
   }) {
     try {
+      printDebug(
+        '[fromMessageEvents] ${this.name} ${events.length.toString()}',
+      );
       bool limited;
       int lastUpdate = this.lastUpdate;
       List<Message> messagesNew = events ?? [];
@@ -546,6 +550,7 @@ class Room {
 
       // Combine current and existing messages on unique ids
       messagesExisting.addAll(messagesNew);
+
       final messagesMap = HashMap.fromIterable(
         messagesExisting,
         key: (message) => message.id,
@@ -557,15 +562,17 @@ class Room {
         (message) => messagesMap.containsKey(message.id),
       );
 
-      // Filter to find startTime and endTime
+      // save message and message id updates
       final messageIds = List<String>.from(messagesMap.keys);
       final messagesAll = List<Message>.from(messagesMap.values);
+      final messageIdsAll = List<String>.from(this.messageIds)
+        ..addAll(messageIds);
 
       // Save values to room
       return this.copyWith(
         outbox: outbox,
         messages: messagesAll,
-        messageIds: messageIds,
+        messageIds: messageIdsAll,
         limited: limited ?? this.limited,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,

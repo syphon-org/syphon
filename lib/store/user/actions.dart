@@ -25,12 +25,23 @@ class SaveUser {
   SaveUser({this.user});
 }
 
+class SetUsers {
+  final Map<String, User> users;
+  SetUsers({this.users});
+}
+
 class SetUserInvites {
   final List<User> users;
   SetUserInvites({this.users});
 }
 
 class ClearUserInvites {}
+
+ThunkAction<AppState> setUsers(Map<String, User> users) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetUsers(users: users));
+  };
+}
 
 ThunkAction<AppState> setUserInvites({List<User> users}) {
   return (Store<AppState> store) async {

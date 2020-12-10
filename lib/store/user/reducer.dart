@@ -11,6 +11,10 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
       return state.copyWith(invites: action.users);
     case ClearUserInvites:
       return state.copyWith(invites: const []);
+    case SetUsers:
+      final users = Map<String, User>.from(state.users);
+      users.addAll(action.users);
+      return state.copyWith(users: users);
     case SaveUser:
       final user = action.user as User;
       final users = Map<String, User>.from(state.users);

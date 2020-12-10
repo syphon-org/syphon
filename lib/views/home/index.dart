@@ -286,7 +286,7 @@ class HomeViewState extends State<Home> {
         final messagesLatest = latestMessages(messages);
         final messagePreview = formatPreview(
           room: room,
-          prefetched: messagesLatest,
+          messages: messagesLatest,
         );
         final roomSettings = props.chatSettings[room.id] ?? null;
 
@@ -331,6 +331,7 @@ class HomeViewState extends State<Home> {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
+        // display message as being 'unread'
         if (messages != null && messages.isNotEmpty) {
           final messageRecent = messagesLatest[0];
 

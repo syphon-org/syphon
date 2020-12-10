@@ -217,9 +217,8 @@ class _Props extends Equatable {
         searchText: store.state.searchStore.searchText,
         room: store.state.roomStore.rooms[roomId] ?? Room(),
         usersFiltered: searchUsersLocal(
-          List.from(
-            (store.state.roomStore.rooms[roomId] ?? Room()).users.values,
-          ),
+          store.state,
+          roomId: roomId,
           searchText: store.state.searchStore.searchText,
         ),
         onSearch: (text) {

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -39,6 +40,16 @@ class SetState {
   SetState({this.roomId, this.states});
 }
 
+ThunkAction<AppState> setMessageEvents({
+  Room room,
+  List<Message> messages,
+  int offset = 0,
+  int limit = 20,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+    };
+
 /**
  * Load Message Events
  * 
@@ -56,17 +67,16 @@ ThunkAction<AppState> loadMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
-      printDebug('[loadMessageEvents]');
       final messagesStored = await loadMessages(
         room.messageIds,
         storage: Storage.main,
         offset: offset, // offset from the most recent eventId found
-        limit: !room.encryptionEnabled ? limit : null,
+        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );
 
       store.dispatch(SetMessages(
         roomId: room.id,
-        messages: room.messages + messagesStored,
+        messages: messagesStored,
       ));
     } catch (error) {
       printDebug('[fetchMessageEvents] $error');
@@ -113,6 +123,8 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
+
+      messages.forEach((m) => printJson(m['content']));
 
       // reuse the logic for syncing
       await store.dispatch(

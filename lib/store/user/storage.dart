@@ -11,7 +11,7 @@ Future<void> saveUsers(
 }) async {
   final store = StoreRef<String, String>('users');
 
-  await storage.transaction((txn) async {
+  return await storage.transaction((txn) async {
     for (User user in users.values) {
       final record = store.record(user.userId);
       await record.put(txn, jsonEncode(user));
