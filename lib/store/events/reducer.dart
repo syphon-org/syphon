@@ -9,20 +9,17 @@ EventStore eventReducer(
     case SetMessages:
       final roomId = action.roomId;
       final messages = Map<String, List<Message>>.from(state.messages);
-
       final messagesOld = Map<String, Message>.fromIterable(
-        state.messages[roomId],
-        key: (message) => message.id,
-        value: (message) => message,
+        messages[roomId] ?? [],
+        key: (msg) => msg.id,
+        value: (msg) => msg,
       );
-
       final messagesNew = Map<String, Message>.fromIterable(
-        action.messages,
-        key: (message) => message.id,
-        value: (message) => message,
+        action.messages ?? [],
+        key: (msg) => msg.id,
+        value: (msg) => msg,
       );
 
-      // combine new and old messages on event id to prevent duplicates
       final messagesAll = messagesOld..addAll(messagesNew);
 
       messages[roomId] = messagesAll.values.toList();

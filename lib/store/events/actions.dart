@@ -74,6 +74,7 @@ ThunkAction<AppState> loadMessageEvents({
         limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );
 
+      // load cold storage messages to state
       store.dispatch(SetMessages(
         roomId: room.id,
         messages: messagesStored,
@@ -123,8 +124,6 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
-
-      messages.forEach((m) => printJson(m['content']));
 
       // reuse the logic for syncing
       await store.dispatch(

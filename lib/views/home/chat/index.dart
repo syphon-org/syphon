@@ -818,7 +818,8 @@ class _Props extends Equatable {
 
         // load message from cold storage
         if (messages.length < room.messageIds.length) {
-          printDebug('[onLoadMoreMessages] loading from cold storage');
+          printDebug(
+              '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
           return store.dispatch(
             loadMessageEvents(
               room: room,

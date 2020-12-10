@@ -38,7 +38,7 @@ class SetUserInvites {
 class ClearUserInvites {}
 
 ThunkAction<AppState> setUsers(Map<String, User> users) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetUsers(users: users));
   };
 }

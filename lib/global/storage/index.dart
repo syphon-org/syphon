@@ -93,7 +93,7 @@ Future<void> deleteStorage() async {
       Storage.mainKey,
     );
   } catch (error) {
-    printDebug(error.toString());
+    printDebug('[deleteStorage] ${error.toString()}');
   }
 }
 

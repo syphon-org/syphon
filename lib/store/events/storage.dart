@@ -7,7 +7,6 @@ import 'package:syphon/store/events/model.dart';
 const String MESSAGES = 'messages';
 
 Future<void> saveMessages(List<Message> messages, {Database storage}) async {
-  printDebug('[saveMessages] saving ${messages.length}');
   final store = StoreRef<String, String>(MESSAGES);
 
   return await storage.transaction((txn) async {
