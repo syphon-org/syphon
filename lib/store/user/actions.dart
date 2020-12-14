@@ -2,7 +2,10 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/model.dart';
@@ -30,6 +33,11 @@ class SetUsers {
   SetUsers({this.users});
 }
 
+class SetUsersBlocked {
+  final List<String> userIds;
+  SetUsersBlocked({this.userIds});
+}
+
 class SetUserInvites {
   final List<User> users;
   SetUserInvites({this.users});
@@ -43,14 +51,20 @@ ThunkAction<AppState> setUsers(Map<String, User> users) {
   };
 }
 
+ThunkAction<AppState> setUsersBlocked(List<String> userIds) {
+  return (Store<AppState> store) {
+    store.dispatch(SetUsersBlocked(userIds: userIds));
+  };
+}
+
 ThunkAction<AppState> setUserInvites({List<User> users}) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetUserInvites(users: users));
   };
 }
 
 ThunkAction<AppState> clearUserInvites() {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(ClearUserInvites());
   };
 }
@@ -88,12 +102,10 @@ ThunkAction<AppState> fetchUserProfile({User user}) {
 /**
  * Toggle Block User
  * 
- * NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
- * 
  * Fetch the blocked user list and recalculate
  * events without the given user id
  */
-ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
+ThunkAction<AppState> toggleBlockUser({User user}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -107,50 +119,34 @@ ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
         type: AccountDataTypes.ignoredUserList,
       );
 
+      // skip error if there's no blocked users list yet
       if (data['errcode'] != null) {
-        throw data['error'];
+        if (data['errcode'] != MatrixErrors.not_found) {
+          throw data['error'];
+        }
       }
-
-      return false;
 
       // Pull the direct room for that specific user
-      Map directRoomUsers = data as Map<String, dynamic>;
-      final usersDirectRooms = directRoomUsers[user] ?? [];
+      Map<String, dynamic> usersBlocked = data['ignored_users'] ?? {};
 
-      if (usersDirectRooms.isEmpty && block) {
-        directRoomUsers[user.userId] = [room.id];
+      // toggle based on if the id is already present
+      if (!usersBlocked.containsKey(user.userId)) {
+        usersBlocked[user.userId] = {};
+      } else {
+        usersBlocked.remove(user.userId);
       }
 
-      // Toggle the direct room data based on user actions
-      directRoomUsers = directRoomUsers.map((userId, rooms) {
-        List<dynamic> updatedRooms = List.from(rooms ?? []);
+      // locally track the blocked users list
+      final usersBlockedList = usersBlocked.keys.toList();
+      await store.dispatch(setUsersBlocked(usersBlockedList));
 
-        if (userId != user.userId) {
-          return MapEntry(userId, updatedRooms);
-        }
-
-        if (block) {
-          updatedRooms.add(room.id);
-        } else {
-          updatedRooms.removeWhere((roomId) => roomId == room.id);
-        }
-
-        return MapEntry(userId, updatedRooms);
-      });
-
-      // Filter out empty list entries for a user
-      directRoomUsers.removeWhere((key, value) {
-        final roomIds = value ?? [];
-        return roomIds.isEmpty;
-      });
-
-      final saveData = await MatrixApi.saveAccountData(
+      // save blocked users list back to account_data remotely
+      final saveData = await MatrixApi.updateBlockedUsers(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,
-        type: AccountDataTypes.ignoredUserList,
-        accountData: directRoomUsers,
+        blockUserList: usersBlocked,
       );
 
       if (saveData['errcode'] != null) {
@@ -159,8 +155,8 @@ ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: "Failed to load users profile",
-        origin: 'fetchUserProfile',
+        message: "Failed to toggle user on blocklist",
+        origin: 'toggleBlockUser',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));

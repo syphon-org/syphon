@@ -17,6 +17,7 @@ import 'package:syphon/views/home/search/search-groups.dart';
 import 'package:syphon/views/home/search/search-rooms.dart';
 import 'package:syphon/views/home/search/search-users.dart';
 import 'package:syphon/views/home/settings/advanced.dart';
+import 'package:syphon/views/home/settings/blocked.dart';
 import 'package:syphon/views/home/settings/chats.dart';
 import 'package:syphon/views/home/settings/devices.dart';
 import 'package:syphon/views/home/settings/index.dart';
@@ -86,6 +87,7 @@ class NavigationProvider {
         '/theming': (BuildContext context) => Theming(),
         '/devices': (BuildContext context) => DevicesView(),
         '/settings': (BuildContext context) => SettingsScreen(),
+        '/blocked': (BuildContext context) => BlockedUsersView(),
         '/loading': (BuildContext context) => Loading(),
       };
 }

@@ -293,15 +293,11 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   onViewUserDetails({Message message, String userId}) {
-    final arguements =
-        ModalRoute.of(context).settings.arguments as ChatViewArguements;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
-        roomId: arguements.roomId,
         userId: userId ?? message.sender,
       ),
     );
@@ -720,9 +716,12 @@ class _Props extends Equatable {
       room: roomSelectors.room(id: roomId, state: store.state),
       users: store.state.userStore.users,
       messages: latestMessages(
-        wrapOutboxMessages(
-          messages: roomMessages(store.state, roomId),
-          outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+        filterMessages(
+          wrapOutboxMessages(
+            messages: roomMessages(store.state, roomId).toList(),
+            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+          ),
+          store.state.userStore.blocked,
         ),
       ),
       roomPrimaryColor: () {

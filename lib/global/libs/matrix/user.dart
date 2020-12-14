@@ -86,12 +86,12 @@ abstract class Users {
    * to the user that set the account_data. The config will be synced 
    * to clients in the top-level account_data.
    */
-  static Future<dynamic> blockUser({
+  static Future<dynamic> updateBlockedUsers({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
     String userId,
-    List<String> roomIds = const [],
+    Map<String, dynamic> blockUserList = const {"ignored_users": {}},
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${AccountDataTypes.ignoredUserList}';
@@ -100,16 +100,14 @@ abstract class Users {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final accountData = {userId: []};
-
-    if (roomIds.isNotEmpty) {
-      accountData[userId] = roomIds;
-    }
+    final body = {
+      'ignored_users': blockUserList ?? {},
+    };
 
     final saveResponse = await http.put(
       url,
       headers: headers,
-      body: json.encode(accountData),
+      body: json.encode(body),
     );
 
     return await json.decode(

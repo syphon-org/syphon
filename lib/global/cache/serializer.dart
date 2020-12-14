@@ -44,6 +44,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.cryptoStore,
       state.mediaStore,
       state.settingsStore,
+      state.userStore,
     ];
 
     // Queue up a cache saving will wait
@@ -66,8 +67,8 @@ class CacheSerializer implements StateSerializer<AppState> {
           // Stopwatch stopwatchSerialize = new Stopwatch()..start();
           try {
             // HACK: unable to pass certain stores directly to an isolate
-            final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
-            if (!sensitiveStorage.contains(store.runtimeType)) {
+            final sensitiveStorage = [MediaStore];
+            if (sensitiveStorage.contains(store.runtimeType)) {
               jsonEncoded = await compute(jsonEncode, store);
             } else {
               jsonEncoded = json.encode(store);
@@ -131,6 +132,7 @@ class CacheSerializer implements StateSerializer<AppState> {
   AppState decode(Uint8List data) {
     AuthStore authStore = AuthStore();
     SyncStore syncStore = SyncStore();
+    UserStore userStore = UserStore();
     CryptoStore cryptoStore = CryptoStore();
     MediaStore mediaStore = MediaStore();
     SettingsStore settingsStore = SettingsStore();
@@ -162,8 +164,10 @@ class CacheSerializer implements StateSerializer<AppState> {
           case 'SettingsStore':
             settingsStore = SettingsStore.fromJson(store);
             break;
-          case 'RoomStore':
           case 'UserStore':
+            userStore = UserStore.fromJson(store);
+            break;
+          case 'RoomStore':
           // --- cold storage only ---
           default:
             break;
@@ -183,7 +187,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       roomStore: RoomStore().copyWith(
         rooms: preloaded['rooms'] ?? {},
       ),
-      userStore: UserStore().copyWith(
+      userStore: userStore.copyWith(
         users: preloaded['users'] ?? {},
       ),
       eventStore: EventStore().copyWith(

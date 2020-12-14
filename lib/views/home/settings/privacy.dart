@@ -112,6 +112,19 @@ class PrivacyPreferences extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
+                          ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/blocked');
+                            },
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Blocked Users',
+                            ),
+                            subtitle: Text(
+                              'View and manage blocked users',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
                         ],
                       ),
                     ),

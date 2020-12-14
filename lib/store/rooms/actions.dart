@@ -875,7 +875,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       if (leaveData['errcode'] != null) {
         if (leaveData['errcode'] == MatrixErrors.room_unknown) {
           await store.dispatch(RemoveRoom(roomId: room.id));
-        } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+        } else if (leaveData['errcode'] == MatrixErrors.not_found) {
           await store.dispatch(RemoveRoom(roomId: room.id));
         }
 
@@ -893,7 +893,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       );
 
       if (forgetData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.room_not_found) {
+        if (leaveData['errcode'] == MatrixErrors.not_found) {
           await store.dispatch(RemoveRoom(roomId: room.id));
         }
         if (room.direct) {

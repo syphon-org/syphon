@@ -56,9 +56,6 @@ abstract class Events {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
 
-    printDebug('[Matrix.fetchMessageEvents] ${limit}');
-
-    // Params
     url += '?limit=$limit';
     url += from != null ? '&from=${from}' : '';
     url += to != null ? '&to=${to}' : '';
