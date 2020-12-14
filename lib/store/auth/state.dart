@@ -3,26 +3,26 @@ import 'dart:async';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 
-@HiveType(typeId: AuthStoreHiveId)
-@JsonSerializable(ignoreUnannotated: true)
+@JsonSerializable()
 class AuthStore extends Equatable {
-  @HiveField(0)
-  @JsonKey(name: 'user')
   final User user;
+
+  @JsonKey(ignore: true)
   User get currentUser => user;
 
+  @JsonKey(ignore: true)
   final StreamController<User> authObserver;
+
+  @JsonKey(ignore: true)
   Stream<User> get onAuthStateChanged =>
       authObserver != null ? authObserver.stream : null;
 

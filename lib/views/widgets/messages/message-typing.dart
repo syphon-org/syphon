@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/user/model.dart';
@@ -85,6 +86,7 @@ class MessageTypingState extends State<MessageTypingWidget>
     }
 
     if (widget.usersTyping.length > 0) {
+      printDebug('[MessageTypingWidget] ${widget.usersTyping.length}');
       final usernamesTyping = widget.usersTyping;
       userTyping = widget.roomUsers[usernamesTyping[0]];
     }

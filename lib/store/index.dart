@@ -7,7 +7,10 @@ import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:sembast/sembast.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/cache/storage.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
@@ -16,6 +19,8 @@ import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/reducer.dart';
+import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/global/cache/serializer.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -42,6 +47,7 @@ class AppState extends Equatable {
   final MediaStore mediaStore;
   final SettingsStore settingsStore;
   final RoomStore roomStore;
+  final EventStore eventStore;
   final UserStore userStore;
   final SyncStore syncStore;
   final CryptoStore cryptoStore;
@@ -52,6 +58,7 @@ class AppState extends Equatable {
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
     this.roomStore = const RoomStore(),
+    this.eventStore = const EventStore(),
     this.userStore = const UserStore(),
     this.mediaStore = const MediaStore(),
     this.searchStore = const SearchStore(),
@@ -68,6 +75,7 @@ class AppState extends Equatable {
         roomStore,
         userStore,
         mediaStore,
+        eventStore,
         searchStore,
         settingsStore,
         cryptoStore,
@@ -80,6 +88,7 @@ AppState appReducer(AppState state, action) => AppState(
       alertsStore: alertsReducer(state.alertsStore, action),
       mediaStore: mediaReducer(state.mediaStore, action),
       roomStore: roomReducer(state.roomStore, action),
+      eventStore: eventReducer(state.eventStore, action),
       syncStore: syncReducer(state.syncStore, action),
       userStore: userReducer(state.userStore, action),
       searchStore: searchReducer(state.searchStore, action),
@@ -89,22 +98,20 @@ AppState appReducer(AppState state, action) => AppState(
 
 /**
  * Initialize Store
- * - Hot redux state cache for top level data
- * * Consider still using hive here
- * 
- * PLEASE NOTE redux persist manages when the store
- * should persist and if it can, not where it's persisting too
- * this is why the "storage: MemoryStore()" property is set and
- * the Hive Serializer has been impliemented
+ * - Hot redux state cache for top level data 
  */
-Future<Store> initStore() async {
+Future<Store> initStore(Database cache, Database storage) async {
+  // partially load storage to memory to rehydrate cache
+  final data = await loadStorage(storage);
+
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
-    storage: MemoryStorage(),
-    serializer: CacheSerializer(),
-    throttleDuration: Duration(milliseconds: 4500),
+    storage: CacheStorage(cache: cache),
+    serializer: CacheSerializer(cache: cache, preloaded: data),
+    // TODO: can remove once cold storage is in place
+    throttleDuration: Duration(milliseconds: 4000),
     shouldSave: (Store<AppState> store, dynamic action) {
-      // TODO: can remove once sqlcipher storage is in place
+      // TODO: can remove once cold storage is in place
       switch (action.runtimeType) {
         case SetSynced:
           if (action.synced) {
@@ -124,11 +131,6 @@ Future<Store> initStore() async {
       }
     },
   );
-
-  // Configure cache encryption/decryption instance
-  CacheSecure.ivKey = await unlockIVKey();
-  CacheSecure.ivKeyNext = await unlockIVKeyNext();
-  CacheSecure.cryptKey = await unlockCryptKey();
 
   // Finally load persisted store
   var initialState;

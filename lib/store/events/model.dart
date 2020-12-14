@@ -1,9 +1,5 @@
 // Package imports:
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
@@ -25,10 +21,8 @@ class EventTypes {
   static const creation = 'm.room.create';
   static const message = 'm.room.message';
   static const encrypted = 'm.room.encrypted';
-
-  // {membership: join, displayname: usbfingers, avatar_url: mxc://matrix.org/RrRcMHnqXaJshyXZpGrZloyh }
-  // {is_direct: true, membership: invite, displayname: ereio, avatar_url: mxc://matrix.org/JllILpqzdFAUOvrTPSkDryzW}
   static const member = 'm.room.member';
+  static const reaction = 'm.reaction';
 
   static const guestAccess = 'm.room.guest_access';
   static const joinRules = 'm.room.join_rules';
@@ -36,8 +30,6 @@ class EventTypes {
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
   static const roomKey = 'm.room_key';
-
-  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class MessageTypes {
@@ -49,6 +41,7 @@ class MessageTypes {
   static const AUDIO = 'm.text';
   static const LOCATION = 'm.location';
   static const VIDEO = 'm.video';
+  static const ANNOTATIONO = 'm.annotation';
 }
 
 class MediumType {
@@ -58,22 +51,14 @@ class MediumType {
   static const encryption = 'encryption';
 }
 
-@HiveType(typeId: EventHiveId)
 @JsonSerializable()
 class Event {
-  @HiveField(0)
   final String id; // event_id
-  @HiveField(1)
   final String userId;
-  @HiveField(2)
   final String roomId;
-  @HiveField(3)
   final String type;
-  @HiveField(4)
   final String sender;
-  @HiveField(5)
   final String stateKey;
-  @HiveField(6)
   final int timestamp;
 
   /* 
@@ -127,51 +112,31 @@ class Event {
 }
 
 // TODO: make this actually inherit Event but also allow immutability (dart says no?)
-@HiveType(typeId: MessageHiveId)
 @JsonSerializable()
 class Message {
-  @HiveField(0)
   final String id; // event_id
-  @HiveField(1)
   final String userId;
-  @HiveField(2)
   final String roomId;
-  @HiveField(3)
   final String type;
-  @HiveField(4)
   final String sender;
-  @HiveField(5)
   final String stateKey;
-  @HiveField(6)
   final int timestamp;
 
-  @HiveField(7)
   final bool pending;
-  @HiveField(8)
   final bool syncing;
-  @HiveField(9)
   final bool failed;
 
   // Message Only
-  @HiveField(10)
   final String body;
-  @HiveField(11)
   final String msgtype;
-  @HiveField(12)
   final String format;
-  @HiveField(13)
   final String filename;
-  @HiveField(14)
   final String formattedBody;
 
   // Encrypted Messages only
-  @HiveField(15)
   final String ciphertext;
-  @HiveField(16)
   final String algorithm;
-  // The Curve25519 key of the device which initiated the session originally.
-  @HiveField(17)
-  final String senderKey;
+  final String senderKey; // Curve25519 device key which initiated the session
 
   /* 
   * TODO: content will not always be a string? configure parsing data

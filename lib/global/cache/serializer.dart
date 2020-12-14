@@ -8,14 +8,15 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
-import 'package:steel_crypt/steel_crypt.dart';
+import 'package:sembast/sembast.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
-import 'package:syphon/global/libs/hive/encoder.dart';
-import 'package:syphon/global/libs/hive/index.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/state.dart';
@@ -30,13 +31,17 @@ import 'package:syphon/store/settings/state.dart';
  * Handles serialization, encryption, and storage for caching redux stores
  */
 class CacheSerializer implements StateSerializer<AppState> {
+  final Database cache;
+  final Map<String, Map<dynamic, dynamic>> preloaded;
+
+  CacheSerializer({this.cache, this.preloaded});
+
   @override
   Uint8List encode(AppState state) {
-    final stores = [
+    final List<Object> stores = [
       state.authStore,
       state.syncStore,
       state.cryptoStore,
-      state.roomStore,
       state.mediaStore,
       state.settingsStore,
       state.userStore,
@@ -46,64 +51,78 @@ class CacheSerializer implements StateSerializer<AppState> {
     // if the previously schedule task has not finished
     Future.microtask(() async {
       // // create a new IV for the encrypted cache
-      CacheSecure.ivKey = createIVKey();
+      Cache.ivKey = createIVKey();
+
       // // backup the IV in case the app is force closed before caching finishes
-      await saveIVKeyNext(CacheSecure.ivKey);
+      await saveIVKeyNext(Cache.ivKey);
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
-          var jsonEncoded;
-          var jsonEncrypted;
+          String jsonEncoded;
+          String jsonEncrypted;
+          String type = store.runtimeType.toString();
 
-          // encode the store contents to json
-          // HACK: unable to pass both listed stores direct to an isolate
-          // final sensitiveStorage = [AuthStore, SyncStore, CryptoStore];
-          // if (!sensitiveStorage.contains(store.runtimeType)) {
-          //   jsonEncoded = await compute(jsonEncode, store);
-          // } else {
-          jsonEncoded = json.encode(store);
-          // }
+          // serialize the store contents
+          // Stopwatch stopwatchSerialize = new Stopwatch()..start();
+          try {
+            // HACK: unable to pass certain stores directly to an isolate
+            final sensitiveStorage = [MediaStore];
+            if (sensitiveStorage.contains(store.runtimeType)) {
+              jsonEncoded = await compute(jsonEncode, store);
+            } else {
+              jsonEncoded = json.encode(store);
+            }
+          } catch (error) {
+            jsonEncoded = json.encode(store);
+            print(
+              '[CacheSerializer] ${type} failed $error',
+            );
+          }
 
-          // encrypt the store contents previously converted to json
-          jsonEncrypted = await compute(encryptJsonBackground, {
-            'ivKey': CacheSecure.ivKey,
-            'cryptKey': CacheSecure.cryptKey,
-            'type': store.runtimeType.toString(),
-            'json': jsonEncoded,
-          });
+          // debugPrint(
+          //   '[CacheSerializer] ${stopwatchSerialize.elapsed} ${type} serialize',
+          // );
 
-          // cache redux store to main cache storage
-          // caching room and crypto stores with additional hive level error handling
-          switch (store.runtimeType) {
-            case RoomStore:
-              await CacheSecure.cacheRooms.put(
-                store.runtimeType.toString(),
-                jsonEncrypted,
-              );
-              break;
-            case CryptoStore:
-              await CacheSecure.cacheCrypto.put(
-                store.runtimeType.toString(),
-                jsonEncrypted,
-              );
-              break;
-            default:
-              await CacheSecure.cacheMain.put(
-                store.runtimeType.toString(),
-                jsonEncrypted,
-              );
-              break;
+          // Stopwatch stopwatchEncrypt = new Stopwatch()..start();
+          // encrypt the store contents
+          jsonEncrypted = await compute(
+            encryptJsonBackground,
+            {
+              'ivKey': Cache.ivKey,
+              'cryptKey': Cache.cryptKey,
+              'type': type,
+              'json': jsonEncoded,
+            },
+            debugLabel: 'encryptJsonBackground',
+          );
+
+          // debugPrint(
+          //   '[CacheSerializer] ${stopwatchEncrypt.elapsed} ${type} encrypt',
+          // );
+
+          try {
+            // Stopwatch stopwatchSave = new Stopwatch()..start();
+            final storeRef = StoreRef<String, String>.main();
+            await storeRef.record(type).put(cache, jsonEncrypted);
+
+            // debugPrint(
+            //   '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
+            // );
+          } catch (error) {
+            print('[CacheSerializer] ERROR $error');
           }
         } catch (error) {
           debugPrint(
-            '[CacheSerializer.encode] $error',
+            '[CacheSerializer] $error',
           );
         }
       }));
 
       // Rotate encryption for the next save
-      await saveIVKey(CacheSecure.ivKey);
+      await saveIVKey(Cache.ivKey);
+
+      return Future.value(null);
     });
 
     // Disregard redux persist storage saving
@@ -111,127 +130,50 @@ class CacheSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
-    final aes = AesCrypt(key: CacheSecure.cryptKey, padding: PaddingAES.pkcs7);
-
     AuthStore authStore = AuthStore();
     SyncStore syncStore = SyncStore();
+    UserStore userStore = UserStore();
     CryptoStore cryptoStore = CryptoStore();
     MediaStore mediaStore = MediaStore();
-    RoomStore roomStore = RoomStore();
     SettingsStore settingsStore = SettingsStore();
-    UserStore userStore = UserStore();
 
-    final List<dynamic> stores = [
-      authStore,
-      syncStore,
-      mediaStore,
-      roomStore,
-      cryptoStore,
-      settingsStore,
-      userStore,
-    ];
-
-    // TODO: remove after most have upgraded to 0.1.4/0.1.5
-    if ((Cache.state != null || Cache.stateRooms != null) &&
-        Cache.migration == null) {
-      debugPrint(
-        '[Legacy Cache Found] ***** FOUND ****** loading and removing cache',
-      );
-      final legacyAppState = LegacyEncoder.decodeHive();
-      deleteLegacyStorage();
-      return legacyAppState;
-    }
+    // Load stores previously fetched from cache,
+    // mutable global due to redux_presist not extendable beyond Uint8List
+    final stores = Cache.cacheStores;
 
     // decode each store cache synchronously
-    stores.forEach((store) {
+    stores.forEach((type, store) {
       try {
-        Map<String, dynamic> decodedJson = {};
-
-        var encryptedJson;
-
-        // fetch from main cache storage
-        // fetching room and crypto store has additional hive level error handling
-        switch (store.runtimeType) {
-          case RoomStore:
-            encryptedJson = CacheSecure.cacheRooms.get(
-              store.runtimeType.toString(),
-              defaultValue: null,
-            );
-            break;
-          case CryptoStore:
-            encryptedJson = CacheSecure.cacheCrypto.get(
-              store.runtimeType.toString(),
-              defaultValue: null,
-            );
-            break;
-          default:
-            encryptedJson = CacheSecure.cacheMain.get(
-              store.runtimeType.toString(),
-              defaultValue: null,
-            );
-            break;
-        }
-
-        // attempt to decrypt encrypted state after loaded from RAM
-        if (encryptedJson != null) {
-          try {
-            final decryptedJson = aes.ctr.decrypt(
-              enc: encryptedJson,
-              iv: CacheSecure.ivKey,
-            );
-            decodedJson = json.decode(decryptedJson);
-          } catch (error) {
-            debugPrint('[CacheSerializer.decode] $error');
-            decodedJson = {};
-          }
-        }
-
-        // decryption may fail if force closed, attempt with new iv generated before close
-        if (decodedJson.isEmpty) {
-          try {
-            // decrypt encrypted state after loaded from RAM
-            final decryptedJson = aes.ctr.decrypt(
-              enc: encryptedJson,
-              iv: CacheSecure.ivKeyNext,
-            );
-            decodedJson = json.decode(decryptedJson);
-          } catch (error) {
-            debugPrint('[CacheSerializer.decode] $error');
-            decodedJson = {};
-          }
-        }
-
         // if all else fails, just pass back a fresh store to avoid a crash
-        if (decodedJson.isEmpty) return;
+        if (store == null || store.isEmpty) return;
 
         // this stinks, but dart doesn't allow reflection for factories/contructors
-        switch (store.runtimeType) {
-          case AuthStore:
-            authStore = AuthStore.fromJson(decodedJson);
+        switch (type) {
+          case 'AuthStore':
+            authStore = AuthStore.fromJson(store);
             break;
-          case SyncStore:
-            syncStore = SyncStore.fromJson(decodedJson);
+          case 'SyncStore':
+            syncStore = SyncStore.fromJson(store);
             break;
-          case CryptoStore:
-            cryptoStore = CryptoStore.fromJson(decodedJson);
+          case 'CryptoStore':
+            cryptoStore = CryptoStore.fromJson(store);
             break;
-          case MediaStore:
-            mediaStore = MediaStore.fromJson(decodedJson);
+          case 'MediaStore':
+            mediaStore = MediaStore.fromJson(store);
             break;
-          case RoomStore:
-            roomStore = RoomStore.fromJson(decodedJson);
+          case 'SettingsStore':
+            settingsStore = SettingsStore.fromJson(store);
             break;
-          case SettingsStore:
-            settingsStore = SettingsStore.fromJson(decodedJson);
+          case 'UserStore':
+            userStore = UserStore.fromJson(store);
             break;
-          case UserStore:
-            userStore = UserStore.fromJson(decodedJson);
-            break;
+          case 'RoomStore':
+          // --- cold storage only ---
           default:
             break;
         }
       } catch (error) {
-        debugPrint('[CacheSerializer.decode] $error');
+        printError('[CacheSerializer.decode] $error');
       }
     });
 
@@ -240,10 +182,17 @@ class CacheSerializer implements StateSerializer<AppState> {
       authStore: authStore ?? AuthStore(),
       syncStore: syncStore ?? SyncStore(),
       cryptoStore: cryptoStore ?? CryptoStore(),
-      roomStore: roomStore ?? RoomStore(),
-      userStore: userStore ?? UserStore(),
       mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
+      roomStore: RoomStore().copyWith(
+        rooms: preloaded['rooms'] ?? {},
+      ),
+      userStore: userStore.copyWith(
+        users: preloaded['users'] ?? {},
+      ),
+      eventStore: EventStore().copyWith(
+        messages: preloaded['messages'] ?? Map<String, List<Message>>(),
+      ),
     );
   }
 }

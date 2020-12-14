@@ -1,5 +1,4 @@
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -13,10 +12,11 @@ import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
@@ -29,13 +29,11 @@ class ModalUserDetails extends StatelessWidget {
   ModalUserDetails({
     Key key,
     this.user,
-    this.roomId,
     this.userId,
   }) : super(key: key);
 
   final User user;
   final String userId;
-  final String roomId;
 
   @protected
   void onNavigateToProfile({BuildContext context, _Props props}) async {
@@ -93,7 +91,6 @@ class ModalUserDetails extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           user: user,
-          roomId: roomId,
           userId: userId,
         ),
         builder: (context, props) => Container(
@@ -173,6 +170,10 @@ class ModalUserDetails extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     ListTile(
+                      onTap: () => this.onMessageUser(
+                        context: context,
+                        props: props,
+                      ),
                       title: Text(
                         'Send A Message',
                         style: Theme.of(context).textTheme.subtitle1,
@@ -189,12 +190,12 @@ class ModalUserDetails extends StatelessWidget {
                           color: Theme.of(context).iconTheme.color,
                         ),
                       ),
-                      onTap: () => this.onMessageUser(
+                    ),
+                    ListTile(
+                      onTap: () => this.onNavigateToInvite(
                         context: context,
                         props: props,
                       ),
-                    ),
-                    ListTile(
                       title: Text(
                         'Invite To Room',
                         style: Theme.of(context).textTheme.subtitle1,
@@ -206,12 +207,12 @@ class ModalUserDetails extends StatelessWidget {
                           size: Dimensions.iconSize,
                         ),
                       ),
-                      onTap: () => this.onNavigateToInvite(
+                    ),
+                    ListTile(
+                      onTap: () => this.onNavigateToProfile(
                         context: context,
                         props: props,
                       ),
-                    ),
-                    ListTile(
                       title: Text(
                         'View Profile',
                         style: Theme.of(context).textTheme.subtitle1,
@@ -223,28 +224,21 @@ class ModalUserDetails extends StatelessWidget {
                           size: Dimensions.iconSize,
                         ),
                       ),
-                      onTap: () => this.onNavigateToProfile(
-                        context: context,
-                        props: props,
-                      ),
                     ),
-                    GestureDetector(
-                      onTap: () => props.onDisabled(),
-                      child: ListTile(
-                        enabled: false,
-                        title: Text(
-                          'Block',
+                    ListTile(
+                      onTap: () async {
+                        await props.onBlockUser(props.user);
+                        Navigator.pop(context);
+                      },
+                      title: Text(
+                        props.blocked ? 'Unblock' : 'Block',
+                      ),
+                      leading: Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.block,
+                          size: Dimensions.iconSize,
                         ),
-                        leading: Container(
-                          padding: EdgeInsets.all(4),
-                          child: Icon(
-                            Icons.block,
-                            size: Dimensions.iconSize,
-                          ),
-                        ),
-                        onTap: () async {
-                          Navigator.pop(context);
-                        },
                       ),
                     ),
                   ],
@@ -258,14 +252,17 @@ class ModalUserDetails extends StatelessWidget {
 
 class _Props extends Equatable {
   final User user;
-
-  final Function onDisabled;
+  final bool blocked;
+  final bool loading;
+  final Function onBlockUser;
   final Function onCreateChatDirect;
 
   _Props({
     @required this.user,
+    @required this.loading,
+    @required this.blocked,
     @required this.onCreateChatDirect,
-    @required this.onDisabled,
+    @required this.onBlockUser,
   });
 
   @override
@@ -277,7 +274,6 @@ class _Props extends Equatable {
     Store<AppState> store, {
     User user,
     String userId,
-    String roomId,
   }) =>
       _Props(
         user: () {
@@ -285,13 +281,17 @@ class _Props extends Equatable {
             return user;
           }
 
-          final room = store.state.roomStore.rooms[roomId];
-          if (room != null) {
-            return room.users[userId];
+          if (userId == null) {
+            return null;
           }
-          return null;
+
+          return store.state.userStore.users[userId];
         }(),
-        onDisabled: () => store.dispatch(addInProgress()),
+        loading: store.state.userStore.loading,
+        blocked: store.state.userStore.blocked.contains(userId ?? user.userId),
+        onBlockUser: (User user) async {
+          await store.dispatch(toggleBlockUser(user: user));
+        },
         onCreateChatDirect: ({User user}) async => store.dispatch(
           createRoom(
             isDirect: true,

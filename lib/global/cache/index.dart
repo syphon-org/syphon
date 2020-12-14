@@ -1,27 +1,31 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:hive/hive.dart';
+import 'package:encrypt/encrypt.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:steel_crypt/steel_crypt.dart';
-import 'package:syphon/global/values.dart';
 
-class CacheSecure {
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sembast/sembast.dart';
+import 'package:sembast/sembast_io.dart';
+import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+
+class Cache {
   // encryption references (in memory only)
   static String ivKey;
   static String ivKeyNext;
   static String cryptKey;
 
-  // cache refrences
-  static Box cacheMain;
-  static Box cacheRooms;
-  static Box cacheCrypto;
+  // hot cachee refrences
+  static Database cacheMain;
+
+  // inital store caches for reload
+  static Map<String, Map> cacheStores = {};
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
-  static const cacheKeyRooms = '${Values.appNameLabel}-room-cache';
-  static const cacheKeyCrypto = '${Values.appNameLabel}-crypto-cache';
 
   // cache key identifiers
   static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
@@ -29,82 +33,76 @@ class CacheSecure {
   static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
-  static const roomNamesKey = 'roomNamesKey';
-  static const protocolKey = 'protocol';
-  static const homeserverKey = 'homeserver';
-  static const accessTokenKey = 'accessToken';
-  static const lastSinceKey = 'lastSince';
   static const userIdKey = 'userId';
+  static const protocolKey = 'protocol';
+  static const lastSinceKey = 'lastSince';
+  static const homeserverKey = 'homeserver';
+  static const roomNamesKey = 'roomNamesKey';
+  static const accessTokenKey = 'accessToken';
 }
 
-Future<void> initCache() async {
-  // Init storage location
-  final String storageLocation = await initStorageLocation();
-
-  // Init configuration
-  Hive.init(storageLocation);
-
-  CacheSecure.cacheMain = await unlockMainCache();
-  CacheSecure.cacheRooms = await unlockRoomCache();
-  CacheSecure.cacheCrypto = await unlockCryptoCache();
-}
-
-Future<dynamic> initStorageLocation() async {
-  var storageLocation;
+/**
+ * Init Cache
+ * 
+ * (needs cold storage extracted as it's own entity)
+ */
+Future<Database> initCache() async {
+  // Configure cache encryption/decryption instance
+  Cache.ivKey = await unlockIVKey();
+  Cache.ivKeyNext = await unlockIVKeyNext();
+  Cache.cryptKey = await unlockCryptKey();
 
   try {
-    if (Platform.isIOS || Platform.isAndroid) {
-      storageLocation = await getApplicationDocumentsDirectory();
-      return storageLocation.path;
+    var cachePath = '${Cache.cacheKeyMain}.db';
+    var cacheFactory;
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      var directory = await getApplicationDocumentsDirectory();
+      await directory.create();
+      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cacheFactory = databaseFactoryIo;
     }
 
-    if (Platform.isMacOS) {
-      storageLocation = await File('cache').create().then(
-            (value) => value.writeAsString(
-              '{}',
-              flush: true,
-            ),
-          );
-
-      return storageLocation.path;
+    /// Supports Windows/Linux/MacOS for now.
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      // open cache w/ sqflite ffi for desktop compat
+      cacheFactory = getDatabaseFactorySqflite(
+        sqflite_ffi.databaseFactoryFfi,
+      );
     }
 
-    if (Platform.isLinux) {
-      storageLocation = await getApplicationDocumentsDirectory();
-      return storageLocation.path;
+    if (cacheFactory == null) {
+      throw UnsupportedError(
+        'Sorry, Syphon does not support your platform yet. Hope to do so soon!',
+      );
     }
 
-    debugPrint('[initStorageLocation] no cache support');
-    return null;
+    Cache.cacheMain = await cacheFactory.openDatabase(
+      cachePath,
+    );
+
+    return Cache.cacheMain;
   } catch (error) {
-    debugPrint('[initStorageLocation] $error');
+    printError('[initCache] ${error}');
     return null;
   }
 }
 
 // // Closes and saves storage
-void closeCache() async {
-  if (CacheSecure.cacheMain != null && CacheSecure.cacheMain.isOpen) {
-    CacheSecure.cacheMain.close();
-  }
-
-  if (CacheSecure.cacheRooms != null && CacheSecure.cacheRooms.isOpen) {
-    CacheSecure.cacheRooms.close();
-  }
-
-  if (CacheSecure.cacheCrypto != null && CacheSecure.cacheCrypto.isOpen) {
-    CacheSecure.cacheCrypto.close();
+void closeCache(Database cache) async {
+  if (cache != null) {
+    cache.close();
   }
 }
 
 String createIVKey() {
-  return CryptKey().genDart();
+  return Key.fromSecureRandom(16).base64;
 }
 
 Future<void> saveIVKey(String ivKey) async {
   // Check if storage has been created before
   return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyLocation,
+    key: Cache.ivKeyLocation,
     value: ivKey,
   );
 }
@@ -112,7 +110,7 @@ Future<void> saveIVKey(String ivKey) async {
 Future<void> saveIVKeyNext(String ivKey) async {
   // Check if storage has been created before
   return await FlutterSecureStorage().write(
-    key: CacheSecure.ivKeyNextLocation,
+    key: Cache.ivKeyNextLocation,
     value: ivKey,
   );
 }
@@ -122,7 +120,7 @@ Future<String> unlockIVKey() async {
   final storageEngine = FlutterSecureStorage();
 
   final ivKeyStored = await storageEngine.read(
-    key: CacheSecure.ivKeyLocation,
+    key: Cache.ivKeyLocation,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -134,7 +132,7 @@ Future<String> unlockIVKeyNext() async {
   final storageEngine = FlutterSecureStorage();
 
   final ivKeyStored = await storageEngine.read(
-    key: CacheSecure.ivKeyNextLocation,
+    key: Cache.ivKeyNextLocation,
   );
 
   // Create a encryptionKey if a serialized one is not found
@@ -149,60 +147,21 @@ Future<String> unlockCryptKey() async {
   try {
     // Check if crypt key already exists
     cryptKey = await storageEngine.read(
-      key: CacheSecure.cryptKeyLocation,
+      key: Cache.cryptKeyLocation,
     );
   } catch (error) {
-    debugPrint('[unlockCryptKey] ${error}');
+    printError('[unlockCryptKey] ${error}');
   }
 
   // Create a encryptionKey if a serialized one is not found
   if (cryptKey == null) {
-    cryptKey = CryptKey().genFortuna(len: 32); // 256 bits
+    cryptKey = Key.fromSecureRandom(32).base64;
 
     await storageEngine.write(
-      key: CacheSecure.cryptKeyLocation,
+      key: Cache.cryptKeyLocation,
       value: cryptKey,
     );
   }
 
   return cryptKey;
-}
-
-Future<Box> unlockMainCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyMain,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockMainCache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockRoomCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyRooms,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockRoomCache] $error');
-    return null;
-  }
-}
-
-Future<Box> unlockCryptoCache() async {
-  try {
-    return await Hive.openBox(
-      CacheSecure.cacheKeyCrypto,
-      crashRecovery: true,
-      compactionStrategy: (entries, deletedEntries) => deletedEntries > 1,
-    );
-  } catch (error) {
-    debugPrint('[unlockCryptoCache] $error');
-    return null;
-  }
 }

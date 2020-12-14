@@ -1,21 +1,12 @@
 // Package imports:
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 
 part 'model.g.dart';
 
-@HiveType(typeId: ReadStatusHiveId)
 @JsonSerializable()
 class ReadStatus {
-  @HiveField(0)
   final int latestRead;
-
-  // UserId -> timestamp
-  @HiveField(1)
-  final Map<String, int> userReads;
+  final Map<String, int> userReads; // UserId -> timestamp
 
   const ReadStatus({
     this.latestRead = 0,

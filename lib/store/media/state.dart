@@ -3,30 +3,12 @@ import 'dart:typed_data';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
-
-part 'state.g.dart';
-
-// NOTE: custom json converter to allow Uint8List when in cache
-// TODO: figure out how to make image-matrix.dart play nice with in component coonversions
-// Would repeatedly update even if a locally cached version matched
 // @JsonSerializable(nullable: true, includeIfNull: true)
-@HiveType(typeId: MediaStoreHiveId)
 class MediaStore extends Equatable {
-  @HiveField(0)
   final bool fetching;
-  @HiveField(1)
+  final Map<String, String> mediaChecks; // Map<mxcUri, status>
   final Map<String, Uint8List> mediaCache;
-
-  // Map<mxcUri, status>
-  @HiveField(2)
-  final Map<String, String> mediaChecks;
-
-  static const hiveBox = 'MediaStore';
 
   const MediaStore({
     this.fetching = false,
@@ -40,6 +22,7 @@ class MediaStore extends Equatable {
         mediaCache,
         mediaChecks,
       ];
+
   MediaStore copyWith({
     fetching,
     mediaCache,
@@ -51,6 +34,9 @@ class MediaStore extends Equatable {
         mediaChecks: mediaChecks ?? this.mediaChecks,
       );
 
+  // custom json converter to allow Uint8List when in cache
+  // TODO: figure out how to make image-matrix.dart play nice with in component coonversions
+  // Would repeatedly update even if a locally cached version matched
   factory MediaStore.fromJson(Map<String, dynamic> json) {
     return MediaStore(
       fetching: json['fetching'] as bool,

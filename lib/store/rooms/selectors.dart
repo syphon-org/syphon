@@ -2,18 +2,27 @@
 import 'package:syphon/store/index.dart';
 import './room/model.dart';
 
-List<Room> rooms(AppState state) {
-  return state.roomStore.roomList;
-}
-
 Room room({AppState state, String id}) {
   if (state.roomStore.rooms == null) return Room();
   return state.roomStore.rooms[id] ?? Room();
 }
 
-List<Room> sortedPrioritizedRooms(Map rooms) {
-  final List<Room> sortedList =
-      rooms != null ? List<Room>.from(rooms.values) : [];
+List<Room> rooms(AppState state) {
+  return state.roomStore.roomList;
+}
+
+List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
+  final List<Room> roomList = rooms != null ? rooms : [];
+
+  return roomList
+    ..removeWhere((room) =>
+        room.userIds.length == 2 &&
+        room.userIds.any((userId) => blocked.contains(userId)))
+    ..toList();
+}
+
+List<Room> sortedPrioritizedRooms(List<Room> rooms) {
+  final sortedList = rooms != null ? rooms : [];
 
   // sort descending
   sortedList.sort((a, b) {

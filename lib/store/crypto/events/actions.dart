@@ -17,7 +17,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 
 /**
  * Encrypt event content with loaded outbound session for room

@@ -10,9 +10,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -20,11 +22,14 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/rooms/events/actions.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
-import 'events/model.dart';
+import '../events/model.dart';
 import 'room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -64,12 +69,13 @@ class UpdateRoom {
 }
 
 class RemoveRoom {
-  final Room room;
-  RemoveRoom({this.room});
+  final String roomId;
+  RemoveRoom({this.roomId});
 }
 
-class ResetRooms {
-  ResetRooms();
+class AddArchive {
+  final String roomId;
+  AddArchive({this.roomId});
 }
 
 /**
@@ -90,17 +96,11 @@ class SaveOutboxMessage {
 class DeleteOutboxMessage {
   final Message message; // room id
 
-  DeleteOutboxMessage({
-    this.message,
-  });
+  DeleteOutboxMessage({this.message});
 }
 
-class AddArchive {
-  final String roomId;
-
-  AddArchive({
-    this.roomId,
-  });
+class ResetRooms {
+  ResetRooms();
 }
 
 /**
@@ -129,35 +129,45 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
-        final List<dynamic> timelineEvents = json['timeline']['events'];
-
-        // map through each event and decrypt if possible
-        final decryptTimelineActions = timelineEvents.map((event) async {
-          final eventType = event['type'];
-          switch (eventType) {
-            case EventTypes.encrypted:
-              return await store.dispatch(
-                decryptMessageEvent(roomId: room.id, event: event),
-              );
-            default:
-              return event;
-          }
-        });
-
-        // add the decrypted events back to the
-        final decryptedTimelineEvents = await Future.wait(
-          decryptTimelineActions,
-        );
-
         // reassign the mapped decrypted evets to the json timeline
-        json['timeline']['events'] = decryptedTimelineEvents;
+        json['timeline']['events'] = await store.dispatch(
+          decryptEvents(room, json),
+        );
       }
 
-      // Filter through parsers
+      // TODO: eventually remove the need for this with modular parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
         lastSince: lastSince,
+      );
+
+      printDebug(
+        '[syncRooms] ${room.name} new msg count ${room.messagesNew.length}',
+      );
+      printDebug(
+        '[syncRooms] ${room.name} ids msg count ${room.messageIds.length}',
+      );
+
+      // update store
+      await store.dispatch(
+        setUsers(room.usersNew),
+      );
+      await store.dispatch(
+        setMessageEvents(room: room, messages: room.messagesNew),
+      );
+
+      // update cold storage
+      await Future.wait([
+        saveUsers(room.usersNew, storage: Storage.main),
+        saveRooms({room.id: room}, storage: Storage.main),
+        saveMessages(room.messagesNew, storage: Storage.main),
+      ]);
+
+      // TODO: remove with parsers - clear users from parsed room objects
+      room = room.copyWith(
+        users: Map<String, User>(),
+        messagesNew: List<Message>(),
       );
 
       // fetch avatar if a uri was found
@@ -238,6 +248,7 @@ ThunkAction<AppState> fetchRooms() {
             '${room.id}': {
               'state': {
                 'events': stateEvents,
+                'prev_batch': messageEvents['from'],
               },
               'timeline': {
                 'events': messageEvents['chunk'],
@@ -417,9 +428,8 @@ ThunkAction<AppState> createRoom({
         value: (user) => user,
       );
 
+      // generate user invite map to cache recent users
       room = room.copyWith(users: userInviteMap);
-
-      printJson(userInviteMap);
 
       if (avatarFile != null) {
         await store.dispatch(
@@ -513,9 +523,8 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted = latestMessages(
-          roomSelectors.room(id: roomId, state: store.state).messages,
-        );
+        final messagesSorted =
+            latestMessages(roomMessages(store.state, roomId));
 
         if (messagesSorted.isNotEmpty) {
           store.dispatch(sendReadReceipts(
@@ -590,27 +599,29 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 
       // Find the other user in the direct room
       final currentUser = store.state.authStore.user;
-      final otherUser = room.users.values.firstWhere(
-        (user) => user.userId != currentUser.userId,
+
+      // only the other user id, and not the user object, is needed here
+      final otherUserId = room.userIds.firstWhere(
+        (userId) => userId != currentUser.userId,
       );
 
-      if (otherUser == null) {
+      if (otherUserId == null) {
         throw 'Cannot toggle room to direct without other users';
       }
 
       // Pull the direct room for that specific user
       Map directRoomUsers = data as Map<String, dynamic>;
-      final usersDirectRooms = directRoomUsers[otherUser.userId] ?? [];
+      final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
       if (usersDirectRooms.isEmpty && enabled) {
-        directRoomUsers[otherUser.userId] = [room.id];
+        directRoomUsers[otherUserId] = [room.id];
       }
 
       // Toggle the direct room data based on user actions
       directRoomUsers = directRoomUsers.map((userId, rooms) {
         List<dynamic> updatedRooms = List.from(rooms ?? []);
 
-        if (userId != otherUser.userId) {
+        if (userId != otherUserId) {
           return MapEntry(userId, updatedRooms);
         }
 
@@ -863,9 +874,9 @@ ThunkAction<AppState> removeRoom({Room room}) {
       // Remove the room locally if it's already been removed remotely
       if (leaveData['errcode'] != null) {
         if (leaveData['errcode'] == MatrixErrors.room_unknown) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
-        } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          await store.dispatch(RemoveRoom(roomId: room.id));
+        } else if (leaveData['errcode'] == MatrixErrors.not_found) {
+          await store.dispatch(RemoveRoom(roomId: room.id));
         }
 
         if (room.direct) {
@@ -882,8 +893,8 @@ ThunkAction<AppState> removeRoom({Room room}) {
       );
 
       if (forgetData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+        if (leaveData['errcode'] == MatrixErrors.not_found) {
+          await store.dispatch(RemoveRoom(roomId: room.id));
         }
         if (room.direct) {
           await store.dispatch(toggleDirectRoom(room: room, enabled: false));
@@ -898,7 +909,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       if (room.direct) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
-      await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      await store.dispatch(RemoveRoom(roomId: room.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
       debugPrint('[removeRoom] $error');
@@ -938,11 +949,11 @@ ThunkAction<AppState> leaveRoom({Room room}) {
 
       if (deleteData['errcode'] != null) {
         if (deleteData['errcode'] == MatrixErrors.room_unknown) {
-          store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          store.dispatch(RemoveRoom(roomId: room.id));
         }
         throw deleteData['error'];
       }
-      store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       debugPrint('[leaveRoom] $error');
     } finally {
@@ -1023,7 +1034,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 //         createRoom(
 //           name: room.name,
 //           topic: room.topic,
-//           invites: room.users,
+//           invites: room.userIds,
 //           isDirect: room.direct,
 //         ),
 //       );

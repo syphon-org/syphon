@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // Project imports:
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 
 abstract class Users {
   /**
@@ -86,30 +86,28 @@ abstract class Users {
    * to the user that set the account_data. The config will be synced 
    * to clients in the top-level account_data.
    */
-  static Future<dynamic> blockUser({
+  static Future<dynamic> updateBlockedUsers({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String accessToken,
     String userId,
-    List<String> roomIds = const [],
+    Map<String, dynamic> blockUserList = const {"ignored_users": {}},
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${EventTypes.ignoredUserList}';
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${AccountDataTypes.ignoredUserList}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final accountData = {userId: []};
-
-    if (roomIds.isNotEmpty) {
-      accountData[userId] = roomIds;
-    }
+    final body = {
+      'ignored_users': blockUserList ?? {},
+    };
 
     final saveResponse = await http.put(
       url,
       headers: headers,
-      body: json.encode(accountData),
+      body: json.encode(body),
     );
 
     return await json.decode(

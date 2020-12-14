@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/views/home/chat/details-message.dart';
 

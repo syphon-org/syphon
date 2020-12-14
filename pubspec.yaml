@@ -44,7 +44,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.4+141
+version: 0.1.5+150
 
 environment:
   sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner
@@ -53,7 +53,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # State Management
+  # state
   expandable: 3.0.1
   equatable: 1.2.4
   canonical_json: 1.0.0
@@ -68,29 +68,23 @@ dependencies:
   path_provider: 1.6.14
   package_info: 0.4.3
 
-  # Encryption
+  # encryption
+  olm: 1.2.1
   crypt: 3.0.1
   crypto: ^2.1.5
-  steel_crypt: ^2.2.2+1
-  olm: 1.2.1
-  # flutter_olm: 1.0.1
-  # olm:
-  #   git:
-  #     url: https://gitlab.com/famedly/libraries/dart-olm
-  #     ref: 4853b5301519a50866a81b58ac3730830a4fe547
-  # cryptography: 1.2.1
+  encrypt: 4.1.0
 
-  # Cache
-  hive: 1.4.4
-  hive_flutter: 0.3.1
-  flutter_secure_storage: 3.3.3
-  json_annotation: ^3.1.0
+  # cache/storage
+  sembast: ^2.4.8
+  sqflite: ^1.3.2
+  sembast_sqflite: 1.0.0
+  sqflite_sqlcipher: 1.1.2
+  sqflite_common_ffi: 1.1.1
   checked_yaml: 1.0.2
-  # sembast: 2.4.7+7
-  # isolate_handler: 0.3.1
-  # flutter_isolate: 1.0.0+14
+  json_annotation: ^3.1.0
+  flutter_secure_storage: 3.3.3
 
-  # Services
+  # services
   http: ^0.12.0+2
   html: ^0.13.3+3
   intl: ^0.16.1
@@ -119,19 +113,16 @@ dependencies:
   flutter_material_color_picker: ^1.0.5
   palette_generator: 0.2.3
 
+  # fun
+  ansicolor: 1.1.1
+
 dev_dependencies:
   json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
-  hive_generator: 0.8.1
-  # TODO: build fixes - remove later
-  build_resolvers: 1.3.10 # <- modified to solve build_runner
 
-  # TODO: build fixes - remove later
 dependency_overrides:
-  path: 1.7.0
-  analyzer: 0.39.16
-  dart_style: 1.3.4
+  analyzer: 0.39.16 # <- override for json_serializable build_runner
 
 flutter_icons:
   android: true
@@ -147,6 +138,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # see https://flutter.dev/custom-fonts/#from-packages
   fonts:
     - family: Poppins
       fonts:
@@ -207,26 +199,3 @@ flutter:
     - assets/icons/global/being-send-unlock.svg
     - assets/icons/global/being-chevrons-right.svg
     - assets/icons/global/feather-message-circle.svg
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages

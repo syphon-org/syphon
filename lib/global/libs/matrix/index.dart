@@ -56,9 +56,9 @@ abstract class MatrixApi {
   static final updateAvatarUri = Users.updateAvatarUri;
 
   // Users
-  static final blockUser = Users.blockUser;
   static final inviteUser = Users.inviteUser;
   static final fetchUserProfile = Users.fetchUserProfile;
+  static final updateBlockedUsers = Users.updateBlockedUsers;
 
   // Media
   static final fetchThumbnail = Media.fetchThumbnail;

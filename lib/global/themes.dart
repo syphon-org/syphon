@@ -1,24 +1,12 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
-import 'package:hive/hive.dart';
-
-// Project imports:
-import 'package:syphon/global/libs/hive/type-ids.dart';
 import 'colours.dart';
 
-part 'themes.g.dart';
-
-@HiveType(typeId: ThemeTypeHiveId)
 enum ThemeType {
-  @HiveField(0)
   LIGHT,
-  @HiveField(1)
   DARK,
-  @HiveField(2)
   DARKER,
-  @HiveField(3)
   NIGHT,
 }
 
