@@ -650,6 +650,7 @@ class _Props extends Equatable {
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
         syncing: () {
+          final synced = store.state.syncStore.synced;
           final syncing = store.state.syncStore.syncing;
           final offline = store.state.syncStore.offline;
           final backgrounded = store.state.syncStore.backgrounded;
@@ -658,10 +659,15 @@ class _Props extends Equatable {
           final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
               store.state.syncStore.lastAttempt ?? 0);
 
-          // See if the last attempted sync is older than 60 seconds
+          // See if the last attempted sy nc is older than 60 seconds
           final isLastAttemptOld = DateTime.now()
               .difference(lastAttempt)
               .compareTo(Duration(seconds: 90));
+
+          // syncing for the first time
+          if (syncing && !synced) {
+            return true;
+          }
 
           // syncing for the first time since going offline
           if (syncing && offline) {

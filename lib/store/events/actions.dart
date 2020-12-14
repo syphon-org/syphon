@@ -118,9 +118,6 @@ ThunkAction<AppState> fetchMessageEvents({
         "limit": limit,
       });
 
-      printDebug("[fetchMessageEvents] CALLED FOR ${room.name} ${to} ${from}");
-      printJson(messagesJson);
-
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       final String end = messagesJson['end'];
 

@@ -41,7 +41,8 @@ Future<List<Message>> loadMessages(
     final store = StoreRef<String, String>(MESSAGES);
 
     // TODO: properly paginate through cold storage messages instead of loading all
-    final eventIdsPaginated = eventIds; //.skip(offset).take(limit).toList();
+    final eventIdsPaginated =
+        eventIds ?? []; //.skip(offset).take(limit).toList();
 
     final messagesPaginated =
         await store.records(eventIdsPaginated).get(storage);

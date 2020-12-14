@@ -369,7 +369,7 @@ class Room {
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String, User>.from(this.usersNew);
+    var usersAdd = Map<String, User>.from(this.usersNew ?? {});
     var userIdsRemove = List<String>();
 
     Set<String> userIds = Set<String>.from(this.userIds ?? []);
@@ -508,19 +508,20 @@ class Room {
    * outside displaying messages
    */
   Room fromMessageEvents({
-    List<Message> messages,
+    List<Message> messages = const [],
     String lastHash,
     String prevHash, // previously fetched hash
     String nextHash,
   }) {
     try {
       printDebug(
-        '[fromMessageEvents] ${this.name} ${messages.length.toString()}',
+        '[fromMessageEvents] ${this.name} ${messages.length}',
       );
 
       bool limited;
       int lastUpdate = this.lastUpdate;
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
+      final messageIds = this.messageIds ?? [];
 
       // Converting only message events
       final hasEncrypted = messages.firstWhere(
@@ -536,11 +537,11 @@ class Room {
       // limited indicates need to fetch additional data for room timelines
       if (this.limited) {
         // Check to see if the new messages contain those existing in cache
-        if (messages.isNotEmpty && this.messageIds.isNotEmpty) {
-          final messageKnown = this.messageIds.firstWhere(
-                (id) => id == messages[0].id,
-                orElse: () => null,
-              );
+        if (messages.isNotEmpty && messageIds.isNotEmpty) {
+          final messageKnown = messageIds.firstWhere(
+            (id) => id == messages[0].id,
+            orElse: () => null,
+          );
 
           // Set limited to false if they now exist
           limited = messageKnown != null;
@@ -572,7 +573,7 @@ class Room {
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
-      final messageIdsAll = Set<String>.from(this.messageIds)
+      final messageIdsAll = Set<String>.from(this.messageIds ?? [])
         ..addAll(messageIdsNew);
 
       // Save values to room

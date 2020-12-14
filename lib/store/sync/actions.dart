@@ -160,10 +160,10 @@ ThunkAction<AppState> stopSyncObserver() {
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
+    await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchSync());
 
     // Fetch All Room Ids - continue showing a sync
-    await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchDirectRooms());
     await store.dispatch(fetchRooms());
     await store.dispatch(SetSyncing(syncing: false));
