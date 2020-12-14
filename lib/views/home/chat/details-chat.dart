@@ -264,7 +264,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               maxHeight: Dimensions.avatarSizeLarge,
                             ),
                             child: ListUserBubbles(
-                              users: props.userList,
+                              users: props.users,
                               roomId: props.room.id,
                             ),
                           )
@@ -501,7 +501,7 @@ class _Props extends Equatable {
   final bool loading;
   final Color roomPrimaryColor;
   final List<Message> messages;
-  final List<User> userList;
+  final List<User> users;
 
   final Function onLeaveChat;
   final Function onSelectPrimaryColor;
@@ -510,7 +510,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.room,
-    @required this.userList,
+    @required this.users,
     @required this.loading,
     @required this.messages,
     @required this.onLeaveChat,
@@ -531,7 +531,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
       room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
-      userList: roomUsers(store.state, roomId),
+      users: roomUsers(store.state, roomId),
       messages: roomMessages(store.state, roomId),
       onLeaveChat: () async {
         await store.dispatch(removeRoom(room: Room(id: roomId)));

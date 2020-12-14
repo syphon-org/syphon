@@ -98,7 +98,7 @@ Future<String> serializeJsonBackground(Object store) async {
 
     return encrypted.base64;
   } catch (error) {
-    printDebug('[serializeJsonBackground] $error');
+    printError('[serializeJsonBackground] $error');
     return null;
   }
 }

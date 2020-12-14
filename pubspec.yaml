@@ -113,6 +113,9 @@ dependencies:
   flutter_material_color_picker: ^1.0.5
   palette_generator: 0.2.3
 
+  # fun
+  ansicolor: 1.1.1
+
 dev_dependencies:
   json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"

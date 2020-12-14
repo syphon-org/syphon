@@ -34,7 +34,7 @@ class MediaStore extends Equatable {
         mediaChecks: mediaChecks ?? this.mediaChecks,
       );
 
-  // NOTE: custom json converter to allow Uint8List when in cache
+  // custom json converter to allow Uint8List when in cache
   // TODO: figure out how to make image-matrix.dart play nice with in component coonversions
   // Would repeatedly update even if a locally cached version matched
   factory MediaStore.fromJson(Map<String, dynamic> json) {

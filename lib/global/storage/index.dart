@@ -93,7 +93,7 @@ Future<void> deleteStorage() async {
       Storage.mainKey,
     );
   } catch (error) {
-    printDebug('[deleteStorage] ${error.toString()}');
+    printError('[deleteStorage] ${error.toString()}');
   }
 }
 
@@ -114,9 +114,8 @@ Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
       room.messageIds,
       storage: storage,
       encrypted: room.encryptionEnabled,
-      limit: 20,
     );
-    printDebug(
+    printError(
       '[loadMessages] ${messages[room.id].length.toString()} ${room.name} loaded',
     );
   }

@@ -16,6 +16,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -159,11 +160,13 @@ ThunkAction<AppState> stopSyncObserver() {
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
-    store.dispatch(fetchSync());
+    await store.dispatch(fetchSync());
 
-    // Fetch All Room Ids
-    await store.dispatch(fetchRooms());
+    // Fetch All Room Ids - continue showing a sync
+    await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchDirectRooms());
+    await store.dispatch(fetchRooms());
+    await store.dispatch(SetSyncing(syncing: false));
   };
 }
 
@@ -219,13 +222,15 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         throw data['error'];
       }
 
+      // TODO: Unfiltered
+      // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
+      // final Map presence = data['presence'];
+
       final nextBatch = data['next_batch'];
       final oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic> rawJoined = data['rooms']['join'];
       final Map<String, dynamic> rawInvites = data['rooms']['invite'];
-      final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       final Map<String, dynamic> rawToDevice = data['to_device'];
-      // TODO: final Map presence = data['presence'];
 
       // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
@@ -236,11 +241,6 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // Update encryption one time key count
       store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
-
-      // TODO: cold storage cache the full sync in encrypted file
-      // if (isFullSync) {
-      //   store.dispatch(saveSync(data));
-      // }
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(
@@ -253,19 +253,8 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
         debugPrint('[fetchSync] full sync completed');
       }
     } catch (error) {
-      String message = '';
-
-      try {
-        // try to understand the error message
-        message = (error.message as String);
-      } catch (error) {
-        debugPrint('[fetchSync] $error');
-      }
-
-      if (message.contains('SocketException')) {
-        debugPrint('[fetchSync] $error');
-        store.dispatch(SetOffline(offline: true));
-      }
+      store.dispatch(SetOffline(offline: true));
+      printError('[fetchSync] ${error.toString()}');
 
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;

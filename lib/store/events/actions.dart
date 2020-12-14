@@ -57,6 +57,8 @@ ThunkAction<AppState> setMessageEvents({
  * those existing in cold storage depending on requests from client
  * 
  * Make sure these have been exhausted before calling fetchMessageEvents
+ * 
+ * TODO: still needs work
  */
 ThunkAction<AppState> loadMessageEvents({
   Room room,
@@ -80,7 +82,7 @@ ThunkAction<AppState> loadMessageEvents({
         messages: messagesStored,
       ));
     } catch (error) {
-      printDebug('[fetchMessageEvents] $error');
+      printError('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -125,6 +127,11 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
+      messages.forEach((msg) {
+        printDebug("[fetchMessageEvents] *** PRINT MESSAGES *** ${room.name}");
+        printJson(msg);
+      });
+
       // reuse the logic for syncing
       await store.dispatch(
         syncRooms({
@@ -139,6 +146,46 @@ ThunkAction<AppState> fetchMessageEvents({
       );
     } catch (error) {
       debugPrint('[fetchMessageEvents] $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+/**
+ * Decrypt Events
+ * 
+ * Reattribute decrypted events to the timeline
+ */
+ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
+  return (Store<AppState> store) async {
+    try {
+      // First past to decrypt encrypted events
+      final List<dynamic> timelineEvents = json['timeline']['events'];
+
+      // map through each event and decrypt if possible
+      final decryptTimelineActions = timelineEvents.map((event) async {
+        final eventType = event['type'];
+        switch (eventType) {
+          case EventTypes.encrypted:
+            return await store.dispatch(
+              decryptMessageEvent(roomId: room.id, event: event),
+            );
+          default:
+            return event;
+        }
+      });
+
+      // add the decrypted events back to the
+      final decryptedTimelineEvents = await Future.wait(
+        decryptTimelineActions,
+      );
+
+      return decryptedTimelineEvents;
+    } catch (error) {
+      debugPrint(
+        '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
+      );
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }

@@ -60,10 +60,10 @@ Future<Map<String, Room>> loadRooms({
       return null;
     }
 
-    printDebug('[rooms] loaded ${rooms.length.toString()}');
+    printInfo('[rooms] loaded ${rooms.length.toString()}');
     return rooms;
   } catch (error) {
-    printDebug(error.toString(), title: 'loadRooms');
+    printError(error.toString(), title: 'loadRooms');
     return null;
   }
 }

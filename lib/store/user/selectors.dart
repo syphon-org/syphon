@@ -14,9 +14,11 @@ dynamic homeserver(AppState state) {
 List<User> friendlyUsers(AppState state) {
   final rooms = state.roomStore.rooms.values;
   final users = state.userStore.users;
+  final userCurrent = state.authStore.user.userId;
   final roomsDirect = rooms.where((room) => room.direct);
   final roomUserIdsList = roomsDirect.map((room) => room.userIds);
-  final roomDirectUserIds = roomUserIdsList.expand((pair) => pair).toList();
+  final roomDirectUserIdsAll = roomUserIdsList.expand((pair) => pair).toList();
+  final roomDirectUserIds = roomDirectUserIdsAll..remove(userCurrent);
   final roomsDirectUsers = roomDirectUserIds.map((userId) => users[userId]);
 
   return List.from(roomsDirectUsers);

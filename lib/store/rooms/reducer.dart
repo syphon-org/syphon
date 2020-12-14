@@ -42,7 +42,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
 
     case RemoveRoom:
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms.remove(action.room.id);
+      rooms.remove(action.roomId);
       return state.copyWith(rooms: rooms);
 
     case SaveOutboxMessage:

@@ -421,9 +421,9 @@ class ChatViewState extends State<ChatView> {
             controller: messagesController,
             children: [
               MessageTypingWidget(
+                roomUsers: props.users,
                 typing: props.room.userTyping,
                 usersTyping: props.room.usersTyping,
-                roomUsers: props.users,
                 selectedMessageId: this.selectedMessage != null
                     ? this.selectedMessage.id
                     : null,
@@ -814,22 +814,22 @@ class _Props extends Equatable {
       },
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
-        final messages = roomMessages(store.state, roomId);
 
         // load message from cold storage
-        if (messages.length < room.messageIds.length) {
-          printDebug(
-              '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-          return store.dispatch(
-            loadMessageEvents(
-              room: room,
-              offset: messages.length,
-            ),
-          );
-        }
+        // TODO: everything is loaded when opening the app for now
+        // final messages = roomMessages(store.state, roomId);
+        // if (messages.length < room.messageIds.length) {
+        //   printDebug(
+        //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
+        //   return store.dispatch(
+        //     loadMessageEvents(
+        //       room: room,
+        //       offset: messages.length,
+        //     ),
+        //   );
+        // }
 
         // fetch messages beyond the oldest known message - lastHash
-        printDebug('[onLoadMoreMessages] loading from remote server');
         return store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,

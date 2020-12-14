@@ -9,13 +9,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -70,12 +69,13 @@ class UpdateRoom {
 }
 
 class RemoveRoom {
-  final Room room;
-  RemoveRoom({this.room});
+  final String roomId;
+  RemoveRoom({this.roomId});
 }
 
-class ResetRooms {
-  ResetRooms();
+class AddArchive {
+  final String roomId;
+  AddArchive({this.roomId});
 }
 
 /**
@@ -96,17 +96,11 @@ class SaveOutboxMessage {
 class DeleteOutboxMessage {
   final Message message; // room id
 
-  DeleteOutboxMessage({
-    this.message,
-  });
+  DeleteOutboxMessage({this.message});
 }
 
-class AddArchive {
-  final String roomId;
-
-  AddArchive({
-    this.roomId,
-  });
+class ResetRooms {
+  ResetRooms();
 }
 
 /**
@@ -135,28 +129,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
-        final List<dynamic> timelineEvents = json['timeline']['events'];
-
-        // map through each event and decrypt if possible
-        final decryptTimelineActions = timelineEvents.map((event) async {
-          final eventType = event['type'];
-          switch (eventType) {
-            case EventTypes.encrypted:
-              return await store.dispatch(
-                decryptMessageEvent(roomId: room.id, event: event),
-              );
-            default:
-              return event;
-          }
-        });
-
-        // add the decrypted events back to the
-        final decryptedTimelineEvents = await Future.wait(
-          decryptTimelineActions,
-        );
-
         // reassign the mapped decrypted evets to the json timeline
-        json['timeline']['events'] = decryptedTimelineEvents;
+        json['timeline']['events'] = await store.dispatch(
+          decryptEvents(room, json),
+        );
       }
 
       // TODO: eventually remove the need for this with modular parsers
@@ -167,31 +143,31 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       );
 
       printDebug(
-        '[fromSync] ${room.name} after sync msg count ${room.messages.length}',
+        '[syncRooms] ${room.name} new msg count ${room.messagesNew.length}',
       );
       printDebug(
-        '[fromSync] ${room.name} msg id count ${room.messageIds.length}',
+        '[syncRooms] ${room.name} ids msg count ${room.messageIds.length}',
       );
 
       // update store
       await store.dispatch(
-        setUsers(room.users),
+        setUsers(room.usersNew),
       );
       await store.dispatch(
-        setMessageEvents(room: room, messages: room.messages),
+        setMessageEvents(room: room, messages: room.messagesNew),
       );
 
       // update cold storage
       await Future.wait([
-        saveUsers(room.users, storage: Storage.main),
+        saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
-        saveMessages(room.messages, storage: Storage.main),
+        saveMessages(room.messagesNew, storage: Storage.main),
       ]);
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
-        messages: List<Message>(),
+        messagesNew: List<Message>(),
       );
 
       // fetch avatar if a uri was found
@@ -272,6 +248,7 @@ ThunkAction<AppState> fetchRooms() {
             '${room.id}': {
               'state': {
                 'events': stateEvents,
+                'prev_batch': messageEvents['from'],
               },
               'timeline': {
                 'events': messageEvents['chunk'],
@@ -897,9 +874,9 @@ ThunkAction<AppState> removeRoom({Room room}) {
       // Remove the room locally if it's already been removed remotely
       if (leaveData['errcode'] != null) {
         if (leaveData['errcode'] == MatrixErrors.room_unknown) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          await store.dispatch(RemoveRoom(roomId: room.id));
         } else if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          await store.dispatch(RemoveRoom(roomId: room.id));
         }
 
         if (room.direct) {
@@ -917,7 +894,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       if (forgetData['errcode'] != null) {
         if (leaveData['errcode'] == MatrixErrors.room_not_found) {
-          await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          await store.dispatch(RemoveRoom(roomId: room.id));
         }
         if (room.direct) {
           await store.dispatch(toggleDirectRoom(room: room, enabled: false));
@@ -932,7 +909,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       if (room.direct) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
-      await store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      await store.dispatch(RemoveRoom(roomId: room.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
       debugPrint('[removeRoom] $error');
@@ -972,11 +949,11 @@ ThunkAction<AppState> leaveRoom({Room room}) {
 
       if (deleteData['errcode'] != null) {
         if (deleteData['errcode'] == MatrixErrors.room_unknown) {
-          store.dispatch(RemoveRoom(room: Room(id: room.id)));
+          store.dispatch(RemoveRoom(roomId: room.id));
         }
         throw deleteData['error'];
       }
-      store.dispatch(RemoveRoom(room: Room(id: room.id)));
+      store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       debugPrint('[leaveRoom] $error');
     } finally {

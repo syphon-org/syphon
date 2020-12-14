@@ -11,7 +11,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/cache/threadables.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
@@ -169,7 +169,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
         }
       } catch (error) {
-        debugPrint('[CacheSerializer.decode] $error');
+        printError('[CacheSerializer.decode] $error');
       }
     });
 

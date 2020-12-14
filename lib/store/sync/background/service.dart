@@ -235,9 +235,10 @@ FutureOr<dynamic> syncLoop({
     // Filter each room through the parser
     rawRooms.forEach((roomId, json) {
       final room = Room().fromSync(json: json, lastSince: lastSinceNew);
+      final messagesNew = room.messagesNew;
 
-      if (room.messages.length == 1) {
-        final String messageSender = room.messages[0].sender;
+      if (messagesNew.length == 1) {
+        final String messageSender = messagesNew[0].sender;
         final String formattedSender = trimAlias(messageSender);
 
         if (!formattedSender.contains(userId)) {

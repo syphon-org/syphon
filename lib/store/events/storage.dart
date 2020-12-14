@@ -2,11 +2,16 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 
 const String MESSAGES = 'messages';
+const String RECEIPTS = 'receipts';
 
-Future<void> saveMessages(List<Message> messages, {Database storage}) async {
+Future<void> saveMessages(
+  List<Message> messages, {
+  Database storage,
+}) async {
   final store = StoreRef<String, String>(MESSAGES);
 
   return await storage.transaction((txn) async {
@@ -35,7 +40,8 @@ Future<List<Message>> loadMessages(
   try {
     final store = StoreRef<String, String>(MESSAGES);
 
-    final eventIdsPaginated = eventIds.skip(offset).take(limit).toList();
+    // TODO: properly paginate through cold storage messages instead of loading all
+    final eventIdsPaginated = eventIds; //.skip(offset).take(limit).toList();
 
     final messagesPaginated =
         await store.records(eventIdsPaginated).get(storage);
@@ -46,7 +52,21 @@ Future<List<Message>> loadMessages(
 
     return messages;
   } catch (error) {
-    printDebug(error.toString(), title: 'loadMessages');
+    printError(error.toString(), title: 'loadMessages');
     return null;
   }
+}
+
+Future<void> saveReceipts(
+  Map<String, ReadStatus> receipts, {
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(RECEIPTS);
+
+  return await storage.transaction((txn) async {
+    for (String roomId in receipts.keys) {
+      final record = store.record(roomId);
+      await record.put(txn, json.encode(receipts[roomId]));
+    }
+  });
 }

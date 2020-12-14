@@ -83,7 +83,7 @@ Future<Database> initCache() async {
 
     return Cache.cacheMain;
   } catch (error) {
-    printDebug('[initCache] ${error}');
+    printError('[initCache] ${error}');
     return null;
   }
 }
@@ -150,7 +150,7 @@ Future<String> unlockCryptKey() async {
       key: Cache.cryptKeyLocation,
     );
   } catch (error) {
-    printDebug('[unlockCryptKey] ${error}');
+    printError('[unlockCryptKey] ${error}');
   }
 
   // Create a encryptionKey if a serialized one is not found

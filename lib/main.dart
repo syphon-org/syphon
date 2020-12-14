@@ -57,7 +57,7 @@ void main() async {
   // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
-    debugPrint('[main] background service started $backgroundSyncStatus');
+    printDebug('[main] background service started $backgroundSyncStatus');
   }
 
   // init hot cache and cold storage

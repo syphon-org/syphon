@@ -65,10 +65,10 @@ Future<Map<String, User>> loadUsers({
       return null;
     }
 
-    printDebug('[users] loaded ${users.length}');
+    printInfo('[users] loaded ${users.length}');
     return users;
   } catch (error) {
-    printDebug(error.toString(), title: 'loadUsers');
+    printError(error.toString(), title: 'loadUsers');
     return null;
   }
 }
