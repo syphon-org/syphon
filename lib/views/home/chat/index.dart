@@ -799,10 +799,12 @@ class _Props extends Equatable {
       },
       onLoadFirstBatch: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
+        printDebug('[onLoadFirstBatch]');
         store.dispatch(
           fetchMessageEvents(
             room: room,
             from: room.nextHash,
+            limit: 25,
           ),
         );
       },

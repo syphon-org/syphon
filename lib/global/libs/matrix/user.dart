@@ -94,7 +94,7 @@ abstract class Users {
     List<String> roomIds = const [],
   }) async {
     String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${EventTypes.ignoredUserList}';
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${AccountDataTypes.ignoredUserList}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

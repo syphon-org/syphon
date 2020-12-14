@@ -118,6 +118,9 @@ ThunkAction<AppState> fetchMessageEvents({
         "limit": limit,
       });
 
+      printDebug("[fetchMessageEvents] CALLED FOR ${room.name} ${to} ${from}");
+      printJson(messagesJson);
+
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       final String end = messagesJson['end'];
 
@@ -126,11 +129,6 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
-
-      messages.forEach((msg) {
-        printDebug("[fetchMessageEvents] *** PRINT MESSAGES *** ${room.name}");
-        printJson(msg);
-      });
 
       // reuse the logic for syncing
       await store.dispatch(
@@ -145,7 +143,7 @@ ThunkAction<AppState> fetchMessageEvents({
         }),
       );
     } catch (error) {
-      debugPrint('[fetchMessageEvents] $error');
+      debugPrint('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }

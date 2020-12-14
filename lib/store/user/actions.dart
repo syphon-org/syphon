@@ -86,12 +86,12 @@ ThunkAction<AppState> fetchUserProfile({User user}) {
 }
 
 /**
- * Toggle Direct Room
+ * Toggle Block User
  * 
  * NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
  * 
- * Fetch the direct rooms list and recalculate it without the
- * given alias
+ * Fetch the blocked user list and recalculate
+ * events without the given user id
  */
 ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
   return (Store<AppState> store) async {
@@ -100,11 +100,12 @@ ThunkAction<AppState> toggleBlockUser({User user, Room room, bool block}) {
 
       // Pull remote direct room data
       final data = await MatrixApi.fetchAccountData(
-          protocol: protocol,
-          homeserver: store.state.authStore.user.homeserver,
-          accessToken: store.state.authStore.user.accessToken,
-          userId: store.state.authStore.user.userId,
-          type: AccountDataTypes.ignoredUserList);
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        userId: store.state.authStore.user.userId,
+        type: AccountDataTypes.ignoredUserList,
+      );
 
       if (data['errcode'] != null) {
         throw data['error'];

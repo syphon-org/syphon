@@ -8,6 +8,7 @@ import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
 
 abstract class Events {
@@ -50,16 +51,20 @@ abstract class Events {
     String from,
     String to,
     int limit = 10, // default limit by matrix
-    bool desc = true, // Direction of events
+    bool desc = true, // direction of events
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
+
+    printDebug('[Matrix.fetchMessageEvents] ${limit}');
 
     // Params
     url += '?limit=$limit';
     url += from != null ? '&from=${from}' : '';
     url += to != null ? '&to=${to}' : '';
     url += desc ? '&dir=b' : '&dir=f';
+    // TODO: remove after implementing reactions
+    url += '&filter={"not_types":["${EventTypes.member}", "m.reaction"]}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
