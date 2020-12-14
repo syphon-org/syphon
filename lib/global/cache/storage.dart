@@ -13,10 +13,12 @@ import 'package:syphon/store/media/state.dart';
 import 'package:syphon/store/rooms/state.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/state.dart';
 
 final List<Object> stores = [
   AuthStore(),
   SyncStore(),
+  UserStore(),
   MediaStore(),
   CryptoStore(),
   SettingsStore(),

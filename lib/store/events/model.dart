@@ -22,6 +22,7 @@ class EventTypes {
   static const message = 'm.room.message';
   static const encrypted = 'm.room.encrypted';
   static const member = 'm.room.member';
+  static const reaction = 'm.reaction';
 
   static const guestAccess = 'm.room.guest_access';
   static const joinRules = 'm.room.join_rules';
@@ -29,8 +30,6 @@ class EventTypes {
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
   static const roomKey = 'm.room_key';
-
-  static const ignoredUserList = 'm.ignored_user_list';
 }
 
 class MessageTypes {
@@ -42,6 +41,7 @@ class MessageTypes {
   static const AUDIO = 'm.text';
   static const LOCATION = 'm.location';
   static const VIDEO = 'm.video';
+  static const ANNOTATIONO = 'm.annotation';
 }
 
 class MediumType {

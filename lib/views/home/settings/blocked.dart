@@ -9,71 +9,38 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
-class ChatUsersDetailArguments {
-  final String roomId;
-
-  ChatUsersDetailArguments({this.roomId});
-}
-
-class ChatUsersDetailView extends StatefulWidget {
-  const ChatUsersDetailView({Key key}) : super(key: key);
+class BlockedUsersView extends StatefulWidget {
+  const BlockedUsersView({Key key}) : super(key: key);
 
   @override
-  ChatUsersDetailState createState() => ChatUsersDetailState();
+  BlockedUsersState createState() => BlockedUsersState();
 }
 
-class ChatUsersDetailState extends State<ChatUsersDetailView> {
-  final searchInputFocusNode = FocusNode();
-
-  ChatUsersDetailState({Key key});
-
+class BlockedUsersState extends State<BlockedUsersView> {
   bool loading = false;
+
+  BlockedUsersState({Key key});
 
   // componentDidMount(){}
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
-
-    final searchResults = store.state.searchStore.searchResults;
-
-    // Clear search if previous results are not from User searching
-    if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
-      store.dispatch(clearSearchResults());
-    }
-  }
-
-  @override
-  void dispose() {
-    searchInputFocusNode.dispose();
-    super.dispose();
   }
 
   @protected
   onShowUserDetails({
     BuildContext context,
-    String roomId,
     String userId,
   }) async {
     await showModalBottomSheet(
@@ -90,15 +57,14 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
   Widget buildUserList(BuildContext context, _Props props) => ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
-        itemCount: props.usersFiltered.length,
+        itemCount: props.usersBlocked.length,
         itemBuilder: (BuildContext context, int index) {
-          final user = (props.usersFiltered[index] as User);
+          final user = props.usersBlocked[index];
 
           return GestureDetector(
             onTap: () => this.onShowUserDetails(
               context: context,
               userId: user.userId,
-              roomId: props.room.id,
             ),
             child: CardSection(
               padding: EdgeInsets.zero,
@@ -137,26 +103,16 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatUsersDetailArguments arguments =
-        ModalRoute.of(context).settings.arguments;
-
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) =>
-          _Props.mapStateToProps(store, arguments.roomId),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
-        appBar: AppBarSearch(
-          title: Strings.titleRoomUsers,
-          label: Strings.labelSearchForUsers,
-          tooltip: 'Search users',
-          brightness: Brightness.dark,
-          focusNode: searchInputFocusNode,
-          onChange: (text) {
-            props.onSearch(text);
-          },
-          onSearch: (text) {
-            props.onSearch(text);
-          },
+        appBar: AppBar(
+          title: Text('Blocked users'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context, false),
+          ),
         ),
         body: Stack(
           children: [
@@ -189,39 +145,24 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 }
 
 class _Props extends Equatable {
-  final Room room;
   final bool loading;
-  final String searchText;
-  final List<dynamic> usersFiltered;
-
-  final Function onSearch;
+  final List<User> usersBlocked;
 
   _Props({
-    @required this.room,
     @required this.loading,
-    @required this.searchText,
-    @required this.usersFiltered,
-    @required this.onSearch,
+    @required this.usersBlocked,
   });
 
   @override
   List<Object> get props => [
-        searchText,
-        usersFiltered,
         loading,
+        usersBlocked,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.roomStore.loading,
-        searchText: store.state.searchStore.searchText,
-        room: store.state.roomStore.rooms[roomId] ?? Room(),
-        usersFiltered: searchUsersLocal(
-          store.state,
-          roomId: roomId,
-          searchText: store.state.searchStore.searchText,
-        ),
-        onSearch: (text) {
-          store.dispatch(setSearchText(text: text));
-        },
+        usersBlocked: store.state.userStore.blocked
+            .map((id) => store.state.userStore.users[id])
+            .toList(),
       );
 }

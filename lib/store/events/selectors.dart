@@ -6,6 +6,14 @@ List<Message> roomMessages(AppState state, String roomId) {
   return state.eventStore.messages[roomId] ?? [];
 }
 
+// remove messages from blocked users
+List<Message> filterMessages(List<Message> messages, List<String> blocked) {
+  return messages
+    ..removeWhere(
+      (message) => blocked.contains(message.sender),
+    );
+}
+
 List<Message> latestMessages(List<Message> messages) {
   final sortedList = List<Message>.from(messages ?? []);
 

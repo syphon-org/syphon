@@ -109,7 +109,7 @@ Future<Store> initStore(Database cache, Database storage) async {
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: data),
     // TODO: can remove once cold storage is in place
-    throttleDuration: Duration(milliseconds: 4500),
+    throttleDuration: Duration(milliseconds: 4000),
     shouldSave: (Store<AppState> store, dynamic action) {
       // TODO: can remove once cold storage is in place
       switch (action.runtimeType) {
