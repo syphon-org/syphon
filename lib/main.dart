@@ -12,13 +12,17 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:sembast/sembast.dart';
 import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -37,6 +41,7 @@ void main() async {
   // disable debugPrint when in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
+    printDebug = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -52,32 +57,56 @@ void main() async {
   // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
-    debugPrint('[main] background service started $backgroundSyncStatus');
+    printDebug('[main] background service started $backgroundSyncStatus');
   }
 
-  // init cold cache (mobile only)
-  await initCache();
+  // init hot cache and cold storage
+  final cache = await initCache();
+
+  // init cold storage and load to data
+  final storage = await initStorage();
+
+  // init redux store
+  final store = await initStore(cache, storage);
 
   // init hot cache and start
-  runApp(Syphon(store: await initStore()));
+  runApp(Syphon(store: store, cache: cache, storage: storage));
 }
 
 class Syphon extends StatefulWidget {
+  final Database cache;
+  final Database storage;
   final Store<AppState> store;
-  const Syphon({Key key, this.store}) : super(key: key);
+
+  const Syphon({
+    Key key,
+    this.store,
+    this.cache,
+    this.storage,
+  }) : super(key: key);
 
   @override
-  SyphonState createState() => SyphonState(store: store);
+  SyphonState createState() => SyphonState(
+        store: store,
+        cache: cache,
+        storage: storage,
+      );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  SyphonState({this.store});
-
+  final Database cache;
+  final Database storage;
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
   Widget defaultHome = Home();
   StreamSubscription alertsListener;
+
+  SyphonState({
+    this.store,
+    this.cache,
+    this.storage,
+  });
 
   @override
   void initState() {
@@ -186,7 +215,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void deactivate() {
-    closeCache();
+    closeCache(cache);
     WidgetsBinding.instance.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());

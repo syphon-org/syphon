@@ -18,6 +18,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -366,6 +367,7 @@ ThunkAction<AppState> logoutUser() {
       }
       final temp = '${store.state.authStore.user.accessToken}';
       store.state.authStore.authObserver.add(null);
+
       final data = await MatrixApi.logoutUser(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -380,6 +382,10 @@ ThunkAction<AppState> logoutUser() {
         }
       }
 
+      // wipe cold storage
+      await deleteStorage();
+
+      // tell authObserver to wipe auth user
       store.state.authStore.authObserver.add(null);
     } catch (error) {
       store.dispatch(addAlert(

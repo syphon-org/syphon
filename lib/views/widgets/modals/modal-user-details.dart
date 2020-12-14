@@ -285,11 +285,11 @@ class _Props extends Equatable {
             return user;
           }
 
-          final room = store.state.roomStore.rooms[roomId];
-          if (room != null) {
-            return room.users[userId];
+          if (userId == null) {
+            return null;
           }
-          return null;
+
+          return store.state.userStore.users[userId];
         }(),
         onDisabled: () => store.dispatch(addInProgress()),
         onCreateChatDirect: ({User user}) async => store.dispatch(

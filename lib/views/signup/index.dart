@@ -29,7 +29,6 @@ import './step-password.dart';
 import './step-username.dart';
 
 // Styling Widgets
-
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );

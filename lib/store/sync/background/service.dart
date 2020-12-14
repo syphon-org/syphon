@@ -60,27 +60,27 @@ class BackgroundSync {
 
     await Future.wait([
       secureStorage.write(
-        key: CacheSecure.protocolKey,
+        key: Cache.protocolKey,
         value: protocol,
       ),
       secureStorage.write(
-        key: CacheSecure.homeserverKey,
+        key: Cache.homeserverKey,
         value: homeserver,
       ),
       secureStorage.write(
-        key: CacheSecure.accessTokenKey,
+        key: Cache.accessTokenKey,
         value: accessToken,
       ),
       secureStorage.write(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
         value: lastSince,
       ),
       secureStorage.write(
-        key: CacheSecure.userIdKey,
+        key: Cache.userIdKey,
         value: currentUser,
       ),
       secureStorage.write(
-        key: CacheSecure.roomNamesKey,
+        key: Cache.roomNamesKey,
         value: jsonEncode(roomNames),
       )
     ]);
@@ -124,17 +124,15 @@ void notificationSyncIsolate() async {
     try {
       final secureStorage = FlutterSecureStorage();
 
-      protocol = await secureStorage.read(key: CacheSecure.protocolKey);
-      homeserver = await secureStorage.read(key: CacheSecure.homeserverKey);
-      accessToken = await secureStorage.read(key: CacheSecure.accessTokenKey);
-      lastSince = await secureStorage.read(key: CacheSecure.lastSinceKey);
-      userId = await secureStorage.read(key: CacheSecure.userIdKey);
+      protocol = await secureStorage.read(key: Cache.protocolKey);
+      homeserver = await secureStorage.read(key: Cache.homeserverKey);
+      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
+      userId = await secureStorage.read(key: Cache.userIdKey);
 
       roomNames = jsonDecode(
-        await secureStorage.read(key: CacheSecure.roomNamesKey),
+        await secureStorage.read(key: Cache.roomNamesKey),
       );
-
-      // Init hive cache + adapters
     } catch (error) {
       print('[notificationSyncIsolate] $error');
     }
@@ -199,17 +197,16 @@ FutureOr<dynamic> syncLoop({
       final secureStorage = FlutterSecureStorage();
 
       lastSinceNew = await secureStorage.read(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
       );
-      // Init hive cache + adapters
     } catch (error) {
       print('[syncLoop] $error');
     }
 
     /**
      * Check last since and see if any new messages arrived in the payload
-     * No need to update the hive store for now, just do not save the lastSince
-     * to the store and the next foreground fetchSync will update the state
+     * do not save the lastSince to the store and 
+     * the next foreground fetchSync will update the state
      */
     final data = await MatrixApi.sync(
       protocol: protocol,
@@ -228,10 +225,9 @@ FutureOr<dynamic> syncLoop({
       final secureStorage = FlutterSecureStorage();
 
       await secureStorage.write(
-        key: CacheSecure.lastSinceKey,
+        key: Cache.lastSinceKey,
         value: lastSinceNew,
       );
-      // Init hive cache + adapters
     } catch (error) {
       print('[syncLoop] $error');
     }
@@ -239,9 +235,10 @@ FutureOr<dynamic> syncLoop({
     // Filter each room through the parser
     rawRooms.forEach((roomId, json) {
       final room = Room().fromSync(json: json, lastSince: lastSinceNew);
+      final messagesNew = room.messagesNew;
 
-      if (room.messages.length == 1) {
-        final String messageSender = room.messages[0].sender;
+      if (messagesNew.length == 1) {
+        final String messageSender = messagesNew[0].sender;
         final String formattedSender = trimAlias(messageSender);
 
         if (!formattedSender.contains(userId)) {

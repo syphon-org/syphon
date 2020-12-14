@@ -9,30 +9,80 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
+class ResetEvents {}
+
+class SetMessages {
+  final String roomId;
+  final List<Message> messages;
+  SetMessages({this.roomId, this.messages});
+}
+
+class SetState {
+  final String roomId;
+  final List<Event> states;
+  SetState({this.roomId, this.states});
+}
+
+ThunkAction<AppState> setMessageEvents({
+  Room room,
+  List<Message> messages,
+  int offset = 0,
+  int limit = 20,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+    };
+
 /**
  * Load Message Events
  * 
- * Pulls next message events from cold storage 
+ * Pulls initial messages from storage or paginates through
+ * those existing in cold storage depending on requests from client
+ * 
+ * Make sure these have been exhausted before calling fetchMessageEvents
+ * 
+ * TODO: still needs work
  */
-ThunkAction<AppState> loadMessageEvents({Room room}) {
+ThunkAction<AppState> loadMessageEvents({
+  Room room,
+  int offset = 0,
+  int limit = 20,
+}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
+
+      final messagesStored = await loadMessages(
+        room.messageIds,
+        storage: Storage.main,
+        offset: offset, // offset from the most recent eventId found
+        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
+      );
+
+      // load cold storage messages to state
+      store.dispatch(SetMessages(
+        roomId: room.id,
+        messages: messagesStored,
+      ));
     } catch (error) {
-      debugPrint('[fetchMessageEvents] $error');
+      printError('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -77,6 +127,11 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
+      messages.forEach((msg) {
+        printDebug("[fetchMessageEvents] *** PRINT MESSAGES *** ${room.name}");
+        printJson(msg);
+      });
+
       // reuse the logic for syncing
       await store.dispatch(
         syncRooms({
@@ -91,6 +146,46 @@ ThunkAction<AppState> fetchMessageEvents({
       );
     } catch (error) {
       debugPrint('[fetchMessageEvents] $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+/**
+ * Decrypt Events
+ * 
+ * Reattribute decrypted events to the timeline
+ */
+ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
+  return (Store<AppState> store) async {
+    try {
+      // First past to decrypt encrypted events
+      final List<dynamic> timelineEvents = json['timeline']['events'];
+
+      // map through each event and decrypt if possible
+      final decryptTimelineActions = timelineEvents.map((event) async {
+        final eventType = event['type'];
+        switch (eventType) {
+          case EventTypes.encrypted:
+            return await store.dispatch(
+              decryptMessageEvent(roomId: room.id, event: event),
+            );
+          default:
+            return event;
+        }
+      });
+
+      // add the decrypted events back to the
+      final decryptedTimelineEvents = await Future.wait(
+        decryptTimelineActions,
+      );
+
+      return decryptedTimelineEvents;
+    } catch (error) {
+      debugPrint(
+        '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
+      );
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }

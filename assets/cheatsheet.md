@@ -97,3 +97,55 @@ if (true) {
   }
  */
  ```
+
+
+ ```dart
+/*
+  Opening storage path on mobile devices (main thread only)
+*/
+ Future<dynamic> initStorageLocation() async {
+  var storageLocation;
+
+  try {
+    if (Platform.isIOS || Platform.isAndroid) {
+      storageLocation = await getApplicationDocumentsDirectory();
+      return storageLocation.path;
+    }
+
+    if (Platform.isMacOS) {
+      storageLocation = await File('cache').create().then(
+            (value) => value.writeAsString(
+              '{}',
+              flush: true,
+            ),
+          );
+
+      return storageLocation.path;
+    }
+
+    if (Platform.isLinux) {
+      storageLocation = await getApplicationDocumentsDirectory();
+      return storageLocation.path;
+    }
+
+    debugPrint('[initStorageLocation] no cache support');
+    return null;
+  } catch (error) {
+    debugPrint('[initStorageLocation] $error');
+    return null;
+  }
+}
+
+```
+
+```dart
+ // reduce several maps to one map
+ final allDirectUsers = roomsDirectUsers.fold(
+   {},
+   (usersAll, users) {
+     (usersAll as Map).addAll(users);
+     return usersAll;
+   },
+ );
+  
+  ```

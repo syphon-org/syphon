@@ -4,11 +4,12 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/rooms/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -50,13 +51,24 @@ class Room {
   // Event lists and handlers
   final Message draft;
 
-  // TODO: removed until state timeline work can be done
-  // final List<Event> state;
-  final List<Message> messages;
+  // Associated user ids
+  final List<String> userIds;
+  final List<String> messageIds;
   final List<Message> outbox;
 
-  final Map<String, User> users;
+  // TODO: removed until state timeline work can be done
+  @JsonKey(ignore: true)
+  final List<Event> state;
+
+  @JsonKey(ignore: true)
+  final List<Message> messagesNew;
+
+  // TODO: offload messageReads, for large rooms these are ridiculously large
+  @JsonKey(ignore: true)
   final Map<String, ReadStatus> messageReads;
+
+  @JsonKey(ignore: true)
+  final Map<String, User> usersNew;
 
   @JsonKey(ignore: true)
   final bool userTyping;
@@ -98,9 +110,11 @@ class Room {
     this.sending = false,
     this.limited = false,
     this.draft,
-    this.users,
+    this.userIds = const [],
     this.outbox = const [],
-    this.messages = const [],
+    this.usersNew = const {},
+    this.messagesNew = const [],
+    this.messageIds = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -115,12 +129,13 @@ class Room {
     this.nextHash,
     this.prevHash,
     this.messageReads,
+    this.state,
   });
 
   Room copyWith({
-    id,
-    name,
-    homeserver,
+    String id,
+    String name,
+    String homeserver,
     avatar,
     avatarUri,
     topic,
@@ -141,14 +156,16 @@ class Room {
     isDraftRoom,
     draft,
     users,
+    userIds,
     events,
-    outbox,
-    messages,
+    List<Message> outbox,
+    List<Message> messagesNew,
+    List<String> messageIds,
     messageReads,
     lastHash,
     prevHash,
     nextHash,
-    // state,
+    state,
   }) =>
       Room(
         id: id ?? this.id,
@@ -174,13 +191,15 @@ class Room {
         usersTyping: usersTyping ?? this.usersTyping,
         isDraftRoom: isDraftRoom ?? this.isDraftRoom,
         outbox: outbox ?? this.outbox,
-        messages: messages ?? this.messages,
-        users: users ?? this.users,
+        messageIds: messageIds ?? this.messageIds,
+        messagesNew: messagesNew ?? this.messagesNew,
+        usersNew: users ?? this.usersNew,
+        userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
-        // state: state ?? this.state,
+        state: state ?? this.state,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -292,7 +311,7 @@ class Room {
           currentUser: currentUser,
         )
         .fromMessageEvents(
-          events: messageEvents,
+          messages: messageEvents,
           lastHash: lastHash,
           prevHash: prevHash,
           nextHash: lastSince,
@@ -349,10 +368,14 @@ class Room {
     bool direct = this.direct ?? false;
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
-    Map<String, User> users = this.users ?? Map<String, User>();
 
-    try {
-      events.forEach((event) {
+    var usersAdd = Map<String, User>.from(this.usersNew);
+    var userIdsRemove = List<String>();
+
+    Set<String> userIds = Set<String>.from(this.userIds ?? []);
+
+    events.forEach((event) {
+      try {
         final timestamp = event.timestamp ?? 0;
         lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
 
@@ -393,16 +416,21 @@ class Room {
           case 'm.room.member':
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
+            final membership = event.content['membership'];
 
             direct = !direct ? event.content['is_direct'] ?? false : direct;
 
             // Cache user to rooms user cache if not present
-            if (!users.containsKey(event.sender)) {
-              users[event.sender] = User(
-                userId: event.sender,
+            if (!usersAdd.containsKey(event.stateKey)) {
+              usersAdd[event.stateKey] = User(
+                userId: event.stateKey,
                 displayName: displayName,
                 avatarUri: memberAvatarUri,
               );
+            }
+
+            if (membership == 'leave') {
+              userIdsRemove.add(event.stateKey);
             }
 
             break;
@@ -414,10 +442,13 @@ class Room {
           default:
             break;
         }
-      });
-    } catch (error) {
-      debugPrint('[Room.fromStateEvents] ${error}');
-    }
+      } catch (error) {
+        debugPrint('[Room.fromStateEvents] ${error} ${event.type}');
+      }
+    });
+
+    userIds = userIds..addAll(usersAdd.keys ?? []);
+    userIds = userIds..removeWhere((id) => userIdsRemove.contains(id));
 
     try {
       // checks to make sure someone didn't name the room after the authed user
@@ -425,9 +456,9 @@ class Room {
           name == currentUser.displayName || name == currentUser.userId;
 
       // no name room check
-      if ((namePriority > 3 && users.isNotEmpty && direct) || badRoomName) {
+      if ((namePriority > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
         // Filter out number of non current users to show preview of total
-        final otherUsers = users.values.where(
+        final otherUsers = usersAdd.values.where(
           (user) =>
               user.userId != currentUser.userId &&
               user.displayName != currentUser.displayName,
@@ -440,7 +471,7 @@ class Room {
 
           // set name and avi to first non user or that + total others
           name = hasMultipleUsers
-              ? '${shownUser.displayName} and ${users.values.length - 1}'
+              ? '${shownUser.displayName} and ${usersAdd.values.length - 1}'
               : shownUser.displayName;
 
           // set avatar if one has not been assigned
@@ -456,10 +487,11 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: users ?? this.users,
+      users: usersAdd ?? this.usersNew,
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
+      userIds: userIds != null ? userIds.toList() : this.userIds ?? [],
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
@@ -476,39 +508,42 @@ class Room {
    * outside displaying messages
    */
   Room fromMessageEvents({
-    List<Message> events,
+    List<Message> messages,
     String lastHash,
     String prevHash, // previously fetched hash
     String nextHash,
   }) {
     try {
+      printDebug(
+        '[fromMessageEvents] ${this.name} ${messages.length.toString()}',
+      );
+
       bool limited;
       int lastUpdate = this.lastUpdate;
-      List<Message> messagesNew = events ?? [];
       List<Message> outbox = List<Message>.from(this.outbox ?? []);
-      List<Message> messagesExisting = List<Message>.from(this.messages ?? []);
 
       // Converting only message events
-      final hasEncrypted = messagesNew.firstWhere(
+      final hasEncrypted = messages.firstWhere(
         (msg) => msg.type == EventTypes.encrypted,
         orElse: () => null,
       );
 
       // See if the newest message has a greater timestamp
-      if (messagesNew.isNotEmpty && lastUpdate < messagesNew[0].timestamp) {
-        lastUpdate = messagesNew[0].timestamp;
+      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
+        lastUpdate = messages[0].timestamp;
       }
 
       // limited indicates need to fetch additional data for room timelines
       if (this.limited) {
         // Check to see if the new messages contain those existing in cache
-        if (messagesNew.isNotEmpty && messagesExisting.isNotEmpty) {
-          final messageLatest = messagesExisting.firstWhere(
-            (msg) => msg.id == messagesNew[0].id,
-            orElse: () => null,
-          );
+        if (messages.isNotEmpty && this.messageIds.isNotEmpty) {
+          final messageKnown = this.messageIds.firstWhere(
+                (id) => id == messages[0].id,
+                orElse: () => null,
+              );
+
           // Set limited to false if they now exist
-          limited = messageLatest != null;
+          limited = messageKnown != null;
         }
 
         // Set limited to false false if
@@ -523,9 +558,8 @@ class Room {
       }
 
       // Combine current and existing messages on unique ids
-      messagesExisting.addAll(messagesNew);
       final messagesMap = HashMap.fromIterable(
-        messagesExisting,
+        messages,
         key: (message) => message.id,
         value: (message) => message,
       );
@@ -535,13 +569,17 @@ class Room {
         (message) => messagesMap.containsKey(message.id),
       );
 
-      // Filter to find startTime and endTime
-      final messagesAll = List<Message>.from(messagesMap.values);
+      // save messages and unique message id updates
+      final messageIdsNew = Set<String>.from(messagesMap.keys);
+      final messagesNew = List<Message>.from(messagesMap.values);
+      final messageIdsAll = Set<String>.from(this.messageIds)
+        ..addAll(messageIdsNew);
 
       // Save values to room
       return this.copyWith(
         outbox: outbox,
-        messages: messagesAll,
+        messagesNew: messagesNew,
+        messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,

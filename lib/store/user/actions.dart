@@ -5,7 +5,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -25,12 +25,23 @@ class SaveUser {
   SaveUser({this.user});
 }
 
+class SetUsers {
+  final Map<String, User> users;
+  SetUsers({this.users});
+}
+
 class SetUserInvites {
   final List<User> users;
   SetUserInvites({this.users});
 }
 
 class ClearUserInvites {}
+
+ThunkAction<AppState> setUsers(Map<String, User> users) {
+  return (Store<AppState> store) {
+    store.dispatch(SetUsers(users: users));
+  };
+}
 
 ThunkAction<AppState> setUserInvites({List<User> users}) {
   return (Store<AppState> store) async {

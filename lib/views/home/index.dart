@@ -11,7 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/themes.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
@@ -22,7 +22,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/events/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -282,11 +282,11 @@ class HomeViewState extends State<Home> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final messages = room.messages ?? const [];
-        final messagesLatest = latestMessages(room.messages);
+        final messages = props.messages[room.id] ?? const [];
+        final messagesLatest = latestMessages(messages);
         final messagePreview = formatPreview(
           room: room,
-          prefetched: messagesLatest,
+          messages: messagesLatest,
         );
         final roomSettings = props.chatSettings[room.id] ?? null;
 
@@ -331,6 +331,7 @@ class HomeViewState extends State<Home> {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
+        // display message as being 'unread'
         if (messages != null && messages.isNotEmpty) {
           final messageRecent = messagesLatest[0];
 
@@ -594,6 +595,7 @@ class _Props extends Equatable {
   final User currentUser;
   final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
+  final Map<String, List<Message>> messages;
 
   final Function onDebug;
   final Function onLeaveChat;
@@ -609,6 +611,7 @@ class _Props extends Equatable {
     @required this.offline,
     @required this.syncing,
     @required this.unauthed,
+    @required this.messages,
     @required this.currentUser,
     @required this.chatSettings,
     @required this.roomTypeBadgesEnabled,
@@ -638,6 +641,7 @@ class _Props extends Equatable {
           sortedPrioritizedRooms(store.state.roomStore.rooms),
           hidden: store.state.roomStore.roomsHidden,
         ),
+        messages: store.state.eventStore.messages,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
         syncing: () {

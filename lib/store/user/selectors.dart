@@ -12,19 +12,16 @@ dynamic homeserver(AppState state) {
 
 // Users the authed user has dm'ed
 List<User> friendlyUsers(AppState state) {
-  final rooms = state.roomStore.rooms.values as Iterable<Room>;
+  final rooms = state.roomStore.rooms.values;
+  final users = state.userStore.users;
+  final userCurrent = state.authStore.user.userId;
   final roomsDirect = rooms.where((room) => room.direct);
-  final roomsDirectUsers = roomsDirect.map((room) => room.users);
+  final roomUserIdsList = roomsDirect.map((room) => room.userIds);
+  final roomDirectUserIdsAll = roomUserIdsList.expand((pair) => pair).toList();
+  final roomDirectUserIds = roomDirectUserIdsAll..remove(userCurrent);
+  final roomsDirectUsers = roomDirectUserIds.map((userId) => users[userId]);
 
-  final allDirectUsers = roomsDirectUsers.fold(
-    {},
-    (usersAll, users) {
-      (usersAll as Map).addAll(users);
-      return usersAll;
-    },
-  );
-
-  return List.from(allDirectUsers.values);
+  return List.from(roomsDirectUsers);
 }
 
 /*
@@ -66,7 +63,17 @@ String formatInitials(String fullword) {
   return initials.toUpperCase();
 }
 
-List<User> searchUsersLocal(List<User> users, {String searchText = ''}) {
+List<User> roomUsers(AppState state, String roomId) {
+  final room = state.roomStore.rooms[roomId] ?? Room(id: roomId);
+  return room.userIds.map((userId) => state.userStore.users[userId]).toList();
+}
+
+List<User> searchUsersLocal(
+  AppState state, {
+  String roomId,
+  String searchText = '',
+}) {
+  var users = roomUsers(state, roomId);
   if (searchText == null || searchText.isEmpty) {
     return users;
   }

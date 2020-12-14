@@ -19,16 +19,18 @@ import 'package:syphon/global/assets.dart';
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/events/actions.dart';
-import 'package:syphon/store/rooms/events/model.dart';
-import 'package:syphon/store/rooms/events/selectors.dart';
+import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
@@ -130,7 +132,7 @@ class ChatViewState extends State<ChatView> {
       });
     }
 
-    if (props.room.messages.length < 10) {
+    if (props.messages.length < 10) {
       props.onLoadFirstBatch();
     }
 
@@ -419,9 +421,9 @@ class ChatViewState extends State<ChatView> {
             controller: messagesController,
             children: [
               MessageTypingWidget(
+                roomUsers: props.users,
                 typing: props.room.userTyping,
                 usersTyping: props.room.usersTyping,
-                roomUsers: props.room.users,
                 selectedMessageId: this.selectedMessage != null
                     ? this.selectedMessage.id
                     : null,
@@ -453,7 +455,7 @@ class ChatViewState extends State<ChatView> {
                       ? this.selectedMessage.id
                       : null;
 
-                  final avatarUri = props.room.users[message.sender]?.avatarUri;
+                  final avatarUri = props.users[message.sender]?.avatarUri;
 
                   return MessageWidget(
                       message: message,
@@ -654,6 +656,7 @@ class _Props extends Equatable {
   final String userId;
   final bool loading;
   final ThemeType theme;
+  final Map<String, User> users;
   final List<Message> messages;
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
@@ -676,6 +679,7 @@ class _Props extends Equatable {
     @required this.room,
     @required this.theme,
     @required this.userId,
+    @required this.users,
     @required this.messages,
     @required this.loading,
     @required this.roomPrimaryColor,
@@ -698,6 +702,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         userId,
+        users,
         messages,
         room,
         roomPrimaryColor,
@@ -713,9 +718,10 @@ class _Props extends Equatable {
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(id: roomId, state: store.state),
+      users: store.state.userStore.users,
       messages: latestMessages(
         wrapOutboxMessages(
-          messages: roomSelectors.room(id: roomId, state: store.state).messages,
+          messages: roomMessages(store.state, roomId),
           outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
         ),
       ),
@@ -733,7 +739,7 @@ class _Props extends Equatable {
         final room = store.state.roomStore.rooms[roomId];
 
         final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(users: room.users),
+          fetchDeviceKeys(userIds: room.userIds),
         );
 
         store.dispatch(setDeviceKeys(usersDeviceKeys));
@@ -809,8 +815,22 @@ class _Props extends Equatable {
       onLoadMoreMessages: () {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
+        // load message from cold storage
+        // TODO: everything is loaded when opening the app for now
+        // final messages = roomMessages(store.state, roomId);
+        // if (messages.length < room.messageIds.length) {
+        //   printDebug(
+        //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
+        //   return store.dispatch(
+        //     loadMessageEvents(
+        //       room: room,
+        //       offset: messages.length,
+        //     ),
+        //   );
+        // }
+
         // fetch messages beyond the oldest known message - lastHash
-        store.dispatch(fetchMessageEvents(
+        return store.dispatch(fetchMessageEvents(
           room: room,
           from: room.lastHash,
           oldest: true,
@@ -826,8 +846,9 @@ class _Props extends Equatable {
         store.dispatch(updateKeySessions(room: room));
 
         final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(users: room.users),
+          fetchDeviceKeys(userIds: room.userIds),
         );
+
         printJson(usersDeviceKeys);
       });
 }

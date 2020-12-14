@@ -1,6 +1,6 @@
 // Project imports:
 import './actions.dart';
-import './events/model.dart';
+import '../events/model.dart';
 import './room/model.dart';
 import './state.dart';
 
@@ -42,7 +42,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
 
     case RemoveRoom:
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms.remove(action.room.id);
+      rooms.remove(action.roomId);
       return state.copyWith(rooms: rooms);
 
     case SaveOutboxMessage:
