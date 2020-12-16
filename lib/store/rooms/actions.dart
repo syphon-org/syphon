@@ -149,14 +149,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} ids msg count ${room.messageIds.length}',
       );
 
-      // update store
-      await store.dispatch(
-        setUsers(room.usersNew),
-      );
-      await store.dispatch(
-        setMessageEvents(room: room, messages: room.messagesNew),
-      );
-
       // update cold storage
       await Future.wait([
         saveUsers(room.usersNew, storage: Storage.main),
@@ -164,11 +156,23 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveMessages(room.messagesNew, storage: Storage.main),
       ]);
 
+      // update store
+      await store.dispatch(
+        setUsers(room.usersNew),
+      );
+
+      await store.dispatch(
+        setMessageEvents(room: room, messages: room.messagesNew),
+      );
+
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
         messagesNew: List<Message>(),
       );
+
+      // update room
+      store.dispatch(SetRoom(room: room));
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {
@@ -188,9 +192,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           from: room.prevHash,
         ));
       }
-
-      // update room
-      store.dispatch(SetRoom(room: room));
     });
   };
 }
