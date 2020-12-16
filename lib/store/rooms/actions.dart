@@ -202,11 +202,60 @@ ThunkAction<AppState> syncRooms(Map roomData) {
  * Takes a negligible amount of time
  *  
  */
+ThunkAction<AppState> fetchRoom(String roomId) {
+  return (Store<AppState> store) async {
+    try {
+      final stateEvents = await MatrixApi.fetchStateEvents(
+        protocol: protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        roomId: roomId,
+      );
+
+      if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+        throw stateEvents['error'];
+      }
+
+      final messageEvents = await compute(
+        MatrixApi.fetchMessageEventsMapped,
+        {
+          "protocol": protocol,
+          "homeserver": store.state.authStore.user.homeserver,
+          "accessToken": store.state.authStore.user.accessToken,
+          "roomId": roomId,
+          "limit": 20,
+        },
+      );
+
+      await store.dispatch(syncRooms({
+        '${roomId}': {
+          'state': {
+            'events': stateEvents,
+            'prev_batch': messageEvents['from'],
+          },
+          'timeline': {
+            'events': messageEvents['chunk'],
+          }
+        },
+      }));
+    } catch (error) {
+      debugPrint('[fetchRooms] ${roomId} $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: roomId, syncing: false));
+    }
+  };
+}
+
+/**
+ *  
+ * Fetch Rooms (w/o /sync)
+ * 
+ * Takes a negligible amount of time
+ *  
+ */
 ThunkAction<AppState> fetchRooms() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
-
       final data = await MatrixApi.fetchRoomIds(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -768,8 +817,9 @@ ThunkAction<AppState> joinRoom({Room room}) {
         room: joinedRoom.copyWith(invite: false),
       ));
 
-      await store.dispatch(fetchRooms());
-      await store.dispatch(fetchDirectRooms());
+      store.dispatch(SetLoading(loading: true));
+      await store.dispatch(fetchRoom(joinedRoom.id));
+      store.dispatch(SetLoading(loading: false));
     } catch (error) {
       store.dispatch(addAlert(error: error, origin: 'joinRoom'));
     }
@@ -777,10 +827,8 @@ ThunkAction<AppState> joinRoom({Room room}) {
 }
 
 /**
- * Join Room (by id)
- * 
- * Not sure if this process is / will be any different
- * than accepting an invite
+ * Invite User (by id)
+ *  
  */
 ThunkAction<AppState> inviteUser({
   Room room,
@@ -845,8 +893,9 @@ ThunkAction<AppState> acceptRoom({Room room}) {
         room: joinedRoom.copyWith(invite: false),
       ));
 
-      await store.dispatch(fetchRooms());
-      await store.dispatch(fetchDirectRooms());
+      store.dispatch(SetLoading(loading: true));
+      await store.dispatch(fetchRoom(joinedRoom.id));
+      store.dispatch(SetLoading(loading: false));
     } catch (error) {
       store.dispatch(addAlert(error: error, origin: 'acceptRoom'));
     }
@@ -910,7 +959,6 @@ ThunkAction<AppState> removeRoom({Room room}) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
       await store.dispatch(RemoveRoom(roomId: room.id));
-      store.dispatch(SetLoading(loading: false));
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {

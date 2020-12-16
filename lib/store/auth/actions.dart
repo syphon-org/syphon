@@ -12,6 +12,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/cache/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -382,8 +383,13 @@ ThunkAction<AppState> logoutUser() {
         }
       }
 
+      // wipe cache
+      await deleteCache();
+      await initCache();
+
       // wipe cold storage
       await deleteStorage();
+      await initStorage();
 
       // tell authObserver to wipe auth user
       store.state.authStore.authObserver.add(null);

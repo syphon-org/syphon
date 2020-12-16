@@ -95,6 +95,31 @@ void closeCache(Database cache) async {
   }
 }
 
+Future<void> deleteCache({Database cache}) async {
+  try {
+    var cacheFactory;
+    var cachePath = '${Cache.cacheKeyMain}.db';
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      var directory = await getApplicationDocumentsDirectory();
+      await directory.create();
+      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cacheFactory = databaseFactoryIo;
+    }
+
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      cacheFactory = getDatabaseFactorySqflite(
+        sqflite_ffi.databaseFactoryFfi,
+      );
+    }
+
+    Cache.cacheMain = await cacheFactory.deleteDatabase(cachePath);
+  } catch (error) {
+    printError('[initCache] ${error}');
+    return null;
+  }
+}
+
 String createIVKey() {
   return Key.fromSecureRandom(16).base64;
 }
