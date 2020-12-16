@@ -18,6 +18,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/rooms/actions.dart';
 
 /**
  * Encrypt event content with loaded outbound session for room
@@ -312,12 +313,23 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 );
 
                 if (EventTypes.roomKey == eventDecrypted['type']) {
-                  return await store.dispatch(
+                  // save decrepted user session key under roomId
+                  await store.dispatch(
                     saveSessionKey(
                       event: eventDecrypted,
                       identityKey: identityKeySender,
                     ),
                   );
+
+                  try {
+                    // redecrypt events in the room with new key
+                    final roomId = eventDecrypted['content']['room_id'];
+                    Map<String, dynamic> room = {roomId: {}};
+
+                    return await store.dispatch(syncRooms(room));
+                  } catch (error) {
+                    debugPrint('[syncRooms|error] $error');
+                  }
                 }
               } catch (error) {
                 debugPrint('[decryptKeyEvent|error] $error');

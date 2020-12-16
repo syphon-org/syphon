@@ -9,6 +9,7 @@ description: a privacy focused matrix client
 # $ flutter pub run build_runner build
 # $ flutter pub run build_runner watch --delete-conflicting-outputs
 # $ flutter pub run build_runner build --delete-conflicting-outputs
+# $ adb shell && pm uninstall org.tether.tether (sometimes doesn't uninstall when debugging?)
 
 # troubleshooting
 # $ pub cache repair
@@ -44,7 +45,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.5+150
+version: 0.1.5+151
 
 environment:
   sdk: ">=2.9.0-13.0 <3.0.0" #  <- modified to solve build_runner
