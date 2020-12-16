@@ -160,7 +160,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       await store.dispatch(
         setUsers(room.usersNew),
       );
-      store.dispatch(
+
+      await store.dispatch(
         setMessageEvents(room: room, messages: room.messagesNew),
       );
 
