@@ -11,6 +11,7 @@ import 'package:syphon/store/events/model.dart';
 
 class ChatInput extends StatelessWidget {
   final bool sendable;
+  final bool enterSend;
   final String mediumType;
   final FocusNode focusNode;
   final TextEditingController controller;
@@ -26,6 +27,7 @@ class ChatInput extends StatelessWidget {
     this.focusNode,
     this.mediumType,
     this.controller,
+    this.enterSend = false,
     this.onChangeMessage,
     this.onChangeMethod,
     this.onSubmitMessage,
@@ -132,7 +134,8 @@ class ChatInput extends StatelessWidget {
           child: TextField(
             maxLines: null,
             keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
+            textInputAction:
+                enterSend ? TextInputAction.send : TextInputAction.newline,
             cursorColor: inputCursorColor,
             focusNode: focusNode,
             controller: controller,

@@ -613,8 +613,9 @@ class ChatViewState extends State<ChatView> {
                       ),
                       child: ChatInput(
                         sendable: sendable,
-                        focusNode: inputFieldNode,
                         mediumType: mediumType,
+                        focusNode: inputFieldNode,
+                        enterSend: props.enterSend,
                         controller: editorController,
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
@@ -636,6 +637,7 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final bool loading;
+  final bool enterSend;
   final ThemeType theme;
   final Map<String, User> users;
   final List<Message> messages;
@@ -663,6 +665,7 @@ class _Props extends Equatable {
     @required this.users,
     @required this.messages,
     @required this.loading,
+    @required this.enterSend,
     @required this.roomPrimaryColor,
     @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
@@ -682,12 +685,13 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        userId,
-        users,
-        messages,
         room,
-        roomPrimaryColor,
+        users,
+        userId,
+        messages,
         loading,
+        enterSend,
+        roomPrimaryColor,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
@@ -700,6 +704,7 @@ class _Props extends Equatable {
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(id: roomId, state: store.state),
       users: store.state.userStore.users,
+      enterSend: store.state.settingsStore.enterSend,
       messages: latestMessages(
         filterMessages(
           wrapOutboxMessages(
