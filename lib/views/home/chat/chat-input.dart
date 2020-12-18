@@ -34,7 +34,8 @@ class ChatInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
     double messageInputWidth = width - 72;
 
     Color inputTextColor = const Color(Colours.blackDefault);
@@ -125,6 +126,7 @@ class ChatInput extends StatelessWidget {
       children: <Widget>[
         Container(
           constraints: BoxConstraints(
+            maxHeight: height * 0.8,
             maxWidth: messageInputWidth,
           ),
           child: TextField(
@@ -144,6 +146,7 @@ class ChatInput extends StatelessWidget {
               filled: true,
               fillColor: inputColorBackground,
               contentPadding: const EdgeInsets.symmetric(
+                vertical: 4.0,
                 horizontal: 20.0,
               ),
               border: OutlineInputBorder(
