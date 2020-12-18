@@ -30,6 +30,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
@@ -39,14 +40,6 @@ import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-
-enum ChatOptions {
-  search,
-  allMedia,
-  chatSettings,
-  inviteFriends,
-  muteNotifications,
-}
 
 class ChatViewArguements {
   final String roomId;
@@ -164,9 +157,7 @@ class ChatViewState extends State<ChatView> {
       editorController.value = TextEditingValue(
         text: text,
         selection: TextSelection.fromPosition(
-          TextPosition(
-            offset: text.length,
-          ),
+          TextPosition(offset: text.length),
         ),
       );
     }
@@ -197,7 +188,6 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onUpdateMessage(String text, _Props props) {
     this.setState(() {
       sendable = text != null && text.trim().isNotEmpty;
@@ -235,7 +225,6 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onChangeMediumType({String newMediumType, _Props props}) {
     // noop
     if (mediumType == newMediumType) {
@@ -277,21 +266,18 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onToggleMessageOptions({Message message}) {
     this.setState(() {
       selectedMessage = message;
     });
   }
 
-  @protected
   onDismissMessageOptions() {
     this.setState(() {
       selectedMessage = null;
     });
   }
 
-  @protected
   onViewUserDetails({Message message, String userId}) {
     showModalBottomSheet(
       context: context,
@@ -303,7 +289,6 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
-  @protected
   onSubmitMessage(_Props props) async {
     props.onSendMessage(
       body: editorController.text,

@@ -138,7 +138,7 @@ class ChatPreferences extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.timeFormat24,
-                                onChanged: (enterSend) =>
+                                onChanged: (value) =>
                                     props.onToggleTimeFormat(),
                               ),
                             ),

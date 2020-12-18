@@ -231,7 +231,7 @@ class ModalUserDetails extends StatelessWidget {
                         Navigator.pop(context);
                       },
                       title: Text(
-                        props.blocked ? 'Unblock' : 'Block',
+                        props.blocked ? 'Unblock User' : 'Block User',
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),

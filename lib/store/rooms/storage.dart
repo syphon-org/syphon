@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Future<void> saveRooms(
@@ -10,11 +11,28 @@ Future<void> saveRooms(
   Database storage,
 }) async {
   final store = StoreRef<String, String>('rooms');
+  storage = storage ?? Storage.main;
 
   return await storage.transaction((txn) async {
     for (Room room in rooms.values) {
       final record = store.record(room.id);
       await record.put(txn, jsonEncode(room));
+    }
+  });
+}
+
+Future<void> deleteRooms(
+  Map<String, Room> rooms, {
+  Database cache,
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>('rooms');
+  storage = storage ?? Storage.main;
+
+  return await storage.transaction((txn) async {
+    for (Room room in rooms.values) {
+      final record = store.record(room.id);
+      await record.delete(txn);
     }
   });
 }
