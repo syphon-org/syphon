@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 // Project imports:
@@ -15,18 +16,12 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
-/**
- * Change to userId and 
- * create a global user store
- */
 class UserDetailsArguments {
   final User user;
 
-  // Improve loading times
-  UserDetailsArguments({
-    this.user,
-  });
+  UserDetailsArguments({this.user});
 }
 
 class UserDetailsView extends StatefulWidget {
@@ -79,6 +74,24 @@ class UserDetailsState extends State<UserDetailsView> {
   }
 
   @protected
+  void onBlockUser({BuildContext context, _Props props}) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => DialogConfirm(
+        title: "Block User",
+        content:
+            "If you block ${props.user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+        onConfirm: () async {
+          await props.blockUser(props.user);
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
+        onDismiss: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  @protected
   onShowColorPicker({
     context,
     int originalColor,
@@ -115,10 +128,7 @@ class UserDetailsState extends State<UserDetailsView> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStateToProps(
-        store,
-        user,
-      ),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store, user),
       builder: (context, props) => Scaffold(
         backgroundColor: scaffordBackgroundColor,
         body: CustomScrollView(
@@ -277,20 +287,15 @@ class UserDetailsState extends State<UserDetailsView> {
                           ListTile(
                             enabled: false,
                             contentPadding: contentPadding,
-                            title: Text(
-                              'View Sessions',
-                            ),
+                            title: Text('View Sessions'),
                           ),
                           ListTile(
-                            enabled: false,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Block',
-                              // style: TextStyle(
-                              //   fontSize: 18.0,
-                              //   color: Colors.redAccent,
-                              // ),
+                            onTap: () => onBlockUser(
+                              context: context,
+                              props: props,
                             ),
+                            contentPadding: contentPadding,
+                            title: Text('Block'),
                           ),
                         ],
                       ),
@@ -310,12 +315,14 @@ class _Props extends Equatable {
   final User user;
   final bool loading;
 
-  final Function onSendMessage;
+  final Function blockUser;
+  final Function sendMessage;
 
   _Props({
     @required this.user,
     @required this.loading,
-    @required this.onSendMessage,
+    @required this.blockUser,
+    @required this.sendMessage,
   });
 
   @override
@@ -325,7 +332,11 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, User user) => _Props(
-        onSendMessage: () {},
+        user: user,
+        blockUser: (User user) async {
+          await store.dispatch(toggleBlockUser(user: user));
+        },
+        sendMessage: () {},
         loading: store.state.roomStore.loading,
       );
 }

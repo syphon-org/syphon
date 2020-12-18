@@ -1,4 +1,5 @@
 // Project imports:
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
 
@@ -46,5 +47,6 @@ List<Message> wrapOutboxMessages({
 bool isTextMessage({Message message}) {
   return message.msgtype == MessageTypes.TEXT ||
       message.msgtype == MessageTypes.EMOTE ||
-      message.msgtype == MessageTypes.NOTICE;
+      message.msgtype == MessageTypes.NOTICE ||
+      message.type == EventTypes.encrypted;
 }

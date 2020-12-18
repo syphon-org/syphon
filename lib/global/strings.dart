@@ -50,6 +50,8 @@ class Strings {
   static const buttonCancel = 'cancel';
   static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+  static const buttonConfirmAlt = 'ok';
+  static const buttonBlocKUser = 'block user';
   static const buttonDeleteKeys = 'delete keys';
 
   // Text Buttons

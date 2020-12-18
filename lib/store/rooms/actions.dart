@@ -921,18 +921,12 @@ ThunkAction<AppState> removeRoom({Room room}) {
         roomId: room.id,
       );
 
-      // Remove the room locally if it's already been removed remotely
+      // remove the room locally if it's already been removed remotely
       if (leaveData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.room_unknown) {
-          await store.dispatch(RemoveRoom(roomId: room.id));
-        } else if (leaveData['errcode'] == MatrixErrors.not_found) {
-          await store.dispatch(RemoveRoom(roomId: room.id));
+        if (leaveData['errcode'] != MatrixErrors.room_unknown &&
+            leaveData['errcode'] != MatrixErrors.not_found) {
+          throw leaveData['error'];
         }
-
-        if (room.direct) {
-          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-        }
-        throw leaveData['error'];
       }
 
       final forgetData = await MatrixApi.forgetRoom(
@@ -943,26 +937,21 @@ ThunkAction<AppState> removeRoom({Room room}) {
       );
 
       if (forgetData['errcode'] != null) {
-        if (leaveData['errcode'] == MatrixErrors.not_found) {
-          await store.dispatch(RemoveRoom(roomId: room.id));
+        if (leaveData['errcode'] != MatrixErrors.room_unknown &&
+            leaveData['errcode'] != MatrixErrors.not_found) {
+          throw leaveData['error'];
         }
-        if (room.direct) {
-          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-        }
-
-        if (room.direct) {
-          await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-        }
-        throw forgetData['error'];
       }
 
-      if (room.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-      }
-      await store.dispatch(RemoveRoom(roomId: room.id));
+      await deleteRooms({room.id: room});
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {
+      if (room.direct) {
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+      }
+
+      await store.dispatch(RemoveRoom(roomId: room.id));
       store.dispatch(SetLoading(loading: false));
     }
   };

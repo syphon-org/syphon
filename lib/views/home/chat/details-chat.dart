@@ -7,9 +7,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/details-all-users.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -92,6 +94,27 @@ class ChatDetailsState extends State<ChatDetailsView> {
   void dispose() {
     super.dispose();
     scrollController.dispose();
+  }
+
+  @protected
+  void onBlockUser({BuildContext context, _Props props}) async {
+    final user = props.users.firstWhere(
+      (user) => user.userId != props.currentUser.userId,
+    );
+    return await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => DialogConfirm(
+        title: "Block User",
+        content:
+            "If you block ${user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+        onConfirm: () async {
+          await props.onBlockUser(user);
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
+        onDismiss: () => Navigator.pop(context),
+      ),
+    );
   }
 
   @protected
@@ -468,6 +491,24 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       child: Container(
                         child: Column(
                           children: [
+                            !props.room.direct
+                                ? null
+                                : ListTile(
+                                    onTap: () => onBlockUser(
+                                      context: context,
+                                      props: props,
+                                    ),
+                                    contentPadding: contentPadding,
+                                    title: Text(
+                                      'Block User',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .subtitle1
+                                          .copyWith(
+                                            color: Colors.redAccent,
+                                          ),
+                                    ),
+                                  ),
                             ListTile(
                               onTap: () => this.onLeaveChat(props),
                               contentPadding: contentPadding,
@@ -499,11 +540,13 @@ class ChatDetailsState extends State<ChatDetailsView> {
 class _Props extends Equatable {
   final Room room;
   final bool loading;
+  final User currentUser;
+  final List<User> users;
   final Color roomPrimaryColor;
   final List<Message> messages;
-  final List<User> users;
 
   final Function onLeaveChat;
+  final Function onBlockUser;
   final Function onSelectPrimaryColor;
   final Function onToggleDirectRoom;
   final Function onViewEncryptionKeys;
@@ -513,6 +556,8 @@ class _Props extends Equatable {
     @required this.users,
     @required this.loading,
     @required this.messages,
+    @required this.currentUser,
+    @required this.onBlockUser,
     @required this.onLeaveChat,
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
@@ -532,7 +577,11 @@ class _Props extends Equatable {
       room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
       users: roomUsers(store.state, roomId),
+      currentUser: store.state.authStore.user,
       messages: roomMessages(store.state, roomId),
+      onBlockUser: (User user) async {
+        await store.dispatch(toggleBlockUser(user: user));
+      },
       onLeaveChat: () async {
         await store.dispatch(removeRoom(room: Room(id: roomId)));
       },

@@ -30,6 +30,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
@@ -39,14 +40,6 @@ import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-
-enum ChatOptions {
-  search,
-  allMedia,
-  chatSettings,
-  inviteFriends,
-  muteNotifications,
-}
 
 class ChatViewArguements {
   final String roomId;
@@ -164,9 +157,7 @@ class ChatViewState extends State<ChatView> {
       editorController.value = TextEditingValue(
         text: text,
         selection: TextSelection.fromPosition(
-          TextPosition(
-            offset: text.length,
-          ),
+          TextPosition(offset: text.length),
         ),
       );
     }
@@ -197,7 +188,6 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onUpdateMessage(String text, _Props props) {
     this.setState(() {
       sendable = text != null && text.trim().isNotEmpty;
@@ -235,7 +225,6 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onChangeMediumType({String newMediumType, _Props props}) {
     // noop
     if (mediumType == newMediumType) {
@@ -277,21 +266,18 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  @protected
   onToggleMessageOptions({Message message}) {
     this.setState(() {
       selectedMessage = message;
     });
   }
 
-  @protected
   onDismissMessageOptions() {
     this.setState(() {
       selectedMessage = null;
     });
   }
 
-  @protected
   onViewUserDetails({Message message, String userId}) {
     showModalBottomSheet(
       context: context,
@@ -303,7 +289,6 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
-  @protected
   onSubmitMessage(_Props props) async {
     props.onSendMessage(
       body: editorController.text,
@@ -628,8 +613,9 @@ class ChatViewState extends State<ChatView> {
                       ),
                       child: ChatInput(
                         sendable: sendable,
-                        focusNode: inputFieldNode,
                         mediumType: mediumType,
+                        focusNode: inputFieldNode,
+                        enterSend: props.enterSend,
                         controller: editorController,
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
@@ -651,6 +637,7 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final bool loading;
+  final bool enterSend;
   final ThemeType theme;
   final Map<String, User> users;
   final List<Message> messages;
@@ -678,6 +665,7 @@ class _Props extends Equatable {
     @required this.users,
     @required this.messages,
     @required this.loading,
+    @required this.enterSend,
     @required this.roomPrimaryColor,
     @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
@@ -697,12 +685,13 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        userId,
-        users,
-        messages,
         room,
-        roomPrimaryColor,
+        users,
+        userId,
+        messages,
         loading,
+        enterSend,
+        roomPrimaryColor,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
@@ -715,6 +704,7 @@ class _Props extends Equatable {
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: roomSelectors.room(id: roomId, state: store.state),
       users: store.state.userStore.users,
+      enterSend: store.state.settingsStore.enterSend,
       messages: latestMessages(
         filterMessages(
           wrapOutboxMessages(
