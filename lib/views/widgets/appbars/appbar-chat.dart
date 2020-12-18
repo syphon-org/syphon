@@ -103,8 +103,9 @@ class AppBarChatState extends State<AppBarChat> {
 
   @protected
   void onBlockUser({BuildContext context, _Props props}) async {
-    final user = props.roomUsers
-        .firstWhere((user) => user.userId != props.currentUser.userId);
+    final user = props.roomUsers.firstWhere(
+      (user) => user.userId != props.currentUser.userId,
+    );
     return await showDialog(
       context: context,
       barrierDismissible: true,
