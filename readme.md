@@ -75,9 +75,9 @@ Syphon will always be a not for profit, community driven application.
 ## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
-### environment
+### general
 - you'll to do several things to setup the environment for Syphon
-    - install flutter (stable channel - mobile / dev channel - desktop)
+    - install flutter (stable channel for ios/android)
     - install android studio
     - install cmake version 3.10.2 - (for olm/megolm)
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
@@ -93,34 +93,28 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub get```
         - ```flutter pub run build_runner build```
 
-### configuration
+### ios/android
 - ios and android should follow normal flutter building instructions
-- linux:
 
-1. add dependency overrides before running ```flutter pub get```
+### macos
+0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
+1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
+2. ```flutter config --enable-macos-desktop```
+3. ```brew install libolm``` to install native olm dependencies
+2. ```flutter build macos``` to build the .app bundle
 
-```yml
-dependency_overrides:
-    dartx: ^0.3.0
-    characters: ^0.3.0
-``` 
+### linux
+0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
+1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
+2. ```flutter config --enable-linux-desktop```
+3. ```apt install libolm3``` or ```pacman -S libolm``` or platform equivalent for libolm
+4. ```flutter build linux && flutter build bundle```
 
-2. run ```flutter pub run build_runner build``` to generate the hive mappings for state caches
-3. comment out whats necessary to make the dependences appear like below
-```yml
-dev_dependencies:
-  build_runner: ^1.0.0
-  # flutter_test:
-  #   sdk: flutter
-  # hive_generator: 0.7.0
-
-dependency_overrides:
-  # dartx: ^0.3.0
-  # characters: ^0.3.0
-```
-4. run ```flutter build linux && flutter build bundle```
 5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
 6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+
+### windows
+- not currently supported, feel free to reach out if you can support making builds!
 
 
 ## 📐 Architecture
