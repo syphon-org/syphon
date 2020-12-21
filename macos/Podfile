@@ -68,6 +68,9 @@ target 'Runner' do
   }
 
   # Plugin Pods
+  pod 'OLMKit'
+
+  # Plugin Pods
   plugin_pods = parse_KV_file('../.flutter-plugins')
   plugin_pods.map { |p|
     symlink = File.join(symlink_plugins_dir, p[:name])
