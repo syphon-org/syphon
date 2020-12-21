@@ -19,7 +19,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
-  - FlutterMacOS (from `Flutter/ephemeral/.symlinks/flutter/darwin-x64-release`)
+  - FlutterMacOS (from `Flutter/ephemeral/.symlinks/flutter/darwin-x64`)
   - package_info (from `Flutter/ephemeral/.symlinks/plugins/package_info/macos`)
   - path_provider (from `Flutter/ephemeral/.symlinks/plugins/path_provider/macos`)
   - path_provider_macos (from `Flutter/ephemeral/.symlinks/plugins/path_provider_macos/macos`)
@@ -35,7 +35,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   FlutterMacOS:
-    :path: Flutter/ephemeral/.symlinks/flutter/darwin-x64-release
+    :path: Flutter/ephemeral/.symlinks/flutter/darwin-x64
   package_info:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info/macos
   path_provider:
