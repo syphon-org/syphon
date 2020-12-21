@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.6](https://github.com/syphon-org/syphon/releases/tag/0.1.5) - 20XX-XX-XX
 
-### Added
+### Added 
 
 ### Fixed
 
