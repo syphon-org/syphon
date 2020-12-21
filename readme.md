@@ -79,14 +79,12 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - you'll to do several things to setup the environment for Syphon
     - install flutter (stable channel for ios/android)
     - install android studio
-    - install cmake version 3.10.2 - (for olm/megolm)
+    - install cmake version for workstation platform (for olm/megolm)
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
     - install libs needed for cmake
-        - macos
-            - ```brew install ninja```
-        - linux
-            - ```sudo apt install ninja-build```
+        - macos -> ```brew install ninja```
+        - linux -> ```sudo apt install ninja-build```
     - clone repo and init submodules
         - ```git submodule update --init --recursive```
     - run the following prebuild commands
@@ -97,6 +95,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - ios and android should follow normal flutter building instructions
 
 ### macos
+
 0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
 1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
 2. ```flutter config --enable-macos-desktop```
@@ -104,12 +103,12 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 2. ```flutter build macos``` to build the .app bundle
 
 ### linux
+
 0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
 1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
 2. ```flutter config --enable-linux-desktop```
 3. ```apt install libolm3``` or ```pacman -S libolm``` or platform equivalent for libolm
 4. ```flutter build linux && flutter build bundle```
-
 5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
 6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
 
@@ -119,15 +118,11 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ## 📐 Architecture
 
-### store (current)
+### store
+- views (flutter)
 - state (redux)
-- state cache (redux_persist + [hive](https://github.com/hivedb/hive)) 
-- cold storage ([hive](https://github.com/hivedb/hive))
-
-### store (future)
-- state (redux)
-- state cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
-- cold storage ([sqlcipher](https://pub.dev/packages/sqflite_sqlcipher))
+- cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
+- storage (sembast + sqflite + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
 
 ### assets
 - Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.

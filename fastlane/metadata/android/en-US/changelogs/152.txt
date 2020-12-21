@@ -1,0 +1,4 @@
+- Block users (removes direct chats and hides messages)
+- Lots of improvements in regards to storing data and initial sign in
+- Overhauled caching again for performance and desktop client support
+- Old cache management (hive) was removed, may need to sign out/sign in
