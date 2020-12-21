@@ -95,11 +95,12 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 - ios and android should follow normal flutter building instructions
 
 ### macos
-
 0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
 1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
 2. ```flutter config --enable-macos-desktop```
 3. ```brew install libolm``` to install native olm dependencies
+4. follow instructions for linking the dylib generated from brew to the Syphon project
+  - refer to [macos dylib linking guide](https://flutter.dev/docs/development/platform-integration/c-interop#compiled-dynamic-library-macos)
 2. ```flutter build macos``` to build the .app bundle
 
 ### linux

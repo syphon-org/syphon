@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 // Flutter imports:
@@ -22,11 +23,13 @@ import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
@@ -51,6 +54,7 @@ void main() async {
 
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
+    // DynamicLibrary.open('libolm.dylib');
     // await WindowUtils.setSize(Size(720, 720));
   }
 
