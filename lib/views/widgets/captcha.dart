@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 // Package imports:
-import 'package:flutter_recaptcha_v2/flutter_recaptcha_v2.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 // Project imports:
@@ -41,7 +40,6 @@ class CaptchaState extends State<Captcha> {
   final String publickey;
   final Function onVerified;
 
-  RecaptchaV2Controller recaptchaV2Controller = RecaptchaV2Controller();
   final Completer<WebViewController> controller =
       Completer<WebViewController>();
 
@@ -57,15 +55,12 @@ class CaptchaState extends State<Captcha> {
 
   @protected
   void onMounted() {
-    recaptchaV2Controller.show();
-
     // Confirm public key is correct
     // debugPrint('[captcha wrapper] ${this.publickey}');
   }
 
   @override
   void dispose() {
-    recaptchaV2Controller.dispose();
     super.dispose();
   }
 
