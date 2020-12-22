@@ -4,6 +4,8 @@ import 'dart:ffi';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,13 +25,10 @@ import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
@@ -50,6 +49,16 @@ void main() async {
   // init platform overrides for compatability with dart libs
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  }
+
+  if (Platform.isLinux) {
+    open.overrideFor(OperatingSystem.linux, () {
+      final appDir = File(Platform.script.toFilePath()).parent;
+      final libSqlite = File('${appDir.path}/sqlite3.so');
+      final libOlm = File('${appDir.path}/libolm.so');
+      DynamicLibrary.open(libOlm.path);
+      return DynamicLibrary.open(libSqlite.path);
+    });
   }
 
   // init window mangment for desktop builds
