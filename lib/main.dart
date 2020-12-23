@@ -58,8 +58,8 @@ void main() async {
     PathProviderLinux.register();
 
     final appDir = File(Platform.script.toFilePath()).parent;
-    final libolmDir = File(path.join(appDir.path, '/lib/libolm.so.3'));
-    final libsqliteDir = File(path.join(appDir.path, '/lib/libsqlite3.so'));
+    final libolmDir = File(path.join(appDir.path, 'lib/libolm.so.3'));
+    final libsqliteDir = File(path.join(appDir.path, 'lib/libsqlite3.so'));
     final libolmExists = await libolmDir.exists();
     final libsqliteExists = await libsqliteDir.exists();
 
