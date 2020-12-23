@@ -9,6 +9,7 @@ import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:path_provider_linux/path_provider_linux.dart';
 
 // Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -51,12 +52,12 @@ void main() async {
   }
 
   if (Platform.isLinux) {
+    PathProviderLinux.register();
+
     open.overrideFor(OperatingSystem.linux, () {
       final appDir = File(Platform.script.toFilePath()).parent;
-      final libSqlite = File('${appDir.path}/sqlite3.so');
       final libOlm = File('${appDir.path}/libolm.so');
       DynamicLibrary.open(libOlm.path);
-      return DynamicLibrary.open(libSqlite.path);
     });
   }
 

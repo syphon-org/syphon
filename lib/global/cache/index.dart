@@ -138,8 +138,16 @@ Future<void> saveIV(String iv) async {
   }
 
   // desktop
-  return await File(Cache.ivLocation).create()
-    ..writeAsString(iv, flush: true);
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    return await File(join(directory.path, Cache.ivLocation)).create()
+      ..writeAsString(iv, flush: true);
+  } catch (error) {
+    printError('[saveIV] $error');
+  }
+
+  // error
+  return null;
 }
 
 Future<String> loadIV() async {
@@ -154,7 +162,8 @@ Future<String> loadIV() async {
 
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     try {
-      ivStored = await File(location).readAsString();
+      final directory = await getApplicationDocumentsDirectory();
+      ivStored = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadIV] $error');
     }
@@ -173,8 +182,16 @@ Future<void> saveIVNext(String iv) async {
   }
 
   // desktop
-  return await File(Cache.ivLocationNext).create()
-    ..writeAsString(iv, flush: true);
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    return await File(join(directory.path, Cache.ivLocationNext)).create()
+      ..writeAsString(iv, flush: true);
+  } catch (error) {
+    printError('[saveIVNext] $error');
+  }
+
+  // desktop
+  return null;
 }
 
 Future<String> loadIVNext() async {
@@ -194,7 +211,8 @@ Future<String> loadIVNext() async {
 
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     try {
-      ivStored = await File(location).readAsString();
+      final directory = await getApplicationDocumentsDirectory();
+      ivStored = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadIVNext] $error');
     }
@@ -230,7 +248,9 @@ Future<String> loadKey() async {
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     // try to read key
     try {
-      key = await File(location).readAsString();
+      final directory = await getApplicationDocumentsDirectory();
+      printError('[loadKey] ${directory.path}');
+      key = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadKey] $error');
     }
@@ -238,8 +258,10 @@ Future<String> loadKey() async {
     // generate a new one on failure
     try {
       if (key == null) {
+        final directory = await getApplicationDocumentsDirectory();
         key = generateKey();
-        await File(location).writeAsString(key, flush: true);
+        await File(join(directory.path, location))
+            .writeAsString(key, flush: true);
       }
     } catch (error) {
       printError('[loadKey] $error');
