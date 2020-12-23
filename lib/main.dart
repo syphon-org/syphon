@@ -59,7 +59,7 @@ void main() async {
 
     final appDir = File(Platform.script.toFilePath()).parent;
     final libolmDir = File(path.join(appDir.path, '/lib/libolm.so.3'));
-    final libsqliteDir = File(path.join(appDir.path, '/lib/sqlite3.so'));
+    final libsqliteDir = File(path.join(appDir.path, '/lib/libsqlite3.so'));
     final libolmExists = await libolmDir.exists();
     final libsqliteExists = await libsqliteDir.exists();
 
