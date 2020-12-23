@@ -4,6 +4,8 @@ import 'dart:ffi';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
@@ -53,11 +55,11 @@ void main() async {
 
   if (Platform.isLinux) {
     PathProviderLinux.register();
+    final directory = await getApplicationDocumentsDirectory();
 
     open.overrideFor(OperatingSystem.linux, () {
-      final appDir = File(Platform.script.toFilePath()).parent;
-      final libOlm = File('${appDir.path}/libolm.so');
-      DynamicLibrary.open(libOlm.path);
+      final libOlm = File(path.join(directory.path, 'libolm.so'));
+      return DynamicLibrary.open(libOlm.path);
     });
   }
 
