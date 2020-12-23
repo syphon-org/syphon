@@ -34,7 +34,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 # Non-System-level dependencies
-list(APPEND ExternalSharedLibraries "/usr/lib/x86_64-linux-gnu/libolm.so.3" )
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
@@ -80,7 +79,9 @@ set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 
 # copy shared libs to local build dir
 message( STATUS "\tCopying <name> shared libraries." )
-file( COPY ${ExternalSharedLibraries} DESTINATION ${INSTALL_BUNDLE_LIB_DIR} NO_SOURCE_PERMISSIONS )
+# list(APPEND ExternalSharedLibraries "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" )
+file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/libolm.so.3" NO_SOURCE_PERMISSIONS )
+file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/libolm.so.3" NO_SOURCE_PERMISSIONS )
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)

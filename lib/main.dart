@@ -66,11 +66,15 @@ void main() async {
     printInfo('[linux] exists ${libolmExists} ${libolmDir.path}');
     printInfo('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
 
-    DynamicLibrary.open(libolmDir.path);
+    if (libolmExists) {
+      DynamicLibrary.open(libolmDir.path);
+    }
 
-    open.overrideFor(OperatingSystem.linux, () {
-      return DynamicLibrary.open(libsqliteDir.path);
-    });
+    if (libsqliteExists) {
+      open.overrideFor(OperatingSystem.linux, () {
+        return DynamicLibrary.open(libsqliteDir.path);
+      });
+    }
   }
 
   // init window mangment for desktop builds
