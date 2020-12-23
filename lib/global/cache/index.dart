@@ -57,7 +57,7 @@ Future<Database> initCache() async {
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
-      var directory = await getApplicationDocumentsDirectory();
+      var directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
@@ -101,7 +101,7 @@ Future<void> deleteCache({Database cache}) async {
     var cachePath = '${Cache.cacheKeyMain}.db';
 
     if (Platform.isAndroid || Platform.isIOS) {
-      var directory = await getApplicationDocumentsDirectory();
+      var directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
@@ -139,7 +139,7 @@ Future<void> saveIV(String iv) async {
 
   // desktop
   try {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     return await File(join(directory.path, Cache.ivLocation)).create()
       ..writeAsString(iv, flush: true);
   } catch (error) {
@@ -162,7 +162,7 @@ Future<String> loadIV() async {
 
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     try {
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getApplicationSupportDirectory();
       ivStored = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadIV] $error');
@@ -183,7 +183,7 @@ Future<void> saveIVNext(String iv) async {
 
   // desktop
   try {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     return await File(join(directory.path, Cache.ivLocationNext)).create()
       ..writeAsString(iv, flush: true);
   } catch (error) {
@@ -211,7 +211,7 @@ Future<String> loadIVNext() async {
 
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     try {
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getApplicationSupportDirectory();
       ivStored = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadIVNext] $error');
@@ -248,8 +248,7 @@ Future<String> loadKey() async {
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     // try to read key
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      printError('[loadKey] ${directory.path}');
+      final directory = await getApplicationSupportDirectory();
       key = await File(join(directory.path, location)).readAsString();
     } catch (error) {
       printError('[loadKey] $error');
@@ -258,7 +257,7 @@ Future<String> loadKey() async {
     // generate a new one on failure
     try {
       if (key == null) {
-        final directory = await getApplicationDocumentsDirectory();
+        final directory = await getApplicationSupportDirectory();
         key = generateKey();
         await File(join(directory.path, location))
             .writeAsString(key, flush: true);

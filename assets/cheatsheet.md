@@ -108,7 +108,7 @@ if (true) {
 
   try {
     if (Platform.isIOS || Platform.isAndroid) {
-      storageLocation = await getApplicationDocumentsDirectory();
+      storageLocation = await getApplicationSupportDirectory();
       return storageLocation.path;
     }
 
@@ -124,7 +124,7 @@ if (true) {
     }
 
     if (Platform.isLinux) {
-      storageLocation = await getApplicationDocumentsDirectory();
+      storageLocation = await getApplicationSupportDirectory();
       return storageLocation.path;
     }
 
@@ -154,3 +154,30 @@ if (true) {
 
 ### captcha
 flutter_recaptcha_v2: 0.1.0 used as reference for webview captcha
+
+
+```dart 
+ Future<String> get _localPath async {
+   final directory = await getApplicationDocumentsDirectory();
+   return directory.path;
+ }
+
+ Future<File> get _localFile async {
+   final path = await _localPath;
+   return File('$path/matrix.json');
+ }
+
+ Future<dynamic> readFullSyncJson() async {
+   try {
+     final file = await _localFile;
+     String contents = await file.readAsString();
+     return await jsonDecode(contents);
+   } catch (error) {
+     // If encountering an error, return 0.
+     debugPrint('[readFullSyncJson] $error');
+     return null;
+   } finally {
+     debugPrint('** Read State From Disk Successfully **');
+   }
+ }
+```

@@ -46,6 +46,7 @@ void main() async {
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
     printDebug = (String message, {String title}) {};
+    printInfo = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -55,7 +56,8 @@ void main() async {
 
   if (Platform.isLinux) {
     PathProviderLinux.register();
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
+    printInfo('[linux] ${directory.path}');
 
     open.overrideFor(OperatingSystem.linux, () {
       final libOlm = File(path.join(directory.path, 'libolm.so'));
@@ -65,8 +67,9 @@ void main() async {
 
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
+    final directory = await getApplicationSupportDirectory();
+    printInfo('[macos] ${directory.path}');
     // DynamicLibrary.open('libolm.dylib');
-    // await WindowUtils.setSize(Size(720, 720));
   }
 
   // init background sync for Android only
