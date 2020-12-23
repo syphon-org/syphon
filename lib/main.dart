@@ -63,17 +63,18 @@ void main() async {
     final libolmExists = await libolmDir.exists();
     final libsqliteExists = await libsqliteDir.exists();
 
-    printInfo('[linux] exists ${libolmExists} ${libolmDir.path}');
-    printInfo('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
-
     if (libolmExists) {
       DynamicLibrary.open(libolmDir.path);
+    } else {
+      printError('[linux] exists ${libolmExists} ${libolmDir.path}');
     }
 
     if (libsqliteExists) {
       open.overrideFor(OperatingSystem.linux, () {
         return DynamicLibrary.open(libsqliteDir.path);
       });
+    } else {
+      printError('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
     }
   }
 

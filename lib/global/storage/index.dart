@@ -114,7 +114,7 @@ Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
       storage: storage,
       encrypted: room.encryptionEnabled,
     );
-    printError(
+    printInfo(
       '[loadMessages] ${messages[room.id]?.length} ${room.name} loaded',
     );
   }
