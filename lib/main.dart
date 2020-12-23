@@ -56,13 +56,20 @@ void main() async {
 
   if (Platform.isLinux) {
     PathProviderLinux.register();
-    final directory = await getApplicationSupportDirectory();
-    printInfo('[linux] ${directory.path}');
+
+    final appDir = File(Platform.script.toFilePath()).parent;
+    final libolmDir = File(path.join(appDir.path, '/lib/libolm.so.3'));
+    final libsqliteDir = File(path.join(appDir.path, '/lib/sqlite3.so'));
+    final libolmExists = await libolmDir.exists();
+    final libsqliteExists = await libsqliteDir.exists();
+
+    printInfo('[linux] exists ${libolmExists} ${libolmDir.path}');
+    printInfo('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
+
+    DynamicLibrary.open(libolmDir.path);
 
     open.overrideFor(OperatingSystem.linux, () {
-      final appDir = File(Platform.script.toFilePath()).parent;
-      final olmDir = File(path.join(appDir.path, '/lib/libolm.so.3'));
-      return DynamicLibrary.open(olmDir.path);
+      return DynamicLibrary.open(libsqliteDir.path);
     });
   }
 
