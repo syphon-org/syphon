@@ -13,3 +13,7 @@ cd $SYPHON_ROOT/ios/olm && make
 
 # olm - copy to linux root
 cp $SYPHON_ROOT/ios/olm/build/libolm.so.3.2.1 $SYPHON_ROOT/linux/libolm.so
+
+# or from shared libraries
+cp /usr/lib/x86_64-linux-gnu/libolm.so.3.1.3  $SYPHON_ROOT/build/linux/release/libolm.so.3
+cp /usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6  $SYPHON_ROOT/build/linux/release/libsqlite3.so
