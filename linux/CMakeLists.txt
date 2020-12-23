@@ -80,8 +80,8 @@ set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 # copy shared libs to local build dir
 message( STATUS "\tCopying <name> shared libraries." )
 # list(APPEND ExternalSharedLibraries "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" )
-file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/libolm.so.3" NO_SOURCE_PERMISSIONS )
-file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/libolm.so.3" NO_SOURCE_PERMISSIONS )
+file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION INSTALL_BUNDLE_LIB_DIR NO_SOURCE_PERMISSIONS )
+file( COPY "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6" DESTINATION INSTALL_BUNDLE_LIB_DIR NO_SOURCE_PERMISSIONS )
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
