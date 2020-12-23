@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# install dev lib olm
+sudo apt install libolm3
+
 # olm - pull submodule
 git submodule update --init -recursive
 
