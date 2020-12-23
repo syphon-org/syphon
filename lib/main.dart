@@ -60,8 +60,9 @@ void main() async {
     printInfo('[linux] ${directory.path}');
 
     open.overrideFor(OperatingSystem.linux, () {
-      final libOlm = File(path.join(directory.path, 'libolm.so'));
-      return DynamicLibrary.open(libOlm.path);
+      final appDir = File(Platform.script.toFilePath()).parent;
+      final olmDir = File(path.join(appDir.path, '/lib/libolm.so.3'));
+      return DynamicLibrary.open(olmDir.path);
     });
   }
 
