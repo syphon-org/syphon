@@ -1,7 +1,9 @@
 #!/bin/bash
+# https://cmake.org/pipermail/cmake/2013-July/055207.html
 
 # install dev lib olm
 sudo apt install libolm3
+sudo apt install libsqlite3
 
 # olm - pull submodule
 git submodule update --init -recursive
