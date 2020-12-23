@@ -5,7 +5,6 @@ import 'dart:io';
 
 // Flutter imports:
 import 'package:sqlite3/open.dart';
-import 'package:sqlite3/sqlite3.dart';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
