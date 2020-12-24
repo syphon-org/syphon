@@ -7,6 +7,7 @@ set(APPLICATION_ID "org.tether.tether")
 cmake_policy(SET CMP0063 NEW)
 
 set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Configure build options.
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -33,7 +34,6 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
-# Non-System-level dependencies
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
@@ -45,7 +45,23 @@ add_executable(${BINARY_NAME}
 )
 apply_standard_settings(${BINARY_NAME})
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
-target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK) 
+target_link_libraries(${BINARY_NAME} PRIVATE olm)
+
+
+# Non-System-level dependencies
+find_package (SQLite3 REQUIRED) 
+if (SQLITE3_FOUND)
+  include_directories(/usr/include)
+  include_directories(${SQLITE3_INCLUDE_DIRS}) 
+endif (SQLITE3_FOUND)
+
+find_package (Olm REQUIRED) 
+if (OLM_FOUND)
+  include_directories(/usr/include)
+  include_directories(${OLM_INCLUDE_DIRS}) 
+endif (OLM_FOUND)
+
 add_dependencies(${BINARY_NAME} flutter_assemble)
 # Only the install-generated bundle's copy of the executable will launch
 # correctly, since the resources must in the right relative locations. To avoid
@@ -59,7 +75,6 @@ set_target_properties(${BINARY_NAME}
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
-
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
@@ -76,12 +91,27 @@ install(CODE "
 
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${INSTALL_BUNDLE_LIB_DIR})
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
 
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
+  COMPONENT Runtime)
+
+get_filename_component(SQLITE3_LIBRARY "${SQLITE3_LIBRARY}" REALPATH)
+get_filename_component(OLM_LIBRARY "${OLM_LIBRARY}" REALPATH)
+
+install(FILES "${SQLITE3_LIBRARIES}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime)
+
+install(FILES "${OLM_LIBRARIES}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime)
+
+install(FILES "${SQLITE3_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime)
+
+install(FILES "${OLM_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
@@ -107,9 +137,3 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
-
-# copy shared libs to local build dir
-message( STATUS "\tCopying shared libraries." )
-# list(APPEND ExternalSharedLibraries "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" )
-file( COPY "/usr/lib/x86_64-linux-gnu/libolm.so.3.1.3" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" NO_SOURCE_PERMISSIONS )
-file( COPY "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" NO_SOURCE_PERMISSIONS )
