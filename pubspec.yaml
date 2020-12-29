@@ -36,6 +36,7 @@ description: a privacy focused matrix client
 # android icons - use Android Studio with generic png
 
 # env setup
+# - git submodule update --init --recursive
 # - defaults delete com.apple.dt.Xcode # Reset XCode settings
 # - synctl start on 192.168.1.2 or respective local server
 # - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
@@ -126,8 +127,8 @@ dev_dependencies:
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
 
-dependency_overrides:
-  intl: ^0.17.0-nullsafety.2 # <-- override for desktop builds on dev channel
+# dependency_overrides:
+# intl: ^0.17.0-nullsafety.2 # <-- override for desktop builds on dev channel
 
 flutter_icons:
   android: true
