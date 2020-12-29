@@ -66,7 +66,7 @@ Syphon will always be a not for profit, community driven application.
 - customize themes and colors throughout the app
 
 ## 🚀 Goals
-- [ ] desktop clients meet parity with mobile
+- [x] desktop clients meet parity with mobile
 - [ ] screen lock and pin protected cache features
 - [ ] P2P messaging through a locally run server on the client
 - [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
