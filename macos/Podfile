@@ -76,6 +76,9 @@ target 'Runner' do
       pod p[:name], :path => File.join(symlink, 'macos')
     end
   }
+
+  # Plugin Pods
+  pod 'OLMKit'
 end
 
 # Prevent Cocoapods from embedding a second Flutter framework and causing an error with the new Xcode build system.

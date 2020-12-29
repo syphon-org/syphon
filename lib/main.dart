@@ -1,12 +1,17 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/open.dart';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:path_provider_linux/path_provider_linux.dart';
 
 // Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -22,7 +27,6 @@ import 'package:syphon/global/storage/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -42,6 +46,7 @@ void main() async {
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};
     printDebug = (String message, {String title}) {};
+    printInfo = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -49,9 +54,35 @@ void main() async {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
+  if (Platform.isLinux) {
+    PathProviderLinux.register();
+
+    final appDir = File(Platform.script.toFilePath()).parent;
+    final libolmDir = File(path.join(appDir.path, 'lib/libolm.so'));
+    final libsqliteDir = File(path.join(appDir.path, 'lib/libsqlite3.so'));
+    final libolmExists = await libolmDir.exists();
+    final libsqliteExists = await libsqliteDir.exists();
+
+    if (libolmExists) {
+      DynamicLibrary.open(libolmDir.path);
+    } else {
+      printError('[linux] exists ${libolmExists} ${libolmDir.path}');
+    }
+
+    if (libsqliteExists) {
+      open.overrideFor(OperatingSystem.linux, () {
+        return DynamicLibrary.open(libsqliteDir.path);
+      });
+    } else {
+      printError('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
+    }
+  }
+
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
-    // await WindowUtils.setSize(Size(720, 720));
+    final directory = await getApplicationSupportDirectory();
+    printInfo('[macos] ${directory.path}');
+    // DynamicLibrary.open('libolm.dylib');
   }
 
   // init background sync for Android only

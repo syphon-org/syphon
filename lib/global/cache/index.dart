@@ -28,9 +28,9 @@ class Cache {
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
 
   // cache key identifiers
-  static const ivKeyLocation = '${Values.appNameLabel}@ivKey';
-  static const ivKeyNextLocation = '${Values.appNameLabel}@ivKeyNext';
-  static const cryptKeyLocation = '${Values.appNameLabel}@cryptKey';
+  static const ivLocation = '${Values.appNameLabel}@ivKey';
+  static const ivLocationNext = '${Values.appNameLabel}@ivKeyNext';
+  static const keyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
   static const userIdKey = 'userId';
@@ -48,16 +48,16 @@ class Cache {
  */
 Future<Database> initCache() async {
   // Configure cache encryption/decryption instance
-  Cache.ivKey = await unlockIVKey();
-  Cache.ivKeyNext = await unlockIVKeyNext();
-  Cache.cryptKey = await unlockCryptKey();
+  Cache.ivKey = await loadIV();
+  Cache.ivKeyNext = await loadIVNext();
+  Cache.cryptKey = await loadKey();
 
   try {
     var cachePath = '${Cache.cacheKeyMain}.db';
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
-      var directory = await getApplicationDocumentsDirectory();
+      var directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
@@ -101,7 +101,7 @@ Future<void> deleteCache({Database cache}) async {
     var cachePath = '${Cache.cacheKeyMain}.db';
 
     if (Platform.isAndroid || Platform.isIOS) {
-      var directory = await getApplicationDocumentsDirectory();
+      var directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
@@ -120,73 +120,152 @@ Future<void> deleteCache({Database cache}) async {
   }
 }
 
-String createIVKey() {
+String generateIV() {
   return Key.fromSecureRandom(16).base64;
 }
 
-Future<void> saveIVKey(String ivKey) async {
-  // Check if storage has been created before
-  return await FlutterSecureStorage().write(
-    key: Cache.ivKeyLocation,
-    value: ivKey,
-  );
+String generateKey() {
+  return Key.fromSecureRandom(32).base64;
 }
 
-Future<void> saveIVKeyNext(String ivKey) async {
-  // Check if storage has been created before
-  return await FlutterSecureStorage().write(
-    key: Cache.ivKeyNextLocation,
-    value: ivKey,
-  );
-}
+Future<void> saveIV(String iv) async {
+  // mobile
+  if (Platform.isAndroid || Platform.isIOS) {
+    return await FlutterSecureStorage().write(
+      key: Cache.ivLocation,
+      value: iv,
+    );
+  }
 
-Future<String> unlockIVKey() async {
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
-
-  final ivKeyStored = await storageEngine.read(
-    key: Cache.ivKeyLocation,
-  );
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivKeyStored == null ? createIVKey() : ivKeyStored;
-}
-
-Future<String> unlockIVKeyNext() async {
-  // Check if storage has been created before
-  final storageEngine = FlutterSecureStorage();
-
-  final ivKeyStored = await storageEngine.read(
-    key: Cache.ivKeyNextLocation,
-  );
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivKeyStored == null ? createIVKey() : ivKeyStored;
-}
-
-Future<String> unlockCryptKey() async {
-  final storageEngine = FlutterSecureStorage();
-
-  var cryptKey;
-
+  // desktop
   try {
-    // Check if crypt key already exists
-    cryptKey = await storageEngine.read(
-      key: Cache.cryptKeyLocation,
-    );
+    final directory = await getApplicationSupportDirectory();
+    return await File(join(directory.path, Cache.ivLocation)).create()
+      ..writeAsString(iv, flush: true);
   } catch (error) {
-    printError('[unlockCryptKey] ${error}');
+    printError('[saveIV] $error');
+  }
+
+  // error
+  return null;
+}
+
+Future<String> loadIV() async {
+  final location = Cache.ivLocation;
+  var ivStored;
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    final storage = FlutterSecureStorage();
+
+    ivStored = await storage.read(key: location);
+  }
+
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    try {
+      final directory = await getApplicationSupportDirectory();
+      ivStored = await File(join(directory.path, location)).readAsString();
+    } catch (error) {
+      printError('[loadIV] $error');
+    }
+  }
+  // Create a encryptionKey if a serialized one is not found
+  return ivStored == null ? generateIV() : ivStored;
+}
+
+Future<void> saveIVNext(String iv) async {
+  // mobile
+  if (Platform.isAndroid || Platform.isIOS) {
+    return await FlutterSecureStorage().write(
+      key: Cache.ivLocationNext,
+      value: iv,
+    );
+  }
+
+  // desktop
+  try {
+    final directory = await getApplicationSupportDirectory();
+    return await File(join(directory.path, Cache.ivLocationNext)).create()
+      ..writeAsString(iv, flush: true);
+  } catch (error) {
+    printError('[saveIVNext] $error');
+  }
+
+  // desktop
+  return null;
+}
+
+Future<String> loadIVNext() async {
+  final location = Cache.ivLocationNext;
+
+  var ivStored;
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    final storage = FlutterSecureStorage();
+
+    try {
+      ivStored = await storage.read(key: location);
+    } catch (error) {
+      printError('[loadIVNext] $error');
+    }
+  }
+
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    try {
+      final directory = await getApplicationSupportDirectory();
+      ivStored = await File(join(directory.path, location)).readAsString();
+    } catch (error) {
+      printError('[loadIVNext] $error');
+    }
   }
 
   // Create a encryptionKey if a serialized one is not found
-  if (cryptKey == null) {
-    cryptKey = Key.fromSecureRandom(32).base64;
+  return ivStored == null ? generateIV() : ivStored;
+}
 
-    await storageEngine.write(
-      key: Cache.cryptKeyLocation,
-      value: cryptKey,
-    );
+Future<String> loadKey() async {
+  final location = Cache.keyLocation;
+  var key;
+
+  // mobile
+  if (Platform.isAndroid || Platform.isIOS) {
+    final storage = FlutterSecureStorage();
+
+    // try to read key
+    try {
+      key = await storage.read(key: location);
+    } catch (error) {
+      printError('[loadKey] ${error}');
+    }
+
+    // generate a new one on failure
+    if (key == null) {
+      key = generateKey();
+      await storage.write(key: Cache.keyLocation, value: key);
+    }
   }
 
-  return cryptKey;
+  // desktop
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    // try to read key
+    try {
+      final directory = await getApplicationSupportDirectory();
+      key = await File(join(directory.path, location)).readAsString();
+    } catch (error) {
+      printError('[loadKey] $error');
+    }
+
+    // generate a new one on failure
+    try {
+      if (key == null) {
+        final directory = await getApplicationSupportDirectory();
+        key = generateKey();
+        await File(join(directory.path, location))
+            .writeAsString(key, flush: true);
+      }
+    } catch (error) {
+      printError('[loadKey] $error');
+    }
+  }
+
+  return key;
 }

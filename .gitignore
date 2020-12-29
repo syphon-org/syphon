@@ -48,3 +48,9 @@ local.properties
 # Ignore compiled C code
 android/app/.cxx/*
 .hidden*
+
+# ignore olm import for macos
+macos/olm
+
+# ignore flutter pod spec
+Flutter.podspec

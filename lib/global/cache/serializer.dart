@@ -51,10 +51,10 @@ class CacheSerializer implements StateSerializer<AppState> {
     // if the previously schedule task has not finished
     Future.microtask(() async {
       // // create a new IV for the encrypted cache
-      Cache.ivKey = createIVKey();
+      Cache.ivKey = generateIV();
 
       // // backup the IV in case the app is force closed before caching finishes
-      await saveIVKeyNext(Cache.ivKey);
+      await saveIVNext(Cache.ivKey);
 
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
@@ -120,7 +120,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       }));
 
       // Rotate encryption for the next save
-      await saveIVKey(Cache.ivKey);
+      await saveIV(Cache.ivKey);
 
       return Future.value(null);
     });

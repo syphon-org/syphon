@@ -24,7 +24,7 @@ class Storage {
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const mainKey = '${Values.appNameLabel}-main-storage.db';
+  static const mainLocation = '${Values.appNameLabel}-main-storage.db';
 }
 
 Future<Database> initStorage() async {
@@ -53,9 +53,8 @@ Future<Database> initStorage() async {
 
     final codec = getEncryptSembastCodec(password: Cache.cryptKey);
 
-    // TODO: make actions have reference to the storage/cache through state
     Storage.main = await storageFactory.openDatabase(
-      Storage.mainKey,
+      Storage.mainLocation,
       codec: codec,
     );
 
@@ -90,7 +89,7 @@ Future<void> deleteStorage() async {
     }
 
     Storage.main = await storageFactory.deleteDatabase(
-      Storage.mainKey,
+      Storage.mainLocation,
     );
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
@@ -115,7 +114,7 @@ Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
       storage: storage,
       encrypted: room.encryptionEnabled,
     );
-    printError(
+    printInfo(
       '[loadMessages] ${messages[room.id]?.length} ${room.name} loaded',
     );
   }
