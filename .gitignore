@@ -51,3 +51,6 @@ android/app/.cxx/*
 
 # ignore olm import for macos
 macos/olm
+
+# ignore flutter pod spec
+Flutter.podspec
