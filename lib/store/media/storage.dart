@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 
@@ -24,7 +25,7 @@ Future<void> saveMedia(
 
   return await storage.transaction((txn) async {
     final record = store.record(mxcUri);
-    await record.put(txn, json.encode(data as List<int>));
+    await record.put(txn, await compute(jsonEncode, data));
   });
 }
 

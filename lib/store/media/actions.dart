@@ -114,6 +114,11 @@ ThunkAction<AppState> fetchThumbnail(
         return;
       }
 
+      store.dispatch(UpdateMediaChecks(
+        mxcUri: mxcUri,
+        status: MediaStatus.CHECKING,
+      ));
+
       // check if the media is only located in cold storage
       if (await checkMedia(mxcUri, storage: Storage.main)) {
         final storedData = await loadMedia(
@@ -126,11 +131,6 @@ ThunkAction<AppState> fetchThumbnail(
           return;
         }
       }
-
-      store.dispatch(UpdateMediaChecks(
-        mxcUri: mxcUri,
-        status: MediaStatus.CHECKING,
-      ));
 
       final params = {
         'protocol': protocol,

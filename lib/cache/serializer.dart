@@ -66,7 +66,6 @@ class CacheSerializer implements StateSerializer<AppState> {
           try {
             jsonEncoded = json.encode(store);
           } catch (error) {
-            jsonEncoded = json.encode(store);
             print(
               '[CacheSerializer] ${type} failed $error',
             );
