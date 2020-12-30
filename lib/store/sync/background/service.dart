@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 
 // Dart imports:
 import 'dart:math';
@@ -42,6 +42,7 @@ class BackgroundSync {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
       debugPrint('[BackgroundSync.init] ${error}');
+      return null;
     }
   }
 

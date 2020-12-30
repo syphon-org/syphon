@@ -8,9 +8,9 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/algos.dart';
-import 'package:syphon/global/cache/storage.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/cache/storage.dart';
+import 'package:syphon/storage/index.dart';
+import 'package:syphon/storage/middleware.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
@@ -22,7 +22,7 @@ import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/events/reducer.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
-import 'package:syphon/global/cache/serializer.dart';
+import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
@@ -144,7 +144,11 @@ Future<Store> initStore(Database cache, Database storage) async {
   final Store<AppState> store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
-    middleware: [thunkMiddleware, persistor.createMiddleware()],
+    middleware: [
+      thunkMiddleware,
+      persistor.createMiddleware(),
+      storageMiddleware
+    ],
   );
 
   return Future.value(store);

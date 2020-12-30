@@ -12,18 +12,19 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -177,6 +178,9 @@ ThunkAction<AppState> startAuthObserver() {
     final Function onAuthStateChanged = (User user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchUserCurrentProfile());
+
+        // save auth to cold storage, redundancy for cache failure
+        saveAuth(store.state.authStore, storage: Storage.main);
 
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {

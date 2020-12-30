@@ -11,7 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -143,10 +143,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       );
 
       printDebug(
-        '[syncRooms] ${room.name} new msg count ${room.messagesNew.length}',
-      );
-      printDebug(
-        '[syncRooms] ${room.name} ids msg count ${room.messageIds.length}',
+        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length}',
       );
 
       // update cold storage

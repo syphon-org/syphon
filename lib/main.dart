@@ -18,10 +18,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';

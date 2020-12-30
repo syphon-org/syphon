@@ -19,6 +19,12 @@ import 'package:syphon/store/index.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
+class MediaStatus {
+  static const FAILURE = 'failure';
+  static const CHECKING = 'checking';
+  static const SUCCESS = 'success';
+}
+
 class UpdateMediaChecks {
   final String mxcUri;
   final String status;
@@ -37,6 +43,13 @@ class UpdateMediaCache {
     this.mxcUri,
     this.data,
   });
+}
+
+ThunkAction<AppState> loadMedia({
+  File localFile,
+  String mediaName = 'photo',
+}) {
+  return (Store<AppState> store) async {};
 }
 
 ThunkAction<AppState> uploadMedia({
@@ -88,25 +101,28 @@ ThunkAction<AppState> fetchThumbnail(
       final mediaCache = store.state.mediaStore.mediaCache;
       final mediaChecks = store.state.mediaStore.mediaChecks;
 
-      // No op if cache is corrupted
+      // Noop if cache is corrupted
       if (mediaCache == null) {
         return;
       }
 
-      // No op if already cached data
+      // Noop if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
-      // No op if already fetching or failed
+      // Noop if currently checking or failed
       if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri] == 'checking' ||
-              mediaChecks[mxcUri] == 'failure') &&
+          (mediaChecks[mxcUri] == MediaStatus.CHECKING ||
+              mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {
         return;
       }
 
-      store.dispatch(UpdateMediaChecks(mxcUri: mxcUri, status: 'checking'));
+      store.dispatch(UpdateMediaChecks(
+        mxcUri: mxcUri,
+        status: MediaStatus.CHECKING,
+      ));
 
       final params = {
         'protocol': protocol,
@@ -129,7 +145,10 @@ ThunkAction<AppState> fetchThumbnail(
       store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes));
     } catch (error) {
       debugPrint('[fetchThumbnail] $mxcUri $error');
-      store.dispatch(UpdateMediaChecks(mxcUri: mxcUri, status: 'failure'));
+      store.dispatch(UpdateMediaChecks(
+        mxcUri: mxcUri,
+        status: MediaStatus.FAILURE,
+      ));
     }
   };
 }

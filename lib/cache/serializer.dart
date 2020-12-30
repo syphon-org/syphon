@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/cache/index.dart';
-import 'package:syphon/global/cache/threadables.dart';
+import 'package:syphon/cache/index.dart';
+import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
@@ -32,7 +32,7 @@ import 'package:syphon/store/settings/state.dart';
  */
 class CacheSerializer implements StateSerializer<AppState> {
   final Database cache;
-  final Map<String, Map<dynamic, dynamic>> preloaded;
+  final Map<String, dynamic> preloaded;
 
   CacheSerializer({this.cache, this.preloaded});
 
@@ -41,10 +41,9 @@ class CacheSerializer implements StateSerializer<AppState> {
     final List<Object> stores = [
       state.authStore,
       state.syncStore,
-      state.cryptoStore,
       state.mediaStore,
+      state.cryptoStore,
       state.settingsStore,
-      state.userStore,
     ];
 
     // Queue up a cache saving will wait
@@ -53,7 +52,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       // // create a new IV for the encrypted cache
       Cache.ivKey = generateIV();
 
-      // // backup the IV in case the app is force closed before caching finishes
+      // backup the IV in case the app is force closed before caching finishes
       await saveIVNext(Cache.ivKey);
 
       // run through all redux stores for encryption and encoding
@@ -130,12 +129,14 @@ class CacheSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
-    AuthStore authStore = AuthStore();
-    SyncStore syncStore = SyncStore();
-    UserStore userStore = UserStore();
-    CryptoStore cryptoStore = CryptoStore();
-    MediaStore mediaStore = MediaStore();
-    SettingsStore settingsStore = SettingsStore();
+    AuthStore authStore;
+    SyncStore syncStore;
+    UserStore userStore;
+    CryptoStore cryptoStore;
+    MediaStore mediaStore;
+    RoomStore roomStore;
+    EventStore eventStore;
+    SettingsStore settingsStore;
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
@@ -167,8 +168,12 @@ class CacheSerializer implements StateSerializer<AppState> {
           case 'UserStore':
             userStore = UserStore.fromJson(store);
             break;
+          case 'EventStore':
+            eventStore = EventStore.fromJson(store);
+            break;
           case 'RoomStore':
-          // --- cold storage only ---
+            roomStore = RoomStore.fromJson(store);
+            break;
           default:
             break;
         }
@@ -179,20 +184,23 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStore ?? AuthStore(),
+      authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
+      cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
+      roomStore: roomStore ??
+          RoomStore().copyWith(
+            rooms: preloaded['rooms'] ?? {},
+          ),
+      userStore: userStore ??
+          UserStore().copyWith(
+            users: preloaded['users'] ?? {},
+          ),
+      eventStore: eventStore ??
+          EventStore().copyWith(
+            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
+          ),
       syncStore: syncStore ?? SyncStore(),
-      cryptoStore: cryptoStore ?? CryptoStore(),
       mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
-      roomStore: RoomStore().copyWith(
-        rooms: preloaded['rooms'] ?? {},
-      ),
-      userStore: userStore.copyWith(
-        users: preloaded['users'] ?? {},
-      ),
-      eventStore: EventStore().copyWith(
-        messages: preloaded['messages'] ?? Map<String, List<Message>>(),
-      ),
     );
   }
 }

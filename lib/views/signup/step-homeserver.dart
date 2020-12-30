@@ -13,12 +13,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
-
-// Store
-
-// Styling
 
 class HomeserverStep extends StatefulWidget {
   const HomeserverStep({Key key}) : super(key: key);

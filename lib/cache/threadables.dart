@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/print.dart';
 
 Future<String> encryptJsonBackground(Map params) async {

@@ -22,6 +22,20 @@ Future<void> saveMessages(
   });
 }
 
+Future<void> saveReceipts(
+  Map<String, ReadStatus> receipts, {
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(RECEIPTS);
+
+  return await storage.transaction((txn) async {
+    for (String roomId in receipts.keys) {
+      final record = store.record(roomId);
+      await record.put(txn, json.encode(receipts[roomId]));
+    }
+  });
+}
+
 /**
  * Load Messages (Cold Storage)
  * 
@@ -56,18 +70,4 @@ Future<List<Message>> loadMessages(
     printError(error.toString(), title: 'loadMessages');
     return null;
   }
-}
-
-Future<void> saveReceipts(
-  Map<String, ReadStatus> receipts, {
-  Database storage,
-}) async {
-  final store = StoreRef<String, String>(RECEIPTS);
-
-  return await storage.transaction((txn) async {
-    for (String roomId in receipts.keys) {
-      final record = store.record(roomId);
-      await record.put(txn, json.encode(receipts[roomId]));
-    }
-  });
 }

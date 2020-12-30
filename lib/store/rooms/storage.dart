@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Future<void> saveRooms(

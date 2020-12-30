@@ -491,24 +491,25 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       child: Container(
                         child: Column(
                           children: [
-                            !props.room.direct
-                                ? null
-                                : ListTile(
-                                    onTap: () => onBlockUser(
-                                      context: context,
-                                      props: props,
-                                    ),
-                                    contentPadding: contentPadding,
-                                    title: Text(
-                                      'Block User',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1
-                                          .copyWith(
-                                            color: Colors.redAccent,
-                                          ),
-                                    ),
-                                  ),
+                            Visibility(
+                              visible: props.room.direct,
+                              child: ListTile(
+                                onTap: () => onBlockUser(
+                                  context: context,
+                                  props: props,
+                                ),
+                                contentPadding: contentPadding,
+                                title: Text(
+                                  'Block User',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1
+                                      .copyWith(
+                                        color: Colors.redAccent,
+                                      ),
+                                ),
+                              ),
+                            ),
                             ListTile(
                               onTap: () => this.onLeaveChat(props),
                               contentPadding: contentPadding,
@@ -549,7 +550,7 @@ class _Props extends Equatable {
   final Function onBlockUser;
   final Function onSelectPrimaryColor;
   final Function onToggleDirectRoom;
-  final Function onViewEncryptionKeys;
+  // final Function onViewEncryptionKeys;
 
   _Props({
     @required this.room,
@@ -562,7 +563,7 @@ class _Props extends Equatable {
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
     @required this.onToggleDirectRoom,
-    @required this.onViewEncryptionKeys,
+    // @required this.onViewEncryptionKeys,
   });
 
   @override

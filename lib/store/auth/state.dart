@@ -12,17 +12,15 @@ import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(ignoreUnannotated: true)
 class AuthStore extends Equatable {
+  @JsonKey(nullable: true)
   final User user;
 
-  @JsonKey(ignore: true)
   User get currentUser => user;
 
-  @JsonKey(ignore: true)
   final StreamController<User> authObserver;
 
-  @JsonKey(ignore: true)
   Stream<User> get onAuthStateChanged =>
       authObserver != null ? authObserver.stream : null;
 
