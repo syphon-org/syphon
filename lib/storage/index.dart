@@ -14,6 +14,7 @@ import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/user/storage.dart';
@@ -120,6 +121,10 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     storage: storage,
   );
 
+  final media = await loadMediaAll(
+    storage: storage,
+  );
+
   final crypto = await loadCrypto(
     storage: storage,
   );
@@ -131,15 +136,13 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
       storage: storage,
       encrypted: room.encryptionEnabled,
     );
-    // printInfo(
-    //   '[loadMessages] ${messages[room.id]?.length} ${room.name} loaded',
-    // );
   }
 
   return {
     'auth': auth,
     'users': users,
     'rooms': rooms,
+    'media': media,
     'crypto': crypto,
     'messages': messages.isNotEmpty ? messages : null,
   };

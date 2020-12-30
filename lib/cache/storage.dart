@@ -8,14 +8,12 @@ import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/media/state.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/state.dart';
 
 final List<Object> stores = [
   AuthStore(),
   SyncStore(),
-  MediaStore(),
   CryptoStore(),
   SettingsStore(),
 ];

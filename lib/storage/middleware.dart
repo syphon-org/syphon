@@ -1,10 +1,13 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/storage.dart';
 
 /// Middleware used for Redux which saves on each action.
 dynamic storageMiddleware<State>(
@@ -15,6 +18,20 @@ dynamic storageMiddleware<State>(
   next(action);
 
   switch (action.runtimeType) {
+    // auth store - CUD ops
+    case SetUser:
+      printInfo(
+        '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
+      );
+      saveAuth(store.state.authStore, storage: Storage.main);
+      break;
+    // media store - CU ops
+    case UpdateMediaCache:
+      // printInfo(
+      //   '[storageMiddleware] saving media ${action.runtimeType.toString()}',
+      // );
+      // saveMedia(action.mxcUri, action.data, storage: Storage.main);
+      break;
     // crypto store - CUD ops
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
@@ -31,6 +48,7 @@ dynamic storageMiddleware<State>(
       );
       saveCrypto(store.state.cryptoStore, storage: Storage.main);
       break;
+
     default:
       break;
   }

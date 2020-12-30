@@ -41,7 +41,6 @@ class CacheSerializer implements StateSerializer<AppState> {
     final List<Object> stores = [
       state.authStore,
       state.syncStore,
-      state.mediaStore,
       state.cryptoStore,
       state.settingsStore,
     ];
@@ -65,13 +64,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           // serialize the store contents
           // Stopwatch stopwatchSerialize = new Stopwatch()..start();
           try {
-            // HACK: unable to pass certain stores directly to an isolate
-            final sensitiveStorage = [MediaStore];
-            if (sensitiveStorage.contains(store.runtimeType)) {
-              jsonEncoded = await compute(jsonEncode, store);
-            } else {
-              jsonEncoded = json.encode(store);
-            }
+            jsonEncoded = json.encode(store);
           } catch (error) {
             jsonEncoded = json.encode(store);
             print(
@@ -140,7 +133,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
-    final stores = Cache.cacheStores;
+    final stores = Cache.cacheStores ?? {};
 
     // decode each store cache synchronously
     stores.forEach((type, store) {
@@ -186,6 +179,10 @@ class CacheSerializer implements StateSerializer<AppState> {
       loading: false,
       authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
       cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
+      mediaStore: mediaStore ??
+          MediaStore().copyWith(
+            mediaCache: preloaded['media'],
+          ),
       roomStore: roomStore ??
           RoomStore().copyWith(
             rooms: preloaded['rooms'] ?? {},
@@ -199,7 +196,6 @@ class CacheSerializer implements StateSerializer<AppState> {
             messages: preloaded['messages'] ?? Map<String, List<Message>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
-      mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
     );
   }

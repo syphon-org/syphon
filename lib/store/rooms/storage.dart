@@ -43,9 +43,8 @@ Future<Map<String, Room>> loadRooms({
   int offset = 0,
   int limit = 10,
 }) async {
-  final Map<String, Room> rooms = {};
-
   try {
+    final Map<String, Room> rooms = {};
     final store = StoreRef<String, String>('rooms');
     final count = await store.count(storage);
 

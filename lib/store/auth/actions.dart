@@ -177,10 +177,7 @@ ThunkAction<AppState> startAuthObserver() {
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
       if (user != null && user.accessToken != null) {
-        await store.dispatch(fetchUserCurrentProfile());
-
-        // save auth to cold storage, redundancy for cache failure
-        saveAuth(store.state.authStore, storage: Storage.main);
+        await store.dispatch(fetchAuthUserProfile());
 
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {
@@ -408,7 +405,7 @@ ThunkAction<AppState> logoutUser() {
   };
 }
 
-ThunkAction<AppState> fetchUserCurrentProfile() {
+ThunkAction<AppState> fetchAuthUserProfile() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -430,7 +427,7 @@ ThunkAction<AppState> fetchUserCurrentProfile() {
       store.dispatch(addAlert(
         error: error,
         message: 'Failed to fetch current user profile',
-        origin: 'fetchUserCurrentProfile',
+        origin: 'fetchAuthUserProfile',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));

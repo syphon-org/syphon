@@ -14,8 +14,10 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/storage.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
@@ -43,13 +45,6 @@ class UpdateMediaCache {
     this.mxcUri,
     this.data,
   });
-}
-
-ThunkAction<AppState> loadMedia({
-  File localFile,
-  String mediaName = 'photo',
-}) {
-  return (Store<AppState> store) async {};
 }
 
 ThunkAction<AppState> uploadMedia({
@@ -119,6 +114,19 @@ ThunkAction<AppState> fetchThumbnail(
         return;
       }
 
+      // check if the media is only located in cold storage
+      if (await checkMedia(mxcUri, storage: Storage.main)) {
+        final storedData = await loadMedia(
+          mxcUri: mxcUri,
+          storage: Storage.main,
+        );
+
+        if (storedData != null) {
+          store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: storedData));
+          return;
+        }
+      }
+
       store.dispatch(UpdateMediaChecks(
         mxcUri: mxcUri,
         status: MediaStatus.CHECKING,
@@ -143,6 +151,11 @@ ThunkAction<AppState> fetchThumbnail(
       final bodyBytes = data['bodyBytes'];
 
       store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes));
+      saveMedia(mxcUri, bodyBytes, storage: Storage.main);
+      store.dispatch(UpdateMediaChecks(
+        mxcUri: mxcUri,
+        status: MediaStatus.SUCCESS,
+      ));
     } catch (error) {
       debugPrint('[fetchThumbnail] $mxcUri $error');
       store.dispatch(UpdateMediaChecks(
