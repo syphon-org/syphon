@@ -1,0 +1,4310 @@
+[
+    {
+        "name": "Aria Network",
+        "url": "https://aria-net.org",
+        "homeserver": "aria-net.org",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Italy",
+        "clienturl": "https://el.aria-net.org/",
+        "comment": "Aria Network provides public services",
+        "uptrid": "786403909",
+        "monitor": {
+            "id": 786403909,
+            "friendly_name": "Aria Network",
+            "url": "https://aria-net.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1605610928,
+            "logs": [
+                {
+                    "id": 1606402224,
+                    "type": 1,
+                    "datetime": 1610098485,
+                    "duration": 720,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1605024525,
+                    "type": 1,
+                    "datetime": 1610027315,
+                    "duration": 720,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1604895656,
+                    "type": 1,
+                    "datetime": 1610020816,
+                    "duration": 719,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1603664867,
+                    "type": 1,
+                    "datetime": 1609954593,
+                    "duration": 720,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1600274655,
+                    "type": 1,
+                    "datetime": 1609778157,
+                    "duration": 2160,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1594728858,
+                    "type": 1,
+                    "datetime": 1609477603,
+                    "duration": 662,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1563075199,
+                    "type": 1,
+                    "datetime": 1607734725,
+                    "duration": 1418,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1562177369,
+                    "type": 1,
+                    "datetime": 1607693643,
+                    "duration": 699,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1562018199,
+                    "type": 1,
+                    "datetime": 1607687122,
+                    "duration": 699,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1561793260,
+                    "type": 1,
+                    "datetime": 1607677001,
+                    "duration": 1419,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.483",
+            "custom_uptime_ratio": "99.725",
+            "custom_down_durations": "7119",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 612
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 564
+                }
+            ],
+            "average_response_time": "588.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1560635157,
+                "type": 2,
+                "datetime": 1607619300,
+                "duration": 57701,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "asra.gr",
+        "url": "https://asra.gr",
+        "homeserver": "asra.gr",
+        "version": "1.24.0",
+        "ipextra": "DNSsec",
+        "country": "Germany",
+        "clienturl": "https://element.asra.gr",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "783166125",
+        "monitor": {
+            "id": 783166125,
+            "friendly_name": "Asra gr",
+            "url": "https://asra.gr/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1564146503,
+            "logs": [],
+            "all_time_uptime_ratio": "99.849",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1002
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 704
+                }
+            ],
+            "average_response_time": "853.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1459276836,
+                "type": 2,
+                "datetime": 1601068359,
+                "duration": 9236903,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "bau-ha.us",
+        "url": "https://bau-ha.us",
+        "homeserver": "bau-ha.us",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://matrix.bau-ha.us",
+        "comment": "hosted at Uni-Weimar by student run Hackspace",
+        "uptrid": "783115202",
+        "monitor": {
+            "id": 783115202,
+            "friendly_name": "Bau-haus",
+            "url": "https://bau-ha.us:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563435210,
+            "logs": [
+                {
+                    "id": 1586154366,
+                    "type": 1,
+                    "datetime": 1608996839,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574534548,
+                    "type": 1,
+                    "datetime": 1608333832,
+                    "duration": 645,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.904",
+            "custom_uptime_ratio": "99.950",
+            "custom_down_durations": "1288",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 492
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1027
+                }
+            ],
+            "average_response_time": "759.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1499777684,
+                "type": 2,
+                "datetime": 1603962900,
+                "duration": 4370932,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "beerfactory",
+        "url": "https://beerfactory.org",
+        "homeserver": "matrix.beerfactory.org",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "France",
+        "clienturl": "https://matrix.beerfactory.org",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "783115199",
+        "monitor": {
+            "id": 783115199,
+            "friendly_name": "Beerfactory",
+            "url": "https://matrix.beerfactory.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563435158,
+            "logs": [
+                {
+                    "id": 1586347449,
+                    "type": 1,
+                    "datetime": 1609008437,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1586228873,
+                    "type": 1,
+                    "datetime": 1609001172,
+                    "duration": 1364,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1583344556,
+                    "type": 1,
+                    "datetime": 1608832358,
+                    "duration": 7832,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1583173913,
+                    "type": 1,
+                    "datetime": 1608822226,
+                    "duration": 2059,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.719",
+            "custom_uptime_ratio": "99.541",
+            "custom_down_durations": "11898",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 511
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 393
+                }
+            ],
+            "average_response_time": "452.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1485258167,
+                "type": 2,
+                "datetime": 1603038328,
+                "duration": 5783898,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "belbit",
+        "url": "https://belbit.net",
+        "homeserver": "belbit.net",
+        "version": "1.23.0",
+        "ipextra": "none",
+        "country": "Romania",
+        "clienturl": "https://belbit.net",
+        "comment": "Belarusian Matrix server",
+        "uptrid": "785930467",
+        "monitor": {
+            "id": 785930467,
+            "friendly_name": "belbit",
+            "url": "https://belbit.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1599586321,
+            "logs": [],
+            "all_time_uptime_ratio": "100.000",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 3962
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 546
+                }
+            ],
+            "average_response_time": "2254.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1442242355,
+                "type": 2,
+                "datetime": 1599582759,
+                "duration": 10722503,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "chatcloud",
+        "url": "https://www.chatcloud.net",
+        "homeserver": "matrix.chatcloud.net",
+        "version": "1.23.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://talk.chatcloud.net",
+        "comment": "Chat server",
+        "uptrid": "784743991",
+        "monitor": {
+            "id": 784743991,
+            "friendly_name": "ChatCloud",
+            "url": "https://matrix.chatcloud.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1586869095,
+            "logs": [],
+            "all_time_uptime_ratio": "99.982",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 411
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 392
+                }
+            ],
+            "average_response_time": "401.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1491400132,
+                "type": 2,
+                "datetime": 1603453038,
+                "duration": 6852224,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "converser",
+        "url": "https://converser.eu",
+        "homeserver": "converser.eu",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "France",
+        "clienturl": "https://chat.anchel.nl",
+        "comment": "hosted by the French webhosting provider 6clones",
+        "uptrid": "783115195",
+        "monitor": {
+            "id": 783115195,
+            "friendly_name": "Converser",
+            "url": "https://converser.eu/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563435115,
+            "logs": [],
+            "all_time_uptime_ratio": "99.590",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1538
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 2465
+                }
+            ],
+            "average_response_time": "2001.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1446742241,
+                "type": 2,
+                "datetime": 1600010946,
+                "duration": 10294316,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "cyberia.club",
+        "url": "https://cyberia.club",
+        "homeserver": "matrix.cyberia.club",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "USA",
+        "clienturl": "https://riot.cyberia.club",
+        "comment": "tech collective from Minneapolis",
+        "uptrid": "783115202",
+        "monitor": {
+            "id": 783115202,
+            "friendly_name": "Bau-haus",
+            "url": "https://bau-ha.us:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563435210,
+            "logs": [
+                {
+                    "id": 1586154366,
+                    "type": 1,
+                    "datetime": 1608996839,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574534548,
+                    "type": 1,
+                    "datetime": 1608333832,
+                    "duration": 645,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.904",
+            "custom_uptime_ratio": "99.950",
+            "custom_down_durations": "1288",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 492
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1027
+                }
+            ],
+            "average_response_time": "759.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1499777684,
+                "type": 2,
+                "datetime": 1603962900,
+                "duration": 4370932,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "dapor",
+        "url": "https://dapor.org",
+        "homeserver": "matrix.dapor.net",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://riot.dapor.org",
+        "comment": "Selfhosted Server with FOSS projects",
+        "uptrid": "783698895",
+        "monitor": {
+            "id": 783698895,
+            "friendly_name": "Dapor",
+            "url": "https://matrix.dapor.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "matrix@anchel.nl",
+            "http_password": "$heba2002UPT!",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1572260469,
+            "logs": [
+                {
+                    "id": 1578516134,
+                    "type": 1,
+                    "datetime": 1608564850,
+                    "duration": 10072,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1576989422,
+                    "type": 1,
+                    "datetime": 1608477850,
+                    "duration": 7920,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576931567,
+                    "type": 1,
+                    "datetime": 1608474950,
+                    "duration": 2160,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576813060,
+                    "type": 1,
+                    "datetime": 1608467670,
+                    "duration": 1440,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576613768,
+                    "type": 1,
+                    "datetime": 1608456008,
+                    "duration": 1440,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576544747,
+                    "type": 1,
+                    "datetime": 1608451647,
+                    "duration": 720,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576518059,
+                    "type": 1,
+                    "datetime": 1608450186,
+                    "duration": 720,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576356552,
+                    "type": 1,
+                    "datetime": 1608440705,
+                    "duration": 720,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576322419,
+                    "type": 1,
+                    "datetime": 1608438524,
+                    "duration": 1440,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1576298986,
+                    "type": 1,
+                    "datetime": 1608437064,
+                    "duration": 720,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1573419159,
+                    "type": 1,
+                    "datetime": 1608273406,
+                    "duration": 716,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1567403710,
+                    "type": 1,
+                    "datetime": 1607970986,
+                    "duration": 4963,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1565919121,
+                    "type": 1,
+                    "datetime": 1607894020,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1565778468,
+                    "type": 1,
+                    "datetime": 1607885647,
+                    "duration": 640,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1563788035,
+                    "type": 1,
+                    "datetime": 1607773808,
+                    "duration": 2085,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1562730275,
+                    "type": 1,
+                    "datetime": 1607716407,
+                    "duration": 2085,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.664",
+            "custom_uptime_ratio": "98.515",
+            "custom_down_durations": "38483",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 436
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 443
+                }
+            ],
+            "average_response_time": "439.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1554214600,
+                "type": 2,
+                "datetime": 1607323024,
+                "duration": 393383,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "eggy",
+        "url": "https://eggy.cc",
+        "homeserver": "eggy.cc",
+        "version": "1.20.1",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Cloudflare",
+        "clienturl": "https://eggy.app",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "785546974",
+        "monitor": {
+            "id": 785546974,
+            "friendly_name": "eggy",
+            "url": "https://eggy.cc/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1594485192,
+            "logs": [],
+            "all_time_uptime_ratio": "99.782",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 505
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 241
+                }
+            ],
+            "average_response_time": "373.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1529861785,
+                "type": 2,
+                "datetime": 1605893110,
+                "duration": 4412152,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "envs",
+        "url": "https://envs.net",
+        "homeserver": "matrix.envs.net",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://element.envs.net/",
+        "comment": "linux lovers, sysadmins, programmer and users",
+        "uptrid": "785629390",
+        "monitor": {
+            "id": 785629390,
+            "friendly_name": "envs",
+            "url": "https://matrix.envs.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1595710780,
+            "logs": [
+                {
+                    "id": 1591885487,
+                    "type": 1,
+                    "datetime": 1609318141,
+                    "duration": 723,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1565284285,
+                    "type": 1,
+                    "datetime": 1607858765,
+                    "duration": 719,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.837",
+            "custom_uptime_ratio": "99.944",
+            "custom_down_durations": "1442",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 391
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 423
+                }
+            ],
+            "average_response_time": "407.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1558337293,
+                "type": 2,
+                "datetime": 1607521403,
+                "duration": 337362,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "freitrix",
+        "url": "https://www.freitrix.de",
+        "homeserver": "freitrix.de",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://webchat.freitrix.de",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "783374215",
+        "monitor": {
+            "id": 783374215,
+            "friendly_name": "Freitrix",
+            "url": "https://freitrix.de/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1567246041,
+            "logs": [],
+            "all_time_uptime_ratio": "99.155",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 589
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 859
+                }
+            ],
+            "average_response_time": "724.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1516147449,
+                "type": 2,
+                "datetime": 1605042233,
+                "duration": 5263029,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "G24",
+        "url": "https://g24.at",
+        "homeserver": "matrix.g24.at",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Austria",
+        "clienturl": "https://riot.g24.at",
+        "comment": "graz culture community",
+        "uptrid": "783295669",
+        "monitor": {
+            "id": 783295669,
+            "friendly_name": "G24",
+            "url": "https://matrix.g24.at/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1566144767,
+            "logs": [],
+            "all_time_uptime_ratio": "99.937",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 597
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 591
+                }
+            ],
+            "average_response_time": "594.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1452800162,
+                "type": 2,
+                "datetime": 1600556688,
+                "duration": 9748574,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "grin.hu",
+        "url": "https://grin.hu",
+        "homeserver": "matrix.grin.hu",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Hungary",
+        "clienturl": "https://riot.grin.hu",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "784065977",
+        "monitor": {
+            "id": 784065977,
+            "friendly_name": "Grin",
+            "url": "https://matrix.grin.hu/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1577545605,
+            "logs": [],
+            "all_time_uptime_ratio": "99.667",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 500
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 500
+                }
+            ],
+            "average_response_time": "500.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1529782066,
+                "type": 2,
+                "datetime": 1605889186,
+                "duration": 4416076,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "hackerspaces.be",
+        "url": "https://hackerspaces.be",
+        "homeserver": "matrix.hackerspaces.be",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "United Kingdom",
+        "clienturl": "https://ptt.hackerspaces.be",
+        "comment": "Belgian Hackerspaces",
+        "uptrid": "785627889",
+        "monitor": {
+            "id": 785627889,
+            "friendly_name": "hackerspaces.be",
+            "url": "https://matrix.hackerspaces.be:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1595676890,
+            "logs": [
+                {
+                    "id": 1609587113,
+                    "type": 1,
+                    "datetime": 1610267082,
+                    "duration": 30814,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1604431042,
+                    "type": 1,
+                    "datetime": 1609995850,
+                    "duration": 53350,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597213216,
+                    "type": 1,
+                    "datetime": 1609618704,
+                    "duration": 2084,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597038407,
+                    "type": 1,
+                    "datetime": 1609609235,
+                    "duration": 4288,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1587851466,
+                    "type": 1,
+                    "datetime": 1609096449,
+                    "duration": 3591,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1587698356,
+                    "type": 1,
+                    "datetime": 1609087068,
+                    "duration": 712,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1582218806,
+                    "type": 1,
+                    "datetime": 1608768553,
+                    "duration": 1359,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1576295673,
+                    "type": 1,
+                    "datetime": 1608436877,
+                    "duration": 714,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.570",
+            "custom_uptime_ratio": "96.261",
+            "custom_down_durations": "96912",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 414
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 3200
+                }
+            ],
+            "average_response_time": "1807.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1551629251,
+                "type": 2,
+                "datetime": 1607180863,
+                "duration": 1256014,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "halogen.city",
+        "url": "https://halogen.city",
+        "homeserver": "halogen.city",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "USA",
+        "clienturl": "https://halogen.chat",
+        "comment": "open-registration server",
+        "uptrid": "783346489",
+        "monitor": {
+            "id": 783346489,
+            "friendly_name": "HalogenCity",
+            "url": "https://halogen.city/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1566901700,
+            "logs": [
+                {
+                    "id": 1606078218,
+                    "type": 1,
+                    "datetime": 1610081022,
+                    "duration": 638,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1589381164,
+                    "type": 1,
+                    "datetime": 1609180503,
+                    "duration": 4319,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1577512187,
+                    "type": 1,
+                    "datetime": 1608509639,
+                    "duration": 20800,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1577308298,
+                    "type": 1,
+                    "datetime": 1608497010,
+                    "duration": 11809,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1577128702,
+                    "type": 1,
+                    "datetime": 1608486145,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1577080397,
+                    "type": 1,
+                    "datetime": 1608483203,
+                    "duration": 2103,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1576980958,
+                    "type": 1,
+                    "datetime": 1608477377,
+                    "duration": 4248,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1576794364,
+                    "type": 1,
+                    "datetime": 1608466512,
+                    "duration": 8559,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1575570549,
+                    "type": 1,
+                    "datetime": 1608394128,
+                    "duration": 5693,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1575170314,
+                    "type": 1,
+                    "datetime": 1608371021,
+                    "duration": 646,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574659043,
+                    "type": 1,
+                    "datetime": 1608340935,
+                    "duration": 685,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1573676646,
+                    "type": 1,
+                    "datetime": 1608287584,
+                    "duration": 644,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1569518364,
+                    "type": 1,
+                    "datetime": 1608068567,
+                    "duration": 2082,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1565577697,
+                    "type": 1,
+                    "datetime": 1607874920,
+                    "duration": 40954,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1565512148,
+                    "type": 1,
+                    "datetime": 1607871246,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1565380105,
+                    "type": 1,
+                    "datetime": 1607863919,
+                    "duration": 1387,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1561438967,
+                    "type": 1,
+                    "datetime": 1607657812,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1561119876,
+                    "type": 1,
+                    "datetime": 1607641777,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1560812414,
+                    "type": 1,
+                    "datetime": 1607627314,
+                    "duration": 1360,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.786",
+            "custom_uptime_ratio": "95.916",
+            "custom_down_durations": "105851",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 757
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 432
+                }
+            ],
+            "average_response_time": "594.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1555648180,
+                "type": 2,
+                "datetime": 1607395216,
+                "duration": 232098,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "Joe's Site",
+        "url": "https://thisisjoes.site",
+        "homeserver": "matrix.thisisjoes.site",
+        "version": "1.24.0",
+        "ipextra": "None <sub>google fiber</sub>",
+        "country": "USA",
+        "clienturl": "https://element.thisisjoes.site/",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "786445651",
+        "monitor": {
+            "id": 786445651,
+            "friendly_name": "joes site",
+            "url": "https://matrix.thisisjoes.site/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1605967383,
+            "logs": [],
+            "all_time_uptime_ratio": "99.081",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 709
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 269
+                }
+            ],
+            "average_response_time": "489.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1543951268,
+                "type": 2,
+                "datetime": 1606776247,
+                "duration": 3529015,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "kde",
+        "url": "https://kde.org",
+        "homeserver": "kde.modular.im",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "United Kingdom",
+        "clienturl": "https://webchat.kde.org",
+        "comment": "kde community",
+        "uptrid": "785226570",
+        "monitor": {
+            "id": 785226570,
+            "friendly_name": "kde",
+            "url": "https://kde.modular.im/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1591803660,
+            "logs": [
+                {
+                    "id": 1579226749,
+                    "type": 1,
+                    "datetime": 1608603861,
+                    "duration": 2159,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578706007,
+                    "type": 1,
+                    "datetime": 1608574555,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1577761267,
+                    "type": 1,
+                    "datetime": 1608524135,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.515",
+            "custom_uptime_ratio": "99.861",
+            "custom_down_durations": "3599",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 842
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 592
+                }
+            ],
+            "average_response_time": "717.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1549290003,
+                "type": 2,
+                "datetime": 1607056960,
+                "duration": 1467175,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "matrix",
+        "url": "https://matrix.org",
+        "homeserver": "matrix-client.matrix.org",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Cloudflare",
+        "clienturl": "https://app.element.io",
+        "comment": "The Default Official Matrix Server",
+        "uptrid": "783115140",
+        "monitor": {
+            "id": 783115140,
+            "friendly_name": "Matrix.org",
+            "url": "https://matrix.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563434156,
+            "logs": [],
+            "all_time_uptime_ratio": "99.876",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 260
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 254
+                }
+            ],
+            "average_response_time": "257.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1530601823,
+                "type": 2,
+                "datetime": 1605937553,
+                "duration": 4367709,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "matrixchat pro",
+        "url": "https://matrixchat.pro",
+        "homeserver": "matrixchat.pro",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Cloudflare",
+        "clienturl": "https://chat.anchel.nl",
+        "comment": "open-registration server and matrix VMs",
+        "uptrid": "785876820",
+        "monitor": {
+            "id": 785876820,
+            "friendly_name": "matrixchat pro",
+            "url": "https://matrixchat.pro/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1598944457,
+            "logs": [
+                {
+                    "id": 1603680578,
+                    "type": 1,
+                    "datetime": 1609955406,
+                    "duration": 660,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1564371468,
+                    "type": 1,
+                    "datetime": 1607806164,
+                    "duration": 711,
+                    "reason": {
+                        "code": "521",
+                        "detail": "CloudFlare Timeout"
+                    }
+                },
+                {
+                    "id": 1561818000,
+                    "type": 1,
+                    "datetime": 1607678035,
+                    "duration": 121620,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.438",
+            "custom_uptime_ratio": "96.614",
+            "custom_down_durations": "87764",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 628
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 630
+                }
+            ],
+            "average_response_time": "629.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1547554919,
+                "type": 2,
+                "datetime": 1606965381,
+                "duration": 712654,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "midov",
+        "url": "https://midov.pl",
+        "homeserver": "midov.pl",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Poland",
+        "clienturl": "https://element.midov.pl",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "783841516",
+        "monitor": {
+            "id": 783841516,
+            "friendly_name": "Midov",
+            "url": "https://midov.pl/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1574189362,
+            "logs": [
+                {
+                    "id": 1600127987,
+                    "type": 1,
+                    "datetime": 1609771679,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1578853696,
+                    "type": 1,
+                    "datetime": 1608582586,
+                    "duration": 719,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1572522549,
+                    "type": 1,
+                    "datetime": 1608230759,
+                    "duration": 5024,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.725",
+            "custom_uptime_ratio": "99.754",
+            "custom_down_durations": "6385",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 577
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 596
+                }
+            ],
+            "average_response_time": "586.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1557750398,
+                "type": 2,
+                "datetime": 1607494649,
+                "duration": 736110,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "mozilla",
+        "url": "https://mozilla.org",
+        "homeserver": "mozilla.modular.im",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Cloudflare",
+        "clienturl": "https://chat.mozilla.org",
+        "comment": "mozilla community",
+        "uptrid": "785786940",
+        "monitor": {
+            "id": 785786940,
+            "friendly_name": "mozilla",
+            "url": "https://mozilla.modular.im/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1597840373,
+            "logs": [],
+            "all_time_uptime_ratio": "100.000",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1148
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 273
+                }
+            ],
+            "average_response_time": "710.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1424772456,
+                "type": 2,
+                "datetime": 1597836811,
+                "duration": 12468451,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "nerdsin.space",
+        "url": "https://nerdsin.space",
+        "homeserver": "nerdsin.space",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Germany",
+        "clienturl": "https://nerdsin.space",
+        "comment": "nerds community",
+        "uptrid": "786865333",
+        "monitor": {
+            "id": 786865333,
+            "friendly_name": "nerdsin.space",
+            "url": "https://nerdsin.space/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1610094713,
+            "logs": [],
+            "all_time_uptime_ratio": "100.000",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1148
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 612
+                }
+            ],
+            "average_response_time": "880.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {}
+        }
+    },
+    {
+        "name": "NitroChat",
+        "url": "https://www.nitrokey.com",
+        "homeserver": "nitro.chat",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Germany",
+        "clienturl": "https://app.nitro.chat",
+        "comment": "hosted by NitroKey.com",
+        "uptrid": "785068994",
+        "monitor": {
+            "id": 785068994,
+            "friendly_name": "nitro.chat",
+            "url": "https://nitro.chat/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1590763388,
+            "logs": [
+                {
+                    "id": 1589227875,
+                    "type": 1,
+                    "datetime": 1609171526,
+                    "duration": 662,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1573500188,
+                    "type": 1,
+                    "datetime": 1608277761,
+                    "duration": 724,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.762",
+            "custom_uptime_ratio": "99.947",
+            "custom_down_durations": "1386",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1257
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 802
+                }
+            ],
+            "average_response_time": "1029.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1467501086,
+                "type": 2,
+                "datetime": 1601677313,
+                "duration": 6600448,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "NLtrix",
+        "url": "https://nltrix.net",
+        "homeserver": "nltrix.net",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Netherlands",
+        "clienturl": "https://element.nltrix.net",
+        "comment": "hosted by internet provider/datacentre BIT",
+        "uptrid": "783146110",
+        "monitor": {
+            "id": 783146110,
+            "friendly_name": "NLtrix",
+            "url": "https://nltrix.net:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563888402,
+            "logs": [],
+            "all_time_uptime_ratio": "99.779",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 574
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 545
+                }
+            ],
+            "average_response_time": "559.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1455180223,
+                "type": 2,
+                "datetime": 1600756094,
+                "duration": 9549168,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "oblak.be",
+        "url": "https://continu.online",
+        "homeserver": "oblak.be",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Italy",
+        "clienturl": "https://chat.oblak.be",
+        "comment": "hosted by continu.online team",
+        "uptrid": "784447715",
+        "monitor": {
+            "id": 784447715,
+            "friendly_name": "Oblak",
+            "url": "https://oblak.be/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1583320660,
+            "logs": [
+                {
+                    "id": 1582267794,
+                    "type": 1,
+                    "datetime": 1608770826,
+                    "duration": 720,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                },
+                {
+                    "id": 1582085356,
+                    "type": 1,
+                    "datetime": 1608761119,
+                    "duration": 8966,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1579518542,
+                    "type": 1,
+                    "datetime": 1608620853,
+                    "duration": 1443,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1579128022,
+                    "type": 1,
+                    "datetime": 1608598513,
+                    "duration": 5040,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578749823,
+                    "type": 1,
+                    "datetime": 1608576944,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578723427,
+                    "type": 1,
+                    "datetime": 1608575484,
+                    "duration": 721,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578682568,
+                    "type": 1,
+                    "datetime": 1608573284,
+                    "duration": 1452,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578566630,
+                    "type": 1,
+                    "datetime": 1608567459,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1578011000,
+                    "type": 1,
+                    "datetime": 1608538594,
+                    "duration": 1476,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1577972169,
+                    "type": 1,
+                    "datetime": 1608536413,
+                    "duration": 724,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1576917464,
+                    "type": 1,
+                    "datetime": 1608474050,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1575019541,
+                    "type": 1,
+                    "datetime": 1608361898,
+                    "duration": 2160,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1573466897,
+                    "type": 1,
+                    "datetime": 1608275865,
+                    "duration": 727,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1573026592,
+                    "type": 1,
+                    "datetime": 1608254921,
+                    "duration": 719,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1572502343,
+                    "type": 1,
+                    "datetime": 1608229850,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1572462193,
+                    "type": 1,
+                    "datetime": 1608227625,
+                    "duration": 1441,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1570538723,
+                    "type": 1,
+                    "datetime": 1608122819,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1570431037,
+                    "type": 1,
+                    "datetime": 1608116993,
+                    "duration": 1440,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1570377010,
+                    "type": 1,
+                    "datetime": 1608114093,
+                    "duration": 1444,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1569953394,
+                    "type": 1,
+                    "datetime": 1608091021,
+                    "duration": 1386,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1569928034,
+                    "type": 1,
+                    "datetime": 1608089461,
+                    "duration": 764,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.419",
+            "custom_uptime_ratio": "98.680",
+            "custom_down_durations": "34223",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1376
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1131
+                }
+            ],
+            "average_response_time": "1253.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1559578740,
+                "type": 2,
+                "datetime": 1607571873,
+                "duration": 517588,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "opentechtalks",
+        "url": "https://chat.opentechtalks.be",
+        "homeserver": "chat.opentechtalks.be",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Belgium",
+        "clienturl": "https://chat.anchel.nl",
+        "comment": "a Belgian Linuxuser community",
+        "uptrid": "785952158",
+        "monitor": {
+            "id": 785952158,
+            "friendly_name": "opentechtalks",
+            "url": "https://chat.opentechtalks.be/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1599837581,
+            "logs": [],
+            "all_time_uptime_ratio": "99.375",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 563
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 539
+                }
+            ],
+            "average_response_time": "551.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1555572410,
+                "type": 2,
+                "datetime": 1607391257,
+                "duration": 2914005,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "oper.io",
+        "url": "https://oper.io",
+        "homeserver": "oper.io",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Iceland",
+        "clienturl": "https://chat.anchel.nl",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "783122555",
+        "monitor": {
+            "id": 783122555,
+            "friendly_name": "Operio",
+            "url": "https://oper.io/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563530603,
+            "logs": [
+                {
+                    "id": 1607403902,
+                    "type": 1,
+                    "datetime": 1610149015,
+                    "duration": 1603,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1596352702,
+                    "type": 1,
+                    "datetime": 1609569537,
+                    "duration": 7842,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1580925557,
+                    "type": 1,
+                    "datetime": 1608697091,
+                    "duration": 6476,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.603",
+            "custom_uptime_ratio": "99.386",
+            "custom_down_durations": "15921",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 506
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 509
+                }
+            ],
+            "average_response_time": "507.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1530731125,
+                "type": 2,
+                "datetime": 1605945417,
+                "duration": 2751674,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "perthchat",
+        "url": "https://perthchat.org",
+        "homeserver": "matrix.perthchat.org",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Australia",
+        "clienturl": "https://client.perthchat.org/",
+        "comment": "AU's first 1gbps server",
+        "uptrid": "783115179",
+        "monitor": {
+            "id": 783115179,
+            "friendly_name": "Perthchat",
+            "url": "https://matrix.perthchat.org:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563434837,
+            "logs": [
+                {
+                    "id": 1572285183,
+                    "type": 1,
+                    "datetime": 1608218111,
+                    "duration": 5987,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1571246131,
+                    "type": 1,
+                    "datetime": 1608162753,
+                    "duration": 49674,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "95.529",
+            "custom_uptime_ratio": "97.853",
+            "custom_down_durations": "55661",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 2577
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1490
+                }
+            ],
+            "average_response_time": "2033.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1559561025,
+                "type": 2,
+                "datetime": 1607571090,
+                "duration": 591663,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "privacytools",
+        "url": "https://www.privacytools.io",
+        "homeserver": "chat.privacytools.io",
+        "version": "1.24.0",
+        "ipextra": "DNSsec",
+        "country": "Germany",
+        "clienturl": "https://element.privacytools.io",
+        "comment": "public and secure services",
+        "uptrid": "783115152",
+        "monitor": {
+            "id": 783115152,
+            "friendly_name": "Privacytools",
+            "url": "https://chat.privacytools.io:8448/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563434309,
+            "logs": [
+                {
+                    "id": 1610206847,
+                    "type": 1,
+                    "datetime": 1610300040,
+                    "duration": 4320,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1610063505,
+                    "type": 1,
+                    "datetime": 1610292099,
+                    "duration": 7201,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1610007796,
+                    "type": 1,
+                    "datetime": 1610289199,
+                    "duration": 2160,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1609981742,
+                    "type": 1,
+                    "datetime": 1610287791,
+                    "duration": 668,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1609827955,
+                    "type": 1,
+                    "datetime": 1610279806,
+                    "duration": 5717,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1609789039,
+                    "type": 1,
+                    "datetime": 1610277600,
+                    "duration": 664,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1609361574,
+                    "type": 1,
+                    "datetime": 1610256507,
+                    "duration": 677,
+                    "reason": {
+                        "code": "504",
+                        "detail": "Gateway Timeout"
+                    }
+                },
+                {
+                    "id": 1609332047,
+                    "type": 1,
+                    "datetime": 1610255025,
+                    "duration": 691,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1608480676,
+                    "type": 1,
+                    "datetime": 1610208257,
+                    "duration": 2880,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1608415820,
+                    "type": 1,
+                    "datetime": 1610204637,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1608272856,
+                    "type": 1,
+                    "datetime": 1610197287,
+                    "duration": 1441,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1608234864,
+                    "type": 1,
+                    "datetime": 1610195062,
+                    "duration": 721,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1607884539,
+                    "type": 1,
+                    "datetime": 1610174818,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1607338051,
+                    "type": 1,
+                    "datetime": 1610145752,
+                    "duration": 13205,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1607239806,
+                    "type": 1,
+                    "datetime": 1610140692,
+                    "duration": 4329,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1607210188,
+                    "type": 1,
+                    "datetime": 1610139231,
+                    "duration": 752,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1606527141,
+                    "type": 1,
+                    "datetime": 1610105326,
+                    "duration": 30960,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1606382639,
+                    "type": 1,
+                    "datetime": 1610097386,
+                    "duration": 7215,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1605970942,
+                    "type": 1,
+                    "datetime": 1610075046,
+                    "duration": 721,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1605944636,
+                    "type": 1,
+                    "datetime": 1610073586,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1605654078,
+                    "type": 1,
+                    "datetime": 1610058663,
+                    "duration": 1411,
+                    "reason": {
+                        "code": "504",
+                        "detail": "Gateway Timeout"
+                    }
+                },
+                {
+                    "id": 1605612926,
+                    "type": 1,
+                    "datetime": 1610056423,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1605483510,
+                    "type": 1,
+                    "datetime": 1610049923,
+                    "duration": 5730,
+                    "reason": {
+                        "code": "504",
+                        "detail": "Gateway Timeout"
+                    }
+                },
+                {
+                    "id": 1604999816,
+                    "type": 1,
+                    "datetime": 1610026083,
+                    "duration": 23041,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1604928854,
+                    "type": 1,
+                    "datetime": 1610022463,
+                    "duration": 2881,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1604302372,
+                    "type": 1,
+                    "datetime": 1609988604,
+                    "duration": 33119,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1604262503,
+                    "type": 1,
+                    "datetime": 1609986423,
+                    "duration": 1441,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1604022059,
+                    "type": 1,
+                    "datetime": 1609973802,
+                    "duration": 733,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1603916688,
+                    "type": 1,
+                    "datetime": 1609967955,
+                    "duration": 692,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1603643231,
+                    "type": 1,
+                    "datetime": 1609953458,
+                    "duration": 4288,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1603615168,
+                    "type": 1,
+                    "datetime": 1609951953,
+                    "duration": 690,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1603059562,
+                    "type": 1,
+                    "datetime": 1609923102,
+                    "duration": 27328,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1602730830,
+                    "type": 1,
+                    "datetime": 1609905602,
+                    "duration": 688,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1595891591,
+                    "type": 1,
+                    "datetime": 1609543142,
+                    "duration": 335072,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1595712432,
+                    "type": 1,
+                    "datetime": 1609532919,
+                    "duration": 721,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1594797317,
+                    "type": 1,
+                    "datetime": 1609481667,
+                    "duration": 39596,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1570922187,
+                    "type": 1,
+                    "datetime": 1608145132,
+                    "duration": 653,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1568972416,
+                    "type": 1,
+                    "datetime": 1608045253,
+                    "duration": 10790,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "96.512",
+            "custom_uptime_ratio": "77.775",
+            "custom_down_durations": "576076",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 226
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 5534
+                }
+            ],
+            "average_response_time": "2880.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1560549100,
+                "type": 2,
+                "datetime": 1607615486,
+                "duration": 429767,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "qunta",
+        "url": "https://qunta.nl",
+        "homeserver": "matrix.qunta.nl",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Cloudflare",
+        "clienturl": "https://riot.qunta.nl",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "784955443",
+        "monitor": {
+            "id": 784955443,
+            "friendly_name": "qunta",
+            "url": "https://matrix.qunta.nl/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1589529340,
+            "logs": [],
+            "all_time_uptime_ratio": "99.940",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 955
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 996
+                }
+            ],
+            "average_response_time": "975.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1418061590,
+                "type": 2,
+                "datetime": 1597111947,
+                "duration": 13193315,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "riotchat",
+        "url": "https://riotchat.de",
+        "homeserver": "riotchat.de",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://riotchat.de",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "786778919",
+        "monitor": {
+            "id": 786778919,
+            "friendly_name": "riotchat",
+            "url": "https://riotchat.de/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1609186530,
+            "logs": [],
+            "all_time_uptime_ratio": "100.000",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 388
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 402
+                }
+            ],
+            "average_response_time": "395.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {}
+        }
+    },
+    {
+        "name": "RU matrix",
+        "url": "https://ru-matrix.org",
+        "homeserver": "ru-matrix.org",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Russia",
+        "clienturl": "https://riot.ru-matrix.org",
+        "comment": "Russian Matrix community",
+        "uptrid": "784410139",
+        "monitor": {
+            "id": 784410139,
+            "friendly_name": "ru-matrix",
+            "url": "https://ru-matrix.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1582788586,
+            "logs": [
+                {
+                    "id": 1607280556,
+                    "type": 1,
+                    "datetime": 1610142842,
+                    "duration": 2800,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1603166924,
+                    "type": 1,
+                    "datetime": 1609928568,
+                    "duration": 727,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1601699521,
+                    "type": 1,
+                    "datetime": 1609852678,
+                    "duration": 650,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597833133,
+                    "type": 1,
+                    "datetime": 1609654524,
+                    "duration": 1360,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597781270,
+                    "type": 1,
+                    "datetime": 1609651507,
+                    "duration": 1379,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597692379,
+                    "type": 1,
+                    "datetime": 1609646338,
+                    "duration": 2093,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597653493,
+                    "type": 1,
+                    "datetime": 1609644117,
+                    "duration": 1361,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597576347,
+                    "type": 1,
+                    "datetime": 1609639729,
+                    "duration": 2806,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597550764,
+                    "type": 1,
+                    "datetime": 1609638223,
+                    "duration": 656,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597511291,
+                    "type": 1,
+                    "datetime": 1609635997,
+                    "duration": 1398,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597431919,
+                    "type": 1,
+                    "datetime": 1609631549,
+                    "duration": 1362,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597388243,
+                    "type": 1,
+                    "datetime": 1609628860,
+                    "duration": 659,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597338938,
+                    "type": 1,
+                    "datetime": 1609625913,
+                    "duration": 673,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597236485,
+                    "type": 1,
+                    "datetime": 1609620089,
+                    "duration": 3541,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597198059,
+                    "type": 1,
+                    "datetime": 1609617862,
+                    "duration": 1368,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1597060959,
+                    "type": 1,
+                    "datetime": 1609610532,
+                    "duration": 1367,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596896674,
+                    "type": 1,
+                    "datetime": 1609601041,
+                    "duration": 4245,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596792647,
+                    "type": 1,
+                    "datetime": 1609595092,
+                    "duration": 2804,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596733058,
+                    "type": 1,
+                    "datetime": 1609592080,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596623786,
+                    "type": 1,
+                    "datetime": 1609585536,
+                    "duration": 2835,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596562873,
+                    "type": 1,
+                    "datetime": 1609581868,
+                    "duration": 1363,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1596476054,
+                    "type": 1,
+                    "datetime": 1609576695,
+                    "duration": 682,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1592518718,
+                    "type": 1,
+                    "datetime": 1609353015,
+                    "duration": 641,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1588544635,
+                    "type": 1,
+                    "datetime": 1609134858,
+                    "duration": 720,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1588483608,
+                    "type": 1,
+                    "datetime": 1609131183,
+                    "duration": 1368,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1588434849,
+                    "type": 1,
+                    "datetime": 1609128241,
+                    "duration": 641,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1575050757,
+                    "type": 1,
+                    "datetime": 1608363738,
+                    "duration": 1364,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574999376,
+                    "type": 1,
+                    "datetime": 1608360726,
+                    "duration": 677,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574973766,
+                    "type": 1,
+                    "datetime": 1608359225,
+                    "duration": 645,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574813732,
+                    "type": 1,
+                    "datetime": 1608349734,
+                    "duration": 2822,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574788125,
+                    "type": 1,
+                    "datetime": 1608348228,
+                    "duration": 641,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574530735,
+                    "type": 1,
+                    "datetime": 1608333586,
+                    "duration": 2005,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1570095167,
+                    "type": 1,
+                    "datetime": 1608099192,
+                    "duration": 724,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.740",
+            "custom_uptime_ratio": "98.109",
+            "custom_down_durations": "49020",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 8070
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 8605
+                }
+            ],
+            "average_response_time": "8337.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1545349326,
+                "type": 2,
+                "datetime": 1606847764,
+                "duration": 1251428,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "sibnsk",
+        "url": "https://sibnsk.net",
+        "homeserver": "matrix.sibnsk.net",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Germany",
+        "clienturl": "https://chat.anchel.nl",
+        "comment": "Linux User Group from Novosibirsk",
+        "uptrid": "783662953",
+        "monitor": {
+            "id": 783662953,
+            "friendly_name": "Sibnsk",
+            "url": "https://matrix.sibnsk.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "matrix@anchel.nl",
+            "http_password": "$heba2002UPT!",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1571722991,
+            "logs": [
+                {
+                    "id": 1575045704,
+                    "type": 1,
+                    "datetime": 1608363403,
+                    "duration": 720,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1572145875,
+                    "type": 1,
+                    "datetime": 1608210726,
+                    "duration": 639,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1566682675,
+                    "type": 1,
+                    "datetime": 1607936880,
+                    "duration": 656,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1564999102,
+                    "type": 1,
+                    "datetime": 1607842496,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1564736040,
+                    "type": 1,
+                    "datetime": 1607827307,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1563468049,
+                    "type": 1,
+                    "datetime": 1607755960,
+                    "duration": 643,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1563417326,
+                    "type": 1,
+                    "datetime": 1607753018,
+                    "duration": 1360,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1563201596,
+                    "type": 1,
+                    "datetime": 1607741432,
+                    "duration": 646,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1561019517,
+                    "type": 1,
+                    "datetime": 1607636643,
+                    "duration": 642,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "97.271",
+            "custom_uptime_ratio": "99.771",
+            "custom_down_durations": "5948",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 503
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 524
+                }
+            ],
+            "average_response_time": "513.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1560761489,
+                "type": 2,
+                "datetime": 1607624980,
+                "duration": 11663,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "sp-codes",
+        "url": "https://sp-codes.de",
+        "homeserver": "matrix.sp-codes.de",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Germany",
+        "clienturl": "https://chat.sp-codes.de",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "785912445",
+        "monitor": {
+            "id": 785912445,
+            "friendly_name": "sp-codes",
+            "url": "https://matrix.sp-codes.de/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1599377475,
+            "logs": [
+                {
+                    "id": 1592715664,
+                    "type": 1,
+                    "datetime": 1609363209,
+                    "duration": 1439,
+                    "reason": {
+                        "code": "404",
+                        "detail": "Not Found"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.224",
+            "custom_uptime_ratio": "99.944",
+            "custom_down_durations": "1439",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 754
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 384
+                }
+            ],
+            "average_response_time": "569.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1487782169,
+                "type": 2,
+                "datetime": 1603225723,
+                "duration": 6137486,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "stratum 0",
+        "url": "https://stratum0.org",
+        "homeserver": "matrix.stratum0.org",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Germany",
+        "clienturl": "https://chat.stratum0.org",
+        "comment": "German (Braunschweig) hackerspace",
+        "uptrid": "783122430",
+        "monitor": {
+            "id": 783122430,
+            "friendly_name": "Stratum0",
+            "url": "https://matrix.stratum0.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1563528968,
+            "logs": [],
+            "all_time_uptime_ratio": "99.676",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 668
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 740
+                }
+            ],
+            "average_response_time": "704.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1436885068,
+                "type": 2,
+                "datetime": 1599052489,
+                "duration": 11252773,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "synod.im",
+        "url": "https://synod.im",
+        "homeserver": "synod.im",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Germany",
+        "clienturl": "https://web.synod.im",
+        "comment": "Linux User in Bereich der Kirchen",
+        "uptrid": "783898574",
+        "monitor": {
+            "id": 783898574,
+            "friendly_name": "Synod",
+            "url": "https://synod.im/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1574957245,
+            "logs": [
+                {
+                    "id": 1609194284,
+                    "type": 1,
+                    "datetime": 1610247265,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1597621904,
+                    "type": 1,
+                    "datetime": 1609642336,
+                    "duration": 719,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1576227683,
+                    "type": 1,
+                    "datetime": 1608432736,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1572934256,
+                    "type": 1,
+                    "datetime": 1608250721,
+                    "duration": 1366,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1567893948,
+                    "type": 1,
+                    "datetime": 1607996733,
+                    "duration": 616,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.875",
+            "custom_uptime_ratio": "99.840",
+            "custom_down_durations": "4141",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 441
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 437
+                }
+            ],
+            "average_response_time": "439.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1541227918,
+                "type": 2,
+                "datetime": 1606619022,
+                "duration": 1377711,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "systemtest",
+        "url": "https://systemtest.tk",
+        "homeserver": "systemtest.tk",
+        "version": "1.23.1",
+        "ipextra": "none",
+        "country": "Romania",
+        "clienturl": "https://riot.systemtest.tk",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "786137478",
+        "monitor": {
+            "id": 786137478,
+            "friendly_name": "systemtest",
+            "url": "https://systemtest.tk/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1602660626,
+            "logs": [
+                {
+                    "id": 1609545519,
+                    "type": 1,
+                    "datetime": 1610265381,
+                    "duration": 719,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "99.972",
+            "custom_uptime_ratio": "99.972",
+            "custom_down_durations": "719",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 521
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 553
+                }
+            ],
+            "average_response_time": "537.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1506422588,
+                "type": 2,
+                "datetime": 1604392848,
+                "duration": 5872533,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "tchncs",
+        "url": "https://tchncs.de",
+        "homeserver": "matrix.tchncs.de",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "Germany",
+        "clienturl": "https://chat.tchncs.de",
+        "comment": "a Selfhosted homeserver",
+        "uptrid": "785993766",
+        "monitor": {
+            "id": 785993766,
+            "friendly_name": "tchncs",
+            "url": "https://matrix.tchncs.de/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1600513122,
+            "logs": [
+                {
+                    "id": 1601929937,
+                    "type": 1,
+                    "datetime": 1609863848,
+                    "duration": 138004,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1564443855,
+                    "type": 1,
+                    "datetime": 1607810555,
+                    "duration": 1409,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.548",
+            "custom_uptime_ratio": "94.621",
+            "custom_down_durations": "139413",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 975
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 611
+                }
+            ],
+            "average_response_time": "793.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1558224367,
+                "type": 2,
+                "datetime": 1607516235,
+                "duration": 294320,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "Toronto Mesh",
+        "url": "https://tomesh.net",
+        "homeserver": "matrix.tomesh.net",
+        "version": "1.24.0",
+        "ipextra": "IPv6",
+        "country": "USA",
+        "clienturl": "https://chat.tomesh.net",
+        "comment": "Community for open source and peer-to-peer tech",
+        "uptrid": "783711883",
+        "monitor": {
+            "id": 783711883,
+            "friendly_name": "Tomesh",
+            "url": "https://matrix.tomesh.net/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "matrix@anchel.nl",
+            "http_password": "$heba2002UPT!",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1572428473,
+            "logs": [
+                {
+                    "id": 1597809155,
+                    "type": 1,
+                    "datetime": 1609653206,
+                    "duration": 209297,
+                    "reason": {
+                        "code": "502",
+                        "detail": "Bad Gateway"
+                    }
+                },
+                {
+                    "id": 1571338800,
+                    "type": 1,
+                    "datetime": 1608167402,
+                    "duration": 1429,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.922",
+            "custom_uptime_ratio": "91.870",
+            "custom_down_durations": "210726",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1958
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 745
+                }
+            ],
+            "average_response_time": "1351.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1536220394,
+                "type": 2,
+                "datetime": 1606317441,
+                "duration": 1849961,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "Universidad Uruguay",
+        "url": "https://www.interior.edu.uy",
+        "homeserver": "matrix.interior.edu.uy",
+        "version": "1.22.0",
+        "ipextra": "IPv6",
+        "country": "Uruguay",
+        "clienturl": "https://chat.interior.edu.uy",
+        "comment": "University of Uruguay",
+        "uptrid": "784079623",
+        "monitor": {
+            "id": 784079623,
+            "friendly_name": "uUruguay",
+            "url": "https://matrix.interior.edu.uy/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1577868455,
+            "logs": [],
+            "all_time_uptime_ratio": "99.871",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 888
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 765
+                }
+            ],
+            "average_response_time": "826.500",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1418429011,
+                "type": 2,
+                "datetime": 1597149276,
+                "duration": 13155986,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "Utwente",
+        "url": "https://www.snt.utwente.nl",
+        "homeserver": "matrix.utwente.io",
+        "version": "1.24.0",
+        "ipextra": "IPv6 DNSsec",
+        "country": "Netherlands",
+        "clienturl": "https://chat.utwente.io",
+        "comment": "Studenten Net Twente",
+        "uptrid": "783175855",
+        "monitor": {
+            "id": 783175855,
+            "friendly_name": "uTwente",
+            "url": "https://matrix.utwente.io/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1564384390,
+            "logs": [],
+            "all_time_uptime_ratio": "99.957",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 742
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 802
+                }
+            ],
+            "average_response_time": "772.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1551483976,
+                "type": 2,
+                "datetime": 1607173415,
+                "duration": 3131847,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "valenciawireless",
+        "url": "http://valenciawireless.org",
+        "homeserver": "valenciawireless.org",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Spain",
+        "clienturl": "https://riot.valenciawireless.org",
+        "comment": "Valencia",
+        "uptrid": "783293518",
+        "monitor": {
+            "id": 783293518,
+            "friendly_name": "ValenciaWireless",
+            "url": "https://matrix.valenciawireless.org/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1566113435,
+            "logs": [
+                {
+                    "id": 1593120435,
+                    "type": 1,
+                    "datetime": 1609385460,
+                    "duration": 1365,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1575353520,
+                    "type": 1,
+                    "datetime": 1608382143,
+                    "duration": 5681,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1574079732,
+                    "type": 1,
+                    "datetime": 1608308965,
+                    "duration": 2081,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1573961725,
+                    "type": 1,
+                    "datetime": 1608303061,
+                    "duration": 720,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                },
+                {
+                    "id": 1573631818,
+                    "type": 1,
+                    "datetime": 1608285075,
+                    "duration": 2081,
+                    "reason": {
+                        "code": "333333",
+                        "detail": "Connection Timeout"
+                    }
+                },
+                {
+                    "id": 1562976574,
+                    "type": 1,
+                    "datetime": 1607729746,
+                    "duration": 2880,
+                    "reason": {
+                        "code": "503",
+                        "detail": "Service Unavailable"
+                    }
+                }
+            ],
+            "all_time_uptime_ratio": "98.066",
+            "custom_uptime_ratio": "99.429",
+            "custom_down_durations": "14808",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1970
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1596
+                }
+            ],
+            "average_response_time": "1783.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1559146051,
+                "type": 2,
+                "datetime": 1607555720,
+                "duration": 174026,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    },
+    {
+        "name": "weho.st",
+        "url": "https://weho.st",
+        "homeserver": "chat.weho.st",
+        "version": "1.24.0",
+        "ipextra": "none",
+        "country": "Netherlands",
+        "clienturl": "https://webchat.weho.st",
+        "comment": "a non-profit internet service provider",
+        "uptrid": "785617124",
+        "monitor": {
+            "id": 785617124,
+            "friendly_name": "weho.st",
+            "url": "https://chat.weho.st/_matrix/federation/v1/version",
+            "type": 1,
+            "sub_type": "",
+            "keyword_type": null,
+            "keyword_value": "",
+            "http_username": "",
+            "http_password": "",
+            "port": "",
+            "interval": 720,
+            "status": 2,
+            "create_datetime": 1595498725,
+            "logs": [],
+            "all_time_uptime_ratio": "98.346",
+            "custom_uptime_ratio": "100.000",
+            "custom_down_durations": "0",
+            "response_times": [
+                {
+                    "datetime": 1610323200,
+                    "value": 1642
+                },
+                {
+                    "datetime": 1610236800,
+                    "value": 1312
+                }
+            ],
+            "average_response_time": "1477.000",
+            "responsetime_length": 2,
+            "responsetimes": [],
+            "lastLogTypeBeforeStartDate": {
+                "id": 1533153952,
+                "type": 2,
+                "datetime": 1606127396,
+                "duration": 4177866,
+                "reason": {
+                    "code": "200",
+                    "detail": "OK"
+                }
+            }
+        }
+    }
+]

@@ -41,7 +41,8 @@ class Strings {
   static const labelNoMessages = 'no messages found';
 
   // Buttons
-  static const buttonLogin = 'login';
+  static const buttonLogin = 'log in';
+  static const buttonLoginSSO = 'single sign on';
   static const buttonSaveGeneric = 'save';
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
@@ -153,10 +154,10 @@ class Strings {
       'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
-  static String formatUsernameHint(String homeserver) {
+  static String formatUsernameHint({String homeserver, String username}) {
     return homeserver.length != 0
-        ? 'username:$homeserver'
-        : 'username:matrix.org';
+        ? '@${username != null && username.length > 0 ? username : 'username'}:$homeserver'
+        : '@${username != null && username.length > 0 ? username : 'username'}:matrix.org';
   }
 
   // Tooltips

@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -13,22 +14,25 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
-import 'package:syphon/store/auth/storage.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -53,14 +57,14 @@ class SetUser {
   SetUser({this.user});
 }
 
-class SetHomeserver {
+class SetHostname {
   final dynamic homeserver;
-  SetHomeserver({this.homeserver});
+  SetHostname({this.homeserver});
 }
 
-class SetHomeserverValid {
-  final bool valid;
-  SetHomeserverValid({this.valid});
+class SetHomeserver {
+  final Homeserver homeserver;
+  SetHomeserver({this.homeserver});
 }
 
 class SetUsername {
@@ -296,7 +300,8 @@ ThunkAction<AppState> loginUser() {
         generateDeviceId(salt: username),
       );
 
-      var homeserver = store.state.authStore.homeserver;
+      var homeserver = store.state.authStore.homeserver.hostname;
+
       try {
         final check = await MatrixApi.checkHomeserver(
               protocol: protocol,
@@ -442,7 +447,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
 
       final data = await MatrixApi.checkUsernameAvailability(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.hostname,
         username: store.state.authStore.username,
       );
 
@@ -503,6 +508,7 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
       store.dispatch(SetLoading(loading: true));
 
       final emailSubmitted = store.state.authStore.email;
+      final homeserver = store.state.authStore.hostname;
       final currentCredential = store.state.authStore.credential;
 
       if (currentCredential.params.containsValue(emailSubmitted) &&
@@ -512,7 +518,7 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
 
       final data = await MatrixApi.registerEmail(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         email: store.state.authStore.email,
         clientSecret: Values.clientSecretMatrix,
         sendAttempt: sendAttempt,
@@ -557,7 +563,8 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
-      final loginType = store.state.authStore.loginType;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
       final authType = session != null ? credential.type : loginType;
@@ -570,7 +577,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       final data = await MatrixApi.registerUser(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         session: store.state.authStore.session,
@@ -802,30 +809,161 @@ ThunkAction<AppState> resetCredentials({
   };
 }
 
-ThunkAction<AppState> selectHomeserver({dynamic homeserver}) {
-  return (Store<AppState> store) {
-    store.dispatch(SetHomeserverValid(valid: true));
-    store.dispatch(SetHomeserver(homeserver: homeserver['hostname']));
-  };
-}
-
-ThunkAction<AppState> setHomeserver({String homeserver}) {
-  return (Store<AppState> store) {
-    store.dispatch(
-      SetHomeserverValid(valid: homeserver != null && homeserver.length > 0),
+ThunkAction<AppState> selectHomeserver({String hostname}) {
+  return (Store<AppState> store) async {
+    final homeserver = await store.dispatch(
+      fetchHomeserver(hostname: hostname),
     );
 
     store.dispatch(
-      SetHomeserver(homeserver: homeserver.trim()),
+      setHomeserver(homeserver: homeserver),
+    );
+
+    store.dispatch(
+      setHostname(homeserver: hostname),
     );
   };
 }
+
+ThunkAction<AppState> fetchHomeservers() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+
+    final List<dynamic> homeserversJson = await JackApi.fetchPublicServers();
+
+    // parse homeserver data
+    final List<Homeserver> homserverData = homeserversJson.map((data) {
+      final hostname = data['hostname'].toString().split('.');
+      final hostnameBase = hostname.length > 1
+          ? hostname[hostname.length - 2] + '.' + hostname[hostname.length - 1]
+          : hostname[0];
+
+      return Homeserver(
+        hostname: hostnameBase,
+        location: data['location'] ?? '',
+        description: data['description'] ?? '',
+        usersActive: data['users_active'] != null
+            ? data['users_active'].toString()
+            : null,
+        roomsTotal: data['public_room_count'] != null
+            ? data['public_room_count'].toString()
+            : null,
+        founded:
+            data['online_since'] != null ? data['online_since'].toString() : '',
+        responseTime: data['last_response_time'] != null
+            ? data['last_response_time'].toString()
+            : '',
+      );
+    }).toList();
+
+    // set homeservers without cached photo url
+    await store.dispatch(SetHomeservers(homeservers: homserverData));
+
+    // find favicons for all the homeservers
+    final homeservers = await Future.wait(
+      homserverData.map((homeserver) async {
+        final faviconUrl = await fetchFavicon(url: homeserver.hostname);
+        try {
+          final response = await http.get(faviconUrl);
+
+          if (response.statusCode == 200) {
+            return homeserver.copyWith(photoUrl: faviconUrl);
+          }
+        } catch (error) {/* noop */}
+
+        return homeserver;
+      }),
+    );
+
+    // set the homeservers and finish loading
+    await store.dispatch(SetHomeservers(homeservers: homeservers));
+    store.dispatch(SetLoading(loading: false));
+  };
+}
+
+ThunkAction<AppState> fetchHomeserver({String hostname}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+    var homeserver = Homeserver(hostname: hostname);
+
+    // fetch homeserver icon url
+    try {
+      final iconUrl = await fetchFavicon(url: homeserver.hostname);
+
+      homeserver = homeserver.copyWith(photoUrl: iconUrl);
+    } catch (error) {
+      printError('[selectHomserver] $error');
+    }
+
+    // fetch homeserver well-known
+    try {
+      final response = await MatrixApi.checkHomeserver(
+            protocol: protocol,
+            homeserver: homeserver.hostname,
+          ) ??
+          {};
+
+      final identityUrl = (response['m.identity_server']['base_url'] as String)
+          .replaceAll('https://', '');
+
+      var baseUrl = (response['m.homeserver']['base_url'] as String)
+          .replaceAll('https://', '');
+
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.replaceRange(baseUrl.length - 1, null, '');
+      }
+
+      homeserver = homeserver.copyWith(
+        baseUrl: baseUrl,
+        identityUrl: identityUrl,
+      );
+    } catch (error) {
+      store.dispatch(SetLoading(loading: false));
+
+      return Homeserver(
+        valid: true,
+        hostname: hostname,
+        baseUrl: hostname,
+        loginType: MatrixAuthTypes.DUMMY,
+      );
+    }
+
+    // fetch homeserver login type
+    try {
+      final response = await MatrixApi.loginType(
+            protocol: protocol,
+            homeserver: homeserver.baseUrl,
+          ) ??
+          {};
+
+      // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
+      final loginType = (response['flows'] as List).elementAt(0)['type'];
+
+      homeserver = homeserver.copyWith(
+        loginType: loginType,
+      );
+    } catch (error) {}
+
+    store.dispatch(SetLoading(loading: false));
+    return homeserver;
+  };
+}
+
+ThunkAction<AppState> setHostname({String homeserver}) =>
+    (Store<AppState> store) {
+      store.dispatch(
+        SetHostname(homeserver: homeserver.trim()),
+      );
+    };
+
+ThunkAction<AppState> setHomeserver({Homeserver homeserver}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetHomeserver(homeserver: homeserver));
+    };
 
 ThunkAction<AppState> setEmail({String email}) {
   return (Store<AppState> store) {
     final validEmail = RegExp(Values.emailRegex).hasMatch(email);
-
-    debugPrint('$email $validEmail');
 
     store.dispatch(SetEmailValid(
       valid: email != null && email.length > 0 && validEmail,

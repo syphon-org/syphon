@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 
-class ButtonSolid extends StatelessWidget {
-  ButtonSolid({
+class ButtonOutline extends StatelessWidget {
+  ButtonOutline({
     Key key,
     this.text,
-    this.textWidget,
     this.loading = false,
     this.disabled = false,
     this.width,
     this.height,
+    this.child,
     this.onPressed,
   }) : super(key: key);
 
@@ -22,7 +22,7 @@ class ButtonSolid extends StatelessWidget {
   final double width;
   final double height;
   final String text;
-  final Widget textWidget;
+  final Widget child;
   final Function onPressed;
 
   @override
@@ -55,8 +55,8 @@ class ButtonSolid extends StatelessWidget {
                     ),
                   ),
                 )
-              : (textWidget != null
-                  ? textWidget
+              : (child != null
+                  ? child
                   : Text(
                       this.text,
                       style: TextStyle(

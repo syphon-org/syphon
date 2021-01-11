@@ -211,7 +211,7 @@ class _Props extends Equatable {
         username: store.state.authStore.username,
         fullUserId: formatAlias(
           resource: store.state.authStore.username,
-          homeserver: store.state.authStore.homeserver,
+          homeserver: store.state.authStore.homeserver.hostname,
         ),
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,

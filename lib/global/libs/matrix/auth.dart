@@ -18,11 +18,24 @@ class MatrixAuthTypes {
   static const TOKEN = 'm.login.token';
   static const TERMS = 'm.login.terms';
   static const DUMMY = 'm.login.dummy';
+  static const SSO = 'm.login.sso';
   static const EMAIL = 'm.login.email.identity';
 }
 
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
+
+  static FutureOr<dynamic> loginType({
+    String protocol,
+    String homeserver,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
   /**
    * https://matrix.org/docs/spec/client_server/latest#id198
    * 

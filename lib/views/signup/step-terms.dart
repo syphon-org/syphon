@@ -214,9 +214,8 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-      homeserver:
-          store.state.authStore.homeserver.substring(0, 1).toUpperCase() +
-              store.state.authStore.homeserver.substring(1),
+      homeserver: store.state.authStore.hostname.substring(0, 1).toUpperCase() +
+          store.state.authStore.hostname.substring(1),
       agreement: store.state.authStore.agreement,
       onToggleAgreement: () async {
         store.dispatch(toggleAgreement());

@@ -35,7 +35,7 @@ class HomeserverStepState extends State<HomeserverStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    homeserverController.text = store.state.authStore.homeserver;
+    homeserverController.text = store.state.authStore.hostname;
   }
 
   @override
@@ -131,9 +131,9 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.homeserver.hostname,
         onChangeHomeserver: (String text) {
-          store.dispatch(setHomeserver(homeserver: text.trim()));
+          store.dispatch(selectHomeserver(hostname: text));
         },
       );
 

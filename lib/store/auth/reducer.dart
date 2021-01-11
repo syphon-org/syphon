@@ -21,10 +21,10 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(credential: action.credential);
     case SetInteractiveAuths:
       return state.copyWith(interactiveAuths: action.interactiveAuths);
+    case SetHostname:
+      return state.copyWith(hostname: action.homeserver);
     case SetHomeserver:
       return state.copyWith(homeserver: action.homeserver);
-    case SetHomeserverValid:
-      return state.copyWith(isHomeserverValid: action.valid);
     case SetUsername:
       return state.copyWith(username: action.username);
     case SetUsernameValid:
