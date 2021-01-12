@@ -440,12 +440,12 @@ class _Props extends Equatable {
         // If user enters full username, make sure to set homeserver
         if (text.contains(':')) {
           store.dispatch(setHostname(
-            homeserver: alias[1],
+            hostname: alias[1],
           ));
         } else {
           if (!hostname.contains('.')) {
             store.dispatch(setHostname(
-              homeserver: homeserver.hostname ?? 'matrix.org',
+              hostname: homeserver.hostname ?? 'matrix.org',
             ));
           }
         }

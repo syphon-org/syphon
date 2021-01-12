@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
@@ -42,6 +43,11 @@ class HomeserverStepState extends State<HomeserverStep> {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+      onWillChange: (oldProps, newProps) {
+        if (oldProps.homeserver.hostname != newProps.homeserver.hostname) {
+          homeserverController.text = newProps.homeserver.hostname;
+        }
+      },
       builder: (context, props) {
         double height = MediaQuery.of(context).size.height;
 
@@ -96,10 +102,10 @@ class HomeserverStepState extends State<HomeserverStep> {
                     disableSpacing: true,
                     controller: homeserverController,
                     onChanged: (text) {
-                      props.onChangeHomeserver(text);
+                      props.onSetHostname(text);
                     },
                     onEditingComplete: () {
-                      props.onChangeHomeserver(props.homeserver);
+                      props.onChangeHomeserver(props.hostname);
                       FocusScope.of(context).unfocus();
                     },
                     suffix: IconButton(
@@ -121,19 +127,27 @@ class HomeserverStepState extends State<HomeserverStep> {
 }
 
 class _Props extends Equatable {
-  final String homeserver;
+  final String hostname;
+  final Homeserver homeserver;
 
+  final Function onSetHostname;
   final Function onChangeHomeserver;
 
   _Props({
+    @required this.hostname,
     @required this.homeserver,
+    @required this.onSetHostname,
     @required this.onChangeHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        homeserver: store.state.authStore.homeserver.hostname,
-        onChangeHomeserver: (String text) {
-          store.dispatch(selectHomeserver(hostname: text));
+        hostname: store.state.authStore.hostname,
+        homeserver: store.state.authStore.homeserver,
+        onSetHostname: (String hostname) {
+          store.dispatch(setHostname(hostname: hostname));
+        },
+        onChangeHomeserver: (String hostname) {
+          store.dispatch(selectHomeserver(hostname: hostname));
         },
       );
 

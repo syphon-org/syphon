@@ -36,6 +36,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/selectors.dart';
 import '../user/model.dart';
 
 // Store
@@ -58,8 +59,8 @@ class SetUser {
 }
 
 class SetHostname {
-  final dynamic homeserver;
-  SetHostname({this.homeserver});
+  final String hostname;
+  SetHostname({this.hostname});
 }
 
 class SetHomeserver {
@@ -811,17 +812,14 @@ ThunkAction<AppState> resetCredentials({
 
 ThunkAction<AppState> selectHomeserver({String hostname}) {
   return (Store<AppState> store) async {
-    final homeserver = await store.dispatch(
+    final Homeserver homeserver = await store.dispatch(
       fetchHomeserver(hostname: hostname),
     );
 
-    store.dispatch(
-      setHomeserver(homeserver: homeserver),
-    );
+    store.dispatch(setHomeserver(homeserver: homeserver));
+    store.dispatch(setHostname(hostname: hostname));
 
-    store.dispatch(
-      setHostname(homeserver: hostname),
-    );
+    return homeserver.valid;
   };
 }
 
@@ -914,9 +912,11 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
       }
 
       homeserver = homeserver.copyWith(
+        valid: true,
         baseUrl: baseUrl,
         identityUrl: identityUrl,
       );
+      print('[fetchHomeserver] ${homeserver.valid}');
     } catch (error) {
       store.dispatch(SetLoading(loading: false));
 
@@ -942,6 +942,7 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
       homeserver = homeserver.copyWith(
         loginType: loginType,
       );
+      print('[fetchHomeserver] ${homeserver.valid}');
     } catch (error) {}
 
     store.dispatch(SetLoading(loading: false));
@@ -949,11 +950,9 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
   };
 }
 
-ThunkAction<AppState> setHostname({String homeserver}) =>
+ThunkAction<AppState> setHostname({String hostname}) =>
     (Store<AppState> store) {
-      store.dispatch(
-        SetHostname(homeserver: homeserver.trim()),
-      );
+      store.dispatch(SetHostname(hostname: hostname.trim()));
     };
 
 ThunkAction<AppState> setHomeserver({Homeserver homeserver}) =>

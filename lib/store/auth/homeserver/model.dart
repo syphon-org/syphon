@@ -77,7 +77,7 @@ class Homeserver extends Equatable {
         roomsTotal: roomsTotal ?? this.roomsTotal,
         founded: founded ?? this.founded,
         responseTime: responseTime ?? this.responseTime,
-        valid: valid ?? false,
+        valid: valid ?? this.valid ?? false,
       );
 
   // Map<String, dynamic> toJson() => _$CredentialToJson(this);

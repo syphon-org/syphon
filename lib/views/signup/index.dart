@@ -18,6 +18,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/signup/step-captcha.dart';
@@ -174,11 +175,20 @@ class SignupViewState extends State<SignupView> {
     final lastStep = (this.sections.length - 1) == this.currentStep;
     switch (currentSection.runtimeType) {
       case HomeserverStep:
-        return () {
-          controller.nextPage(
-            duration: nextAnimationDuration,
-            curve: Curves.ease,
-          );
+        return () async {
+          var valid = true;
+
+          print('${props.hostname} != ${props.hostname}');
+          if (props.hostname != props.homeserver.hostname) {
+            valid = await props.onSelectHomeserver(props.hostname);
+          }
+
+          if (valid) {
+            controller.nextPage(
+              duration: nextAnimationDuration,
+              curve: Curves.ease,
+            );
+          }
         };
       case UsernameStep:
         return () {
@@ -369,7 +379,7 @@ class SignupViewState extends State<SignupView> {
                             Container(
                               child: ButtonSolid(
                                 text: buildButtonString(),
-                                loading: props.creating,
+                                loading: props.creating || props.loading,
                                 disabled: props.creating ||
                                     !onCheckStepValid(
                                       props,
@@ -429,7 +439,8 @@ class SignupViewState extends State<SignupView> {
 class _Props extends Equatable {
   final User user;
 
-  final String homeserver;
+  final String hostname;
+  final Homeserver homeserver;
   final bool isHomeserverValid;
 
   final String username;
@@ -455,9 +466,11 @@ class _Props extends Equatable {
   final Function onCreateUser;
   final Function onSubmitEmail;
   final Function onResetCredential;
+  final Function onSelectHomeserver;
 
   _Props({
     @required this.user,
+    @required this.hostname,
     @required this.homeserver,
     @required this.isHomeserverValid,
     @required this.username,
@@ -477,12 +490,15 @@ class _Props extends Equatable {
     @required this.onCreateUser,
     @required this.onSubmitEmail,
     @required this.onResetCredential,
+    @required this.onSelectHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         completed: store.state.authStore.completed,
-        homeserver: store.state.authStore.homeserver.hostname,
-        isHomeserverValid: store.state.authStore.homeserver.valid,
+        hostname: store.state.authStore.hostname,
+        homeserver: store.state.authStore.homeserver,
+        isHomeserverValid: store.state.authStore.homeserver.valid &&
+            !store.state.authStore.loading,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,
@@ -506,6 +522,9 @@ class _Props extends Equatable {
         },
         onCreateUser: ({bool enableErrors}) async {
           return await store.dispatch(createUser(enableErrors: enableErrors));
+        },
+        onSelectHomeserver: (String hostname) async {
+          return await store.dispatch(selectHomeserver(hostname: hostname));
         },
       );
 
