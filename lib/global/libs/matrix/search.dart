@@ -49,6 +49,8 @@ class Search {
     String homeserver = 'matrix.org',
     String accessToken,
     String searchText,
+    String server,
+    bool global,
     String since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
@@ -56,6 +58,8 @@ class Search {
 
     Map body = {
       "limit": 20,
+      "server": server ?? homeserver,
+      "include_all_networks": global,
       "filter": {
         "generic_search_term": searchText,
       },
@@ -64,6 +68,8 @@ class Search {
     if (since != null) {
       body['since'] = since;
     }
+
+    url += '?server=${server ?? homeserver}';
 
     final response = await http.post(
       url,

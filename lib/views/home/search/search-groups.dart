@@ -51,7 +51,7 @@ class GroupSearchState extends State<GroupSearchView> {
     }
     // Initial search to show rooms by most popular
     if (store.state.searchStore.searchResults.isEmpty) {
-      store.dispatch(searchPublicRooms(searchText: ''));
+      store.dispatch(searchPublicRooms(searchable: ''));
     }
   }
 
@@ -73,9 +73,6 @@ class GroupSearchState extends State<GroupSearchView> {
             brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
-            onChange: (text) {
-              props.onSearch(text);
-            },
             onSearch: (text) {
               props.onSearch(text);
             },
@@ -382,7 +379,7 @@ class _Props extends Equatable {
           store.dispatch(joinRoom(room: room));
         },
         onSearch: (text) {
-          store.dispatch(searchPublicRooms(searchText: text));
+          store.dispatch(searchPublicRooms(searchable: text));
         },
       );
 }

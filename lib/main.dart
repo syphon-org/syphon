@@ -145,8 +145,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
 
-    initUniLinks();
-
     store.dispatch(initDeepLinks());
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());

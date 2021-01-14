@@ -792,6 +792,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
 ThunkAction<AppState> joinRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
+      print(room.id);
       final data = await MatrixApi.joinRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -819,6 +820,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRoom(joinedRoom.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
+      printError(error);
       store.dispatch(addAlert(error: error, origin: 'joinRoom'));
     }
   };

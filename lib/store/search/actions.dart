@@ -14,6 +14,7 @@ import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
@@ -150,16 +151,31 @@ ThunkAction<AppState> searchRooms({String searchText}) {
 /** 
  *  Search Rooms (Remote)
  */
-ThunkAction<AppState> searchPublicRooms({String searchText}) {
+ThunkAction<AppState> searchPublicRooms({String searchable}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
+
+      final homeserverName = store.state.authStore.user.homeserverName;
+
+      var searchText = searchable;
+      var searchServer = homeserverName;
+
+      if (searchText.contains(':')) {
+        final filteredText = searchText.split(':');
+        searchText = filteredText[0];
+        searchServer = filteredText[1];
+      }
+
+      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer);
 
       final data = await MatrixApi.searchRooms(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
+        server: isUrl ? searchServer : homeserverName,
+        global: true,
       );
 
       if (data['errcode'] != null) {
