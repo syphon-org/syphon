@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 // Flutter imports:
@@ -37,6 +38,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../user/model.dart';
 
@@ -169,6 +171,38 @@ class ResetUser {}
 class ResetOnboarding {}
 
 class ResetAuthStore {}
+
+StreamSubscription _sub;
+
+ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
+      try {
+        String initialLink = await getInitialLink();
+        print('[initUniLinks] ${initialLink}');
+
+        _sub = getUriLinksStream().listen((Uri uri) {
+          print('[streamUniLinks] ${uri}');
+          final token = uri.queryParameters['loginToken'];
+          store.dispatch(loginUserSSO(token: token));
+        }, onError: (err) {
+          print('[streamUniLinks] error ${err}');
+        });
+      } on PlatformException {
+        addAlert(
+          message:
+              'Failed to SSO Login, please try again later or contact support',
+        );
+        // Handle exception by warning the user their action did not succeed
+        // return?
+      }
+    };
+
+ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
+      try {
+        _sub.cancel();
+      } catch (error) {}
+    };
+
+Future<Null> disposeUniLinks() async {}
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
@@ -347,7 +381,7 @@ ThunkAction<AppState> loginUser() {
   };
 }
 
-ThunkAction<AppState> loginUserSSO() {
+ThunkAction<AppState> loginUserSSO({String token}) {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
@@ -356,50 +390,49 @@ ThunkAction<AppState> loginUserSSO() {
         fetchBaseUrl(homeserver: store.state.authStore.homeserver),
       );
 
-      final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
+      if (token == null) {
+        final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
 
-      if (await canLaunch(ssoUrl)) {
-        await launch(ssoUrl, forceSafariVC: false);
-      } else {
-        throw 'Could not launch ${ssoUrl}';
+        if (await canLaunch(ssoUrl)) {
+          return await launch(ssoUrl, forceSafariVC: false);
+        } else {
+          throw 'Could not launch ${ssoUrl}';
+        }
       }
 
-      print('[loginUserSSO] running stills');
       final username = store.state.authStore.username;
 
       final Device device = await store.dispatch(
         generateDeviceId(salt: username),
       );
 
-      // final data = await MatrixApi.loginUserToken(
-      //   protocol: protocol,
-      //   type: MatrixAuthTypes.TOKEN,
-      //   homeserver: homeserver.baseUrl,
-      //   token: token,
-      //   session: session,
-      //   deviceId: device.deviceId,
-      //   deviceName: device.displayName,
-      // );
+      final data = await MatrixApi.loginUserToken(
+        protocol: protocol,
+        type: MatrixAuthTypes.TOKEN,
+        homeserver: homeserver.baseUrl,
+        token: token,
+        session: null,
+        deviceId: device.deviceId,
+        deviceName: device.displayName,
+      );
 
-      // if (data['errcode'] == 'M_FORBIDDEN') {
-      //   throw 'Invalid credentials, confirm and try again';
-      // }
+      if (data['errcode'] == 'M_FORBIDDEN') {
+        throw 'Invalid credentials, confirm and try again';
+      }
 
-      // if (data['errcode'] != null) {
-      //   throw data['error'];
-      // }
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
 
-      // await store.dispatch(SetUser(
-      //   user: User.fromMatrix(data),
-      // ));
+      await store.dispatch(SetUser(
+        user: User.fromMatrix(data),
+      ));
 
-      // store.state.authStore.authObserver.add(
-      //   store.state.authStore.user,
-      // );
+      store.state.authStore.authObserver.add(
+        store.state.authStore.user,
+      );
 
-      // store.dispatch(ResetOnboarding());
-
-      print('[loginUserSSO] finished');
+      store.dispatch(ResetOnboarding());
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUser",

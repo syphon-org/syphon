@@ -103,7 +103,7 @@ abstract class Auth {
       'type': type,
       "token": token,
       "trx_id": Random().nextInt(1 << 32),
-      "session": session,
+      // "session": session,
     };
 
     if (deviceId != null) {
