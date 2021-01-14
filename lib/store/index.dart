@@ -11,6 +11,7 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/storage.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
+import 'package:syphon/store/alerts/middleware.dart';
 
 // Project imports:
 import 'package:syphon/store/alerts/model.dart';
@@ -147,7 +148,8 @@ Future<Store> initStore(Database cache, Database storage) async {
     middleware: [
       thunkMiddleware,
       persistor.createMiddleware(),
-      storageMiddleware
+      storageMiddleware,
+      alertMiddleware,
     ],
   );
 

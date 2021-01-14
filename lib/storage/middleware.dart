@@ -7,9 +7,12 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/media/storage.dart';
 
-/// Middleware used for Redux which saves on each action.
+///
+/// Storage Middleware
+///
+/// Save to storage based on which redux actions are fired
+///
 dynamic storageMiddleware<State>(
   Store<AppState> store,
   dynamic action,

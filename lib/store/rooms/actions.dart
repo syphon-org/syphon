@@ -820,7 +820,6 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRoom(joinedRoom.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
-      printError(error);
       store.dispatch(addAlert(error: error, origin: 'joinRoom'));
     }
   };
