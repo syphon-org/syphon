@@ -99,10 +99,6 @@ class LoginState extends State<Login> {
           margin: const EdgeInsets.only(
             bottom: 8,
           ),
-          constraints: BoxConstraints(
-            minWidth: Dimensions.inputWidthMin,
-            maxWidth: Dimensions.inputWidthMax,
-          ),
           child: TextFieldSecure(
             maxLines: 1,
             label: props.usernameHint,
@@ -276,7 +272,10 @@ class LoginState extends State<Login> {
                     flex: 4,
                     fit: FlexFit.loose,
                     child: Container(
-                      width: Dimensions.contentWidth(context),
+                      constraints: BoxConstraints(
+                        minWidth: Dimensions.inputWidthMin,
+                        maxWidth: Dimensions.inputWidthMax,
+                      ),
                       child: Flex(
                         direction: Axis.vertical,
                         mainAxisAlignment: MainAxisAlignment.end,
