@@ -28,6 +28,21 @@
   <array>
     <string>en</string>
   </array>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+	<key>CFBundleTypeRole</key>
+	<string>Editor</string>
+	<key>CFBundleURLName</key>
+	<string>syphon.org</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+	<string>http</string>
+	<string>https</string>
+	<string>syphon</string>
+	</array>
+	</dict>
+	</array>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>YES</string>
 	<key>NSCameraUsageDescription</key>

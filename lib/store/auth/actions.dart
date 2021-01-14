@@ -27,6 +27,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -36,7 +37,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/user/selectors.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../user/model.dart';
 
 // Store
@@ -301,32 +302,16 @@ ThunkAction<AppState> loginUser() {
         generateDeviceId(salt: username),
       );
 
-      var homeserver = store.state.authStore.homeserver.hostname;
+      var homeserver = store.state.authStore.homeserver;
 
       try {
-        final check = await MatrixApi.checkHomeserver(
-              protocol: protocol,
-              homeserver: homeserver,
-            ) ??
-            {};
-
-        homeserver = (check['m.homeserver']['base_url'] as String)
-            .replaceAll('https://', '');
-
-        if (check['m.homeserver'] == null) {
-          addInfo(
-            message: Strings.errorCheckHomeserver,
-          );
-          // sometimes, people leave an extra forward slash in the m.homeserver field
-        } else if (homeserver.endsWith('/')) {
-          homeserver = homeserver.replaceRange(homeserver.length - 1, null, '');
-        }
+        homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
       } catch (error) {/* still attempt login */}
 
       final data = await MatrixApi.loginUser(
         protocol: protocol,
-        type: "m.login.password",
-        homeserver: homeserver,
+        type: MatrixAuthTypes.PASSWORD,
+        homeserver: homeserver.baseUrl,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         deviceId: device.deviceId,
@@ -350,6 +335,71 @@ ThunkAction<AppState> loginUser() {
       );
 
       store.dispatch(ResetOnboarding());
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: "loginUser",
+        message: error,
+        error: error,
+      ));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> loginUserSSO() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+
+    try {
+      final homeserver = await store.dispatch(
+        fetchBaseUrl(homeserver: store.state.authStore.homeserver),
+      );
+
+      final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
+
+      if (await canLaunch(ssoUrl)) {
+        await launch(ssoUrl, forceSafariVC: false);
+      } else {
+        throw 'Could not launch ${ssoUrl}';
+      }
+
+      print('[loginUserSSO] running stills');
+      final username = store.state.authStore.username;
+
+      final Device device = await store.dispatch(
+        generateDeviceId(salt: username),
+      );
+
+      // final data = await MatrixApi.loginUserToken(
+      //   protocol: protocol,
+      //   type: MatrixAuthTypes.TOKEN,
+      //   homeserver: homeserver.baseUrl,
+      //   token: token,
+      //   session: session,
+      //   deviceId: device.deviceId,
+      //   deviceName: device.displayName,
+      // );
+
+      // if (data['errcode'] == 'M_FORBIDDEN') {
+      //   throw 'Invalid credentials, confirm and try again';
+      // }
+
+      // if (data['errcode'] != null) {
+      //   throw data['error'];
+      // }
+
+      // await store.dispatch(SetUser(
+      //   user: User.fromMatrix(data),
+      // ));
+
+      // store.state.authStore.authObserver.add(
+      //   store.state.authStore.user,
+      // );
+
+      // store.dispatch(ResetOnboarding());
+
+      print('[loginUserSSO] finished');
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUser",
@@ -895,29 +945,13 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
 
     // fetch homeserver well-known
     try {
-      final response = await MatrixApi.checkHomeserver(
-            protocol: protocol,
-            homeserver: homeserver.hostname,
-          ) ??
-          {};
-
-      final identityUrl = (response['m.identity_server']['base_url'] as String)
-          .replaceAll('https://', '');
-
-      var baseUrl = (response['m.homeserver']['base_url'] as String)
-          .replaceAll('https://', '');
-
-      if (baseUrl.endsWith('/')) {
-        baseUrl = baseUrl.replaceRange(baseUrl.length - 1, null, '');
+      homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
+      if (!homeserver.valid) {
+        throw Exception(Strings.errorCheckHomeserver);
       }
-
-      homeserver = homeserver.copyWith(
-        valid: true,
-        baseUrl: baseUrl,
-        identityUrl: identityUrl,
-      );
-      print('[fetchHomeserver] ${homeserver.valid}');
     } catch (error) {
+      addInfo(message: error);
+
       store.dispatch(SetLoading(loading: false));
 
       return Homeserver(
@@ -939,10 +973,7 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
       // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
       final loginType = (response['flows'] as List).elementAt(0)['type'];
 
-      homeserver = homeserver.copyWith(
-        loginType: loginType,
-      );
-      print('[fetchHomeserver] ${homeserver.valid}');
+      homeserver = homeserver.copyWith(loginType: loginType);
     } catch (error) {}
 
     store.dispatch(SetLoading(loading: false));

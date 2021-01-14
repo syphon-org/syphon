@@ -1,6 +1,7 @@
 // Dart imports:
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 // Package imports:
 import 'package:http/http.dart' as http;
@@ -60,6 +61,49 @@ abstract class Auth {
       'type': type,
       "identifier": {"type": "m.id.user", "user": username},
       'password': password,
+    };
+
+    if (deviceId != null) {
+      body['device_id'] = deviceId;
+    }
+
+    if (deviceName != null) {
+      body['initial_device_display_name'] = deviceName;
+    }
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+/**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Login User
+   * 
+   *  Gets the homeserver's supported login types to authenticate
+   *  users. Clients should pick one of these and supply it as 
+   *  the type when logging in.
+   */
+  static FutureOr<dynamic> loginUserToken({
+    String protocol,
+    String homeserver,
+    String type = MatrixAuthTypes.TOKEN,
+    String token,
+    String session,
+    String deviceId,
+    String deviceName,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    Map body = {
+      'type': type,
+      "token": token,
+      "trx_id": Random().nextInt(1 << 32),
+      "session": session,
     };
 
     if (deviceId != null) {

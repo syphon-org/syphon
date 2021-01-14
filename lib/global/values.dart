@@ -31,6 +31,8 @@ class Values {
 
   static const supportEmail = 'support@syphon.org';
 
+  static const matrixSSOUrl =
+      '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
   static const openHelpUrl =
       'mailto:$supportEmail?subject=Syphon%20App%20Help&body=Leave%20your%20feedback%20or%20question%20here';
 

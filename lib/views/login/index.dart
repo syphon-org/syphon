@@ -109,6 +109,7 @@ class LoginState extends State<Login> {
             disableSpacing: true,
             controller: usernameController,
             formatters: [FilteringTextInputFormatter.deny(RegExp(r'@'))],
+            onEditingComplete: () => props.onChangeHomeserver(),
             onSubmitted: (text) {
               FocusScope.of(context).requestFocus(passwordFocus);
             },
@@ -395,6 +396,7 @@ class _Props extends Equatable {
   final Function onIncrementTheme;
   final Function onChangeUsername;
   final Function onChangePassword;
+  final Function onChangeHomeserver;
   final Function onLoginUser;
 
   _Props({
@@ -408,57 +410,75 @@ class _Props extends Equatable {
     @required this.onIncrementTheme,
     @required this.onChangeUsername,
     @required this.onChangePassword,
+    @required this.onChangeHomeserver,
     @required this.onLoginUser,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-      loading: store.state.authStore.loading,
-      username: store.state.authStore.username,
-      password: store.state.authStore.password,
-      homeserver: store.state.authStore.homeserver,
-      loginType: store.state.authStore.homeserver.loginType,
-      isLoginAttemptable:
-          store.state.authStore.homeserver.loginType == MatrixAuthTypes.SSO ||
-              (store.state.authStore.isPasswordValid &&
-                  store.state.authStore.isUsernameValid &&
-                  !store.state.authStore.loading &&
-                  !store.state.authStore.stopgap),
-      usernameHint: Strings.formatUsernameHint(
+        loading: store.state.authStore.loading,
         username: store.state.authStore.username,
-        homeserver: store.state.authStore.homeserver.hostname,
-      ),
-      onChangeUsername: (String text) {
-        final hostname = store.state.authStore.hostname;
-        final homeserver = store.state.authStore.homeserver ?? Homeserver();
+        password: store.state.authStore.password,
+        homeserver: store.state.authStore.homeserver,
+        loginType: store.state.authStore.homeserver.loginType,
+        isLoginAttemptable:
+            store.state.authStore.homeserver.loginType == MatrixAuthTypes.SSO ||
+                (store.state.authStore.isPasswordValid &&
+                    store.state.authStore.isUsernameValid &&
+                    !store.state.authStore.loading &&
+                    !store.state.authStore.stopgap),
+        usernameHint: Strings.formatUsernameHint(
+          username: store.state.authStore.username,
+          homeserver: store.state.authStore.hostname,
+        ),
+        onChangeUsername: (String text) {
+          final hostname = store.state.authStore.hostname;
+          final homeserver = store.state.authStore.homeserver;
 
-        final alias = text.trim().replaceAll('@', '').split(':');
+          final alias = text.trim().replaceAll('@', '').split(':');
 
-        store.dispatch(setUsername(
-          username: alias[0],
-        ));
+          store.dispatch(setUsername(username: alias[0]));
 
-        // If user enters full username, make sure to set homeserver
-        if (text.contains(':')) {
-          store.dispatch(setHostname(
-            hostname: alias[1],
-          ));
-        } else {
-          if (!hostname.contains('.')) {
-            store.dispatch(setHostname(
-              hostname: homeserver.hostname ?? 'matrix.org',
-            ));
+          // If user enters full username, make sure to set homeserver
+          if (text.contains(':')) {
+            store.dispatch(setHostname(hostname: alias[1]));
+          } else {
+            if (!hostname.contains('.')) {
+              store.dispatch(setHostname(
+                hostname: homeserver.hostname ?? 'matrix.org',
+              ));
+            }
           }
-        }
-      },
-      onChangePassword: (String text) {
-        store.dispatch(setLoginPassword(password: text));
-      },
-      onIncrementTheme: () {
-        store.dispatch(incrementTheme());
-      },
-      onLoginUser: () async {
-        await store.dispatch(loginUser());
-      });
+        },
+        onChangeHomeserver: () async {
+          final hostname = store.state.authStore.hostname;
+          final homeserver = store.state.authStore.homeserver;
+
+          print('[onChangeHomeserver] ${hostname} ${homeserver}');
+          if (hostname != homeserver.hostname) {
+            await store.dispatch(selectHomeserver(hostname: hostname));
+          }
+        },
+        onChangePassword: (String text) {
+          store.dispatch(setLoginPassword(password: text));
+        },
+        onIncrementTheme: () {
+          store.dispatch(incrementTheme());
+        },
+        onLoginUser: () async {
+          final hostname = store.state.authStore.hostname;
+          final homeserver = store.state.authStore.homeserver;
+
+          if (hostname != homeserver.hostname) {
+            return store.dispatch(selectHomeserver(hostname: hostname));
+          }
+
+          if (homeserver.loginType == MatrixAuthTypes.SSO) {
+            return await store.dispatch(loginUserSSO());
+          }
+
+          return await store.dispatch(loginUser());
+        },
+      );
 
   @override
   List<Object> get props => [
