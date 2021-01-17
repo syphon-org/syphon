@@ -2,6 +2,7 @@
 import './actions.dart';
 import '../events/model.dart';
 import './state.dart';
+import 'package:syphon/store/events/messages/model.dart';
 
 EventStore eventReducer(
     [EventStore state = const EventStore(), dynamic action]) {
@@ -26,11 +27,11 @@ EventStore eventReducer(
 
       return state.copyWith(messages: messages);
 
-    case SetState:
+    case SetEvents:
       final roomId = action.roomId;
-      final states = Map<String, List<Event>>.from(state.states);
-      states[roomId] = action.state;
-      return state.copyWith(states: states);
+      final events = Map<String, List<Event>>.from(state.events);
+      events[roomId] = action.state;
+      return state.copyWith(events: events);
 
     case ResetEvents:
       return EventStore();

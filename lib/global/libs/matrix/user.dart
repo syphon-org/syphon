@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // Project imports:
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 abstract class Users {
   /**

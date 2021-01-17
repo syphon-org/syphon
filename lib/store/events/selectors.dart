@@ -1,6 +1,8 @@
 // Project imports:
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {

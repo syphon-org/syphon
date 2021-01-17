@@ -4,7 +4,10 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 
+const String EVENTS = 'EVENTS';
 const String MESSAGES = 'messages';
 const String RECEIPTS = 'receipts';
 
@@ -18,6 +21,20 @@ Future<void> saveMessages(
     for (Message message in messages) {
       final record = store.record(message.id);
       await record.put(txn, json.encode(message));
+    }
+  });
+}
+
+Future<void> saveEvents(
+  List<Event> events, {
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(EVENTS);
+
+  return await storage.transaction((txn) async {
+    for (Event event in events) {
+      final record = store.record(event.id);
+      await record.put(txn, json.encode(event));
     }
   });
 }

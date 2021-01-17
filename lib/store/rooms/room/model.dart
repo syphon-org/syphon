@@ -4,12 +4,15 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -277,6 +280,18 @@ class Room {
       for (int i = 0; i < timelineEvents.length; i++) {
         final event = timelineEvents[i];
 
+        switch (event.type) {
+          case EventTypes.message:
+          case EventTypes.encrypted:
+            messageEvents.add(Message.fromEvent(event));
+            break;
+          case EventTypes.reaction:
+            messageEvents.add(Message.fromEvent(event));
+            break;
+          default:
+            stateEvents.add(event);
+            break;
+        }
         if (event.type == EventTypes.message ||
             event.type == EventTypes.encrypted) {
           messageEvents.add(Message.fromEvent(event));

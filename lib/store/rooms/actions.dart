@@ -10,8 +10,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -19,7 +21,6 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -29,7 +30,6 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
-import '../events/model.dart';
 import 'room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];

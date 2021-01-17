@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -22,6 +21,8 @@ import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -34,10 +35,10 @@ class SetMessages {
   SetMessages({this.roomId, this.messages});
 }
 
-class SetState {
+class SetEvents {
   final String roomId;
-  final List<Event> states;
-  SetState({this.roomId, this.states});
+  final List<Event> events;
+  SetEvents({this.roomId, this.events});
 }
 
 ThunkAction<AppState> setMessageEvents({

@@ -12,6 +12,8 @@ import 'dart:collection';
  */
 import 'package:sembast/sembast.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Map<String, dynamic> parseMessages({
@@ -127,7 +129,7 @@ Map<String, dynamic> parseEvents(
     }
   }
   return {
-    'states': stateEvents,
+    'events': stateEvents,
     "messages": messageEvents,
   };
 }

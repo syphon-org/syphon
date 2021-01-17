@@ -8,6 +8,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 class ChatInput extends StatelessWidget {
   final bool sendable;

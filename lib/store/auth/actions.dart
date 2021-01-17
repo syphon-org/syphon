@@ -176,9 +176,6 @@ StreamSubscription _sub;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
-        // TODO: do we need this to login on a fresh start?
-        // String initialLink = await getInitialLink();
-
         _sub = getUriLinksStream().listen((Uri uri) {
           print('[streamUniLinks] ${uri}');
           final token = uri.queryParameters['loginToken'];

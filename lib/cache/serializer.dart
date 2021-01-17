@@ -15,7 +15,7 @@ import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';

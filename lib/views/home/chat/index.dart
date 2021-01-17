@@ -27,10 +27,11 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
-import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
@@ -439,17 +440,18 @@ class ChatViewState extends State<ChatView> {
                   final avatarUri = props.users[message.sender]?.avatarUri;
 
                   return MessageWidget(
-                      message: message,
-                      isUserSent: isUserSent,
-                      isLastSender: isLastSender,
-                      isNextSender: isNextSender,
-                      lastRead: props.room.lastRead,
-                      selectedMessageId: selectedMessageId,
-                      onPressAvatar: onViewUserDetails,
-                      onLongPress: onToggleMessageOptions,
-                      avatarUri: avatarUri,
-                      theme: props.theme,
-                      timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr');
+                    message: message,
+                    isUserSent: isUserSent,
+                    isLastSender: isLastSender,
+                    isNextSender: isNextSender,
+                    lastRead: props.room.lastRead,
+                    selectedMessageId: selectedMessageId,
+                    onPressAvatar: onViewUserDetails,
+                    onLongPress: onToggleMessageOptions,
+                    avatarUri: avatarUri,
+                    theme: props.theme,
+                    timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
+                  );
                 },
               ),
             ],

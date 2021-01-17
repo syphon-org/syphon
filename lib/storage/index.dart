@@ -12,7 +12,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';

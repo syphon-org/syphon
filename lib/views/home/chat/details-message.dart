@@ -14,7 +14,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 final String debug = DotEnv().env['DEBUG'];

@@ -4,12 +4,11 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 abstract class Events {
   /**

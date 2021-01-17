@@ -1,9 +1,7 @@
-// Dart imports:
-import 'dart:async';
-
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/store/events/messages/model.dart';
 
 import 'model.dart';
 
@@ -11,29 +9,29 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class EventStore extends Equatable {
-  final Map<String, List<Event>> states; // indexed by roomId
+  final Map<String, List<Event>> events; // indexed by roomId
   final Map<String, List<Message>> messages; // indexed by roomId
   final Map<String, List<Event>> receipts;
 
   const EventStore({
-    this.states = const {},
+    this.events = const {},
     this.messages = const {},
     this.receipts = const {},
   });
 
   @override
   List<Object> get props => [
-        states,
+        events,
         messages,
         receipts,
       ];
 
   EventStore copyWith({
-    states,
+    events,
     messages,
   }) =>
       EventStore(
-        states: states ?? this.states,
+        events: events ?? this.events,
         messages: messages ?? this.messages,
         receipts: receipts ?? this.receipts,
       );

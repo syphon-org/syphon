@@ -18,6 +18,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
 /**
