@@ -132,9 +132,11 @@ class Message extends Event {
       var replacement = false;
       var relatedEventId;
 
-      if ((event.content as Map).containsKey('m.relates_to')) {
-        replacement = event.content['m.relates_to']['rel_type'] == 'm.replace';
-        relatedEventId = event.content['m.relates_to']['event_id'];
+      final relatesTo = event.content['m.relates_to'];
+
+      if (relatesTo != null && relatesTo['rel_type'] == 'm.replace') {
+        replacement = true;
+        relatedEventId = relatesTo['event_id'];
         body = event.content['m.new_content']['body'];
         msgtype = event.content['m.new_content']['msgtype'];
       }

@@ -139,10 +139,10 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
       encrypted: room.encryptionEnabled,
     );
 
-    reactions = await loadReactions(
+    reactions.addAll(await loadReactions(
       room.messageIds,
       storage: storage,
-    );
+    ));
   }
 
   return {

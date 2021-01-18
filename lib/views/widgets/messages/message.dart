@@ -86,7 +86,7 @@ class MessageWidget extends StatelessWidget {
             final reactionCount = reactionCounts[index];
             return ClipRRect(
               child: Container(
-                width: reactionCount > 0 ? 48 : 32,
+                width: reactionCount > 1 ? 48 : 32,
                 height: 48,
                 decoration: BoxDecoration(
                   color: Colors.grey[500],
@@ -108,15 +108,15 @@ class MessageWidget extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: reactionCount > 0,
+                      visible: reactionCount > 1,
                       child: Container(
-                        padding: EdgeInsets.only(left: 2),
+                        padding: EdgeInsets.only(left: 3),
                         child: Text(
                           reactionCount.toString(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                             color: Theme.of(context).textTheme.subtitle1.color,
                             height: 1.35,
                           ),

@@ -35,7 +35,6 @@ class Room {
   final String joinRule; // "public", "knock", "invite", "private"
 
   final bool direct;
-  final bool syncing;
   final bool sending;
   final bool drafting;
   final bool invite;
@@ -88,6 +87,9 @@ class Room {
 
   @JsonKey(ignore: true)
   final bool limited;
+
+  @JsonKey(ignore: true)
+  final bool loading;
 
   @JsonKey(ignore: true)
   String get type {
@@ -199,7 +201,7 @@ class Room {
         hidden: hidden ?? this.hidden ?? false,
         archived: archived ?? this.archived ?? false,
         sending: sending ?? this.sending,
-        syncing: syncing ?? this.syncing,
+        syncing: syncing ?? this.syncing ?? false,
         limited: limited ?? this.limited,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,

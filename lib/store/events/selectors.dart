@@ -62,7 +62,7 @@ Map<String, Message> replaceEdited(List<Message> messages) {
     messages ?? [],
     key: (msg) => msg.id,
     value: (msg) {
-      if (msg.replacement ?? false) {
+      if (msg.replacement) {
         replacements.add(msg);
       }
 

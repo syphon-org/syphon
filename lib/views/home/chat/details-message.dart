@@ -23,7 +23,6 @@ class MessageDetailArguments {
   final String roomId;
   final Message message;
 
-  // Improve loading times
   MessageDetailArguments({
     this.message,
     this.roomId,
@@ -176,7 +175,7 @@ class MessageDetails extends StatelessWidget {
                   ),
                   trailing: Container(
                     child: Text(
-                      'TODO',
+                      'Matrix',
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w300,

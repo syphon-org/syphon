@@ -59,8 +59,7 @@ abstract class Events {
     url += from != null ? '&from=${from}' : '';
     url += to != null ? '&to=${to}' : '';
     url += desc ? '&dir=b' : '&dir=f';
-    // TODO: remove after implementing reactions
-    url += '&filter={"not_types":["${EventTypes.member}", "m.reaction"]}';
+    url += '&filter={"not_types":["${EventTypes.member}"]}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

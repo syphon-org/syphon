@@ -48,10 +48,10 @@ Future<void> saveReactions(
       var reactionsUpdated = [reaction];
 
       if (exists) {
-        final existingListRaw = await record.get(storage);
-        final existingList = List<Reaction>.from(
-          await json.decode(existingListRaw),
-        );
+        final existingRaw = await record.get(storage);
+        final existingJson = List.from(await json.decode(existingRaw));
+        final existingList =
+            existingJson.map((json) => Reaction.fromJson(json));
 
         reactionsUpdated = [...existingList, ...reactionsUpdated];
       }
@@ -85,6 +85,7 @@ Future<Map<String, List<Reaction>>> loadReactions(
     }
   }
 
+  print('[loadReactions] ${reactionsMap.values.length}');
   return reactionsMap;
 }
 

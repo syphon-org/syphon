@@ -152,7 +152,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
         saveMessages(room.messagesNew, storage: Storage.main),
-        // saveReactions(room.reactions, storage: Storage.main),
+        saveReactions(room.reactions, storage: Storage.main),
       ]);
 
       // update store
@@ -791,7 +791,6 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
 ThunkAction<AppState> joinRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
-      print(room.id);
       final data = await MatrixApi.joinRoom(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -142,6 +143,9 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
+      for (dynamic message in messages) {
+        printJson(message);
+      }
       // reuse the logic for syncing
       await store.dispatch(
         syncRooms({
