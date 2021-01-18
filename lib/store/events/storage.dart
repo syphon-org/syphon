@@ -85,7 +85,6 @@ Future<Map<String, List<Reaction>>> loadReactions(
     }
   }
 
-  print('[loadReactions] ${reactionsMap.values.length}');
   return reactionsMap;
 }
 

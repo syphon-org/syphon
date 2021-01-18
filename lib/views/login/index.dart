@@ -452,7 +452,6 @@ class _Props extends Equatable {
           final hostname = store.state.authStore.hostname;
           final homeserver = store.state.authStore.homeserver;
 
-          print('[onChangeHomeserver] ${hostname} ${homeserver}');
           if (hostname != homeserver.hostname) {
             await store.dispatch(selectHomeserver(hostname: hostname));
           }

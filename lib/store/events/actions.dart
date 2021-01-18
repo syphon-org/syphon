@@ -143,9 +143,6 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      for (dynamic message in messages) {
-        printJson(message);
-      }
       // reuse the logic for syncing
       await store.dispatch(
         syncRooms({

@@ -89,7 +89,7 @@ class Room {
   final bool limited;
 
   @JsonKey(ignore: true)
-  final bool loading;
+  final bool syncing;
 
   @JsonKey(ignore: true)
   String get type {
@@ -304,7 +304,6 @@ class Room {
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
-            printJson(event.content);
             reactionEvents.add(Reaction.fromEvent(event));
             break;
           default:
