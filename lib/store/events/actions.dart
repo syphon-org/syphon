@@ -55,19 +55,14 @@ ThunkAction<AppState> setMessages({
   int limit = 20,
 }) =>
     (Store<AppState> store) {
-      return store.dispatch(
-        SetMessages(roomId: room.id, messages: messages),
-      );
+      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
     };
 
 ThunkAction<AppState> setReactions({
-  Room room,
   List<Reaction> reactions,
 }) =>
     (Store<AppState> store) {
-      return store.dispatch(
-        SetReactions(roomId: room.id, reactions: reactions),
-      );
+      return store.dispatch(SetReactions(reactions: reactions));
     };
 
 /**
@@ -80,7 +75,7 @@ ThunkAction<AppState> setReactions({
  * 
  * TODO: still needs work
  */
-ThunkAction<AppState> loadMessageEvents({
+ThunkAction<AppState> loadMessagesCached({
   Room room,
   int offset = 0,
   int limit = 20,

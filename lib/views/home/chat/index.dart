@@ -23,6 +23,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -30,7 +31,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
@@ -703,16 +704,21 @@ class _Props extends Equatable {
       timeFormat24Enabled:
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
-      room: roomSelectors.room(id: roomId, state: store.state),
+      room: selectRoom(id: roomId, state: store.state),
       users: store.state.userStore.users,
       enterSend: store.state.settingsStore.enterSend,
-      messages: latestMessages(replaceEdited(filterMessages(
-        wrapOutboxMessages(
-          messages: roomMessages(store.state, roomId).toList(),
-          outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+      messages: latestMessages(
+        replaceRelated(
+          filterBlocked(
+            wrapOutboxMessages(
+              messages: roomMessages(store.state, roomId).toList(),
+              outbox: selectRoom(id: roomId, state: store.state).outbox,
+            ),
+            blocked: store.state.userStore.blocked,
+          ),
+          reactions: selectReactions(store.state),
         ),
-        store.state.userStore.blocked,
-      ))),
+      ),
       roomPrimaryColor: () {
         final customChatSettings =
             store.state.settingsStore.customChatSettings ?? Map();

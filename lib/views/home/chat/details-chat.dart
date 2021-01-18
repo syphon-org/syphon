@@ -23,7 +23,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -575,8 +575,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-      room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
+      room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
       currentUser: store.state.authStore.user,
       messages: roomMessages(store.state, roomId),
@@ -605,7 +605,7 @@ class _Props extends Equatable {
         );
       },
       onToggleDirectRoom: () {
-        final room = roomSelectors.room(id: roomId, state: store.state);
+        final room = selectRoom(id: roomId, state: store.state);
         store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
       });
 }

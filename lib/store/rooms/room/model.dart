@@ -60,6 +60,7 @@ class Room {
   // Associated user ids
   final List<String> userIds;
   final List<String> messageIds;
+  final List<String> reactionIds;
   final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
@@ -125,6 +126,7 @@ class Room {
     this.reactions = const [],
     this.messagesNew = const [],
     this.messageIds = const [],
+    this.reactionIds = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -176,6 +178,7 @@ class Room {
     List<Message> messagesNew,
     List<Event> reactions,
     List<String> messageIds,
+    List<String> reactionIds,
     messageReads,
     lastHash,
     prevHash,
@@ -292,16 +295,14 @@ class Room {
         timelineEventsRaw.map((event) => Event.fromMatrix(event)),
       );
 
-      // TODO: make this more functional, need to split into two lists on type
-      for (int i = 0; i < timelineEvents.length; i++) {
-        final event = timelineEvents[i];
-
+      for (Event event in timelineEvents) {
         switch (event.type) {
           case EventTypes.message:
           case EventTypes.encrypted:
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
+            printJson(event.content);
             reactionEvents.add(Reaction.fromEvent(event));
             break;
           default:
@@ -333,8 +334,8 @@ class Room {
           invite: invite,
           limited: limited,
           events: stateEvents,
-          reactions: reactionEvents,
           currentUser: currentUser,
+          reactions: reactionEvents,
         )
         .fromMessageEvents(
           messages: messageEvents,

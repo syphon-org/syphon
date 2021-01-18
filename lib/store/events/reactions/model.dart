@@ -6,7 +6,7 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Reaction extends Event {
-  final String body; // 'key' in matrix / is likely an emoji
+  final String body; // 'key' in matrix likely an emoji
   final String relType;
   final String relEventId;
 

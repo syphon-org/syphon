@@ -1,6 +1,7 @@
 // Project imports:
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/index.dart';
 
@@ -8,15 +9,52 @@ List<Message> roomMessages(AppState state, String roomId) {
   return state.eventStore.messages[roomId] ?? [];
 }
 
+Map<String, List<Reaction>> selectReactions(AppState state) {
+  return state.eventStore.reactions ?? [];
+}
+
 // remove messages from blocked users
-List<Message> filterMessages(List<Message> messages, List<String> blocked) {
+List<Message> filterBlocked(List<Message> messages, {List<String> blocked}) {
   return messages
     ..removeWhere(
       (message) => blocked.contains(message.sender),
     );
 }
 
-List<Message> replaceEdited(List<Message> messages) {
+List<Message> replaceRelated(
+  List<Message> messages, {
+  Map<String, List<Reaction>> reactions,
+}) {
+  final messagesMap = replaceReactions(
+    replaceEdited(messages),
+    reactions: reactions,
+  );
+
+  return List.from(messagesMap.values);
+}
+
+Map<String, Message> replaceReactions(
+  Map<String, Message> messages, {
+  Map<String, List<Reaction>> reactions,
+}) {
+  // get a list message ids (also reaction keys) that have values in 'reactions'
+  final List<String> reactionKeys =
+      reactions.keys.where((k) => messages.containsKey(k)).toList();
+
+  // add the parsed list to the message to be handled in the UI
+  for (String reactionKey in reactionKeys) {
+    final reactionList = reactions[reactionKey];
+    if (reactionList != null) {
+      messages[reactionKey] = messages[reactionKey].copyWith(
+        reactions: reactionList,
+      );
+    }
+  }
+
+  return messages;
+}
+
+Map<String, Message> replaceEdited(List<Message> messages) {
   final replacements = List<Message>();
 
   // create a map of messages for O(1) when replacing (O(N))
@@ -37,11 +75,12 @@ List<Message> replaceEdited(List<Message> messages) {
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
   for (Message replacement in replacements) {
-    if (messagesMap.containsKey(replacement.replacementId)) {
-      final replaced = messagesMap[replacement.replacementId];
-      messagesMap[replacement.replacementId] = replaced.copyWith(
+    if (messagesMap.containsKey(replacement.relatedEventId)) {
+      final eventUpdated = messagesMap[replacement.relatedEventId];
+      messagesMap[replacement.relatedEventId] = eventUpdated.copyWith(
         body: replacement.body,
         msgtype: replacement.msgtype,
+        edits: [replacement, ...(eventUpdated.edits ?? List<Message>())],
         edited: true,
       );
 
@@ -50,7 +89,7 @@ List<Message> replaceEdited(List<Message> messages) {
     }
   }
 
-  return List.from(messagesMap.values);
+  return messagesMap;
 }
 
 List<Message> reduceReactions(

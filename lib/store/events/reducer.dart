@@ -1,4 +1,6 @@
 // Project imports:
+import 'package:syphon/store/events/reactions/model.dart';
+
 import './actions.dart';
 import '../events/model.dart';
 import './state.dart';
@@ -14,7 +16,24 @@ EventStore eventReducer(
       return state.copyWith(events: events);
 
     case SetReactions:
-      return state;
+      final reactionsUpdated = Map<String, List<Reaction>>.from(
+        state.reactions,
+      );
+
+      for (Reaction reaction in action.reactions ?? []) {
+        final exists = reactionsUpdated.containsKey(reaction.relEventId);
+
+        if (exists) {
+          final existing = reactionsUpdated[reaction.relEventId];
+          reactionsUpdated[reaction.relEventId] = [...existing, reaction];
+        } else {
+          reactionsUpdated[reaction.relEventId] = [reaction];
+        }
+      }
+
+      return state.copyWith(
+        reactions: reactionsUpdated,
+      );
     case SetMessages:
       final roomId = action.roomId;
       final messages = Map<String, List<Message>>.from(state.messages);

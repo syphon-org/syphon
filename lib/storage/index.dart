@@ -13,6 +13,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -130,11 +131,17 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
   );
 
   Map<String, List<Message>> messages = Map();
+  Map<String, List<Reaction>> reactions = Map();
   for (Room room in rooms.values) {
     messages[room.id] = await loadMessages(
       room.messageIds,
       storage: storage,
       encrypted: room.encryptionEnabled,
+    );
+
+    reactions = await loadReactions(
+      room.messageIds,
+      storage: storage,
     );
   }
 
@@ -145,5 +152,6 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     'media': media,
     'crypto': crypto,
     'messages': messages.isNotEmpty ? messages : null,
+    'reactions': reactions,
   };
 }

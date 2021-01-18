@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 
 part 'model.g.dart';
 
@@ -13,7 +13,13 @@ class Message extends Event {
   // message editing
   final bool edited;
   final bool replacement;
-  final String replacementId; // TODO: relatedEventIds
+  final String relatedEventId;
+
+  @JsonKey(ignore: true)
+  final List<Message> edits;
+
+  @JsonKey(ignore: true)
+  final List<Reaction> reactions;
 
   // Message Only
   final String body;
@@ -48,8 +54,10 @@ class Message extends Event {
     this.pending = false,
     this.failed = false,
     this.replacement = false,
+    this.relatedEventId,
+    this.edits = const [],
+    this.reactions = const [],
     this.edited = false,
-    this.replacementId,
   }) : super(
           id: id,
           userId: userId,
@@ -83,7 +91,9 @@ class Message extends Event {
     failed = false,
     replacement = false,
     edited = false,
-    replacementId,
+    relatedEventId,
+    edits,
+    reactions,
   }) =>
       Message(
         id: id ?? this.id,
@@ -106,7 +116,9 @@ class Message extends Event {
         failed: failed ?? this.failed ?? false,
         replacement: replacement ?? this.replacement ?? false,
         edited: edited ?? this.edited ?? false,
-        replacementId: replacementId ?? this.replacementId,
+        relatedEventId: relatedEventId ?? this.relatedEventId,
+        edits: edits ?? this.edits,
+        reactions: reactions ?? this.reactions,
       );
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
@@ -118,11 +130,11 @@ class Message extends Event {
       var body = event.content['body'] ?? '';
       var msgtype = event.content['msgtype'];
       var replacement = false;
-      var replacementId;
+      var relatedEventId;
 
       if ((event.content as Map).containsKey('m.relates_to')) {
         replacement = event.content['m.relates_to']['rel_type'] == 'm.replace';
-        replacementId = event.content['m.relates_to']['event_id'];
+        relatedEventId = event.content['m.relates_to']['event_id'];
         body = event.content['m.new_content']['body'];
         msgtype = event.content['m.new_content']['msgtype'];
       }
@@ -145,7 +157,7 @@ class Message extends Event {
         algorithm: event.content['algorithm'],
         senderKey: event.content['sender_key'],
         replacement: replacement,
-        replacementId: replacementId,
+        relatedEventId: relatedEventId,
         failed: false,
         pending: false,
         syncing: false,
