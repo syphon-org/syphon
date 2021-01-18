@@ -13,6 +13,7 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -33,23 +34,25 @@ class Room {
   final String topic;
   final String joinRule; // "public", "knock", "invite", "private"
 
-  final int namePriority;
-  final int lastRead;
   final bool direct;
   final bool syncing;
   final bool sending;
-  final bool isDraftRoom;
+  final bool drafting;
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
+  final bool hidden;
+  final bool archived;
 
   final String lastHash; // oldest hash in timeline
   final String prevHash; // most recent prev_batch (not the lastHash)
   final String nextHash; // most recent next_batch
 
+  final int lastRead;
   final int lastUpdate;
   final int totalJoinedUsers;
+  final int namePriority;
 
   // Event lists and handlers
   final Message draft;
@@ -62,6 +65,9 @@ class Room {
   // TODO: removed until state timeline work can be done
   @JsonKey(ignore: true)
   final List<Event> state;
+
+  @JsonKey(ignore: true)
+  final List<Reaction> reactions;
 
   @JsonKey(ignore: true)
   final List<Message> messagesNew;
@@ -112,10 +118,11 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.limited = false,
-    this.draft,
+    this.draft = null,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
+    this.reactions = const [],
     this.messagesNew = const [],
     this.messageIds = const [],
     this.lastRead = 0,
@@ -127,7 +134,9 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.usersTyping = const [],
-    this.isDraftRoom = false,
+    this.drafting = false,
+    this.hidden = false,
+    this.archived = false,
     this.lastHash,
     this.nextHash,
     this.prevHash,
@@ -156,13 +165,16 @@ class Room {
     encryptionEnabled,
     userTyping,
     usersTyping,
-    isDraftRoom,
     draft,
+    drafting,
+    hidden,
+    archived,
     users,
     userIds,
     events,
     List<Message> outbox,
     List<Message> messagesNew,
+    List<Event> reactions,
     List<String> messageIds,
     messageReads,
     lastHash,
@@ -178,9 +190,11 @@ class Room {
         joinRule: joinRule ?? this.joinRule,
         avatarUri: avatarUri ?? this.avatarUri,
         homeserver: homeserver ?? this.homeserver,
-        draft: draft ?? this.draft,
+        drafting: drafting ?? this.drafting ?? false,
         invite: invite ?? this.invite,
         direct: direct ?? this.direct,
+        hidden: hidden ?? this.hidden ?? false,
+        archived: archived ?? this.archived ?? false,
         sending: sending ?? this.sending,
         syncing: syncing ?? this.syncing,
         limited: limited ?? this.limited,
@@ -192,10 +206,11 @@ class Room {
         encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
-        isDraftRoom: isDraftRoom ?? this.isDraftRoom,
+        draft: draft ?? this.draft,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
+        reactions: reactions ?? this.reactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,
@@ -237,9 +252,10 @@ class Room {
     String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
-    List<Event> ephemeralEvents = [];
-    List<Message> messageEvents = [];
     List<Event> accountEvents = [];
+    List<Event> ephemeralEvents = [];
+    List<Reaction> reactionEvents = [];
+    List<Message> messageEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
@@ -286,17 +302,11 @@ class Room {
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
-            messageEvents.add(Message.fromEvent(event));
+            reactionEvents.add(Reaction.fromEvent(event));
             break;
           default:
             stateEvents.add(event);
             break;
-        }
-        if (event.type == EventTypes.message ||
-            event.type == EventTypes.encrypted) {
-          messageEvents.add(Message.fromEvent(event));
-        } else {
-          stateEvents.add(event);
         }
       }
     }
@@ -323,6 +333,7 @@ class Room {
           invite: invite,
           limited: limited,
           events: stateEvents,
+          reactions: reactionEvents,
           currentUser: currentUser,
         )
         .fromMessageEvents(
@@ -374,6 +385,7 @@ class Room {
     bool limited,
     User currentUser,
     List<Event> events,
+    List<Reaction> reactions,
   }) {
     String name;
     String avatarUri;
@@ -512,6 +524,7 @@ class Room {
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
+      reactions: reactions,
     );
   }
 

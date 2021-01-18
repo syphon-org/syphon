@@ -59,6 +59,11 @@ class MessageWidget extends StatelessWidget {
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
     var opacity = 1.0;
     var isRead = message.timestamp < lastRead;
+    var status = formatTimestamp(
+      lastUpdateMillis: message.timestamp,
+      timeFormat: timeFormat,
+      showTime: true,
+    );
 
     // Current User Bubble Styling
     if (isUserSent) {
@@ -150,6 +155,14 @@ class MessageWidget extends StatelessWidget {
 
     if (selectedMessageId != null) {
       opacity = selectedMessageId == message.id ? 1 : 0.5;
+    }
+
+    if (message.failed) {
+      status = Strings.errorMessageSendingFailed;
+    }
+
+    if (message.edited) {
+      status += ' (Edited)';
     }
 
     String body = message.body;
@@ -273,15 +286,10 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                 ),
                                 Container(
+                                  // timestamp and error message
                                   margin: EdgeInsets.only(right: 4),
                                   child: Text(
-                                    message.failed
-                                        ? Strings.errorMessageSendingFailed
-                                        : formatTimestamp(
-                                            lastUpdateMillis: message.timestamp,
-                                            timeFormat: timeFormat,
-                                            showTime: true,
-                                          ),
+                                    status,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: textColor,

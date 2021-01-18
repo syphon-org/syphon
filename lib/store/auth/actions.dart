@@ -179,7 +179,8 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         _sub = getUriLinksStream().listen((Uri uri) {
           print('[streamUniLinks] ${uri}');
           final token = uri.queryParameters['loginToken'];
-          if (store.state.authStore.user == null) {
+          print(store.state.authStore.user.accessToken);
+          if (store.state.authStore.user.accessToken == null) {
             store.dispatch(loginUserSSO(token: token));
           }
         }, onError: (err) {

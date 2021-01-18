@@ -25,7 +25,6 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 

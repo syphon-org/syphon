@@ -10,6 +10,7 @@ class AccountDataTypes {
 }
 
 class RelationTypes {
+  static const relatesTo = 'm.relates_to';
   static const annotation = 'm.annotation';
   static const replace = 'm.replace';
 }

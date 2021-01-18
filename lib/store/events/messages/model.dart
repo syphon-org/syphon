@@ -10,6 +10,12 @@ class Message extends Event {
   final bool syncing;
   final bool failed;
 
+  // message editing
+  final bool edited;
+  final bool replacement;
+  final String replacementId; // TODO: relatedEventIds
+  final int latestTimestamp;
+
   // Message Only
   final String body;
   final String msgtype;
@@ -42,6 +48,10 @@ class Message extends Event {
     this.syncing = false,
     this.pending = false,
     this.failed = false,
+    this.replacement = false,
+    this.edited = false,
+    this.replacementId,
+    this.latestTimestamp,
   }) : super(
           id: id,
           userId: userId,
@@ -53,12 +63,74 @@ class Message extends Event {
           content: content,
         );
 
+  @override
+  Message copyWith({
+    id,
+    type,
+    sender,
+    roomId,
+    stateKey,
+    content,
+    timestamp,
+    body,
+    msgtype,
+    format,
+    filename,
+    formattedBody,
+    ciphertext,
+    senderKey,
+    algorithm,
+    syncing = false,
+    pending = false,
+    failed = false,
+    replacement = false,
+    edited = false,
+    replacementId,
+    latestTimestamp,
+  }) =>
+      Message(
+        id: id ?? this.id,
+        type: type ?? this.type,
+        sender: sender ?? this.sender,
+        roomId: roomId ?? this.roomId,
+        stateKey: stateKey ?? this.stateKey,
+        timestamp: timestamp ?? this.timestamp,
+        content: content ?? this.content,
+        body: body ?? this.body,
+        formattedBody: formattedBody ?? this.formattedBody,
+        msgtype: msgtype ?? this.msgtype,
+        format: format ?? this.format,
+        filename: filename ?? this.filename,
+        ciphertext: ciphertext ?? this.ciphertext,
+        senderKey: senderKey ?? this.senderKey,
+        algorithm: algorithm ?? this.algorithm,
+        syncing: syncing ?? this.syncing ?? false,
+        pending: pending ?? this.pending ?? false,
+        failed: failed ?? this.failed ?? false,
+        replacement: replacement ?? this.replacement ?? false,
+        edited: edited ?? this.edited ?? false,
+        replacementId: replacementId ?? this.replacementId,
+        latestTimestamp: latestTimestamp ?? this.latestTimestamp,
+      );
+
   Map<String, dynamic> toJson() => _$MessageToJson(this);
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
+      var body = event.content['body'] ?? '';
+      var msgtype = event.content['msgtype'];
+      var replacement = false;
+      var replacementId;
+
+      if ((event.content as Map).containsKey('m.relates_to')) {
+        replacement = event.content['m.relates_to']['rel_type'] == 'm.replace';
+        replacementId = event.content['m.relates_to']['event_id'];
+        body = event.content['m.new_content']['body'];
+        msgtype = event.content['m.new_content']['msgtype'];
+      }
+
       return Message(
         id: event.id,
         userId: event.userId,
@@ -68,17 +140,20 @@ class Message extends Event {
         stateKey: event.stateKey,
         timestamp: event.timestamp,
         content: event.content,
-        body: event.content['body'] ?? '',
-        msgtype: event.content['msgtype'],
+        body: body,
+        msgtype: msgtype,
         format: event.content['format'],
         filename: event.content['filename'],
         formattedBody: event.content['formatted_body'],
         ciphertext: event.content['ciphertext'] ?? '',
         algorithm: event.content['algorithm'],
         senderKey: event.content['sender_key'],
+        replacement: replacement,
+        replacementId: replacementId,
+        failed: false,
         pending: false,
         syncing: false,
-        failed: false,
+        edited: false,
       );
     } catch (error) {
       return Message(
@@ -93,6 +168,7 @@ class Message extends Event {
         pending: false,
         syncing: false,
         failed: false,
+        edited: false,
       );
     }
   }

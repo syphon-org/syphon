@@ -27,10 +27,10 @@ List<Room> sortedPrioritizedRooms(List<Room> rooms) {
   // sort descending
   sortedList.sort((a, b) {
     // Prioritze draft rooms
-    if (a.isDraftRoom && !b.isDraftRoom) {
+    if (a.drafting && !b.drafting) {
       return -1;
     }
-    if (!a.isDraftRoom && b.isDraftRoom) {
+    if (!a.drafting && b.drafting) {
       return 1;
     }
     if (a.invite && !b.invite) {

@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 
 part 'model.g.dart';
 
@@ -53,14 +54,16 @@ class Event {
   Map<String, dynamic> toJson() => _$EventToJson(this);
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
-  factory Event.fromMatrix(Map<String, dynamic> json) => Event(
-        id: json['event_id'] as String,
-        userId: json['user_id'] as String,
-        roomId: json['room_id'] as String,
-        type: json['type'] as String,
-        sender: json['sender'] as String,
-        stateKey: json['state_key'] as String,
-        timestamp: json['origin_server_ts'] as int,
-        content: json['content'] as dynamic,
-      );
+  factory Event.fromMatrix(Map<String, dynamic> json) {
+    return Event(
+      id: json['event_id'] as String,
+      userId: json['user_id'] as String,
+      roomId: json['room_id'] as String,
+      type: json['type'] as String,
+      sender: json['sender'] as String,
+      stateKey: json['state_key'] as String,
+      timestamp: json['origin_server_ts'] as int,
+      content: json['content'] as dynamic,
+    );
+  }
 }

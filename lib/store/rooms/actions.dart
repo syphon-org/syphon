@@ -14,6 +14,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -151,21 +152,19 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
         saveMessages(room.messagesNew, storage: Storage.main),
+        saveReactions(room.reactions, storage: Storage.main),
       ]);
 
       // update store
-      await store.dispatch(
-        setUsers(room.usersNew),
-      );
-
-      await store.dispatch(
-        setMessageEvents(room: room, messages: room.messagesNew),
-      );
+      await store.dispatch(setUsers(room.usersNew));
+      await store.dispatch(setReactions(room: room, reactions: room.reactions));
+      await store.dispatch(setMessages(room: room, messages: room.messagesNew));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
         messagesNew: List<Message>(),
+        reactions: List<Reaction>(),
       );
 
       // update room
@@ -1036,7 +1035,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 //         topic: topic,
 //         direct: isDirect,
 //         avatarUri: avatarUri,
-//         isDraftRoom: true,
+//         draft: true,
 //         users: Map.fromIterable(
 //           users,
 //           key: (user) => user.id,
@@ -1062,7 +1061,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 // }) {
 //   return (Store<AppState> store) async {
 //     try {
-//       if (!room.isDraftRoom) {
+//       if (!room.drafting) {
 //         throw 'Room has already been created';
 //       }
 

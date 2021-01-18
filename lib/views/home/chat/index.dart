@@ -26,7 +26,6 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
@@ -707,15 +706,13 @@ class _Props extends Equatable {
       room: roomSelectors.room(id: roomId, state: store.state),
       users: store.state.userStore.users,
       enterSend: store.state.settingsStore.enterSend,
-      messages: latestMessages(
-        filterMessages(
-          wrapOutboxMessages(
-            messages: roomMessages(store.state, roomId).toList(),
-            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
-          ),
-          store.state.userStore.blocked,
+      messages: latestMessages(replaceEdited(filterMessages(
+        wrapOutboxMessages(
+          messages: roomMessages(store.state, roomId).toList(),
+          outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
         ),
-      ),
+        store.state.userStore.blocked,
+      ))),
       roomPrimaryColor: () {
         final customChatSettings =
             store.state.settingsStore.customChatSettings ?? Map();

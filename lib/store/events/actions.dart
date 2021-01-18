@@ -17,6 +17,7 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -29,26 +30,44 @@ final protocol = DotEnv().env['PROTOCOL'];
 
 class ResetEvents {}
 
-class SetMessages {
-  final String roomId;
-  final List<Message> messages;
-  SetMessages({this.roomId, this.messages});
-}
-
 class SetEvents {
   final String roomId;
   final List<Event> events;
   SetEvents({this.roomId, this.events});
 }
 
-ThunkAction<AppState> setMessageEvents({
+class SetMessages {
+  final String roomId;
+  final List<Message> messages;
+  SetMessages({this.roomId, this.messages});
+}
+
+class SetReactions {
+  final String roomId;
+  final List<Reaction> reactions;
+  SetReactions({this.roomId, this.reactions});
+}
+
+ThunkAction<AppState> setMessages({
   Room room,
   List<Message> messages,
   int offset = 0,
   int limit = 20,
 }) =>
     (Store<AppState> store) {
-      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+      return store.dispatch(
+        SetMessages(roomId: room.id, messages: messages),
+      );
+    };
+
+ThunkAction<AppState> setReactions({
+  Room room,
+  List<Reaction> reactions,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(
+        SetReactions(roomId: room.id, reactions: reactions),
+      );
     };
 
 /**

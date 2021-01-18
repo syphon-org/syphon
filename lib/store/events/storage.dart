@@ -4,26 +4,13 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 
-const String EVENTS = 'EVENTS';
+const String EVENTS = 'events';
 const String MESSAGES = 'messages';
 const String RECEIPTS = 'receipts';
-
-Future<void> saveMessages(
-  List<Message> messages, {
-  Database storage,
-}) async {
-  final store = StoreRef<String, String>(MESSAGES);
-
-  return await storage.transaction((txn) async {
-    for (Message message in messages) {
-      final record = store.record(message.id);
-      await record.put(txn, json.encode(message));
-    }
-  });
-}
+const String REACTIONS = 'reactions';
 
 Future<void> saveEvents(
   List<Event> events, {
@@ -35,6 +22,34 @@ Future<void> saveEvents(
     for (Event event in events) {
       final record = store.record(event.id);
       await record.put(txn, json.encode(event));
+    }
+  });
+}
+
+Future<void> saveReactions(
+  List<Reaction> reactions, {
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(REACTIONS);
+
+  return await storage.transaction((txn) async {
+    for (Reaction reaction in reactions) {
+      final record = store.record(reaction.id);
+      await record.put(txn, json.encode(reaction));
+    }
+  });
+}
+
+Future<void> saveMessages(
+  List<Message> messages, {
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(MESSAGES);
+
+  return await storage.transaction((txn) async {
+    for (Message message in messages) {
+      final record = store.record(message.id);
+      await record.put(txn, json.encode(message));
     }
   });
 }
