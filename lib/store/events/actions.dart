@@ -273,6 +273,51 @@ ThunkAction<AppState> saveDraft({
   };
 }
 
+///
+/// Format Message Reply
+///
+/// Format a message as a reply to another
+/// https://matrix.org/docs/spec/client_server/latest#rich-replies
+/// https://github.com/matrix-org/matrix-doc/pull/1767
+///
+///
+ThunkAction<AppState> formatMessageReply(
+  Room room,
+  String body,
+  String eventId,
+) {
+  return (Store<AppState> store) async {
+    try {
+      final Message original = await loadMessage(eventId);
+
+      return Message(
+        content: {
+          "body": '''> ${original.body}
+          $body
+          ''',
+          "format": "org.matrix.custom.html",
+          "formatted_body": '''
+          <mx-reply>
+            <blockquote>
+              <a href="https://matrix.to/#/!${room.id}/\$${original.id}:example.org">In reply to</a>
+              <a href="https://matrix.to/#/${original.senderKey}">${original.senderKey}</a>
+              <br />
+              ${original.formattedBody}
+            </blockquote>
+          </mx-reply>
+          $body
+          ''',
+          "m.relates_to": {
+            "m.in_reply_to": {"event_id": "$eventId"}
+          }
+        },
+      );
+    } catch (error) {
+      return null;
+    }
+  };
+}
+
 /**
  * 
  * Read Message Marker

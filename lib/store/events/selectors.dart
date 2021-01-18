@@ -42,7 +42,6 @@ List<Message> replaceEdited(List<Message> messages) {
       messagesMap[replacement.replacementId] = replaced.copyWith(
         body: replacement.body,
         msgtype: replacement.msgtype,
-        latestTimestamp: replacement.timestamp,
         edited: true,
       );
 

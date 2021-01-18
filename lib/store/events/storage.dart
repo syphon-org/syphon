@@ -68,6 +68,14 @@ Future<void> saveReceipts(
   });
 }
 
+Future<Message> loadMessage(String eventId, {Database storage}) async {
+  final store = StoreRef<String, String>(MESSAGES);
+
+  final message = await store.record(eventId).get(storage);
+
+  return Message.fromJson(json.decode(message));
+}
+
 /**
  * Load Messages (Cold Storage)
  * 

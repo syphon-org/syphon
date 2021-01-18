@@ -14,7 +14,6 @@ class Message extends Event {
   final bool edited;
   final bool replacement;
   final String replacementId; // TODO: relatedEventIds
-  final int latestTimestamp;
 
   // Message Only
   final String body;
@@ -51,7 +50,6 @@ class Message extends Event {
     this.replacement = false,
     this.edited = false,
     this.replacementId,
-    this.latestTimestamp,
   }) : super(
           id: id,
           userId: userId,
@@ -86,7 +84,6 @@ class Message extends Event {
     replacement = false,
     edited = false,
     replacementId,
-    latestTimestamp,
   }) =>
       Message(
         id: id ?? this.id,
@@ -110,7 +107,6 @@ class Message extends Event {
         replacement: replacement ?? this.replacement ?? false,
         edited: edited ?? this.edited ?? false,
         replacementId: replacementId ?? this.replacementId,
-        latestTimestamp: latestTimestamp ?? this.latestTimestamp,
       );
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
