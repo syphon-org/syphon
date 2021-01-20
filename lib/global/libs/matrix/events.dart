@@ -217,6 +217,81 @@ abstract class Events {
   }
 
   /**
+   * Send Reaction
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+   * 
+   * Notes on requestId (considered a transactionId in Matrix)
+   * 
+   * The transaction ID for this event. 
+   * Clients should generate an ID unique across requests with the same access token; 
+   * it will be used by the server to ensure idempotency of requests. <- really a requestId
+   */
+  static Future<dynamic> sendReaction({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String reaction,
+    String roomId,
+    String messageId,
+    String trxId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      "m.relates_to": {
+        "rel_type": "m.annotation",
+        "event_id": "$messageId",
+        "key": "$reaction"
+      }
+    };
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  ///
+  /// Redact Event
+  ///
+  /// For all types of sendable events
+  ///
+  static Future<dynamic> redactEvent({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+    String eventId,
+    String trxId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {};
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
    * Send (Event) To Device
    * 
    * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-sendtodevice-eventtype-txnid

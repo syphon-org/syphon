@@ -44,12 +44,14 @@ abstract class MatrixApi {
   static final sendEvent = Events.sendEvent;
   static final sendTyping = Events.sendTyping;
   static final sendMessage = Events.sendMessage;
+  static final sendReaction = Events.sendReaction;
   static final sendReadReceipts = Events.sendReadMarkers;
+  static final sendEventToDevice = Events.sendEventToDevice;
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
   static final fetchMessageEventsMapped = Events.fetchMessageEventsMapped;
-  static final sendEventToDevice = Events.sendEventToDevice;
+  static final redactEvent = Events.redactEvent;
 
   // Account Data & User Management
   static final fetchAccountData = Users.fetchAccountData;

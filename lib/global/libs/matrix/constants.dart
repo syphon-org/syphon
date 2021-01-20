@@ -23,6 +23,7 @@ class EventTypes {
   static const message = 'm.room.message';
   static const encrypted = 'm.room.encrypted';
   static const member = 'm.room.member';
+  static const redaction = 'm.room.redaction';
   static const reaction = 'm.reaction';
 
   static const guestAccess = 'm.room.guest_access';

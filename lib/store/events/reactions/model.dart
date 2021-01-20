@@ -63,7 +63,8 @@ class Reaction extends Event {
       _$ReactionFromJson(json);
 
   factory Reaction.fromEvent(Event event) {
-    final content = event.content['m.relates_to'];
+    final content = event.content['m.relates_to'] ?? {};
+    print("${event.content} ${event.type}");
     return Reaction(
       id: event.id,
       userId: event.userId,

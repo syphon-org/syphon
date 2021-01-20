@@ -29,24 +29,24 @@ class MessageWidget extends StatelessWidget {
     this.timeFormat = '12hr',
     this.onLongPress,
     this.onPressAvatar,
+    this.onInputReaction,
     this.onToggleReaction,
-    this.onSelectReaction,
   }) : super(key: key);
 
   final Message message;
+  final ThemeType theme;
+  final int lastRead;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
   final bool messageOnly;
-  final int lastRead;
   final String timeFormat;
-  final ThemeType theme;
+  final String avatarUri;
   final String selectedMessageId;
   final Function onLongPress;
   final Function onPressAvatar;
-  final Function onSelectReaction;
+  final Function onInputReaction;
   final Function onToggleReaction;
-  final String avatarUri;
 
   @protected
   Widget buildReactions(
@@ -66,25 +66,24 @@ class MessageWidget extends StatelessWidget {
     final reactionKeys = reactionsMap.keys.toList();
     final reactionCounts = reactionsMap.values.toList();
 
-    return GestureDetector(
-      onTap: () {
-        if (this.onPressAvatar != null) {
-          HapticFeedback.lightImpact();
-          this.onSelectReaction(message: message);
-        }
-      },
-      child: Container(
-        height: Dimensions.iconSize,
-        transform: Matrix4.translationValues(0.0, 8.0, 0.0),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          itemCount: reactionKeys.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            final reactionKey = reactionKeys[index];
-            final reactionCount = reactionCounts[index];
-            return ClipRRect(
+    return Container(
+      height: Dimensions.iconSize,
+      transform: Matrix4.translationValues(0.0, 8.0, 0.0),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        itemCount: reactionKeys.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (BuildContext context, int index) {
+          final reactionKey = reactionKeys[index];
+          final reactionCount = reactionCounts[index];
+          return GestureDetector(
+            onTap: () {
+              if (this.onToggleReaction != null) {
+                this.onToggleReaction(reactionKey);
+              }
+            },
+            child: ClipRRect(
               child: Container(
                 width: reactionCount > 1 ? 48 : 32,
                 height: 48,
@@ -126,9 +125,9 @@ class MessageWidget extends StatelessWidget {
                   ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -144,9 +143,8 @@ class MessageWidget extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              if (this.onPressAvatar != null) {
-                HapticFeedback.lightImpact();
-                this.onToggleReaction(message: message);
+              if (onInputReaction != null) {
+                onInputReaction();
               }
             },
             child: ClipRRect(

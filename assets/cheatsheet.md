@@ -180,3 +180,24 @@ flutter_recaptcha_v2: 0.1.0 used as reference for webview captcha
    }
  }
 ```
+
+
+```dart
+
+  /// something to try when binding state, the downside is you
+  /// don't get the didUpdateWidget
+  class ChatViewConnected extends StatelessWidget {
+    @override
+    Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+          distinct: true,
+          converter: (Store<AppState> store) => _Props.mapStateToProps(
+            store,
+            (ModalRoute.of(context).settings.arguments as ChatViewArguements)
+                .roomId,
+          ),
+          builder: (context, props) {
+            return ChatView();
+          },
+        );
+ }
+```

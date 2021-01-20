@@ -304,7 +304,9 @@ class Room {
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
-            reactionEvents.add(Reaction.fromEvent(event));
+            if ((event.content as Map).keys.length > 0) {
+              reactionEvents.add(Reaction.fromEvent(event));
+            }
             break;
           default:
             stateEvents.add(event);

@@ -119,6 +119,7 @@ dependencies:
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5
   palette_generator: 0.2.3
+  emoji_picker: 0.1.0
 
   # fun
   ansicolor: 1.1.1
