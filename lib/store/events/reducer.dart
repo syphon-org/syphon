@@ -25,7 +25,9 @@ EventStore eventReducer(
 
         if (exists) {
           final existing = reactionsUpdated[reaction.relEventId];
-          reactionsUpdated[reaction.relEventId] = [...existing, reaction];
+          if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
+            reactionsUpdated[reaction.relEventId] = [...existing, reaction];
+          }
         } else {
           reactionsUpdated[reaction.relEventId] = [reaction];
         }

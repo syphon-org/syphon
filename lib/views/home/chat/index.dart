@@ -305,10 +305,15 @@ class ChatViewState extends State<ChatView> {
               symbolIcon: CategoryIcon(icon: Icons.tag),
             ),
             onEmojiSelected: (emoji, category) {
-              return props.onToggleReaction(
+              props.onToggleReaction(
                 emoji: emoji.emoji,
                 message: message,
               );
+
+              Navigator.pop(context, false);
+              this.setState(() {
+                selectedMessage = null;
+              });
             }),
       ),
     );

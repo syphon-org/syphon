@@ -177,14 +177,12 @@ StreamSubscription _sub;
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
         _sub = getUriLinksStream().listen((Uri uri) {
-          print('[streamUniLinks] ${uri}');
           final token = uri.queryParameters['loginToken'];
-          print(store.state.authStore.user.accessToken);
           if (store.state.authStore.user.accessToken == null) {
             store.dispatch(loginUserSSO(token: token));
           }
         }, onError: (err) {
-          print('[streamUniLinks] error ${err}');
+          printError('[streamUniLinks] error ${err}');
         });
       } on PlatformException {
         addAlert(

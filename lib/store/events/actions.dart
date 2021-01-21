@@ -422,19 +422,13 @@ ThunkAction<AppState> redactEvent({
 }) {
   return (Store<AppState> store) async {
     try {
-      print(room.id);
-      print(room.id);
-      print(event.content);
-
-      final result = await MatrixApi.redactEvent(
+      await MatrixApi.redactEvent(
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
         eventId: event.id,
       );
-
-      print(result);
     } catch (error) {
       debugPrint('[deleteMessage] $error');
     }

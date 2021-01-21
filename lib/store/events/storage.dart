@@ -53,8 +53,9 @@ Future<void> saveReactions(
         final existingList =
             existingJson.map((json) => Reaction.fromJson(json));
 
-        if (!existingList.contains(reaction))
+        if (!existingList.contains(reaction)) {
           reactionsUpdated = [...existingList, reaction];
+        }
       }
 
       await record.put(txn, json.encode(reactionsUpdated));

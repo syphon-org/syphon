@@ -34,8 +34,6 @@ ThunkAction<AppState> toggleReaction({
         (reaction) => reaction.sender == user.userId && reaction.body == emoji,
         orElse: () => null);
 
-    print('${emoji} ${reaction.id} ${reaction.body}');
-
     if (reaction == null) {
       store.dispatch(sendReaction(message: message, room: room, emoji: emoji));
     } else {
@@ -55,6 +53,7 @@ ThunkAction<AppState> sendReaction({
   return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));
     try {
+      print('${room} ${message} ${emoji}');
       await MatrixApi.sendReaction(
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,

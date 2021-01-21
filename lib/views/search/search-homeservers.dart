@@ -339,12 +339,6 @@ class _Props extends Equatable {
           var urlRegex = new RegExp(urlPattern, caseSensitive: false);
 
           if (urlRegex.hasMatch('https://$hostname')) {
-            print('IS a url $hostname');
-          } else {
-            print('NOT a url $hostname');
-          }
-
-          if (urlRegex.hasMatch('https://$hostname')) {
             final preview = await store.dispatch(
               fetchHomeserver(hostname: hostname),
             );

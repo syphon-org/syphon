@@ -73,7 +73,10 @@ Future<String> fetchFavicon({String url}) async {
     final baseUrl = origins.length > 1
         ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
         : origins[0];
-    final response = await http.get('https://$baseUrl');
+
+    final response = await http.get('https://$baseUrl').timeout(
+          const Duration(seconds: 4),
+        );
 
     final document = parse(response.body);
     final faviconIcon = document.querySelector('link[rel="icon"]');
@@ -93,7 +96,6 @@ Future<String> fetchFavicon({String url}) async {
     return faviconUrl +
         favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    /** noop */
     print(error);
   }
 

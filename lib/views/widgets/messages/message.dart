@@ -66,110 +66,114 @@ class MessageWidget extends StatelessWidget {
     final reactionKeys = reactionsMap.keys.toList();
     final reactionCounts = reactionsMap.values.toList();
 
-    return Container(
-      height: Dimensions.iconSize,
-      transform: Matrix4.translationValues(0.0, 8.0, 0.0),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
-        itemCount: reactionKeys.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (BuildContext context, int index) {
-          final reactionKey = reactionKeys[index];
-          final reactionCount = reactionCounts[index];
-          return GestureDetector(
-            onTap: () {
-              if (this.onToggleReaction != null) {
-                this.onToggleReaction(reactionKey);
-              }
-            },
-            child: ClipRRect(
-              child: Container(
-                width: reactionCount > 1 ? 48 : 32,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.grey[500],
-                  borderRadius: BorderRadius.circular(Dimensions.iconSize),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1,
-                  ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      itemCount: reactionKeys.length,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (BuildContext context, int index) {
+        final reactionKey = reactionKeys[index];
+        final reactionCount = reactionCounts[index];
+        return GestureDetector(
+          onTap: () {
+            if (this.onToggleReaction != null) {
+              this.onToggleReaction(reactionKey);
+            }
+          },
+          child: ClipRRect(
+            child: Container(
+              width: reactionCount > 1 ? 48 : 32,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey[500],
+                borderRadius: BorderRadius.circular(Dimensions.iconSize),
+                border: Border.all(
+                  color: Colors.white,
+                  width: 1,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      reactionKey,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.subtitle1.color,
-                        height: 1.35,
-                      ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    reactionKey,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.subtitle1.color,
+                      height: 1.35,
                     ),
-                    Visibility(
-                      visible: reactionCount > 1,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 3),
-                        child: Text(
-                          reactionCount.toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).textTheme.subtitle1.color,
-                            height: 1.35,
-                          ),
+                  ),
+                  Visibility(
+                    visible: reactionCount > 1,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 3),
+                      child: Text(
+                        reactionCount.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).textTheme.subtitle1.color,
+                          height: 1.35,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
   @protected
   Widget buildReactionsInput(
-      BuildContext context, MainAxisAlignment alignment) {
-    return Container(
-      transform: Matrix4.translationValues(0.0, 8.0, 0.0),
-      child: Row(
-        mainAxisAlignment: alignment,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (onInputReaction != null) {
-                onInputReaction();
-              }
-            },
-            child: ClipRRect(
-              child: Container(
-                padding: EdgeInsets.only(bottom: 2),
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1,
-                  ),
-                ),
-                width: Dimensions.iconSizeLarge,
-                height: Dimensions.iconSizeLarge,
-                child: Icon(
-                  Icons.tag_faces,
-                  size: Dimensions.iconSize,
-                  color: Colors.white,
-                ),
-              ),
+    BuildContext context,
+    MainAxisAlignment alignment,
+    bool isUserSent,
+  ) {
+    final buildEmojiButton = GestureDetector(
+      onTap: () {
+        if (onInputReaction != null) {
+          onInputReaction();
+        }
+      },
+      child: ClipRRect(
+        child: Container(
+          width: 36,
+          height: Dimensions.iconSizeLarge,
+          decoration: BoxDecoration(
+            color: Colors.grey[500],
+            borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
+            border: Border.all(
+              color: Colors.white,
+              width: 1,
             ),
           ),
-        ],
+          child: Icon(
+            Icons.tag_faces,
+            size: 22,
+            color: Colors.white,
+          ),
+        ),
       ),
+    );
+
+    // swaps order in row if user sent
+    return Row(
+      mainAxisAlignment: alignment,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: isUserSent
+          ? [
+              buildEmojiButton,
+              buildReactions(context, alignment),
+            ]
+          : [
+              buildReactions(context, alignment),
+              buildEmojiButton,
+            ],
     );
   }
 
@@ -178,7 +182,6 @@ class MessageWidget extends StatelessWidget {
     final message = this.message;
     final selected =
         selectedMessageId != null && selectedMessageId == message.id;
-    final emojis = message.reactions.length > 0;
 
     var textColor = Colors.white;
     var showSender = true;
@@ -187,7 +190,7 @@ class MessageWidget extends StatelessWidget {
     var bubbleColor = Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
-    var alignmentReaction = MainAxisAlignment.end;
+    var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
     var opacity = 1.0;
@@ -503,22 +506,35 @@ class MessageWidget extends StatelessWidget {
                           Visibility(
                             visible: selected,
                             child: Positioned(
-                              right: 0,
+                              left: isUserSent ? 0 : null,
+                              right: !isUserSent ? 0 : null,
                               bottom: 0,
-                              child: buildReactionsInput(
-                                context,
-                                alignmentReaction,
+                              child: Container(
+                                height: Dimensions.iconSize,
+                                transform:
+                                    Matrix4.translationValues(0.0, 8.0, 0.0),
+                                child: buildReactionsInput(
+                                  context,
+                                  alignmentReaction,
+                                  isUserSent,
+                                ),
                               ),
                             ),
                           ),
                           Visibility(
-                            visible: message.reactions.length > 0,
+                            visible: message.reactions.length > 0 && !selected,
                             child: Positioned(
-                              right: 0,
+                              left: isUserSent ? 0 : null,
+                              right: !isUserSent ? 0 : null,
                               bottom: 0,
-                              child: buildReactions(
-                                context,
-                                alignmentReaction,
+                              child: Container(
+                                height: Dimensions.iconSize,
+                                transform:
+                                    Matrix4.translationValues(0.0, 8.0, 0.0),
+                                child: buildReactions(
+                                  context,
+                                  alignmentReaction,
+                                ),
                               ),
                             ),
                           ),

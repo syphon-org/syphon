@@ -64,7 +64,7 @@ class Reaction extends Event {
 
   factory Reaction.fromEvent(Event event) {
     final content = event.content['m.relates_to'] ?? {};
-    print("${event.content} ${event.type}");
+    print("${event.id} ${event.content} ${event.type}");
     return Reaction(
       id: event.id,
       userId: event.userId,
