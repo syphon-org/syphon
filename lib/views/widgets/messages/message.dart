@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:swipeable/swipeable.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
@@ -31,6 +32,8 @@ class MessageWidget extends StatelessWidget {
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
+    this.onSwipeRight,
+    this.onSwipeLeft,
   }) : super(key: key);
 
   final Message message;
@@ -47,6 +50,8 @@ class MessageWidget extends StatelessWidget {
   final Function onPressAvatar;
   final Function onInputReaction;
   final Function onToggleReaction;
+  final Function onSwipeRight;
+  final Function onSwipeLeft;
 
   @protected
   Widget buildReactions(
@@ -281,270 +286,282 @@ class MessageWidget extends StatelessWidget {
       }
     }
 
-    return GestureDetector(
-      onLongPress: () {
-        if (this.onLongPress != null) {
-          HapticFeedback.lightImpact();
-          this.onLongPress(message: message);
-        }
-      },
-      child: Opacity(
-        opacity: opacity,
+    return Swipeable(
+      onSwipeLeft: onSwipeLeft,
+      onSwipeRight: onSwipeRight,
+      background: Center(
         child: Container(
-          transform: Matrix4.translationValues(0.0, 0.0, zIndex),
-          child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: bubbleSpacing,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
-                child: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: alignmentMessage,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Visibility(
-                      visible: !isLastSender && !isUserSent && !messageOnly,
-                      maintainState: !messageOnly,
-                      maintainAnimation: !messageOnly,
-                      maintainSize: !messageOnly,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (this.onPressAvatar != null) {
-                            HapticFeedback.lightImpact();
-                            this.onPressAvatar(message: message);
-                          }
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          child: Avatar(
-                            margin: EdgeInsets.zero,
-                            padding: EdgeInsets.zero,
-                            uri: avatarUri,
-                            alt: message.sender,
-                            size: Dimensions.avatarSizeMessage,
-                            background: Colours.hashedColor(message.sender),
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
+      ),
+      child: GestureDetector(
+        onLongPress: () {
+          if (this.onLongPress != null) {
+            HapticFeedback.lightImpact();
+            this.onLongPress(message: message);
+          }
+        },
+        child: Opacity(
+          opacity: opacity,
+          child: Container(
+            transform: Matrix4.translationValues(0.0, 0.0, zIndex),
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: bubbleSpacing,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: alignmentMessage,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Visibility(
+                        visible: !isLastSender && !isUserSent && !messageOnly,
+                        maintainState: !messageOnly,
+                        maintainAnimation: !messageOnly,
+                        maintainSize: !messageOnly,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (this.onPressAvatar != null) {
+                              HapticFeedback.lightImpact();
+                              this.onPressAvatar(message: message);
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            child: Avatar(
+                              margin: EdgeInsets.zero,
+                              padding: EdgeInsets.zero,
+                              uri: avatarUri,
+                              alt: message.sender,
+                              size: Dimensions.avatarSizeMessage,
+                              background: Colours.hashedColor(message.sender),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: bubbleColor,
-                              borderRadius: bubbleBorder,
-                            ),
-                            child: Flex(
-                              direction: Axis.vertical,
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: alignmentMessageText,
-                              children: <Widget>[
-                                Visibility(
-                                  visible: !isUserSent && showSender,
-                                  child: Container(
-                                    margin: EdgeInsets.only(bottom: 4),
-                                    child: Text(
-                                      formatSender(message.sender),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  child: Text(
-                                    body.trim(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  ),
-                                ),
-                                Flex(
-                                  /// *** Message Status Row ***
-                                  direction: Axis.horizontal,
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: alignmentMessageText,
-                                  children: [
-                                    Visibility(
-                                      visible: !isUserSent &&
-                                          message.type == EventTypes.encrypted,
-                                      child: Container(
-                                        width: Dimensions.indicatorSize,
-                                        height: Dimensions.indicatorSize,
-                                        margin: EdgeInsets.only(right: 4),
-                                        child: Icon(
-                                          Icons.lock,
-                                          color: textColor,
-                                          size: Dimensions.iconSizeMini,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      // timestamp and error message
-                                      margin: EdgeInsets.only(right: 4),
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: bubbleColor,
+                                borderRadius: bubbleBorder,
+                              ),
+                              child: Flex(
+                                direction: Axis.vertical,
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: alignmentMessageText,
+                                children: <Widget>[
+                                  Visibility(
+                                    visible: !isUserSent && showSender,
+                                    child: Container(
+                                      margin: EdgeInsets.only(bottom: 4),
                                       child: Text(
-                                        status,
+                                        formatSender(message.sender),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: textColor,
-                                          fontWeight: FontWeight.w100,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
-                                    Visibility(
-                                      visible: isUserSent &&
-                                          message.type == EventTypes.encrypted,
-                                      child: Container(
-                                        width: Dimensions.indicatorSize,
-                                        height: Dimensions.indicatorSize,
-                                        margin: EdgeInsets.only(left: 2),
-                                        child: Icon(
-                                          Icons.lock,
-                                          color: textColor,
-                                          size: Dimensions.iconSizeMini,
-                                        ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 5),
+                                    child: Text(
+                                      body.trim(),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w300,
                                       ),
                                     ),
-                                    Visibility(
-                                      visible: isUserSent && message.failed,
-                                      child: Container(
-                                        width: Dimensions.indicatorSize,
-                                        height: Dimensions.indicatorSize,
-                                        margin: EdgeInsets.only(left: 3),
-                                        child: Icon(
-                                          Icons.close,
-                                          color: Colors.redAccent,
-                                          size: Dimensions.indicatorSize,
-                                        ),
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: isUserSent && !message.failed,
-                                      child: Stack(children: [
-                                        Visibility(
-                                          visible: message.pending,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(left: 4),
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: Dimensions
-                                                  .defaultStrokeWidthLite,
-                                            ),
+                                  ),
+                                  Flex(
+                                    /// *** Message Status Row ***
+                                    direction: Axis.horizontal,
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: alignmentMessageText,
+                                    children: [
+                                      Visibility(
+                                        visible: !isUserSent &&
+                                            message.type ==
+                                                EventTypes.encrypted,
+                                        child: Container(
+                                          width: Dimensions.indicatorSize,
+                                          height: Dimensions.indicatorSize,
+                                          margin: EdgeInsets.only(right: 4),
+                                          child: Icon(
+                                            Icons.lock,
+                                            color: textColor,
+                                            size: Dimensions.iconSizeMini,
                                           ),
                                         ),
-                                        Visibility(
-                                          visible: !message.pending,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(left: 4),
-                                            child: Icon(
-                                              Icons.check,
-                                              size: 10,
-                                              color: indicatorIconColor,
+                                      ),
+                                      Container(
+                                        // timestamp and error message
+                                        margin: EdgeInsets.only(right: 4),
+                                        child: Text(
+                                          status,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: textColor,
+                                            fontWeight: FontWeight.w100,
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: isUserSent &&
+                                            message.type ==
+                                                EventTypes.encrypted,
+                                        child: Container(
+                                          width: Dimensions.indicatorSize,
+                                          height: Dimensions.indicatorSize,
+                                          margin: EdgeInsets.only(left: 2),
+                                          child: Icon(
+                                            Icons.lock,
+                                            color: textColor,
+                                            size: Dimensions.iconSizeMini,
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: isUserSent && message.failed,
+                                        child: Container(
+                                          width: Dimensions.indicatorSize,
+                                          height: Dimensions.indicatorSize,
+                                          margin: EdgeInsets.only(left: 3),
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.redAccent,
+                                            size: Dimensions.indicatorSize,
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: isUserSent && !message.failed,
+                                        child: Stack(children: [
+                                          Visibility(
+                                            visible: message.pending,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 4),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: Dimensions
+                                                    .defaultStrokeWidthLite,
+                                              ),
                                             ),
-                                            decoration: ShapeDecoration(
-                                              color: indicatorColor,
-                                              shape: CircleBorder(
-                                                side: BorderSide(
-                                                  color: indicatorIconColor,
-                                                  width: isRead ? 1.5 : 1,
+                                          ),
+                                          Visibility(
+                                            visible: !message.pending,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 4),
+                                              child: Icon(
+                                                Icons.check,
+                                                size: 10,
+                                                color: indicatorIconColor,
+                                              ),
+                                              decoration: ShapeDecoration(
+                                                color: indicatorColor,
+                                                shape: CircleBorder(
+                                                  side: BorderSide(
+                                                    color: indicatorIconColor,
+                                                    width: isRead ? 1.5 : 1,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Visibility(
-                                          visible: !message.syncing,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(left: 11),
-                                            child: Icon(
-                                              Icons.check,
-                                              size: 10,
-                                              color: indicatorIconColor,
-                                            ),
-                                            decoration: ShapeDecoration(
-                                              color: indicatorColor,
-                                              shape: CircleBorder(
-                                                side: BorderSide(
-                                                  color: indicatorIconColor,
-                                                  width: isRead ? 1.5 : 1,
+                                          Visibility(
+                                            visible: !message.syncing,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 11),
+                                              child: Icon(
+                                                Icons.check,
+                                                size: 10,
+                                                color: indicatorIconColor,
+                                              ),
+                                              decoration: ShapeDecoration(
+                                                color: indicatorColor,
+                                                shape: CircleBorder(
+                                                  side: BorderSide(
+                                                    color: indicatorIconColor,
+                                                    width: isRead ? 1.5 : 1,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ]),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                        ]),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: selected,
-                            child: Positioned(
-                              left: isUserSent ? 0 : null,
-                              right: !isUserSent ? 0 : null,
-                              bottom: 0,
-                              child: Container(
-                                height: Dimensions.iconSize,
-                                transform:
-                                    Matrix4.translationValues(0.0, 8.0, 0.0),
-                                child: buildReactionsInput(
-                                  context,
-                                  alignmentReaction,
-                                  isUserSent,
+                            Visibility(
+                              visible: selected,
+                              child: Positioned(
+                                left: isUserSent ? 0 : null,
+                                right: !isUserSent ? 0 : null,
+                                bottom: 0,
+                                child: Container(
+                                  height: Dimensions.iconSize,
+                                  transform:
+                                      Matrix4.translationValues(0.0, 8.0, 0.0),
+                                  child: buildReactionsInput(
+                                    context,
+                                    alignmentReaction,
+                                    isUserSent,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          Visibility(
-                            visible: message.reactions.length > 0 && !selected,
-                            child: Positioned(
-                              left: isUserSent ? 0 : null,
-                              right: !isUserSent ? 0 : null,
-                              bottom: 0,
-                              child: Container(
-                                height: Dimensions.iconSize,
-                                transform:
-                                    Matrix4.translationValues(0.0, 8.0, 0.0),
-                                child: buildReactions(
-                                  context,
-                                  alignmentReaction,
+                            Visibility(
+                              visible:
+                                  message.reactions.length > 0 && !selected,
+                              child: Positioned(
+                                left: isUserSent ? 0 : null,
+                                right: !isUserSent ? 0 : null,
+                                bottom: 0,
+                                child: Container(
+                                  height: Dimensions.iconSize,
+                                  transform:
+                                      Matrix4.translationValues(0.0, 8.0, 0.0),
+                                  child: buildReactions(
+                                    context,
+                                    alignmentReaction,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
