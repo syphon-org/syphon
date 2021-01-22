@@ -11,6 +11,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
@@ -279,11 +280,15 @@ class MessageWidget extends StatelessWidget {
       status += ' (Edited)';
     }
 
-    String body = message.body;
+    String body = message.body ?? '';
     if (message.type == EventTypes.encrypted) {
       if (message.body.isEmpty) {
         body = Strings.contentEncryptedMessage;
       }
+    }
+
+    if (message.body == null) {
+      body = Strings.labelDeletedMessage;
     }
 
     return Swipeable(

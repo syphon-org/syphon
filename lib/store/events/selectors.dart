@@ -2,7 +2,6 @@
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {
@@ -14,35 +13,44 @@ Map<String, List<Reaction>> selectReactions(AppState state) {
 }
 
 // remove messages from blocked users
-List<Message> filterBlocked(
+List<Message> filterMessages(
   List<Message> messages,
   AppState state,
 ) {
   final blocked = state.userStore.blocked;
+
   return messages
     ..removeWhere(
       (message) => blocked.contains(message.sender),
     );
 }
 
-List<Message> replaceRelated(
+List<Message> appendRelated(
   List<Message> messages,
   AppState state,
 ) {
-  final messagesMap = replaceReactions(
+  var messagesMap = appendReactions(
     replaceEdited(messages),
-    reactions: selectReactions(state),
     state: state,
   );
+
+  final redactions = state.eventStore.redactions;
+
+  // get a list message ids (also reaction keys) that have values in 'reactions'
+  redactions.forEach((key, value) {
+    if (messagesMap.containsKey(key)) {
+      messagesMap[key] = messagesMap[key].copyWith(body: null);
+    }
+  });
 
   return List.from(messagesMap.values);
 }
 
-Map<String, Message> replaceReactions(
+Map<String, Message> appendReactions(
   Map<String, Message> messages, {
-  Map<String, List<Reaction>> reactions,
   AppState state,
 }) {
+  final reactions = selectReactions(state);
   final redactions = state.eventStore.redactions;
 
   // get a list message ids (also reaction keys) that have values in 'reactions'
@@ -126,7 +134,7 @@ List<Message> latestMessages(List<Message> messages) {
   return sortedList;
 }
 
-List<Message> wrapOutboxMessages({
+List<Message> combineOutbox({
   List<Message> messages,
   List<Message> outbox,
 }) {
