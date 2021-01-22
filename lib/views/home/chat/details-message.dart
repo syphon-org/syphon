@@ -94,6 +94,8 @@ class MessageDetails extends StatelessWidget {
               .message;
           final timestamp =
               DateTime.fromMillisecondsSinceEpoch(message.timestamp);
+          final received = DateTime.fromMillisecondsSinceEpoch(
+              message.received ?? message.timestamp);
 
           final isUserSent = props.userId == message.sender;
 
@@ -116,11 +118,26 @@ class MessageDetails extends StatelessWidget {
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                  child: MessageWidget(
-                    message: message,
-                    isUserSent: isUserSent,
-                    messageOnly: true,
-                    theme: props.theme,
+                  child: ListView.builder(
+                    reverse: true,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(bottom: 4),
+                    addRepaintBoundaries: true,
+                    addAutomaticKeepAlives: true,
+                    itemCount: 1,
+                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      final current =
+                          index == 0 ? message : message.edits[index - 1];
+                      return MessageWidget(
+                        message: current,
+                        isUserSent: isUserSent,
+                        messageOnly: true,
+                        theme: props.theme,
+                        timeFormat: 'full',
+                      );
+                    },
                   ),
                 ),
                 ListTile(
@@ -155,7 +172,7 @@ class MessageDetails extends StatelessWidget {
                   ),
                   trailing: Container(
                     child: Text(
-                      'TODO',
+                      DateFormat('MMM d h:mm a').format(received),
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w300,

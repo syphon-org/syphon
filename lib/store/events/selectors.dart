@@ -1,4 +1,5 @@
 // Project imports:
+import 'package:intl/intl.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -95,13 +96,15 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
   for (Message replacement in replacements) {
-    if (messagesMap.containsKey(replacement.relatedEventId)) {
-      final eventUpdated = messagesMap[replacement.relatedEventId];
-      messagesMap[replacement.relatedEventId] = eventUpdated.copyWith(
+    final messageId = replacement.relatedEventId;
+    if (messagesMap.containsKey(messageId)) {
+      final messageEdited = messagesMap[messageId];
+
+      messagesMap[messageId] = messageEdited.copyWith(
+        edited: true,
         body: replacement.body,
         msgtype: replacement.msgtype,
-        edits: [replacement, ...(eventUpdated.edits ?? List<Message>())],
-        edited: true,
+        edits: [messageEdited, ...(messageEdited.edits ?? List<Message>())],
       );
 
       // remove replacements from the returned messages

@@ -27,6 +27,7 @@ class Message extends Event {
   final String format;
   final String filename;
   final String formattedBody;
+  final int received;
 
   // Encrypted Messages only
   final String ciphertext;
@@ -51,6 +52,7 @@ class Message extends Event {
     this.ciphertext,
     this.senderKey,
     this.algorithm,
+    this.received,
     this.syncing = false,
     this.pending = false,
     this.failed = false,
@@ -88,6 +90,7 @@ class Message extends Event {
     ciphertext,
     senderKey,
     algorithm,
+    received,
     syncing = false,
     pending = false,
     failed = false,
@@ -117,6 +120,7 @@ class Message extends Event {
         syncing: syncing ?? this.syncing ?? false,
         pending: pending ?? this.pending ?? false,
         failed: failed ?? this.failed ?? false,
+        received: received ?? this.received,
         replacement: replacement ?? this.replacement ?? false,
         edited: edited ?? this.edited ?? false,
         relatedEventId: relatedEventId ?? this.relatedEventId,
@@ -163,6 +167,7 @@ class Message extends Event {
         senderKey: event.content['sender_key'],
         replacement: replacement,
         relatedEventId: relatedEventId,
+        received: DateTime.now().millisecond,
         failed: false,
         pending: false,
         syncing: false,

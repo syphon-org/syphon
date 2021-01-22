@@ -202,11 +202,17 @@ class MessageWidget extends StatelessWidget {
     var opacity = 1.0;
     var zIndex = 1.0;
     var isRead = message.timestamp < lastRead;
-    var status = formatTimestamp(
-      lastUpdateMillis: message.timestamp,
-      timeFormat: timeFormat,
-      showTime: true,
-    );
+    var status = timeFormat == 'full'
+        ? formatTimestampFull(
+            lastUpdateMillis: message.timestamp,
+            timeFormat: timeFormat,
+            showTime: true,
+          )
+        : formatTimestamp(
+            lastUpdateMillis: message.timestamp,
+            timeFormat: timeFormat,
+            showTime: true,
+          );
 
     // Current User Bubble Styling
     if (isUserSent) {
