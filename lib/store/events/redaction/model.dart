@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/events/model.dart';
 
 part 'model.g.dart';
@@ -17,6 +18,7 @@ class Redaction extends Event {
     stateKey,
     timestamp,
     content,
+    data,
     this.redactId,
   }) : super(
           id: id,
@@ -37,6 +39,8 @@ class Redaction extends Event {
     stateKey,
     content,
     timestamp,
+    redactId,
+    data,
   }) =>
       Redaction(
         id: id ?? this.id,
@@ -47,22 +51,23 @@ class Redaction extends Event {
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         redactId: redactId ?? this.redactId,
+        data: data,
       );
 
   Map<String, dynamic> toJson() => _$RedactionToJson(this);
   factory Redaction.fromJson(Map<String, dynamic> json) =>
       _$RedactionFromJson(json);
 
-  factory Redaction.fromMatrix(Map<String, dynamic> json) {
+  factory Redaction.fromEvent(Event event) {
     return Redaction(
-      id: json['event_id'] as String,
-      userId: json['user_id'] as String,
-      roomId: json['room_id'] as String,
-      type: json['type'] as String,
-      sender: json['sender'] as String,
-      stateKey: json['state_key'] as String,
-      timestamp: json['origin_server_ts'] as int,
-      redactId: json['redact'] as String,
+      id: event.id,
+      userId: event.userId,
+      roomId: event.roomId,
+      type: event.type,
+      sender: event.sender,
+      stateKey: event.stateKey,
+      timestamp: event.timestamp,
+      redactId: event.data != null ? event.data['redacts'] : null,
     );
   }
 }

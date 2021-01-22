@@ -14,6 +14,7 @@ import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -130,13 +131,17 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     storage: storage,
   );
 
+  final redactions = await loadRedactions(
+    storage: storage,
+  );
+
   Map<String, List<Message>> messages = Map();
   Map<String, List<Reaction>> reactions = Map();
+
   for (Room room in rooms.values) {
     messages[room.id] = await loadMessages(
       room.messageIds,
       storage: storage,
-      encrypted: room.encryptionEnabled,
     );
 
     reactions.addAll(await loadReactions(
@@ -153,5 +158,6 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     'crypto': crypto,
     'messages': messages.isNotEmpty ? messages : null,
     'reactions': reactions,
+    'redactions': redactions,
   };
 }

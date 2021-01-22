@@ -19,6 +19,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -49,6 +50,11 @@ class SetReactions {
   SetReactions({this.roomId, this.reactions});
 }
 
+class SetRedactions {
+  final List<Redaction> redactions;
+  SetRedactions({this.redactions});
+}
+
 ThunkAction<AppState> setMessages({
   Room room,
   List<Message> messages,
@@ -64,6 +70,14 @@ ThunkAction<AppState> setReactions({
 }) =>
     (Store<AppState> store) {
       return store.dispatch(SetReactions(reactions: reactions));
+    };
+
+ThunkAction<AppState> setRedactions({
+  String roomId,
+  List<Redaction> redactions,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetRedactions(redactions: redactions));
     };
 
 /**

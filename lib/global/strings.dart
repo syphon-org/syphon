@@ -39,6 +39,7 @@ class Strings {
   static const labelRecentUsers = 'Recent Users';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
+  static const labelDeletedMessage = 'This message was deleted';
 
   // Buttons
   static const buttonLogin = 'log in';
@@ -77,8 +78,8 @@ class Strings {
       '${Values.appName} works by using an encrypted \nand decentralized protocol \ncalled ';
 
   static const contentIntroSecondPartOne =
-      'Matrix enables you to message others';
-  static const contentIntroSecondPartBold = '\nprivately and control ';
+      'Matrix enables you to message others \nwith';
+  static const contentIntroSecondPartBold = 'privacy and control ';
   static const contentIntroSecondPartTwo = 'where the\nmessages are stored';
 
   static const contentIntroThird =

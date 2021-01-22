@@ -1,16 +1,19 @@
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 
 const String EVENTS = 'events';
 const String MESSAGES = 'messages';
 const String RECEIPTS = 'receipts';
 const String REACTIONS = 'reactions';
+const String REDACTIONS = 'redactions';
 
 Future<void> saveEvents(
   List<Event> events, {
@@ -26,6 +29,76 @@ Future<void> saveEvents(
   });
 }
 
+Future<void> deleteEvents(
+  List<Event> events, {
+  Database storage,
+}) async {
+  final stores = [
+    StoreRef<String, String>(MESSAGES),
+    StoreRef<String, String>(REACTIONS),
+  ];
+
+  return await Future.wait(stores.map((store) async {
+    return await storage.transaction((txn) async {
+      for (Event event in events) {
+        final record = store.record(event.id);
+        await record.delete(storage);
+      }
+    });
+  }));
+}
+
+///
+/// Save Redactions
+///
+/// Saves redactions to a map keyed by
+/// event ids of redacted events
+///
+Future<void> saveRedactions(
+  List<Redaction> redactions, {
+  Database storage,
+}) async {
+  try {
+    final store = StoreRef<String, String>(REDACTIONS);
+
+    return await storage.transaction((txn) async {
+      for (Redaction redaction in redactions) {
+        print('[saveRedaction] ${redaction.redactId}');
+        final record = store.record(redaction.redactId);
+        await record.put(txn, json.encode(redaction));
+      }
+    });
+  } catch (error) {
+    print('[saveRedactions] $error');
+    throw error;
+  }
+}
+
+///
+/// Load Redactions
+///
+/// Load all the redactions from storage
+/// filtering should occur shortly after in
+/// another parser/filter/selector
+///
+Future<Map<String, Redaction>> loadRedactions({
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(REDACTIONS);
+
+  final redactions = Map<String, Redaction>();
+
+  final redactionsData = await store.find(storage);
+
+  for (RecordSnapshot<String, String> record in redactionsData) {
+    redactions[record.key] = Redaction.fromJson(
+      json.decode(record.value),
+    );
+  }
+
+  return redactions;
+}
+
 ///
 /// Save Reactions
 ///
@@ -38,29 +111,41 @@ Future<void> saveReactions(
   List<Reaction> reactions, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(REACTIONS);
+  try {
+    final store = StoreRef<String, String>(REACTIONS);
 
-  return await storage.transaction((txn) async {
-    for (Reaction reaction in reactions) {
-      final record = store.record(reaction.relEventId);
-      final exists = await record.exists(storage);
+    return await storage.transaction((txn) async {
+      for (Reaction reaction in reactions) {
+        if (reaction.relEventId != null) {
+          final record = store.record(reaction.relEventId);
+          final exists = await record.exists(storage);
 
-      var reactionsUpdated = [reaction];
+          var reactionsUpdated = [reaction];
 
-      if (exists) {
-        final existingRaw = await record.get(storage);
-        final existingJson = List.from(await json.decode(existingRaw));
-        final existingList =
-            existingJson.map((json) => Reaction.fromJson(json));
+          if (exists) {
+            final existingRaw = await record.get(storage);
+            final existingJson = List.from(await json.decode(existingRaw));
+            final existingList = List.from(existingJson.map(
+              (json) => Reaction.fromJson(json),
+            ));
 
-        if (!existingList.contains(reaction)) {
-          reactionsUpdated = [...existingList, reaction];
+            final exists = existingList.any(
+              (existing) => existing.id == reaction.id,
+            );
+
+            if (!exists) {
+              reactionsUpdated = [...existingList, reaction];
+            }
+          }
+
+          await record.put(txn, json.encode(reactionsUpdated));
         }
       }
-
-      await record.put(txn, json.encode(reactionsUpdated));
-    }
-  });
+    });
+  } catch (error) {
+    print('[saveReactions] $error');
+    throw error;
+  }
 }
 
 ///
@@ -135,7 +220,6 @@ Future<Message> loadMessage(String eventId, {Database storage}) async {
 Future<List<Message>> loadMessages(
   List<String> eventIds, {
   Database storage,
-  bool encrypted,
   int offset = 0,
   int limit = 20, // default amount loaded
 }) async {

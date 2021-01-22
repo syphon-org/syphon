@@ -51,6 +51,8 @@ class Values {
 
   static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
 
+  static const redacted = 'redacted';
+
   // Animations
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;

@@ -10,10 +10,10 @@ import 'dart:collection';
  * to save seperately, or sacrific iterating through the message list again
  * 
  */
-import 'package:sembast/sembast.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Map<String, dynamic> parseMessages({
@@ -91,12 +91,35 @@ Map<String, dynamic> parseMessages({
   };
 }
 
-Map<String, dynamic> parseEvents(
-  Map<String, dynamic> json, {
-  Database database,
-}) {
+Map<String, dynamic> parseOptions(Map<String, dynamic> json) {
+  bool invite;
+  bool limited;
+  String lastHash;
+  String prevHash;
+
+  invite = json['invite_state'] != null;
+
+  if (json['timeline'] != null) {
+    limited = json['timeline']['limited'];
+    lastHash = json['timeline']['last_hash'];
+    prevHash = json['timeline']['prev_batch'];
+  }
+
+  return {
+    "invite": invite,
+    "limited": limited,
+    "lastHash": lastHash,
+    "prevHash": prevHash,
+  };
+}
+
+Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
   List<Event> stateEvents = [];
+  List<Event> accountEvents = [];
   List<Message> messageEvents = [];
+  List<Event> ephemeralEvents = [];
+  List<Reaction> reactionEvents = [];
+  List<Event> redactedEvents = [];
 
   if (json['state'] != null) {
     final List<dynamic> stateEventsRaw = json['state']['events'];
@@ -112,6 +135,20 @@ Map<String, dynamic> parseEvents(
         stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
+  if (json['ephemeral'] != null) {
+    final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
+
+    ephemeralEvents =
+        ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+  }
+
+  if (json['account_data'] != null) {
+    final List<dynamic> accountEventsRaw = json['account_data']['events'];
+
+    accountEvents =
+        accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+  }
+
   if (json['timeline'] != null) {
     final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
@@ -119,17 +156,32 @@ Map<String, dynamic> parseEvents(
       timelineEventsRaw.map((event) => Event.fromMatrix(event)),
     );
 
-    for (dynamic event in timelineEvents) {
-      if (event.type == EventTypes.message ||
-          event.type == EventTypes.encrypted) {
-        messageEvents.add(Message.fromEvent(event));
-      } else {
-        stateEvents.add(event);
+    for (Event event in timelineEvents) {
+      switch (event.type) {
+        case EventTypes.message:
+        case EventTypes.encrypted:
+          // deleted messages check
+          messageEvents.add(Message.fromEvent(event));
+          break;
+        case EventTypes.reaction:
+          // deleted messages check
+          reactionEvents.add(Reaction.fromEvent(event));
+          break;
+        case EventTypes.redaction:
+          redactedEvents.add(event);
+          break;
+        default:
+          stateEvents.add(event);
+          break;
       }
     }
   }
   return {
-    'events': stateEvents,
-    "messages": messageEvents,
+    'stateEvents': stateEvents,
+    "accountEvents": accountEvents,
+    "messageEvents": messageEvents,
+    "redactedEvents": redactedEvents,
+    "reactionEvents": reactionEvents,
+    "ephemeralEvents": ephemeralEvents,
   };
 }

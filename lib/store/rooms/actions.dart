@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -135,8 +136,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           decryptEvents(room, json),
         );
       }
-
-      // TODO: eventually remove the need for this with modular parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
@@ -147,26 +146,29 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length}',
       );
 
+      // TODO: eventually remove the need for this with modular parsers
       // update cold storage
       await Future.wait([
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
         saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
+        saveRedactions(room.redactions, storage: Storage.main),
       ]);
 
       // update store
       await store.dispatch(setUsers(room.usersNew));
       await store.dispatch(setMessages(room: room, messages: room.messagesNew));
       await store.dispatch(setReactions(reactions: room.reactions));
+      await store.dispatch(setRedactions(redactions: room.redactions));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
         messagesNew: List<Message>(),
         reactions: List<Reaction>(),
+        redactions: List<Redaction>(),
       );
-
       // update room
       store.dispatch(SetRoom(room: room));
 

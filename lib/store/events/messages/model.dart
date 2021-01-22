@@ -42,6 +42,7 @@ class Message extends Event {
     stateKey,
     timestamp,
     content,
+    data,
     this.body,
     this.msgtype,
     this.format,
@@ -67,6 +68,7 @@ class Message extends Event {
           stateKey: stateKey,
           timestamp: timestamp,
           content: content,
+          data: null,
         );
 
   @override
@@ -94,6 +96,7 @@ class Message extends Event {
     relatedEventId,
     edits,
     reactions,
+    data,
   }) =>
       Message(
         id: id ?? this.id,

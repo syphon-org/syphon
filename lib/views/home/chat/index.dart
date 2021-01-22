@@ -698,6 +698,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final Map<String, User> users;
   final List<Message> messages;
+  final int redactions;
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
   final bool roomTypeBadgesEnabled;
@@ -722,6 +723,7 @@ class _Props extends Equatable {
     @required this.userId,
     @required this.users,
     @required this.messages,
+    @required this.redactions,
     @required this.loading,
     @required this.enterSend,
     @required this.roomPrimaryColor,
@@ -748,6 +750,7 @@ class _Props extends Equatable {
         users,
         userId,
         messages,
+        redactions,
         loading,
         enterSend,
         roomPrimaryColor,
@@ -764,16 +767,17 @@ class _Props extends Equatable {
       room: selectRoom(id: roomId, state: store.state),
       users: store.state.userStore.users,
       enterSend: store.state.settingsStore.enterSend,
+      redactions: store.state.eventStore.redactions.length,
       messages: latestMessages(
-        replaceRelated(
-          filterBlocked(
-            wrapOutboxMessages(
+        appendRelated(
+          filterMessages(
+            combineOutbox(
               messages: roomMessages(store.state, roomId).toList(),
               outbox: selectRoom(id: roomId, state: store.state).outbox,
             ),
-            blocked: store.state.userStore.blocked,
+            store.state,
           ),
-          reactions: selectReactions(store.state),
+          store.state,
         ),
       ),
       roomPrimaryColor: () {

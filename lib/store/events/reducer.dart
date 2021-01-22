@@ -1,5 +1,6 @@
 // Project imports:
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
 import '../events/model.dart';
@@ -16,6 +17,10 @@ EventStore eventReducer(
       return state.copyWith(events: events);
 
     case SetReactions:
+      if (action.reactions.isEmpty) {
+        return state;
+      }
+
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );
@@ -33,12 +38,15 @@ EventStore eventReducer(
         }
       }
 
-      return state.copyWith(
-        reactions: reactionsUpdated,
-      );
+      return state.copyWith(reactions: reactionsUpdated);
+
     case SetMessages:
+      if (action.messages.isEmpty) {
+        return state;
+      }
       final roomId = action.roomId;
       final messages = Map<String, List<Message>>.from(state.messages);
+
       final messagesOld = Map<String, Message>.fromIterable(
         messages[roomId] ?? [],
         key: (msg) => msg.id,
@@ -55,6 +63,23 @@ EventStore eventReducer(
       messages[roomId] = messagesAll.values.toList();
 
       return state.copyWith(messages: messages);
+
+    case SetRedactions:
+      if (action.redactions.isEmpty) {
+        return state;
+      }
+
+      final redactions = Map<String, Redaction>.from(state.redactions);
+
+      final redactionsNew = Map<String, Redaction>.fromIterable(
+        action.redactions ?? [],
+        key: (redaction) => redaction.redactId,
+        value: (redaction) => redaction,
+      );
+
+      return state.copyWith(
+        redactions: redactions..addAll(redactionsNew),
+      );
 
     case ResetEvents:
       return EventStore();

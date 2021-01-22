@@ -14,6 +14,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -68,6 +69,9 @@ class Room {
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
+
+  @JsonKey(ignore: true)
+  final List<Redaction> redactions;
 
   @JsonKey(ignore: true)
   final List<Message> messagesNew;
@@ -129,6 +133,7 @@ class Room {
     this.messagesNew = const [],
     this.messageIds = const [],
     this.reactionIds = const [],
+    this.redactions = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -181,6 +186,7 @@ class Room {
     List<Event> reactions,
     List<String> messageIds,
     List<String> reactionIds,
+    List<Redaction> redactions,
     messageReads,
     lastHash,
     prevHash,
@@ -216,6 +222,7 @@ class Room {
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
         reactions: reactions ?? this.reactions,
+        redactions: redactions ?? this.redactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,
@@ -261,6 +268,7 @@ class Room {
     List<Event> ephemeralEvents = [];
     List<Reaction> reactionEvents = [];
     List<Message> messageEvents = [];
+    List<Redaction> redactionEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
@@ -276,6 +284,20 @@ class Room {
       stateEvents =
           stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
+    }
+
+    if (json['ephemeral'] != null) {
+      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
+
+      ephemeralEvents =
+          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    }
+
+    if (json['account_data'] != null) {
+      final List<dynamic> accountEventsRaw = json['account_data']['events'];
+
+      accountEvents =
+          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     // Find state and message updates from timeline
@@ -304,29 +326,16 @@ class Room {
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
-            if ((event.content as Map).keys.length > 0) {
-              reactionEvents.add(Reaction.fromEvent(event));
-            }
+            reactionEvents.add(Reaction.fromEvent(event));
+            break;
+          case EventTypes.redaction:
+            redactionEvents.add(Redaction.fromEvent(event));
             break;
           default:
             stateEvents.add(event);
             break;
         }
       }
-    }
-
-    if (json['ephemeral'] != null) {
-      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
-
-      ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    if (json['account_data'] != null) {
-      final List<dynamic> accountEventsRaw = json['account_data']['events'];
-
-      accountEvents =
-          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     return this
@@ -339,6 +348,7 @@ class Room {
           events: stateEvents,
           currentUser: currentUser,
           reactions: reactionEvents,
+          redactions: redactionEvents,
         )
         .fromMessageEvents(
           messages: messageEvents,
@@ -390,6 +400,7 @@ class Room {
     User currentUser,
     List<Event> events,
     List<Reaction> reactions,
+    List<Redaction> redactions,
   }) {
     String name;
     String avatarUri;
@@ -529,6 +540,7 @@ class Room {
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,
+      redactions: redactions,
     );
   }
 
