@@ -222,6 +222,7 @@ class Room {
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
         reactions: reactions ?? this.reactions,
+        redactions: redactions ?? this.redactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
         messageReads: messageReads ?? this.messageReads,

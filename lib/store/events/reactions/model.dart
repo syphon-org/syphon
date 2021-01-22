@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
@@ -67,6 +68,7 @@ class Reaction extends Event {
   factory Reaction.fromEvent(Event event) {
     final content =
         event.content != null ? event.content['m.relates_to'] ?? {} : {};
+
     return Reaction(
       id: event.id,
       userId: event.userId,
@@ -78,23 +80,6 @@ class Reaction extends Event {
       body: content['key'],
       relType: content['rel_type'],
       relEventId: content['event_id'],
-    );
-  }
-
-  factory Reaction.fromMatrix(Map<String, dynamic> json) {
-    final relations =
-        json['content'] != null ? json['content']['m.relates_to'] : {};
-    return Reaction(
-      id: json['event_id'] as String,
-      userId: json['user_id'] as String,
-      roomId: json['room_id'] as String,
-      type: json['type'] as String,
-      sender: json['sender'] as String,
-      stateKey: json['state_key'] as String,
-      timestamp: json['origin_server_ts'] as int,
-      body: relations['key'] as String,
-      relType: relations['rel_type'] as String,
-      relEventId: relations['event_id'] as String,
     );
   }
 }

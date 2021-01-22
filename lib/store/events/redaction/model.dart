@@ -39,6 +39,7 @@ class Redaction extends Event {
     stateKey,
     content,
     timestamp,
+    redactId,
     data,
   }) =>
       Redaction(
@@ -58,7 +59,6 @@ class Redaction extends Event {
       _$RedactionFromJson(json);
 
   factory Redaction.fromEvent(Event event) {
-    printJson(event.data);
     return Redaction(
       id: event.id,
       userId: event.userId,
@@ -67,7 +67,7 @@ class Redaction extends Event {
       sender: event.sender,
       stateKey: event.stateKey,
       timestamp: event.timestamp,
-      redactId: event.data != null ? event.data['redact'] : null,
+      redactId: event.data != null ? event.data['redacts'] : null,
     );
   }
 }

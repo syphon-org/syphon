@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -57,14 +58,20 @@ Future<void> saveRedactions(
   List<Redaction> redactions, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(REDACTIONS);
+  try {
+    final store = StoreRef<String, String>(REDACTIONS);
 
-  return await storage.transaction((txn) async {
-    for (Redaction redaction in redactions) {
-      final record = store.record(redaction.id);
-      await record.put(txn, json.encode(redaction));
-    }
-  });
+    return await storage.transaction((txn) async {
+      for (Redaction redaction in redactions) {
+        print('[saveRedaction] ${redaction.redactId}');
+        final record = store.record(redaction.redactId);
+        await record.put(txn, json.encode(redaction));
+      }
+    });
+  } catch (error) {
+    print('[saveRedactions] $error');
+    throw error;
+  }
 }
 
 ///
@@ -104,28 +111,35 @@ Future<void> saveReactions(
   List<Reaction> reactions, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(REACTIONS);
+  try {
+    final store = StoreRef<String, String>(REACTIONS);
 
-  return await storage.transaction((txn) async {
-    for (Reaction reaction in reactions) {
-      final record = store.record(reaction.relEventId);
-      final exists = await record.exists(storage);
+    return await storage.transaction((txn) async {
+      for (Reaction reaction in reactions) {
+        if (reaction.relEventId != null) {
+          final record = store.record(reaction.relEventId);
+          final exists = await record.exists(storage);
 
-      var reactionsUpdated = [reaction];
+          var reactionsUpdated = [reaction];
 
-      if (exists) {
-        final existingRaw = await record.get(storage);
-        final existingJson = List.from(await json.decode(existingRaw));
-        final existingList =
-            existingJson.map((json) => Reaction.fromJson(json));
+          if (exists) {
+            final existingRaw = await record.get(storage);
+            final existingJson = List.from(await json.decode(existingRaw));
+            final existingList =
+                existingJson.map((json) => Reaction.fromJson(json));
 
-        if (!existingList.contains(reaction))
-          reactionsUpdated = [...existingList, reaction];
+            if (!existingList.contains(reaction))
+              reactionsUpdated = [...existingList, reaction];
+          }
+
+          await record.put(txn, json.encode(reactionsUpdated));
+        }
       }
-
-      await record.put(txn, json.encode(reactionsUpdated));
-    }
-  });
+    });
+  } catch (error) {
+    print('[saveReactions] $error');
+    throw error;
+  }
 }
 
 ///

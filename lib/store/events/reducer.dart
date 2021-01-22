@@ -42,7 +42,7 @@ EventStore eventReducer(
       return state.copyWith(reactions: reactionsUpdated);
 
     case SetMessages:
-      if (state.messages.isEmpty) {
+      if (action.messages.isEmpty) {
         return state;
       }
       final roomId = action.roomId;
@@ -70,7 +70,7 @@ EventStore eventReducer(
         return state;
       }
 
-      final redactions = Map.from(state.redactions);
+      final redactions = Map<String, Redaction>.from(state.redactions);
 
       final redactionsNew = Map<String, Redaction>.fromIterable(
         action.redactions ?? [],

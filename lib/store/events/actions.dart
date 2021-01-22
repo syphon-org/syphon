@@ -77,9 +77,7 @@ ThunkAction<AppState> setRedactions({
   List<Redaction> redactions,
 }) =>
     (Store<AppState> store) {
-      return store.dispatch(
-        SetRedactions(redactions: redactions),
-      );
+      return store.dispatch(SetRedactions(redactions: redactions));
     };
 
 /**

@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -135,8 +136,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           decryptEvents(room, json),
         );
       }
-
-      // TODO: eventually remove the need for this with modular parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
@@ -147,6 +146,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length}',
       );
 
+      // TODO: eventually remove the need for this with modular parsers
       // update cold storage
       await Future.wait([
         saveUsers(room.usersNew, storage: Storage.main),
@@ -167,8 +167,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         users: Map<String, User>(),
         messagesNew: List<Message>(),
         reactions: List<Reaction>(),
+        redactions: List<Redaction>(),
       );
-
       // update room
       store.dispatch(SetRoom(room: room));
 
