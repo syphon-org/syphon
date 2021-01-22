@@ -57,7 +57,7 @@ class Event {
 
   factory Event.fromMatrix(Map<String, dynamic> json) {
     // HACK: redact is the only matrix event with unique top level data values
-    final data = json.containsKey('redact') ? json : null;
+    final data = json.containsKey('redacts') ? json : null;
 
     return Event(
       id: json['event_id'] as String,

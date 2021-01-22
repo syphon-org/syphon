@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/events/model.dart';
 
 part 'model.g.dart';
@@ -57,6 +58,7 @@ class Redaction extends Event {
       _$RedactionFromJson(json);
 
   factory Redaction.fromEvent(Event event) {
+    printJson(event.data);
     return Redaction(
       id: event.id,
       userId: event.userId,
@@ -65,7 +67,7 @@ class Redaction extends Event {
       sender: event.sender,
       stateKey: event.stateKey,
       timestamp: event.timestamp,
-      redactId: event.data['redact'],
+      redactId: event.data != null ? event.data['redact'] : null,
     );
   }
 }

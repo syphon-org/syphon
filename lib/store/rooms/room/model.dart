@@ -133,6 +133,7 @@ class Room {
     this.messagesNew = const [],
     this.messageIds = const [],
     this.reactionIds = const [],
+    this.redactions = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -185,6 +186,7 @@ class Room {
     List<Event> reactions,
     List<String> messageIds,
     List<String> reactionIds,
+    List<Redaction> redactions,
     messageReads,
     lastHash,
     prevHash,
@@ -265,6 +267,7 @@ class Room {
     List<Event> ephemeralEvents = [];
     List<Reaction> reactionEvents = [];
     List<Message> messageEvents = [];
+    List<Redaction> redactionEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
@@ -325,7 +328,7 @@ class Room {
             reactionEvents.add(Reaction.fromEvent(event));
             break;
           case EventTypes.redaction:
-            redactions.add(Redaction.fromEvent(event));
+            redactionEvents.add(Redaction.fromEvent(event));
             break;
           default:
             stateEvents.add(event);
@@ -344,6 +347,7 @@ class Room {
           events: stateEvents,
           currentUser: currentUser,
           reactions: reactionEvents,
+          redactions: redactionEvents,
         )
         .fromMessageEvents(
           messages: messageEvents,
@@ -395,6 +399,7 @@ class Room {
     User currentUser,
     List<Event> events,
     List<Reaction> reactions,
+    List<Redaction> redactions,
   }) {
     String name;
     String avatarUri;
@@ -534,6 +539,7 @@ class Room {
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,
+      redactions: redactions,
     );
   }
 

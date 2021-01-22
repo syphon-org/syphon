@@ -51,9 +51,8 @@ class SetReactions {
 }
 
 class SetRedactions {
-  final String roomId;
   final List<Redaction> redactions;
-  SetRedactions({this.roomId, this.redactions});
+  SetRedactions({this.redactions});
 }
 
 ThunkAction<AppState> setMessages({
@@ -79,7 +78,7 @@ ThunkAction<AppState> setRedactions({
 }) =>
     (Store<AppState> store) {
       return store.dispatch(
-        SetRedactions(redactions: redactions, roomId: roomId),
+        SetRedactions(redactions: redactions),
       );
     };
 

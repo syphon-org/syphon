@@ -771,9 +771,9 @@ class _Props extends Equatable {
               messages: roomMessages(store.state, roomId).toList(),
               outbox: selectRoom(id: roomId, state: store.state).outbox,
             ),
-            blocked: store.state.userStore.blocked,
+            store.state,
           ),
-          reactions: selectReactions(store.state),
+          store.state,
         ),
       ),
       roomPrimaryColor: () {

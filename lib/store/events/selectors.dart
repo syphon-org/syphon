@@ -14,7 +14,11 @@ Map<String, List<Reaction>> selectReactions(AppState state) {
 }
 
 // remove messages from blocked users
-List<Message> filterBlocked(List<Message> messages, {List<String> blocked}) {
+List<Message> filterBlocked(
+  List<Message> messages,
+  AppState state,
+) {
+  final blocked = state.userStore.blocked;
   return messages
     ..removeWhere(
       (message) => blocked.contains(message.sender),
@@ -22,14 +26,13 @@ List<Message> filterBlocked(List<Message> messages, {List<String> blocked}) {
 }
 
 List<Message> replaceRelated(
-  List<Message> messages, {
-  Map<String, List<Reaction>> reactions,
-  Map<String, Redaction> redactions,
-}) {
+  List<Message> messages,
+  AppState state,
+) {
   final messagesMap = replaceReactions(
     replaceEdited(messages),
-    reactions: reactions,
-    redactions: 
+    reactions: selectReactions(state),
+    state: state,
   );
 
   return List.from(messagesMap.values);
@@ -38,8 +41,10 @@ List<Message> replaceRelated(
 Map<String, Message> replaceReactions(
   Map<String, Message> messages, {
   Map<String, List<Reaction>> reactions,
-  Map<String, Redaction> redactions,
+  AppState state,
 }) {
+  final redactions = state.eventStore.redactions;
+
   // get a list message ids (also reaction keys) that have values in 'reactions'
   final List<String> reactionedMessageIds =
       reactions.keys.where((k) => messages.containsKey(k)).toList();
@@ -49,9 +54,11 @@ Map<String, Message> replaceReactions(
     final reactionList = reactions[messageId];
     if (reactionList != null) {
       messages[messageId] = messages[messageId].copyWith(
-        reactions: reactionList.where(
-          (reaction) => !redactions.containsKey(reaction.id),
-        ),
+        reactions: reactionList
+            .where(
+              (reaction) => !redactions.containsKey(reaction.id),
+            )
+            .toList(),
       );
     }
   }
