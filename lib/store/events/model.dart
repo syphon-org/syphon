@@ -1,13 +1,8 @@
 // Package imports:
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 
 part 'model.g.dart';
 
-/* 
-* TODO: content will not always be a string? configure parsing data
-* or more complex objects
-*/
 @JsonSerializable()
 class Event {
   final String id; // event_id
@@ -21,6 +16,9 @@ class Event {
   @JsonKey(ignore: true)
   final dynamic content;
 
+  @JsonKey(ignore: true)
+  final dynamic data;
+
   const Event({
     this.id,
     this.userId,
@@ -30,6 +28,7 @@ class Event {
     this.stateKey,
     this.content,
     this.timestamp,
+    this.data,
   });
 
   Event copyWith({
@@ -40,6 +39,7 @@ class Event {
     stateKey,
     content,
     timestamp,
+    data,
   }) =>
       Event(
         id: id ?? this.id,
@@ -49,12 +49,16 @@ class Event {
         stateKey: stateKey ?? this.stateKey,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
+        data: data ?? this.data,
       );
 
   Map<String, dynamic> toJson() => _$EventToJson(this);
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
   factory Event.fromMatrix(Map<String, dynamic> json) {
+    // HACK: redact is the only matrix event with unique top level data values
+    final data = json.containsKey('redact') ? json : null;
+
     return Event(
       id: json['event_id'] as String,
       userId: json['user_id'] as String,
@@ -64,6 +68,7 @@ class Event {
       stateKey: json['state_key'] as String,
       timestamp: json['origin_server_ts'] as int,
       content: json['content'] as dynamic,
+      data: data,
     );
   }
 }

@@ -1,8 +1,8 @@
 // Project imports:
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {
@@ -24,10 +24,12 @@ List<Message> filterBlocked(List<Message> messages, {List<String> blocked}) {
 List<Message> replaceRelated(
   List<Message> messages, {
   Map<String, List<Reaction>> reactions,
+  Map<String, Redaction> redactions,
 }) {
   final messagesMap = replaceReactions(
     replaceEdited(messages),
     reactions: reactions,
+    redactions: 
   );
 
   return List.from(messagesMap.values);
@@ -36,17 +38,20 @@ List<Message> replaceRelated(
 Map<String, Message> replaceReactions(
   Map<String, Message> messages, {
   Map<String, List<Reaction>> reactions,
+  Map<String, Redaction> redactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionKeys =
+  final List<String> reactionedMessageIds =
       reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
-  for (String reactionKey in reactionKeys) {
-    final reactionList = reactions[reactionKey];
+  for (String messageId in reactionedMessageIds) {
+    final reactionList = reactions[messageId];
     if (reactionList != null) {
-      messages[reactionKey] = messages[reactionKey].copyWith(
-        reactions: reactionList,
+      messages[messageId] = messages[messageId].copyWith(
+        reactions: reactionList.where(
+          (reaction) => !redactions.containsKey(reaction.id),
+        ),
       );
     }
   }
@@ -90,13 +95,6 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   }
 
   return messagesMap;
-}
-
-List<Message> reduceReactions(
-  List<Message> messages,
-  List<Reaction> reactions,
-) {
-  return messages;
 }
 
 List<Message> latestMessages(List<Message> messages) {

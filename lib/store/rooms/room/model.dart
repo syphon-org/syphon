@@ -14,6 +14,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -68,6 +69,9 @@ class Room {
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
+
+  @JsonKey(ignore: true)
+  final List<Redaction> redactions;
 
   @JsonKey(ignore: true)
   final List<Message> messagesNew;
@@ -278,6 +282,20 @@ class Room {
       invite = true;
     }
 
+    if (json['ephemeral'] != null) {
+      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
+
+      ephemeralEvents =
+          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    }
+
+    if (json['account_data'] != null) {
+      final List<dynamic> accountEventsRaw = json['account_data']['events'];
+
+      accountEvents =
+          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    }
+
     // Find state and message updates from timeline
     // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
@@ -304,29 +322,16 @@ class Room {
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:
-            if ((event.content as Map).keys.length > 0) {
-              reactionEvents.add(Reaction.fromEvent(event));
-            }
+            reactionEvents.add(Reaction.fromEvent(event));
+            break;
+          case EventTypes.redaction:
+            redactions.add(Redaction.fromEvent(event));
             break;
           default:
             stateEvents.add(event);
             break;
         }
       }
-    }
-
-    if (json['ephemeral'] != null) {
-      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
-
-      ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    if (json['account_data'] != null) {
-      final List<dynamic> accountEventsRaw = json['account_data']['events'];
-
-      accountEvents =
-          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     return this

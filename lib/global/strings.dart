@@ -39,6 +39,7 @@ class Strings {
   static const labelRecentUsers = 'Recent Users';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
+  static const labelDeletedMessage = 'this message was deleted';
 
   // Buttons
   static const buttonLogin = 'log in';

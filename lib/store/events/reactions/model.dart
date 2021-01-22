@@ -19,6 +19,7 @@ class Reaction extends Event {
     stateKey,
     timestamp,
     content,
+    data, //ignore
     this.body,
     this.relType,
     this.relEventId,
@@ -41,6 +42,7 @@ class Reaction extends Event {
     stateKey,
     content,
     timestamp,
+    data, //ignore
     body,
     relType,
     relEventId,
@@ -63,8 +65,7 @@ class Reaction extends Event {
       _$ReactionFromJson(json);
 
   factory Reaction.fromEvent(Event event) {
-    final content = event.content['m.relates_to'] ?? {};
-    print("${event.id} ${event.content} ${event.type}");
+    final content = event.content['m.relates_to'];
     return Reaction(
       id: event.id,
       userId: event.userId,
@@ -80,7 +81,8 @@ class Reaction extends Event {
   }
 
   factory Reaction.fromMatrix(Map<String, dynamic> json) {
-    final relations = json['content']['m.relates_to'];
+    final relations =
+        json['content'] != null ? json['content']['m.relates_to'] : {};
     return Reaction(
       id: json['event_id'] as String,
       userId: json['user_id'] as String,
