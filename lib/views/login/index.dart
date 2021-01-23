@@ -104,6 +104,7 @@ class LoginState extends State<Login> {
             label: props.usernameHint,
             disableSpacing: true,
             controller: usernameController,
+            autofillHints: [AutofillHints.username],
             formatters: [FilteringTextInputFormatter.deny(RegExp(r'@'))],
             onEditingComplete: () => props.onChangeHomeserver(),
             onSubmitted: (text) {
@@ -140,6 +141,7 @@ class LoginState extends State<Login> {
             focusNode: passwordFocus,
             obscureText: !visibility,
             textAlign: TextAlign.left,
+            autofillHints: [AutofillHints.password],
             onChanged: (password) {
               props.onChangePassword(password);
             },

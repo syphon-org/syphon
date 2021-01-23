@@ -34,6 +34,7 @@ class TextFieldSecure extends StatelessWidget {
     this.onSubmitted,
     this.onEditingComplete,
     this.textInputAction,
+    this.autofillHints,
   }) : super(key: key);
 
   final bool valid;
@@ -54,9 +55,15 @@ class TextFieldSecure extends StatelessWidget {
   final Function onChanged;
   final Function onSubmitted;
   final Function onEditingComplete;
+  final Iterable<String> autofillHints;
 
   @override
   Widget build(BuildContext context) => Container(
+        height: Dimensions.inputHeight,
+        constraints: BoxConstraints(
+          minWidth: Dimensions.inputWidthMin,
+          maxWidth: Dimensions.inputWidthMax,
+        ),
         child: TextField(
           enabled: !disabled,
           maxLines: maxLines,
@@ -68,6 +75,7 @@ class TextFieldSecure extends StatelessWidget {
           onEditingComplete: onEditingComplete,
           autocorrect: false,
           enableSuggestions: false,
+          autofillHints: autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
               ? [
@@ -102,11 +110,6 @@ class TextFieldSecure extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        height: Dimensions.inputHeight,
-        constraints: BoxConstraints(
-          minWidth: Dimensions.inputWidthMin,
-          maxWidth: Dimensions.inputWidthMax,
         ),
       );
 }
