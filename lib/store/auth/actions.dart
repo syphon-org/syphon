@@ -15,12 +15,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/utils.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -59,6 +61,11 @@ class SetCreating {
 class SetUser {
   final User user;
   SetUser({this.user});
+}
+
+class SetClientSecret {
+  final String clientSecret;
+  SetClientSecret({this.clientSecret});
 }
 
 class SetHostname {
@@ -199,8 +206,6 @@ ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
         _sub.cancel();
       } catch (error) {}
     };
-
-Future<Null> disposeUniLinks() async {}
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
@@ -584,13 +589,133 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
+///
+/// Check Password reset Verification
+///
+/// TODO: find a way to check if they've clicked the link
+/// without invalidating the token, sending a blank password
+/// doesn't work
+ThunkAction<AppState> checkPasswordResetVerification({
+  int sendAttempt = 1,
+  String password,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null &&
+          data['errcode'] == MatrixErrors.not_authorized) {
+        throw data['error'];
+      }
+
+      await store.dispatch(addConfirmation(
+        message: 'Verification Confirmed',
+      ));
+
+      store.dispatch(ResetAuthStore());
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        message: 'Please click the emailed verify link before continuing',
+      ));
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(ResetOnboarding());
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully reset your password!',
+      ));
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final email = store.state.authStore.email;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+
+      final data = await MatrixApi.sendPasswordResetEmail(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        email: email,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(SetSession(session: data['sid']));
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully sent password reset email to ${email}',
+      ));
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final emailSubmitted = store.state.authStore.email;
       final homeserver = store.state.authStore.hostname;
+      final emailSubmitted = store.state.authStore.email;
+      final clientSecret = store.state.authStore.clientSecret;
       final currentCredential = store.state.authStore.credential;
 
       if (currentCredential.params.containsValue(emailSubmitted) &&
@@ -602,7 +727,8 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         protocol: protocol,
         homeserver: homeserver,
         email: store.state.authStore.email,
-        clientSecret: Values.clientSecretMatrix,
+        clientSecret:
+            clientSecret, // TODO: confirm the new client secret generator works
         sendAttempt: sendAttempt,
       );
 
@@ -610,17 +736,15 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         throw data['error'];
       }
 
-      store.dispatch(
-        SetCredential(
-          credential: currentCredential.copyWith(
-            params: {
-              'sid': data['sid'],
-              'client_secret': Values.clientSecretMatrix,
-              'email_submitted': store.state.authStore.email
-            },
-          ),
+      store.dispatch(SetCredential(
+        credential: currentCredential.copyWith(
+          params: {
+            'sid': data['sid'],
+            'client_secret': clientSecret,
+            'email_submitted': store.state.authStore.email
+          },
         ),
-      );
+      ));
       return true;
     } catch (error) {
       debugPrint('[submitEmail] $error');
@@ -878,16 +1002,16 @@ ThunkAction<AppState> updateCredential({
   };
 }
 
-ThunkAction<AppState> resetCredentials({
-  String type,
-  String value,
-  Map<String, String> params,
-}) {
+ThunkAction<AppState> resetCredentials() {
   return (Store<AppState> store) async {
     store.dispatch(SetSession(session: null));
-    store.dispatch(SetCredential(
-      credential: null,
-    ));
+    store.dispatch(SetCredential(credential: null));
+  };
+}
+
+ThunkAction<AppState> resetSession() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSession(session: ''));
   };
 }
 
@@ -981,14 +1105,15 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
         throw Exception(Strings.errorCheckHomeserver);
       }
     } catch (error) {
+      printError('[selectHomserver] $error');
       addInfo(message: error);
 
       store.dispatch(SetLoading(loading: false));
 
       return Homeserver(
-        valid: true,
-        hostname: hostname,
+        valid: false,
         baseUrl: hostname,
+        hostname: hostname,
         loginType: MatrixAuthTypes.DUMMY,
       );
     }
@@ -1011,6 +1136,13 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
     return homeserver;
   };
 }
+
+ThunkAction<AppState> initClientSecret({String hostname}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetClientSecret(
+        clientSecret: generateClientSecret(length: 24),
+      ));
+    };
 
 ThunkAction<AppState> setHostname({String hostname}) =>
     (Store<AppState> store) {
@@ -1042,6 +1174,28 @@ ThunkAction<AppState> setUsername({String username}) {
   };
 }
 
+ThunkAction<AppState> resolveUsername({String username}) {
+  return (Store<AppState> store) {
+    final hostname = store.state.authStore.hostname;
+    final homeserver = store.state.authStore.homeserver;
+
+    final alias = username.trim().replaceAll('@', '').split(':');
+
+    store.dispatch(setUsername(username: alias[0]));
+
+    // If user enters full username, make sure to set homeserver
+    if (username.contains(':')) {
+      store.dispatch(setHostname(hostname: alias[1]));
+    } else {
+      if (!hostname.contains('.')) {
+        store.dispatch(setHostname(
+          hostname: homeserver.hostname ?? 'matrix.org',
+        ));
+      }
+    }
+  };
+}
+
 ThunkAction<AppState> setLoginPassword({String password}) =>
     (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
@@ -1051,7 +1205,10 @@ ThunkAction<AppState> setLoginPassword({String password}) =>
       ));
     };
 
-ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
+ThunkAction<AppState> setPassword({
+  String password,
+  bool ignoreConfirm = false,
+}) {
   return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password));
 

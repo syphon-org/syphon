@@ -53,7 +53,6 @@ ThunkAction<AppState> sendReaction({
   return (Store<AppState> store) async {
     store.dispatch(SetSending(room: room, sending: true));
     try {
-      print('${room} ${message} ${emoji}');
       await MatrixApi.sendReaction(
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,

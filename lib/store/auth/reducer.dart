@@ -15,6 +15,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(user: action.user);
     case SetSession:
       return state.copyWith(session: action.session);
+    case SetClientSecret:
+      return state.copyWith(clientSecret: action.clientSecret);
     case SetCompleted:
       return state.copyWith(completed: action.completed);
     case SetCredential:
@@ -56,9 +58,9 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
     case ResetOnboarding:
       return state.copyWith(
         username: '',
-        password: null,
-        passwordConfirm: null,
-        passwordCurrent: null,
+        password: '',
+        passwordConfirm: '',
+        passwordCurrent: '',
         isPasswordValid: false,
         isUsernameValid: false,
         agreement: false,

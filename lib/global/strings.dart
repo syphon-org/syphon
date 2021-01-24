@@ -27,6 +27,8 @@ class Strings {
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
+  static const titleDialogUserVerifyRequirement = 'User verification';
+  static const titleDialogVerifyEmailRequirement = 'Confirm email';
 
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
@@ -45,6 +47,8 @@ class Strings {
   static const buttonLogin = 'log in';
   static const buttonLoginSSO = 'single sign on';
   static const buttonSaveGeneric = 'save';
+  static const buttonSendVerification = 'send verification email';
+  static const buttonConfirmVerification = 'confirm verification';
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';
@@ -55,6 +59,7 @@ class Strings {
   static const buttonConfirmAlt = 'ok';
   static const buttonBlocKUser = 'block user';
   static const buttonDeleteKeys = 'delete keys';
+  static const buttonResetPassword = 'reset password';
 
   // Text Buttons
   static const buttonTextSignup = "button-text-signup";
@@ -101,6 +106,12 @@ class Strings {
 
   static const contentEmailRequirement =
       'This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information';
+
+  static const contentExplainPasswordReset =
+      'A verification email will be sent to your inbox before resetting your password. After verification, you\'ll be able to set and confirm a new password.';
+
+  static const contentConfirmPasswordReset =
+      'Click on the link sent to your email. After clicking the link, press the continue button below to change your passwoord.';
 
   static const contentEmailVerifiedRequirement =
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';

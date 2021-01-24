@@ -46,6 +46,9 @@ class Assets {
   static const heroSignupVerificationView =
       'assets/graphics/undraw_new_message.svg';
 
+  // undraw
+  static const heroResetPasswordEmail = 'assets/graphics/undraw_mail_sent.svg';
+
   // chat
   static const heroChatNotFound = 'assets/graphics/undraw_not_found.svg';
 }

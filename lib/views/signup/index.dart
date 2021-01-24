@@ -42,9 +42,9 @@ class SignupView extends StatefulWidget {
 
 class SignupViewState extends State<SignupView> {
   int currentStep = 0;
-  bool onboarding = false;
-  bool validStep = false;
   bool naving = false;
+  bool validStep = false;
+  bool onboarding = false;
   StreamSubscription subscription;
   PageController pageController;
 
@@ -178,7 +178,6 @@ class SignupViewState extends State<SignupView> {
         return () async {
           var valid = true;
 
-          print('${props.hostname} != ${props.hostname}');
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
           }

@@ -26,6 +26,8 @@ import 'package:syphon/views/home/settings/password/index.dart';
 import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
 import 'package:syphon/views/home/settings/theming.dart';
+import 'package:syphon/views/login/forgot/password-reset-email.dart';
+import 'package:syphon/views/login/forgot/password-reset.dart';
 import 'package:syphon/views/search/search-homeservers.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/login/index.dart';
@@ -60,6 +62,8 @@ class NavigationProvider {
         '/intro': (BuildContext context) => Intro(),
         '/login': (BuildContext context) => Login(),
         '/signup': (BuildContext context) => SignupView(),
+        '/forgot': (BuildContext context) => PasswordResetEmailView(),
+        '/reset': (BuildContext context) => PasswordResetView(),
         '/search/homeservers': (BuildContext context) => SearchHomeservers(),
         '/verification': (BuildContext context) => VerificationView(),
         '/home': (BuildContext context) => Home(),
@@ -79,7 +83,7 @@ class NavigationProvider {
         '/notifications': (BuildContext context) => NotificationSettingsView(),
         '/advanced': (BuildContext context) => AdvancedView(),
         '/storage': (BuildContext context) => StorageView(),
-        '/password': (BuildContext context) => PasswordView(),
+        '/password': (BuildContext context) => PasswordUpdateView(),
         '/licenses': (BuildContext context) =>
             LicensePage(applicationName: Values.appName),
         '/privacy': (BuildContext context) => PrivacyPreferences(),

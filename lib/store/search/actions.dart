@@ -14,6 +14,7 @@ import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -96,7 +97,7 @@ Future<String> fetchFavicon({String url}) async {
     return faviconUrl +
         favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    print(error);
+    printError(error);
   }
 
   return null;

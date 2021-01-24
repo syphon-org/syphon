@@ -19,6 +19,12 @@ class AuthStore extends Equatable {
   @JsonKey(nullable: true)
   final User user;
 
+  @JsonKey(nullable: true)
+  final String session; // a.k.a sid or session id
+
+  @JsonKey(nullable: true)
+  final String clientSecret;
+
   User get currentUser => user;
 
   final StreamController<User> authObserver;
@@ -27,8 +33,6 @@ class AuthStore extends Equatable {
       authObserver != null ? authObserver.stream : null;
 
   // Interactive Auth Data
-  final String session;
-
   final Credential credential;
   final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
@@ -58,6 +62,8 @@ class AuthStore extends Equatable {
 
   const AuthStore({
     this.user = const User(),
+    this.session,
+    this.clientSecret,
     this.authObserver,
     this.email = '',
     this.username = '', // null
@@ -66,7 +72,6 @@ class AuthStore extends Equatable {
     this.passwordConfirm = '',
     this.agreement = false,
     this.captcha = false,
-    this.session,
     this.completed = const [],
     this.hostname = Values.homeserverDefault,
     this.homeserver = const Homeserver(
@@ -92,6 +97,8 @@ class AuthStore extends Equatable {
   @override
   List<Object> get props => [
         user,
+        session,
+        clientSecret,
         authObserver,
         username,
         password,
@@ -102,7 +109,6 @@ class AuthStore extends Equatable {
         hostname,
         homeserver,
         completed,
-        session,
         isEmailValid,
         isEmailAvailable,
         isUsernameValid,
@@ -118,6 +124,8 @@ class AuthStore extends Equatable {
 
   AuthStore copyWith({
     user,
+    session,
+    clientSecret,
     email,
     loading,
     username,
@@ -129,7 +137,6 @@ class AuthStore extends Equatable {
     homeserver,
     completed,
     captcha,
-    session,
     isHomeserverValid,
     isUsernameValid,
     isUsernameAvailable,
@@ -145,6 +152,8 @@ class AuthStore extends Equatable {
   }) =>
       AuthStore(
         user: user ?? this.user,
+        session: session ?? this.session,
+        clientSecret: clientSecret ?? this.clientSecret,
         email: email ?? this.email,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,
@@ -157,7 +166,6 @@ class AuthStore extends Equatable {
         homeserver: homeserver ?? this.homeserver,
         completed: completed ?? this.completed,
         captcha: captcha ?? this.captcha,
-        session: session ?? this.session,
         isEmailValid: isEmailValid ?? this.isEmailValid,
         isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
         isUsernameValid: isUsernameValid ?? this.isUsernameValid,

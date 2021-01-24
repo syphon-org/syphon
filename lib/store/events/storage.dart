@@ -63,13 +63,12 @@ Future<void> saveRedactions(
 
     return await storage.transaction((txn) async {
       for (Redaction redaction in redactions) {
-        print('[saveRedaction] ${redaction.redactId}');
         final record = store.record(redaction.redactId);
         await record.put(txn, json.encode(redaction));
       }
     });
   } catch (error) {
-    print('[saveRedactions] $error');
+    printError('[saveRedactions] $error');
     throw error;
   }
 }
@@ -143,7 +142,7 @@ Future<void> saveReactions(
       }
     });
   } catch (error) {
-    print('[saveReactions] $error');
+    printError('[saveReactions] $error');
     throw error;
   }
 }
