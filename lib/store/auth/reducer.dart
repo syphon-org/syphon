@@ -58,9 +58,9 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
     case ResetOnboarding:
       return state.copyWith(
         username: '',
-        password: null,
-        passwordConfirm: null,
-        passwordCurrent: null,
+        password: '',
+        passwordConfirm: '',
+        passwordCurrent: '',
         isPasswordValid: false,
         isUsernameValid: false,
         agreement: false,

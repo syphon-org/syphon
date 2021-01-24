@@ -589,12 +589,57 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
+///
+/// Check Password reset Verification
+///
+/// TODO: find a way to check if they've clicked the link
+/// without invalidating the token, sending a blank password
+/// doesn't work
+ThunkAction<AppState> checkPasswordResetVerification({
+  int sendAttempt = 1,
+  String password,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null &&
+          data['errcode'] == MatrixErrors.not_authorized) {
+        throw data['error'];
+      }
+
+      await store.dispatch(addConfirmation(
+        message: 'Verification Confirmed',
+      ));
+
+      store.dispatch(ResetAuthStore());
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        message: 'Please click the emailed verify link before continuing',
+      ));
+      return false;
+    }
+  };
+}
+
 ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final email = store.state.authStore.email;
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
       final session = store.state.authStore.session;
@@ -612,13 +657,15 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
         throw data['error'];
       }
 
-      store.dispatch(SetSession(session: data['sid']));
+      store.dispatch(ResetOnboarding());
 
       await store.dispatch(addConfirmation(
-        message: 'Successfully sent password reset email to ${email}',
+        message: 'Successfully reset your password!',
       ));
+      return true;
     } catch (error) {
       store.dispatch(addAlert(error: error));
+      return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -955,14 +1002,16 @@ ThunkAction<AppState> updateCredential({
   };
 }
 
-ThunkAction<AppState> resetCredentials({
-  String type,
-  String value,
-  Map<String, String> params,
-}) {
+ThunkAction<AppState> resetCredentials() {
   return (Store<AppState> store) async {
     store.dispatch(SetSession(session: null));
     store.dispatch(SetCredential(credential: null));
+  };
+}
+
+ThunkAction<AppState> resetSession() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSession(session: ''));
   };
 }
 
@@ -1156,7 +1205,10 @@ ThunkAction<AppState> setLoginPassword({String password}) =>
       ));
     };
 
-ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
+ThunkAction<AppState> setPassword({
+  String password,
+  bool ignoreConfirm = false,
+}) {
   return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password));
 

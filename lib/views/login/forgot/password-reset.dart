@@ -18,7 +18,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/views/home/settings/password/step-password.dart';
+import 'package:syphon/views/login/forgot/step-password-reset.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 final Duration nextAnimationDuration = Duration(
@@ -39,7 +39,7 @@ class PasswordResetState extends State<PasswordResetView> {
   PageController pageController;
 
   var sections = [
-    PasswordStep(),
+    PasswordResetStep(),
   ];
 
   PasswordResetState({
@@ -138,14 +138,18 @@ class PasswordResetState extends State<PasswordResetView> {
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),
                               child: ButtonSolid(
-                                text: Strings.buttonSaveGeneric,
+                                text: Strings.buttonResetPassword,
                                 loading: props.loading,
                                 disabled:
                                     !props.isPasswordValid || props.loading,
                                 onPressed: () async {
-                                  final result = await props.onSavePassword();
+                                  final result = await props.onResetPassword();
+
                                   if (result) {
-                                    Navigator.pop(context);
+                                    Navigator.popUntil(
+                                      context,
+                                      ModalRoute.withName('/login'),
+                                    );
                                   }
                                 },
                               ),
@@ -167,28 +171,22 @@ class _Props extends Equatable {
   final bool loading;
   final bool isPasswordValid;
   final Map interactiveAuths;
-  final Function onSavePassword;
+  final Function onResetPassword;
 
   _Props({
     @required this.loading,
     @required this.isPasswordValid,
     @required this.interactiveAuths,
-    @required this.onSavePassword,
+    @required this.onResetPassword,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid: store.state.authStore.isPasswordValid &&
-            store.state.authStore.passwordCurrent != null &&
-            store.state.authStore.passwordCurrent.length > 0,
+        isPasswordValid: store.state.authStore.isPasswordValid,
         interactiveAuths: store.state.authStore.interactiveAuths,
-        onSavePassword: () async {
-          final valid = store.state.authStore.isPasswordValid;
-          if (!valid) return;
-
-          final newPassword = store.state.authStore.password;
+        onResetPassword: () async {
           return await store.dispatch(
-            updatePassword(newPassword),
+            resetPassword(password: store.state.authStore.password),
           );
         },
       );

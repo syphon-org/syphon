@@ -379,12 +379,12 @@ abstract class Auth {
       "auth": {
         "type": "m.login.email.identity",
         "threepid_creds": {
-          "sid": session, // "tSDUkdpPurZKsaPr",
-          "client_secret": clientSecret
+          "sid": session,
+          "client_secret": clientSecret,
         },
         "threepidCreds": {
-          "sid": session, // "tSDUkdpPurZKsaPr",
-          "client_secret": clientSecret
+          "sid": session,
+          "client_secret": clientSecret,
         }
       },
       "new_password": passwordNew

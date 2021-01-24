@@ -60,7 +60,7 @@ class EmailStepState extends State<EmailVerifyStep> {
         double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
-        Widget suffixWidgetUsername = CircularProgressIndicator(
+        Widget suffixWidgetHomeserver = CircularProgressIndicator(
           strokeWidth: Dimensions.defaultStrokeWidth,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
@@ -84,13 +84,13 @@ class EmailStepState extends State<EmailVerifyStep> {
 
         if (!props.loading && this.typingTimeout == null) {
           if (props.isHomeserverValid) {
-            suffixWidgetUsername = Icon(
+            suffixWidgetHomeserver = Icon(
               Icons.check,
               color: Colors.white,
             );
             suffixBackgroundColor = Theme.of(context).primaryColor;
           } else {
-            suffixWidgetUsername = Icon(
+            suffixWidgetHomeserver = Icon(
               Icons.close,
               color: Colors.white,
             );
@@ -154,7 +154,8 @@ class EmailStepState extends State<EmailVerifyStep> {
                                       DialogExplaination(
                                     title: Strings
                                         .titleDialogUserVerifyRequirement,
-                                    content: Strings.contentVerifyPasswordReset,
+                                    content:
+                                        Strings.contentExplainPasswordReset,
                                     onConfirm: () {
                                       Navigator.pop(context);
                                     },
@@ -192,6 +193,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     label: "Homeserver",
                     hint: 'matrix.org',
                     disableSpacing: true,
+                    disabled: props.session,
                     valid: props.isHomeserverValid,
                     controller: homeserverController,
                     onSubmitted: (hostname) {
@@ -238,7 +240,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                         ),
                         child: Container(
                           padding: EdgeInsets.all((6)),
-                          child: suffixWidgetUsername,
+                          child: suffixWidgetHomeserver,
                         ),
                       ),
                     ),
@@ -257,6 +259,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   child: TextFieldSecure(
                     label: "Email",
                     disableSpacing: true,
+                    disabled: props.session,
                     valid: props.isEmailValid,
                     controller: emailController,
                     onSubmitted: (_) {
@@ -297,6 +300,7 @@ class EmailStepState extends State<EmailVerifyStep> {
 class _Props extends Equatable {
   final String email;
   final String hostname;
+  final bool session;
   final bool loading;
   final bool isEmailValid;
   final bool isHomeserverValid;
@@ -308,6 +312,7 @@ class _Props extends Equatable {
   _Props({
     @required this.email,
     @required this.hostname,
+    @required this.session,
     @required this.loading,
     @required this.isEmailValid,
     @required this.isHomeserverValid,
@@ -322,6 +327,8 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
+        session: store.state.authStore.session != null &&
+            store.state.authStore.session.length > 0,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

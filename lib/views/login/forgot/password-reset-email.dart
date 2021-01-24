@@ -20,18 +20,19 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/login/forgot/step-email-verify.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class ResetPasswordEmailView extends StatefulWidget {
-  const ResetPasswordEmailView({Key key}) : super(key: key);
+class PasswordResetEmailView extends StatefulWidget {
+  const PasswordResetEmailView({Key key}) : super(key: key);
 
-  ResetPasswordEmailState createState() => ResetPasswordEmailState();
+  PasswordResetEmailState createState() => PasswordResetEmailState();
 }
 
-class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
+class PasswordResetEmailState extends State<PasswordResetEmailView> {
   int sendAttempt = 1;
   bool loading = false;
   bool showConfirmation = false;
@@ -41,7 +42,7 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
     EmailVerifyStep(),
   ];
 
-  ResetPasswordEmailState({
+  PasswordResetEmailState({
     Key key,
   });
 
@@ -55,10 +56,23 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
     );
   }
 
-  onConfirmVerification() {
+  onShowConfirmDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => DialogExplaination(
+        title: Strings.titleDialogVerifyEmailRequirement,
+        content: Strings.contentConfirmPasswordReset,
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  onVerificationConfirmed() {
     Navigator.pushNamed(
       context,
-      '/forgot',
+      '/reset',
     );
   }
 
@@ -152,6 +166,7 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
                                             .onSendVerification(sendAttempt);
 
                                         if (result) {
+                                          onShowConfirmDialog();
                                           this.setState(() {
                                             sendAttempt += 1;
                                             showConfirmation = true;
@@ -168,10 +183,25 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
                                     visible: showConfirmation,
                                     child: ButtonSolid(
                                       text: Strings.buttonConfirmVerification,
-                                      loading: props.loading,
+                                      loading: props.loading || this.loading,
                                       disabled: !props.isEmailValid,
                                       onPressed: () async {
-                                        onConfirmVerification();
+                                        this.setState(() {
+                                          loading = true;
+                                        });
+
+                                        final result =
+                                            await props.onConfirmVerification();
+
+                                        if (result) {
+                                          onVerificationConfirmed();
+                                        } else {
+                                          onShowConfirmDialog();
+                                        }
+
+                                        this.setState(() {
+                                          loading = false;
+                                        });
                                       },
                                     ),
                                   ),
@@ -197,6 +227,7 @@ class _Props extends Equatable {
   final bool isHomeserverValid;
   final Map interactiveAuths;
   final Function onSendVerification;
+  final Function onConfirmVerification;
 
   _Props({
     @required this.loading,
@@ -204,6 +235,7 @@ class _Props extends Equatable {
     @required this.isHomeserverValid,
     @required this.interactiveAuths,
     @required this.onSendVerification,
+    @required this.onConfirmVerification,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -211,6 +243,15 @@ class _Props extends Equatable {
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.isHomeserverValid,
         interactiveAuths: store.state.authStore.interactiveAuths,
+        onConfirmVerification: () async {
+          return true;
+          // TODO: find a way to check if they've clicked the link
+          // without invalidating the token, sending a blank password
+          // doesn't work
+          // return await store.dispatch(
+          //   checkPasswordResetVerification(sendAttempt: 0),
+          // );
+        },
         onSendVerification: (int sendAttempt) async {
           return await store.dispatch(
             sendPasswordResetEmail(sendAttempt: sendAttempt),

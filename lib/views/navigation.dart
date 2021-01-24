@@ -27,6 +27,7 @@ import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
 import 'package:syphon/views/home/settings/theming.dart';
 import 'package:syphon/views/login/forgot/password-reset-email.dart';
+import 'package:syphon/views/login/forgot/password-reset.dart';
 import 'package:syphon/views/search/search-homeservers.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/login/index.dart';
@@ -61,7 +62,8 @@ class NavigationProvider {
         '/intro': (BuildContext context) => Intro(),
         '/login': (BuildContext context) => Login(),
         '/signup': (BuildContext context) => SignupView(),
-        '/forgot': (BuildContext context) => ResetPasswordEmailView(),
+        '/forgot': (BuildContext context) => PasswordResetEmailView(),
+        '/reset': (BuildContext context) => PasswordResetView(),
         '/search/homeservers': (BuildContext context) => SearchHomeservers(),
         '/verification': (BuildContext context) => VerificationView(),
         '/home': (BuildContext context) => Home(),

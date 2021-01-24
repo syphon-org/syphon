@@ -183,10 +183,13 @@ class LoginState extends State<Login> {
               padding: EdgeInsets.only(right: 4),
               child: TouchableOpacity(
                 activeOpacity: 0.4,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/forgot',
-                ),
+                onTap: () async {
+                  await props.onResetSession();
+                  Navigator.pushNamed(
+                    context,
+                    '/forgot',
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -416,6 +419,7 @@ class _Props extends Equatable {
   final Function onChangeUsername;
   final Function onChangePassword;
   final Function onChangeHomeserver;
+  final Function onResetSession;
 
   _Props({
     @required this.loading,
@@ -431,6 +435,7 @@ class _Props extends Equatable {
     @required this.onChangeUsername,
     @required this.onChangePassword,
     @required this.onChangeHomeserver,
+    @required this.onResetSession,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -449,6 +454,9 @@ class _Props extends Equatable {
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
         ),
+        onResetSession: () async {
+          await store.dispatch(resetSession());
+        },
         onChangeUsername: (String text) async {
           await store.dispatch(resolveUsername(username: text));
         },
