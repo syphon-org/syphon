@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
@@ -15,6 +16,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
@@ -35,6 +37,7 @@ class EmailStepState extends State<EmailVerifyStep> {
 
   Timer typingTimeout;
   final emailController = TextEditingController();
+  final homeserverController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -46,6 +49,7 @@ class EmailStepState extends State<EmailVerifyStep> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     emailController.text = store.state.authStore.email;
+    homeserverController.text = store.state.authStore.homeserver.hostname;
   }
 
   @override
@@ -56,22 +60,37 @@ class EmailStepState extends State<EmailVerifyStep> {
         double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
-        Widget suffixWidget = CircularProgressIndicator(
+        Widget suffixWidgetUsername = CircularProgressIndicator(
           strokeWidth: Dimensions.defaultStrokeWidth,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
         );
 
+        Widget suffixWidgetEmail = CircularProgressIndicator(
+          strokeWidth: Dimensions.defaultStrokeWidth,
+          valueColor: const AlwaysStoppedAnimation<Color>(
+            Colors.white,
+          ),
+        );
+
+        if (props.isEmailValid) {
+          suffixWidgetEmail = Icon(
+            Icons.check,
+            color: Colors.white,
+          );
+          suffixBackgroundColor = Theme.of(context).primaryColor;
+        }
+
         if (!props.loading && this.typingTimeout == null) {
-          if (props.isEmailValid) {
-            suffixWidget = Icon(
+          if (props.isHomeserverValid) {
+            suffixWidgetUsername = Icon(
               Icons.check,
               color: Colors.white,
             );
             suffixBackgroundColor = Theme.of(context).primaryColor;
           } else {
-            suffixWidget = Icon(
+            suffixWidgetUsername = Icon(
               Icons.close,
               color: Colors.white,
             );
@@ -109,14 +128,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.only(bottom: 8, top: 8),
-                      child: Text(
-                        'Enter the email address\nassociated with your username\nto first verify your account.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ),
-                    Container(
+                      margin: EdgeInsets.only(top: 32),
                       child: Stack(
                         overflow: Overflow.visible,
                         children: <Widget>[
@@ -126,7 +138,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                               horizontal: 24,
                             ),
                             child: Text(
-                              'Enter your email address',
+                              'Enter both your email\n and homeserver',
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline5,
                             ),
@@ -141,7 +153,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                                   builder: (BuildContext context) =>
                                       DialogExplaination(
                                     title: Strings
-                                        .titleDialogEmailVerifiedRequirement,
+                                        .titleDialogUserVerifyRequirement,
                                     content: Strings.contentVerifyPasswordReset,
                                     onConfirm: () {
                                       Navigator.pop(context);
@@ -169,6 +181,73 @@ class EmailStepState extends State<EmailVerifyStep> {
               Flexible(
                 flex: 1,
                 child: Container(
+                  margin: EdgeInsets.only(bottom: 16, top: 8),
+                  width: Dimensions.contentWidthWide(context),
+                  height: Dimensions.inputHeight,
+                  constraints: BoxConstraints(
+                    minWidth: Dimensions.inputWidthMin,
+                    maxWidth: Dimensions.inputWidthMax,
+                  ),
+                  child: TextFieldSecure(
+                    label: "Homeserver",
+                    hint: 'matrix.org',
+                    disableSpacing: true,
+                    valid: props.isHomeserverValid,
+                    controller: homeserverController,
+                    onSubmitted: (hostname) {
+                      FocusScope.of(context).unfocus();
+                      // Set new username
+                      props.onSelectHomeserver(hostname);
+                    },
+                    onEditingComplete: () {
+                      FocusScope.of(context).unfocus();
+                      // Set new username
+                      props.onSelectHomeserver();
+                    },
+                    onChanged: (hostname) {
+                      // Set new username
+                      // clear current timeout if something changed
+                      if (typingTimeout != null) {
+                        typingTimeout.cancel();
+                        this.setState(() {
+                          typingTimeout = null;
+                        });
+                      }
+
+                      // Run check after 1 second of no typing
+                      typingTimeout = Timer(
+                        Duration(milliseconds: 1000),
+                        () {
+                          props.onSelectHomeserver(hostname);
+
+                          this.setState(() {
+                            typingTimeout = null;
+                          });
+                        },
+                      );
+                    },
+                    suffix: Visibility(
+                      visible: props.isHomeserverValid,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        margin: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: suffixBackgroundColor,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all((6)),
+                          child: suffixWidgetUsername,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(
                   width: Dimensions.contentWidthWide(context),
                   height: Dimensions.inputHeight,
                   constraints: BoxConstraints(
@@ -188,25 +267,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     },
                     onChanged: (email) {
                       // Set new username
-                      props.onSetEmail(email: email);
-
-                      // clear current timeout if something changed
-                      if (typingTimeout != null) {
-                        typingTimeout.cancel();
-                        this.setState(() {
-                          typingTimeout = null;
-                        });
-                      }
-
-                      // Run check after 1 second of no typing
-                      typingTimeout = Timer(
-                        Duration(milliseconds: 1000),
-                        () {
-                          this.setState(() {
-                            typingTimeout = null;
-                          });
-                        },
-                      );
+                      props.onSetEmail(email);
                     },
                     suffix: Visibility(
                       visible: props.isEmailValid,
@@ -220,7 +281,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                         ),
                         child: Container(
                           padding: EdgeInsets.all((6)),
-                          child: suffixWidget,
+                          child: suffixWidgetEmail,
                         ),
                       ),
                     ),
@@ -235,24 +296,45 @@ class EmailStepState extends State<EmailVerifyStep> {
 
 class _Props extends Equatable {
   final String email;
+  final String hostname;
   final bool loading;
   final bool isEmailValid;
+  final bool isHomeserverValid;
 
   final Function onSetEmail;
+  final Function onSetHomeserver;
+  final Function onSelectHomeserver;
 
   _Props({
     @required this.email,
+    @required this.hostname,
     @required this.loading,
     @required this.isEmailValid,
+    @required this.isHomeserverValid,
     @required this.onSetEmail,
+    @required this.onSetHomeserver,
+    @required this.onSelectHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         email: store.state.authStore.email,
+        hostname: store.state.authStore.hostname,
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
-        onSetEmail: ({String email}) {
+        isHomeserverValid: store.state.authStore.homeserver.valid,
+        onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
+        },
+        onSetHomeserver: ({String hostname}) {
+          return store.dispatch(setHostname(hostname: hostname));
+        },
+        onSelectHomeserver: (String homeserver) async {
+          final hostname = homeserver ?? store.state.authStore.hostname;
+          final urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
+
+          if (urlRegex.hasMatch('https://$hostname')) {
+            await store.dispatch(selectHomeserver(hostname: hostname));
+          }
         },
       );
 
@@ -261,5 +343,6 @@ class _Props extends Equatable {
         email,
         loading,
         isEmailValid,
+        isHomeserverValid,
       ];
 }

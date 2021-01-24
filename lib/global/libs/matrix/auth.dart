@@ -5,6 +5,7 @@ import 'dart:math';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/algos.dart';
 
 /**
  * https://matrix.org/docs/spec/client_server/latest#id183

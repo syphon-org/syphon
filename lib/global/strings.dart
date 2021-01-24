@@ -27,6 +27,7 @@ class Strings {
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
+  static const titleDialogUserVerifyRequirement = 'User verification';
 
   // Placeholders
   static const placeholderHomeserverSearch = 'Search for homeservers...';
@@ -46,6 +47,7 @@ class Strings {
   static const buttonLoginSSO = 'single sign on';
   static const buttonSaveGeneric = 'save';
   static const buttonSendVerification = 'send verification email';
+  static const buttonConfirmVerification = 'confirm verification';
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';

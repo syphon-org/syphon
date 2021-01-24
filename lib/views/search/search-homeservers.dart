@@ -13,6 +13,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/string-keys.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -334,9 +335,7 @@ class _Props extends Equatable {
           store.dispatch(searchHomeservers(searchText: text));
         },
         onFetchHomeserverPreview: (String hostname) async {
-          var urlPattern =
-              r"(https?|http)://([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?";
-          var urlRegex = new RegExp(urlPattern, caseSensitive: false);
+          var urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
 
           if (urlRegex.hasMatch('https://$hostname')) {
             final preview = await store.dispatch(

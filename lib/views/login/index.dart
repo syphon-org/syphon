@@ -449,24 +449,8 @@ class _Props extends Equatable {
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
         ),
-        onChangeUsername: (String text) {
-          final hostname = store.state.authStore.hostname;
-          final homeserver = store.state.authStore.homeserver;
-
-          final alias = text.trim().replaceAll('@', '').split(':');
-
-          store.dispatch(setUsername(username: alias[0]));
-
-          // If user enters full username, make sure to set homeserver
-          if (text.contains(':')) {
-            store.dispatch(setHostname(hostname: alias[1]));
-          } else {
-            if (!hostname.contains('.')) {
-              store.dispatch(setHostname(
-                hostname: homeserver.hostname ?? 'matrix.org',
-              ));
-            }
-          }
+        onChangeUsername: (String text) async {
+          await store.dispatch(resolveUsername(username: text));
         },
         onChangeHomeserver: () async {
           final hostname = store.state.authStore.hostname;

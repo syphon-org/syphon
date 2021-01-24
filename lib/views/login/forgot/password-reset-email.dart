@@ -32,10 +32,9 @@ class ResetPasswordEmailView extends StatefulWidget {
 }
 
 class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
-  int currentStep = 0;
-  bool naving = false;
-  bool validStep = false;
-  bool onboarding = false;
+  int sendAttempt = 1;
+  bool loading = false;
+  bool showConfirmation = false;
   PageController pageController;
 
   var sections = [
@@ -53,6 +52,13 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
       initialPage: 0,
       keepPage: false,
       viewportFraction: 1.5,
+    );
+  }
+
+  onConfirmVerification() {
+    Navigator.pushNamed(
+      context,
+      '/forgot',
     );
   }
 
@@ -112,13 +118,6 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
                                 children: sections,
-                                onPageChanged: (index) {
-                                  setState(() {
-                                    currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
-                                  });
-                                },
                               ),
                             ),
                           ],
@@ -135,19 +134,48 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
                               constraints: BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
                               ),
-                              child: ButtonSolid(
-                                text: Strings.buttonSendVerification,
-                                loading: props.loading,
-                                disabled: !props.isEmailValid,
-                                onPressed: () async {
-                                  final result =
-                                      await props.onSendVerification();
-                                  if (result) {
-                                    this.setState(() {
-                                      showConfirmation = true;
-                                    });
-                                  }
-                                },
+                              child: Stack(
+                                children: [
+                                  Visibility(
+                                    visible: !showConfirmation,
+                                    child: ButtonSolid(
+                                      text: Strings.buttonSendVerification,
+                                      loading: loading,
+                                      disabled: !props.isEmailValid ||
+                                          !props.isHomeserverValid,
+                                      onPressed: () async {
+                                        this.setState(() {
+                                          loading = true;
+                                        });
+
+                                        final result = await props
+                                            .onSendVerification(sendAttempt);
+
+                                        if (result) {
+                                          this.setState(() {
+                                            sendAttempt += 1;
+                                            showConfirmation = true;
+                                          });
+                                        }
+
+                                        this.setState(() {
+                                          loading = false;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: showConfirmation,
+                                    child: ButtonSolid(
+                                      text: Strings.buttonConfirmVerification,
+                                      loading: props.loading,
+                                      disabled: !props.isEmailValid,
+                                      onPressed: () async {
+                                        onConfirmVerification();
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -166,12 +194,14 @@ class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
 class _Props extends Equatable {
   final bool loading;
   final bool isEmailValid;
+  final bool isHomeserverValid;
   final Map interactiveAuths;
   final Function onSendVerification;
 
   _Props({
     @required this.loading,
     @required this.isEmailValid,
+    @required this.isHomeserverValid,
     @required this.interactiveAuths,
     @required this.onSendVerification,
   });
@@ -179,9 +209,12 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
+        isHomeserverValid: store.state.authStore.isHomeserverValid,
         interactiveAuths: store.state.authStore.interactiveAuths,
-        onSendVerification: () async {
-          return await store.dispatch(resetPassword());
+        onSendVerification: (int sendAttempt) async {
+          return await store.dispatch(
+            sendPasswordResetEmail(sendAttempt: sendAttempt),
+          );
         },
       );
 

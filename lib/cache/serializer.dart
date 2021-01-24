@@ -68,7 +68,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           try {
             jsonEncoded = json.encode(store);
           } catch (error) {
-            print(
+            printError(
               '[CacheSerializer] ${type} failed $error',
             );
           }
@@ -103,7 +103,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             //   '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
             // );
           } catch (error) {
-            print('[CacheSerializer] ERROR $error');
+            printError('[CacheSerializer] ERROR $error');
           }
         } catch (error) {
           debugPrint(

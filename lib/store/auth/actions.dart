@@ -15,6 +15,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
@@ -594,7 +595,7 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
       store.dispatch(SetLoading(loading: true));
 
       final email = store.state.authStore.email;
-      final homeserver = store.state.authStore.hostname;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
       final session = store.state.authStore.session;
 
@@ -610,8 +611,6 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      print('[sendPasswordResetEmail] ${data['sid']}');
 
       store.dispatch(SetSession(session: data['sid']));
 
@@ -632,7 +631,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       store.dispatch(SetLoading(loading: true));
 
       final email = store.state.authStore.email;
-      final homeserver = store.state.authStore.hostname;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
 
       final data = await MatrixApi.sendPasswordResetEmail(
@@ -640,21 +639,22 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
+        email: email,
       );
 
       if (data['errcode'] != null) {
         throw data['error'];
       }
 
-      print('[sendPasswordResetEmail] ${data['sid']}');
-
       store.dispatch(SetSession(session: data['sid']));
 
       await store.dispatch(addConfirmation(
         message: 'Successfully sent password reset email to ${email}',
       ));
+      return true;
     } catch (error) {
       store.dispatch(addAlert(error: error));
+      return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -1056,14 +1056,15 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
         throw Exception(Strings.errorCheckHomeserver);
       }
     } catch (error) {
+      printError('[selectHomserver] $error');
       addInfo(message: error);
 
       store.dispatch(SetLoading(loading: false));
 
       return Homeserver(
-        valid: true,
-        hostname: hostname,
+        valid: false,
         baseUrl: hostname,
+        hostname: hostname,
         loginType: MatrixAuthTypes.DUMMY,
       );
     }
@@ -1121,6 +1122,28 @@ ThunkAction<AppState> setUsername({String username}) {
     store.dispatch(
         SetUsernameValid(valid: username != null && username.length > 0));
     store.dispatch(SetUsername(username: username.trim()));
+  };
+}
+
+ThunkAction<AppState> resolveUsername({String username}) {
+  return (Store<AppState> store) {
+    final hostname = store.state.authStore.hostname;
+    final homeserver = store.state.authStore.homeserver;
+
+    final alias = username.trim().replaceAll('@', '').split(':');
+
+    store.dispatch(setUsername(username: alias[0]));
+
+    // If user enters full username, make sure to set homeserver
+    if (username.contains(':')) {
+      store.dispatch(setHostname(hostname: alias[1]));
+    } else {
+      if (!hostname.contains('.')) {
+        store.dispatch(setHostname(
+          hostname: homeserver.hostname ?? 'matrix.org',
+        ));
+      }
+    }
   };
 }
 
