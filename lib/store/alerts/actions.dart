@@ -74,16 +74,16 @@ ThunkAction<AppState> addInfo({
 }
 
 ThunkAction<AppState> addConfirmation({
-  type = 'success',
-  origin = 'Unknown',
-  message,
+  String type = 'success',
+  String origin = 'Unknown',
+  String message,
   error,
 }) {
   return (Store<AppState> store) async {
     debugPrint('[$origin|confirm] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert = Alert(type: type, message: message, error: error);
+    final alert = Alert(type: type, message: message, error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };

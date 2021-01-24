@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
@@ -220,6 +221,21 @@ class LoginState extends State<Login> {
           elevation: 0,
           brightness: Brightness.light,
           backgroundColor: Colors.transparent,
+          actions: <Widget>[
+            Visibility(
+              maintainSize: false,
+              visible: DotEnv().env['DEBUG'] == 'true',
+              child: IconButton(
+                icon: Icon(Icons.settings),
+                iconSize: Dimensions.iconSizeLarge,
+                tooltip: 'Debug (Future Tools)',
+                color: Theme.of(context).scaffoldBackgroundColor,
+                onPressed: () {
+                  props.onDebug();
+                },
+              ),
+            ),
+          ],
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
@@ -394,11 +410,12 @@ class _Props extends Equatable {
   final String loginType;
   final Homeserver homeserver;
 
+  final Function onDebug;
+  final Function onLoginUser;
   final Function onIncrementTheme;
   final Function onChangeUsername;
   final Function onChangePassword;
   final Function onChangeHomeserver;
-  final Function onLoginUser;
 
   _Props({
     @required this.loading,
@@ -408,11 +425,12 @@ class _Props extends Equatable {
     @required this.homeserver,
     @required this.isLoginAttemptable,
     @required this.usernameHint,
+    @required this.onDebug,
+    @required this.onLoginUser,
     @required this.onIncrementTheme,
     @required this.onChangeUsername,
     @required this.onChangePassword,
     @required this.onChangeHomeserver,
-    @required this.onLoginUser,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -464,6 +482,9 @@ class _Props extends Equatable {
         onIncrementTheme: () {
           store.dispatch(incrementTheme());
         },
+        onDebug: () async {
+          store.dispatch(initClientSecret());
+        },
         onLoginUser: () async {
           final hostname = store.state.authStore.hostname;
           final homeserver = store.state.authStore.homeserver;
@@ -485,7 +506,7 @@ class _Props extends Equatable {
         loading,
         username,
         password,
-        isLoginAttemptable,
         usernameHint,
+        isLoginAttemptable,
       ];
 }

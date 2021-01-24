@@ -18,20 +18,20 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/home/settings/password/step-password.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import './step-password.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class PasswordUpdateView extends StatefulWidget {
-  const PasswordUpdateView({Key key}) : super(key: key);
+class PasswordResetView extends StatefulWidget {
+  const PasswordResetView({Key key}) : super(key: key);
 
-  PasswordUpdateState createState() => PasswordUpdateState();
+  PasswordResetState createState() => PasswordResetState();
 }
 
-class PasswordUpdateState extends State<PasswordUpdateView> {
+class PasswordResetState extends State<PasswordResetView> {
   int currentStep = 0;
   bool naving = false;
   bool validStep = false;
@@ -42,7 +42,9 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
     PasswordStep(),
   ];
 
-  PasswordUpdateState({Key key});
+  PasswordResetState({
+    Key key,
+  });
 
   @override
   void initState() {

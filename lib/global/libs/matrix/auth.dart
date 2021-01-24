@@ -359,12 +359,50 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * Register New User
-   * 
-   * inhibit_login automatically logs in the user after creation 
-   */
+  ///
+  /// Reset Password
+  ///
+  /// Actually reset the password after verification
+  ///
   static FutureOr<dynamic> resetPassword({
+    String protocol,
+    String homeserver,
+    String clientSecret,
+    String passwordNew,
+    String session,
+    int sendAttempt = 1,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+
+    Map body = {
+      "auth": {
+        "type": "m.login.email.identity",
+        "threepid_creds": {
+          "sid": session, // "tSDUkdpPurZKsaPr",
+          "client_secret": clientSecret
+        },
+        "threepidCreds": {
+          "sid": session, // "tSDUkdpPurZKsaPr",
+          "client_secret": clientSecret
+        }
+      },
+      "new_password": passwordNew
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  ///
+  /// Verify Password Reset Email
+  ///
+  /// Returns a token to verify the password reset
+  /// request for a specifed email address
+  static FutureOr<dynamic> sendPasswordResetEmail({
     String protocol,
     String homeserver,
     String clientSecret,

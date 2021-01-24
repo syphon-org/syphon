@@ -18,20 +18,20 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/login/forgot/step-email-verify.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import './step-password.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class PasswordUpdateView extends StatefulWidget {
-  const PasswordUpdateView({Key key}) : super(key: key);
+class ResetPasswordEmailView extends StatefulWidget {
+  const ResetPasswordEmailView({Key key}) : super(key: key);
 
-  PasswordUpdateState createState() => PasswordUpdateState();
+  ResetPasswordEmailState createState() => ResetPasswordEmailState();
 }
 
-class PasswordUpdateState extends State<PasswordUpdateView> {
+class ResetPasswordEmailState extends State<ResetPasswordEmailView> {
   int currentStep = 0;
   bool naving = false;
   bool validStep = false;
@@ -39,10 +39,12 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
   PageController pageController;
 
   var sections = [
-    PasswordStep(),
+    EmailVerifyStep(),
   ];
 
-  PasswordUpdateState({Key key});
+  ResetPasswordEmailState({
+    Key key,
+  });
 
   @override
   void initState() {
@@ -129,21 +131,21 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              width: width * 0.66,
                               height: Dimensions.inputHeight,
                               constraints: BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
-                                maxWidth: Dimensions.buttonWidthMax,
                               ),
                               child: ButtonSolid(
-                                text: Strings.buttonSaveGeneric,
+                                text: Strings.buttonSendVerification,
                                 loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
+                                disabled: !props.isEmailValid,
                                 onPressed: () async {
-                                  final result = await props.onSavePassword();
+                                  final result =
+                                      await props.onSendVerification();
                                   if (result) {
-                                    Navigator.pop(context);
+                                    this.setState(() {
+                                      showConfirmation = true;
+                                    });
                                   }
                                 },
                               ),
@@ -163,38 +165,30 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
 
 class _Props extends Equatable {
   final bool loading;
-  final bool isPasswordValid;
+  final bool isEmailValid;
   final Map interactiveAuths;
-  final Function onSavePassword;
+  final Function onSendVerification;
 
   _Props({
     @required this.loading,
-    @required this.isPasswordValid,
+    @required this.isEmailValid,
     @required this.interactiveAuths,
-    @required this.onSavePassword,
+    @required this.onSendVerification,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid: store.state.authStore.isPasswordValid &&
-            store.state.authStore.passwordCurrent != null &&
-            store.state.authStore.passwordCurrent.length > 0,
+        isEmailValid: store.state.authStore.isEmailValid,
         interactiveAuths: store.state.authStore.interactiveAuths,
-        onSavePassword: () async {
-          final valid = store.state.authStore.isPasswordValid;
-          if (!valid) return;
-
-          final newPassword = store.state.authStore.password;
-          return await store.dispatch(
-            updatePassword(newPassword),
-          );
+        onSendVerification: () async {
+          return await store.dispatch(resetPassword());
         },
       );
 
   @override
   List<Object> get props => [
         loading,
-        isPasswordValid,
+        isEmailValid,
         interactiveAuths,
       ];
 }

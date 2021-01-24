@@ -21,6 +21,7 @@ import 'package:syphon/global/libs/jack/index.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/utils.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -59,6 +60,11 @@ class SetCreating {
 class SetUser {
   final User user;
   SetUser({this.user});
+}
+
+class SetClientSecret {
+  final String clientSecret;
+  SetClientSecret({this.clientSecret});
 }
 
 class SetHostname {
@@ -199,8 +205,6 @@ ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
         _sub.cancel();
       } catch (error) {}
     };
-
-Future<Null> disposeUniLinks() async {}
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
@@ -584,13 +588,87 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
+ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final email = store.state.authStore.email;
+      final homeserver = store.state.authStore.hostname;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('[sendPasswordResetEmail] ${data['sid']}');
+
+      store.dispatch(SetSession(session: data['sid']));
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully sent password reset email to ${email}',
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final email = store.state.authStore.email;
+      final homeserver = store.state.authStore.hostname;
+      final clientSecret = store.state.authStore.clientSecret;
+
+      final data = await MatrixApi.sendPasswordResetEmail(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      print('[sendPasswordResetEmail] ${data['sid']}');
+
+      store.dispatch(SetSession(session: data['sid']));
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully sent password reset email to ${email}',
+      ));
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final emailSubmitted = store.state.authStore.email;
       final homeserver = store.state.authStore.hostname;
+      final emailSubmitted = store.state.authStore.email;
+      final clientSecret = store.state.authStore.clientSecret;
       final currentCredential = store.state.authStore.credential;
 
       if (currentCredential.params.containsValue(emailSubmitted) &&
@@ -602,7 +680,8 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         protocol: protocol,
         homeserver: homeserver,
         email: store.state.authStore.email,
-        clientSecret: Values.clientSecretMatrix,
+        clientSecret:
+            clientSecret, // TODO: confirm the new client secret generator works
         sendAttempt: sendAttempt,
       );
 
@@ -610,17 +689,15 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         throw data['error'];
       }
 
-      store.dispatch(
-        SetCredential(
-          credential: currentCredential.copyWith(
-            params: {
-              'sid': data['sid'],
-              'client_secret': Values.clientSecretMatrix,
-              'email_submitted': store.state.authStore.email
-            },
-          ),
+      store.dispatch(SetCredential(
+        credential: currentCredential.copyWith(
+          params: {
+            'sid': data['sid'],
+            'client_secret': clientSecret,
+            'email_submitted': store.state.authStore.email
+          },
         ),
-      );
+      ));
       return true;
     } catch (error) {
       debugPrint('[submitEmail] $error');
@@ -885,9 +962,7 @@ ThunkAction<AppState> resetCredentials({
 }) {
   return (Store<AppState> store) async {
     store.dispatch(SetSession(session: null));
-    store.dispatch(SetCredential(
-      credential: null,
-    ));
+    store.dispatch(SetCredential(credential: null));
   };
 }
 
@@ -1011,6 +1086,13 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
     return homeserver;
   };
 }
+
+ThunkAction<AppState> initClientSecret({String hostname}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetClientSecret(
+        clientSecret: generateClientSecret(length: 24),
+      ));
+    };
 
 ThunkAction<AppState> setHostname({String hostname}) =>
     (Store<AppState> store) {

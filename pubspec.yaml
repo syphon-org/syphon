@@ -186,6 +186,7 @@ flutter:
     - assets/graphics/undraw_escaping.svg
     - assets/graphics/undraw_message_sent.svg
     - assets/graphics/undraw_new_message.svg
+    - assets/graphics/undraw_mail_sent.svg
 
     - assets/graphics/undraw_in_thought.svg
     - assets/graphics/undraw_profile_data.svg

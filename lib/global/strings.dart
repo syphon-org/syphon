@@ -45,6 +45,7 @@ class Strings {
   static const buttonLogin = 'log in';
   static const buttonLoginSSO = 'single sign on';
   static const buttonSaveGeneric = 'save';
+  static const buttonSendVerification = 'send verification email';
   static const buttonSignupNext = 'continue';
   static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';
@@ -101,6 +102,9 @@ class Strings {
 
   static const contentEmailRequirement =
       'This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information';
+
+  static const contentVerifyPasswordReset =
+      'A verification email will be sent to your inbox before resetting your password. After verification, you\'ll be able to set and confirm a new password.';
 
   static const contentEmailVerifiedRequirement =
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';

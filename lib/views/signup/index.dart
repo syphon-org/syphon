@@ -42,10 +42,9 @@ class SignupView extends StatefulWidget {
 
 class SignupViewState extends State<SignupView> {
   int currentStep = 0;
-  bool onboarding = false;
-  bool validStep = false;
   bool naving = false;
-  StreamSubscription subscription;
+  bool validStep = false;
+  bool onboarding = false;
   PageController pageController;
 
   List<Widget> sections = [
