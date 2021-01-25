@@ -70,6 +70,13 @@ class UpdateRoom {
   });
 }
 
+class SetReply {
+  final bool clear;
+  final Message reply; // room id
+
+  SetReply({this.clear, this.reply});
+}
+
 class RemoveRoom {
   final String roomId;
   RemoveRoom({this.roomId});

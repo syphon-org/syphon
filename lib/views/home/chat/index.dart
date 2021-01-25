@@ -496,6 +496,7 @@ class ChatViewState extends State<ChatView> {
                     avatarUri: avatarUri,
                     theme: props.theme,
                     timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
+                    onSwipe: props.onSelectReply,
                     onPressAvatar: onViewUserDetails,
                     onLongPress: onToggleMessageOptions,
                     onInputReaction: () => onInputReaction(
@@ -662,6 +663,8 @@ class ChatViewState extends State<ChatView> {
                         focusNode: inputFieldNode,
                         enterSend: props.enterSend,
                         controller: editorController,
+                        quotable: props.room.reply,
+                        onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
@@ -704,6 +707,7 @@ class _Props extends Equatable {
   final Function onToggleReaction;
   final Function onCheatCode;
   final Function onMarkRead;
+  final Function onSelectReply;
 
   _Props({
     @required this.room,
@@ -730,6 +734,7 @@ class _Props extends Equatable {
     @required this.onToggleReaction,
     @required this.onCheatCode,
     @required this.onMarkRead,
+    @required this.onSelectReply,
   });
 
   @override
@@ -768,6 +773,9 @@ class _Props extends Equatable {
           store.state,
         ),
       ),
+      onSelectReply: (Message message) {
+        store.dispatch(selectReply(roomId: roomId, message: message));
+      },
       roomPrimaryColor: () {
         final customChatSettings =
             store.state.settingsStore.customChatSettings ?? Map();

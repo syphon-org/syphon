@@ -32,8 +32,7 @@ class MessageWidget extends StatelessWidget {
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
-    this.onSwipeRight,
-    this.onSwipeLeft,
+    this.onSwipe,
   }) : super(key: key);
 
   final Message message;
@@ -50,8 +49,7 @@ class MessageWidget extends StatelessWidget {
   final Function onPressAvatar;
   final Function onInputReaction;
   final Function onToggleReaction;
-  final Function onSwipeRight;
-  final Function onSwipeLeft;
+  final Function onSwipe;
 
   @protected
   Widget buildReactions(
@@ -297,25 +295,29 @@ class MessageWidget extends StatelessWidget {
     }
 
     return Swipeable(
-      threshold: 50.0,
-      onSwipeLeft: onSwipeLeft,
-      onSwipeRight: onSwipeRight,
+      threshold: 80.0,
+      onSwipeLeft: isUserSent ? () => onSwipe(message) : null,
+      onSwipeRight: !isUserSent ? () => onSwipe(message) : null,
       background: Positioned(
         top: 0,
         bottom: 0,
         left: !isUserSent ? 0 : null,
         right: isUserSent ? 0 : null,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isUserSent ? 24 : 50,
-          ),
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: alignmentMessage,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.reply, size: Dimensions.iconSizeLarge),
-            ],
+        child: Opacity(
+          // HACK: hide the reply icon under the message
+          opacity: opacity == 0.5 ? 0 : 1,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isUserSent ? 24 : 50,
+            ),
+            child: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: alignmentMessage,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.reply, size: Dimensions.iconSizeLarge),
+              ],
+            ),
           ),
         ),
       ),

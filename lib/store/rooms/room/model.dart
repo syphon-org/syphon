@@ -56,6 +56,7 @@ class Room {
 
   // Event lists and handlers
   final Message draft;
+  final Message reply;
 
   // Associated user ids
   final List<String> userIds;
@@ -126,6 +127,7 @@ class Room {
     this.sending = false,
     this.limited = false,
     this.draft = null,
+    this.reply = null,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
@@ -175,6 +177,7 @@ class Room {
     userTyping,
     usersTyping,
     draft,
+    reply,
     drafting,
     hidden,
     archived,
@@ -218,6 +221,7 @@ class Room {
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
+        reply: reply ?? this.reply,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,

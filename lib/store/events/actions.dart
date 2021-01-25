@@ -283,6 +283,17 @@ ThunkAction<AppState> saveDraft({
   };
 }
 
+ThunkAction<AppState> selectReply({
+  String roomId,
+  Message message,
+}) {
+  return (Store<AppState> store) async {
+    final room = store.state.roomStore.rooms[roomId];
+    final reply = message == null ? Message() : message;
+    store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
+  };
+}
+
 ///
 /// Format Message Reply
 ///
