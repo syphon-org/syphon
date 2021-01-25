@@ -136,74 +136,77 @@ class ChatInput extends StatelessWidget {
     return Column(
       children: [
         Visibility(
-          visible: quotable != null,
+          visible: replying,
           maintainSize: false,
           maintainState: false,
           maintainAnimation: false,
           child: Row(
             //////// REPLY FIELD ////////
             children: <Widget>[
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: messageInputWidth,
-                ),
-                child: TextField(
-                  maxLines: 1,
-                  enabled: false,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  controller: TextEditingController(
-                    text: replying ? quotable.body : '',
-                  ),
-                  style: TextStyle(
-                    color: inputTextColor,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: replying ? quotable.sender : '',
-                    labelStyle: TextStyle(color: Theme.of(context).accentColor),
-                    suffix: Container(
-                      child: TouchableOpacity(
-                        onTap: onCancelReply,
-                        child: Column(children: [
-                          Icon(
-                            Icons.close,
+              Stack(
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: messageInputWidth,
+                    ),
+                    child: TextField(
+                      maxLines: 1,
+                      enabled: false,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      controller: TextEditingController(
+                        text: replying ? quotable.body : '',
+                      ),
+                      style: TextStyle(
+                        color: inputTextColor,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: replying ? quotable.sender : '',
+                        labelStyle:
+                            TextStyle(color: Theme.of(context).accentColor),
+                        filled: true,
+                        contentPadding: Dimensions.inputContentPadding,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).accentColor,
+                            width: 1,
                           ),
-                        ]),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                            bottomLeft: Radius.circular(!replying ? 24 : 0),
+                            bottomRight: Radius.circular(!replying ? 24 : 0),
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).accentColor,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                            bottomLeft: Radius.circular(!replying ? 24 : 0),
+                            bottomRight: Radius.circular(!replying ? 24 : 0),
+                          ),
+                        ),
+                        hintText: hintText,
                       ),
                     ),
-                    filled: true,
-                    // fillColor: replying
-                    //     ? Colours.hashedColor(quotable.sender).withAlpha(24)
-                    //     : Colors.blueAccent,
-                    contentPadding: Dimensions.inputContentPadding,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).accentColor,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
-                        bottomLeft: Radius.circular(!replying ? 24 : 0),
-                        bottomRight: Radius.circular(!replying ? 24 : 0),
-                      ),
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).accentColor,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
-                        bottomLeft: Radius.circular(!replying ? 24 : 0),
-                        bottomRight: Radius.circular(!replying ? 24 : 0),
-                      ),
-                    ),
-                    hintText: hintText,
                   ),
-                ),
-              ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: IconButton(
+                      onPressed: () => onCancelReply(),
+                      icon: Icon(
+                        Icons.close,
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

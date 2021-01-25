@@ -295,7 +295,6 @@ class MessageWidget extends StatelessWidget {
     }
 
     return Swipeable(
-      threshold: 80.0,
       onSwipeLeft: isUserSent ? () => onSwipe(message) : null,
       onSwipeRight: !isUserSent ? () => onSwipe(message) : null,
       background: Positioned(
