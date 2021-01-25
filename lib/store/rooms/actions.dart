@@ -143,7 +143,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       );
 
       printDebug(
-        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length}',
+        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length} | ${room.limited}',
       );
 
       // TODO: eventually remove the need for this with modular parsers

@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 // Project imports:
@@ -118,23 +119,8 @@ class BlockedUsersState extends State<BlockedUsersView> {
           children: [
             buildUserList(context, props),
             Positioned(
-              child: Visibility(
-                visible: this.loading,
-                child: Container(
-                  margin: EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      RefreshProgressIndicator(
-                        strokeWidth: Dimensions.defaultStrokeWidth,
-                        valueColor: new AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor,
-                        ),
-                        value: null,
-                      ),
-                    ],
-                  ),
-                ),
+              child: Loader(
+                loading: this.loading,
               ),
             ),
           ],

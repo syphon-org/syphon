@@ -23,6 +23,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 
 class SearchHomeservers extends StatefulWidget {
   const SearchHomeservers({Key key}) : super(key: key);
@@ -70,7 +71,6 @@ class SearchHomeserversState extends State<SearchHomeservers> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final height = MediaQuery.of(context).size.height;
           return Scaffold(
             appBar: AppBarSearch(
               title: tr(StringKeys.titleViewHomeserverSearch),
@@ -229,6 +229,11 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                       );
                     },
                   ),
+                  Positioned(
+                    child: Loader(
+                      loading: props.loading,
+                    ),
+                  ),
                   Visibility(
                     visible: props.searchText != null &&
                         props.searchText.isNotEmpty &&
@@ -267,25 +272,6 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    child: Visibility(
-                      visible: props.loading,
-                      child: Container(
-                          margin: EdgeInsets.only(top: height * 0.02),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RefreshProgressIndicator(
-                                value: null,
-                                strokeWidth: Dimensions.defaultStrokeWidth,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor,
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -322,7 +308,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.searchStore.loading,
+        loading:
+            store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults

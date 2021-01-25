@@ -160,8 +160,8 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
         senderKey: encryptedEvent['sender_key'],

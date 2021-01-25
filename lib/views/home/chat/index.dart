@@ -40,6 +40,7 @@ import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -597,21 +598,8 @@ class ChatViewState extends State<ChatView> {
                             props,
                           ),
                           Positioned(
-                            child: Visibility(
-                              visible: props.loading,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).primaryColor,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
+                            child: Loader(
+                              loading: props.loading,
                             ),
                           ),
                           Positioned(
