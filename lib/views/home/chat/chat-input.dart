@@ -49,7 +49,7 @@ class ChatInput extends StatelessWidget {
 
     final bool replying = quotable != null && quotable.sender != null;
 
-    final maxHeight = replying ? height * 0.8 : height * 0.75;
+    final maxHeight = replying ? height * 0.45 : height * 0.5;
 
     Color inputTextColor = const Color(Colours.blackDefault);
     Color inputColorBackground = const Color(Colours.greyEnabled);
@@ -220,46 +220,43 @@ class ChatInput extends StatelessWidget {
                 maxHeight: maxHeight,
                 maxWidth: messageInputWidth,
               ),
-              child: Container(
-                child: TextField(
-                  maxLines: null,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: enterSend
-                      ? TextInputAction.send
-                      : TextInputAction.newline,
-                  cursorColor: inputCursorColor,
-                  focusNode: focusNode,
-                  controller: controller,
-                  onChanged: onChangeMessage != null ? onChangeMessage : null,
-                  onSubmitted: !sendable ? null : onSubmittedMessage,
-                  style: TextStyle(
-                    height: 1.5,
-                    color: inputTextColor,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: inputColorBackground,
-                    contentPadding: Dimensions.inputContentPadding,
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Theme.of(context).accentColor, width: 1),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(!replying ? 24 : 0),
-                          topRight: Radius.circular(!replying ? 24 : 0),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
-                        )),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(!replying ? 24 : 0),
-                      topRight: Radius.circular(!replying ? 24 : 0),
-                      bottomLeft: Radius.circular(24),
-                      bottomRight: Radius.circular(24),
-                    )),
-                    hintText: hintText,
-                  ),
+              child: TextField(
+                maxLines: null,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: TextInputType.multiline,
+                textInputAction:
+                    enterSend ? TextInputAction.send : TextInputAction.newline,
+                cursorColor: inputCursorColor,
+                focusNode: focusNode,
+                controller: controller,
+                onChanged: onChangeMessage != null ? onChangeMessage : null,
+                onSubmitted: !sendable ? null : onSubmittedMessage,
+                style: TextStyle(
+                  height: 1.5,
+                  color: inputTextColor,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: inputColorBackground,
+                  contentPadding: Dimensions.inputContentPadding,
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Theme.of(context).accentColor, width: 1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(!replying ? 24 : 0),
+                        topRight: Radius.circular(!replying ? 24 : 0),
+                        bottomLeft: Radius.circular(24),
+                        bottomRight: Radius.circular(24),
+                      )),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(!replying ? 24 : 0),
+                    topRight: Radius.circular(!replying ? 24 : 0),
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  )),
+                  hintText: hintText,
                 ),
               ),
             ),
