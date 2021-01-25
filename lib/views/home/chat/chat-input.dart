@@ -10,7 +10,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 class ChatInput extends StatelessWidget {
   final bool sendable;
@@ -161,11 +160,12 @@ class ChatInput extends StatelessWidget {
                         color: inputTextColor,
                       ),
                       decoration: InputDecoration(
+                        filled: true,
                         labelText: replying ? quotable.sender : '',
                         labelStyle:
                             TextStyle(color: Theme.of(context).accentColor),
-                        filled: true,
-                        contentPadding: Dimensions.inputContentPadding,
+                        contentPadding:
+                            Dimensions.inputContentPadding.copyWith(right: 36),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                             color: Theme.of(context).accentColor,
@@ -190,18 +190,18 @@ class ChatInput extends StatelessWidget {
                             bottomRight: Radius.circular(!replying ? 24 : 0),
                           ),
                         ),
-                        hintText: hintText,
                       ),
                     ),
                   ),
                   Positioned(
-                    right: 0,
                     top: 0,
+                    right: 0,
                     bottom: 0,
                     child: IconButton(
                       onPressed: () => onCancelReply(),
                       icon: Icon(
                         Icons.close,
+                        size: Dimensions.iconSize,
                       ),
                     ),
                   ),
@@ -238,6 +238,7 @@ class ChatInput extends StatelessWidget {
                 ),
                 decoration: InputDecoration(
                   filled: true,
+                  hintText: hintText,
                   fillColor: inputColorBackground,
                   contentPadding: Dimensions.inputContentPadding,
                   focusedBorder: OutlineInputBorder(
@@ -256,7 +257,6 @@ class ChatInput extends StatelessWidget {
                     bottomLeft: Radius.circular(24),
                     bottomRight: Radius.circular(24),
                   )),
-                  hintText: hintText,
                 ),
               ),
             ),

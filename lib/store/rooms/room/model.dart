@@ -37,11 +37,16 @@ class Room {
 
   final bool direct;
   final bool sending;
+
+  @JsonKey(defaultValue: false)
   final bool drafting;
+
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
+
+  @JsonKey(defaultValue: false)
   final bool hidden;
   final bool archived;
 
@@ -211,7 +216,7 @@ class Room {
         archived: archived ?? this.archived ?? false,
         sending: sending ?? this.sending,
         syncing: syncing ?? this.syncing ?? false,
-        limited: limited ?? this.limited,
+        limited: limited ?? this.limited ?? false,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,

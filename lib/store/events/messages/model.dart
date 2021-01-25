@@ -11,8 +11,12 @@ class Message extends Event {
   final bool failed;
 
   // message editing
+  @JsonKey(defaultValue: false)
   final bool edited;
+
+  @JsonKey(defaultValue: false)
   final bool replacement;
+
   final String relatedEventId;
 
   @JsonKey(ignore: true)
