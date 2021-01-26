@@ -9,12 +9,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -26,55 +28,60 @@ final protocol = DotEnv().env['PROTOCOL'];
 /// Send Message
 ThunkAction<AppState> sendMessage({
   Room room,
-  final body,
-  String type = MessageTypes.TEXT,
+  Message message,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(SetSending(room: room, sending: true));
-
-    // if you're incredibly unlucky, and fast, you could have a problem here
-    final String tempId = Random.secure().nextInt(1 << 32).toString();
-
     try {
+      store.dispatch(SetSending(room: room, sending: true));
+
+      // if you're incredibly unlucky, and fast, you could have a problem here
+      final tempId = Random.secure().nextInt(1 << 32).toString();
+      final reply = store.state.roomStore.rooms[room.id].reply;
+
+      // trim trailing whitespace
+      message = message.copyWith(body: message.body.trimRight());
+
+      // pending outbox message
+      var pending = Message(
+        id: tempId,
+        body: message.body,
+        type: message.type,
+        content: {
+          'body': message.body,
+          'msgtype': message.type ?? MessageTypes.TEXT,
+        },
+        sender: store.state.authStore.user.userId,
+        roomId: room.id,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        pending: true,
+        syncing: true,
+      );
+
+      if (reply != null && reply.body != null) {
+        pending = await store.dispatch(
+          formatMessageReply(room, pending, reply),
+        );
+      }
       // Save unsent message to outbox
       store.dispatch(SaveOutboxMessage(
         id: room.id,
-        pendingMessage: Message(
-          id: tempId.toString(),
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          pending: true,
-          syncing: true,
-        ),
+        pendingMessage: pending,
       ));
-
-      final message = {
-        'body': body,
-        'type': type,
-      };
 
       final data = await MatrixApi.sendMessage(
         protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
         trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
-        message: message,
+        message: pending.content,
       );
 
       if (data['errcode'] != null) {
         store.dispatch(SaveOutboxMessage(
           id: room.id,
           tempId: tempId.toString(),
-          pendingMessage: Message(
-            id: tempId.toString(),
-            body: body,
-            type: type,
-            sender: store.state.authStore.user.userId,
-            roomId: room.id,
+          pendingMessage: pending.copyWith(
             timestamp: DateTime.now().millisecondsSinceEpoch,
             pending: false,
             syncing: false,
@@ -85,17 +92,13 @@ ThunkAction<AppState> sendMessage({
         throw data['error'];
       }
 
-      // Update sent message with event id but needs to be
-      // synced to remove from outbox
+      // Update sent message with event id but needs
+      // to be syncing to remove from outbox
       store.dispatch(SaveOutboxMessage(
         id: room.id,
         tempId: tempId.toString(),
-        pendingMessage: Message(
+        pendingMessage: pending.copyWith(
           id: data['event_id'],
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
           timestamp: DateTime.now().millisecondsSinceEpoch,
           syncing: true,
         ),
@@ -103,9 +106,16 @@ ThunkAction<AppState> sendMessage({
 
       return true;
     } catch (error) {
-      debugPrint('[sendMessage] $error');
+      store.dispatch(
+        addAlert(
+          error: error,
+          message: error.toString(),
+          origin: 'sendMessage',
+        ),
+      );
       return false;
     } finally {
+      store.dispatch(SetRoom(room: room.copyWith(reply: Message())));
       store.dispatch(SetSending(room: room, sending: false));
     }
   };
@@ -118,8 +128,7 @@ ThunkAction<AppState> sendMessage({
  */
 ThunkAction<AppState> sendMessageEncrypted({
   Room room,
-  final body,
-  String type = MessageTypes.TEXT,
+  Message message, // body and type only for now
 }) {
   return (Store<AppState> store) async {
     try {
@@ -129,32 +138,44 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
+      final reply = store.state.roomStore.rooms[room.id].reply;
+
+      // trim trailing whitespace
+      message = message.copyWith(body: message.body.trimRight());
+
+      // pending outbox message
+      var pending = Message(
+        id: tempId.toString(),
+        body: message.body,
+        type: message.type,
+        content: {
+          'body': message.body,
+          'msgtype': message.type ?? MessageTypes.TEXT,
+        },
+        sender: store.state.authStore.user.userId,
+        roomId: room.id,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        pending: true,
+        syncing: true,
+      );
+
+      if (reply != null && reply.body != null) {
+        pending = await store.dispatch(
+          formatMessageReply(room, pending, reply),
+        );
+      }
 
       store.dispatch(SaveOutboxMessage(
         id: room.id,
-        pendingMessage: Message(
-          id: tempId,
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          pending: true,
-          syncing: true,
-        ),
+        pendingMessage: pending,
       ));
-
-      final messageEvent = {
-        'body': body,
-        'type': type,
-      };
 
       // Encrypt the message event
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
           roomId: room.id,
           eventType: EventTypes.message,
-          content: messageEvent,
+          content: pending.content,
         ),
       );
 
@@ -174,12 +195,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         store.dispatch(SaveOutboxMessage(
           id: room.id,
           tempId: tempId.toString(),
-          pendingMessage: Message(
-            id: tempId.toString(),
-            body: body,
-            type: type,
-            sender: store.state.authStore.user.userId,
-            roomId: room.id,
+          pendingMessage: pending.copyWith(
             timestamp: DateTime.now().millisecondsSinceEpoch,
             pending: false,
             syncing: false,
@@ -193,23 +209,25 @@ ThunkAction<AppState> sendMessageEncrypted({
       store.dispatch(SaveOutboxMessage(
         id: room.id,
         tempId: tempId.toString(),
-        pendingMessage: Message(
+        pendingMessage: pending.copyWith(
           id: data['event_id'],
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
           timestamp: DateTime.now().millisecondsSinceEpoch,
           syncing: true,
         ),
       ));
+      return true;
     } catch (error) {
       store.dispatch(
         addAlert(
-            error: error,
-            message: error.toString(),
-            origin: 'sendMessageEncrypted'),
+          error: error,
+          message: error.toString(),
+          origin: 'sendMessageEncrypted',
+        ),
       );
+      return false;
+    } finally {
+      store.dispatch(SetRoom(room: room.copyWith(reply: Message())));
+      store.dispatch(SetSending(room: room, sending: false));
     }
   };
 }

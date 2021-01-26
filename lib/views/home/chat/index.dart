@@ -815,18 +815,22 @@ class _Props extends Equatable {
       },
       onSendMessage: ({String body, String type}) async {
         final room = store.state.roomStore.rooms[roomId];
+
+        final message = Message(
+          body: body,
+          type: type,
+        );
+
         if (room.encryptionEnabled) {
           return store.dispatch(sendMessageEncrypted(
-            body: body,
             room: room,
-            type: type,
+            message: message,
           ));
         }
 
         return store.dispatch(sendMessage(
-          body: body,
           room: room,
-          type: type,
+          message: message,
         ));
       },
       onDeleteMessage: ({

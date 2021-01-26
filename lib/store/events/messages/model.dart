@@ -171,7 +171,7 @@ class Message extends Event {
         senderKey: event.content['sender_key'],
         replacement: replacement,
         relatedEventId: relatedEventId,
-        received: DateTime.now().millisecond,
+        received: DateTime.now().millisecondsSinceEpoch,
         failed: false,
         pending: false,
         syncing: false,
