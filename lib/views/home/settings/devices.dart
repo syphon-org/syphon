@@ -24,6 +24,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 
 final String debug = DotEnv().env['DEBUG'];
 
@@ -288,21 +289,8 @@ class DeviceViewState extends State<DevicesView> {
                     },
                   ),
                   Positioned(
-                    child: Visibility(
-                      visible: props.loading,
-                      child: Container(
-                          child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          RefreshProgressIndicator(
-                            strokeWidth: Dimensions.defaultStrokeWidth,
-                            valueColor: new AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor,
-                            ),
-                            value: null,
-                          ),
-                        ],
-                      )),
+                    child: Loader(
+                      loading: props.loading,
                     ),
                   ),
                 ],

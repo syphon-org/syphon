@@ -41,12 +41,6 @@ class SetLoading {
   SetLoading({this.loading});
 }
 
-class SetSending {
-  final bool sending;
-  final Room room;
-  SetSending({this.sending, this.room});
-}
-
 class SetRooms {
   final List<Room> rooms;
   SetRooms({this.rooms});
@@ -60,14 +54,25 @@ class SetRoom {
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id
-  final Message draft;
   final bool syncing;
+  final bool sending;
+  final Message draft;
+  final Message reply;
 
   UpdateRoom({
     this.id,
     this.draft,
+    this.reply,
     this.syncing,
+    this.sending,
   });
+}
+
+class SetReply {
+  final bool clear;
+  final Message reply; // room id
+
+  SetReply({this.clear, this.reply});
 }
 
 class RemoveRoom {
@@ -143,7 +148,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       );
 
       printDebug(
-        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length}',
+        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length} | ${room.limited}',
       );
 
       // TODO: eventually remove the need for this with modular parsers

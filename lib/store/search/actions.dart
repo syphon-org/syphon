@@ -97,7 +97,7 @@ Future<String> fetchFavicon({String url}) async {
     return faviconUrl +
         favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    printError(error);
+    printError(error.toString());
   }
 
   return null;

@@ -204,13 +204,25 @@ abstract class Events {
 
     Map body = {
       "body": message['body'],
-      "msgtype": message['type'] ?? 'm.text',
+      "msgtype": message['msgtype'] ?? 'm.text',
     };
+
+    if (message['format'] != null) {
+      body['format'] = message['format'];
+    }
+
+    if (message['m.relates_to'] != null) {
+      body['m.relates_to'] = message['m.relates_to'];
+    }
+
+    if (message['formatted_body'] != null) {
+      body['formatted_body'] = message['formatted_body'];
+    }
 
     final response = await http.put(
       url,
       headers: headers,
-      body: json.encode(body),
+      body: json.encode(message),
     );
 
     return await json.decode(response.body);

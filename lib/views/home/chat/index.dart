@@ -40,6 +40,7 @@ import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -275,12 +276,13 @@ class ChatViewState extends State<ChatView> {
   }
 
   onInputReaction({Message message, _Props props}) async {
+    final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: Dimensions.defaultModalHeight * 1.5,
+        height: height / 2.2,
         padding: EdgeInsets.symmetric(
           vertical: 12,
         ),
@@ -495,6 +497,7 @@ class ChatViewState extends State<ChatView> {
                     avatarUri: avatarUri,
                     theme: props.theme,
                     timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
+                    onSwipe: props.onSelectReply,
                     onPressAvatar: onViewUserDetails,
                     onLongPress: onToggleMessageOptions,
                     onInputReaction: () => onInputReaction(
@@ -597,21 +600,8 @@ class ChatViewState extends State<ChatView> {
                             props,
                           ),
                           Positioned(
-                            child: Visibility(
-                              visible: props.loading,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).primaryColor,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
+                            child: Loader(
+                              loading: props.loading,
                             ),
                           ),
                           Positioned(
@@ -674,6 +664,8 @@ class ChatViewState extends State<ChatView> {
                         focusNode: inputFieldNode,
                         enterSend: props.enterSend,
                         controller: editorController,
+                        quotable: props.room.reply,
+                        onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
@@ -716,6 +708,7 @@ class _Props extends Equatable {
   final Function onToggleReaction;
   final Function onCheatCode;
   final Function onMarkRead;
+  final Function onSelectReply;
 
   _Props({
     @required this.room,
@@ -742,6 +735,7 @@ class _Props extends Equatable {
     @required this.onToggleReaction,
     @required this.onCheatCode,
     @required this.onMarkRead,
+    @required this.onSelectReply,
   });
 
   @override
@@ -780,6 +774,9 @@ class _Props extends Equatable {
           store.state,
         ),
       ),
+      onSelectReply: (Message message) {
+        store.dispatch(selectReply(roomId: roomId, message: message));
+      },
       roomPrimaryColor: () {
         final customChatSettings =
             store.state.settingsStore.customChatSettings ?? Map();
@@ -819,18 +816,22 @@ class _Props extends Equatable {
       },
       onSendMessage: ({String body, String type}) async {
         final room = store.state.roomStore.rooms[roomId];
+
+        final message = Message(
+          body: body,
+          type: type,
+        );
+
         if (room.encryptionEnabled) {
           return store.dispatch(sendMessageEncrypted(
-            body: body,
             room: room,
-            type: type,
+            message: message,
           ));
         }
 
         return store.dispatch(sendMessage(
-          body: body,
           room: room,
-          type: type,
+          message: message,
         ));
       },
       onDeleteMessage: ({

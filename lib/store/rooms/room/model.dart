@@ -37,11 +37,16 @@ class Room {
 
   final bool direct;
   final bool sending;
+
+  @JsonKey(defaultValue: false)
   final bool drafting;
+
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
+
+  @JsonKey(defaultValue: false)
   final bool hidden;
   final bool archived;
 
@@ -56,6 +61,7 @@ class Room {
 
   // Event lists and handlers
   final Message draft;
+  final Message reply;
 
   // Associated user ids
   final List<String> userIds;
@@ -126,6 +132,7 @@ class Room {
     this.sending = false,
     this.limited = false,
     this.draft = null,
+    this.reply = null,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
@@ -175,6 +182,7 @@ class Room {
     userTyping,
     usersTyping,
     draft,
+    reply,
     drafting,
     hidden,
     archived,
@@ -206,9 +214,9 @@ class Room {
         direct: direct ?? this.direct,
         hidden: hidden ?? this.hidden ?? false,
         archived: archived ?? this.archived ?? false,
-        sending: sending ?? this.sending,
+        sending: sending ?? this.sending ?? false,
         syncing: syncing ?? this.syncing ?? false,
-        limited: limited ?? this.limited,
+        limited: limited ?? this.limited ?? false,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
@@ -218,6 +226,7 @@ class Room {
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
+        reply: reply ?? this.reply,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,

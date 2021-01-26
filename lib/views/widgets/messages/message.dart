@@ -11,7 +11,6 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
@@ -33,8 +32,7 @@ class MessageWidget extends StatelessWidget {
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
-    this.onSwipeRight,
-    this.onSwipeLeft,
+    this.onSwipe,
   }) : super(key: key);
 
   final Message message;
@@ -51,8 +49,7 @@ class MessageWidget extends StatelessWidget {
   final Function onPressAvatar;
   final Function onInputReaction;
   final Function onToggleReaction;
-  final Function onSwipeRight;
-  final Function onSwipeLeft;
+  final Function onSwipe;
 
   @protected
   Widget buildReactions(
@@ -77,6 +74,7 @@ class MessageWidget extends StatelessWidget {
       physics: ClampingScrollPhysics(),
       itemCount: reactionKeys.length,
       scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
         final reactionKey = reactionKeys[index];
         final reactionCount = reactionCounts[index];
@@ -86,47 +84,45 @@ class MessageWidget extends StatelessWidget {
               this.onToggleReaction(reactionKey);
             }
           },
-          child: ClipRRect(
-            child: Container(
-              width: reactionCount > 1 ? 48 : 32,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.grey[500],
-                borderRadius: BorderRadius.circular(Dimensions.iconSize),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1,
-                ),
+          child: Container(
+            width: reactionCount > 1 ? 48 : 32,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey[500],
+              borderRadius: BorderRadius.circular(Dimensions.iconSize),
+              border: Border.all(
+                color: Colors.white,
+                width: 1,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    reactionKey,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.subtitle1.color,
-                      height: 1.35,
-                    ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  reactionKey,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.subtitle1.color,
+                    height: 1.35,
                   ),
-                  Visibility(
-                    visible: reactionCount > 1,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 3),
-                      child: Text(
-                        reactionCount.toString(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).textTheme.subtitle1.color,
-                          height: 1.35,
-                        ),
+                ),
+                Visibility(
+                  visible: reactionCount > 1,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 3),
+                    child: Text(
+                      reactionCount.toString(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).textTheme.subtitle1.color,
+                        height: 1.35,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -191,6 +187,8 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     var showSender = true;
+    // emoji input button needs space
+    var hasReactions = message.reactions.length > 0 || selected;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     var bubbleColor = Colours.hashedColor(message.sender);
@@ -298,11 +296,29 @@ class MessageWidget extends StatelessWidget {
     }
 
     return Swipeable(
-      onSwipeLeft: onSwipeLeft,
-      onSwipeRight: onSwipeRight,
-      background: Center(
-        child: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
+      onSwipeLeft: isUserSent ? () => onSwipe(message) : null,
+      onSwipeRight: !isUserSent ? () => onSwipe(message) : null,
+      background: Positioned(
+        top: 0,
+        bottom: 0,
+        left: !isUserSent ? 0 : null,
+        right: isUserSent ? 0 : null,
+        child: Opacity(
+          // HACK: hide the reply icon under the message
+          opacity: opacity == 0.5 ? 0 : 1,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isUserSent ? 24 : 50,
+            ),
+            child: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: alignmentMessage,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.reply, size: Dimensions.iconSizeLarge),
+              ],
+            ),
+          ),
         ),
       ),
       child: GestureDetector(
@@ -322,10 +338,9 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin: bubbleSpacing,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
+                  margin:
+                      bubbleSpacing, // spacing between different user bubbles
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
                     direction: Axis.horizontal,
                     mainAxisAlignment: alignmentMessage,
@@ -344,7 +359,8 @@ class MessageWidget extends StatelessWidget {
                             }
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8),
+                            margin: const EdgeInsets.only(right: 8)
+                                .copyWith(bottom: hasReactions ? 16 : 0),
                             child: Avatar(
                               margin: EdgeInsets.zero,
                               padding: EdgeInsets.zero,
@@ -365,6 +381,9 @@ class MessageWidget extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 8,
+                              ),
+                              margin: EdgeInsets.only(
+                                bottom: hasReactions ? 14 : 0,
                               ),
                               decoration: BoxDecoration(
                                 color: bubbleColor,
@@ -538,7 +557,7 @@ class MessageWidget extends StatelessWidget {
                                 child: Container(
                                   height: Dimensions.iconSize,
                                   transform:
-                                      Matrix4.translationValues(0.0, 8.0, 0.0),
+                                      Matrix4.translationValues(0.0, 4.0, 0.0),
                                   child: buildReactionsInput(
                                     context,
                                     alignmentReaction,
@@ -548,8 +567,7 @@ class MessageWidget extends StatelessWidget {
                               ),
                             ),
                             Visibility(
-                              visible:
-                                  message.reactions.length > 0 && !selected,
+                              visible: hasReactions && !selected,
                               child: Positioned(
                                 left: isUserSent ? 0 : null,
                                 right: !isUserSent ? 0 : null,
@@ -557,7 +575,7 @@ class MessageWidget extends StatelessWidget {
                                 child: Container(
                                   height: Dimensions.iconSize,
                                   transform:
-                                      Matrix4.translationValues(0.0, 8.0, 0.0),
+                                      Matrix4.translationValues(0.0, 4.0, 0.0),
                                   child: buildReactions(
                                     context,
                                     alignmentReaction,

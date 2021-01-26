@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 
 part 'model.g.dart';
 

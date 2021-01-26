@@ -51,7 +51,7 @@ ThunkAction<AppState> sendReaction({
   String emoji,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(SetSending(room: room, sending: true));
+    store.dispatch(UpdateRoom(id: room.id, sending: true));
     try {
       await MatrixApi.sendReaction(
         trxId: DateTime.now().millisecond.toString(),
@@ -67,7 +67,7 @@ ThunkAction<AppState> sendReaction({
       debugPrint('[sendReaction] $error');
       return false;
     } finally {
-      store.dispatch(SetSending(room: room, sending: false));
+      store.dispatch(UpdateRoom(id: room.id, sending: false));
     }
   };
 }
