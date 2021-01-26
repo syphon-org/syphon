@@ -534,7 +534,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
 
       final data = await MatrixApi.checkUsernameAvailability(
         protocol: protocol,
-        homeserver: store.state.authStore.hostname,
+        homeserver: store.state.authStore.homeserver.baseUrl,
         username: store.state.authStore.username,
       );
 
@@ -713,7 +713,7 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final homeserver = store.state.authStore.hostname;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
       final emailSubmitted = store.state.authStore.email;
       final clientSecret = store.state.authStore.clientSecret;
       final currentCredential = store.state.authStore.credential;

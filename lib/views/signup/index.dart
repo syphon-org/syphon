@@ -42,7 +42,6 @@ class SignupView extends StatefulWidget {
 
 class SignupViewState extends State<SignupView> {
   int currentStep = 0;
-  bool naving = false;
   bool validStep = false;
   bool onboarding = false;
   StreamSubscription subscription;
@@ -75,6 +74,15 @@ class SignupViewState extends State<SignupView> {
   @protected
   void onMounted() async {
     final store = StoreProvider.of<AppState>(context);
+
+    final props = _Props.mapStateToProps(store);
+
+    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+      setState(() {
+        sections = sections
+          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+      });
+    }
 
     // Init change listener
     subscription = store.onChange.listen((state) async {
@@ -110,17 +118,26 @@ class SignupViewState extends State<SignupView> {
           sections = newSections;
         });
       }
-
-      if (state.authStore.user.accessToken != null) {
-        final String currentRoute = ModalRoute.of(context).settings.name;
-        if (currentRoute != '/home' && !naving) {
-          setState(() {
-            naving = true;
-          });
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
-        }
-      }
     });
+  }
+
+  @protected
+  void onDidChange(_Props props) {
+    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+      setState(() {
+        sections = sections
+          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+      });
+    }
+    if (props.homeserver.loginType == MatrixAuthTypes.PASSWORD) {
+      setState(() {
+        sections = [
+          HomeserverStep(),
+          UsernameStep(),
+          PasswordStep(),
+        ];
+      });
+    }
   }
 
   @override
@@ -180,6 +197,11 @@ class SignupViewState extends State<SignupView> {
 
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
+          }
+
+          if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+            valid = false; // don't do anything else
+            await props.onLoginSSO();
           }
 
           if (valid) {
@@ -279,21 +301,11 @@ class SignupViewState extends State<SignupView> {
     }
   }
 
-  Widget buildButtonText({BuildContext context}) {
-    if (this.currentStep == sections.length - 1) {
-      return Text(
-        Strings.buttonSignupFinish,
-        style: Theme.of(context).textTheme.button,
-      );
+  String buildButtonString(_Props props) {
+    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+      return Strings.buttonLoginSSO;
     }
 
-    return Text(
-      Strings.buttonSignupNext,
-      style: Theme.of(context).textTheme.button,
-    );
-  }
-
-  String buildButtonString() {
     if (this.currentStep == sections.length - 1) {
       return Strings.buttonSignupFinish;
     }
@@ -304,6 +316,7 @@ class SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
+        onDidChange: onDidChange,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           double width = MediaQuery.of(context).size.width;
@@ -377,7 +390,7 @@ class SignupViewState extends State<SignupView> {
                           children: <Widget>[
                             Container(
                               child: ButtonSolid(
-                                text: buildButtonString(),
+                                text: buildButtonString(props),
                                 loading: props.creating || props.loading,
                                 disabled: props.creating ||
                                     !onCheckStepValid(
@@ -462,6 +475,7 @@ class _Props extends Equatable {
 
   final Map interactiveAuths;
 
+  final Function onLoginSSO;
   final Function onCreateUser;
   final Function onSubmitEmail;
   final Function onResetCredential;
@@ -486,6 +500,7 @@ class _Props extends Equatable {
     @required this.verificationNeeded,
     @required this.interactiveAuths,
     @required this.completed,
+    @required this.onLoginSSO,
     @required this.onCreateUser,
     @required this.onSubmitEmail,
     @required this.onResetCredential,
@@ -495,7 +510,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.homeserver ?? Homeserver(),
         isHomeserverValid: store.state.authStore.homeserver.valid &&
             !store.state.authStore.loading,
         username: store.state.authStore.username,
@@ -518,6 +533,9 @@ class _Props extends Equatable {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.DUMMY,
           ));
+        },
+        onLoginSSO: () async {
+          return await store.dispatch(loginUserSSO());
         },
         onCreateUser: ({bool enableErrors}) async {
           return await store.dispatch(createUser(enableErrors: enableErrors));
