@@ -214,7 +214,7 @@ class Room {
         direct: direct ?? this.direct,
         hidden: hidden ?? this.hidden ?? false,
         archived: archived ?? this.archived ?? false,
-        sending: sending ?? this.sending,
+        sending: sending ?? this.sending ?? false,
         syncing: syncing ?? this.syncing ?? false,
         limited: limited ?? this.limited ?? false,
         lastRead: lastRead ?? this.lastRead,

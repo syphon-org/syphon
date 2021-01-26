@@ -9,12 +9,6 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);
-    case SetSending:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.room.id] = rooms[action.room.id].copyWith(
-        sending: action.sending,
-      );
-      return state.copyWith(rooms: rooms);
 
     case SetRooms:
       final Map<String, Room> rooms = Map.fromIterable(
@@ -35,6 +29,8 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       if (rooms[action.id] != null) {
         rooms[action.id] = rooms[action.id].copyWith(
           draft: action.draft,
+          reply: action.reply,
+          sending: action.sending,
           syncing: action.syncing,
         );
       }

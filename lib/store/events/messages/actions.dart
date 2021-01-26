@@ -32,7 +32,7 @@ ThunkAction<AppState> sendMessage({
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetSending(room: room, sending: true));
+      store.dispatch(UpdateRoom(id: room.id, sending: true));
 
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
@@ -115,8 +115,7 @@ ThunkAction<AppState> sendMessage({
       );
       return false;
     } finally {
-      store.dispatch(SetRoom(room: room.copyWith(reply: Message())));
-      store.dispatch(SetSending(room: room, sending: false));
+      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
     }
   };
 }
@@ -132,6 +131,8 @@ ThunkAction<AppState> sendMessageEncrypted({
 }) {
   return (Store<AppState> store) async {
     try {
+      store.dispatch(UpdateRoom(id: room.id, sending: true));
+
       // send the key session - if one hasn't been sent
       // or created - to every user within the room
       await store.dispatch(updateKeySessions(room: room));
@@ -226,8 +227,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(SetRoom(room: room.copyWith(reply: Message())));
-      store.dispatch(SetSending(room: room, sending: false));
+      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
     }
   };
 }

@@ -41,12 +41,6 @@ class SetLoading {
   SetLoading({this.loading});
 }
 
-class SetSending {
-  final bool sending;
-  final Room room;
-  SetSending({this.sending, this.room});
-}
-
 class SetRooms {
   final List<Room> rooms;
   SetRooms({this.rooms});
@@ -60,13 +54,17 @@ class SetRoom {
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id
-  final Message draft;
   final bool syncing;
+  final bool sending;
+  final Message draft;
+  final Message reply;
 
   UpdateRoom({
     this.id,
     this.draft,
+    this.reply,
     this.syncing,
+    this.sending,
   });
 }
 
