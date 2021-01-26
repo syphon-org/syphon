@@ -187,7 +187,8 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     var showSender = true;
-    var hasReactions = message.reactions.length > 0;
+    // emoji input button needs space
+    var hasReactions = message.reactions.length > 0 || selected;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     var bubbleColor = Colours.hashedColor(message.sender);

@@ -276,12 +276,13 @@ class ChatViewState extends State<ChatView> {
   }
 
   onInputReaction({Message message, _Props props}) async {
+    final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: Dimensions.defaultModalHeight * 1.5,
+        height: height / 2.2,
         padding: EdgeInsets.symmetric(
           vertical: 12,
         ),
