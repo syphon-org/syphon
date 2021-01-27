@@ -88,8 +88,16 @@ EventStore eventReducer(
       }
 
       final roomId = action.roomId;
-      final receiptsUpdated = Map.from(state.receipts)[roomId]
-        ..addAll(action.receipts);
+      final receiptsUpdated = Map<String, Map<String, ReadReceipt>>.from(
+        state.receipts,
+      );
+      final receiptsNew = Map<String, ReadReceipt>.from(
+        action.receipts,
+      );
+
+      if (receiptsUpdated.containsKey(roomId)) {
+        receiptsUpdated[roomId].addAll(receiptsNew);
+      }
 
       return state.copyWith(receipts: receiptsUpdated);
 

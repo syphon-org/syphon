@@ -197,6 +197,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             messages: preloaded['messages'] ?? Map<String, List<Message>>(),
             reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
             redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
+            receipts: preloaded['receipts'] ?? Map<String, Redaction>(),
           ),
       syncStore: syncStore ?? SyncStore(),
       settingsStore: settingsStore ?? SettingsStore(),

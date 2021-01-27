@@ -252,7 +252,7 @@ class Props extends Equatable {
     String roomId,
   ) =>
       Props(
-        readReceipts: store.state.roomStore.rooms[roomId].readReceipts ??
+        readReceipts: store.state.eventStore.receipts[roomId] ??
             Map<String, ReadReceipt>(),
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
@@ -262,5 +262,6 @@ class Props extends Equatable {
   List<Object> get props => [
         userId,
         theme,
+        readReceipts,
       ];
 }
