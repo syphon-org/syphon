@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -197,7 +198,8 @@ class CacheSerializer implements StateSerializer<AppState> {
             messages: preloaded['messages'] ?? Map<String, List<Message>>(),
             reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
             redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded['receipts'] ?? Map<String, Redaction>(),
+            receipts: preloaded['receipts'] ??
+                Map<String, Map<String, ReadReceipt>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
       settingsStore: settingsStore ?? SettingsStore(),

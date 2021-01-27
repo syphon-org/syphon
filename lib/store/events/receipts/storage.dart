@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -25,21 +26,25 @@ Future<void> saveReceipts(
 ///
 /// Load Receipts
 ///
+/// Iterates through
 ///
-Future<Map<String, ReadReceipt>> loadReceipts({
+Future<Map<String, Map<String, ReadReceipt>>> loadReceipts({
   Database storage,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
 
-  final redactions = Map<String, ReadReceipt>();
+  final receipts = Map<String, Map<String, ReadReceipt>>();
 
   final roomReceipts = await store.find(storage);
 
   for (RecordSnapshot<String, String> record in roomReceipts) {
-    redactions[record.key] = ReadReceipt.fromJson(
-      json.decode(record.value),
+    final testing = await json.decode(record.value);
+    final mapped = Map<String, dynamic>.from(testing);
+    final Map<String, ReadReceipt> converted = mapped.map(
+      (key, value) => MapEntry(key, ReadReceipt.fromJson(value)),
     );
+    receipts[record.key] = converted;
   }
 
-  return redactions;
+  return receipts;
 }
