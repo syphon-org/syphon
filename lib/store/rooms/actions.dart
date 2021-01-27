@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
@@ -159,6 +160,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
+        saveReceipts(room.id, room.readReceipts, storage: Storage.main),
       ]);
 
       // update store
@@ -166,6 +168,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       await store.dispatch(setMessages(room: room, messages: room.messagesNew));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
+      await store.dispatch(
+        setReceipts(room: room, receipts: room.readReceipts),
+      );
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(

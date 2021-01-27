@@ -18,6 +18,7 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
@@ -50,6 +51,12 @@ class SetReactions {
   SetReactions({this.roomId, this.reactions});
 }
 
+class SetReceipts {
+  final String roomId;
+  final Map<String, ReadReceipt> receipts;
+  SetReceipts({this.roomId, this.receipts});
+}
+
 class SetRedactions {
   final List<Redaction> redactions;
   SetRedactions({this.redactions});
@@ -78,6 +85,14 @@ ThunkAction<AppState> setRedactions({
 }) =>
     (Store<AppState> store) {
       return store.dispatch(SetRedactions(redactions: redactions));
+    };
+
+ThunkAction<AppState> setReceipts({
+  Room room,
+  Map<String, ReadReceipt> receipts,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetReceipts(roomId: room.id, receipts: receipts));
     };
 
 /**

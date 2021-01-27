@@ -4,16 +4,16 @@ import 'package:json_annotation/json_annotation.dart';
 part 'model.g.dart';
 
 @JsonSerializable()
-class ReadStatus {
+class ReadReceipt {
   final int latestRead;
   final Map<String, int> userReads; // UserId -> timestamp
 
-  const ReadStatus({
+  const ReadReceipt({
     this.latestRead = 0,
     this.userReads,
   });
 
-  factory ReadStatus.fromReceipt(Map<String, dynamic> receipt) {
+  factory ReadReceipt.fromReceipt(Map<String, dynamic> receipt) {
     var usersRead = Map<String, int>();
     var latestTimestamp = 0;
     final Map<String, dynamic> userTimestamps = receipt['m.read'];
@@ -28,22 +28,22 @@ class ReadStatus {
       },
     );
 
-    return ReadStatus(
+    return ReadReceipt(
       userReads: usersRead,
       latestRead: latestTimestamp,
     );
   }
 
-  ReadStatus copyWith({
+  ReadReceipt copyWith({
     usersRead,
     latestRead,
   }) =>
-      ReadStatus(
+      ReadReceipt(
         userReads: usersRead ?? this.userReads,
         latestRead: latestRead ?? this.latestRead,
       );
 
-  Map<String, dynamic> toJson() => _$ReadStatusToJson(this);
-  factory ReadStatus.fromJson(Map<String, dynamic> json) =>
-      _$ReadStatusFromJson(json);
+  Map<String, dynamic> toJson() => _$ReadReceiptToJson(this);
+  factory ReadReceipt.fromJson(Map<String, dynamic> json) =>
+      _$ReadReceiptFromJson(json);
 }

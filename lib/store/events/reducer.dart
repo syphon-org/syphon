@@ -1,4 +1,5 @@
 // Project imports:
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
@@ -80,6 +81,17 @@ EventStore eventReducer(
       return state.copyWith(
         redactions: redactions..addAll(redactionsNew),
       );
+
+    case SetReceipts:
+      if (action.receipts.isEmpty) {
+        return state;
+      }
+
+      final roomId = action.roomId;
+      final receiptsUpdated = Map.from(state.receipts)[roomId]
+        ..addAll(action.receipts);
+
+      return state.copyWith(receipts: receiptsUpdated);
 
     case ResetEvents:
       return EventStore();

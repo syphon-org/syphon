@@ -36,10 +36,10 @@ class MessageDetails extends StatelessWidget {
 
   @protected
   Widget buildUserReadList(Props props, Message message) {
-    ReadStatus readStatus = props.messageReads[message.id];
+    ReadReceipt readReceipts = props.readReceipts[message.id];
 
     Map<String, int> userTimestamps =
-        readStatus != null ? readStatus.userReads : Map<String, int>();
+        readReceipts != null ? readReceipts.userReads : Map<String, int>();
     final List<String> users = userTimestamps.keys.toList();
 
     return ListView.builder(
@@ -238,13 +238,13 @@ class Props extends Equatable {
   final bool loading;
   final String userId;
   final ThemeType theme;
-  final Map<String, ReadStatus> messageReads;
+  final Map<String, ReadReceipt> readReceipts;
 
   Props({
     @required this.loading,
     @required this.userId,
     @required this.theme,
-    @required this.messageReads,
+    @required this.readReceipts,
   });
 
   static Props mapStateToProps(
@@ -252,8 +252,8 @@ class Props extends Equatable {
     String roomId,
   ) =>
       Props(
-        messageReads: store.state.roomStore.rooms[roomId].messageReads ??
-            Map<String, ReadStatus>(),
+        readReceipts: store.state.roomStore.rooms[roomId].readReceipts ??
+            Map<String, ReadReceipt>(),
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
       );

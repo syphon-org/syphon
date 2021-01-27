@@ -82,9 +82,9 @@ class Room {
   @JsonKey(ignore: true)
   final List<Message> messagesNew;
 
-  // TODO: offload messageReads, for large rooms these are ridiculously large
+  // TODO: offload readReceipts, for large rooms these are ridiculously large
   @JsonKey(ignore: true)
-  final Map<String, ReadStatus> messageReads;
+  final Map<String, ReadReceipt> readReceipts;
 
   @JsonKey(ignore: true)
   final Map<String, User> usersNew;
@@ -156,7 +156,7 @@ class Room {
     this.lastHash,
     this.nextHash,
     this.prevHash,
-    this.messageReads,
+    this.readReceipts,
     this.state,
   });
 
@@ -195,7 +195,7 @@ class Room {
     List<String> messageIds,
     List<String> reactionIds,
     List<Redaction> redactions,
-    messageReads,
+    readReceipts,
     lastHash,
     prevHash,
     nextHash,
@@ -234,7 +234,7 @@ class Room {
         redactions: redactions ?? this.redactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
-        messageReads: messageReads ?? this.messageReads,
+        readReceipts: readReceipts ?? this.readReceipts,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
@@ -660,10 +660,7 @@ class Room {
   }) {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
-
-    var messageReads = this.messageReads != null
-        ? Map<String, ReadStatus>.from(this.messageReads)
-        : Map<String, ReadStatus>();
+    final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
 
     try {
       events.forEach((event) {
@@ -688,14 +685,14 @@ class Room {
             // Filter through every eventId to find receipts
             receiptEventIds.forEach((key, receipt) {
               // convert every m.read object to a map of userIds + timestamps for read
-              final newReadStatuses = ReadStatus.fromReceipt(receipt);
+              final newReadStatuses = ReadReceipt.fromReceipt(receipt);
 
               // update the eventId if that event already has reads
-              if (!messageReads.containsKey(key)) {
-                messageReads[key] = newReadStatuses;
+              if (!readReceipts.containsKey(key)) {
+                readReceipts[key] = newReadStatuses;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                messageReads[key].userReads.addAll(newReadStatuses.userReads);
+                readReceipts[key].userReads.addAll(newReadStatuses.userReads);
               }
             });
             break;
@@ -708,7 +705,7 @@ class Room {
     return this.copyWith(
       userTyping: userTyping,
       usersTyping: usersTyping,
-      messageReads: messageReads,
+      readReceipts: readReceipts,
     );
   }
 }
