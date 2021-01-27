@@ -11,8 +11,7 @@
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/normal_background</item>
-
-        <item name="android:windowTranslucentStatus">true</item>
+        
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
     <color name="primary">#34C7B5</color>
