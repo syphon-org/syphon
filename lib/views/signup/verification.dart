@@ -69,14 +69,7 @@ class VerificationViewState extends State<VerificationView>
           });
         }
         break;
-      case AppLifecycleState.inactive:
-        debugPrint("app in inactive");
-        break;
-      case AppLifecycleState.paused:
-        debugPrint("app in paused");
-        break;
-      case AppLifecycleState.detached:
-        debugPrint("app in detached");
+      default:
         break;
     }
   }

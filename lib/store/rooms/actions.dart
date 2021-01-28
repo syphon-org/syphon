@@ -172,9 +172,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       await store.dispatch(setMessages(room: room, messages: room.messagesNew));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
-      await store.dispatch(
-        setReceipts(room: room, receipts: room.readReceipts),
-      );
+      await store.dispatch(setReceipts(
+        room: room,
+        receipts: room.readReceipts,
+      ));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(

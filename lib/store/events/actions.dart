@@ -180,6 +180,7 @@ ThunkAction<AppState> fetchMessageEvents({
               'events': messages,
               'last_hash': oldest ? end : null,
               'prev_batch': end,
+              'limited': end == start ? false : null,
             }
           },
         }),

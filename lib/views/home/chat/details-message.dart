@@ -15,6 +15,8 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 final String debug = DotEnv().env['DEBUG'];
@@ -35,47 +37,23 @@ class MessageDetails extends StatelessWidget {
   final contentPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 8);
 
   @protected
-  Widget buildUserReadList(Props props, Message message) {
-    ReadReceipt readReceipts = props.readReceipts[message.id];
+  Widget buildUserReadList(Props props, double width) {
+    ReadReceipt readReceipts =
+        props.readReceipts[props.message.id] ?? ReadReceipt();
+    Map<String, int> userReads = readReceipts.userReads ?? Map();
 
-    Map<String, int> userTimestamps =
-        readReceipts != null ? readReceipts.userReads : Map<String, int>();
-    final List<String> users = userTimestamps.keys.toList();
+    print(userReads.length.toString());
 
-    return ListView.builder(
-      itemCount: users.length,
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      itemBuilder: (BuildContext context, int index) {
-        var timestamp = DateTime.now();
-        try {
-          timestamp = DateTime.fromMillisecondsSinceEpoch(
-            userTimestamps[users[index]],
-          );
-        } catch (error) {
-          debugPrint('[buildUserReadList] $error');
-        }
-        return ListTile(
-          dense: true,
-          contentPadding: Dimensions.listPadding,
-          title: Text(
-            users[index],
-            style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          trailing: Container(
-            child: Text(
-              DateFormat('MMM d h:mm a').format(timestamp),
-              style: TextStyle(
-                fontSize: 14.0,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-          ),
-        );
-      },
+    final List<User> users = userReads.keys
+        .map(
+          (userId) => props.users[userId],
+        )
+        .toList();
+
+    return ListUserBubbles(
+      max: 4,
+      users: users,
+      roomId: props.roomId,
     );
   }
 
@@ -84,14 +62,12 @@ class MessageDetails extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(
           store,
-          (ModalRoute.of(context).settings.arguments as MessageDetailArguments)
-              .roomId,
+          ModalRoute.of(context).settings.arguments,
         ),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          final Message message = (ModalRoute.of(context).settings.arguments
-                  as MessageDetailArguments)
-              .message;
+          final double width = MediaQuery.of(context).size.width;
+          final Message message = props.message;
+
           final timestamp =
               DateTime.fromMillisecondsSinceEpoch(message.timestamp);
           final received = DateTime.fromMillisecondsSinceEpoch(
@@ -113,7 +89,7 @@ class MessageDetails extends StatelessWidget {
                 ),
               ),
             ),
-            body: Container(
+            body: SingleChildScrollView(
                 child: Column(
               children: <Widget>[
                 Container(
@@ -221,12 +197,23 @@ class MessageDetails extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 500,
+                ListTile(
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Read By',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  child: buildUserReadList(props, message),
-                )
+                  trailing: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: width / 2,
+                      maxHeight: 100,
+                    ),
+                    child: buildUserReadList(props, width),
+                  ),
+                ),
               ],
             )),
           );
@@ -235,24 +222,31 @@ class MessageDetails extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final bool loading;
   final String userId;
+  final String roomId;
   final ThemeType theme;
+  final Message message;
+  final Map<String, User> users;
   final Map<String, ReadReceipt> readReceipts;
 
   Props({
-    @required this.loading,
-    @required this.userId,
+    @required this.users,
     @required this.theme,
+    @required this.roomId,
+    @required this.userId,
+    @required this.message,
     @required this.readReceipts,
   });
 
   static Props mapStateToProps(
     Store<AppState> store,
-    String roomId,
+    MessageDetailArguments args,
   ) =>
       Props(
-        readReceipts: store.state.eventStore.receipts[roomId] ??
+        roomId: args.roomId,
+        message: args.message,
+        users: store.state.userStore.users,
+        readReceipts: store.state.eventStore.receipts[args.roomId] ??
             Map<String, ReadReceipt>(),
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
@@ -260,8 +254,8 @@ class Props extends Equatable {
 
   @override
   List<Object> get props => [
-        userId,
         theme,
+        userId,
         readReceipts,
       ];
 }
