@@ -13,8 +13,10 @@ import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
@@ -58,6 +60,7 @@ class UpdateRoom {
   final bool sending;
   final Message draft;
   final Message reply;
+  final int lastRead;
 
   UpdateRoom({
     this.id,
@@ -65,6 +68,7 @@ class UpdateRoom {
     this.reply,
     this.syncing,
     this.sending,
+    this.lastRead,
   });
 }
 
@@ -141,6 +145,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           decryptEvents(room, json),
         );
       }
+
+      // TODO: eventually remove the need for this with modular parsers
       room = room.fromSync(
         json: json,
         currentUser: user,
@@ -151,7 +157,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length} | ${room.limited}',
       );
 
-      // TODO: eventually remove the need for this with modular parsers
       // update cold storage
       await Future.wait([
         saveUsers(room.usersNew, storage: Storage.main),
@@ -159,6 +164,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
+        saveReceipts(room.id, room.readReceipts, storage: Storage.main),
       ]);
 
       // update store
@@ -166,6 +172,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       await store.dispatch(setMessages(room: room, messages: room.messagesNew));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
+      await store.dispatch(setReceipts(
+        room: room,
+        receipts: room.readReceipts,
+      ));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
@@ -173,7 +183,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         messagesNew: List<Message>(),
         reactions: List<Reaction>(),
         redactions: List<Redaction>(),
+        readReceipts: Map<String, ReadReceipt>(),
       );
+
       // update room
       store.dispatch(SetRoom(room: room));
 
@@ -569,15 +581,17 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // mark read locally only
       if (!store.state.settingsStore.readReceipts) {
-        await store.dispatch(SetRoom(
-          room: room.copyWith(lastRead: DateTime.now().millisecondsSinceEpoch),
+        await store.dispatch(UpdateRoom(
+          id: roomId,
+          lastRead: DateTime.now().millisecondsSinceEpoch,
         ));
       }
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted =
-            latestMessages(roomMessages(store.state, roomId));
+        final messagesSorted = latestMessages(
+          roomMessages(store.state, roomId),
+        );
 
         if (messagesSorted.isNotEmpty) {
           store.dispatch(sendReadReceipts(

@@ -188,20 +188,6 @@ Future<void> saveMessages(
   });
 }
 
-Future<void> saveReceipts(
-  Map<String, ReadStatus> receipts, {
-  Database storage,
-}) async {
-  final store = StoreRef<String, String>(RECEIPTS);
-
-  return await storage.transaction((txn) async {
-    for (String roomId in receipts.keys) {
-      final record = store.record(roomId);
-      await record.put(txn, json.encode(receipts[roomId]));
-    }
-  });
-}
-
 Future<Message> loadMessage(String eventId, {Database storage}) async {
   final store = StoreRef<String, String>(MESSAGES);
 

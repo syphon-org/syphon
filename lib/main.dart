@@ -27,7 +27,6 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -48,6 +47,7 @@ void main() async {
     debugPrint = (String message, {int wrapWidth}) {};
     printDebug = (String message, {String title}) {};
     printInfo = (String message, {String title}) {};
+    printError = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs

@@ -201,3 +201,31 @@ flutter_recaptcha_v2: 0.1.0 used as reference for webview captcha
         );
  }
 ```
+
+```dart
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    final store = StoreProvider.of<AppState>(context);
+    final props = _Props.mapStateToProps(store);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (success == null || !success) {
+          final result = await props.onCreateUser(enableErrors: true);
+          this.setState(() {
+            success = result;
+          });
+        }
+        break;
+      case AppLifecycleState.inactive:
+        debugPrint("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        debugPrint("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        debugPrint("app in detached");
+        break;
+    }
+  }
+```

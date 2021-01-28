@@ -14,6 +14,7 @@ import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
@@ -109,6 +110,8 @@ Future<void> deleteStorage() async {
  * 
  * for example, only load users that are known to be
  * involved in stored messages/events
+ * 
+ * TODO: need pagination for pretty much all of these
  */
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   final auth = await loadAuth(
@@ -132,6 +135,10 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
   );
 
   final redactions = await loadRedactions(
+    storage: storage,
+  );
+
+  final receipts = await loadReceipts(
     storage: storage,
   );
 
@@ -159,5 +166,6 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     'messages': messages.isNotEmpty ? messages : null,
     'reactions': reactions,
     'redactions': redactions,
+    'receipts': receipts,
   };
 }

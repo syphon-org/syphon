@@ -7,6 +7,8 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/storage.dart';
 
 ///
 /// Storage Middleware
@@ -21,19 +23,29 @@ dynamic storageMiddleware<State>(
   next(action);
 
   switch (action.runtimeType) {
-    // auth store - CUD ops
+    // auth store
     case SetUser:
       printInfo(
         '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
       );
       saveAuth(store.state.authStore, storage: Storage.main);
       break;
-    // media store - CU ops
+    // media store
     case UpdateMediaCache:
       // printInfo(
       //   '[storageMiddleware] saving media ${action.runtimeType.toString()}',
       // );
       // saveMedia(action.mxcUri, action.data, storage: Storage.main);
+      break;
+    case UpdateRoom:
+      // TODO: create a mutation like SetSyncing to distinguish small but important room mutations
+      if (action.syncing == null) {
+        printInfo(
+          '[storageMiddleware] saving room ${action.runtimeType.toString()}',
+        );
+        final room = store.state.roomStore.rooms[action.id];
+        saveRoom(room, storage: Storage.main);
+      }
       break;
     // crypto store - CUD ops
     case SetOlmAccountBackup:
