@@ -99,6 +99,7 @@ dependencies:
   easy_localization: 2.3.3
   flutter_dotenv: 2.1.0
   android_alarm_manager: 0.4.5+15
+  uni_links: 0.4.0 
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
@@ -118,6 +119,8 @@ dependencies:
   flutter_local_notifications: 1.4.0
   flutter_material_color_picker: ^1.0.5
   palette_generator: 0.2.3
+  emoji_picker: 0.1.0
+  swipeable: 1.1.0
 
   # fun
   ansicolor: 1.1.1
@@ -171,7 +174,7 @@ flutter:
     - ./.env.debug
     - ./.env.release
     - assets/translations/en.json
-    - assets/translations/ru.json
+    - assets/translations/ru.json 
     - assets/graphics/undraw_sync_files.svg
     - assets/graphics/undraw_accept_terms.svg
     - assets/graphics/undraw_mobile_user.svg
@@ -183,6 +186,7 @@ flutter:
     - assets/graphics/undraw_escaping.svg
     - assets/graphics/undraw_message_sent.svg
     - assets/graphics/undraw_new_message.svg
+    - assets/graphics/undraw_mail_sent.svg
 
     - assets/graphics/undraw_in_thought.svg
     - assets/graphics/undraw_profile_data.svg

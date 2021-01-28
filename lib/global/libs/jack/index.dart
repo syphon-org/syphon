@@ -11,16 +11,16 @@ import 'package:http/http.dart' as http;
  * 
  */
 class JackApi {
-  static const fetchPublicServersEndpoint =
-      'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=United+States+(Denver)';
-
+  static const List<String> endpoints = [
+    'https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=United+States+(Denver)',
+  ];
   /**
    * Fetch Public Homeservers (hello matrix)
    * 
    * Returns an array of homeseerver objects
    */
   static Future<dynamic> fetchPublicServers() async {
-    String url = fetchPublicServersEndpoint;
+    String url = endpoints.elementAt(0);
 
     Map<String, String> headers = {
       // 'Authorization': 'Bearer $accessToken',

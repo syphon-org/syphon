@@ -4,31 +4,35 @@ import 'dart:async';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 
 // Project imports:
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(ignoreUnannotated: true)
 class AuthStore extends Equatable {
+  @JsonKey(nullable: true)
   final User user;
 
-  @JsonKey(ignore: true)
+  @JsonKey(nullable: true)
+  final String session; // a.k.a sid or session id
+
+  @JsonKey(nullable: true)
+  final String clientSecret;
+
   User get currentUser => user;
 
-  @JsonKey(ignore: true)
   final StreamController<User> authObserver;
 
-  @JsonKey(ignore: true)
   Stream<User> get onAuthStateChanged =>
       authObserver != null ? authObserver.stream : null;
 
   // Interactive Auth Data
-  final String session;
-
   final Credential credential;
   final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
@@ -39,8 +43,8 @@ class AuthStore extends Equatable {
   final String password;
   final String passwordCurrent;
   final String passwordConfirm;
-  final String homeserver;
-  final String loginType;
+  final String hostname; // used pre sign up
+  final Homeserver homeserver; // used during signup and login
   final bool agreement;
   final bool captcha;
 
@@ -58,6 +62,8 @@ class AuthStore extends Equatable {
 
   const AuthStore({
     this.user = const User(),
+    this.session,
+    this.clientSecret,
     this.authObserver,
     this.email = '',
     this.username = '', // null
@@ -66,10 +72,14 @@ class AuthStore extends Equatable {
     this.passwordConfirm = '',
     this.agreement = false,
     this.captcha = false,
-    this.session,
     this.completed = const [],
-    this.homeserver = Values.homeserverDefault,
-    this.loginType = 'm.login.dummy',
+    this.hostname = Values.homeserverDefault,
+    this.homeserver = const Homeserver(
+      valid: true,
+      hostname: "matrix.org",
+      baseUrl: "matrix.org",
+      loginType: MatrixAuthTypes.DUMMY,
+    ),
     this.interactiveAuths = const {},
     this.isEmailValid = false,
     this.isEmailAvailable = true,
@@ -87,6 +97,8 @@ class AuthStore extends Equatable {
   @override
   List<Object> get props => [
         user,
+        session,
+        clientSecret,
         authObserver,
         username,
         password,
@@ -94,10 +106,9 @@ class AuthStore extends Equatable {
         passwordCurrent,
         agreement,
         captcha,
+        hostname,
         homeserver,
         completed,
-        session,
-        loginType,
         isEmailValid,
         isEmailAvailable,
         isUsernameValid,
@@ -113,6 +124,8 @@ class AuthStore extends Equatable {
 
   AuthStore copyWith({
     user,
+    session,
+    clientSecret,
     email,
     loading,
     username,
@@ -120,10 +133,10 @@ class AuthStore extends Equatable {
     passwordConfirm,
     passwordCurrent,
     agreement,
+    hostname,
     homeserver,
     completed,
     captcha,
-    session,
     isHomeserverValid,
     isUsernameValid,
     isUsernameAvailable,
@@ -139,6 +152,8 @@ class AuthStore extends Equatable {
   }) =>
       AuthStore(
         user: user ?? this.user,
+        session: session ?? this.session,
+        clientSecret: clientSecret ?? this.clientSecret,
         email: email ?? this.email,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,
@@ -147,10 +162,10 @@ class AuthStore extends Equatable {
         agreement: agreement ?? this.agreement,
         passwordCurrent: passwordCurrent ?? this.passwordCurrent,
         passwordConfirm: passwordConfirm ?? this.passwordConfirm,
+        hostname: hostname ?? this.hostname,
         homeserver: homeserver ?? this.homeserver,
         completed: completed ?? this.completed,
         captcha: captcha ?? this.captcha,
-        session: session ?? this.session,
         isEmailValid: isEmailValid ?? this.isEmailValid,
         isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
         isUsernameValid: isUsernameValid ?? this.isUsernameValid,

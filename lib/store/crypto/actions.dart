@@ -15,6 +15,7 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -24,7 +25,6 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -241,6 +241,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
 
         store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
+        await store.dispatch(saveOlmAccount());
       } else {
         // deserialize stored account since one exists
         olmAccount.unpickle(deviceId, olmAccountKey);
@@ -432,6 +433,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
       oneTimeKeysCounts: oneTimeKeysCounts,
     ));
 
+    // register new key counts
     final int maxKeyCount = olmAccount.max_number_of_one_time_keys();
     final int signedCurveCount =
         oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;

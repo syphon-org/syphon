@@ -4,12 +4,17 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -30,30 +35,38 @@ class Room {
   final String topic;
   final String joinRule; // "public", "knock", "invite", "private"
 
-  final int namePriority;
-  final int lastRead;
   final bool direct;
-  final bool syncing;
   final bool sending;
-  final bool isDraftRoom;
+
+  @JsonKey(defaultValue: false)
+  final bool drafting;
+
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
 
+  @JsonKey(defaultValue: false)
+  final bool hidden;
+  final bool archived;
+
   final String lastHash; // oldest hash in timeline
   final String prevHash; // most recent prev_batch (not the lastHash)
   final String nextHash; // most recent next_batch
 
+  final int lastRead;
   final int lastUpdate;
   final int totalJoinedUsers;
+  final int namePriority;
 
   // Event lists and handlers
   final Message draft;
+  final Message reply;
 
   // Associated user ids
   final List<String> userIds;
   final List<String> messageIds;
+  final List<String> reactionIds;
   final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
@@ -61,11 +74,16 @@ class Room {
   final List<Event> state;
 
   @JsonKey(ignore: true)
+  final List<Reaction> reactions;
+
+  @JsonKey(ignore: true)
+  final List<Redaction> redactions;
+
+  @JsonKey(ignore: true)
   final List<Message> messagesNew;
 
-  // TODO: offload messageReads, for large rooms these are ridiculously large
   @JsonKey(ignore: true)
-  final Map<String, ReadStatus> messageReads;
+  final Map<String, ReadReceipt> readReceipts;
 
   @JsonKey(ignore: true)
   final Map<String, User> usersNew;
@@ -78,6 +96,9 @@ class Room {
 
   @JsonKey(ignore: true)
   final bool limited;
+
+  @JsonKey(ignore: true)
+  final bool syncing;
 
   @JsonKey(ignore: true)
   String get type {
@@ -109,12 +130,16 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.limited = false,
-    this.draft,
+    this.draft = null,
+    this.reply = null,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
+    this.reactions = const [],
     this.messagesNew = const [],
     this.messageIds = const [],
+    this.reactionIds = const [],
+    this.redactions = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -124,11 +149,13 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.usersTyping = const [],
-    this.isDraftRoom = false,
+    this.drafting = false,
+    this.hidden = false,
+    this.archived = false,
     this.lastHash,
     this.nextHash,
     this.prevHash,
-    this.messageReads,
+    this.readReceipts,
     this.state,
   });
 
@@ -153,15 +180,21 @@ class Room {
     encryptionEnabled,
     userTyping,
     usersTyping,
-    isDraftRoom,
     draft,
+    reply,
+    drafting,
+    hidden,
+    archived,
     users,
     userIds,
     events,
     List<Message> outbox,
     List<Message> messagesNew,
+    List<Event> reactions,
     List<String> messageIds,
-    messageReads,
+    List<String> reactionIds,
+    List<Redaction> redactions,
+    Map<String, ReadReceipt> readReceipts,
     lastHash,
     prevHash,
     nextHash,
@@ -175,12 +208,14 @@ class Room {
         joinRule: joinRule ?? this.joinRule,
         avatarUri: avatarUri ?? this.avatarUri,
         homeserver: homeserver ?? this.homeserver,
-        draft: draft ?? this.draft,
+        drafting: drafting ?? this.drafting ?? false,
         invite: invite ?? this.invite,
         direct: direct ?? this.direct,
-        sending: sending ?? this.sending,
-        syncing: syncing ?? this.syncing,
-        limited: limited ?? this.limited,
+        hidden: hidden ?? this.hidden ?? false,
+        archived: archived ?? this.archived ?? false,
+        sending: sending ?? this.sending ?? false,
+        syncing: syncing ?? this.syncing ?? false,
+        limited: limited ?? this.limited ?? false,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
@@ -189,13 +224,16 @@ class Room {
         encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
-        isDraftRoom: isDraftRoom ?? this.isDraftRoom,
+        draft: draft ?? this.draft,
+        reply: reply ?? this.reply,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
+        reactions: reactions ?? this.reactions,
+        redactions: redactions ?? this.redactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
-        messageReads: messageReads ?? this.messageReads,
+        readReceipts: readReceipts ?? this.readReceipts,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
@@ -234,9 +272,11 @@ class Room {
     String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
-    List<Event> ephemeralEvents = [];
-    List<Message> messageEvents = [];
     List<Event> accountEvents = [];
+    List<Event> ephemeralEvents = [];
+    List<Reaction> reactionEvents = [];
+    List<Message> messageEvents = [];
+    List<Redaction> redactionEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
@@ -252,6 +292,20 @@ class Room {
       stateEvents =
           stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
+    }
+
+    if (json['ephemeral'] != null) {
+      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
+
+      ephemeralEvents =
+          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    }
+
+    if (json['account_data'] != null) {
+      final List<dynamic> accountEventsRaw = json['account_data']['events'];
+
+      accountEvents =
+          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     // Find state and message updates from timeline
@@ -273,31 +327,23 @@ class Room {
         timelineEventsRaw.map((event) => Event.fromMatrix(event)),
       );
 
-      // TODO: make this more functional, need to split into two lists on type
-      for (int i = 0; i < timelineEvents.length; i++) {
-        final event = timelineEvents[i];
-
-        if (event.type == EventTypes.message ||
-            event.type == EventTypes.encrypted) {
-          messageEvents.add(Message.fromEvent(event));
-        } else {
-          stateEvents.add(event);
+      for (Event event in timelineEvents) {
+        switch (event.type) {
+          case EventTypes.message:
+          case EventTypes.encrypted:
+            messageEvents.add(Message.fromEvent(event));
+            break;
+          case EventTypes.reaction:
+            reactionEvents.add(Reaction.fromEvent(event));
+            break;
+          case EventTypes.redaction:
+            redactionEvents.add(Redaction.fromEvent(event));
+            break;
+          default:
+            stateEvents.add(event);
+            break;
         }
       }
-    }
-
-    if (json['ephemeral'] != null) {
-      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
-
-      ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    if (json['account_data'] != null) {
-      final List<dynamic> accountEventsRaw = json['account_data']['events'];
-
-      accountEvents =
-          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     return this
@@ -309,6 +355,8 @@ class Room {
           limited: limited,
           events: stateEvents,
           currentUser: currentUser,
+          reactions: reactionEvents,
+          redactions: redactionEvents,
         )
         .fromMessageEvents(
           messages: messageEvents,
@@ -359,6 +407,8 @@ class Room {
     bool limited,
     User currentUser,
     List<Event> events,
+    List<Reaction> reactions,
+    List<Redaction> redactions,
   }) {
     String name;
     String avatarUri;
@@ -497,6 +547,8 @@ class Room {
       lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
+      reactions: reactions,
+      redactions: redactions,
     );
   }
 
@@ -607,10 +659,7 @@ class Room {
   }) {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
-
-    var messageReads = this.messageReads != null
-        ? Map<String, ReadStatus>.from(this.messageReads)
-        : Map<String, ReadStatus>();
+    final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
 
     try {
       events.forEach((event) {
@@ -635,14 +684,14 @@ class Room {
             // Filter through every eventId to find receipts
             receiptEventIds.forEach((key, receipt) {
               // convert every m.read object to a map of userIds + timestamps for read
-              final newReadStatuses = ReadStatus.fromReceipt(receipt);
+              final readReceiptsNew = ReadReceipt.fromReceipt(receipt);
 
               // update the eventId if that event already has reads
-              if (!messageReads.containsKey(key)) {
-                messageReads[key] = newReadStatuses;
+              if (!readReceipts.containsKey(key)) {
+                readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                messageReads[key].userReads.addAll(newReadStatuses.userReads);
+                readReceipts[key].userReads.addAll(readReceiptsNew.userReads);
               }
             });
             break;
@@ -655,7 +704,7 @@ class Room {
     return this.copyWith(
       userTyping: userTyping,
       usersTyping: usersTyping,
-      messageReads: messageReads,
+      readReceipts: readReceipts,
     );
   }
 }

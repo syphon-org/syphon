@@ -29,10 +29,12 @@ class TextFieldSecure extends StatelessWidget {
     this.obscureText = false,
     this.disableSpacing = false,
     this.textAlign = TextAlign.left,
+    this.formatters = const [],
     this.onChanged,
     this.onSubmitted,
     this.onEditingComplete,
     this.textInputAction,
+    this.autofillHints,
   }) : super(key: key);
 
   final bool valid;
@@ -48,13 +50,20 @@ class TextFieldSecure extends StatelessWidget {
   final FocusNode focusNode;
   final TextInputAction textInputAction;
   final TextEditingController controller;
+  final List<TextInputFormatter> formatters;
 
   final Function onChanged;
   final Function onSubmitted;
   final Function onEditingComplete;
+  final Iterable<String> autofillHints;
 
   @override
   Widget build(BuildContext context) => Container(
+        height: Dimensions.inputHeight,
+        constraints: BoxConstraints(
+          minWidth: Dimensions.inputWidthMin,
+          maxWidth: Dimensions.inputWidthMax,
+        ),
         child: TextField(
           enabled: !disabled,
           maxLines: maxLines,
@@ -66,15 +75,18 @@ class TextFieldSecure extends StatelessWidget {
           onEditingComplete: onEditingComplete,
           autocorrect: false,
           enableSuggestions: false,
+          autofillHints: autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
               ? [
-                  BlacklistingTextInputFormatter(RegExp(r"\t")),
+                  FilteringTextInputFormatter.deny(RegExp(r"\t")),
+                  ...formatters,
                 ]
               : [
-                  BlacklistingTextInputFormatter(RegExp(r"\s")),
-                  BlacklistingTextInputFormatter(RegExp(r"\t")),
-                  BlacklistingTextInputFormatter(RegExp(r"\n")),
+                  FilteringTextInputFormatter.deny(RegExp(r"\s")),
+                  FilteringTextInputFormatter.deny(RegExp(r"\t")),
+                  FilteringTextInputFormatter.deny(RegExp(r"\n")),
+                  ...formatters,
                 ],
           smartQuotesType: SmartQuotesType.disabled,
           smartDashesType: SmartDashesType.disabled,
@@ -98,11 +110,6 @@ class TextFieldSecure extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        height: Dimensions.inputHeight,
-        constraints: BoxConstraints(
-          minWidth: Dimensions.inputWidthMin,
-          maxWidth: Dimensions.inputWidthMax,
         ),
       );
 }

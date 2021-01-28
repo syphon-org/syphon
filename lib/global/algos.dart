@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:syphon/global/print.dart';
 
 List<int> fibonacci(int n) {
   if (n == 0) {
@@ -10,8 +11,11 @@ List<int> fibonacci(int n) {
   if (n == 1) {
     return [0, 1];
   }
+
   final series = fibonacci(n - 1);
+
   series.add(series[series.length - 1] + series[series.length - 2]);
+
   return series;
 }
 
@@ -32,7 +36,7 @@ Future<void> timeWrapper(
 
   final stoptime = stopwatch.elapsed;
 
-  debugPrint('[$name TIMER] ${function.runtimeType} $stoptime');
+  printDebug('[$name TIMER] ${function.runtimeType} $stoptime');
 
   return result;
 }

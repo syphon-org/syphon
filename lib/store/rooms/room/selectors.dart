@@ -1,11 +1,12 @@
 // Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-List<Room> availableRooms(List<Room> rooms, {List<String> hidden = const []}) {
-  return List.from(rooms.where((room) => !hidden.contains(room.id)));
+List<Room> availableRooms(List<Room> rooms) {
+  return List.from(rooms.where((room) => !room.hidden));
 }
 
 String formatPreviewTopic(String fullTopic, {String defaultTopic}) {

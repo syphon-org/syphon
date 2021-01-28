@@ -25,8 +25,10 @@ class ListUserBubbles extends StatelessWidget {
     this.roomId = '',
     this.invite = false,
     this.forceOption = false,
+    this.max = 12,
   }) : super(key: key);
 
+  final int max;
   final bool invite;
   final bool forceOption;
   final String roomId;
@@ -54,7 +56,7 @@ class ListUserBubbles extends StatelessWidget {
         children: [
           ListView.builder(
             shrinkWrap: true,
-            itemCount: users.length < 12 ? users.length : 12,
+            itemCount: users.length < max ? users.length : max,
             scrollDirection: Axis.horizontal,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
@@ -85,7 +87,7 @@ class ListUserBubbles extends StatelessWidget {
             },
           ),
           Visibility(
-            visible: users.length > 12 || forceOption,
+            visible: users.length > max || forceOption,
             child: Container(
               margin: EdgeInsets.only(left: 4, right: 12),
               padding: EdgeInsets.symmetric(vertical: 14),

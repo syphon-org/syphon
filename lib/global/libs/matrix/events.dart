@@ -4,12 +4,11 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 abstract class Events {
   /**
@@ -60,8 +59,7 @@ abstract class Events {
     url += from != null ? '&from=${from}' : '';
     url += to != null ? '&to=${to}' : '';
     url += desc ? '&dir=b' : '&dir=f';
-    // TODO: remove after implementing reactions
-    url += '&filter={"not_types":["${EventTypes.member}", "m.reaction"]}';
+    url += '&filter={"not_types":["${EventTypes.member}"]}';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -206,8 +204,95 @@ abstract class Events {
 
     Map body = {
       "body": message['body'],
-      "msgtype": message['type'] ?? 'm.text',
+      "msgtype": message['msgtype'] ?? 'm.text',
     };
+
+    if (message['format'] != null) {
+      body['format'] = message['format'];
+    }
+
+    if (message['m.relates_to'] != null) {
+      body['m.relates_to'] = message['m.relates_to'];
+    }
+
+    if (message['formatted_body'] != null) {
+      body['formatted_body'] = message['formatted_body'];
+    }
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(message),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /**
+   * Send Reaction
+   * 
+   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+   * 
+   * Notes on requestId (considered a transactionId in Matrix)
+   * 
+   * The transaction ID for this event. 
+   * Clients should generate an ID unique across requests with the same access token; 
+   * it will be used by the server to ensure idempotency of requests. <- really a requestId
+   */
+  static Future<dynamic> sendReaction({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String reaction,
+    String roomId,
+    String messageId,
+    String trxId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {
+      "m.relates_to": {
+        "rel_type": "m.annotation",
+        "event_id": "$messageId",
+        "key": "$reaction"
+      }
+    };
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  ///
+  /// Redact Event
+  ///
+  /// For all types of sendable events
+  ///
+  static Future<dynamic> redactEvent({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+    String accessToken,
+    String roomId,
+    String eventId,
+    String trxId,
+  }) async {
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map body = {};
 
     final response = await http.put(
       url,

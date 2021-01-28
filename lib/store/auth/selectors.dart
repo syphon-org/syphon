@@ -1,4 +1,5 @@
 // Project imports:
+import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -9,6 +10,10 @@ bool creating(AppState state) {
 }
 
 bool isLoginAttemptable(AppState state) {
+  if (state.authStore.homeserver.loginType == MatrixAuthTypes.SSO) {
+    return true;
+  }
+
   return state.authStore.isPasswordValid &&
       state.authStore.isUsernameValid &&
       !state.authStore.loading;

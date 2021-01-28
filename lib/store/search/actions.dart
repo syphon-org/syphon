@@ -14,7 +14,10 @@ import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -64,81 +67,50 @@ class SetSearchResults {
   });
 }
 
-Future<String> fetchHomeserverIcon({dynamic homeserver}) async {
-  String icon = "";
+Future<String> fetchFavicon({String url}) async {
   try {
-    final hostname = homeserver['hostname'];
-
     // get the root store
-    final origins = hostname.toString().split('.');
-    final rootorigin = origins.length > 1
+    final origins = url.toString().split('.');
+    final baseUrl = origins.length > 1
         ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
         : origins[0];
-    final response = await http.get('https://$rootorigin');
+
+    final response = await http.get('https://$baseUrl').timeout(
+          const Duration(seconds: 4),
+        );
 
     final document = parse(response.body);
-    final favicon = document.querySelector('link[rel="shortcut icon"]');
-    icon = favicon.attributes['href'].toString().contains('http')
-        ? favicon.attributes['href']
-        : 'https://$rootorigin/' +
-            favicon.attributes['href']
-                .replaceAll('...', '')
-                .replaceAll('//', '/');
+    final faviconIcon = document.querySelector('link[rel="icon"]');
+    final faviconShort = document.querySelector('link[rel="shortcut icon"]');
+    final favicon = faviconShort != null ? faviconShort : faviconIcon;
+
+    var faviconUrl = 'https://$baseUrl';
+
+    if (favicon.attributes['href'].toString().contains('http')) {
+      return favicon.attributes['href'];
+    }
+
+    if (!favicon.attributes['href'].toString().startsWith('/')) {
+      faviconUrl += '/';
+    }
+
+    return faviconUrl +
+        favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    /** noop */
+    printError(error.toString());
   }
-  return icon;
-}
 
-ThunkAction<AppState> fetchHomeserverIcons() {
-  return (Store<AppState> store) async {
-    final homeservers = store.state.searchStore.homeservers;
-
-    final faviconFetches = homeservers.map((homeserver) async {
-      final iconUrl = await fetchHomeserverIcon(homeserver: homeserver);
-
-      if (iconUrl.length <= 0) return homeserver;
-
-      try {
-        final response = await http.get(iconUrl);
-        if (response.statusCode != 200) return homeserver;
-      } catch (error) {
-        /** noop */
-        return homeserver;
-      }
-
-      final homeserverUpdated = Map.from(homeserver);
-      homeserverUpdated['favicon'] = iconUrl;
-      return homeserverUpdated;
-    });
-
-    final homeserversIconized = await Future.wait(faviconFetches);
-
-    store.dispatch(UpdateHomeservers(
-      homeservers: List.from(homeserversIconized),
-    ));
-  };
-}
-
-ThunkAction<AppState> fetchHomeservers() {
-  return (Store<AppState> store) async {
-    store.dispatch(SetLoading(loading: true));
-
-    final List<dynamic> homeservers = await JackApi.fetchPublicServers();
-
-    await store.dispatch(SetHomeservers(homeservers: homeservers));
-    await store.dispatch(fetchHomeserverIcons());
-    store.dispatch(SetLoading(loading: false));
-  };
+  return null;
 }
 
 ThunkAction<AppState> searchHomeservers({String searchText}) {
   return (Store<AppState> store) async {
-    List<dynamic> searchResults = store.state.searchStore.homeservers
-        .where((homeserver) =>
-            homeserver['hostname'].contains(searchText) ||
-            homeserver['description'].contains(searchText))
-        .toList();
+    List<Homeserver> searchResults =
+        (store.state.searchStore.homeservers as List<Homeserver>)
+            .where((homeserver) =>
+                homeserver.hostname.contains(searchText) ||
+                homeserver.description.contains(searchText))
+            .toList();
 
     store.dispatch(SetSearchResults(
       searchText: searchText,
@@ -182,16 +154,31 @@ ThunkAction<AppState> searchRooms({String searchText}) {
 /** 
  *  Search Rooms (Remote)
  */
-ThunkAction<AppState> searchPublicRooms({String searchText}) {
+ThunkAction<AppState> searchPublicRooms({String searchable}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
+
+      final homeserverName = store.state.authStore.user.homeserverName;
+
+      var searchText = searchable;
+      var searchServer = homeserverName;
+
+      if (searchText.contains(':')) {
+        final filteredText = searchText.split(':');
+        searchText = filteredText[0];
+        searchServer = filteredText[1];
+      }
+
+      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer);
 
       final data = await MatrixApi.searchRooms(
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
+        server: isUrl ? searchServer : homeserverName,
+        global: true,
       );
 
       if (data['errcode'] != null) {

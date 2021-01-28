@@ -8,7 +8,7 @@ class Alert {
   final String type;
   final String message;
   final Duration duration;
-  final Error error;
+  final String error;
 
   const Alert({
     this.type = 'warning',

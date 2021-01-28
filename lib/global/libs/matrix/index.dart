@@ -10,16 +10,20 @@ import 'package:syphon/global/libs/matrix/search.dart';
 import 'package:syphon/global/libs/matrix/user.dart';
 
 abstract class MatrixApi {
-  // Authentication
   static const NEEDS_INTERACTIVE_AUTH = Auth.NEEDS_INTERACTIVE_AUTH;
 
+  // Auth
   static final loginUser = Auth.loginUser;
+  static final loginUserToken = Auth.loginUserToken;
+  static final loginType = Auth.loginType;
   static final logoutUser = Auth.logoutUser;
   static final registerUser = Auth.registerUser;
+  static final registerEmail = Auth.registerEmail;
+  static final resetPassword = Auth.resetPassword;
   static final updatePassword = Auth.updatePassword;
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
+  static final sendPasswordResetEmail = Auth.sendPasswordResetEmail;
   static final checkHomeserver = Auth.checkHomeserver;
-  static final registerEmail = Auth.registerEmail;
 
   // Search
   static final searchRooms = Search.searchRooms;
@@ -42,12 +46,14 @@ abstract class MatrixApi {
   static final sendEvent = Events.sendEvent;
   static final sendTyping = Events.sendTyping;
   static final sendMessage = Events.sendMessage;
+  static final sendReaction = Events.sendReaction;
   static final sendReadReceipts = Events.sendReadMarkers;
+  static final sendEventToDevice = Events.sendEventToDevice;
   static final sendMessageEncrypted = Events.sendMessageEncrypted;
   static final fetchStateEvents = Events.fetchStateEvents;
   static final fetchMessageEvents = Events.fetchMessageEvents;
   static final fetchMessageEventsMapped = Events.fetchMessageEventsMapped;
-  static final sendEventToDevice = Events.sendEventToDevice;
+  static final redactEvent = Events.redactEvent;
 
   // Account Data & User Management
   static final fetchAccountData = Users.fetchAccountData;

@@ -28,6 +28,7 @@ import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 
 class RoomSearchArguments {
   User user;
@@ -359,22 +360,8 @@ class RoomSearchState extends State<RoomSearchView> {
               children: [
                 buildRoomList(context, props),
                 Positioned(
-                  child: Visibility(
-                    visible: props.loading,
-                    child: Container(
-                        margin: EdgeInsets.only(top: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            RefreshProgressIndicator(
-                              strokeWidth: Dimensions.defaultStrokeWidth,
-                              valueColor: new AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).accentColor,
-                              ),
-                              value: null,
-                            ),
-                          ],
-                        )),
+                  child: Loader(
+                    loading: props.loading,
                   ),
                 ),
               ],

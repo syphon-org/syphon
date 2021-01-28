@@ -14,19 +14,30 @@ import 'package:syphon/global/algos.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
 class ResetEvents {}
+
+class SetEvents {
+  final String roomId;
+  final List<Event> events;
+  SetEvents({this.roomId, this.events});
+}
 
 class SetMessages {
   final String roomId;
@@ -34,13 +45,24 @@ class SetMessages {
   SetMessages({this.roomId, this.messages});
 }
 
-class SetState {
+class SetReactions {
   final String roomId;
-  final List<Event> states;
-  SetState({this.roomId, this.states});
+  final List<Reaction> reactions;
+  SetReactions({this.roomId, this.reactions});
 }
 
-ThunkAction<AppState> setMessageEvents({
+class SetReceipts {
+  final String roomId;
+  final Map<String, ReadReceipt> receipts;
+  SetReceipts({this.roomId, this.receipts});
+}
+
+class SetRedactions {
+  final List<Redaction> redactions;
+  SetRedactions({this.redactions});
+}
+
+ThunkAction<AppState> setMessages({
   Room room,
   List<Message> messages,
   int offset = 0,
@@ -48,6 +70,29 @@ ThunkAction<AppState> setMessageEvents({
 }) =>
     (Store<AppState> store) {
       return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+    };
+
+ThunkAction<AppState> setReactions({
+  List<Reaction> reactions,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetReactions(reactions: reactions));
+    };
+
+ThunkAction<AppState> setRedactions({
+  String roomId,
+  List<Redaction> redactions,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetRedactions(redactions: redactions));
+    };
+
+ThunkAction<AppState> setReceipts({
+  Room room,
+  Map<String, ReadReceipt> receipts,
+}) =>
+    (Store<AppState> store) {
+      return store.dispatch(SetReceipts(roomId: room.id, receipts: receipts));
     };
 
 /**
@@ -58,9 +103,8 @@ ThunkAction<AppState> setMessageEvents({
  * 
  * Make sure these have been exhausted before calling fetchMessageEvents
  * 
- * TODO: still needs work
  */
-ThunkAction<AppState> loadMessageEvents({
+ThunkAction<AppState> loadMessagesCached({
   Room room,
   int offset = 0,
   int limit = 20,
@@ -135,6 +179,7 @@ ThunkAction<AppState> fetchMessageEvents({
               'events': messages,
               'last_hash': oldest ? end : null,
               'prev_batch': end,
+              'limited': end == start ? false : null,
             }
           },
         }),
@@ -253,6 +298,56 @@ ThunkAction<AppState> saveDraft({
   };
 }
 
+ThunkAction<AppState> selectReply({
+  String roomId,
+  Message message,
+}) {
+  return (Store<AppState> store) async {
+    final room = store.state.roomStore.rooms[roomId];
+    final reply = message == null ? Message() : message;
+    store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
+  };
+}
+
+///
+/// Format Message Reply
+///
+/// Format a message as a reply to another
+/// https://matrix.org/docs/spec/client_server/latest#rich-replies
+/// https://github.com/matrix-org/matrix-doc/pull/1767
+///
+///
+ThunkAction<AppState> formatMessageReply(
+  Room room,
+  Message message,
+  Message reply,
+) {
+  return (Store<AppState> store) async {
+    try {
+      final body = '''> <${reply.sender}> ${reply.body}\n\n${message.body}''';
+      final formattedBody =
+          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
+
+      return message.copyWith(
+        body: body,
+        format: "org.matrix.custom.html",
+        formattedBody: formattedBody,
+        content: {
+          "body": body,
+          "format": "org.matrix.custom.html",
+          "formatted_body": formattedBody,
+          "m.relates_to": {
+            "m.in_reply_to": {"event_id": "${reply.id}"}
+          },
+          "msgtype": message.type
+        },
+      );
+    } catch (error) {
+      return null;
+    }
+  };
+}
+
 /**
  * 
  * Read Message Marker
@@ -330,199 +425,6 @@ ThunkAction<AppState> sendTyping({
 }
 
 /**
- * Send Encrypted Messages
- * 
- * Specifically for sending encrypted messages using megolm
- */
-ThunkAction<AppState> sendMessageEncrypted({
-  Room room,
-  final body,
-  String type = MessageTypes.TEXT,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      // send the key session - if one hasn't been sent
-      // or created - to every user within the room
-      await store.dispatch(updateKeySessions(room: room));
-
-      // Save unsent message to outbox
-      final tempId = Random.secure().nextInt(1 << 32).toString();
-
-      store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        pendingMessage: Message(
-          id: tempId,
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          pending: true,
-          syncing: true,
-        ),
-      ));
-
-      final messageEvent = {
-        'body': body,
-        'type': type,
-      };
-
-      // Encrypt the message event
-      final encryptedEvent = await store.dispatch(
-        encryptMessageContent(
-          roomId: room.id,
-          eventType: EventTypes.message,
-          content: messageEvent,
-        ),
-      );
-
-      final data = await MatrixApi.sendMessageEncrypted(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        trxId: DateTime.now().millisecond.toString(),
-        roomId: room.id,
-        senderKey: encryptedEvent['sender_key'],
-        ciphertext: encryptedEvent['ciphertext'],
-        sessionId: encryptedEvent['session_id'],
-        deviceId: store.state.authStore.user.deviceId,
-      );
-
-      if (data['errcode'] != null) {
-        store.dispatch(SaveOutboxMessage(
-          id: room.id,
-          tempId: tempId.toString(),
-          pendingMessage: Message(
-            id: tempId.toString(),
-            body: body,
-            type: type,
-            sender: store.state.authStore.user.userId,
-            roomId: room.id,
-            timestamp: DateTime.now().millisecondsSinceEpoch,
-            pending: false,
-            syncing: false,
-            failed: true,
-          ),
-        ));
-
-        throw data['error'];
-      }
-
-      store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        tempId: tempId.toString(),
-        pendingMessage: Message(
-          id: data['event_id'],
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
-    } catch (error) {
-      store.dispatch(
-        addAlert(
-            error: error,
-            message: error.toString(),
-            origin: 'sendMessageEncrypted'),
-      );
-    }
-  };
-}
-
-/**
- * Send Room Event (Send Message)
- */
-ThunkAction<AppState> sendMessage({
-  Room room,
-  final body,
-  String type = MessageTypes.TEXT,
-}) {
-  return (Store<AppState> store) async {
-    store.dispatch(SetSending(room: room, sending: true));
-
-    // if you're incredibly unlucky, and fast, you could have a problem here
-    final String tempId = Random.secure().nextInt(1 << 32).toString();
-
-    try {
-      // Save unsent message to outbox
-      store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        pendingMessage: Message(
-          id: tempId.toString(),
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          pending: true,
-          syncing: true,
-        ),
-      ));
-
-      final message = {
-        'body': body,
-        'type': type,
-      };
-
-      final data = await MatrixApi.sendMessage(
-        protocol: protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        trxId: DateTime.now().millisecond.toString(),
-        roomId: room.id,
-        message: message,
-      );
-
-      if (data['errcode'] != null) {
-        store.dispatch(SaveOutboxMessage(
-          id: room.id,
-          tempId: tempId.toString(),
-          pendingMessage: Message(
-            id: tempId.toString(),
-            body: body,
-            type: type,
-            sender: store.state.authStore.user.userId,
-            roomId: room.id,
-            timestamp: DateTime.now().millisecondsSinceEpoch,
-            pending: false,
-            syncing: false,
-            failed: true,
-          ),
-        ));
-
-        throw data['error'];
-      }
-
-      // Update sent message with event id but needs to be
-      // synced to remove from outbox
-      store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        tempId: tempId.toString(),
-        pendingMessage: Message(
-          id: data['event_id'],
-          body: body,
-          type: type,
-          sender: store.state.authStore.user.userId,
-          roomId: room.id,
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
-
-      return true;
-    } catch (error) {
-      debugPrint('[sendMessage] $error');
-      return false;
-    } finally {
-      store.dispatch(SetSending(room: room, sending: false));
-    }
-  };
-}
-
-/**
  * Delete Room Event (For Outbox, Local, and Remote)
  */
 
@@ -532,9 +434,33 @@ ThunkAction<AppState> deleteMessage({
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
-        store.dispatch(DeleteOutboxMessage(message: message));
-        return;
+        return store.dispatch(DeleteOutboxMessage(message: message));
       }
+    } catch (error) {
+      debugPrint('[deleteMessage] $error');
+    }
+  };
+}
+
+///
+/// Redact Event
+///
+/// Only use when you're sure no temporary events
+/// can be removed first (like failed or pending sends)
+///
+ThunkAction<AppState> redactEvent({
+  Room room,
+  Event event,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      await MatrixApi.redactEvent(
+        trxId: DateTime.now().millisecond.toString(),
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: room.id,
+        eventId: event.id,
+      );
     } catch (error) {
       debugPrint('[deleteMessage] $error');
     }

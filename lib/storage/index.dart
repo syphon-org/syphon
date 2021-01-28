@@ -4,14 +4,20 @@ import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/codec.dart';
+import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/auth/storage.dart';
+import 'package:syphon/store/crypto/storage.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/user/storage.dart';
@@ -96,8 +102,22 @@ Future<void> deleteStorage() async {
   }
 }
 
-Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
-  // load all rooms from cold storages
+/**
+ * Load Storage
+ * 
+ * bulk loads cold storage objects to RAM, this can
+ * be much more specific and performant
+ * 
+ * for example, only load users that are known to be
+ * involved in stored messages/events
+ * 
+ * TODO: need pagination for pretty much all of these
+ */
+Future<Map<String, dynamic>> loadStorage(Database storage) async {
+  final auth = await loadAuth(
+    storage: storage,
+  );
+
   final rooms = await loadRooms(
     storage: storage,
   );
@@ -106,22 +126,46 @@ Future<Map<String, Map<dynamic, dynamic>>> loadStorage(Database storage) async {
     storage: storage,
   );
 
-  // load message using rooms loaded from cold storage
-  Map<String, List<Message>> messages = new Map();
+  final media = await loadMediaAll(
+    storage: storage,
+  );
+
+  final crypto = await loadCrypto(
+    storage: storage,
+  );
+
+  final redactions = await loadRedactions(
+    storage: storage,
+  );
+
+  final receipts = await loadReceipts(
+    storage: storage,
+  );
+
+  Map<String, List<Message>> messages = Map();
+  Map<String, List<Reaction>> reactions = Map();
+
   for (Room room in rooms.values) {
     messages[room.id] = await loadMessages(
       room.messageIds,
       storage: storage,
-      encrypted: room.encryptionEnabled,
     );
-    printInfo(
-      '[loadMessages] ${messages[room.id]?.length} ${room.name} loaded',
-    );
+
+    reactions.addAll(await loadReactions(
+      room.messageIds,
+      storage: storage,
+    ));
   }
 
   return {
+    'auth': auth,
     'users': users,
     'rooms': rooms,
+    'media': media,
+    'crypto': crypto,
     'messages': messages.isNotEmpty ? messages : null,
+    'reactions': reactions,
+    'redactions': redactions,
+    'receipts': receipts,
   };
 }

@@ -1,5 +1,6 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 
 class SearchStore extends Equatable {
   final bool loading;

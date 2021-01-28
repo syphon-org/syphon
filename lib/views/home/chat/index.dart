@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,20 +24,23 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
-import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -60,12 +64,12 @@ class ChatView extends StatefulWidget {
 }
 
 class ChatViewState extends State<ChatView> {
+  bool sendable = false;
+  Message selectedMessage;
   Timer typingNotifier;
   Timer typingNotifierTimeout;
   FocusNode inputFieldNode;
   Map<String, Color> senderColors;
-  bool sendable = false;
-  Message selectedMessage;
 
   double overshoot = 0;
   bool loadMore = false;
@@ -98,14 +102,14 @@ class ChatViewState extends State<ChatView> {
   void onMounted() async {
     final arguements =
         ModalRoute.of(context).settings.arguments as ChatViewArguements;
-    final store = StoreProvider.of<AppState>(context);
+    final store = StoreProvider.of<AppState>(context, listen: false);
     final props = _Props.mapStateToProps(store, arguements.roomId);
     final draft = props.room.draft;
 
+    // only marked if read receipts are enabled
     props.onMarkRead();
 
-    // TODO: remove after the cache is updated
-    if (props.room.invite != null && props.room.invite) {
+    if (props.room.invite) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -129,6 +133,20 @@ class ChatViewState extends State<ChatView> {
       props.onLoadFirstBatch();
     }
 
+    if (draft != null && draft.type == MessageTypes.TEXT) {
+      final text = draft.body;
+      this.setState(() {
+        sendable = text != null && text.isNotEmpty;
+      });
+
+      editorController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: text.length),
+        ),
+      );
+    }
+
     messagesController.addListener(() {
       final extentBefore = messagesController.position.extentBefore;
       final max = messagesController.position.maxScrollExtent;
@@ -147,23 +165,8 @@ class ChatViewState extends State<ChatView> {
         });
       }
     });
-
-    if (draft != null && draft.type == MessageTypes.TEXT) {
-      final text = draft.body;
-      this.setState(() {
-        sendable = text != null && text.isNotEmpty;
-      });
-
-      editorController.value = TextEditingValue(
-        text: text,
-        selection: TextSelection.fromPosition(
-          TextPosition(offset: text.length),
-        ),
-      );
-    }
   }
 
-  // equivalent of componentDidUpdate
   @protected
   onDidChange(_Props props) {
     if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
@@ -270,6 +273,52 @@ class ChatViewState extends State<ChatView> {
     this.setState(() {
       selectedMessage = message;
     });
+  }
+
+  onInputReaction({Message message, _Props props}) async {
+    final height = MediaQuery.of(context).size.height;
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: height / 2.2,
+        padding: EdgeInsets.symmetric(
+          vertical: 12,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: EmojiPicker(
+            rows: 7,
+            columns: 9,
+            indicatorColor: Theme.of(context).accentColor,
+            bgColor: Theme.of(context).scaffoldBackgroundColor,
+            numRecommended: 10,
+            categoryIcons: CategoryIcons(
+              smileyIcon: CategoryIcon(icon: Icons.tag_faces_rounded),
+              objectIcon: CategoryIcon(icon: Icons.lightbulb),
+              travelIcon: CategoryIcon(icon: Icons.flight),
+              activityIcon: CategoryIcon(icon: Icons.sports_soccer),
+              symbolIcon: CategoryIcon(icon: Icons.tag),
+            ),
+            onEmojiSelected: (emoji, category) {
+              props.onToggleReaction(
+                emoji: emoji.emoji,
+                message: message,
+              );
+
+              Navigator.pop(context, false);
+              this.setState(() {
+                selectedMessage = null;
+              });
+            }),
+      ),
+    );
   }
 
   onDismissMessageOptions() {
@@ -439,17 +488,27 @@ class ChatViewState extends State<ChatView> {
                   final avatarUri = props.users[message.sender]?.avatarUri;
 
                   return MessageWidget(
+                    message: message,
+                    isUserSent: isUserSent,
+                    isLastSender: isLastSender,
+                    isNextSender: isNextSender,
+                    lastRead: props.room.lastRead,
+                    selectedMessageId: selectedMessageId,
+                    avatarUri: avatarUri,
+                    theme: props.theme,
+                    timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
+                    onSwipe: props.onSelectReply,
+                    onPressAvatar: onViewUserDetails,
+                    onLongPress: onToggleMessageOptions,
+                    onInputReaction: () => onInputReaction(
                       message: message,
-                      isUserSent: isUserSent,
-                      isLastSender: isLastSender,
-                      isNextSender: isNextSender,
-                      lastRead: props.room.lastRead,
-                      selectedMessageId: selectedMessageId,
-                      onPressAvatar: onViewUserDetails,
-                      onLongPress: onToggleMessageOptions,
-                      avatarUri: avatarUri,
-                      theme: props.theme,
-                      timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr');
+                      props: props,
+                    ),
+                    onToggleReaction: (emoji) => props.onToggleReaction(
+                      emoji: emoji,
+                      message: message,
+                    ),
+                  );
                 },
               ),
             ],
@@ -460,14 +519,15 @@ class ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
+        onDidChange: onDidChange,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           (ModalRoute.of(context).settings.arguments as ChatViewArguements)
               .roomId,
         ),
-        onDidChange: onDidChange,
         builder: (context, props) {
           double height = MediaQuery.of(context).size.height;
+
           final closedInputPadding = !inputFieldNode.hasFocus &&
               Platform.isIOS &&
               Dimensions.buttonlessHeightiOS < height;
@@ -540,21 +600,8 @@ class ChatViewState extends State<ChatView> {
                             props,
                           ),
                           Positioned(
-                            child: Visibility(
-                              visible: props.loading,
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  RefreshProgressIndicator(
-                                    strokeWidth: Dimensions.defaultStrokeWidth,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).primaryColor,
-                                    ),
-                                    value: null,
-                                  ),
-                                ],
-                              )),
+                            child: Loader(
+                              loading: props.loading,
                             ),
                           ),
                           Positioned(
@@ -617,6 +664,8 @@ class ChatViewState extends State<ChatView> {
                         focusNode: inputFieldNode,
                         enterSend: props.enterSend,
                         controller: editorController,
+                        quotable: props.room.reply,
+                        onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => this.onSubmitMessage(props),
@@ -641,6 +690,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final Map<String, User> users;
   final List<Message> messages;
+  final int redactions;
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
   final bool roomTypeBadgesEnabled;
@@ -655,8 +705,10 @@ class _Props extends Equatable {
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
   final Function onToggleEncryption;
+  final Function onToggleReaction;
   final Function onCheatCode;
   final Function onMarkRead;
+  final Function onSelectReply;
 
   _Props({
     @required this.room,
@@ -664,6 +716,7 @@ class _Props extends Equatable {
     @required this.userId,
     @required this.users,
     @required this.messages,
+    @required this.redactions,
     @required this.loading,
     @required this.enterSend,
     @required this.roomPrimaryColor,
@@ -679,8 +732,10 @@ class _Props extends Equatable {
     @required this.onLoadFirstBatch,
     @required this.onAcceptInvite,
     @required this.onToggleEncryption,
+    @required this.onToggleReaction,
     @required this.onCheatCode,
     @required this.onMarkRead,
+    @required this.onSelectReply,
   });
 
   @override
@@ -689,6 +744,7 @@ class _Props extends Equatable {
         users,
         userId,
         messages,
+        redactions,
         loading,
         enterSend,
         roomPrimaryColor,
@@ -702,18 +758,25 @@ class _Props extends Equatable {
       timeFormat24Enabled:
           store.state.settingsStore.timeFormat24Enabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
-      room: roomSelectors.room(id: roomId, state: store.state),
+      room: selectRoom(id: roomId, state: store.state),
       users: store.state.userStore.users,
       enterSend: store.state.settingsStore.enterSend,
+      redactions: store.state.eventStore.redactions.length,
       messages: latestMessages(
-        filterMessages(
-          wrapOutboxMessages(
-            messages: roomMessages(store.state, roomId).toList(),
-            outbox: roomSelectors.room(id: roomId, state: store.state).outbox,
+        appendRelated(
+          filterMessages(
+            combineOutbox(
+              messages: roomMessages(store.state, roomId).toList(),
+              outbox: selectRoom(id: roomId, state: store.state).outbox,
+            ),
+            store.state,
           ),
-          store.state.userStore.blocked,
+          store.state,
         ),
       ),
+      onSelectReply: (Message message) {
+        store.dispatch(selectReply(roomId: roomId, message: message));
+      },
       roomPrimaryColor: () {
         final customChatSettings =
             store.state.settingsStore.customChatSettings ?? Map();
@@ -751,23 +814,24 @@ class _Props extends Equatable {
           room: store.state.roomStore.rooms[roomId],
         ));
       },
-      onSendMessage: ({
-        String body,
-        String type,
-      }) async {
+      onSendMessage: ({String body, String type}) async {
         final room = store.state.roomStore.rooms[roomId];
+
+        final message = Message(
+          body: body,
+          type: type,
+        );
+
         if (room.encryptionEnabled) {
           return store.dispatch(sendMessageEncrypted(
-            body: body,
             room: room,
-            type: type,
+            message: message,
           ));
         }
 
         return store.dispatch(sendMessage(
-          body: body,
           room: room,
-          type: type,
+          message: message,
         ));
       },
       onDeleteMessage: ({
@@ -787,7 +851,7 @@ class _Props extends Equatable {
         store.dispatch(markRoomRead(roomId: roomId));
       },
       onLoadFirstBatch: () {
-        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        final room = selectRoom(id: roomId, state: store.state);
         printDebug('[onLoadFirstBatch]');
         store.dispatch(
           fetchMessageEvents(
@@ -797,8 +861,15 @@ class _Props extends Equatable {
           ),
         );
       },
+      onToggleReaction: ({Message message, String emoji}) {
+        final room = selectRoom(id: roomId, state: store.state);
+
+        store.dispatch(
+          toggleReaction(room: room, message: message, emoji: emoji),
+        );
+      },
       onToggleEncryption: () {
-        final room = store.state.roomStore.rooms[roomId] ?? Room();
+        final room = selectRoom(id: roomId, state: store.state);
         store.dispatch(
           toggleRoomEncryption(room: room),
         );
@@ -807,7 +878,7 @@ class _Props extends Equatable {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
         // load message from cold storage
-        // TODO: everything is loaded when opening the app for now
+        // TODO: paginate cold storage messages
         // final messages = roomMessages(store.state, roomId);
         // if (messages.length < room.messageIds.length) {
         //   printDebug(

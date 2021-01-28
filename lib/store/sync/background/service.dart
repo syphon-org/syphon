@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 
 // Dart imports:
 import 'dart:math';
@@ -22,6 +22,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 
@@ -42,6 +43,7 @@ class BackgroundSync {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
       debugPrint('[BackgroundSync.init] ${error}');
+      return null;
     }
   }
 

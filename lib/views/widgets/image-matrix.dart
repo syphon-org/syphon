@@ -100,7 +100,7 @@ class MatrixImageState extends State<MatrixImage> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final failed = props.mediaChecks[widget.mxcUri] != null &&
-              props.mediaChecks[widget.mxcUri] == 'failed';
+              props.mediaChecks[widget.mxcUri] == MediaStatus.FAILURE;
           final loading =
               forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
 
@@ -143,18 +143,15 @@ class MatrixImageState extends State<MatrixImage> {
 }
 
 class _Props extends Equatable {
-  final bool fetching;
   final Map<String, Uint8List> mediaCache;
   final Map<String, String> mediaChecks;
 
   _Props({
-    @required this.fetching,
     @required this.mediaCache,
     @required this.mediaChecks,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        fetching: false,
         mediaCache:
             store.state.mediaStore.mediaCache ?? Map<String, Uint8List>(),
         mediaChecks:
@@ -163,7 +160,7 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        fetching,
+        mediaChecks,
         mediaCache,
       ];
 }
