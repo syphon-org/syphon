@@ -727,8 +727,7 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         protocol: protocol,
         homeserver: homeserver,
         email: store.state.authStore.email,
-        clientSecret:
-            clientSecret, // TODO: confirm the new client secret generator works
+        clientSecret: clientSecret,
         sendAttempt: sendAttempt,
       );
 

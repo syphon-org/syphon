@@ -82,7 +82,6 @@ class Room {
   @JsonKey(ignore: true)
   final List<Message> messagesNew;
 
-  // TODO: offload readReceipts, for large rooms these are ridiculously large
   @JsonKey(ignore: true)
   final Map<String, ReadReceipt> readReceipts;
 

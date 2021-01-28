@@ -12,10 +12,6 @@ import 'package:syphon/store/user/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
-/**
- * TODO: Create one store for all known users
- */
-
 class SetLoading {
   final bool loading;
   SetLoading({this.loading});

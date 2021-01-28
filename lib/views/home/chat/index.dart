@@ -878,7 +878,7 @@ class _Props extends Equatable {
         final room = store.state.roomStore.rooms[roomId] ?? Room();
 
         // load message from cold storage
-        // TODO: everything is loaded when opening the app for now
+        // TODO: paginate cold storage messages
         // final messages = roomMessages(store.state, roomId);
         // if (messages.length < room.messageIds.length) {
         //   printDebug(
