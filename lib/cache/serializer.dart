@@ -65,7 +65,6 @@ class CacheSerializer implements StateSerializer<AppState> {
           String type = store.runtimeType.toString();
 
           // serialize the store contents
-          // Stopwatch stopwatchSerialize = new Stopwatch()..start();
           try {
             jsonEncoded = json.encode(store);
           } catch (error) {
@@ -74,11 +73,6 @@ class CacheSerializer implements StateSerializer<AppState> {
             );
           }
 
-          // debugPrint(
-          //   '[CacheSerializer] ${stopwatchSerialize.elapsed} ${type} serialize',
-          // );
-
-          // Stopwatch stopwatchEncrypt = new Stopwatch()..start();
           // encrypt the store contents
           jsonEncrypted = await compute(
             encryptJsonBackground,
@@ -91,25 +85,15 @@ class CacheSerializer implements StateSerializer<AppState> {
             debugLabel: 'encryptJsonBackground',
           );
 
-          // debugPrint(
-          //   '[CacheSerializer] ${stopwatchEncrypt.elapsed} ${type} encrypt',
-          // );
-
           try {
             // Stopwatch stopwatchSave = new Stopwatch()..start();
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache, jsonEncrypted);
-
-            // debugPrint(
-            //   '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
-            // );
           } catch (error) {
-            printError('[CacheSerializer] ERROR $error');
+            printError('[CacheSerializer] $error');
           }
         } catch (error) {
-          debugPrint(
-            '[CacheSerializer] $error',
-          );
+          printError('[CacheSerializer] $error');
         }
       }));
 

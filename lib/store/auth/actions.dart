@@ -827,7 +827,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      debugPrint('[createUser] error $error');
+      printError('[createUser] error $error');
       if (enableErrors) {
         store.dispatch(
           addAlert(message: 'Failed to signup', error: error),

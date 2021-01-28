@@ -195,7 +195,7 @@ class Room {
     List<String> messageIds,
     List<String> reactionIds,
     List<Redaction> redactions,
-    readReceipts,
+    Map<String, ReadReceipt> readReceipts,
     lastHash,
     prevHash,
     nextHash,
@@ -685,14 +685,14 @@ class Room {
             // Filter through every eventId to find receipts
             receiptEventIds.forEach((key, receipt) {
               // convert every m.read object to a map of userIds + timestamps for read
-              final newReadStatuses = ReadReceipt.fromReceipt(receipt);
+              final readReceiptsNew = ReadReceipt.fromReceipt(receipt);
 
               // update the eventId if that event already has reads
               if (!readReceipts.containsKey(key)) {
-                readReceipts[key] = newReadStatuses;
+                readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceipts[key].userReads.addAll(newReadStatuses.userReads);
+                readReceipts[key].userReads.addAll(readReceiptsNew.userReads);
               }
             });
             break;

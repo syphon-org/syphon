@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';

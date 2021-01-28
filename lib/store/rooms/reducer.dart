@@ -32,6 +32,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
           reply: action.reply,
           sending: action.sending,
           syncing: action.syncing,
+          lastRead: action.lastRead,
         );
       }
 
