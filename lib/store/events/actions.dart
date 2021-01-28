@@ -103,7 +103,6 @@ ThunkAction<AppState> setReceipts({
  * 
  * Make sure these have been exhausted before calling fetchMessageEvents
  * 
- * TODO: still needs work
  */
 ThunkAction<AppState> loadMessagesCached({
   Room room,
@@ -437,8 +436,6 @@ ThunkAction<AppState> deleteMessage({
       if (message.pending || message.failed) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
-
-      // TODO: redactEvent
     } catch (error) {
       debugPrint('[deleteMessage] $error');
     }

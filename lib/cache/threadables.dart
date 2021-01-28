@@ -72,10 +72,6 @@ Future<Map> decryptJsonBackground(Map params) async {
   return jsonDecoded;
 }
 
-// TODO: needs plugins that work in isolates, still having
-// issues using path_provider or any equivalent in threads
-// while still being able to pass the entire store object
-// to the isolate
 // responsibile for both json serialization and encryption
 Future<String> serializeJsonBackground(Object store) async {
   try {

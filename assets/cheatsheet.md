@@ -1,4 +1,8 @@
 
+### Pain Points
+ 
+ - Plugins should be able to run in isolates without additional hackery
+ - still having issues using path_provider or any equivalent in threads while still being able to pass the entire store object to the isolate
 
 ### User Creation
 

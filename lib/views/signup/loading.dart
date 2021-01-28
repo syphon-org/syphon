@@ -20,9 +20,6 @@ class Loading extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    /* 
-     * TODO: convert to flexibles
-    */
     return Scaffold(
       body: ScrollConfiguration(
         behavior: DefaultScrollBehavior(),

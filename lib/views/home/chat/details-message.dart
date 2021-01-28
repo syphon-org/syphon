@@ -34,8 +34,6 @@ class MessageDetailArguments {
 class MessageDetails extends StatelessWidget {
   MessageDetails({Key key}) : super(key: key);
 
-  final contentPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 8);
-
   @protected
   Widget buildUserReadList(Props props, double width) {
     ReadReceipt readReceipts =

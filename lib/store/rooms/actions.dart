@@ -89,11 +89,12 @@ class AddArchive {
   AddArchive({this.roomId});
 }
 
-/**
- * tempId for messages that have attempted sending but not finished
- */
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but not finished
 class SaveOutboxMessage {
-  final String id; // TODO: room id
+  final String id; // room id
   final String tempId;
   final Message pendingMessage;
 
@@ -1032,9 +1033,8 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 }
 
 /**
- * Create Draft Room
+ * TODO: Create Draft Room
  * 
- * TODO: make sure this is in accordance with matrix in that
  * A local only room that has not been established with matrix
  * meant to prep a room or first message before actually creating it 
  */
@@ -1072,7 +1072,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 // }
 
 /**
- * TODO: Room Drafts
+ * TODO: Convert Draft Room
  * 
  * Convert a draft room to a remote matrix room
  */

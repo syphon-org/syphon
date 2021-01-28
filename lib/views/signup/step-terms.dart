@@ -112,9 +112,7 @@ class TermsStep extends StatelessWidget {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                debugPrint(
-                                  'TODO: navigate to terms of service explination',
-                                );
+                                // TODO: show terms of service explaination dialog
                               },
                               child: Container(
                                 height: 20,
