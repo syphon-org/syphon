@@ -134,8 +134,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       return;
     }
 
-    // update those that exist or add a new room
-    return await Future.forEach(roomData.keys, (id) async {
+    await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
       // use pre-existing values where available
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
@@ -209,7 +208,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           from: room.prevHash,
         ));
       }
-    });
+    }));
   };
 }
 
