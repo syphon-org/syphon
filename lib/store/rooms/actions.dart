@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -147,12 +148,12 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         );
       }
 
-      // TODO: eventually remove the need for this with modular parsers
-      room = room.fromSync(
-        json: json,
-        currentUser: user,
-        lastSince: lastSince,
-      );
+      room = await compute(parseRoom, {
+        'json': json,
+        'room': room,
+        'currentUser': user,
+        'lastSince': lastSince,
+      });
 
       printDebug(
         '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length} | ${room.limited}',
@@ -165,7 +166,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
-        saveReceipts(room.id, room.readReceipts, storage: Storage.main),
+        saveReceipts(room.readReceipts, storage: Storage.main),
       ]);
 
       // update store

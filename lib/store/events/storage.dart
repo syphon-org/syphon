@@ -157,21 +157,27 @@ Future<Map<String, List<Reaction>>> loadReactions(
   List<String> messageIds, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(REACTIONS);
-  final reactionsMap = Map<String, List<Reaction>>();
-  final reactionsRecords =
-      await store.records(messageIds).getSnapshots(storage);
+  try {
+    final store = StoreRef<String, String>(REACTIONS);
+    final reactionsMap = Map<String, List<Reaction>>();
+    final reactionsRecords =
+        await store.records(messageIds).getSnapshots(storage);
 
-  for (RecordSnapshot<String, String> reactionList in reactionsRecords ?? []) {
-    if (reactionList != null) {
-      final reactions = List.from(await json.decode(reactionList.value))
-          .map((json) => Reaction.fromJson(json))
-          .toList();
-      reactionsMap.putIfAbsent(reactionList.key, () => reactions);
+    for (RecordSnapshot<String, String> reactionList
+        in reactionsRecords ?? []) {
+      if (reactionList != null) {
+        final reactions = List.from(await json.decode(reactionList.value))
+            .map((json) => Reaction.fromJson(json))
+            .toList();
+        reactionsMap.putIfAbsent(reactionList.key, () => reactions);
+      }
     }
-  }
 
-  return reactionsMap;
+    return reactionsMap;
+  } catch (error) {
+    printError(error);
+    return Map();
+  }
 }
 
 Future<void> saveMessages(
@@ -225,6 +231,6 @@ Future<List<Message>> loadMessages(
     return messages;
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
-    return null;
+    return List();
   }
 }

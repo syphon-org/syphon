@@ -852,7 +852,7 @@ class _Props extends Equatable {
       },
       onLoadFirstBatch: () {
         final room = selectRoom(id: roomId, state: store.state);
-        printDebug('[onLoadFirstBatch]');
+        printDebug('[onLoadFirstBatch] ${room.id}');
         store.dispatch(
           fetchMessageEvents(
             room: room,
