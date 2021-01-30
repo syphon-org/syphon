@@ -12,6 +12,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
@@ -114,58 +115,65 @@ Future<void> deleteStorage() async {
  * TODO: need pagination for pretty much all of these
  */
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
-  final auth = await loadAuth(
-    storage: storage,
-  );
-
-  final rooms = await loadRooms(
-    storage: storage,
-  );
-
-  final users = await loadUsers(
-    storage: storage,
-  );
-
-  final media = await loadMediaAll(
-    storage: storage,
-  );
-
-  final crypto = await loadCrypto(
-    storage: storage,
-  );
-
-  final redactions = await loadRedactions(
-    storage: storage,
-  );
-
-  final receipts = await loadReceipts(
-    storage: storage,
-  );
-
-  Map<String, List<Message>> messages = Map();
-  Map<String, List<Reaction>> reactions = Map();
-
-  for (Room room in rooms.values) {
-    messages[room.id] = await loadMessages(
-      room.messageIds,
+  try {
+    final auth = await loadAuth(
       storage: storage,
     );
 
-    reactions.addAll(await loadReactions(
-      room.messageIds,
+    final rooms = await loadRooms(
       storage: storage,
-    ));
-  }
+    );
 
-  return {
-    'auth': auth,
-    'users': users,
-    'rooms': rooms,
-    'media': media,
-    'crypto': crypto,
-    'messages': messages.isNotEmpty ? messages : null,
-    'reactions': reactions,
-    'redactions': redactions,
-    'receipts': receipts,
-  };
+    final users = await loadUsers(
+      storage: storage,
+    );
+
+    final media = await loadMediaAll(
+      storage: storage,
+    );
+
+    final crypto = await loadCrypto(
+      storage: storage,
+    );
+
+    final redactions = await loadRedactions(
+      storage: storage,
+    );
+
+    Map<String, List<Message>> messages = Map();
+    Map<String, List<Reaction>> reactions = Map();
+    Map<String, Map<String, ReadReceipt>> receipts = Map();
+
+    for (Room room in rooms.values) {
+      messages[room.id] = await loadMessages(
+        room.messageIds,
+        storage: storage,
+      );
+
+      reactions.addAll(await loadReactions(
+        room.messageIds,
+        storage: storage,
+      ));
+
+      receipts[room.id] = await loadReceipts(
+        room.messageIds,
+        storage: storage,
+      );
+    }
+
+    return {
+      'auth': auth,
+      'users': users,
+      'rooms': rooms,
+      'media': media,
+      'crypto': crypto,
+      'messages': messages.isNotEmpty ? messages : null,
+      'reactions': reactions,
+      'redactions': redactions,
+      'receipts': receipts,
+    };
+  } catch (error) {
+    printError('[loadStorage]  ${error.toString()}');
+    return {};
+  }
 }

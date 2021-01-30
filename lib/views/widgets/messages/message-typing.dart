@@ -86,9 +86,8 @@ class MessageTypingState extends State<MessageTypingWidget>
     }
 
     if (widget.usersTyping.length > 0) {
-      printDebug('[MessageTypingWidget] ${widget.usersTyping.length}');
       final usernamesTyping = widget.usersTyping;
-      userTyping = widget.roomUsers[usernamesTyping[0]];
+      userTyping = widget.roomUsers[usernamesTyping[0]] ?? User();
     }
 
     return Opacity(

@@ -12,15 +12,20 @@ import 'package:syphon/store/events/redaction/model.dart';
 ///
 ///
 Future<void> saveReceipts(
-  String roomId,
   Map<String, ReadReceipt> receipts, {
   Database storage,
+  bool ready,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
 
+  // TODO: the initial sync loads way too many read receipts
+  if (!ready) return;
+
   return await storage.transaction((txn) async {
-    final record = store.record(roomId);
-    await record.put(txn, json.encode(receipts));
+    for (String key in receipts.keys) {
+      final record = store.record(key);
+      await record.put(txn, json.encode(receipts[key]));
+    }
   });
 }
 
@@ -29,23 +34,25 @@ Future<void> saveReceipts(
 ///
 /// Iterates through
 ///
-Future<Map<String, Map<String, ReadReceipt>>> loadReceipts({
+Future<Map<String, ReadReceipt>> loadReceipts(
+  List<String> messageIds, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
+  try {
+    final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
 
-  final receipts = Map<String, Map<String, ReadReceipt>>();
+    final receiptsMap = Map<String, ReadReceipt>();
+    final records = await store.records(messageIds).getSnapshots(storage);
 
-  final roomReceipts = await store.find(storage);
-
-  for (RecordSnapshot<String, String> record in roomReceipts) {
-    final testing = await json.decode(record.value);
-    final mapped = Map<String, dynamic>.from(testing);
-    final Map<String, ReadReceipt> converted = mapped.map(
-      (key, value) => MapEntry(key, ReadReceipt.fromJson(value)),
-    );
-    receipts[record.key] = converted;
+    for (RecordSnapshot<String, String> record in records ?? []) {
+      if (record != null) {
+        final receipt = ReadReceipt.fromJson(await json.decode(record.value));
+        receiptsMap.putIfAbsent(record.key, () => receipt);
+      }
+    }
+    return receiptsMap;
+  } catch (error) {
+    printError(error.toString());
+    return Map();
   }
-
-  return receipts;
 }

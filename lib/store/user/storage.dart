@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/user/model.dart';
 
 Future<void> saveUsers(
@@ -9,7 +10,7 @@ Future<void> saveUsers(
   Database cache,
   Database storage,
 }) async {
-  final store = StoreRef<String, String>('users');
+  final store = StoreRef<String, String>(StorageKeys.USERS);
 
   return await storage.transaction((txn) async {
     for (User user in users.values) {
@@ -33,7 +34,7 @@ Future<Map<String, User>> loadUsers({
   final Map<String, User> users = {};
 
   try {
-    final store = StoreRef<String, String>('users');
+    final store = StoreRef<String, String>(StorageKeys.USERS);
     final count = await store.count(storage);
 
     final finder = Finder(

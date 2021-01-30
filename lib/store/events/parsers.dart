@@ -15,6 +15,21 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/user/model.dart';
+
+Room parseRoom(Map params) {
+  Map json = params['json'];
+  Room room = params['room'];
+  User currentUser = params['currentUser'];
+  String lastSince = params['lastSince'];
+
+  // TODO: eventually remove the need for this with modular parsers
+  return room.fromSync(
+    json: json,
+    currentUser: currentUser,
+    lastSince: lastSince,
+  );
+}
 
 Map<String, dynamic> parseMessages({
   Room room,
