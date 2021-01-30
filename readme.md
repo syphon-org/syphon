@@ -92,7 +92,12 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub run build_runner build```
 
 ### ios/android
-- ios and android should follow normal flutter building instructions
+0. pull dependencies needed 
+   - ```flutter pub get```
+1. generate json conversion for models
+   - ```flutter pub run build_runner build --delete-conflicting-outputs```
+2. generate json conversion for models
+   - ```flutter run```
 
 ### macos
 0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
