@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/crypto/state.dart';
-
-const String CRYPTO = 'crypto';
 
 /**
  * Save Crypto Store
@@ -17,10 +16,10 @@ Future<void> saveCrypto(
   CryptoStore cryptoStore, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(CRYPTO);
+  final store = StoreRef<String, String>(StorageKeys.CRYPTO);
 
   return await storage.transaction((txn) async {
-    final record = store.record(CRYPTO);
+    final record = store.record(StorageKeys.CRYPTO);
     await record.put(txn, json.encode(cryptoStore));
   });
 }
@@ -33,9 +32,9 @@ Future<void> saveCrypto(
  */
 Future<CryptoStore> loadCrypto({Database storage}) async {
   try {
-    final store = StoreRef<String, String>(CRYPTO);
+    final store = StoreRef<String, String>(StorageKeys.CRYPTO);
 
-    final crypto = await store.record(CRYPTO).get(storage);
+    final crypto = await store.record(StorageKeys.CRYPTO).get(storage);
 
     if (crypto == null) {
       return null;

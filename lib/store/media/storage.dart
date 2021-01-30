@@ -4,14 +4,13 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-
-const String MEDIA = 'MEDIA';
+import 'package:syphon/storage/constants.dart';
 
 Future<bool> checkMedia(
   String mxcUri, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(MEDIA);
+  final store = StoreRef<String, String>(StorageKeys.MEDIA);
 
   return await store.record(mxcUri).exists(storage);
 }
@@ -21,7 +20,7 @@ Future<void> saveMedia(
   Uint8List data, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(MEDIA);
+  final store = StoreRef<String, String>(StorageKeys.MEDIA);
 
   return await storage.transaction((txn) async {
     final record = store.record(mxcUri);
@@ -39,7 +38,7 @@ Future<Uint8List> loadMedia({
   Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(MEDIA);
+    final store = StoreRef<String, String>(StorageKeys.MEDIA);
 
     final mediaData = await store.record(mxcUri).get(storage);
 
@@ -64,7 +63,7 @@ Future<Map<String, Uint8List>> loadMediaAll({
 }) async {
   try {
     final Map<String, Uint8List> media = {};
-    final store = StoreRef<String, String>(MEDIA);
+    final store = StoreRef<String, String>(StorageKeys.MEDIA);
 
     final mediaDataAll = await store.find(storage);
 

@@ -3,23 +3,18 @@ import 'dart:convert';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
-const String EVENTS = 'events';
-const String MESSAGES = 'messages';
-const String RECEIPTS = 'receipts';
-const String REACTIONS = 'reactions';
-const String REDACTIONS = 'redactions';
-
 Future<void> saveEvents(
   List<Event> events, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(EVENTS);
+  final store = StoreRef<String, String>(StorageKeys.EVENTS);
 
   return await storage.transaction((txn) async {
     for (Event event in events) {
@@ -34,8 +29,8 @@ Future<void> deleteEvents(
   Database storage,
 }) async {
   final stores = [
-    StoreRef<String, String>(MESSAGES),
-    StoreRef<String, String>(REACTIONS),
+    StoreRef<String, String>(StorageKeys.MESSAGES),
+    StoreRef<String, String>(StorageKeys.REACTIONS),
   ];
 
   return await Future.wait(stores.map((store) async {
@@ -59,7 +54,7 @@ Future<void> saveRedactions(
   Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(REDACTIONS);
+    final store = StoreRef<String, String>(StorageKeys.REDACTIONS);
 
     return await storage.transaction((txn) async {
       for (Redaction redaction in redactions) {
@@ -83,7 +78,7 @@ Future<void> saveRedactions(
 Future<Map<String, Redaction>> loadRedactions({
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(REDACTIONS);
+  final store = StoreRef<String, String>(StorageKeys.REDACTIONS);
 
   final redactions = Map<String, Redaction>();
 
@@ -111,7 +106,7 @@ Future<void> saveReactions(
   Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(REACTIONS);
+    final store = StoreRef<String, String>(StorageKeys.REACTIONS);
 
     return await storage.transaction((txn) async {
       for (Reaction reaction in reactions) {
@@ -158,7 +153,7 @@ Future<Map<String, List<Reaction>>> loadReactions(
   Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(REACTIONS);
+    final store = StoreRef<String, String>(StorageKeys.REACTIONS);
     final reactionsMap = Map<String, List<Reaction>>();
     final reactionsRecords =
         await store.records(messageIds).getSnapshots(storage);
@@ -184,7 +179,7 @@ Future<void> saveMessages(
   List<Message> messages, {
   Database storage,
 }) async {
-  final store = StoreRef<String, String>(MESSAGES);
+  final store = StoreRef<String, String>(StorageKeys.MESSAGES);
 
   return await storage.transaction((txn) async {
     for (Message message in messages) {
@@ -195,7 +190,7 @@ Future<void> saveMessages(
 }
 
 Future<Message> loadMessage(String eventId, {Database storage}) async {
-  final store = StoreRef<String, String>(MESSAGES);
+  final store = StoreRef<String, String>(StorageKeys.MESSAGES);
 
   final message = await store.record(eventId).get(storage);
 
@@ -217,7 +212,7 @@ Future<List<Message>> loadMessages(
   final List<Message> messages = [];
 
   try {
-    final store = StoreRef<String, String>(MESSAGES);
+    final store = StoreRef<String, String>(StorageKeys.MESSAGES);
 
     // TODO: properly paginate through cold storage messages instead of loading all
     final messageIds = eventIds ?? []; //.skip(offset).take(limit).toList();

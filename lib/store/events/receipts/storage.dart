@@ -56,35 +56,3 @@ Future<Map<String, ReadReceipt>> loadReceipts(
     return Map();
   }
 }
-
-///
-/// Load Receipts
-///
-/// Iterates through
-///
-Future<Map<String, Map<String, ReadReceipt>>> loadReceiptsOLD(
-  List<String> messageIds, {
-  Database storage,
-}) async {
-  try {
-    final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
-
-    final receipts = Map<String, Map<String, ReadReceipt>>();
-
-    final flatReceipts = await store.find(storage);
-
-    for (RecordSnapshot<String, String> record in flatReceipts) {
-      final testing = await json.decode(record.value);
-      final mapped = Map<String, dynamic>.from(testing);
-      final Map<String, ReadReceipt> converted = mapped.map(
-        (key, value) => MapEntry(key, ReadReceipt.fromJson(value)),
-      );
-      receipts[record.key] = converted;
-    }
-
-    return receipts;
-  } catch (error) {
-    printError(error);
-    return null;
-  }
-}
