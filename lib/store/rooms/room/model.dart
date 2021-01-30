@@ -316,8 +316,8 @@ class Room {
       prevHash = json['timeline']['prev_batch'];
 
       if (limited != null) {
-        debugPrint(
-          '[fromSync] LIMITED ${limited} ${lastHash} ${prevHash}',
+        printDebug(
+          '[fromSync] ${this.id} limited ${limited} lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
 
@@ -644,7 +644,7 @@ class Room {
         nextHash: nextHash ?? this.nextHash,
       );
     } catch (error) {
-      debugPrint('[fromMessageEvents] $error');
+      printError('[fromMessageEvents] $error');
       return this;
     }
   }

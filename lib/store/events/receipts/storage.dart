@@ -14,8 +14,12 @@ import 'package:syphon/store/events/redaction/model.dart';
 Future<void> saveReceipts(
   Map<String, ReadReceipt> receipts, {
   Database storage,
+  bool ready,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
+
+  // TODO: the initial sync loads way too many read receipts
+  if (!ready) return;
 
   return await storage.transaction((txn) async {
     for (String key in receipts.keys) {

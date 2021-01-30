@@ -127,6 +127,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
     final user = store.state.authStore.user;
+    final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
     // syncing null data happens sometimes?
@@ -136,7 +137,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
-      // use pre-existing values where available
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
 
       // First past to decrypt encrypted events
@@ -147,6 +147,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         );
       }
 
+      // parse room and events
       room = await compute(parseRoom, {
         'json': json,
         'room': room,
@@ -155,7 +156,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       });
 
       printDebug(
-        '[syncRooms] ${room.name} ids ${room.messagesNew.length} | messages ${room.messageIds.length} | ${room.limited}',
+        '[syncRooms] ${room.name} initial: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
       // update cold storage
@@ -165,7 +166,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
-        saveReceipts(room.readReceipts, storage: Storage.main),
+        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
       ]);
 
       // update store
@@ -248,10 +249,10 @@ ThunkAction<AppState> fetchRoom(String roomId) {
         '${roomId}': {
           'state': {
             'events': stateEvents,
-            'prev_batch': messageEvents['from'],
           },
           'timeline': {
             'events': messageEvents['chunk'],
+            'prev_batch': messageEvents['from'],
           }
         },
       }));
@@ -270,7 +271,7 @@ ThunkAction<AppState> fetchRoom(String roomId) {
  * Takes a negligible amount of time
  *  
  */
-ThunkAction<AppState> fetchRooms() {
+ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.fetchRoomIds(
@@ -288,15 +289,19 @@ ThunkAction<AppState> fetchRooms() {
       final joinedRooms = joinedRoomsRaw.map((id) => Room(id: id)).toList();
       final fullJoinedRooms = joinedRooms.map((room) async {
         try {
-          final stateEvents = await MatrixApi.fetchStateEvents(
-            protocol: protocol,
-            homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken,
-            roomId: room.id,
-          );
+          var stateEvents;
 
-          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-            throw stateEvents['error'];
+          if (syncState) {
+            stateEvents = await MatrixApi.fetchStateEvents(
+              protocol: protocol,
+              homeserver: store.state.authStore.user.homeserver,
+              accessToken: store.state.authStore.user.accessToken,
+              roomId: room.id,
+            );
+
+            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+              throw stateEvents['error'];
+            }
           }
 
           final messageEvents = await compute(
@@ -313,11 +318,11 @@ ThunkAction<AppState> fetchRooms() {
           await store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
-                'events': stateEvents,
-                'prev_batch': messageEvents['from'],
+                'events': stateEvents ?? [],
               },
               'timeline': {
                 'events': messageEvents['chunk'],
+                'prev_batch': messageEvents['from'],
               }
             },
           }));
