@@ -355,6 +355,7 @@ ThunkAction<AppState> loginUser() {
         deviceName: device.displayName,
       );
 
+      printJson(data);
       if (data['errcode'] == 'M_FORBIDDEN') {
         throw 'Invalid credentials, confirm and try again';
       }
@@ -364,7 +365,7 @@ ThunkAction<AppState> loginUser() {
       }
 
       await store.dispatch(SetUser(
-        user: User.fromMatrix(data),
+        user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
       ));
 
       store.state.authStore.authObserver.add(
