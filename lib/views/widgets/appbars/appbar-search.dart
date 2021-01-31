@@ -136,6 +136,8 @@ class AppBarSearchState extends State<AppBarSearch> {
                 visible: searching,
                 maintainState: true,
                 child: TextField(
+                  autocorrect: false,
+                  enableSuggestions: false,
                   focusNode: widget.focusNode ?? focusNode,
                   onChanged: (text) {
                     if (this.searchTimeout != null) {

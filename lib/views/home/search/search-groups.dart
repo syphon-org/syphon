@@ -8,6 +8,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 // Project imports:
@@ -74,8 +75,15 @@ class GroupSearchState extends State<GroupSearchView> {
             brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
-            onSearch: (text) {
-              props.onSearch(text);
+            onSearch: (String text) {
+              var isValid = true;
+              if (text.contains(':')) {
+                isValid = RegExp(Values.urlRegex).hasMatch(text.split(':')[1]);
+              }
+
+              if (isValid) {
+                props.onSearch(text);
+              }
             },
           ),
           body: Center(

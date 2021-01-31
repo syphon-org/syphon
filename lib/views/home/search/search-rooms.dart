@@ -406,9 +406,7 @@ class _Props extends Equatable {
           store.dispatch(searchRooms(searchText: text));
         },
         onSendInvite: ({Room room, User user}) {
-          store.dispatch(
-            inviteUser(room: room, user: user),
-          );
+          store.dispatch(inviteUser(room: room, user: user));
         },
       );
 }
