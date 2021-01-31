@@ -355,7 +355,6 @@ ThunkAction<AppState> loginUser() {
         deviceName: device.displayName,
       );
 
-      printJson(data);
       if (data['errcode'] == 'M_FORBIDDEN') {
         throw 'Invalid credentials, confirm and try again';
       }

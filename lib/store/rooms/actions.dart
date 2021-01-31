@@ -822,7 +822,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
+        roomId: room.id ?? room.alias,
       );
 
       if (data['errcode'] != null) {
@@ -845,7 +845,9 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRoom(joinedRoom.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
-      store.dispatch(addAlert(error: error, origin: 'joinRoom'));
+      store.dispatch(
+        addAlert(error: error, origin: 'joinRoom'),
+      );
     }
   };
 }

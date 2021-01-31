@@ -96,7 +96,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] $error');
+    debugPrint('[$origin] ${error.toString()}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error);

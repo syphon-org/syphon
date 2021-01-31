@@ -1,3 +1,9 @@
+///
+/// Storage Keys
+///
+/// Keys to the castle or
+/// just keys to reference data
+/// from cold storage
 class StorageKeys {
   static const String AUTH = 'auth';
   static const String ROOMS = 'rooms';

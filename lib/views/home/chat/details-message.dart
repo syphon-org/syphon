@@ -40,8 +40,6 @@ class MessageDetails extends StatelessWidget {
         props.readReceipts[props.message.id] ?? ReadReceipt();
     Map<String, int> userReads = readReceipts.userReads ?? Map();
 
-    print(userReads.length.toString());
-
     final List<User> users = userReads.keys
         .map(
           (userId) => props.users[userId],

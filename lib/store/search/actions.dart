@@ -195,9 +195,10 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
         totalResults: data['total_room_count_estimate'],
       ));
     } catch (error) {
-      store.dispatch(
-        addAlert(message: 'Failed to search rooms'),
-      );
+      store.dispatch(addAlert(
+        message: 'Failed to search rooms',
+        error: error,
+      ));
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
