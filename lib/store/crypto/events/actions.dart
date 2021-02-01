@@ -18,6 +18,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
 /**
@@ -300,48 +301,45 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
       final List<dynamic> events = toDeviceRaw['events'];
 
       // Parse and decrypt necessary events
-      await Future.wait(
-        events.map((event) async {
-          final eventType = event['type'];
-          final identityKeySender = event['content']['sender_key'];
+      await Future.wait(events.map((event) async {
+        final eventType = event['type'];
+        final identityKeySender = event['content']['sender_key'];
 
-          switch (eventType) {
-            case EventTypes.encrypted:
-              try {
-                final eventDecrypted = await store.dispatch(
-                  decryptKeyEvent(event: event),
+        switch (eventType) {
+          case EventTypes.encrypted:
+            try {
+              final eventDecrypted = await store.dispatch(
+                decryptKeyEvent(event: event),
+              );
+
+              if (EventTypes.roomKey == eventDecrypted['type']) {
+                // save decrepted user session key under roomId
+                await store.dispatch(
+                  saveSessionKey(
+                    event: eventDecrypted,
+                    identityKey: identityKeySender,
+                  ),
                 );
 
-                if (EventTypes.roomKey == eventDecrypted['type']) {
-                  // save decrepted user session key under roomId
-                  await store.dispatch(
-                    saveSessionKey(
-                      event: eventDecrypted,
-                      identityKey: identityKeySender,
-                    ),
-                  );
+                try {
+                  // redecrypt events in the room with new key
+                  final roomId = eventDecrypted['content']['room_id'];
+                  Map<String, dynamic> room = {roomId: {}};
 
-                  try {
-                    // redecrypt events in the room with new key
-                    final roomId = eventDecrypted['content']['room_id'];
-                    Map<String, dynamic> room = {roomId: {}};
-
-                    return await store.dispatch(syncRooms(room));
-                  } catch (error) {
-                    debugPrint('[syncRooms|error] $error');
-                  }
+                  return await store.dispatch(syncRooms(room));
+                } catch (error) {
+                  debugPrint('[syncRooms|error] $error');
                 }
-              } catch (error) {
-                debugPrint('[decryptKeyEvent|error] $error');
               }
+            } catch (error) {
+              debugPrint('[decryptKeyEvent|error] $error');
+            }
 
-              break;
-            default:
-              // TODO: handle other to device events
-              break;
-          }
-        }),
-      );
+            break;
+          default:
+            break;
+        }
+      }));
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
@@ -351,6 +349,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
   };
 }
 
+// TODO: refactor sync device and/or use this one?
 ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
   return (Store<AppState> store) async {
     try {
@@ -378,7 +377,6 @@ ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
             }
             break;
           default:
-            // TODO: handle other to device events
             break;
         }
       }

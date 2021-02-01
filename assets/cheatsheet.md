@@ -1,4 +1,8 @@
 
+### Pain Points
+ 
+ - Plugins should be able to run in isolates without additional hackery
+ - still having issues using path_provider or any equivalent in threads while still being able to pass the entire store object to the isolate
 
 ### User Creation
 
@@ -179,4 +183,53 @@ flutter_recaptcha_v2: 0.1.0 used as reference for webview captcha
      debugPrint('** Read State From Disk Successfully **');
    }
  }
+```
+
+
+```dart
+
+  /// something to try when binding state, the downside is you
+  /// don't get the didUpdateWidget
+  class ChatViewConnected extends StatelessWidget {
+    @override
+    Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+          distinct: true,
+          converter: (Store<AppState> store) => _Props.mapStateToProps(
+            store,
+            (ModalRoute.of(context).settings.arguments as ChatViewArguements)
+                .roomId,
+          ),
+          builder: (context, props) {
+            return ChatView();
+          },
+        );
+ }
+```
+
+```dart
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    final store = StoreProvider.of<AppState>(context);
+    final props = _Props.mapStateToProps(store);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (success == null || !success) {
+          final result = await props.onCreateUser(enableErrors: true);
+          this.setState(() {
+            success = result;
+          });
+        }
+        break;
+      case AppLifecycleState.inactive:
+        debugPrint("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        debugPrint("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        debugPrint("app in detached");
+        break;
+    }
+  }
 ```

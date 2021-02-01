@@ -14,12 +14,6 @@ class RoomStore extends Equatable {
   final Map<String, Room> rooms;
 
   @JsonKey(ignore: true)
-  final List<String> archive; // TODO: archive by ID
-
-  @JsonKey(ignore: true)
-  final List<String> roomsHidden; // TODO: hidden by ID
-
-  @JsonKey(ignore: true)
   final bool loading;
 
   @JsonKey(ignore: true)
@@ -27,30 +21,22 @@ class RoomStore extends Equatable {
 
   const RoomStore({
     this.rooms = const {},
-    this.archive = const [],
     this.loading = false,
-    this.roomsHidden = const [],
   });
 
   @override
   List<Object> get props => [
         rooms,
-        archive,
-        roomsHidden,
       ];
 
   RoomStore copyWith({
     rooms,
-    archive,
     loading,
     lastSince,
-    roomsHidden,
   }) =>
       RoomStore(
         rooms: rooms ?? this.rooms,
-        archive: archive ?? this.archive,
         loading: loading ?? this.loading,
-        roomsHidden: roomsHidden ?? this.roomsHidden,
       );
 
   Map<String, dynamic> toJson() => _$RoomStoreToJson(this);

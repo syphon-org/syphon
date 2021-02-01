@@ -31,6 +31,8 @@ class Values {
 
   static const supportEmail = 'support@syphon.org';
 
+  static const matrixSSOUrl =
+      '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
   static const openHelpUrl =
       'mailto:$supportEmail?subject=Syphon%20App%20Help&body=Leave%20your%20feedback%20or%20question%20here';
 
@@ -44,7 +46,12 @@ class Values {
   static const emailRegex =
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 
+  static const urlRegex =
+      r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+
   static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
+
+  static const redacted = 'redacted';
 
   // Animations
   static const animationDurationDefault = 350; // millis

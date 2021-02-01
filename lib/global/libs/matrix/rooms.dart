@@ -147,8 +147,7 @@ abstract class Rooms {
   * Create Room - POST
   * 
   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-join
-  *  
-  * TODO: third party authentication work is needed
+  * 
   */
   static Future<dynamic> joinRoom({
     String protocol = 'https://',
@@ -343,15 +342,13 @@ abstract class Rooms {
     );
   }
 
-  /**
-   * Create Room Filter (Lazy Loading) - POST
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter
-   * 
-   * Create a filter to use when fetching room state, messages, or /sync'ing
-   * 
-   * TODO: failing, giving a too many requests error (?) won't return from matrix
-   */
+  ///
+  /// Create Room Filter (Lazy Loading) - POST
+  ///
+  /// Create a filter to use when fetching room state, messages, or /sync'ing
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter
+  ///
   static Future<dynamic> createFilter({
     String protocol = 'https://',
     String homeserver = 'matrix.org',

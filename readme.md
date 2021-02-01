@@ -25,7 +25,7 @@ a privacy centric matrix client - now in open alpha*
 <p align='center'>
     <img src="https://img.shields.io/github/license/syphon-org/syphon?color=teal"/>
     <img src="https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color=teal"/>
-    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.1.5?color=teal"/>
+    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.1.6?color=teal"/>
     <img src="https://img.shields.io/github/downloads/syphon-org/syphon/total?color=teal"/>  
     <a href="https://matrix.to/#/#syphon:matrix.org">
         <img src="https://img.shields.io/matrix/syphon:matrix.org?color=teal"/>
@@ -92,7 +92,12 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub run build_runner build```
 
 ### ios/android
-- ios and android should follow normal flutter building instructions
+0. pull dependencies needed 
+   - ```flutter pub get```
+1. generate json conversion for models
+   - ```flutter pub run build_runner build --delete-conflicting-outputs```
+2. generate json conversion for models
+   - ```flutter run```
 
 ### macos
 0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)

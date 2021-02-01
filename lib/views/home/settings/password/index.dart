@@ -25,18 +25,17 @@ final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class PasswordView extends StatefulWidget {
-  const PasswordView({Key key}) : super(key: key);
+class PasswordUpdateView extends StatefulWidget {
+  const PasswordUpdateView({Key key}) : super(key: key);
 
   PasswordUpdateState createState() => PasswordUpdateState();
 }
 
-class PasswordUpdateState extends State<PasswordView> {
+class PasswordUpdateState extends State<PasswordUpdateView> {
   int currentStep = 0;
-  bool onboarding = false;
-  bool validStep = false;
   bool naving = false;
-  StreamSubscription subscription;
+  bool validStep = false;
+  bool onboarding = false;
   PageController pageController;
 
   var sections = [

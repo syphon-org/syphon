@@ -10,15 +10,15 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
-
-// Store
-
-// Styling
+import 'package:touchable_opacity/touchable_opacity.dart';
 
 class HomeserverStep extends StatefulWidget {
   const HomeserverStep({Key key}) : super(key: key);
@@ -40,13 +40,89 @@ class HomeserverStepState extends State<HomeserverStep> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    homeserverController.text = store.state.authStore.homeserver;
+    final hostname = store.state.authStore.hostname;
+    final homeserver = store.state.authStore.homeserver ?? Homeserver();
+    homeserverController.text = homeserver.hostname ?? hostname;
+  }
+
+  buildContinueSSO(_Props props) => Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: ListTile(
+          leading: Avatar(
+            size: Dimensions.avatarSizeMin,
+            url: props.homeserver.photoUrl,
+            alt: props.homeserver.hostname ?? '',
+            background: Colours.hashedColor(props.homeserver.hostname),
+          ),
+          title: Text(
+            props.homeserver.hostname ?? '',
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          subtitle: Text(
+            props.homeserver.baseUrl ?? '',
+            style: Theme.of(context).textTheme.caption,
+          ),
+          trailing: TouchableOpacity(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/search/homeservers',
+              );
+            },
+            child: Icon(
+              Icons.search_rounded,
+              size: Dimensions.iconSizeLarge,
+            ),
+          ),
+        ),
+      );
+
+  buildContinueNormal(_Props props) => Container(
+        width: Dimensions.contentWidthWide(context),
+        height: Dimensions.inputHeight,
+        constraints: BoxConstraints(
+          minWidth: Dimensions.inputWidthMin,
+          maxWidth: Dimensions.inputWidthMax,
+        ),
+        child: TextFieldSecure(
+          label: 'Homeserver',
+          disableSpacing: true,
+          controller: homeserverController,
+          onChanged: (text) {
+            props.onSetHostname(text);
+          },
+          onEditingComplete: () {
+            props.onChangeHomeserver(props.hostname);
+            FocusScope.of(context).unfocus();
+          },
+          suffix: IconButton(
+              icon: Icon(Icons.search),
+              tooltip: 'Find your homeserver',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/search/homeservers',
+                );
+              }),
+        ),
+      );
+
+  buildContinue(_Props props) {
+    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+      return buildContinueSSO(props);
+    }
+    return buildContinueNormal(props);
   }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+      onWillChange: (oldProps, newProps) {
+        if (oldProps.homeserver.hostname != newProps.homeserver.hostname) {
+          homeserverController.text = newProps.homeserver.hostname;
+        }
+      },
       builder: (context, props) {
         double height = MediaQuery.of(context).size.height;
 
@@ -69,7 +145,8 @@ class HomeserverStepState extends State<HomeserverStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupHomeserver,
-                    semanticsLabel: 'User hidding behind a message',
+                    semanticsLabel:
+                        'User resting their leg on an at symbol stool box',
                   ),
                 ),
               ),
@@ -90,33 +167,8 @@ class HomeserverStepState extends State<HomeserverStep> {
               Flexible(
                 flex: 1,
                 child: Container(
-                  width: Dimensions.contentWidthWide(context),
-                  height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
-                    minWidth: Dimensions.inputWidthMin,
-                    maxWidth: Dimensions.inputWidthMax,
-                  ),
-                  child: TextFieldSecure(
-                    label: 'Homeserver',
-                    disableSpacing: true,
-                    controller: homeserverController,
-                    onChanged: (text) {
-                      props.onChangeHomeserver(text);
-                    },
-                    onEditingComplete: () {
-                      props.onChangeHomeserver(props.homeserver);
-                      FocusScope.of(context).unfocus();
-                    },
-                    suffix: IconButton(
-                        icon: Icon(Icons.search),
-                        tooltip: 'Find your homeserver',
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/search/homeservers',
-                          );
-                        }),
-                  ),
+                  width: Dimensions.contentWidth(context),
+                  child: buildContinue(props),
                 ),
               ),
             ],
@@ -126,19 +178,27 @@ class HomeserverStepState extends State<HomeserverStep> {
 }
 
 class _Props extends Equatable {
-  final String homeserver;
+  final String hostname;
+  final Homeserver homeserver;
 
+  final Function onSetHostname;
   final Function onChangeHomeserver;
 
   _Props({
+    @required this.hostname,
     @required this.homeserver,
+    @required this.onSetHostname,
     @required this.onChangeHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver,
-        onChangeHomeserver: (String text) {
-          store.dispatch(setHomeserver(homeserver: text.trim()));
+        onSetHostname: (String hostname) {
+          store.dispatch(setHostname(hostname: hostname));
+        },
+        onChangeHomeserver: (String hostname) {
+          store.dispatch(selectHomeserver(hostname: hostname));
         },
       );
 

@@ -67,23 +67,23 @@ ThunkAction<AppState> addInfo({
     debugPrint('[$origin] $type : $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert = new Alert(type: type, message: message);
+    final alert = Alert(type: type, message: message, error: error);
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };
 }
 
 ThunkAction<AppState> addConfirmation({
-  type = 'success',
-  origin = 'Unknown',
-  message,
+  String type = 'success',
+  String origin = 'Unknown',
+  String message,
   error,
 }) {
   return (Store<AppState> store) async {
     debugPrint('[$origin|confirm] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert = new Alert(type: type, message: message);
+    final alert = Alert(type: type, message: message, error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };
@@ -99,7 +99,7 @@ ThunkAction<AppState> addAlert({
     debugPrint('[$origin] $error');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert = new Alert(type: type, message: message);
+    final alert = Alert(type: type, message: message, error: error);
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };

@@ -193,13 +193,13 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] starting sync');
+      debugPrint('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
       var filterId;
 
       if (isFullSync) {
-        debugPrint('[fetchSync] running full sync');
+        debugPrint('[fetchSync] *** full sync running *** ');
       }
 
       // Normal matrix /sync call to the homeserver (Threaded)
@@ -250,7 +250,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       ));
 
       if (isFullSync) {
-        debugPrint('[fetchSync] full sync completed');
+        debugPrint('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
       store.dispatch(SetOffline(offline: true));

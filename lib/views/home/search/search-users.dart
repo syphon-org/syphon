@@ -13,6 +13,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -324,8 +325,6 @@ class SearchUserState extends State<SearchUserView> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final height = MediaQuery.of(context).size.height;
-
           return Scaffold(
             appBar: AppBarSearch(
               title: Strings.titleSearchUsers,
@@ -348,22 +347,8 @@ class SearchUserState extends State<SearchUserView> {
               children: [
                 buildUserList(context, props),
                 Positioned(
-                  child: Visibility(
-                    visible: props.loading,
-                    child: Container(
-                        margin: EdgeInsets.only(top: height * 0.02),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            RefreshProgressIndicator(
-                              strokeWidth: Dimensions.defaultStrokeWidth,
-                              valueColor: new AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).primaryColor,
-                              ),
-                              value: null,
-                            ),
-                          ],
-                        )),
+                  child: Loader(
+                    loading: props.loading,
                   ),
                 ),
               ],

@@ -9,13 +9,16 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/cache/index.dart';
-import 'package:syphon/global/cache/threadables.dart';
+import 'package:syphon/cache/index.dart';
+import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';
@@ -32,7 +35,7 @@ import 'package:syphon/store/settings/state.dart';
  */
 class CacheSerializer implements StateSerializer<AppState> {
   final Database cache;
-  final Map<String, Map<dynamic, dynamic>> preloaded;
+  final Map<String, dynamic> preloaded;
 
   CacheSerializer({this.cache, this.preloaded});
 
@@ -42,9 +45,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.authStore,
       state.syncStore,
       state.cryptoStore,
-      state.mediaStore,
       state.settingsStore,
-      state.userStore,
     ];
 
     // Queue up a cache saving will wait
@@ -53,7 +54,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       // // create a new IV for the encrypted cache
       Cache.ivKey = generateIV();
 
-      // // backup the IV in case the app is force closed before caching finishes
+      // backup the IV in case the app is force closed before caching finishes
       await saveIVNext(Cache.ivKey);
 
       // run through all redux stores for encryption and encoding
@@ -64,27 +65,14 @@ class CacheSerializer implements StateSerializer<AppState> {
           String type = store.runtimeType.toString();
 
           // serialize the store contents
-          // Stopwatch stopwatchSerialize = new Stopwatch()..start();
           try {
-            // HACK: unable to pass certain stores directly to an isolate
-            final sensitiveStorage = [MediaStore];
-            if (sensitiveStorage.contains(store.runtimeType)) {
-              jsonEncoded = await compute(jsonEncode, store);
-            } else {
-              jsonEncoded = json.encode(store);
-            }
-          } catch (error) {
             jsonEncoded = json.encode(store);
-            print(
+          } catch (error) {
+            printError(
               '[CacheSerializer] ${type} failed $error',
             );
           }
 
-          // debugPrint(
-          //   '[CacheSerializer] ${stopwatchSerialize.elapsed} ${type} serialize',
-          // );
-
-          // Stopwatch stopwatchEncrypt = new Stopwatch()..start();
           // encrypt the store contents
           jsonEncrypted = await compute(
             encryptJsonBackground,
@@ -97,25 +85,15 @@ class CacheSerializer implements StateSerializer<AppState> {
             debugLabel: 'encryptJsonBackground',
           );
 
-          // debugPrint(
-          //   '[CacheSerializer] ${stopwatchEncrypt.elapsed} ${type} encrypt',
-          // );
-
           try {
             // Stopwatch stopwatchSave = new Stopwatch()..start();
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache, jsonEncrypted);
-
-            // debugPrint(
-            //   '[CacheSerializer] ${stopwatchSave.elapsed} ${type} saved',
-            // );
           } catch (error) {
-            print('[CacheSerializer] ERROR $error');
+            printError('[CacheSerializer] $error');
           }
         } catch (error) {
-          debugPrint(
-            '[CacheSerializer] $error',
-          );
+          printError('[CacheSerializer] $error');
         }
       }));
 
@@ -130,16 +108,18 @@ class CacheSerializer implements StateSerializer<AppState> {
   }
 
   AppState decode(Uint8List data) {
-    AuthStore authStore = AuthStore();
-    SyncStore syncStore = SyncStore();
-    UserStore userStore = UserStore();
-    CryptoStore cryptoStore = CryptoStore();
-    MediaStore mediaStore = MediaStore();
-    SettingsStore settingsStore = SettingsStore();
+    AuthStore authStore;
+    SyncStore syncStore;
+    UserStore userStore;
+    CryptoStore cryptoStore;
+    MediaStore mediaStore;
+    RoomStore roomStore;
+    EventStore eventStore;
+    SettingsStore settingsStore;
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
-    final stores = Cache.cacheStores;
+    final stores = Cache.cacheStores ?? {};
 
     // decode each store cache synchronously
     stores.forEach((type, store) {
@@ -167,8 +147,12 @@ class CacheSerializer implements StateSerializer<AppState> {
           case 'UserStore':
             userStore = UserStore.fromJson(store);
             break;
+          case 'EventStore':
+            eventStore = EventStore.fromJson(store);
+            break;
           case 'RoomStore':
-          // --- cold storage only ---
+            roomStore = RoomStore.fromJson(store);
+            break;
           default:
             break;
         }
@@ -179,20 +163,30 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStore ?? AuthStore(),
+      authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
+      cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
+      mediaStore: mediaStore ??
+          MediaStore().copyWith(
+            mediaCache: preloaded['media'],
+          ),
+      roomStore: roomStore ??
+          RoomStore().copyWith(
+            rooms: preloaded['rooms'] ?? {},
+          ),
+      userStore: userStore ??
+          UserStore().copyWith(
+            users: preloaded['users'] ?? {},
+          ),
+      eventStore: eventStore ??
+          EventStore().copyWith(
+            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
+            reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
+            redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
+            receipts: preloaded['receipts'] ??
+                Map<String, Map<String, ReadReceipt>>(),
+          ),
       syncStore: syncStore ?? SyncStore(),
-      cryptoStore: cryptoStore ?? CryptoStore(),
-      mediaStore: mediaStore ?? MediaStore(),
       settingsStore: settingsStore ?? SettingsStore(),
-      roomStore: RoomStore().copyWith(
-        rooms: preloaded['rooms'] ?? {},
-      ),
-      userStore: userStore.copyWith(
-        users: preloaded['users'] ?? {},
-      ),
-      eventStore: EventStore().copyWith(
-        messages: preloaded['messages'] ?? Map<String, List<Message>>(),
-      ),
     );
   }
 }

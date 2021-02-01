@@ -3,21 +3,17 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/cache/index.dart';
-import 'package:syphon/global/cache/threadables.dart';
+import 'package:syphon/cache/index.dart';
+import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/media/state.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/state.dart';
-import 'package:syphon/store/user/state.dart';
 
 final List<Object> stores = [
   AuthStore(),
   SyncStore(),
-  UserStore(),
-  MediaStore(),
   CryptoStore(),
   SettingsStore(),
 ];

@@ -1,9 +1,11 @@
 // Dart imports:
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/algos.dart';
 
 /**
  * https://matrix.org/docs/spec/client_server/latest#id183
@@ -18,11 +20,24 @@ class MatrixAuthTypes {
   static const TOKEN = 'm.login.token';
   static const TERMS = 'm.login.terms';
   static const DUMMY = 'm.login.dummy';
+  static const SSO = 'm.login.sso';
   static const EMAIL = 'm.login.email.identity';
 }
 
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
+
+  static FutureOr<dynamic> loginType({
+    String protocol,
+    String homeserver,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
   /**
    * https://matrix.org/docs/spec/client_server/latest#id198
    * 
@@ -47,6 +62,49 @@ abstract class Auth {
       'type': type,
       "identifier": {"type": "m.id.user", "user": username},
       'password': password,
+    };
+
+    if (deviceId != null) {
+      body['device_id'] = deviceId;
+    }
+
+    if (deviceName != null) {
+      body['initial_device_display_name'] = deviceName;
+    }
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+/**
+   * https://matrix.org/docs/spec/client_server/latest#id198
+   * 
+   * Login User
+   * 
+   *  Gets the homeserver's supported login types to authenticate
+   *  users. Clients should pick one of these and supply it as 
+   *  the type when logging in.
+   */
+  static FutureOr<dynamic> loginUserToken({
+    String protocol,
+    String homeserver,
+    String type = MatrixAuthTypes.TOKEN,
+    String token,
+    String session,
+    String deviceId,
+    String deviceName,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    Map body = {
+      'type': type,
+      "token": token,
+      "trx_id": Random().nextInt(1 << 32),
+      // "session": session,
     };
 
     if (deviceId != null) {
@@ -302,12 +360,50 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * Register New User
-   * 
-   * inhibit_login automatically logs in the user after creation 
-   */
+  ///
+  /// Reset Password
+  ///
+  /// Actually reset the password after verification
+  ///
   static FutureOr<dynamic> resetPassword({
+    String protocol,
+    String homeserver,
+    String clientSecret,
+    String passwordNew,
+    String session,
+    int sendAttempt = 1,
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+
+    Map body = {
+      "auth": {
+        "type": "m.login.email.identity",
+        "threepid_creds": {
+          "sid": session,
+          "client_secret": clientSecret,
+        },
+        "threepidCreds": {
+          "sid": session,
+          "client_secret": clientSecret,
+        }
+      },
+      "new_password": passwordNew
+    };
+
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  ///
+  /// Verify Password Reset Email
+  ///
+  /// Returns a token to verify the password reset
+  /// request for a specifed email address
+  static FutureOr<dynamic> sendPasswordResetEmail({
     String protocol,
     String homeserver,
     String clientSecret,

@@ -12,19 +12,23 @@ class ButtonSolid extends StatelessWidget {
     this.textWidget,
     this.loading = false,
     this.disabled = false,
+    this.width,
+    this.height,
     this.onPressed,
   }) : super(key: key);
 
   final bool loading;
   final bool disabled;
+  final double width;
+  final double height;
   final String text;
   final Widget textWidget;
   final Function onPressed;
 
   @override
   Widget build(BuildContext context) => Container(
-        width: Dimensions.contentWidth(context),
-        height: Dimensions.inputHeight,
+        width: width ?? Dimensions.contentWidth(context),
+        height: height ?? Dimensions.inputHeight,
         constraints: BoxConstraints(
           minWidth: Dimensions.buttonWidthMin,
           maxWidth: Dimensions.buttonWidthMax,
