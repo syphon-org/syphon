@@ -336,7 +336,9 @@ class _Props extends Equatable {
         blockUser: (User user) async {
           await store.dispatch(toggleBlockUser(user: user));
         },
-        sendMessage: () {},
+        sendMessage: () {
+          // TODO: same as the modal
+        },
         loading: store.state.roomStore.loading,
       );
 }

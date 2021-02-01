@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/print.dart';
 
 Future<String> encryptJsonBackground(Map params) async {
@@ -72,10 +72,6 @@ Future<Map> decryptJsonBackground(Map params) async {
   return jsonDecoded;
 }
 
-// TODO: needs plugins that work in isolates, still having
-// issues using path_provider or any equivalent in threads
-// while still being able to pass the entire store object
-// to the isolate
 // responsibile for both json serialization and encryption
 Future<String> serializeJsonBackground(Object store) async {
   try {

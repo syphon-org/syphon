@@ -95,9 +95,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                debugPrint(
-                                  'TODO: navigate to captcha explination',
-                                );
+                                // TODO: show captcha explaination dialog
                               },
                               child: Container(
                                 height: 20,

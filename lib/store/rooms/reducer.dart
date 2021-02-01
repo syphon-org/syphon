@@ -1,6 +1,7 @@
 // Project imports:
+import 'package:syphon/store/events/messages/model.dart';
+
 import './actions.dart';
-import '../events/model.dart';
 import './room/model.dart';
 import './state.dart';
 
@@ -8,12 +9,6 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);
-    case SetSending:
-      final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.room.id] = rooms[action.room.id].copyWith(
-        sending: action.sending,
-      );
-      return state.copyWith(rooms: rooms);
 
     case SetRooms:
       final Map<String, Room> rooms = Map.fromIterable(
@@ -34,7 +29,10 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       if (rooms[action.id] != null) {
         rooms[action.id] = rooms[action.id].copyWith(
           draft: action.draft,
+          reply: action.reply,
+          sending: action.sending,
           syncing: action.syncing,
+          lastRead: action.lastRead,
         );
       }
 
@@ -66,9 +64,12 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case AddArchive:
-      final List<String> roomsHiddenNew = List.from(state.roomsHidden ?? []);
-      roomsHiddenNew.add(action.roomId);
-      return state.copyWith(roomsHidden: roomsHiddenNew);
+      final rooms = Map<String, Room>.from(state.rooms);
+      final room = rooms[action.roomId];
+
+      rooms[action.roomId] = room.copyWith(hidden: true);
+
+      return state.copyWith(rooms: rooms);
     case ResetRooms:
       return RoomStore();
     default:

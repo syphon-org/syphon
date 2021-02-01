@@ -338,7 +338,7 @@ class _Props extends Equatable {
             if (!successful) return false;
           }
 
-          await store.dispatch(fetchUserCurrentProfile());
+          await store.dispatch(fetchAuthUserProfile());
           return true;
         },
       );

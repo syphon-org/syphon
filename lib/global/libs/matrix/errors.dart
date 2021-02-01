@@ -6,3 +6,8 @@ class MatrixErrors {
   static const String unknown_token = 'M_UNKNOWN_TOKEN';
   static const String email_in_use = 'M_THREEPID_IN_USE';
 }
+
+class MatrixErrorsSoft {
+  static const String terms_and_conditions =
+      'agree to our terms and conditions';
+}

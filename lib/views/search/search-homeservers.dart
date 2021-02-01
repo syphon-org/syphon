@@ -13,16 +13,17 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/string-keys.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 
 class SearchHomeservers extends StatefulWidget {
   const SearchHomeservers({Key key}) : super(key: key);
@@ -70,7 +71,6 @@ class SearchHomeserversState extends State<SearchHomeservers> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final height = MediaQuery.of(context).size.height;
           return Scaffold(
             appBar: AppBarSearch(
               title: tr(StringKeys.titleViewHomeserverSearch),
@@ -78,12 +78,17 @@ class SearchHomeserversState extends State<SearchHomeservers> {
               tooltip: 'Search Homeservers',
               brightness: Brightness.dark,
               focusNode: searchInputFocusNode,
+              throttle: Duration(milliseconds: 500),
               forceFocus: true,
               onChange: (text) {
                 props.onSearch(text);
               },
               onSearch: (text) {
                 props.onSearch(text);
+
+                if (props.searchText.isNotEmpty && props.homeservers.isEmpty) {
+                  props.onFetchHomeserverPreview(text);
+                }
               },
               onToggleSearch: () => this.setState(() {
                 searching = !searching;
@@ -96,11 +101,12 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                     scrollDirection: Axis.vertical,
                     itemCount: props.homeservers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final homeserver = props.homeservers[index] ?? Map();
+                      final Homeserver homeserver =
+                          props.homeservers[index] ?? Map();
 
                       return GestureDetector(
                         onTap: () {
-                          props.onSelect(homeserver: homeserver);
+                          props.onSelect(homeserver.hostname);
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -111,17 +117,17 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                             header: ListTile(
                               leading: Avatar(
                                 size: Dimensions.avatarSizeMin,
-                                url: homeserver['favicon'],
-                                alt: homeserver['hostname'],
+                                url: homeserver.photoUrl,
+                                alt: homeserver.hostname,
                                 background:
-                                    Colours.hashedColor(homeserver['hostname']),
+                                    Colours.hashedColor(homeserver.hostname),
                               ),
                               title: Text(
-                                homeserver['hostname'],
+                                homeserver.hostname,
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                               subtitle: Text(
-                                homeserver['description'],
+                                homeserver.description,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ),
@@ -137,33 +143,51 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver['location'] ?? '',
+                                        homeserver.location ?? '',
                                         softWrap: true,
                                       )
                                     ],
                                   ),
                                 ),
-                                Expanded(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Text(
-                                        'Users',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
-                                        softWrap: true,
-                                      ),
-                                      homeserver['users_active'] != null
-                                          ? Text(
-                                              homeserver['users_active']
-                                                  .toString(),
-                                              softWrap: true,
-                                            )
-                                          : Text(
-                                              homeserver['public_room_count']
-                                                  .toString(),
-                                              softWrap: true,
-                                            ),
-                                    ],
+                                Visibility(
+                                  visible: homeserver.usersActive != null,
+                                  child: Expanded(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Text(
+                                          'Users',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                          softWrap: true,
+                                        ),
+                                        Text(
+                                          homeserver.usersActive ?? '',
+                                          softWrap: true,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: homeserver.roomsTotal != null &&
+                                      homeserver.usersActive == null,
+                                  child: Expanded(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Text(
+                                          'Rooms',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                          softWrap: true,
+                                        ),
+                                        Text(
+                                          homeserver.roomsTotal ?? '',
+                                          softWrap: true,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Expanded(
@@ -176,7 +200,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver['online_since'].toString(),
+                                        homeserver.founded.toString(),
                                         softWrap: true,
                                       ),
                                     ],
@@ -192,9 +216,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        (homeserver['last_response_time'] ?? '')
-                                                .toString() +
-                                            'ms',
+                                        homeserver.responseTime + 'ms',
                                         softWrap: true,
                                       ),
                                     ],
@@ -207,24 +229,30 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                       );
                     },
                   ),
+                  Positioned(
+                    child: Loader(
+                      loading: props.loading,
+                    ),
+                  ),
                   Visibility(
                     visible: props.searchText != null &&
                         props.searchText.isNotEmpty &&
+                        props.searchText.length > 0 &&
                         props.homeservers.isEmpty,
                     child: Container(
                       padding: EdgeInsets.only(top: 8, bottom: 8),
                       child: GestureDetector(
                         onTap: () {
-                          final homeserver = {
-                            'hostname': props.searchText,
-                          };
-                          props.onSelect(homeserver: homeserver);
+                          props.onSelect(props.searchText);
                           Navigator.pop(context);
                         },
                         child: ListTile(
                           leading: Avatar(
                             alt: props.searchText ?? '',
                             size: Dimensions.avatarSizeMin,
+                            url: props.homeserver.photoUrl != null
+                                ? props.homeserver.photoUrl
+                                : null,
                             background: props.searchText.length > 0
                                 ? Colours.hashedColor(props.searchText)
                                 : Colors.grey,
@@ -244,25 +272,6 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    child: Visibility(
-                      visible: props.loading,
-                      child: Container(
-                          margin: EdgeInsets.only(top: height * 0.02),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RefreshProgressIndicator(
-                                value: null,
-                                strokeWidth: Dimensions.defaultStrokeWidth,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor,
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -275,15 +284,19 @@ class _Props extends Equatable {
   final bool loading;
   final String searchText;
   final List<dynamic> homeservers;
+  final Homeserver homeserver;
   final Function onSearch;
   final Function onSelect;
+  final Function onFetchHomeserverPreview;
 
   _Props({
     @required this.loading,
     @required this.homeservers,
     @required this.searchText,
+    @required this.homeserver,
     @required this.onSelect,
     @required this.onSearch,
+    @required this.onFetchHomeserverPreview,
   });
 
   @override
@@ -291,19 +304,33 @@ class _Props extends Equatable {
         loading,
         searchText,
         homeservers,
+        homeserver,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.searchStore.loading,
+        loading:
+            store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults
             : store.state.searchStore.homeservers,
-        onSelect: ({Map homeserver}) {
-          store.dispatch(selectHomeserver(homeserver: homeserver));
+        homeserver: store.state.authStore.homeserver ?? Homeserver(),
+        onSelect: (String hostname) {
+          store.dispatch(selectHomeserver(hostname: hostname));
         },
         onSearch: (text) {
           store.dispatch(searchHomeservers(searchText: text));
+        },
+        onFetchHomeserverPreview: (String hostname) async {
+          var urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
+
+          if (urlRegex.hasMatch('https://$hostname')) {
+            final preview = await store.dispatch(
+              fetchHomeserver(hostname: hostname),
+            );
+
+            await store.dispatch(setHomeserver(homeserver: preview));
+          }
         },
       );
 }

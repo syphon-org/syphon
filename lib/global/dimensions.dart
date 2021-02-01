@@ -39,9 +39,10 @@ class Dimensions {
 
   // Buttons
   static const double buttonHeightMin = 56;
-  static const double buttonWidthMin = 256;
+  static const double buttonWidthMin = 96;
   static const double buttonWidthMax = 296;
   static const double buttonAppBarSize = 26;
+  static const double buttonSendSize = 48;
 
   // Messages
   static const double bubbleHeightMin = 54;
@@ -75,6 +76,11 @@ class Dimensions {
   static const double inputBorderRadius = 30.0;
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
+
+  static const EdgeInsets inputContentPadding = const EdgeInsets.symmetric(
+    vertical: 4.0,
+    horizontal: 20.0,
+  );
 
   static const EdgeInsets inputMargin = EdgeInsets.all(8);
 

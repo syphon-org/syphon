@@ -10,8 +10,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/parsers.dart';
+import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -19,7 +26,6 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -29,7 +35,6 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
-import '../events/model.dart';
 import 'room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
@@ -37,12 +42,6 @@ final protocol = DotEnv().env['PROTOCOL'];
 class SetLoading {
   final bool loading;
   SetLoading({this.loading});
-}
-
-class SetSending {
-  final bool sending;
-  final Room room;
-  SetSending({this.sending, this.room});
 }
 
 class SetRooms {
@@ -58,14 +57,27 @@ class SetRoom {
 // Atomically Update specific room attributes
 class UpdateRoom {
   final String id; // room id
-  final Message draft;
   final bool syncing;
+  final bool sending;
+  final Message draft;
+  final Message reply;
+  final int lastRead;
 
   UpdateRoom({
     this.id,
     this.draft,
+    this.reply,
     this.syncing,
+    this.sending,
+    this.lastRead,
   });
+}
+
+class SetReply {
+  final bool clear;
+  final Message reply; // room id
+
+  SetReply({this.clear, this.reply});
 }
 
 class RemoveRoom {
@@ -78,11 +90,12 @@ class AddArchive {
   AddArchive({this.roomId});
 }
 
-/**
- * tempId for messages that have attempted sending but not finished
- */
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but not finished
 class SaveOutboxMessage {
-  final String id; // TODO: room id
+  final String id; // room id
   final String tempId;
   final Message pendingMessage;
 
@@ -114,6 +127,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
     final user = store.state.authStore.user;
+    final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
     // syncing null data happens sometimes?
@@ -121,10 +135,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       return;
     }
 
-    // update those that exist or add a new room
-    return await Future.forEach(roomData.keys, (id) async {
+    await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
-      // use pre-existing values where available
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
 
       // First past to decrypt encrypted events
@@ -135,18 +147,16 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         );
       }
 
-      // TODO: eventually remove the need for this with modular parsers
-      room = room.fromSync(
-        json: json,
-        currentUser: user,
-        lastSince: lastSince,
-      );
+      // parse room and events
+      room = await compute(parseRoom, {
+        'json': json,
+        'room': room,
+        'currentUser': user,
+        'lastSince': lastSince,
+      });
 
       printDebug(
-        '[syncRooms] ${room.name} new msg count ${room.messagesNew.length}',
-      );
-      printDebug(
-        '[syncRooms] ${room.name} ids msg count ${room.messageIds.length}',
+        '[syncRooms] ${room.name} initial: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
       // update cold storage
@@ -154,21 +164,28 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
         saveMessages(room.messagesNew, storage: Storage.main),
+        saveReactions(room.reactions, storage: Storage.main),
+        saveRedactions(room.redactions, storage: Storage.main),
+        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
       ]);
 
       // update store
-      await store.dispatch(
-        setUsers(room.usersNew),
-      );
-
-      await store.dispatch(
-        setMessageEvents(room: room, messages: room.messagesNew),
-      );
+      await store.dispatch(setUsers(room.usersNew));
+      await store.dispatch(setMessages(room: room, messages: room.messagesNew));
+      await store.dispatch(setReactions(reactions: room.reactions));
+      await store.dispatch(setRedactions(redactions: room.redactions));
+      await store.dispatch(setReceipts(
+        room: room,
+        receipts: room.readReceipts,
+      ));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
         messagesNew: List<Message>(),
+        reactions: List<Reaction>(),
+        redactions: List<Redaction>(),
+        readReceipts: Map<String, ReadReceipt>(),
       );
 
       // update room
@@ -192,7 +209,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           from: room.prevHash,
         ));
       }
-    });
+    }));
   };
 }
 
@@ -232,10 +249,10 @@ ThunkAction<AppState> fetchRoom(String roomId) {
         '${roomId}': {
           'state': {
             'events': stateEvents,
-            'prev_batch': messageEvents['from'],
           },
           'timeline': {
             'events': messageEvents['chunk'],
+            'prev_batch': messageEvents['from'],
           }
         },
       }));
@@ -254,7 +271,7 @@ ThunkAction<AppState> fetchRoom(String roomId) {
  * Takes a negligible amount of time
  *  
  */
-ThunkAction<AppState> fetchRooms() {
+ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.fetchRoomIds(
@@ -272,15 +289,19 @@ ThunkAction<AppState> fetchRooms() {
       final joinedRooms = joinedRoomsRaw.map((id) => Room(id: id)).toList();
       final fullJoinedRooms = joinedRooms.map((room) async {
         try {
-          final stateEvents = await MatrixApi.fetchStateEvents(
-            protocol: protocol,
-            homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken,
-            roomId: room.id,
-          );
+          var stateEvents;
 
-          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-            throw stateEvents['error'];
+          if (syncState) {
+            stateEvents = await MatrixApi.fetchStateEvents(
+              protocol: protocol,
+              homeserver: store.state.authStore.user.homeserver,
+              accessToken: store.state.authStore.user.accessToken,
+              roomId: room.id,
+            );
+
+            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+              throw stateEvents['error'];
+            }
           }
 
           final messageEvents = await compute(
@@ -297,11 +318,11 @@ ThunkAction<AppState> fetchRooms() {
           await store.dispatch(syncRooms({
             '${room.id}': {
               'state': {
-                'events': stateEvents,
-                'prev_batch': messageEvents['from'],
+                'events': stateEvents ?? [],
               },
               'timeline': {
                 'events': messageEvents['chunk'],
+                'prev_batch': messageEvents['from'],
               }
             },
           }));
@@ -566,15 +587,17 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // mark read locally only
       if (!store.state.settingsStore.readReceipts) {
-        await store.dispatch(SetRoom(
-          room: room.copyWith(lastRead: DateTime.now().millisecondsSinceEpoch),
+        await store.dispatch(UpdateRoom(
+          id: roomId,
+          lastRead: DateTime.now().millisecondsSinceEpoch,
         ));
       }
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted =
-            latestMessages(roomMessages(store.state, roomId));
+        final messagesSorted = latestMessages(
+          roomMessages(store.state, roomId),
+        );
 
         if (messagesSorted.isNotEmpty) {
           store.dispatch(sendReadReceipts(
@@ -1015,9 +1038,8 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 }
 
 /**
- * Create Draft Room
+ * TODO: Create Draft Room
  * 
- * TODO: make sure this is in accordance with matrix in that
  * A local only room that has not been established with matrix
  * meant to prep a room or first message before actually creating it 
  */
@@ -1038,7 +1060,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 //         topic: topic,
 //         direct: isDirect,
 //         avatarUri: avatarUri,
-//         isDraftRoom: true,
+//         draft: true,
 //         users: Map.fromIterable(
 //           users,
 //           key: (user) => user.id,
@@ -1055,7 +1077,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 // }
 
 /**
- * TODO: Room Drafts
+ * TODO: Convert Draft Room
  * 
  * Convert a draft room to a remote matrix room
  */
@@ -1064,7 +1086,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
 // }) {
 //   return (Store<AppState> store) async {
 //     try {
-//       if (!room.isDraftRoom) {
+//       if (!room.drafting) {
 //         throw 'Room has already been created';
 //       }
 

@@ -20,6 +20,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 
 class GroupSearchView extends StatefulWidget {
   const GroupSearchView({Key key}) : super(key: key);
@@ -51,7 +52,7 @@ class GroupSearchState extends State<GroupSearchView> {
     }
     // Initial search to show rooms by most popular
     if (store.state.searchStore.searchResults.isEmpty) {
-      store.dispatch(searchPublicRooms(searchText: ''));
+      store.dispatch(searchPublicRooms(searchable: ''));
     }
   }
 
@@ -73,9 +74,6 @@ class GroupSearchState extends State<GroupSearchView> {
             brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
-            onChange: (text) {
-              props.onSearch(text);
-            },
             onSearch: (text) {
               props.onSearch(text);
             },
@@ -327,22 +325,8 @@ class GroupSearchState extends State<GroupSearchView> {
                   },
                 ),
                 Positioned(
-                  child: Visibility(
-                    visible: props.loading,
-                    child: Container(
-                        margin: EdgeInsets.only(top: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            RefreshProgressIndicator(
-                              strokeWidth: Dimensions.defaultStrokeWidth,
-                              valueColor: new AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).primaryColor,
-                              ),
-                              value: null,
-                            ),
-                          ],
-                        )),
+                  child: Loader(
+                    loading: props.loading,
                   ),
                 ),
               ],
@@ -382,7 +366,7 @@ class _Props extends Equatable {
           store.dispatch(joinRoom(room: room));
         },
         onSearch: (text) {
-          store.dispatch(searchPublicRooms(searchText: text));
+          store.dispatch(searchPublicRooms(searchable: text));
         },
       );
 }

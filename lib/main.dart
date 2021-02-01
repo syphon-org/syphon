@@ -18,10 +18,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
@@ -47,6 +47,7 @@ void main() async {
     debugPrint = (String message, {int wrapWidth}) {};
     printDebug = (String message, {String title}) {};
     printInfo = (String message, {String title}) {};
+    printError = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -144,6 +145,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
 
+    store.dispatch(initDeepLinks());
+    store.dispatch(initClientSecret());
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
 
@@ -241,6 +244,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     if (alertsListener != null) {
       alertsListener.cancel();
     }
+    store.dispatch(disposeDeepLinks());
     super.dispose();
   }
 

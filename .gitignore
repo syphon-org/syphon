@@ -54,3 +54,6 @@ macos/olm
 
 # ignore flutter pod spec
 Flutter.podspec
+
+# vscode workspace
+*.code-workspace

@@ -8,6 +8,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -78,7 +79,7 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[fetchNotificationPusherRules] $error');
+      printError('[fetchNotificationPusherRules] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

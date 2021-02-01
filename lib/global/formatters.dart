@@ -29,6 +29,21 @@ String formatSenderInitials(String sender) {
       : formattedSender.substring(0, 2);
 }
 
+String formatTimestampFull({
+  int lastUpdateMillis,
+  bool showTime = false,
+  String timeFormat,
+}) {
+  if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
+
+  final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
+  final hourFormat = timeFormat == '24hr' ? 'H:mm' : 'h:mm';
+
+  return DateFormat(
+    showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
+  ).format(timestamp);
+}
+
 // 1237597223894 -> 30m, now, etc
 String formatTimestamp({
   int lastUpdateMillis,

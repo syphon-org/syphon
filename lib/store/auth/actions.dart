@@ -2,6 +2,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -12,25 +14,34 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/cache/index.dart';
+import 'package:syphon/cache/index.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/utils.dart';
 import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
+import 'package:syphon/store/auth/homeserver/actions.dart';
+import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../user/model.dart';
 
 // Store
@@ -52,14 +63,19 @@ class SetUser {
   SetUser({this.user});
 }
 
-class SetHomeserver {
-  final dynamic homeserver;
-  SetHomeserver({this.homeserver});
+class SetClientSecret {
+  final String clientSecret;
+  SetClientSecret({this.clientSecret});
 }
 
-class SetHomeserverValid {
-  final bool valid;
-  SetHomeserverValid({this.valid});
+class SetHostname {
+  final String hostname;
+  SetHostname({this.hostname});
+}
+
+class SetHomeserver {
+  final Homeserver homeserver;
+  SetHomeserver({this.homeserver});
 }
 
 class SetUsername {
@@ -163,6 +179,34 @@ class ResetOnboarding {}
 
 class ResetAuthStore {}
 
+StreamSubscription _sub;
+
+ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
+      try {
+        _sub = getUriLinksStream().listen((Uri uri) {
+          final token = uri.queryParameters['loginToken'];
+          if (store.state.authStore.user.accessToken == null) {
+            store.dispatch(loginUserSSO(token: token));
+          }
+        }, onError: (err) {
+          printError('[streamUniLinks] error ${err}');
+        });
+      } on PlatformException {
+        addAlert(
+          message:
+              'Failed to SSO Login, please try again later or contact support',
+        );
+        // Handle exception by warning the user their action did not succeed
+        // return?
+      }
+    };
+
+ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
+      try {
+        _sub.cancel();
+      } catch (error) {}
+    };
+
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
     if (store.state.authStore.authObserver != null) {
@@ -176,7 +220,7 @@ ThunkAction<AppState> startAuthObserver() {
     final user = store.state.authStore.user;
     final Function onAuthStateChanged = (User user) async {
       if (user != null && user.accessToken != null) {
-        await store.dispatch(fetchUserCurrentProfile());
+        await store.dispatch(fetchAuthUserProfile());
 
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {
@@ -296,32 +340,81 @@ ThunkAction<AppState> loginUser() {
       );
 
       var homeserver = store.state.authStore.homeserver;
+
       try {
-        final check = await MatrixApi.checkHomeserver(
-              protocol: protocol,
-              homeserver: homeserver,
-            ) ??
-            {};
-
-        homeserver = (check['m.homeserver']['base_url'] as String)
-            .replaceAll('https://', '');
-
-        if (check['m.homeserver'] == null) {
-          addInfo(
-            message: Strings.errorCheckHomeserver,
-          );
-          // sometimes, people leave an extra forward slash in the m.homeserver field
-        } else if (homeserver.endsWith('/')) {
-          homeserver = homeserver.replaceRange(homeserver.length - 1, null, '');
-        }
+        homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
       } catch (error) {/* still attempt login */}
 
       final data = await MatrixApi.loginUser(
         protocol: protocol,
-        type: "m.login.password",
-        homeserver: homeserver,
+        type: MatrixAuthTypes.PASSWORD,
+        homeserver: homeserver.baseUrl,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
+        deviceId: device.deviceId,
+        deviceName: device.displayName,
+      );
+
+      if (data['errcode'] == 'M_FORBIDDEN') {
+        throw 'Invalid credentials, confirm and try again';
+      }
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      await store.dispatch(SetUser(
+        user: User.fromMatrix(data),
+      ));
+
+      store.state.authStore.authObserver.add(
+        store.state.authStore.user,
+      );
+
+      store.dispatch(ResetOnboarding());
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: "loginUser",
+        message: error,
+        error: error,
+      ));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> loginUserSSO({String token}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+
+    try {
+      final homeserver = await store.dispatch(
+        fetchBaseUrl(homeserver: store.state.authStore.homeserver),
+      );
+
+      if (token == null) {
+        final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
+
+        if (await canLaunch(ssoUrl)) {
+          return await launch(ssoUrl, forceSafariVC: false);
+        } else {
+          throw 'Could not launch ${ssoUrl}';
+        }
+      }
+
+      final username = store.state.authStore.username;
+
+      final Device device = await store.dispatch(
+        generateDeviceId(salt: username),
+      );
+
+      final data = await MatrixApi.loginUserToken(
+        protocol: protocol,
+        type: MatrixAuthTypes.TOKEN,
+        homeserver: homeserver.baseUrl,
+        token: token,
+        session: null,
         deviceId: device.deviceId,
         deviceName: device.displayName,
       );
@@ -404,7 +497,7 @@ ThunkAction<AppState> logoutUser() {
   };
 }
 
-ThunkAction<AppState> fetchUserCurrentProfile() {
+ThunkAction<AppState> fetchAuthUserProfile() {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -426,7 +519,7 @@ ThunkAction<AppState> fetchUserCurrentProfile() {
       store.dispatch(addAlert(
         error: error,
         message: 'Failed to fetch current user profile',
-        origin: 'fetchUserCurrentProfile',
+        origin: 'fetchAuthUserProfile',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -441,7 +534,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
 
       final data = await MatrixApi.checkUsernameAvailability(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: store.state.authStore.homeserver.baseUrl,
         username: store.state.authStore.username,
       );
 
@@ -496,12 +589,133 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
   };
 }
 
+///
+/// Check Password reset Verification
+///
+/// TODO: find a way to check if they've clicked the link
+/// without invalidating the token, sending a blank password
+/// doesn't work
+ThunkAction<AppState> checkPasswordResetVerification({
+  int sendAttempt = 1,
+  String password,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null &&
+          data['errcode'] == MatrixErrors.not_authorized) {
+        throw data['error'];
+      }
+
+      await store.dispatch(addConfirmation(
+        message: 'Verification Confirmed',
+      ));
+
+      store.dispatch(ResetAuthStore());
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        message: 'Please click the emailed verify link before continuing',
+      ));
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+      final session = store.state.authStore.session;
+
+      final data = await MatrixApi.resetPassword(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        passwordNew: password,
+        session: session,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(ResetOnboarding());
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully reset your password!',
+      ));
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final email = store.state.authStore.email;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final clientSecret = store.state.authStore.clientSecret;
+
+      final data = await MatrixApi.sendPasswordResetEmail(
+        protocol: protocol,
+        homeserver: homeserver,
+        clientSecret: clientSecret,
+        sendAttempt: sendAttempt,
+        email: email,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      store.dispatch(SetSession(session: data['sid']));
+
+      await store.dispatch(addConfirmation(
+        message: 'Successfully sent password reset email to ${email}',
+      ));
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(error: error));
+      return false;
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      final homeserver = store.state.authStore.homeserver.baseUrl;
       final emailSubmitted = store.state.authStore.email;
+      final clientSecret = store.state.authStore.clientSecret;
       final currentCredential = store.state.authStore.credential;
 
       if (currentCredential.params.containsValue(emailSubmitted) &&
@@ -511,9 +725,9 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
 
       final data = await MatrixApi.registerEmail(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         email: store.state.authStore.email,
-        clientSecret: Values.clientSecretMatrix,
+        clientSecret: clientSecret,
         sendAttempt: sendAttempt,
       );
 
@@ -521,17 +735,15 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
         throw data['error'];
       }
 
-      store.dispatch(
-        SetCredential(
-          credential: currentCredential.copyWith(
-            params: {
-              'sid': data['sid'],
-              'client_secret': Values.clientSecretMatrix,
-              'email_submitted': store.state.authStore.email
-            },
-          ),
+      store.dispatch(SetCredential(
+        credential: currentCredential.copyWith(
+          params: {
+            'sid': data['sid'],
+            'client_secret': clientSecret,
+            'email_submitted': store.state.authStore.email
+          },
         ),
-      );
+      ));
       return true;
     } catch (error) {
       debugPrint('[submitEmail] $error');
@@ -556,7 +768,8 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
-      final loginType = store.state.authStore.loginType;
+      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
       final authType = session != null ? credential.type : loginType;
@@ -569,7 +782,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       final data = await MatrixApi.registerUser(
         protocol: protocol,
-        homeserver: store.state.authStore.homeserver,
+        homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         session: store.state.authStore.session,
@@ -613,7 +826,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      debugPrint('[createUser] error $error');
+      printError('[createUser] error $error');
       if (enableErrors) {
         store.dispatch(
           addAlert(message: 'Failed to signup', error: error),
@@ -788,43 +1001,161 @@ ThunkAction<AppState> updateCredential({
   };
 }
 
-ThunkAction<AppState> resetCredentials({
-  String type,
-  String value,
-  Map<String, String> params,
-}) {
+ThunkAction<AppState> resetCredentials() {
   return (Store<AppState> store) async {
     store.dispatch(SetSession(session: null));
-    store.dispatch(SetCredential(
-      credential: null,
-    ));
+    store.dispatch(SetCredential(credential: null));
   };
 }
 
-ThunkAction<AppState> selectHomeserver({dynamic homeserver}) {
-  return (Store<AppState> store) {
-    store.dispatch(SetHomeserverValid(valid: true));
-    store.dispatch(SetHomeserver(homeserver: homeserver['hostname']));
+ThunkAction<AppState> resetSession() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetSession(session: ''));
   };
 }
 
-ThunkAction<AppState> setHomeserver({String homeserver}) {
-  return (Store<AppState> store) {
-    store.dispatch(
-      SetHomeserverValid(valid: homeserver != null && homeserver.length > 0),
+ThunkAction<AppState> selectHomeserver({String hostname}) {
+  return (Store<AppState> store) async {
+    final Homeserver homeserver = await store.dispatch(
+      fetchHomeserver(hostname: hostname),
     );
 
-    store.dispatch(
-      SetHomeserver(homeserver: homeserver.trim()),
-    );
+    store.dispatch(setHomeserver(homeserver: homeserver));
+    store.dispatch(setHostname(hostname: hostname));
+
+    return homeserver.valid;
   };
 }
+
+ThunkAction<AppState> fetchHomeservers() {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+
+    final List<dynamic> homeserversJson = await JackApi.fetchPublicServers();
+
+    // parse homeserver data
+    final List<Homeserver> homserverData = homeserversJson.map((data) {
+      final hostname = data['hostname'].toString().split('.');
+      final hostnameBase = hostname.length > 1
+          ? hostname[hostname.length - 2] + '.' + hostname[hostname.length - 1]
+          : hostname[0];
+
+      return Homeserver(
+        hostname: hostnameBase,
+        location: data['location'] ?? '',
+        description: data['description'] ?? '',
+        usersActive: data['users_active'] != null
+            ? data['users_active'].toString()
+            : null,
+        roomsTotal: data['public_room_count'] != null
+            ? data['public_room_count'].toString()
+            : null,
+        founded:
+            data['online_since'] != null ? data['online_since'].toString() : '',
+        responseTime: data['last_response_time'] != null
+            ? data['last_response_time'].toString()
+            : '',
+      );
+    }).toList();
+
+    // set homeservers without cached photo url
+    await store.dispatch(SetHomeservers(homeservers: homserverData));
+
+    // find favicons for all the homeservers
+    final homeservers = await Future.wait(
+      homserverData.map((homeserver) async {
+        final faviconUrl = await fetchFavicon(url: homeserver.hostname);
+        try {
+          final response = await http.get(faviconUrl);
+
+          if (response.statusCode == 200) {
+            return homeserver.copyWith(photoUrl: faviconUrl);
+          }
+        } catch (error) {/* noop */}
+
+        return homeserver;
+      }),
+    );
+
+    // set the homeservers and finish loading
+    await store.dispatch(SetHomeservers(homeservers: homeservers));
+    store.dispatch(SetLoading(loading: false));
+  };
+}
+
+ThunkAction<AppState> fetchHomeserver({String hostname}) {
+  return (Store<AppState> store) async {
+    store.dispatch(SetLoading(loading: true));
+    var homeserver = Homeserver(hostname: hostname);
+
+    // fetch homeserver icon url
+    try {
+      final iconUrl = await fetchFavicon(url: homeserver.hostname);
+
+      homeserver = homeserver.copyWith(photoUrl: iconUrl);
+    } catch (error) {
+      printError('[selectHomserver] $error');
+    }
+
+    // fetch homeserver well-known
+    try {
+      homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
+      if (!homeserver.valid) {
+        throw Exception(Strings.errorCheckHomeserver);
+      }
+    } catch (error) {
+      printError('[selectHomserver] $error');
+      addInfo(message: error);
+
+      store.dispatch(SetLoading(loading: false));
+
+      return Homeserver(
+        valid: false,
+        baseUrl: hostname,
+        hostname: hostname,
+        loginType: MatrixAuthTypes.DUMMY,
+      );
+    }
+
+    // fetch homeserver login type
+    try {
+      final response = await MatrixApi.loginType(
+            protocol: protocol,
+            homeserver: homeserver.baseUrl,
+          ) ??
+          {};
+
+      // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
+      final loginType = (response['flows'] as List).elementAt(0)['type'];
+
+      homeserver = homeserver.copyWith(loginType: loginType);
+    } catch (error) {}
+
+    store.dispatch(SetLoading(loading: false));
+    return homeserver;
+  };
+}
+
+ThunkAction<AppState> initClientSecret({String hostname}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetClientSecret(
+        clientSecret: generateClientSecret(length: 24),
+      ));
+    };
+
+ThunkAction<AppState> setHostname({String hostname}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetHostname(hostname: hostname.trim()));
+    };
+
+ThunkAction<AppState> setHomeserver({Homeserver homeserver}) =>
+    (Store<AppState> store) {
+      store.dispatch(SetHomeserver(homeserver: homeserver));
+    };
 
 ThunkAction<AppState> setEmail({String email}) {
   return (Store<AppState> store) {
     final validEmail = RegExp(Values.emailRegex).hasMatch(email);
-
-    debugPrint('$email $validEmail');
 
     store.dispatch(SetEmailValid(
       valid: email != null && email.length > 0 && validEmail,
@@ -842,6 +1173,28 @@ ThunkAction<AppState> setUsername({String username}) {
   };
 }
 
+ThunkAction<AppState> resolveUsername({String username}) {
+  return (Store<AppState> store) {
+    final hostname = store.state.authStore.hostname;
+    final homeserver = store.state.authStore.homeserver;
+
+    final alias = username.trim().replaceAll('@', '').split(':');
+
+    store.dispatch(setUsername(username: alias[0]));
+
+    // If user enters full username, make sure to set homeserver
+    if (username.contains(':')) {
+      store.dispatch(setHostname(hostname: alias[1]));
+    } else {
+      if (!hostname.contains('.')) {
+        store.dispatch(setHostname(
+          hostname: homeserver.hostname ?? 'matrix.org',
+        ));
+      }
+    }
+  };
+}
+
 ThunkAction<AppState> setLoginPassword({String password}) =>
     (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
@@ -851,7 +1204,10 @@ ThunkAction<AppState> setLoginPassword({String password}) =>
       ));
     };
 
-ThunkAction<AppState> setPassword({String password, bool ignoreConfirm}) {
+ThunkAction<AppState> setPassword({
+  String password,
+  bool ignoreConfirm = false,
+}) {
   return (Store<AppState> store) {
     store.dispatch(SetPassword(password: password));
 

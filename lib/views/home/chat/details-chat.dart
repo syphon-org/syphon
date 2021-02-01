@@ -20,10 +20,10 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart' as roomSelectors;
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -491,24 +491,25 @@ class ChatDetailsState extends State<ChatDetailsView> {
                       child: Container(
                         child: Column(
                           children: [
-                            !props.room.direct
-                                ? null
-                                : ListTile(
-                                    onTap: () => onBlockUser(
-                                      context: context,
-                                      props: props,
-                                    ),
-                                    contentPadding: contentPadding,
-                                    title: Text(
-                                      'Block User',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1
-                                          .copyWith(
-                                            color: Colors.redAccent,
-                                          ),
-                                    ),
-                                  ),
+                            Visibility(
+                              visible: props.room.direct,
+                              child: ListTile(
+                                onTap: () => onBlockUser(
+                                  context: context,
+                                  props: props,
+                                ),
+                                contentPadding: contentPadding,
+                                title: Text(
+                                  'Block User',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1
+                                      .copyWith(
+                                        color: Colors.redAccent,
+                                      ),
+                                ),
+                              ),
+                            ),
                             ListTile(
                               onTap: () => this.onLeaveChat(props),
                               contentPadding: contentPadding,
@@ -549,7 +550,7 @@ class _Props extends Equatable {
   final Function onBlockUser;
   final Function onSelectPrimaryColor;
   final Function onToggleDirectRoom;
-  final Function onViewEncryptionKeys;
+  // final Function onViewEncryptionKeys;
 
   _Props({
     @required this.room,
@@ -562,7 +563,7 @@ class _Props extends Equatable {
     @required this.roomPrimaryColor,
     @required this.onSelectPrimaryColor,
     @required this.onToggleDirectRoom,
-    @required this.onViewEncryptionKeys,
+    // @required this.onViewEncryptionKeys,
   });
 
   @override
@@ -574,8 +575,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-      room: roomSelectors.room(id: roomId, state: store.state),
       loading: store.state.roomStore.loading,
+      room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
       currentUser: store.state.authStore.user,
       messages: roomMessages(store.state, roomId),
@@ -604,7 +605,7 @@ class _Props extends Equatable {
         );
       },
       onToggleDirectRoom: () {
-        final room = roomSelectors.room(id: roomId, state: store.state);
+        final room = selectRoom(id: roomId, state: store.state);
         store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
       });
 }

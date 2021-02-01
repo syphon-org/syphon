@@ -14,6 +14,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
+    this.throttle = const Duration(milliseconds: 400),
     this.brightness = Brightness.dark,
     this.elevation,
     this.focusNode,
@@ -31,6 +32,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   final String label;
   final String tooltip;
   final double elevation;
+  final Duration throttle;
   final Brightness brightness;
   final FocusNode focusNode;
 
@@ -144,7 +146,7 @@ class AppBarSearchState extends State<AppBarSearch> {
                     this.onChange(text: text);
 
                     this.setState(() {
-                      searchTimeout = Timer(Duration(milliseconds: 400), () {
+                      searchTimeout = Timer(widget.throttle, () {
                         this.onSearch(text: text);
                       });
                     });

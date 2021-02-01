@@ -22,7 +22,8 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -637,15 +638,10 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         theme: store.state.settingsStore.theme,
-        rooms: availableRooms(
-          sortedPrioritizedRooms(
-            filterBlockedRooms(
-              store.state.roomStore.rooms.values.toList(),
-              store.state.userStore.blocked,
-            ),
-          ),
-          hidden: store.state.roomStore.roomsHidden,
-        ),
+        rooms: availableRooms(sortedPrioritizedRooms(filterBlockedRooms(
+          store.state.roomStore.rooms.values.toList(),
+          store.state.userStore.blocked,
+        ))),
         messages: store.state.eventStore.messages,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,

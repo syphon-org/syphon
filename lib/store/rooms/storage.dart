@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/storage/index.dart';
+import 'package:syphon/storage/constants.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Future<void> saveRooms(
@@ -10,7 +11,7 @@ Future<void> saveRooms(
   Database cache,
   Database storage,
 }) async {
-  final store = StoreRef<String, String>('rooms');
+  final store = StoreRef<String, String>(StorageKeys.ROOMS);
   storage = storage ?? Storage.main;
 
   return await storage.transaction((txn) async {
@@ -21,12 +22,26 @@ Future<void> saveRooms(
   });
 }
 
+Future<void> saveRoom(
+  Room room, {
+  Database cache,
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(StorageKeys.ROOMS);
+  storage = storage ?? Storage.main;
+
+  return await storage.transaction((txn) async {
+    final record = store.record(room.id);
+    await record.put(txn, jsonEncode(room));
+  });
+}
+
 Future<void> deleteRooms(
   Map<String, Room> rooms, {
   Database cache,
   Database storage,
 }) async {
-  final store = StoreRef<String, String>('rooms');
+  final store = StoreRef<String, String>(StorageKeys.ROOMS);
   storage = storage ?? Storage.main;
 
   return await storage.transaction((txn) async {
@@ -43,10 +58,9 @@ Future<Map<String, Room>> loadRooms({
   int offset = 0,
   int limit = 10,
 }) async {
-  final Map<String, Room> rooms = {};
-
   try {
-    final store = StoreRef<String, String>('rooms');
+    final Map<String, Room> rooms = {};
+    final store = StoreRef<String, String>(StorageKeys.ROOMS);
     final count = await store.count(storage);
 
     final finder = Finder(

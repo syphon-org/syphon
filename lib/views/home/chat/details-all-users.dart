@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -162,23 +163,8 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
           children: [
             buildUserList(context, props),
             Positioned(
-              child: Visibility(
-                visible: this.loading,
-                child: Container(
-                  margin: EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      RefreshProgressIndicator(
-                        strokeWidth: Dimensions.defaultStrokeWidth,
-                        valueColor: new AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor,
-                        ),
-                        value: null,
-                      ),
-                    ],
-                  ),
-                ),
+              child: Loader(
+                loading: this.loading,
               ),
             ),
           ],
