@@ -51,6 +51,11 @@ class LoginState extends State<Login> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     usernameController.dispose();
     passwordController.dispose();
@@ -100,29 +105,35 @@ class LoginState extends State<Login> {
           margin: const EdgeInsets.only(
             bottom: 8,
           ),
-          child: TextFieldSecure(
-            maxLines: 1,
-            label: props.usernameHint,
-            disableSpacing: true,
-            controller: usernameController,
-            autofillHints: [AutofillHints.username],
-            formatters: [FilteringTextInputFormatter.deny(RegExp(r'@'))],
-            onEditingComplete: () => props.onChangeHomeserver(),
-            onSubmitted: (text) {
-              FocusScope.of(context).requestFocus(passwordFocus);
+          child: Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                props.onChangeHomeserver();
+              }
             },
-            onChanged: (username) {
-              props.onChangeUsername(username);
-            },
-            suffix: TouchableOpacity(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/search/homeservers',
-                );
+            child: TextFieldSecure(
+              maxLines: 1,
+              label: props.usernameHint,
+              disableSpacing: true,
+              controller: usernameController,
+              autofillHints: [AutofillHints.username],
+              formatters: [FilteringTextInputFormatter.deny(RegExp(r'@'))],
+              onSubmitted: (text) {
+                FocusScope.of(context).requestFocus(passwordFocus);
               },
-              child: Icon(
-                Icons.search_rounded,
+              onChanged: (username) {
+                props.onChangeUsername(username);
+              },
+              suffix: TouchableOpacity(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/search/homeservers',
+                  );
+                },
+                child: Icon(
+                  Icons.search_rounded,
+                ),
               ),
             ),
           ),
