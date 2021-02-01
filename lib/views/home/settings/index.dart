@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -115,30 +116,6 @@ class SettingsScreen extends StatelessWidget {
                             onTap: props.authLoading
                                 ? null
                                 : () {
-                                    Navigator.pushNamed(
-                                        context, '/chat-preferences');
-                                  },
-                            contentPadding: Dimensions.listPaddingSettings,
-                            leading: Container(
-                                padding: EdgeInsets.only(
-                                  top: 4,
-                                  left: 4,
-                                  bottom: 4,
-                                  right: 4,
-                                ),
-                                child: Icon(
-                                  Icons.photo_filter,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              tr('list-item-settings-chat'),
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                          ),
-                          ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
                                     Navigator.pushNamed(context, '/privacy');
                                   },
                             contentPadding: Dimensions.listPaddingSettings,
@@ -172,6 +149,34 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                             title: Text(
                               tr('title-view-theming'),
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Theme ${props.theme.toString().toLowerCase()}',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: props.authLoading
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(
+                                        context, '/chat-preferences');
+                                  },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.only(
+                                  top: 4,
+                                  left: 4,
+                                  bottom: 4,
+                                  right: 4,
+                                ),
+                                child: Icon(
+                                  Icons.photo_filter,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              tr('list-item-settings-chat'),
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           ),
@@ -257,11 +262,13 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool notificationsEnabled;
+  final ThemeType theme;
 
   final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
+    @required this.theme,
     @required this.loading,
     @required this.authLoading,
     @required this.notificationsEnabled,
@@ -280,6 +287,7 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
+        theme: store.state.settingsStore.theme,
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,

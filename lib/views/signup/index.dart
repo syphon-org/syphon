@@ -12,7 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 // Project imports:
-import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
