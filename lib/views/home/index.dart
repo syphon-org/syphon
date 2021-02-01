@@ -269,7 +269,7 @@ class HomeViewState extends State<Home> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                Strings.labelNoMessages,
+                props.syncing ? Strings.labelSyncing : Strings.labelNoMessages,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),

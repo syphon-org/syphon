@@ -34,6 +34,7 @@ class Strings {
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSyncing = 'syncing...';
   static const labelSearchForHomeservers = "Search for homeservers...";
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
