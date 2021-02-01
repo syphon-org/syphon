@@ -69,4 +69,10 @@ class Values {
     'Default',
     "Large",
   ];
+
+  static const messageSizes = [
+    'Small',
+    'Default',
+    "Large",
+  ];
 }

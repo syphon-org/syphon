@@ -11,10 +11,10 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/selectors.dart';
 import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -152,7 +152,7 @@ class SettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
-                              'Theme ${props.theme.toString().toLowerCase()}',
+                              'Theme ${props.theme}, Font ${props.font}',
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
@@ -262,12 +262,14 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool notificationsEnabled;
-  final ThemeType theme;
+  final String font;
+  final String theme;
 
   final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
+    @required this.font,
     @required this.theme,
     @required this.loading,
     @required this.authLoading,
@@ -278,6 +280,7 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
+        theme,
         loading,
         authLoading,
         notificationsEnabled,
@@ -287,7 +290,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        theme: store.state.settingsStore.theme,
+        font: fontName(store.state),
+        theme: themeTypeName(store.state),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,

@@ -496,6 +496,7 @@ class ChatViewState extends State<ChatView> {
                     selectedMessageId: selectedMessageId,
                     avatarUri: avatarUri,
                     theme: props.theme,
+                    fontSize: 14,
                     timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
                     onSwipe: props.onSelectReply,
                     onPressAvatar: onViewUserDetails,

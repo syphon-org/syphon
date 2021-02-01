@@ -56,6 +56,11 @@ class SetFontSize {
   SetFontSize({this.fontSize});
 }
 
+class SetMessageSize {
+  final String messageSize;
+  SetMessageSize({this.messageSize});
+}
+
 class SetRoomPrimaryColor {
   final int color;
   final String roomId;
@@ -320,6 +325,21 @@ ThunkAction<AppState> incrementFontSize() {
 
     store.dispatch(SetFontSize(
       fontSize: fontSizes[(currentIndex + 1) % fontSizes.length],
+    ));
+  };
+}
+
+/**
+ * Iterate over fontFamilies on action
+ */
+ThunkAction<AppState> incrementMessageSize() {
+  return (Store<AppState> store) async {
+    final currentMessageSize = store.state.settingsStore.messageSize;
+    final messageSizes = Values.messageSizes;
+    final currentIndex = messageSizes.indexOf(currentMessageSize);
+
+    store.dispatch(SetMessageSize(
+      messageSize: messageSizes[(currentIndex + 1) % messageSizes.length],
     ));
   };
 }

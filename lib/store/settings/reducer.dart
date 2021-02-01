@@ -30,6 +30,10 @@ SettingsStore settingsReducer(
       return state.copyWith(
         fontSize: action.fontSize,
       );
+    case SetMessageSize:
+      return state.copyWith(
+        messageSize: action.messageSize,
+      );
     case SetAvatarShape:
       return state.copyWith(
         avatarShape: action.avatarShape,

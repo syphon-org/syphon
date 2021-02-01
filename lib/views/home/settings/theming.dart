@@ -14,6 +14,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
@@ -167,6 +168,17 @@ class Theming extends StatelessWidget {
                           ),
                           onTap: () => props.onIncrementFontSize(),
                         ),
+                        ListTile(
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Message Size',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.messageSize,
+                          ),
+                          onTap: () => props.onIncrementMessageSize(),
+                        ),
                       ],
                     ),
                   ),
@@ -227,6 +239,7 @@ class Props extends Equatable {
   final String language;
   final String fontName;
   final String fontSize;
+  final String messageSize;
   final String avatarShape;
 
   final bool roomTypeBadgesEnabled;
@@ -236,6 +249,7 @@ class Props extends Equatable {
   final Function onSelectAppBarColor;
   final Function onIncrementFontType;
   final Function onIncrementFontSize;
+  final Function onIncrementMessageSize;
   final Function onIncrementTheme;
   final Function onToggleRoomTypeBadges;
   final Function onIncrementAvatarShape;
@@ -248,6 +262,7 @@ class Props extends Equatable {
     @required this.language,
     @required this.fontName,
     @required this.fontSize,
+    @required this.messageSize,
     @required this.avatarShape,
     @required this.roomTypeBadgesEnabled,
     @required this.onSelectPrimaryColor,
@@ -258,6 +273,7 @@ class Props extends Equatable {
     @required this.onIncrementTheme,
     @required this.onToggleRoomTypeBadges,
     @required this.onIncrementAvatarShape,
+    @required this.onIncrementMessageSize,
   });
 
   @override
@@ -280,13 +296,11 @@ class Props extends Equatable {
             store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
         appBarColor:
             store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
-        themeType: store.state.settingsStore.theme
-            .toString()
-            .split('.')[1]
-            .toLowerCase(),
+        themeType: themeTypeName(store.state),
         language: store.state.settingsStore.language ?? 'English',
         fontName: store.state.settingsStore.fontName ?? 'Rubik',
         fontSize: store.state.settingsStore.fontSize ?? 'Default',
+        messageSize: store.state.settingsStore.messageSize ?? 'Default',
         avatarShape: store.state.settingsStore.avatarShape ?? 'Circle',
         roomTypeBadgesEnabled:
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
@@ -310,6 +324,9 @@ class Props extends Equatable {
         ),
         onIncrementFontSize: () => store.dispatch(
           incrementFontSize(),
+        ),
+        onIncrementMessageSize: () => store.dispatch(
+          incrementMessageSize(),
         ),
         onIncrementTheme: () => store.dispatch(
           incrementTheme(),
