@@ -22,6 +22,8 @@ import 'package:syphon/global/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/storage/index.dart';
+import 'package:flutter/services.dart';
+import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
@@ -143,6 +145,33 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+
+    // set system status bar to match theme.
+    // sadly the navbar doesn't play nicely with just being transparent
+    // so will also be updated on theme change
+    final currentTheme = store.state.settingsStore.theme;
+    var themeNavbarColour;
+    var themeNavbarIconBrightness;
+    switch (currentTheme) {
+      case (ThemeType.LIGHT):
+        themeNavbarColour = Colours.whiteDefault;
+        themeNavbarIconBrightness = Brightness.dark;
+        break;
+      case (ThemeType.NIGHT):
+        themeNavbarColour = Colours.blackFull;
+        themeNavbarIconBrightness = Brightness.light;
+        break;
+      default:
+        themeNavbarColour = Colours.blackDefault;
+        themeNavbarIconBrightness = Brightness.light;
+    }
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Color(themeNavbarColour),
+        systemNavigationBarIconBrightness: themeNavbarIconBrightness,
+      ),
+    );
 
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
