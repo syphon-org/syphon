@@ -90,14 +90,13 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/notifications',
-                                    );
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/notifications',
+                              );
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -113,11 +112,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/privacy');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/privacy');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -135,11 +133,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/theming');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/theming');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -157,12 +154,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(
-                                        context, '/chat-preferences');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/chat-preferences');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.only(
@@ -181,11 +176,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/devices');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/devices');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -199,11 +193,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/advanced');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/advanced');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -217,9 +210,8 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () => props.onLogoutUser(),
+                            enabled: !props.authLoading,
+                            onTap: () => props.onLogoutUser(),
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -296,8 +288,6 @@ class _Props extends Equatable {
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
         onDisabled: () => store.dispatch(addInProgress()),
-        onLogoutUser: () {
-          store.dispatch(logoutUser());
-        },
+        onLogoutUser: () => store.dispatch(logoutUser()),
       );
 }
