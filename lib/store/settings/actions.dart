@@ -357,7 +357,7 @@ ThunkAction<AppState> incrementTheme() {
         ThemeType.values[(themeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
-    initSystemTheme(nextTheme);
+    initSystemTheme(nextTheme, statusTransparent: false);
 
     store.dispatch(SetTheme(nextTheme));
   };

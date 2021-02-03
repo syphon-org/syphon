@@ -16,12 +16,16 @@ enum ThemeType {
 ///
 /// Written by TR_SLimey
 ///
-void initSystemTheme(ThemeType themeType) {
+void initSystemTheme(ThemeType themeType, {bool statusTransparent}) {
   var themeNavbarColour;
   var themeNavbarIconBrightness;
 
   switch (themeType) {
     case (ThemeType.LIGHT):
+      // TODO: transparent setting
+      // themeNavbarColour = Colors.transparent.value;
+      // themeNavbarIconBrightness = Brightness.light;
+
       themeNavbarColour = Colours.whiteDefault;
       themeNavbarIconBrightness = Brightness.dark;
       break;
@@ -36,7 +40,7 @@ void initSystemTheme(ThemeType themeType) {
 
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
+      statusBarColor: statusTransparent ? Colors.transparent : null,
       systemNavigationBarColor: Color(themeNavbarColour),
       systemNavigationBarIconBrightness: themeNavbarIconBrightness,
     ),

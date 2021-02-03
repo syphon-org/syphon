@@ -151,8 +151,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // sadly the navbar doesn't play nicely with just being transparent
     // so will also be updated on theme change
     final currentTheme = store.state.settingsStore.theme;
-
-    initSystemTheme(currentTheme);
+    initSystemTheme(currentTheme, statusTransparent: false);
 
     store.dispatch(initDeepLinks());
     store.dispatch(initClientSecret());
@@ -168,15 +167,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
+        final currentTheme = store.state.settingsStore.theme;
+        initSystemTheme(currentTheme, statusTransparent: false);
+        break;
       case AppLifecycleState.inactive:
         break;
         break;
@@ -187,6 +183,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store.dispatch(setBackgrounded(true));
         break;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted();
   }
 
   @protected
