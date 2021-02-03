@@ -353,32 +353,11 @@ ThunkAction<AppState> incrementTheme() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.theme;
     final themeIndex = ThemeType.values.indexOf(currentTheme);
-    final nextTheme = ThemeType.values[
-      (themeIndex + 1) % ThemeType.values.length
-    ];
+    final nextTheme =
+        ThemeType.values[(themeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
-    var nextThemeNavbarColour;
-    var nextThemeNavbarIconBrightness;
-    switch (nextTheme) {
-      case (ThemeType.LIGHT):
-        nextThemeNavbarColour = Colours.whiteDefault;
-        nextThemeNavbarIconBrightness = Brightness.dark;
-        break;
-      case (ThemeType.NIGHT):
-        nextThemeNavbarColour = Colours.blackFull;
-        nextThemeNavbarIconBrightness = Brightness.light;
-        break;
-      default:
-        nextThemeNavbarColour = Colours.blackDefault;
-        nextThemeNavbarIconBrightness = Brightness.light;
-    }
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: Color(nextThemeNavbarColour),
-        systemNavigationBarIconBrightness: nextThemeNavbarIconBrightness,
-      ),
-    );
+    initSystemTheme(nextTheme);
 
     store.dispatch(SetTheme(nextTheme));
   };
