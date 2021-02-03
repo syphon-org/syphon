@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:flutter/services.dart';
+import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -331,10 +333,34 @@ ThunkAction<AppState> incrementTheme() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.theme;
     final themeIndex = ThemeType.values.indexOf(currentTheme);
+    final nextTheme = ThemeType.values[
+      (themeIndex + 1) % ThemeType.values.length
+    ];
 
-    store.dispatch(SetTheme(
-      ThemeType.values[(themeIndex + 1) % ThemeType.values.length],
-    ));
+    // update system navbar theme to match
+    var nextThemeNavbarColour;
+    var nextThemeNavbarIconBrightness;
+    switch (nextTheme) {
+      case (ThemeType.LIGHT):
+        nextThemeNavbarColour = Colours.whiteDefault;
+        nextThemeNavbarIconBrightness = Brightness.dark;
+        break;
+      case (ThemeType.NIGHT):
+        nextThemeNavbarColour = Colours.blackFull;
+        nextThemeNavbarIconBrightness = Brightness.light;
+        break;
+      default:
+        nextThemeNavbarColour = Colours.blackDefault;
+        nextThemeNavbarIconBrightness = Brightness.light;
+    }
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(nextThemeNavbarColour),
+        systemNavigationBarIconBrightness: nextThemeNavbarIconBrightness,
+      ),
+    );
+
+    store.dispatch(SetTheme(nextTheme));
   };
 }
 
