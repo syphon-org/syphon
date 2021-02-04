@@ -324,8 +324,6 @@ ThunkAction<AppState> formatMessageReply(
 ) {
   return (Store<AppState> store) async {
     try {
-      // The below screws up Element Web's ability to parse JSON for some reason
-      // TODO
       final body = '''> <${reply.sender}> ${reply.body}\n\n${message.body}''';
       final formattedBody =
           '''<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
