@@ -58,6 +58,11 @@ String formatInitials(String fullword) {
 
   // example words -> EX
   final word = fullword.replaceAll('@', '');
+
+  if (word.length == 0) {
+    return 'NA';
+  }
+
   final initials =
       word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
 

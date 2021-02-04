@@ -20,6 +20,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -789,10 +790,12 @@ ThunkAction<AppState> loadKeySessionOutbound({
   };
 }
 
-/**
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
- */
+///
+/// Load Key Session Inbound
+///
+/// Manage and load Olm sessions for pre-key messages or indications
+///
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
 ThunkAction<AppState> loadKeySessionInbound({
   int type,
   String body,
@@ -800,6 +803,7 @@ ThunkAction<AppState> loadKeySessionInbound({
 }) {
   return (Store<AppState> store) async {
     try {
+      // type 1 - attempt to decrypt with an existing session
       var inboundKeySessionSerialized =
           store.state.cryptoStore.inboundKeySessions[identityKey];
 

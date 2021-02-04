@@ -52,7 +52,7 @@ class Avatar extends StatelessWidget {
           dynamic avatarWidget = ClipRRect(
             borderRadius: borderRadius,
             child: Text(
-              formatInitials(alt),
+              formatInitials(alt ?? ''),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: Dimensions.avatarFontSize(size: size),

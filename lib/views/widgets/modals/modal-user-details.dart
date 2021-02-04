@@ -30,10 +30,12 @@ class ModalUserDetails extends StatelessWidget {
     Key key,
     this.user,
     this.userId,
+    this.nested,
   }) : super(key: key);
 
   final User user;
   final String userId;
+  final bool nested; // pop context twice when double nested in a view
 
   @protected
   void onNavigateToProfile({BuildContext context, _Props props}) async {
@@ -59,24 +61,33 @@ class ModalUserDetails extends StatelessWidget {
 
   @protected
   void onMessageUser({BuildContext context, _Props props}) async {
+    final user = props.user;
     return await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => DialogStartChat(
-        user: props.user,
-        title: 'Chat with ${props.user.displayName}',
+        user: user,
+        title: 'Chat with ${user.displayName}',
         content: Strings.confirmationStartChat,
         onStartChat: () async {
-          final newRoomId = await props.onCreateChatDirect(user: props.user);
+          final newRoomId = await props.onCreateChatDirect(user: user);
+
           Navigator.pop(context);
-          Navigator.popAndPushNamed(
-            context,
-            '/home/chat',
-            arguments: ChatViewArguements(
-              roomId: newRoomId,
-              title: formatUsername(props.user),
-            ),
-          );
+
+          if (nested) {
+            Navigator.pop(context);
+          }
+
+          if (newRoomId != null) {
+            Navigator.popAndPushNamed(
+              context,
+              '/home/chat',
+              arguments: ChatViewArguements(
+                roomId: newRoomId,
+                title: user.displayName,
+              ),
+            );
+          }
         },
         onCancel: () async {
           Navigator.pop(context);

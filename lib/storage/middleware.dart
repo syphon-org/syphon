@@ -25,9 +25,9 @@ dynamic storageMiddleware<State>(
   switch (action.runtimeType) {
     // auth store
     case SetUser:
-      printInfo(
-        '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
-      );
+      // printInfo(
+      //   '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
+      // );
       saveAuth(store.state.authStore, storage: Storage.main);
       break;
     // media store
@@ -40,9 +40,9 @@ dynamic storageMiddleware<State>(
     case UpdateRoom:
       // TODO: create a mutation like SetSyncing to distinguish small but important room mutations
       if (action.syncing == null) {
-        printInfo(
-          '[storageMiddleware] saving room ${action.runtimeType.toString()}',
-        );
+        // printInfo(
+        //   '[storageMiddleware] saving room ${action.runtimeType.toString()}',
+        // );
         final room = store.state.roomStore.rooms[action.id];
         saveRoom(room, storage: Storage.main);
       }
@@ -58,9 +58,9 @@ dynamic storageMiddleware<State>(
     case AddOutboundKeySession:
     case AddOutboundMessageSession:
     case ResetCrypto:
-      printInfo(
-        '[storageMiddleware] saving crypto ${action.runtimeType.toString()}',
-      );
+      // printInfo(
+      //   '[storageMiddleware] saving crypto ${action.runtimeType.toString()}',
+      // );
       saveCrypto(store.state.cryptoStore, storage: Storage.main);
       break;
 
