@@ -29,6 +29,8 @@ class SettingsStore extends Equatable {
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
 
+  @JsonKey(nullable: true)
+  final String messageSize;
   final String fontName;
   final String fontSize;
   final String language;
@@ -57,6 +59,7 @@ class SettingsStore extends Equatable {
     this.theme = ThemeType.LIGHT,
     this.fontName = 'Rubik',
     this.fontSize = 'Default',
+    this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
     this.enterSend = false,
@@ -84,6 +87,7 @@ class SettingsStore extends Equatable {
         theme,
         fontName,
         fontSize,
+        messageSize,
         language,
         avatarShape,
         smsEnabled,
@@ -110,6 +114,7 @@ class SettingsStore extends Equatable {
     String fontName,
     String fontSize,
     String language,
+    String messageSize,
     String avatarShape,
     bool smsEnabled,
     bool enterSend,
@@ -153,6 +158,7 @@ class SettingsStore extends Equatable {
         loading: loading ?? this.loading,
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
+        messageSize: messageSize ?? this.messageSize,
       );
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);

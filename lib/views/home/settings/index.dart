@@ -14,6 +14,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/selectors.dart';
 import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -89,14 +90,13 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/notifications',
-                                    );
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/notifications',
+                              );
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -112,12 +112,52 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(
-                                        context, '/chat-preferences');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/privacy');
+                            },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              tr('list-item-settings-privacy'),
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/theming');
+                            },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.brightness_medium,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              tr('title-view-theming'),
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Theme ${props.theme}, Font ${props.font}',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/chat-preferences');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.only(
@@ -136,51 +176,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/privacy');
-                                  },
-                            contentPadding: Dimensions.listPaddingSettings,
-                            leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
-                                  Icons.lock,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              tr('list-item-settings-privacy'),
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            subtitle: Text(
-                              'Screen Lock Off, Registration Lock Off',
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                          ),
-                          ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/theming');
-                                  },
-                            contentPadding: Dimensions.listPaddingSettings,
-                            leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
-                                  Icons.brightness_medium,
-                                  size: 28,
-                                )),
-                            title: Text(
-                              tr('title-view-theming'),
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                          ),
-                          ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/devices');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/devices');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -194,11 +193,10 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () {
-                                    Navigator.pushNamed(context, '/advanced');
-                                  },
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, '/advanced');
+                            },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -212,9 +210,8 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: props.authLoading
-                                ? null
-                                : () => props.onLogoutUser(),
+                            enabled: !props.authLoading,
+                            onTap: () => props.onLogoutUser(),
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
                                 padding: EdgeInsets.all(4),
@@ -257,11 +254,15 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool notificationsEnabled;
+  final String font;
+  final String theme;
 
   final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
+    @required this.font,
+    @required this.theme,
     @required this.loading,
     @required this.authLoading,
     @required this.notificationsEnabled,
@@ -271,6 +272,7 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
+        theme,
         loading,
         authLoading,
         notificationsEnabled,
@@ -280,12 +282,12 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
+        font: fontName(store.state),
+        theme: themeTypeName(store.state),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
         onDisabled: () => store.dispatch(addInProgress()),
-        onLogoutUser: () {
-          store.dispatch(logoutUser());
-        },
+        onLogoutUser: () => store.dispatch(logoutUser()),
       );
 }

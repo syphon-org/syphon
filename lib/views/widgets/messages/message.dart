@@ -27,6 +27,7 @@ class MessageWidget extends StatelessWidget {
     this.selectedMessageId,
     this.avatarUri,
     this.theme = ThemeType.LIGHT,
+    this.fontSize = 14.0,
     this.timeFormat = '12hr',
     this.onLongPress,
     this.onPressAvatar,
@@ -38,6 +39,7 @@ class MessageWidget extends StatelessWidget {
   final Message message;
   final ThemeType theme;
   final int lastRead;
+  final double fontSize;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
@@ -411,14 +413,15 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                   Container(
                                     margin: EdgeInsets.only(bottom: 5),
-                                    child: Text(
-                                      body.trim(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                                    child: Text(body.trim(),
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .subtitle2
+                                              .fontSize,
+                                        )),
                                   ),
                                   Flex(
                                     /// *** Message Status Row ***

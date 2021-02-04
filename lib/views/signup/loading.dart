@@ -8,7 +8,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 

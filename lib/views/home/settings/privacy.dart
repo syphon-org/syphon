@@ -13,6 +13,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -187,20 +188,26 @@ class PrivacyPreferences extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle2,
                             ),
                           ),
-                          ListTile(
-                            enabled: false,
-                            onTap: props.onImportDeviceKey,
-                            contentPadding: Dimensions.listPadding,
-                            title: Text(
-                              'Import Keys',
+                          GestureDetector(
+                            onTap: () => props.onDisabled(),
+                            child: ListTile(
+                              enabled: false,
+                              onTap: props.onImportDeviceKey,
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Import Keys',
+                              ),
                             ),
                           ),
-                          ListTile(
-                            enabled: false,
-                            onTap: () => props.onExportDeviceKey(context),
-                            contentPadding: Dimensions.listPadding,
-                            title: Text(
-                              'Export Keys',
+                          GestureDetector(
+                            onTap: () => props.onDisabled(),
+                            child: ListTile(
+                              enabled: false,
+                              onTap: () => props.onExportDeviceKey(context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Export Keys',
+                              ),
                             ),
                           ),
                           ListTile(
@@ -233,8 +240,10 @@ class Props extends Equatable {
   final Function onExportDeviceKey;
   final Function onImportDeviceKey;
   final Function onDeleteDeviceKey;
+  final Function onDisabled;
 
   Props({
+    @required this.onDisabled,
     @required this.typingIndicators,
     @required this.readReceipts,
     @required this.onToggleTypingIndicators,
@@ -253,6 +262,7 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         typingIndicators: store.state.settingsStore.typingIndicators,
         readReceipts: store.state.settingsStore.readReceipts,
+        onDisabled: () => store.dispatch(addInProgress()),
         onToggleTypingIndicators: () => store.dispatch(
           toggleTypingIndicators(),
         ),

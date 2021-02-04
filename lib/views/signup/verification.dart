@@ -10,7 +10,7 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';

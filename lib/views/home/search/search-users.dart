@@ -83,6 +83,7 @@ class SearchUserState extends State<SearchUserView> {
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
         user: user,
+        nested: true,
       ),
     );
   }
@@ -100,15 +101,19 @@ class SearchUserState extends State<SearchUserView> {
             creatingRoomDisplayName = user.displayName;
           });
           final newRoomId = await props.onCreateChatDirect(user: user);
+
           Navigator.pop(context);
-          Navigator.popAndPushNamed(
-            context,
-            '/home/chat',
-            arguments: ChatViewArguements(
-              roomId: newRoomId,
-              title: user.displayName,
-            ),
-          );
+
+          if (newRoomId != null) {
+            Navigator.popAndPushNamed(
+              context,
+              '/home/chat',
+              arguments: ChatViewArguements(
+                roomId: newRoomId,
+                title: user.displayName,
+              ),
+            );
+          }
         },
       ),
     );
@@ -134,15 +139,19 @@ class SearchUserState extends State<SearchUserView> {
             creatingRoomDisplayName = user.displayName;
           });
           final newRoomId = await props.onCreateChatDirect(user: user);
+
           Navigator.pop(context);
-          Navigator.popAndPushNamed(
-            context,
-            '/home/chat',
-            arguments: ChatViewArguements(
-              roomId: newRoomId,
-              title: user.displayName,
-            ),
-          );
+
+          if (newRoomId != null) {
+            Navigator.popAndPushNamed(
+              context,
+              '/home/chat',
+              arguments: ChatViewArguements(
+                roomId: newRoomId,
+                title: user.displayName,
+              ),
+            );
+          }
         },
       ),
     );
@@ -384,7 +393,11 @@ class _Props extends Equatable {
         creatingRoom: store.state.roomStore.loading,
         usersRecent: friendlyUsers(store.state),
         searchResults: store.state.searchStore.searchResults ?? [],
-        onSearch: (text) {
+        onSearch: (String text) {
+          if (text.contains('@') && text.length == 1) {
+            return;
+          }
+
           store.dispatch(searchUsers(searchText: text));
         },
         onCreateChatDirect: ({User user}) async {

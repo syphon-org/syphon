@@ -20,7 +20,7 @@ dynamic alertMiddleware<State>(
 ) async {
   switch (action.runtimeType) {
     case AddAlert:
-      final alert = action.alert.error;
+      final alert = action.alert.error ?? '';
 
       // TODO: prompt user that they're going to be redirected for a terms
       // and conditions acceptance

@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
 class ThirdSection extends StatelessWidget {

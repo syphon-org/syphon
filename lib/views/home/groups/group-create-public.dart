@@ -20,7 +20,7 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 // Project imports:
-import 'package:syphon/global/behaviors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';

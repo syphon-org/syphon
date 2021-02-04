@@ -58,6 +58,11 @@ class SetFontSize {
   SetFontSize({this.fontSize});
 }
 
+class SetMessageSize {
+  final String messageSize;
+  SetMessageSize({this.messageSize});
+}
+
 class SetRoomPrimaryColor {
   final int color;
   final String roomId;
@@ -327,38 +332,32 @@ ThunkAction<AppState> incrementFontSize() {
 }
 
 /**
+ * Iterate over fontFamilies on action
+ */
+ThunkAction<AppState> incrementMessageSize() {
+  return (Store<AppState> store) async {
+    final currentMessageSize = store.state.settingsStore.messageSize;
+    final messageSizes = Values.messageSizes;
+    final currentIndex = messageSizes.indexOf(currentMessageSize);
+
+    store.dispatch(SetMessageSize(
+      messageSize: messageSizes[(currentIndex + 1) % messageSizes.length],
+    ));
+  };
+}
+
+/**
  * Iterate over theme types on action
  */
 ThunkAction<AppState> incrementTheme() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.theme;
     final themeIndex = ThemeType.values.indexOf(currentTheme);
-    final nextTheme = ThemeType.values[
-      (themeIndex + 1) % ThemeType.values.length
-    ];
+    final nextTheme =
+        ThemeType.values[(themeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
-    var nextThemeNavbarColour;
-    var nextThemeNavbarIconBrightness;
-    switch (nextTheme) {
-      case (ThemeType.LIGHT):
-        nextThemeNavbarColour = Colours.whiteDefault;
-        nextThemeNavbarIconBrightness = Brightness.dark;
-        break;
-      case (ThemeType.NIGHT):
-        nextThemeNavbarColour = Colours.blackFull;
-        nextThemeNavbarIconBrightness = Brightness.light;
-        break;
-      default:
-        nextThemeNavbarColour = Colours.blackDefault;
-        nextThemeNavbarIconBrightness = Brightness.light;
-    }
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: Color(nextThemeNavbarColour),
-        systemNavigationBarIconBrightness: nextThemeNavbarIconBrightness,
-      ),
-    );
+    initSystemTheme(nextTheme, statusTransparent: false);
 
     store.dispatch(SetTheme(nextTheme));
   };

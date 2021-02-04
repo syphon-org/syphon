@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'colours.dart';
 
@@ -8,6 +9,42 @@ enum ThemeType {
   DARK,
   DARKER,
   NIGHT,
+}
+
+///
+/// Init System Theme
+///
+/// Written by TR_SLimey
+///
+void initSystemTheme(ThemeType themeType, {bool statusTransparent}) {
+  var themeNavbarColour;
+  var themeNavbarIconBrightness;
+
+  switch (themeType) {
+    case (ThemeType.LIGHT):
+      // TODO: transparent setting
+      // themeNavbarColour = Colors.transparent.value;
+      // themeNavbarIconBrightness = Brightness.light;
+
+      themeNavbarColour = Colours.whiteDefault;
+      themeNavbarIconBrightness = Brightness.dark;
+      break;
+    case (ThemeType.NIGHT):
+      themeNavbarColour = Colours.blackFull;
+      themeNavbarIconBrightness = Brightness.light;
+      break;
+    default:
+      themeNavbarColour = Colours.blackDefault;
+      themeNavbarIconBrightness = Brightness.light;
+  }
+
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: statusTransparent ? Colors.transparent : null,
+      systemNavigationBarColor: Color(themeNavbarColour),
+      systemNavigationBarIconBrightness: themeNavbarIconBrightness,
+    ),
+  );
 }
 
 class Themes {

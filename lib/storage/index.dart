@@ -21,6 +21,7 @@ import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
+import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {
@@ -136,6 +137,10 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
       storage: storage,
     );
 
+    final settings = await loadSettings(
+      storage: storage,
+    );
+
     final redactions = await loadRedactions(
       storage: storage,
     );
@@ -171,6 +176,7 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
       'reactions': reactions,
       'redactions': redactions,
       'receipts': receipts,
+      'settings': settings,
     };
   } catch (error) {
     printError('[loadStorage]  ${error.toString()}');

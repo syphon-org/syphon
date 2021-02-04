@@ -45,7 +45,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.authStore,
       state.syncStore,
       state.cryptoStore,
-      state.settingsStore,
     ];
 
     // Queue up a cache saving will wait
@@ -186,7 +185,7 @@ class CacheSerializer implements StateSerializer<AppState> {
                 Map<String, Map<String, ReadReceipt>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
-      settingsStore: settingsStore ?? SettingsStore(),
+      settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),
     );
   }
 }

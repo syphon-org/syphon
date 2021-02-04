@@ -155,18 +155,21 @@ abstract class Rooms {
     String accessToken,
     String roomId,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/join';
+    final parts = roomId.split(':');
+    final serverName = parts.length > 0 ? parts[1] : homeserver;
+    final roomIdFormatted = Uri.encodeComponent(roomId);
+
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body = {};
-
     final response = await http.post(
       url,
       headers: headers,
-      body: json.encode(body),
+      body: json.encode({}),
     );
 
     return await json.decode(

@@ -566,10 +566,6 @@ class Room {
     String nextHash,
   }) {
     try {
-      printDebug(
-        '[fromMessageEvents] ${this.name} ${messages.length}',
-      );
-
       bool limited;
       int lastUpdate = this.lastUpdate;
       List<Message> outbox = List<Message>.from(this.outbox ?? []);

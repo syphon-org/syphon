@@ -8,15 +8,7 @@ import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/state.dart';
-
-final List<Object> stores = [
-  AuthStore(),
-  SyncStore(),
-  CryptoStore(),
-  SettingsStore(),
-];
 
 class CacheStorage implements StorageEngine {
   final Database cache;
@@ -25,6 +17,12 @@ class CacheStorage implements StorageEngine {
 
   @override
   Future<Uint8List> load() async {
+    final List<Object> stores = [
+      AuthStore(),
+      SyncStore(),
+      CryptoStore(),
+    ];
+
     await Future.wait(stores.map((store) async {
       final type = store.runtimeType.toString();
       try {
@@ -60,11 +58,5 @@ class CacheStorage implements StorageEngine {
   @override
   Future<void> save(Uint8List data) {
     return null;
-  }
-
-  Future<void> saveOffload(String jsonEncrypted, {String type}) async {
-    final table = StoreRef<String, String>.main();
-    final record = table.record(type);
-    await record.put(cache, jsonEncrypted);
   }
 }

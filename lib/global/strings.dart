@@ -34,6 +34,7 @@ class Strings {
   static const placeholderHomeserverSearch = 'Search for homeservers...';
 
   // Labels
+  static const labelSyncing = 'syncing chats...';
   static const labelSearchForHomeservers = "Search for homeservers...";
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
@@ -41,6 +42,7 @@ class Strings {
   static const labelRecentUsers = 'Recent Users';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
+  static const labelNoGroups = 'no groups found';
   static const labelDeletedMessage = 'This message was deleted';
 
   // Buttons

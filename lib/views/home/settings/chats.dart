@@ -80,20 +80,6 @@ class ChatPreferences extends StatelessWidget {
                               onTap: () => props.onDisabled(),
                               child: ListTile(
                                 enabled: false,
-                                onTap: () => props.onDisabled(),
-                                contentPadding: Dimensions.listPadding,
-                                title: Text(
-                                  'Message Font Size',
-                                ),
-                                trailing: Text(
-                                  props.chatFontSize,
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => props.onDisabled(),
-                              child: ListTile(
-                                enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Show Membership Events',

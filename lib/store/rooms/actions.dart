@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 // Flutter imports:
@@ -156,7 +157,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       });
 
       printDebug(
-        '[syncRooms] ${room.name} initial: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
+        '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
       // update cold storage
@@ -220,7 +221,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
  * Takes a negligible amount of time
  *  
  */
-ThunkAction<AppState> fetchRoom(String roomId) {
+ThunkAction<AppState> fetchRoom(String roomId, {bool direct}) {
   return (Store<AppState> store) async {
     try {
       final stateEvents = await MatrixApi.fetchStateEvents(
@@ -253,6 +254,11 @@ ThunkAction<AppState> fetchRoom(String roomId) {
           'timeline': {
             'events': messageEvents['chunk'],
             'prev_batch': messageEvents['from'],
+          },
+          'account_data': {
+            'events': [
+              {"type": 'm.direct', 'content': {}}
+            ],
           }
         },
       }));
@@ -471,6 +477,7 @@ ThunkAction<AppState> createRoom({
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
+      final currentUser = store.state.authStore.user;
       final inviteIds = invites.map((user) => user.userId).toList();
 
       final data = await MatrixApi.createRoom(
@@ -502,17 +509,19 @@ ThunkAction<AppState> createRoom({
       // generate user invite map to cache recent users
       room = room.copyWith(users: userInviteMap);
 
-      if (avatarFile != null) {
-        await store.dispatch(
-          updateRoomAvatar(roomId: room.id, localFile: avatarFile),
-        );
-      }
-
       if (isDirect) {
         final directUser = invites[0];
         room = room.copyWith(
           direct: true,
-          users: {directUser.userId: directUser},
+          name: directUser.displayName ?? directUser.userId,
+          userIds: [
+            directUser.userId,
+            currentUser.userId,
+          ],
+          users: {
+            directUser.userId: directUser,
+            currentUser.userId: currentUser
+          },
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));
@@ -524,15 +533,24 @@ ThunkAction<AppState> createRoom({
         await store.dispatch(toggleRoomEncryption(room: room));
       }
 
+      if (avatarFile != null) {
+        await store.dispatch(
+          updateRoomAvatar(roomId: room.id, localFile: avatarFile),
+        );
+      }
+
       await store.dispatch(SetRoom(room: room));
+
+      saveRooms({room.id: room}, storage: Storage.main);
 
       return room.id;
     } catch (error) {
       store.dispatch(
         addAlert(
-            message: error.toString(),
-            error: error,
-            origin: 'createRoom|$preset'),
+          message: error.toString(),
+          error: error,
+          origin: 'createRoom|$preset',
+        ),
       );
       return room != null ? room.id : null;
     } finally {
@@ -676,6 +694,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       // only the other user id, and not the user object, is needed here
       final otherUserId = room.userIds.firstWhere(
         (userId) => userId != currentUser.userId,
+        orElse: () => null,
       );
 
       if (otherUserId == null) {
@@ -727,6 +746,14 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       }
 
       await store.dispatch(SetRoom(room: room.copyWith(direct: enabled)));
+
+      // Refresh room information with toggle enabled
+      // TODO: enable this in version 0.1.7
+      // await store.dispatch(fetchRoom(room.id, direct: true));
+
+      // WARN: toggles the rooms as "direct" within Syphon
+      // There's got to be a better
+      // TODO: remove this in version 0.1.7
       await store.dispatch(fetchDirectRooms());
     } catch (error) {
       debugPrint('[toggleDirectRoom] $error');
@@ -822,7 +849,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
         protocol: protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
+        roomId: room.id ?? room.alias,
       );
 
       if (data['errcode'] != null) {
@@ -845,7 +872,9 @@ ThunkAction<AppState> joinRoom({Room room}) {
       await store.dispatch(fetchRoom(joinedRoom.id));
       store.dispatch(SetLoading(loading: false));
     } catch (error) {
-      store.dispatch(addAlert(error: error, origin: 'joinRoom'));
+      store.dispatch(
+        addAlert(error: error, origin: 'joinRoom'),
+      );
     }
   };
 }
