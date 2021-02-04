@@ -9,11 +9,14 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
+import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/storage.dart';
 
 ///
 /// Storage Middleware
 ///
-/// Save to storage based on which redux actions are fired
+/// Saves store data to cold storage based
+/// on which redux actions are fired.
 ///
 dynamic storageMiddleware<State>(
   Store<AppState> store,
@@ -47,20 +50,39 @@ dynamic storageMiddleware<State>(
         saveRoom(room, storage: Storage.main);
       }
       break;
-    // crypto store - CUD ops
+    case SetTheme:
+    case SetPrimaryColor:
+    case SetAvatarShape:
+    case SetAccentColor:
+    case SetAppBarColor:
+    case SetFontName:
+    case SetFontSize:
+    case SetMessageSize:
+    case SetRoomPrimaryColor:
+    case SetDevices:
+    case SetLanguage:
+    case SetEnterSend:
+    case ToggleRoomTypeBadges:
+    case ToggleMembershipEvents:
+    case ToggleNotifications:
+    case ToggleTypingIndicators:
+    case ToggleTimeFormat:
+    case ToggleReadReceipts:
+    case LogAppAgreement:
+      saveSettings(store.state.settingsStore, storage: Storage.main);
+      break;
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
     case ToggleDeviceKeysExist:
     case SetDeviceKeys:
-    case SetOneTimeKeysClaimed:
     case SetOneTimeKeysCounts:
+    case SetOneTimeKeysClaimed:
     case AddInboundKeySession:
+    case AddInboundMessageSession:
     case AddOutboundKeySession:
     case AddOutboundMessageSession:
+    case UpdateMessageSessionOutbound:
     case ResetCrypto:
-      // printInfo(
-      //   '[storageMiddleware] saving crypto ${action.runtimeType.toString()}',
-      // );
       saveCrypto(store.state.cryptoStore, storage: Storage.main);
       break;
 

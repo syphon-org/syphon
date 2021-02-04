@@ -10,6 +10,7 @@ class StorageKeys {
   static const String USERS = 'users';
   static const String MEDIA = 'MEDIA';
   static const String CRYPTO = 'crypto';
+  static const String SETTINGS = 'settings';
   static const String EVENTS = 'events';
   static const String MESSAGES = 'messages';
   static const String RECEIPTS = 'receipts';

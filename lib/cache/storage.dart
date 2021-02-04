@@ -61,10 +61,4 @@ class CacheStorage implements StorageEngine {
   Future<void> save(Uint8List data) {
     return null;
   }
-
-  Future<void> saveOffload(String jsonEncrypted, {String type}) async {
-    final table = StoreRef<String, String>.main();
-    final record = table.record(type);
-    await record.put(cache, jsonEncrypted);
-  }
 }
