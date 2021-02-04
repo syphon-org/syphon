@@ -324,6 +324,8 @@ ThunkAction<AppState> formatMessageReply(
 ) {
   return (Store<AppState> store) async {
     try {
+      // The below screws up Element Web's ability to parse JSON for some reason
+      // TODO
       final body = '''> <${reply.sender}> ${reply.body}\n\n${message.body}''';
       final formattedBody =
           '''<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
@@ -336,6 +338,9 @@ ThunkAction<AppState> formatMessageReply(
           "body": body,
           "format": "org.matrix.custom.html",
           "formatted_body": formattedBody,
+          // m.relates_to below is not necessary in the unencrypted part of the
+          // message according to the spec but Element web and android seem to
+          // do it so I'm leaving it here
           "m.relates_to": {
             "m.in_reply_to": {"event_id": "${reply.id}"}
           },

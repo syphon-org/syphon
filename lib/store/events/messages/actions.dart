@@ -160,10 +160,15 @@ ThunkAction<AppState> sendMessageEncrypted({
         syncing: true,
       );
 
+      var unencryptedData = {};
+
       if (reply != null && reply.body != null) {
         pending = await store.dispatch(
           formatMessageReply(room, pending, reply),
         );
+        unencryptedData["m.relates_to"] = {
+          "m.in_reply_to": {"event_id": "${reply.id}"}
+        };
       }
 
       store.dispatch(SaveOutboxMessage(
@@ -183,6 +188,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       final data = await MatrixApi.sendMessageEncrypted(
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
+        unencryptedData: unencryptedData,
         accessToken: store.state.authStore.user.accessToken,
         trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,

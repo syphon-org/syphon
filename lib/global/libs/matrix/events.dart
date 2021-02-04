@@ -106,6 +106,7 @@ abstract class Events {
   static Future<dynamic> sendMessageEncrypted({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
+    Map unencryptedData,
     String accessToken,
     String trxId,
     String roomId,
@@ -128,6 +129,10 @@ abstract class Events {
       "session_id": sessionId, // "<outbound group session id>",
       "device_id": deviceId, // "<our device ID>"
     };
+
+    if (unencryptedData != null) {
+      body.addAll(unencryptedData);
+    }
 
     final response = await http.put(
       url,
