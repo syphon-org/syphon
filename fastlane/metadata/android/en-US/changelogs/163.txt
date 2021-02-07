@@ -1,0 +1,21 @@
+# 0.1.6
+
+🔮 New Features:
+ - SSO Login & Signup
+ - Reactions / Emoji Support 🎉
+ - View Edited Messages (Condensed)
+ - Swipe To Reply
+ - Cross Server Room/Topic Search
+ - Forgot / Reset Password Flow
+
+🛠 Performance
+- More caching and cold storage saving/loading improvements
+- Parsing all matrix data from separate threads
+
+🐛 Bug Fixes
+- fixed e2ee decryption issue
+- fixed read receipt bugs
+- fixed various caching performance issues
+- fixed failed syncing on most self-hosted homeservers
+- fixed settings permanence issues
+- fixed new direct chat with invalid user_ids
