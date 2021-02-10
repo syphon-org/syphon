@@ -44,9 +44,8 @@ ThunkAction<AppState> encryptMessageContent({
       'room_id': roomId,
     };
 
-    // Canoncially encode the json for encryption
-    final encodedPayload = canonicalJson.encode(payload);
-    final serializedPayload = utf8.decode(encodedPayload);
+    // Encode the json for encryption
+    final serializedPayload = json.encode(payload);
     final encryptedPayload = outboundMessageSession.encrypt(serializedPayload);
 
     // save the outbound session after processing content

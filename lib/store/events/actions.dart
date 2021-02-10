@@ -336,6 +336,9 @@ ThunkAction<AppState> formatMessageReply(
           "body": body,
           "format": "org.matrix.custom.html",
           "formatted_body": formattedBody,
+          // m.relates_to below is not necessary in the unencrypted part of the
+          // message according to the spec but Element web and android seem to
+          // do it so I'm leaving it here
           "m.relates_to": {
             "m.in_reply_to": {"event_id": "${reply.id}"}
           },
