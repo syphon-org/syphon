@@ -6,6 +6,7 @@ import 'dart:math';
 // Package imports:
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/values.dart';
 
 /**
  * https://matrix.org/docs/spec/client_server/latest#id183
@@ -74,6 +75,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -117,6 +119,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -146,6 +149,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -228,6 +232,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -243,6 +248,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(
@@ -265,6 +271,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(
@@ -334,6 +341,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -392,6 +400,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -421,6 +430,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 

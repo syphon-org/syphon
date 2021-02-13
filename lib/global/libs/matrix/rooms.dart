@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/values.dart';
 
 abstract class Rooms {
   /**
@@ -164,6 +165,7 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(
@@ -172,9 +174,7 @@ abstract class Rooms {
       body: json.encode({}),
     );
 
-    return await json.decode(
-      response.body,
-    );
+    return await json.decode(response.body);
   }
 
   /**
@@ -204,6 +204,7 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -231,9 +232,7 @@ abstract class Rooms {
       body: json.encode(body),
     );
 
-    return await json.decode(
-      response.body,
-    );
+    return await json.decode(response.body);
   }
 
   /**
@@ -259,6 +258,7 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final reponse = await http.post(
@@ -296,16 +296,15 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
-    final reponse = await http.post(
+    final response = await http.post(
       url,
       headers: headers,
     );
 
-    return await json.decode(
-      reponse.body,
-    );
+    return await json.decode(response.body);
   }
 
   /**
@@ -364,6 +363,7 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = filters;
@@ -405,6 +405,7 @@ abstract class Rooms {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final reponse = await http.post(

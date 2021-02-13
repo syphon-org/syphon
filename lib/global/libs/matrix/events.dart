@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
@@ -401,6 +402,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {

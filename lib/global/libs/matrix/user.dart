@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/values.dart';
 
 abstract class Users {
   /**
@@ -135,21 +136,20 @@ abstract class Users {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final body = {
       'user_id': userId,
     };
 
-    final saveResponse = await http.post(
+    final response = await http.post(
       url,
       headers: headers,
       body: json.encode(body),
     );
 
-    return await json.decode(
-      saveResponse.body,
-    );
+    return await json.decode(response.body);
   }
 
   /**

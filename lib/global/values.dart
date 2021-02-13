@@ -57,6 +57,7 @@ class Values {
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;
 
+  static const defaultHeaders = {'Content-type': 'application/json'};
   static const fontFamilies = [
     'Rubik',
     "Roboto",
