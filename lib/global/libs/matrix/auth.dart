@@ -320,6 +320,17 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  static Future<dynamic> checkVersion({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/versions';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
   /**
    * Update User Password
    * 

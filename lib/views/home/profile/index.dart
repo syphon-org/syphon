@@ -70,7 +70,6 @@ class ProfileViewState extends State<ProfileView> {
     });
   }
 
-  @protected
   onShowImageOptions(context) async {
     await showModalBottomSheet(
       context: context,
@@ -214,7 +213,6 @@ class ProfileViewState extends State<ProfileView> {
                                   label: 'Display Name',
                                   controller: displayNameController,
                                   onChanged: (name) {
-                                    print('OnChanged $name');
                                     this.setState(() {
                                       displayNameNew = name;
                                     });

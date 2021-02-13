@@ -24,6 +24,7 @@ abstract class MatrixApi {
   static final checkUsernameAvailability = Auth.checkUsernameAvailability;
   static final sendPasswordResetEmail = Auth.sendPasswordResetEmail;
   static final checkHomeserver = Auth.checkHomeserver;
+  static final checkVersion = Auth.checkVersion;
 
   // Search
   static final searchRooms = Search.searchRooms;
