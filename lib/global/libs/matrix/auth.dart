@@ -5,7 +5,6 @@ import 'dart:math';
 
 // Package imports:
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/values.dart';
 
 /**

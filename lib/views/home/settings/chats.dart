@@ -128,6 +128,22 @@ class ChatPreferences extends StatelessWidget {
                                     props.onToggleTimeFormat(),
                               ),
                             ),
+                            ListTile(
+                              onTap: () => props.onToggleDismissKeyboard(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Dismiss Keyboard',
+                              ),
+                              subtitle: Text(
+                                'Dismiss the keyboard after sending a message',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.dismissKeyboard,
+                                onChanged: (value) =>
+                                    props.onToggleDismissKeyboard(),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -229,22 +245,26 @@ class Props extends Equatable {
   final String language;
   final bool enterSend;
   final bool timeFormat24;
+  final bool dismissKeyboard;
   final String chatFontSize;
 
   final Function onDisabled;
   final Function onIncrementLanguage;
   final Function onToggleEnterSend;
   final Function onToggleTimeFormat;
+  final Function onToggleDismissKeyboard;
 
   Props({
     @required this.language,
     @required this.enterSend,
     @required this.chatFontSize,
     @required this.timeFormat24,
+    @required this.dismissKeyboard,
     @required this.onDisabled,
     @required this.onIncrementLanguage,
     @required this.onToggleEnterSend,
     @required this.onToggleTimeFormat,
+    @required this.onToggleDismissKeyboard,
   });
 
   @override
@@ -261,10 +281,12 @@ class Props extends Equatable {
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
+        dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {
           store.dispatch(addInfo(message: tr('alert-restart-app-effect')));
           store.dispatch(incrementLanguage(context));
         },
+        onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
         onDisabled: () => store.dispatch(addInProgress()),

@@ -224,14 +224,14 @@ class MessageWidget extends StatelessWidget {
         } else {
           // Message at the beginning of a user sender messages block
           bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
-          bubbleBorder = Styles.bubbleBorderTopSender;
+          bubbleBorder = Styles.bubbleBorderTopUser;
         }
       }
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
         bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
-        bubbleBorder = Styles.bubbleBorderBottomSender;
+        bubbleBorder = Styles.bubbleBorderBottomUser;
       }
       // External User Sent Styling
     } else {

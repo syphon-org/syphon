@@ -339,15 +339,18 @@ class ChatViewState extends State<ChatView> {
   }
 
   onSubmitMessage(_Props props) async {
+    this.setState(() {
+      sendable = false;
+    });
     props.onSendMessage(
       body: editorController.text,
       type: MessageTypes.TEXT,
     );
     editorController.clear();
-    FocusScope.of(context).unfocus();
-    this.setState(() {
-      sendable = false;
-    });
+    print('Testing Enabled Keyboard Dismissed ${props.dismissKeyboardEnabled}');
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
+    }
   }
 
   @protected
@@ -669,9 +672,8 @@ class ChatViewState extends State<ChatView> {
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onChangeMessage: (text) => onUpdateMessage(text, props),
-                        onSubmitMessage: () => this.onSubmitMessage(props),
-                        onSubmittedMessage: (text) =>
-                            this.onSubmitMessage(props),
+                        onSubmitMessage: () => onSubmitMessage(props),
+                        onSubmittedMessage: (text) => onSubmitMessage(props),
                       ),
                     ),
                   ),
@@ -695,6 +697,7 @@ class _Props extends Equatable {
   final Color roomPrimaryColor;
   final bool timeFormat24Enabled;
   final bool roomTypeBadgesEnabled;
+  final bool dismissKeyboardEnabled;
 
   final Function onSendTyping;
   final Function onSendMessage;
@@ -723,6 +726,7 @@ class _Props extends Equatable {
     @required this.roomPrimaryColor,
     @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
+    @required this.dismissKeyboardEnabled,
     @required this.onUpdateDeviceKeys,
     @required this.onSendTyping,
     @required this.onSendMessage,
@@ -752,12 +756,14 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
-      userId: store.state.authStore.user.userId,
       theme: store.state.settingsStore.theme,
+      userId: store.state.authStore.user.userId,
       roomTypeBadgesEnabled:
           store.state.settingsStore.roomTypeBadgesEnabled ?? true,
       timeFormat24Enabled:
           store.state.settingsStore.timeFormat24Enabled ?? false,
+      dismissKeyboardEnabled:
+          store.state.settingsStore.dismissKeyboardEnabled ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
       room: selectRoom(id: roomId, state: store.state),
       users: store.state.userStore.users,

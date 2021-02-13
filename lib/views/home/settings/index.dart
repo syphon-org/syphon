@@ -20,13 +20,6 @@ import './widgets/profile-preview.dart';
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({Key key}) : super(key: key);
 
-  Widget buildToggledSubtitle({bool value}) {
-    return Text(
-      value ? 'On' : 'Off',
-      style: TextStyle(fontSize: 14.0),
-    );
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -80,7 +73,10 @@ class SettingsScreen extends StatelessWidget {
                               title: Text(
                                 tr('list-item-settings-sms'),
                               ),
-                              subtitle: buildToggledSubtitle(value: false),
+                              subtitle: Text(
+                                false ? Strings.labelOn : Strings.labelOff,
+                                style: TextStyle(fontSize: 14.0),
+                              ),
                               leading: Container(
                                   padding: EdgeInsets.all(4),
                                   child: Icon(
@@ -107,8 +103,11 @@ class SettingsScreen extends StatelessWidget {
                             title: Text(
                               tr('list-item-settings-notification'),
                             ),
-                            subtitle: buildToggledSubtitle(
-                              value: props.notificationsEnabled,
+                            subtitle: Text(
+                              props.notificationsEnabled
+                                  ? Strings.labelOn
+                                  : Strings.labelOff,
+                              style: TextStyle(fontSize: 14.0),
                             ),
                           ),
                           ListTile(

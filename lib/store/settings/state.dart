@@ -28,6 +28,7 @@ class SettingsStore extends Equatable {
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
+  final bool dismissKeyboardEnabled;
 
   @JsonKey(nullable: true)
   final String messageSize;
@@ -70,6 +71,7 @@ class SettingsStore extends Equatable {
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
+    this.dismissKeyboardEnabled = false,
     this.customChatSettings,
     this.devices = const [],
     this.loading = false,
@@ -97,6 +99,7 @@ class SettingsStore extends Equatable {
         notificationsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
+        dismissKeyboardEnabled,
         customChatSettings,
         devices,
         loading,
@@ -124,6 +127,7 @@ class SettingsStore extends Equatable {
     bool membershipEventsEnabled,
     bool roomTypeBadgesEnabled,
     bool timeFormat24Enabled,
+    bool dismissKeyboardEnabled,
     Map<String, ChatSetting> customChatSettings,
     NotificationSettings notificationSettings,
     List<Device> devices,
@@ -148,6 +152,8 @@ class SettingsStore extends Equatable {
             typingIndicators != null ? typingIndicators : this.typingIndicators,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
+        dismissKeyboardEnabled:
+            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
         membershipEventsEnabled:
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:

@@ -44,6 +44,8 @@ class Strings {
   static const labelNoMessages = 'no messages found';
   static const labelNoGroups = 'no groups found';
   static const labelDeletedMessage = 'This message was deleted';
+  static const labelOn = 'On';
+  static const labelOff = 'Off';
 
   // Buttons
   static const buttonLogin = 'log in';
