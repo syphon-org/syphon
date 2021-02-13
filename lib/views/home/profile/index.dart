@@ -40,35 +40,34 @@ class ProfileViewState extends State<ProfileView> {
 
   String userIdNew;
   String displayNameNew;
-  final displayNameController = TextEditingController();
+
   final userIdController = TextEditingController();
+  final displayNameController = TextEditingController();
+
   final String title = Strings.titleProfile;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() {
-    final store = StoreProvider.of<AppState>(context);
+  onMounted(_Props props) {
     displayNameController.value = TextEditingValue(
-      text: store.state.authStore.user.displayName,
+      text: props.user.displayName,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: store.state.authStore.user.displayName.length,
+          offset: props.user.displayName.length,
         ),
       ),
     );
+
     userIdController.value = TextEditingValue(
-      text: store.state.authStore.user.userId,
+      text: props.user.userId,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: store.state.authStore.user.userId.length,
+          offset: props.user.userId.length,
         ),
       ),
     );
+
+    this.setState(() {
+      displayNameNew = props.user.displayName;
+    });
   }
 
   @protected
@@ -94,6 +93,7 @@ class ProfileViewState extends State<ProfileView> {
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+      onInitialBuild: onMounted,
       builder: (context, props) {
         final double imageSize = Dimensions.avatarSizeDetails;
 
@@ -212,12 +212,13 @@ class ProfileViewState extends State<ProfileView> {
                                 ),
                                 child: TextFieldSecure(
                                   label: 'Display Name',
+                                  controller: displayNameController,
                                   onChanged: (name) {
+                                    print('OnChanged $name');
                                     this.setState(() {
                                       displayNameNew = name;
                                     });
                                   },
-                                  controller: displayNameController,
                                 ),
                               ),
                               Container(
@@ -246,7 +247,9 @@ class ProfileViewState extends State<ProfileView> {
                                   child: ButtonSolid(
                                     text: Strings.buttonSaveGeneric,
                                     loading: props.loading,
-                                    disabled: props.loading,
+                                    disabled: props.loading ||
+                                        displayNameNew ==
+                                            props.user.displayName,
                                     onPressed: () async {
                                       final bool successful =
                                           await props.onSaveProfile(
@@ -272,7 +275,7 @@ class ProfileViewState extends State<ProfileView> {
                                       activeOpacity: 0.4,
                                       onTap: () => Navigator.pop(context),
                                       child: Text(
-                                        'quit editing',
+                                        'cancel',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 18,
