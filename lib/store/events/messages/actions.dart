@@ -25,6 +25,13 @@ import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
+ThunkAction<AppState> initRevisedMessages({
+  Room room,
+  Message message,
+}) {
+  return (Store<AppState> store) async {};
+}
+
 /// Send Message
 ThunkAction<AppState> sendMessage({
   Room room,

@@ -285,7 +285,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRooms] ${roomId} $error');
+      debugPrint('[fetchRoom] ${roomId} $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -313,23 +313,21 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       }
 
       // Convert joined_rooms to Room objects
-      final List<dynamic> joinedRoomsRaw = data['joined_rooms'];
-      final joinedRooms = joinedRoomsRaw.map((id) => Room(id: id)).toList();
+      final joinedRooms = (data['joined_rooms'] as List<dynamic>);
+      final joinedRoomsList = joinedRooms.map((id) => Room(id: id)).toList();
 
-      final fullJoinedRooms = joinedRooms.map((room) async {
+      await Future.wait(joinedRoomsList.map((room) async {
         try {
           store.dispatch(fetchRoom(room.id, fetchState: syncState));
         } catch (error) {
-          debugPrint('[fetchRooms] ${room.id} $error');
+          debugPrint('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
-      });
-
-      await Future.wait(fullJoinedRooms);
+      }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRooms] $error');
+      debugPrint('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -360,28 +358,19 @@ ThunkAction<AppState> fetchDirectRooms() {
       }
 
       // Mark specified rooms as direct chats
-      final directRoomMap = data as Map<String, dynamic>;
-      final List<Map> directRoomList = [];
+      // convert roomId arrays to one array
+      final directRooms = data as Map<String, dynamic>;
+      final directRoomList = directRooms.values.expand((x) => x).toList();
 
-      // Parse room map to allow for pulling by roomId (keeping userId)
-      directRoomMap.forEach((userId, roomIds) {
-        roomIds.forEach((roomId) {
-          directRoomList.add({userId: roomId});
-        });
-      });
-
+      // Wait for all room data to be pulled
       // Fetch room state and messages by userId/roomId
-      final directRoomData = directRoomList.map((directRoom) async {
-        final roomId = directRoom.values.elementAt(0);
+      await Future.wait(directRoomList.map((roomId) async {
         try {
           store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
           debugPrint('[fetchDirectRooms] $error');
         }
-      });
-
-      // Wait for all room data to be pulled
-      await Future.wait(directRoomData);
+      }));
     } catch (error) {
       debugPrint('[fetchDirectRooms] $error');
     } finally {

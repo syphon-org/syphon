@@ -63,7 +63,7 @@ ThunkAction<AppState> clearUserInvites() {
   };
 }
 
-ThunkAction<AppState> fetchUserProfile({User user}) {
+ThunkAction<AppState> fetchUser({User user = const User()}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -72,13 +72,14 @@ ThunkAction<AppState> fetchUserProfile({User user}) {
         protocol: protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        userId: store.state.authStore.currentUser.userId,
+        userId: user.userId,
       );
 
       store.dispatch(SaveUser(
         user: user.copyWith(
-          displayName: data['displayname'],
+          userId: user.userId,
           avatarUri: data['avatar_url'],
+          displayName: data['displayname'],
         ),
       ));
     } catch (error) {

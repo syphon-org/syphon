@@ -53,7 +53,7 @@ Future<Database> initStorage() async {
       );
     }
 
-    if (factory == null) {
+    if (storageFactory == null) {
       throw UnsupportedError(
         'Sorry, Syphon does not support your platform yet. Hope to do so soon!',
       );

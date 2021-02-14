@@ -48,7 +48,7 @@ ThunkAction<AppState> fetchBaseUrl({Homeserver homeserver}) {
   };
 }
 
-ThunkAction<AppState> fetchServerStatus({Homeserver homeserver}) {
+ThunkAction<AppState> fetchServerVersion({Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {

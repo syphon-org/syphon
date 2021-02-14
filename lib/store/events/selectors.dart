@@ -26,25 +26,32 @@ List<Message> filterMessages(
     );
 }
 
-List<Message> appendRelated(
+List<Message> reviseMessages(
   List<Message> messages,
   AppState state,
 ) {
-  var messagesMap = appendReactions(
-    replaceEdited(messages),
+  final messagesMap = filterRedactions(
+    appendReactions(replaceEdited(messages), state: state),
     state: state,
   );
 
+  return List.from(messagesMap.values);
+}
+
+Map<String, Message> filterRedactions(
+  Map<String, Message> messages, {
+  AppState state,
+}) {
   final redactions = state.eventStore.redactions;
 
   // get a list message ids (also reaction keys) that have values in 'reactions'
   redactions.forEach((key, value) {
-    if (messagesMap.containsKey(key)) {
-      messagesMap[key] = messagesMap[key].copyWith(body: null);
+    if (messages.containsKey(key)) {
+      messages[key] = messages[key].copyWith(body: null);
     }
   });
 
-  return List.from(messagesMap.values);
+  return messages;
 }
 
 Map<String, Message> appendReactions(

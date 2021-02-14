@@ -770,7 +770,7 @@ class _Props extends Equatable {
       enterSend: store.state.settingsStore.enterSend,
       redactions: store.state.eventStore.redactions.length,
       messages: latestMessages(
-        appendRelated(
+        reviseMessages(
           filterMessages(
             combineOutbox(
               messages: roomMessages(store.state, roomId).toList(),
