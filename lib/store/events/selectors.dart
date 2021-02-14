@@ -1,8 +1,11 @@
 // Project imports:
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {
@@ -30,20 +33,41 @@ List<Message> reviseMessages(
   List<Message> messages,
   AppState state,
 ) {
+  final reactions = selectReactions(state);
+  final redactions = state.eventStore.redactions;
+
+  return reviseMessagesAlt(messages, redactions, reactions);
+}
+
+List<Message> reviseMessagesAlt(
+  List<Message> messages,
+  Map<String, Redaction> redactions,
+  Map<String, List<Reaction>> reactions,
+) {
   final messagesMap = filterRedactions(
-    appendReactions(replaceEdited(messages), state: state),
-    state: state,
+    appendReactions(
+      replaceEdited(messages),
+      reactions: reactions,
+      redactions: redactions,
+    ),
+    redactions: redactions,
   );
 
   return List.from(messagesMap.values);
 }
 
+List<Message> reviseMessagesBackground(Map params) {
+  List<Message> messages = params['messages'];
+  Map<String, Redaction> redactions = params['redactions'];
+  Map<String, List<Reaction>> reactions = params['reactions'];
+
+  return reviseMessagesAlt(messages, redactions, reactions);
+}
+
 Map<String, Message> filterRedactions(
   Map<String, Message> messages, {
-  AppState state,
+  Map<String, Redaction> redactions,
 }) {
-  final redactions = state.eventStore.redactions;
-
   // get a list message ids (also reaction keys) that have values in 'reactions'
   redactions.forEach((key, value) {
     if (messages.containsKey(key)) {
@@ -56,11 +80,9 @@ Map<String, Message> filterRedactions(
 
 Map<String, Message> appendReactions(
   Map<String, Message> messages, {
-  AppState state,
+  Map<String, Redaction> redactions,
+  Map<String, List<Reaction>> reactions,
 }) {
-  final reactions = selectReactions(state);
-  final redactions = state.eventStore.redactions;
-
   // get a list message ids (also reaction keys) that have values in 'reactions'
   final List<String> reactionedMessageIds =
       reactions.keys.where((k) => messages.containsKey(k)).toList();

@@ -99,6 +99,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
 
+    // mutate messages
     store.dispatch(initRevisedMessages());
 
     final currentUser = store.state.authStore.user;
