@@ -15,6 +15,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -139,6 +140,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
+      List messages = List<Message>();
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
@@ -160,11 +162,16 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
+      // HACK: mutation filters - filters previously fetched messages
+      messages = await store.dispatch(mutateMessages(
+        messages: room.messagesNew,
+      ));
+
       // update cold storage
       await Future.wait([
+        saveMessages(messages, storage: Storage.main),
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
-        saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
         saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
@@ -172,12 +179,17 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
       // update store
       await store.dispatch(setUsers(room.usersNew));
-      await store.dispatch(setMessages(room: room, messages: room.messagesNew));
+      await store.dispatch(setMessages(room: room, messages: messages));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
       await store.dispatch(setReceipts(
         room: room,
         receipts: room.readReceipts,
+      ));
+
+      // mutation filters
+      await store.dispatch(mutateMessagesRoom(
+        room: room,
       ));
 
       // TODO: remove with parsers - clear users from parsed room objects
@@ -540,14 +552,14 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted = latestMessages(
+        final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );
 
-        if (messagesSorted.isNotEmpty) {
+        if (messageLatest != null) {
           store.dispatch(sendReadReceipts(
             room: Room(id: roomId),
-            message: messagesSorted.elementAt(0),
+            message: messageLatest,
           ));
         }
       }

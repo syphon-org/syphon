@@ -83,8 +83,8 @@ ThunkAction<AppState> setRedactions({
   String roomId,
   List<Redaction> redactions,
 }) =>
-    (Store<AppState> store) async {
-      await store.dispatch(SetRedactions(redactions: redactions));
+    (Store<AppState> store) {
+      store.dispatch(SetRedactions(redactions: redactions));
     };
 
 ThunkAction<AppState> setReceipts({

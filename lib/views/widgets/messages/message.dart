@@ -47,11 +47,11 @@ class MessageWidget extends StatelessWidget {
   final String timeFormat;
   final String avatarUri;
   final String selectedMessageId;
-  final Function onLongPress;
+  final Function onSwipe;
   final Function onPressAvatar;
   final Function onInputReaction;
   final Function onToggleReaction;
-  final Function onSwipe;
+  final void Function(Message) onLongPress;
 
   @protected
   Widget buildReactions(
@@ -325,9 +325,9 @@ class MessageWidget extends StatelessWidget {
       ),
       child: GestureDetector(
         onLongPress: () {
-          if (this.onLongPress != null) {
+          if (onLongPress != null) {
             HapticFeedback.lightImpact();
-            this.onLongPress(message: message);
+            onLongPress(message);
           }
         },
         child: Opacity(

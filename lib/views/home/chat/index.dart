@@ -1,12 +1,10 @@
 // Dart imports:
-import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 // Package imports:
@@ -31,18 +29,15 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-input.dart';
 import 'package:syphon/views/home/chat/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/dialog-invite.dart';
+import 'package:syphon/views/home/chat/message-list.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:syphon/views/widgets/messages/message-typing.dart';
-import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class ChatViewArguements {
@@ -66,15 +61,12 @@ class ChatView extends StatefulWidget {
 class ChatViewState extends State<ChatView> {
   bool sendable = false;
   Message selectedMessage;
-  Timer typingNotifier;
-  Timer typingNotifierTimeout;
-  FocusNode inputFieldNode;
   Map<String, Color> senderColors;
 
-  double overshoot = 0;
   bool loadMore = false;
   String mediumType = MediumType.plaintext;
 
+  final inputFieldNode = FocusNode();
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
@@ -82,28 +74,10 @@ class ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-    inputFieldNode = FocusNode();
-    inputFieldNode.addListener(() {
-      if (!inputFieldNode.hasFocus && this.typingNotifier != null) {
-        this.typingNotifier.cancel();
-        this.setState(() {
-          typingNotifier = null;
-        });
-      }
-    });
-
-    // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      onMounted();
-    });
   }
 
   @protected
-  void onMounted() async {
-    final arguements =
-        ModalRoute.of(context).settings.arguments as ChatViewArguements;
-    final store = StoreProvider.of<AppState>(context, listen: false);
-    final props = _Props.mapStateToProps(store, arguements.roomId);
+  void onMounted(_Props props) async {
     final draft = props.room.draft;
 
     // only marked if read receipts are enabled
@@ -129,20 +103,15 @@ class ChatViewState extends State<ChatView> {
       });
     }
 
-    if (props.messages.length < 10) {
+    if (props.messagesLength < 10) {
       props.onLoadFirstBatch();
     }
 
     if (draft != null && draft.type == MessageTypes.TEXT) {
-      final text = draft.body;
-      this.setState(() {
-        sendable = text != null && text.isNotEmpty;
-      });
-
       editorController.value = TextEditingValue(
-        text: text,
+        text: draft.body,
         selection: TextSelection.fromPosition(
-          TextPosition(offset: text.length),
+          TextPosition(offset: draft.body.length),
         ),
       );
     }
@@ -168,7 +137,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onDidChange(_Props props) {
+  onUpdate(_Props props) {
     if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
       this.setState(() {
         mediumType = MediumType.encryption;
@@ -182,50 +151,37 @@ class ChatViewState extends State<ChatView> {
     inputFieldNode.dispose();
     messagesController.dispose();
     super.dispose();
-    if (this.typingNotifier != null) {
-      this.typingNotifier.cancel();
-    }
+  }
 
-    if (this.typingNotifierTimeout != null) {
-      this.typingNotifierTimeout.cancel();
+  onViewUserDetails({Message message, String userId}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        userId: userId ?? message.sender,
+      ),
+    );
+  }
+
+  onSubmitMessage(_Props props) async {
+    this.setState(() {
+      sendable = false;
+    });
+    props.onSendMessage(
+      body: editorController.text,
+      type: MessageTypes.TEXT,
+    );
+    editorController.clear();
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
     }
   }
 
-  onUpdateMessage(String text, _Props props) {
+  onToggleSelectedMessage(Message message) {
     this.setState(() {
-      sendable = text != null && text.trim().isNotEmpty;
+      selectedMessage = message;
     });
-
-    // start an interval for updating typing status
-    if (inputFieldNode.hasFocus && this.typingNotifier == null) {
-      props.onSendTyping(typing: true, roomId: props.room.id);
-      this.setState(() {
-        typingNotifier = Timer.periodic(
-          Duration(milliseconds: 4000),
-          (timer) => props.onSendTyping(typing: true, roomId: props.room.id),
-        );
-      });
-    }
-
-    // Handle a timeout of the interval if the user idles with input focused
-    if (inputFieldNode.hasFocus) {
-      if (typingNotifierTimeout != null) {
-        this.typingNotifierTimeout.cancel();
-      }
-      this.setState(() {
-        typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
-          if (typingNotifier != null) {
-            this.typingNotifier.cancel();
-            this.setState(() {
-              typingNotifier = null;
-              typingNotifierTimeout = null;
-            });
-            // run after to avoid flickering
-            props.onSendTyping(typing: false, roomId: props.room.id);
-          }
-        });
-      });
-    }
   }
 
   onChangeMediumType({String newMediumType, _Props props}) {
@@ -269,12 +225,6 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  onToggleMessageOptions({Message message}) {
-    this.setState(() {
-      selectedMessage = message;
-    });
-  }
-
   onInputReaction({Message message, _Props props}) async {
     final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
@@ -313,44 +263,10 @@ class ChatViewState extends State<ChatView> {
               );
 
               Navigator.pop(context, false);
-              this.setState(() {
-                selectedMessage = null;
-              });
+              onToggleSelectedMessage(null);
             }),
       ),
     );
-  }
-
-  onDismissMessageOptions() {
-    this.setState(() {
-      selectedMessage = null;
-    });
-  }
-
-  onViewUserDetails({Message message, String userId}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ModalUserDetails(
-        userId: userId ?? message.sender,
-      ),
-    );
-  }
-
-  onSubmitMessage(_Props props) async {
-    this.setState(() {
-      sendable = false;
-    });
-    props.onSendMessage(
-      body: editorController.text,
-      type: MessageTypes.TEXT,
-    );
-    editorController.clear();
-    print('Testing Enabled Keyboard Dismissed ${props.dismissKeyboardEnabled}');
-    if (props.dismissKeyboardEnabled) {
-      FocusScope.of(context).unfocus();
-    }
   }
 
   @protected
@@ -440,90 +356,11 @@ class ChatViewState extends State<ChatView> {
     );
   }
 
-  @protected
-  Widget buildMessageList(BuildContext context, _Props props) =>
-      GestureDetector(
-        onTap: onDismissMessageOptions,
-        child: Container(
-          child: ListView(
-            reverse: true,
-            padding: EdgeInsets.only(bottom: 12),
-            physics: selectedMessage != null
-                ? const NeverScrollableScrollPhysics()
-                : null,
-            controller: messagesController,
-            children: [
-              MessageTypingWidget(
-                roomUsers: props.users,
-                typing: props.room.userTyping,
-                usersTyping: props.room.usersTyping,
-                selectedMessageId: this.selectedMessage != null
-                    ? this.selectedMessage.id
-                    : null,
-                onPressAvatar: onViewUserDetails,
-              ),
-              ListView.builder(
-                reverse: true,
-                shrinkWrap: true,
-                padding: EdgeInsets.only(bottom: 4),
-                addRepaintBoundaries: true,
-                addAutomaticKeepAlives: true,
-                itemCount: props.messages.length,
-                scrollDirection: Axis.vertical,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  final message = props.messages[index];
-                  final lastMessage =
-                      index != 0 ? props.messages[index - 1] : null;
-                  final nextMessage = index + 1 < props.messages.length
-                      ? props.messages[index + 1]
-                      : null;
-
-                  final isLastSender = lastMessage != null &&
-                      lastMessage.sender == message.sender;
-                  final isNextSender = nextMessage != null &&
-                      nextMessage.sender == message.sender;
-                  final isUserSent = props.userId == message.sender;
-                  final selectedMessageId = this.selectedMessage != null
-                      ? this.selectedMessage.id
-                      : null;
-
-                  final avatarUri = props.users[message.sender]?.avatarUri;
-
-                  return MessageWidget(
-                    message: message,
-                    isUserSent: isUserSent,
-                    isLastSender: isLastSender,
-                    isNextSender: isNextSender,
-                    lastRead: props.room.lastRead,
-                    selectedMessageId: selectedMessageId,
-                    avatarUri: avatarUri,
-                    theme: props.theme,
-                    fontSize: 14,
-                    timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
-                    onSwipe: props.onSelectReply,
-                    onPressAvatar: onViewUserDetails,
-                    onLongPress: onToggleMessageOptions,
-                    onInputReaction: () => onInputReaction(
-                      message: message,
-                      props: props,
-                    ),
-                    onToggleReaction: (emoji) => props.onToggleReaction(
-                      emoji: emoji,
-                      message: message,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onDidChange: onDidChange,
+        onDidChange: onUpdate,
+        onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           (ModalRoute.of(context).settings.arguments as ChatViewArguements)
@@ -571,9 +408,7 @@ class ChatViewState extends State<ChatView> {
             appBar = AppBarMessageOptions(
               room: props.room,
               message: selectedMessage,
-              onDismiss: () => this.setState(() {
-                selectedMessage = null;
-              }),
+              onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
                 message: this.selectedMessage,
               ),
@@ -599,9 +434,13 @@ class ChatViewState extends State<ChatView> {
                       },
                       child: Stack(
                         children: [
-                          buildMessageList(
-                            context,
-                            props,
+                          MessageList(
+                            roomId: props.room.id,
+                            selectedMessage: selectedMessage,
+                            scrollController: messagesController,
+                            onSelectReply: props.onSelectReply,
+                            onViewUserDetails: onViewUserDetails,
+                            onToggleSelectedMessage: onToggleSelectedMessage,
                           ),
                           Positioned(
                             child: Loader(
@@ -663,15 +502,14 @@ class ChatViewState extends State<ChatView> {
                         bottom: closedInputPadding ? 16 : 0,
                       ),
                       child: ChatInput(
-                        sendable: sendable,
+                        roomId: props.room.id,
                         mediumType: mediumType,
                         focusNode: inputFieldNode,
-                        enterSend: props.enterSend,
+                        enterSend: props.enterSendEnabled,
                         controller: editorController,
                         quotable: props.room.reply,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
-                        onChangeMessage: (text) => onUpdateMessage(text, props),
                         onSubmitMessage: () => onSubmitMessage(props),
                         onSubmittedMessage: (text) => onSubmitMessage(props),
                       ),
@@ -689,17 +527,13 @@ class _Props extends Equatable {
   final Room room;
   final String userId;
   final bool loading;
-  final bool enterSend;
+  final int messagesLength;
+  final bool enterSendEnabled;
   final ThemeType theme;
-  final Map<String, User> users;
-  final List<Message> messages;
-  final int redactions;
   final Color roomPrimaryColor;
-  final bool timeFormat24Enabled;
   final bool roomTypeBadgesEnabled;
   final bool dismissKeyboardEnabled;
 
-  final Function onSendTyping;
   final Function onSendMessage;
   final Function onDeleteMessage;
   final Function onUpdateDeviceKeys;
@@ -718,17 +552,13 @@ class _Props extends Equatable {
     @required this.room,
     @required this.theme,
     @required this.userId,
-    @required this.users,
-    @required this.messages,
-    @required this.redactions,
     @required this.loading,
-    @required this.enterSend,
+    @required this.messagesLength,
+    @required this.enterSendEnabled,
     @required this.roomPrimaryColor,
-    @required this.timeFormat24Enabled,
     @required this.roomTypeBadgesEnabled,
     @required this.dismissKeyboardEnabled,
     @required this.onUpdateDeviceKeys,
-    @required this.onSendTyping,
     @required this.onSendMessage,
     @required this.onDeleteMessage,
     @required this.onSaveDraftMessage,
@@ -746,41 +576,23 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         room,
-        users,
         userId,
-        messages,
-        redactions,
         loading,
-        enterSend,
+        enterSendEnabled,
         roomPrimaryColor,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+      room: selectRoom(id: roomId, state: store.state),
       theme: store.state.settingsStore.theme,
       userId: store.state.authStore.user.userId,
       roomTypeBadgesEnabled:
           store.state.settingsStore.roomTypeBadgesEnabled ?? true,
-      timeFormat24Enabled:
-          store.state.settingsStore.timeFormat24Enabled ?? false,
       dismissKeyboardEnabled:
           store.state.settingsStore.dismissKeyboardEnabled ?? false,
+      enterSendEnabled: store.state.settingsStore.enterSend ?? false,
       loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
-      room: selectRoom(id: roomId, state: store.state),
-      users: store.state.userStore.users,
-      enterSend: store.state.settingsStore.enterSend,
-      redactions: store.state.eventStore.redactions.length,
-      messages: latestMessages(
-        reviseMessages(
-          filterMessages(
-            combineOutbox(
-              messages: roomMessages(store.state, roomId).toList(),
-              outbox: selectRoom(id: roomId, state: store.state).outbox,
-            ),
-            store.state,
-          ),
-          store.state,
-        ),
-      ),
+      messagesLength: store.state.eventStore.messages[roomId]?.length,
       onSelectReply: (Message message) {
         store.dispatch(selectReply(roomId: roomId, message: message));
       },
@@ -851,9 +663,6 @@ class _Props extends Equatable {
       onAcceptInvite: () {
         store.dispatch(acceptRoom(room: Room(id: roomId)));
       },
-      onSendTyping: ({typing, roomId}) => store.dispatch(
-            sendTyping(typing: typing, roomId: roomId),
-          ),
       onMarkRead: () {
         store.dispatch(markRoomRead(roomId: roomId));
       },

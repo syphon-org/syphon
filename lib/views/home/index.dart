@@ -284,10 +284,10 @@ class HomeViewState extends State<Home> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
-        final messagesLatest = latestMessages(messages);
+        final messageLatest = latestMessage(messages);
         final messagePreview = formatPreview(
           room: room,
-          messages: messagesLatest,
+          messages: messageLatest == null ? null : [messageLatest],
         );
         final roomSettings = props.chatSettings[room.id] ?? null;
 
@@ -334,7 +334,7 @@ class HomeViewState extends State<Home> {
 
         // display message as being 'unread'
         if (messages != null && messages.isNotEmpty) {
-          final messageRecent = messagesLatest[0];
+          final messageRecent = messageLatest;
 
           if (room.lastRead < messageRecent.timestamp) {
             messagesNew = true;

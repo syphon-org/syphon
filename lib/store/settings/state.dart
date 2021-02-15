@@ -5,13 +5,13 @@ import 'package:json_annotation/json_annotation.dart';
 // Project imports:
 import "package:syphon/global/themes.dart";
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 21
 @JsonSerializable()
 class SettingsStore extends Equatable {
   final int primaryColor;
@@ -32,10 +32,13 @@ class SettingsStore extends Equatable {
 
   @JsonKey(nullable: true)
   final String messageSize;
+
   final String fontName;
   final String fontSize;
   final String language;
   final String avatarShape;
+
+  final List<String> sortOptions;
 
   final List<Device> devices;
 
@@ -63,6 +66,7 @@ class SettingsStore extends Equatable {
     this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
+    this.sortOptions = const [SortOptions.PINNED],
     this.enterSend = false,
     this.smsEnabled = false,
     this.readReceipts = false,

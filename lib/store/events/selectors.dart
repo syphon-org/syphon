@@ -9,7 +9,7 @@ import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {
-  return state.eventStore.messages[roomId] ?? [];
+  return List.from(state.eventStore.messages[roomId] ?? []);
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
@@ -144,8 +144,18 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
+Message latestMessage(List<Message> messages) {
+  // sort descending
+  if (messages.isEmpty) {
+    return null;
+  }
+
+  return messages.fold(messages[0],
+      (newest, msg) => msg.timestamp > newest.timestamp ? msg : newest);
+}
+
 List<Message> latestMessages(List<Message> messages) {
-  final sortedList = List<Message>.from(messages ?? []);
+  final sortedList = messages ?? [];
 
   // sort descending
   sortedList.sort((a, b) {
