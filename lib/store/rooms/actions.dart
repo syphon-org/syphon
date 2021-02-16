@@ -140,7 +140,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
-      List messages = List<Message>();
+      List<Message> messages = List<Message>();
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
@@ -162,20 +162,20 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
+      // update cold storage
+      await Future.wait([
+        saveUsers(room.usersNew, storage: Storage.main),
+        saveRooms({room.id: room}, storage: Storage.main),
+        saveReactions(room.reactions, storage: Storage.main),
+        saveMessages(room.messagesNew, storage: Storage.main),
+        saveRedactions(room.redactions, storage: Storage.main),
+        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
+      ]);
+
       // mutation filters - handles previously fetched messages
       messages = await store.dispatch(mutateMessages(
         messages: room.messagesNew,
       ));
-
-      // update cold storage
-      await Future.wait([
-        saveMessages(messages, storage: Storage.main),
-        saveUsers(room.usersNew, storage: Storage.main),
-        saveRooms({room.id: room}, storage: Storage.main),
-        saveReactions(room.reactions, storage: Storage.main),
-        saveRedactions(room.redactions, storage: Storage.main),
-        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
-      ]);
 
       // update store
       await store.dispatch(setUsers(room.usersNew));

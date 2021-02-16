@@ -24,15 +24,14 @@ String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
 
-String formatPreview({Room room, List<Message> messages}) {
+String formatPreview({Room room, Message message}) {
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null && room.draft.body != null) {
     return 'Draft: ${formatPreviewMessage(room.draft.body)}';
   }
 
-  // Show topic if the user has joined a group but not sent anything (lurkin')
-
-  if (messages == null || messages.length < 1) {
+  // Show topic if the user has joined a group but not sent
+  if (message == null) {
     if (room.invite) {
       return 'Invite to chat';
     }
@@ -44,11 +43,14 @@ String formatPreview({Room room, List<Message> messages}) {
     return formatPreviewTopic(room.topic, defaultTopic: '');
   }
 
-  // sort messages found
-  final recentMessage = messages[0];
-  var body = formatPreviewMessage(recentMessage.body);
+  if (message.body == '' || message.body == null) {
+    return 'This message was deleted';
+  }
 
-  if (recentMessage.type == EventTypes.encrypted && body.isEmpty) {
+  // sort messages found
+  var body = formatPreviewMessage(message.body);
+
+  if (message.type == EventTypes.encrypted && body.isEmpty) {
     body = Strings.contentEncryptedMessage.replaceAll('[]', '');
   }
 

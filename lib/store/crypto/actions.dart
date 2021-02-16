@@ -430,7 +430,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
     }
 
     // if the key count hasn't changed, don't update it
-    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts;
+    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts ?? {};
     if (currentKeyCount[Algorithms.signedcurve25519] ==
         oneTimeKeysCounts[Algorithms.signedcurve25519]) {
       return;

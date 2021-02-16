@@ -150,6 +150,8 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     Map<String, Map<String, ReadReceipt>> receipts = Map();
 
     for (Room room in rooms.values) {
+      print('${room.name} ${room.messageIds.length}');
+
       messages[room.id] = await loadMessages(
         room.messageIds,
         storage: storage,
