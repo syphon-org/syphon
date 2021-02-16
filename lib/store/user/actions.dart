@@ -41,6 +41,8 @@ class ClearUserInvites {}
 
 ThunkAction<AppState> setUsers(Map<String, User> users) {
   return (Store<AppState> store) {
+    if (users.isEmpty) return;
+
     store.dispatch(SetUsers(users: users));
   };
 }

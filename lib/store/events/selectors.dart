@@ -1,7 +1,6 @@
 // Project imports:
 import 'dart:async';
 
-import 'package:intl/intl.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';

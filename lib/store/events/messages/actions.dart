@@ -88,6 +88,8 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
 ///
 ThunkAction<AppState> mutateMessagesRoom({Room room}) {
   return (Store<AppState> store) async {
+    if (room.messagesNew.isEmpty) return;
+
     final messages = store.state.eventStore.messages[room.id];
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;

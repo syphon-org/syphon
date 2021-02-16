@@ -162,7 +162,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
-      // HACK: mutation filters - filters previously fetched messages
+      // mutation filters - handles previously fetched messages
       messages = await store.dispatch(mutateMessages(
         messages: room.messagesNew,
       ));
@@ -187,7 +187,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         receipts: room.readReceipts,
       ));
 
-      // mutation filters
+      // mutation filters - handles backfilling mutations
       await store.dispatch(mutateMessagesRoom(
         room: room,
       ));

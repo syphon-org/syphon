@@ -20,7 +20,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -427,6 +426,13 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map oneTimeKeysCounts) {
     // Confirm user has generated an olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     if (olmAccount == null) {
+      return;
+    }
+
+    // if the key count hasn't changed, don't update it
+    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts;
+    if (currentKeyCount[Algorithms.signedcurve25519] ==
+        oneTimeKeysCounts[Algorithms.signedcurve25519]) {
       return;
     }
 
