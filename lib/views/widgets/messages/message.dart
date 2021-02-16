@@ -199,6 +199,7 @@ class MessageWidget extends StatelessWidget {
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
+    var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
     var isRead = message.timestamp < lastRead;
@@ -290,6 +291,11 @@ class MessageWidget extends StatelessWidget {
     if (message.type == EventTypes.encrypted) {
       if (message.body.isEmpty) {
         body = Strings.contentEncryptedMessage;
+      }
+    } else {
+      if (message.body.isEmpty) {
+        body = Strings.contentDeletedMessage;
+        fontStyle = FontStyle.italic;
       }
     }
 
@@ -413,15 +419,18 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                   Container(
                                     margin: EdgeInsets.only(bottom: 5),
-                                    child: Text(body.trim(),
-                                        style: TextStyle(
-                                          color: textColor,
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .subtitle2
-                                              .fontSize,
-                                        )),
+                                    child: Text(
+                                      body.trim(),
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontStyle: fontStyle,
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .subtitle2
+                                            .fontSize,
+                                      ),
+                                    ),
                                   ),
                                   Flex(
                                     /// *** Message Status Row ***

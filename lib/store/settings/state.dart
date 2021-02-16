@@ -14,6 +14,9 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class SettingsStore extends Equatable {
+  @JsonKey(ignore: true)
+  final bool loading;
+
   final int primaryColor;
   final int accentColor;
   final int appBarColor;
@@ -38,12 +41,12 @@ class SettingsStore extends Equatable {
   final String language;
   final String avatarShape;
 
-  final List<String> sortOptions;
-
   final List<Device> devices;
 
   // Map<roomId, ChatSetting>
   final Map<String, ChatSetting> customChatSettings;
+  final List<String> sortGroups;
+  final String sortOrder;
 
   final NotificationSettings notificationSettings;
 
@@ -51,9 +54,6 @@ class SettingsStore extends Equatable {
 
   @JsonKey(ignore: true)
   final String pusherToken; // NOTE: can be device token for APNS
-
-  @JsonKey(ignore: true)
-  final bool loading;
 
   const SettingsStore({
     this.primaryColor = Colours.cyanSyphon,
@@ -66,7 +66,8 @@ class SettingsStore extends Equatable {
     this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
-    this.sortOptions = const [SortOptions.PINNED],
+    this.sortGroups = const [SortOptions.PINNED],
+    this.sortOrder = SortOrder.LATEST,
     this.enterSend = false,
     this.smsEnabled = false,
     this.readReceipts = false,

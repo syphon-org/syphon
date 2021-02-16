@@ -71,9 +71,7 @@ class ChatPreferences extends StatelessWidget {
                                 title: Text(
                                   'Language',
                                 ),
-                                trailing: Text(
-                                  props.language,
-                                ),
+                                trailing: Text(props.language),
                               ),
                             ),
                             GestureDetector(
@@ -142,6 +140,47 @@ class ChatPreferences extends StatelessWidget {
                                 value: props.dismissKeyboard,
                                 onChanged: (value) =>
                                     props.onToggleDismissKeyboard(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width,
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Ordering',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'Sort By',
+                                ),
+                                trailing: Text(
+                                  'Timestamp',
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'Group By',
+                                ),
+                                trailing: Text(
+                                  'None',
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
                               ),
                             ),
                           ],

@@ -9,11 +9,10 @@ List<Room> availableRooms(List<Room> rooms) {
   return List.from(rooms.where((room) => !room.hidden));
 }
 
-String formatPreviewTopic(String fullTopic, {String defaultTopic}) {
-  final topic = fullTopic ?? defaultTopic ?? 'No Topic Available';
-  return topic.length > 100
-      ? topic.substring(0, 100).replaceAll('\n', ' ')
-      : topic;
+String formatPreviewTopic(String fullTopic) {
+  final topic = fullTopic ?? Strings.contentTopicEmpty;
+  final topicTruncated = topic.length > 100 ? topic.substring(0, 100) : topic;
+  return topicTruncated.replaceAll('\n', ' ');
 }
 
 String formatPreviewMessage(String body) {
@@ -32,29 +31,32 @@ String formatPreview({Room room, Message message}) {
 
   // Show topic if the user has joined a group but not sent
   if (message == null) {
+    // romm is just an invite
     if (room.invite) {
       return 'Invite to chat';
     }
 
+    // room was created, but no messages or topic
     if (room.topic == null || room.topic.length < 1) {
       return 'No messages yet';
     }
 
-    return formatPreviewTopic(room.topic, defaultTopic: '');
+    // show the topic as the preview message
+    return formatPreviewTopic(room.topic);
   }
 
-  if (message.body == '' || message.body == null) {
+  // message was deleted
+  if (message.type != EventTypes.encrypted &&
+      (message.body == '' || message.body == null)) {
     return 'This message was deleted';
   }
 
-  // sort messages found
-  var body = formatPreviewMessage(message.body);
-
-  if (message.type == EventTypes.encrypted && body.isEmpty) {
-    body = Strings.contentEncryptedMessage.replaceAll('[]', '');
+  // message hasn't been decrypted
+  if (message.type == EventTypes.encrypted && message.body.isEmpty) {
+    return Strings.contentEncryptedMessage;
   }
 
-  return body;
+  return formatPreviewMessage(message.body);
 }
 
 String formatRoomName({Room room}) {

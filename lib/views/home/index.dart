@@ -284,8 +284,8 @@ class HomeViewState extends State<Home> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
-        final roomSettings = props.chatSettings[room.id] ?? null;
         final messageLatest = latestMessage(messages);
+        final roomSettings = props.chatSettings[room.id] ?? null;
         final preview = formatPreview(room: room, message: messageLatest);
 
         bool messagesNew = false;
@@ -323,8 +323,12 @@ class HomeViewState extends State<Home> {
 
         if (messages != null && messages.isNotEmpty) {
           // it has undecrypted message contained within
-          if (messages[0].type == EventTypes.encrypted &&
-              messages[0].body.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted &&
+              messageLatest.body.isEmpty) {
+            textStyle = TextStyle(fontStyle: FontStyle.italic);
+          }
+
+          if (messageLatest.body == null || messageLatest.body.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
