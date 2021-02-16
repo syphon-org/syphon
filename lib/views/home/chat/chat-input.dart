@@ -105,7 +105,7 @@ class ChatInputState extends State<ChatInput> {
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
-      // props.onSendTyping(typing: true, roomId: props.room.id);
+      props.onSendTyping(typing: true, roomId: props.room.id);
       this.setState(() {
         typingNotifier = Timer.periodic(
           Duration(milliseconds: 4000),
@@ -133,6 +133,9 @@ class ChatInputState extends State<ChatInput> {
           }
         });
       });
+    }
+    if (widget.onUpdateMessage != null) {
+      widget.onUpdateMessage(text);
     }
   }
 
@@ -322,9 +325,7 @@ class ChatInputState extends State<ChatInput> {
                       cursorColor: inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
-                      onChanged: widget.onUpdateMessage != null
-                          ? widget.onUpdateMessage
-                          : null,
+                      onChanged: (text) => onUpdate(text, props: props),
                       onSubmitted: !sendable ? null : widget.onSubmittedMessage,
                       style: TextStyle(
                         height: 1.5,
