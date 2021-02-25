@@ -225,7 +225,6 @@ Future<List<Message>> loadMessages(
 
     return messages;
   } catch (error) {
-    print('what?');
     printError(error.toString(), title: 'loadMessages');
     return List();
   }

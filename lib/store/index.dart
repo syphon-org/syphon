@@ -24,7 +24,7 @@ import 'package:syphon/store/events/reducer.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/cache/serializer.dart';
-import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/reducer.dart';
@@ -109,24 +109,17 @@ Future<Store> initStore(Database cache, Database storage) async {
   final persistor = Persistor<AppState>(
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: data),
-    // TODO: can remove once cold storage is in place
-    throttleDuration: Duration(milliseconds: 4000),
     shouldSave: (Store<AppState> store, dynamic action) {
-      // TODO: can remove once cold storage is in place
       switch (action.runtimeType) {
-        case SetSynced:
-          if (action.synced) {
-            return true;
-          }
-          return false;
+        case SetRoom:
         case SetOlmAccount:
         case SetOlmAccountBackup:
         case SetDeviceKeysOwned:
         case SetUser:
         case ResetCrypto:
         case ResetUser:
+          print('[initStore] saving ${action}');
           return true;
-        case SetSyncing:
         default:
           return false;
       }

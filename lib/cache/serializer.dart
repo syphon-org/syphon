@@ -45,12 +45,13 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.authStore,
       state.syncStore,
       state.cryptoStore,
+      state.roomStore,
     ];
 
     // Queue up a cache saving will wait
     // if the previously schedule task has not finished
     Future.microtask(() async {
-      // // create a new IV for the encrypted cache
+      // create a new IV for the encrypted cache
       Cache.ivKey = generateIV();
 
       // backup the IV in case the app is force closed before caching finishes

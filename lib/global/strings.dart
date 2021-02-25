@@ -173,9 +173,13 @@ class Strings {
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
   static String formatUsernameHint({String homeserver, String username}) {
-    return homeserver.length != 0
-        ? '@${username != null && username.length > 0 ? username : 'username'}:$homeserver'
-        : '@${username != null && username.length > 0 ? username : 'username'}:matrix.org';
+    final usernameFormatted =
+        username != null && username.length > 0 ? username : 'username';
+    final alias = homeserver.length != 0
+        ? '@$usernameFormatted:$homeserver'
+        : '@$usernameFormatted:matrix.org';
+
+    return alias.replaceFirst('@', '', 1);
   }
 
   // Tooltips
