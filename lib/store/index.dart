@@ -146,6 +146,7 @@ Future<Store> initStore(Database cache, Database storage) async {
     ],
   );
 
+  // finish loading cold storage after app state init
   loadStorageAsync(storage, store);
 
   return Future.value(store);

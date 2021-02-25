@@ -113,13 +113,11 @@ Future<void> deleteStorage() async {
 //
 // Load Storage
 //
-// bulk loads cold storage objects to RAM, this can
-// be much more specific and performant
+// essential cold storage backup needed in case hot
+// cache becomes corrupted (issue with closing the application)
+// with the json is serializing
 //
-// for example, only load users that are known to be
-// involved in stored messages/events
-//
-// TODO: need pagination for pretty much all of these
+// TODO: make cold cache failure aware
 //
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   try {
@@ -197,7 +195,7 @@ void loadStorageAsync(Database storage, Store<AppState> store) async {
             break;
           case StorageKeys.ROOMS:
             store.dispatch(SetRooms(
-              rooms: (data.value as Map).values.toList(),
+              rooms: List.from((data.value as Map).values),
             ));
             break;
           case StorageKeys.MEDIA:
