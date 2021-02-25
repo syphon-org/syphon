@@ -8,8 +8,10 @@ import '../events/model.dart';
 import './state.dart';
 import 'package:syphon/store/events/messages/model.dart';
 
-EventStore eventReducer(
-    [EventStore state = const EventStore(), dynamic action]) {
+EventStore eventReducer([
+  EventStore state = const EventStore(),
+  dynamic action,
+]) {
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
@@ -97,6 +99,14 @@ EventStore eventReducer(
 
       return state.copyWith(receipts: receiptsUpdated);
 
+    case LoadMessages:
+      return state.copyWith(messages: action.messagesMap);
+    case LoadReactions:
+      return state.copyWith(reactions: action.reactionsMap);
+    case LoadReceipts:
+      return state.copyWith(receipts: action.receiptsMap);
+    case LoadRedactions:
+      return state.copyWith(redactions: action.redactionsMap);
     case ResetEvents:
       return EventStore();
     default:

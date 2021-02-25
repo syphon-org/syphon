@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
@@ -16,10 +15,6 @@ import 'package:syphon/storage/constants.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';

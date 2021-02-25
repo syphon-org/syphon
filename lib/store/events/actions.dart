@@ -31,8 +31,6 @@ import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
 
-class ResetEvents {}
-
 class SetEvents {
   final String roomId;
   final List<Event> events;
@@ -61,6 +59,28 @@ class SetRedactions {
   final List<Redaction> redactions;
   SetRedactions({this.redactions});
 }
+
+class LoadMessages {
+  final Map<String, List<Message>> messagesMap;
+  LoadMessages({this.messagesMap});
+}
+
+class LoadReactions {
+  final Map<String, List<Reaction>> reactionsMap;
+  LoadReactions({this.reactionsMap});
+}
+
+class LoadReceipts {
+  final Map<String, Map<String, ReadReceipt>> receiptsMap;
+  LoadReceipts({this.receiptsMap});
+}
+
+class LoadRedactions {
+  final Map<String, Redaction> redactionsMap;
+  LoadRedactions({this.redactionsMap});
+}
+
+class ResetEvents {}
 
 ThunkAction<AppState> setMessages({
   Room room,
