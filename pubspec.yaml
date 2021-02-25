@@ -47,7 +47,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.7+170
+version: 0.1.8+180
 
 environment:
   sdk: ">=2.9.0 <3.0.0" # <- modified to solve build_runner
@@ -99,7 +99,7 @@ dependencies:
   easy_localization: 2.3.3
   flutter_dotenv: 2.1.0
   android_alarm_manager: 0.4.5+15
-  uni_links: 0.4.0 
+  uni_links: 0.4.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   # Desktop UI Only - UNCOMMENT FOR BUILDS
@@ -174,7 +174,7 @@ flutter:
     - ./.env.debug
     - ./.env.release
     - assets/translations/en.json
-    - assets/translations/ru.json 
+    - assets/translations/ru.json
     - assets/graphics/undraw_sync_files.svg
     - assets/graphics/undraw_accept_terms.svg
     - assets/graphics/undraw_mobile_user.svg
