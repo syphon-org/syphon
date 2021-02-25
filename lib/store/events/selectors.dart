@@ -1,12 +1,14 @@
 // Project imports:
-import 'package:intl/intl.dart';
+import 'dart:async';
+
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String roomId) {
-  return state.eventStore.messages[roomId] ?? [];
+  return List.from(state.eventStore.messages[roomId] ?? []);
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
@@ -26,34 +28,60 @@ List<Message> filterMessages(
     );
 }
 
-List<Message> appendRelated(
+List<Message> reviseMessages(
   List<Message> messages,
   AppState state,
 ) {
-  var messagesMap = appendReactions(
-    replaceEdited(messages),
-    state: state,
-  );
-
+  final reactions = selectReactions(state);
   final redactions = state.eventStore.redactions;
 
-  // get a list message ids (also reaction keys) that have values in 'reactions'
-  redactions.forEach((key, value) {
-    if (messagesMap.containsKey(key)) {
-      messagesMap[key] = messagesMap[key].copyWith(body: null);
-    }
-  });
+  return reviseMessagesAlt(messages, redactions, reactions);
+}
+
+List<Message> reviseMessagesAlt(
+  List<Message> messages,
+  Map<String, Redaction> redactions,
+  Map<String, List<Reaction>> reactions,
+) {
+  final messagesMap = filterRedactions(
+    appendReactions(
+      replaceEdited(messages),
+      reactions: reactions,
+      redactions: redactions,
+    ),
+    redactions: redactions,
+  );
 
   return List.from(messagesMap.values);
 }
 
+List<Message> reviseMessagesBackground(Map params) {
+  List<Message> messages = params['messages'];
+  Map<String, Redaction> redactions = params['redactions'];
+  Map<String, List<Reaction>> reactions = params['reactions'];
+
+  return reviseMessagesAlt(messages, redactions, reactions);
+}
+
+Map<String, Message> filterRedactions(
+  Map<String, Message> messages, {
+  Map<String, Redaction> redactions,
+}) {
+  // get a list message ids (also reaction keys) that have values in 'reactions'
+  redactions.forEach((key, value) {
+    if (messages.containsKey(key)) {
+      messages[key] = messages[key].copyWith(body: null);
+    }
+  });
+
+  return messages;
+}
+
 Map<String, Message> appendReactions(
   Map<String, Message> messages, {
-  AppState state,
+  Map<String, Redaction> redactions,
+  Map<String, List<Reaction>> reactions,
 }) {
-  final reactions = selectReactions(state);
-  final redactions = state.eventStore.redactions;
-
   // get a list message ids (also reaction keys) that have values in 'reactions'
   final List<String> reactionedMessageIds =
       reactions.keys.where((k) => messages.containsKey(k)).toList();
@@ -115,8 +143,18 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
+Message latestMessage(List<Message> messages) {
+  // sort descending
+  if (messages.isEmpty) {
+    return null;
+  }
+
+  return messages.fold(messages[0],
+      (newest, msg) => msg.timestamp > newest.timestamp ? msg : newest);
+}
+
 List<Message> latestMessages(List<Message> messages) {
-  final sortedList = List<Message>.from(messages ?? []);
+  final sortedList = messages ?? [];
 
   // sort descending
   sortedList.sort((a, b) {

@@ -15,6 +15,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -139,6 +140,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
       Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
+      List<Message> messages = List<Message>();
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
@@ -164,20 +166,30 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       await Future.wait([
         saveUsers(room.usersNew, storage: Storage.main),
         saveRooms({room.id: room}, storage: Storage.main),
-        saveMessages(room.messagesNew, storage: Storage.main),
         saveReactions(room.reactions, storage: Storage.main),
+        saveMessages(room.messagesNew, storage: Storage.main),
         saveRedactions(room.redactions, storage: Storage.main),
         saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
       ]);
 
+      // mutation filters - handles previously fetched messages
+      messages = await store.dispatch(mutateMessages(
+        messages: room.messagesNew,
+      ));
+
       // update store
       await store.dispatch(setUsers(room.usersNew));
-      await store.dispatch(setMessages(room: room, messages: room.messagesNew));
+      await store.dispatch(setMessages(room: room, messages: messages));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
       await store.dispatch(setReceipts(
         room: room,
         receipts: room.readReceipts,
+      ));
+
+      // mutation filters - handles backfilling mutations
+      await store.dispatch(mutateMessagesRoom(
+        room: room,
       ));
 
       // TODO: remove with parsers - clear users from parsed room objects
@@ -221,49 +233,71 @@ ThunkAction<AppState> syncRooms(Map roomData) {
  * Takes a negligible amount of time
  *  
  */
-ThunkAction<AppState> fetchRoom(String roomId, {bool direct}) {
+ThunkAction<AppState> fetchRoom(
+  String roomId, {
+  bool direct = false,
+  bool fetchState = true,
+  bool fetchMessages = true,
+  String userId,
+}) {
   return (Store<AppState> store) async {
     try {
-      final stateEvents = await MatrixApi.fetchStateEvents(
-        protocol: protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        roomId: roomId,
-      );
+      var stateEvents;
+      dynamic messageEvents = {};
 
-      if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-        throw stateEvents['error'];
+      if (fetchState) {
+        stateEvents = await MatrixApi.fetchStateEvents(
+          protocol: protocol,
+          homeserver: store.state.authStore.user.homeserver,
+          accessToken: store.state.authStore.user.accessToken,
+          roomId: roomId,
+        );
+
+        if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+          throw stateEvents['error'];
+        }
       }
 
-      final messageEvents = await compute(
-        MatrixApi.fetchMessageEventsMapped,
-        {
-          "protocol": protocol,
-          "homeserver": store.state.authStore.user.homeserver,
-          "accessToken": store.state.authStore.user.accessToken,
-          "roomId": roomId,
-          "limit": 20,
-        },
-      );
+      if (fetchMessages) {
+        messageEvents = await compute(
+          MatrixApi.fetchMessageEventsMapped,
+          {
+            "protocol": protocol,
+            "homeserver": store.state.authStore.user.homeserver,
+            "accessToken": store.state.authStore.user.accessToken,
+            "roomId": roomId,
+            "limit": 20,
+          },
+        );
 
-      await store.dispatch(syncRooms({
-        '${roomId}': {
+        if (messageEvents['errcode'] != null) {
+          throw messageEvents['error'];
+        }
+      }
+
+      final payload = {
+        '$roomId': {
           'state': {
-            'events': stateEvents,
+            'events': stateEvents ?? [],
           },
           'timeline': {
             'events': messageEvents['chunk'],
             'prev_batch': messageEvents['from'],
           },
-          'account_data': {
-            'events': [
-              {"type": 'm.direct', 'content': {}}
-            ],
-          }
         },
-      }));
+      };
+
+      if (direct) {
+        payload['$roomId']['account_data'] = {
+          'events': [
+            {"type": 'm.direct'}
+          ]
+        };
+      }
+
+      await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRooms] ${roomId} $error');
+      debugPrint('[fetchRoom] ${roomId} $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -291,58 +325,21 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       }
 
       // Convert joined_rooms to Room objects
-      final List<dynamic> joinedRoomsRaw = data['joined_rooms'];
-      final joinedRooms = joinedRoomsRaw.map((id) => Room(id: id)).toList();
-      final fullJoinedRooms = joinedRooms.map((room) async {
+      final joinedRooms = (data['joined_rooms'] as List<dynamic>);
+      final joinedRoomsList = joinedRooms.map((id) => Room(id: id)).toList();
+
+      await Future.wait(joinedRoomsList.map((room) async {
         try {
-          var stateEvents;
-
-          if (syncState) {
-            stateEvents = await MatrixApi.fetchStateEvents(
-              protocol: protocol,
-              homeserver: store.state.authStore.user.homeserver,
-              accessToken: store.state.authStore.user.accessToken,
-              roomId: room.id,
-            );
-
-            if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-              throw stateEvents['error'];
-            }
-          }
-
-          final messageEvents = await compute(
-            MatrixApi.fetchMessageEventsMapped,
-            {
-              "protocol": protocol,
-              "homeserver": store.state.authStore.user.homeserver,
-              "accessToken": store.state.authStore.user.accessToken,
-              "roomId": room.id,
-              "limit": 20,
-            },
-          );
-
-          await store.dispatch(syncRooms({
-            '${room.id}': {
-              'state': {
-                'events': stateEvents ?? [],
-              },
-              'timeline': {
-                'events': messageEvents['chunk'],
-                'prev_batch': messageEvents['from'],
-              }
-            },
-          }));
+          store.dispatch(fetchRoom(room.id, fetchState: syncState));
         } catch (error) {
-          debugPrint('[fetchRooms] ${room.id} $error');
+          debugPrint('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
-      });
-
-      await Future.wait(fullJoinedRooms);
+      }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRooms] $error');
+      debugPrint('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -373,77 +370,19 @@ ThunkAction<AppState> fetchDirectRooms() {
       }
 
       // Mark specified rooms as direct chats
-      final directRoomMap = data as Map<String, dynamic>;
-      final List<Map> directRoomList = [];
+      // convert roomId arrays to one array
+      final directRooms = data as Map<String, dynamic>;
+      final directRoomList = directRooms.values.expand((x) => x).toList();
 
-      // Parse room map to allow for pulling by roomId (keeping userId)
-      directRoomMap.forEach((userId, roomIds) {
-        roomIds.forEach((roomId) {
-          directRoomList.add({userId: roomId});
-        });
-      });
-
+      // Wait for all room data to be pulled
       // Fetch room state and messages by userId/roomId
-      final directRoomData = directRoomList.map((directRoom) async {
-        final userId = directRoom.keys.elementAt(0);
-        final roomId = directRoom.values.elementAt(0);
+      await Future.wait(directRoomList.map((roomId) async {
         try {
-          final stateEvents = await MatrixApi.fetchStateEvents(
-            protocol: protocol,
-            homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken,
-            roomId: roomId,
-          );
-
-          if (!(stateEvents is List) && stateEvents['errcode'] != null) {
-            throw stateEvents['error'];
-          }
-
-          final messageEvents = await compute(
-            MatrixApi.fetchMessageEventsMapped,
-            {
-              "protocol": protocol,
-              "homeserver": store.state.authStore.user.homeserver,
-              "accessToken": store.state.authStore.user.accessToken,
-              "roomId": roomId,
-              "limit": 20,
-            },
-          );
-
-          if (messageEvents['errcode'] != null) {
-            throw messageEvents['error'];
-          }
-
-          // Format response like /sync request
-          // Hacked together to provide isDirect data
-          await store.dispatch(syncRooms({
-            '$roomId': {
-              'state': {
-                'events': stateEvents,
-              },
-              'timeline': {
-                'events': messageEvents['chunk'],
-                'prev_batch': messageEvents['from'],
-              },
-              'account_data': {
-                'events': [
-                  {
-                    "type": 'm.direct',
-                    'content': {
-                      '$userId',
-                    }
-                  }
-                ],
-              }
-            },
-          }));
+          store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
           debugPrint('[fetchDirectRooms] $error');
         }
-      });
-
-      // Wait for all room data to be pulled
-      await Future.wait(directRoomData);
+      }));
     } catch (error) {
       debugPrint('[fetchDirectRooms] $error');
     } finally {
@@ -613,14 +552,14 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts) {
-        final messagesSorted = latestMessages(
+        final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );
 
-        if (messagesSorted.isNotEmpty) {
+        if (messageLatest != null) {
           store.dispatch(sendReadReceipts(
             room: Room(id: roomId),
-            message: messagesSorted.elementAt(0),
+            message: messageLatest,
           ));
         }
       }
@@ -748,13 +687,12 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       await store.dispatch(SetRoom(room: room.copyWith(direct: enabled)));
 
       // Refresh room information with toggle enabled
-      // TODO: enable this in version 0.1.7
-      // await store.dispatch(fetchRoom(room.id, direct: true));
+      await store.dispatch(fetchRoom(room.id, direct: true));
 
       // WARN: toggles the rooms as "direct" within Syphon
       // There's got to be a better
       // TODO: remove this in version 0.1.7
-      await store.dispatch(fetchDirectRooms());
+      // await store.dispatch(fetchDirectRooms());
     } catch (error) {
       debugPrint('[toggleDirectRoom] $error');
     } finally {

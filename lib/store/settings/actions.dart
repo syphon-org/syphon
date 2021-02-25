@@ -98,6 +98,8 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
+class ToggleDismissKeyboard {}
+
 class ToggleRoomTypeBadges {}
 
 class ToggleMembershipEvents {}
@@ -403,6 +405,12 @@ ThunkAction<AppState> toggleReadReceipts() {
 ThunkAction<AppState> toggleTypingIndicators() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleTypingIndicators());
+  };
+}
+
+ThunkAction<AppState> toggleDismissKeyboard() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleDismissKeyboard());
   };
 }
 

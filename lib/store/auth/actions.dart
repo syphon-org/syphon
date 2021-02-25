@@ -333,13 +333,13 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      final username = store.state.authStore.username;
+      var homeserver = store.state.authStore.homeserver;
+      final username = store.state.authStore.username.replaceAll('@', '');
+      final password = store.state.authStore.password;
 
       final Device device = await store.dispatch(
         generateDeviceId(salt: username),
       );
-
-      var homeserver = store.state.authStore.homeserver;
 
       try {
         homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
@@ -349,8 +349,8 @@ ThunkAction<AppState> loginUser() {
         protocol: protocol,
         type: MatrixAuthTypes.PASSWORD,
         homeserver: homeserver.baseUrl,
-        username: store.state.authStore.username,
-        password: store.state.authStore.password,
+        username: username,
+        password: password,
         deviceId: device.deviceId,
         deviceName: device.displayName,
       );
@@ -438,7 +438,7 @@ ThunkAction<AppState> loginUserSSO({String token}) {
       store.dispatch(ResetOnboarding());
     } catch (error) {
       store.dispatch(addAlert(
-        origin: "loginUser",
+        origin: "loginUserSSO",
         message: error,
         error: error,
       ));
@@ -1178,7 +1178,11 @@ ThunkAction<AppState> resolveUsername({String username}) {
     final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
 
-    final alias = username.trim().replaceAll('@', '').split(':');
+    var formatted = username.trim();
+    if (formatted.length > 1) {
+      formatted = formatted.replaceFirst('@', '', 1);
+    }
+    final alias = formatted.split(':');
 
     store.dispatch(setUsername(username: alias[0]));
 

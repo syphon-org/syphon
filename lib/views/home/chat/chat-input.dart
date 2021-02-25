@@ -1,7 +1,12 @@
 // Flutter imports:
+import 'dart:async';
+
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 
 // Project imports:
@@ -9,31 +14,35 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/selectors.dart';
 
-class ChatInput extends StatelessWidget {
-  final bool sendable;
+class ChatInput extends StatefulWidget {
+  final String roomId;
   final bool enterSend;
   final Message quotable;
   final String mediumType;
   final FocusNode focusNode;
   final TextEditingController controller;
 
-  final Function onChangeMessage;
   final Function onSubmitMessage;
   final Function onSubmittedMessage;
   final Function onChangeMethod;
+  final Function onUpdateMessage;
   final Function onCancelReply;
 
-  ChatInput({
+  const ChatInput({
     Key key,
-    this.sendable,
-    this.focusNode,
+    @required this.roomId,
+    @required this.focusNode,
+    @required this.controller,
     this.mediumType,
-    this.controller,
     this.quotable,
     this.enterSend = false,
-    this.onChangeMessage,
+    this.onUpdateMessage,
     this.onChangeMethod,
     this.onSubmitMessage,
     this.onSubmittedMessage,
@@ -41,233 +50,347 @@ class ChatInput extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-    double messageInputWidth = width - 72;
+  ChatInputState createState() => ChatInputState();
+}
 
-    final bool replying = quotable != null && quotable.sender != null;
+class ChatInputState extends State<ChatInput> {
+  ChatInputState({
+    Key key,
+  }) : super();
 
-    final maxHeight = replying ? height * 0.45 : height * 0.5;
+  bool sendable = false;
 
-    Color inputTextColor = const Color(Colours.blackDefault);
-    Color inputColorBackground = const Color(Colours.greyEnabled);
-    Color inputCursorColor = Colors.blueGrey;
-    Color sendButtonColor = const Color(Colours.greyDisabled);
-    String hintText = Strings.placeholderInputMatrixUnencrypted;
+  Timer typingNotifier;
+  Timer typingNotifierTimeout;
 
-    if (mediumType == MediumType.plaintext) {
-      if (sendable) {
-        if (Theme.of(context).accentColor != Theme.of(context).primaryColor) {
-          sendButtonColor = Theme.of(context).accentColor;
-        } else {
-          sendButtonColor = Colors.grey[700];
-        }
-      }
+  Color inputTextColor = const Color(Colours.blackDefault);
+  Color inputColorBackground = const Color(Colours.greyEnabled);
+  Color inputCursorColor = Colors.blueGrey;
+  Color sendButtonColor = const Color(Colours.greyDisabled);
+  String hintText = Strings.placeholderInputMatrixUnencrypted;
+
+  @protected
+  onMounted(_Props props) {
+    final draft = props.room.draft;
+
+    if (draft != null && draft.type == MessageTypes.TEXT) {
+      this.setState(() {
+        sendable = draft.body != null && draft.body.isNotEmpty;
+      });
     }
 
-    if (mediumType == MediumType.encryption) {
-      hintText = Strings.placeholderInputMatrixEncrypted;
-
-      if (sendable) {
-        sendButtonColor = Theme.of(context).primaryColor;
+    widget.focusNode.addListener(() {
+      if (!widget.focusNode.hasFocus && this.typingNotifier != null) {
+        this.typingNotifier.cancel();
+        this.setState(() {
+          typingNotifier = null;
+        });
       }
-    }
+    });
 
     if (Theme.of(context).brightness == Brightness.dark) {
-      inputTextColor = Colors.white;
-      inputCursorColor = Colors.white;
-      inputColorBackground = Colors.blueGrey;
+      this.setState(() {
+        inputTextColor = Colors.white;
+        inputCursorColor = Colors.white;
+        inputColorBackground = Colors.blueGrey;
+      });
+    }
+  }
+
+  @protected
+  onUpdate(String text, {_Props props}) {
+    this.setState(() {
+      sendable = text != null && text.trim().isNotEmpty;
+    });
+
+    // start an interval for updating typing status
+    if (widget.focusNode.hasFocus && typingNotifier == null) {
+      props.onSendTyping(typing: true, roomId: props.room.id);
+      this.setState(() {
+        typingNotifier = Timer.periodic(
+          Duration(milliseconds: 4000),
+          (timer) => props.onSendTyping(typing: true, roomId: props.room.id),
+        );
+      });
     }
 
-    // Default, but shouldn't be used
-    Widget sendButton = InkWell(
-      borderRadius: BorderRadius.circular(48),
-      onLongPress: onChangeMethod,
-      onTap: !sendable ? null : onSubmitMessage,
-      child: CircleAvatar(
-        backgroundColor: sendButtonColor,
-        child: Icon(
-          Icons.send,
-          color: Colors.white,
-        ),
-      ),
-    );
+    // Handle a timeout of the interval if the user idles with input focused
+    if (widget.focusNode.hasFocus) {
+      if (typingNotifierTimeout != null) {
+        this.typingNotifierTimeout.cancel();
+      }
 
-    if (mediumType == MediumType.plaintext) {
-      sendButton = InkWell(
-        borderRadius: BorderRadius.circular(48),
-        onLongPress: onChangeMethod,
-        onTap: !sendable ? null : onSubmitMessage,
-        child: CircleAvatar(
-          backgroundColor: sendButtonColor,
-          child: Container(
-            margin: EdgeInsets.only(left: 2, top: 3),
-            child: SvgPicture.asset(
-              Assets.iconSendUnlockBeing,
-              color: Colors.white,
-              semanticsLabel: Strings.semanticsSendUnencrypted,
+      this.setState(() {
+        typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
+          if (typingNotifier != null) {
+            this.typingNotifier.cancel();
+            this.setState(() {
+              typingNotifier = null;
+              typingNotifierTimeout = null;
+            });
+            // run after to avoid flickering
+            props.onSendTyping(typing: false, roomId: props.room.id);
+          }
+        });
+      });
+    }
+    if (widget.onUpdateMessage != null) {
+      widget.onUpdateMessage(text);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (this.typingNotifier != null) {
+      this.typingNotifier.cancel();
+    }
+
+    if (this.typingNotifierTimeout != null) {
+      this.typingNotifierTimeout.cancel();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.roomId),
+        onInitialBuild: onMounted,
+        builder: (context, props) {
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
+
+          // dynamic dimensions
+          final double messageInputWidth = width - 72;
+          final bool replying =
+              widget.quotable != null && widget.quotable.sender != null;
+          final double maxHeight = replying ? height * 0.45 : height * 0.5;
+
+          if (widget.mediumType == MediumType.plaintext) {
+            if (sendable) {
+              if (Theme.of(context).accentColor !=
+                  Theme.of(context).primaryColor) {
+                sendButtonColor = Theme.of(context).accentColor;
+              } else {
+                sendButtonColor = Colors.grey[700];
+              }
+            }
+          }
+
+          if (widget.mediumType == MediumType.encryption) {
+            hintText = Strings.placeholderInputMatrixEncrypted;
+
+            if (sendable) {
+              sendButtonColor = Theme.of(context).primaryColor;
+            }
+          }
+
+          var sendButton = InkWell(
+            borderRadius: BorderRadius.circular(48),
+            onLongPress: widget.onChangeMethod,
+            onTap: !sendable ? null : widget.onSubmitMessage,
+            child: CircleAvatar(
+              backgroundColor: sendButtonColor,
+              child: Container(
+                margin: EdgeInsets.only(left: 2, top: 3),
+                child: SvgPicture.asset(
+                  Assets.iconSendUnlockBeing,
+                  color: Colors.white,
+                  semanticsLabel: Strings.semanticsSendUnencrypted,
+                ),
+              ),
             ),
-          ),
-        ),
-      );
-    }
+          );
 
-    if (mediumType == MediumType.encryption) {
-      sendButton = InkWell(
-        borderRadius: BorderRadius.circular(48),
-        onLongPress: onChangeMethod,
-        onTap: !sendable ? null : onSubmitMessage,
-        child: CircleAvatar(
-          backgroundColor: sendButtonColor,
-          child: Container(
-            margin: EdgeInsets.only(left: 2, top: 3),
-            child: SvgPicture.asset(
-              Assets.iconSendLockSolidBeing,
-              color: Colors.white,
-              semanticsLabel: Strings.semanticsSendUnencrypted,
-            ),
-          ),
-        ),
-      );
-    }
+          if (widget.mediumType == MediumType.encryption) {
+            sendButton = InkWell(
+              borderRadius: BorderRadius.circular(48),
+              onLongPress: widget.onChangeMethod,
+              onTap: !sendable ? null : widget.onSubmitMessage,
+              child: CircleAvatar(
+                backgroundColor: sendButtonColor,
+                child: Container(
+                  margin: EdgeInsets.only(left: 2, top: 3),
+                  child: SvgPicture.asset(
+                    Assets.iconSendLockSolidBeing,
+                    color: Colors.white,
+                    semanticsLabel: Strings.semanticsSendUnencrypted,
+                  ),
+                ),
+              ),
+            );
+          }
 
-    return Column(
-      children: [
-        Visibility(
-          visible: replying,
-          maintainSize: false,
-          maintainState: false,
-          maintainAnimation: false,
-          child: Row(
-            //////// REPLY FIELD ////////
-            children: <Widget>[
-              Stack(
-                children: [
+          return Column(
+            children: [
+              Visibility(
+                visible: replying,
+                maintainSize: false,
+                maintainState: false,
+                maintainAnimation: false,
+                child: Row(
+                  //////// REPLY FIELD ////////
+                  children: <Widget>[
+                    Stack(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: messageInputWidth,
+                          ),
+                          child: TextField(
+                            maxLines: 1,
+                            enabled: false,
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            controller: TextEditingController(
+                              text: replying ? widget.quotable.body : '',
+                            ),
+                            style: TextStyle(
+                              color: inputTextColor,
+                            ),
+                            decoration: InputDecoration(
+                              filled: true,
+                              labelText: replying ? widget.quotable.sender : '',
+                              labelStyle: TextStyle(
+                                  color: Theme.of(context).accentColor),
+                              contentPadding: Dimensions.inputContentPadding
+                                  .copyWith(right: 36),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).accentColor,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(24),
+                                  topRight: Radius.circular(24),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).accentColor,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(24),
+                                  topRight: Radius.circular(24),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: IconButton(
+                            onPressed: () => widget.onCancelReply(),
+                            icon: Icon(
+                              Icons.close,
+                              size: Dimensions.iconSize,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              Row(
+                //////// ACTUAL INPUT FIELD ////////
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
                   Container(
                     constraints: BoxConstraints(
+                      maxHeight: maxHeight,
                       maxWidth: messageInputWidth,
                     ),
                     child: TextField(
-                      maxLines: 1,
-                      enabled: false,
+                      maxLines: null,
                       autocorrect: false,
                       enableSuggestions: false,
-                      controller: TextEditingController(
-                        text: replying ? quotable.body : '',
-                      ),
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: widget.enterSend
+                          ? TextInputAction.send
+                          : TextInputAction.newline,
+                      cursorColor: inputCursorColor,
+                      focusNode: widget.focusNode,
+                      controller: widget.controller,
+                      onChanged: (text) => onUpdate(text, props: props),
+                      onSubmitted: !sendable ? null : widget.onSubmittedMessage,
                       style: TextStyle(
+                        height: 1.5,
                         color: inputTextColor,
                       ),
                       decoration: InputDecoration(
                         filled: true,
-                        labelText: replying ? quotable.sender : '',
-                        labelStyle:
-                            TextStyle(color: Theme.of(context).accentColor),
-                        contentPadding:
-                            Dimensions.inputContentPadding.copyWith(right: 36),
+                        hintText: hintText,
+                        fillColor: inputColorBackground,
+                        contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).accentColor,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(24),
-                            topRight: Radius.circular(24),
-                            bottomLeft: Radius.circular(!replying ? 24 : 0),
-                            bottomRight: Radius.circular(!replying ? 24 : 0),
-                          ),
-                        ),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).accentColor, width: 1),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(!replying ? 24 : 0),
+                              topRight: Radius.circular(!replying ? 24 : 0),
+                              bottomLeft: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            )),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).accentColor,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(24),
-                            topRight: Radius.circular(24),
-                            bottomLeft: Radius.circular(!replying ? 24 : 0),
-                            bottomRight: Radius.circular(!replying ? 24 : 0),
-                          ),
-                        ),
+                            borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(!replying ? 24 : 0),
+                          topRight: Radius.circular(!replying ? 24 : 0),
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
+                        )),
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: IconButton(
-                      onPressed: () => onCancelReply(),
-                      icon: Icon(
-                        Icons.close,
-                        size: Dimensions.iconSize,
-                      ),
-                    ),
+                  Container(
+                    width: Dimensions.buttonSendSize,
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: sendButton,
                   ),
                 ],
               )
             ],
-          ),
+          );
+        },
+      );
+}
+
+class _Props extends Equatable {
+  final Room room;
+  final bool enterSendEnabled;
+
+  final Function onSendTyping;
+
+  _Props({
+    @required this.room,
+    @required this.enterSendEnabled,
+    @required this.onSendTyping,
+  });
+
+  @override
+  List<Object> get props => [
+        room,
+        enterSendEnabled,
+      ];
+
+  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+        room: selectRoom(id: roomId, state: store.state),
+        enterSendEnabled: store.state.settingsStore.enterSend ?? false,
+        onSendTyping: ({typing, roomId}) => store.dispatch(
+          sendTyping(typing: typing, roomId: roomId),
         ),
-        Row(
-          //////// ACTUAL INPUT FIELD ////////
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Container(
-              constraints: BoxConstraints(
-                maxHeight: maxHeight,
-                maxWidth: messageInputWidth,
-              ),
-              child: TextField(
-                maxLines: null,
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: TextInputType.multiline,
-                textInputAction:
-                    enterSend ? TextInputAction.send : TextInputAction.newline,
-                cursorColor: inputCursorColor,
-                focusNode: focusNode,
-                controller: controller,
-                onChanged: onChangeMessage != null ? onChangeMessage : null,
-                onSubmitted: !sendable ? null : onSubmittedMessage,
-                style: TextStyle(
-                  height: 1.5,
-                  color: inputTextColor,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  hintText: hintText,
-                  fillColor: inputColorBackground,
-                  contentPadding: Dimensions.inputContentPadding,
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).accentColor, width: 1),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(!replying ? 24 : 0),
-                        topRight: Radius.circular(!replying ? 24 : 0),
-                        bottomLeft: Radius.circular(24),
-                        bottomRight: Radius.circular(24),
-                      )),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(!replying ? 24 : 0),
-                    topRight: Radius.circular(!replying ? 24 : 0),
-                    bottomLeft: Radius.circular(24),
-                    bottomRight: Radius.circular(24),
-                  )),
-                ),
-              ),
-            ),
-            Container(
-              width: Dimensions.buttonSendSize,
-              padding: EdgeInsets.symmetric(vertical: 4),
-              child: sendButton,
-            ),
-          ],
-        )
-      ],
-    );
-  }
+      );
 }

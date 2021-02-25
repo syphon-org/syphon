@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/values.dart';
 
 class Algorithms {
   static const signedcurve25519 = 'signed_curve25519';
@@ -38,6 +39,7 @@ abstract class Encryption {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -137,6 +139,7 @@ abstract class Encryption {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -162,6 +165,7 @@ abstract class Encryption {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(

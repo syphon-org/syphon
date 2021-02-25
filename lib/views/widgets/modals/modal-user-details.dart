@@ -12,13 +12,11 @@ import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/search/search-rooms.dart';
@@ -263,6 +261,7 @@ class ModalUserDetails extends StatelessWidget {
 
 class _Props extends Equatable {
   final User user;
+  final Map<String, User> users;
   final bool blocked;
   final bool loading;
   final Function onBlockUser;
@@ -270,6 +269,7 @@ class _Props extends Equatable {
 
   _Props({
     @required this.user,
+    @required this.users,
     @required this.loading,
     @required this.blocked,
     @required this.onCreateChatDirect,
@@ -279,6 +279,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         user,
+        users,
       ];
 
   static _Props mapStateToProps(
@@ -293,11 +294,16 @@ class _Props extends Equatable {
           }
 
           if (userId == null) {
-            return null;
+            return User();
           }
 
-          return store.state.userStore.users[userId];
+          if (!store.state.userStore.users.containsKey(userId)) {
+            store.dispatch(fetchUser(user: User(userId: userId)));
+          }
+
+          return store.state.userStore.users[userId] ?? User();
         }(),
+        users: store.state.userStore.users,
         loading: store.state.userStore.loading,
         blocked: store.state.userStore.blocked.contains(userId ?? user.userId),
         onBlockUser: (User user) async {

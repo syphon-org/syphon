@@ -259,9 +259,11 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
       store.dispatch(SetBackoff(backoff: nextBackoff));
-    } finally {
-      store.dispatch(setBackgrounded(false));
       store.dispatch(SetSyncing(syncing: false));
+    } finally {
+      if (store.state.syncStore.backgrounded) {
+        store.dispatch(setBackgrounded(false));
+      }
     }
   };
 }

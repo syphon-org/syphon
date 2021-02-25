@@ -1,38 +1,29 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
 
 // Flutter imports:
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/open.dart';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:path_provider_linux/path_provider_linux.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/print.dart';
-import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 
 // Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/home/index.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
@@ -41,69 +32,19 @@ void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
 
-  // load correct environment configurations
-  await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
-
-  // disable debugPrint when in release mode
-  if (kReleaseMode) {
-    debugPrint = (String message, {int wrapWidth}) {};
-    printDebug = (String message, {String title}) {};
-    printInfo = (String message, {String title}) {};
-    printError = (String message, {String title}) {};
-  }
-
-  // init platform overrides for compatability with dart libs
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
-  }
-
-  if (Platform.isLinux) {
-    PathProviderLinux.register();
-
-    final appDir = File(Platform.script.toFilePath()).parent;
-    final libolmDir = File(path.join(appDir.path, 'lib/libolm.so'));
-    final libsqliteDir = File(path.join(appDir.path, 'lib/libsqlite3.so'));
-    final libolmExists = await libolmDir.exists();
-    final libsqliteExists = await libsqliteDir.exists();
-
-    if (libolmExists) {
-      DynamicLibrary.open(libolmDir.path);
-    } else {
-      printError('[linux] exists ${libolmExists} ${libolmDir.path}');
-    }
-
-    if (libsqliteExists) {
-      open.overrideFor(OperatingSystem.linux, () {
-        return DynamicLibrary.open(libsqliteDir.path);
-      });
-    } else {
-      printError('[linux] exists ${libsqliteExists} ${libsqliteDir.path}');
-    }
-  }
-
-  // init window mangment for desktop builds
-  if (Platform.isMacOS) {
-    final directory = await getApplicationSupportDirectory();
-    printInfo('[macos] ${directory.path}');
-    // DynamicLibrary.open('libolm.dylib');
-  }
-
-  // init background sync for Android only
-  if (Platform.isAndroid) {
-    final backgroundSyncStatus = await BackgroundSync.init();
-    printDebug('[main] background service started $backgroundSyncStatus');
-  }
+  // init platform specific code
+  await initPlatformDependencies();
 
   // init hot cache and cold storage
   final cache = await initCache();
 
-  // init cold storage and load to data
+  // init cold storage and load backup cache
   final storage = await initStorage();
 
   // init redux store
   final store = await initStore(cache, storage);
 
-  // init hot cache and start
+  // init app
   runApp(Syphon(store: store, cache: cache, storage: storage));
 }
 
@@ -157,6 +98,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.dispatch(initClientSecret());
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
+
+    // mutate messages
+    store.dispatch(mutateMessagesAll());
 
     final currentUser = store.state.authStore.user;
     final authed = currentUser.accessToken != null;

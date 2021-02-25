@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
@@ -16,7 +15,6 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -53,7 +51,7 @@ Future<Database> initStorage() async {
       );
     }
 
-    if (factory == null) {
+    if (storageFactory == null) {
       throw UnsupportedError(
         'Sorry, Syphon does not support your platform yet. Hope to do so soon!',
       );
@@ -117,33 +115,13 @@ Future<void> deleteStorage() async {
  */
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   try {
-    final auth = await loadAuth(
-      storage: storage,
-    );
-
-    final rooms = await loadRooms(
-      storage: storage,
-    );
-
-    final users = await loadUsers(
-      storage: storage,
-    );
-
-    final media = await loadMediaAll(
-      storage: storage,
-    );
-
-    final crypto = await loadCrypto(
-      storage: storage,
-    );
-
-    final settings = await loadSettings(
-      storage: storage,
-    );
-
-    final redactions = await loadRedactions(
-      storage: storage,
-    );
+    final auth = await loadAuth(storage: storage);
+    final rooms = await loadRooms(storage: storage);
+    final users = await loadUsers(storage: storage);
+    final media = await loadMediaAll(storage: storage);
+    final crypto = await loadCrypto(storage: storage);
+    final settings = await loadSettings(storage: storage);
+    final redactions = await loadRedactions(storage: storage);
 
     Map<String, List<Message>> messages = Map();
     Map<String, List<Reaction>> reactions = Map();

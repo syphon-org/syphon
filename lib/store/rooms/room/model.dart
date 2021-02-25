@@ -167,7 +167,7 @@ class Room {
     avatarUri,
     topic,
     invite,
-    direct,
+    bool direct,
     limited,
     syncing,
     sending,
@@ -376,9 +376,7 @@ class Room {
    * 
    * Mostly used to assign is_direct 
    */
-  Room fromAccountData(
-    List<Event> accountDataEvents,
-  ) {
+  Room fromAccountData(List<Event> accountDataEvents) {
     dynamic isDirect;
     try {
       accountDataEvents.forEach((event) {

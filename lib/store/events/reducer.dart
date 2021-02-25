@@ -18,10 +18,6 @@ EventStore eventReducer(
       return state.copyWith(events: events);
 
     case SetReactions:
-      if (action.reactions.isEmpty) {
-        return state;
-      }
-
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );

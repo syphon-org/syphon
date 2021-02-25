@@ -47,11 +47,11 @@ class MessageWidget extends StatelessWidget {
   final String timeFormat;
   final String avatarUri;
   final String selectedMessageId;
-  final Function onLongPress;
+  final Function onSwipe;
   final Function onPressAvatar;
   final Function onInputReaction;
   final Function onToggleReaction;
-  final Function onSwipe;
+  final void Function(Message) onLongPress;
 
   @protected
   Widget buildReactions(
@@ -199,6 +199,7 @@ class MessageWidget extends StatelessWidget {
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
     var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
+    var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
     var isRead = message.timestamp < lastRead;
@@ -224,14 +225,14 @@ class MessageWidget extends StatelessWidget {
         } else {
           // Message at the beginning of a user sender messages block
           bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
-          bubbleBorder = Styles.bubbleBorderTopSender;
+          bubbleBorder = Styles.bubbleBorderTopUser;
         }
       }
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
         bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
-        bubbleBorder = Styles.bubbleBorderBottomSender;
+        bubbleBorder = Styles.bubbleBorderBottomUser;
       }
       // External User Sent Styling
     } else {
@@ -291,6 +292,11 @@ class MessageWidget extends StatelessWidget {
       if (message.body.isEmpty) {
         body = Strings.contentEncryptedMessage;
       }
+    } else {
+      if (message.body.isEmpty) {
+        body = Strings.contentDeletedMessage;
+        fontStyle = FontStyle.italic;
+      }
     }
 
     if (message.body == null) {
@@ -325,9 +331,9 @@ class MessageWidget extends StatelessWidget {
       ),
       child: GestureDetector(
         onLongPress: () {
-          if (this.onLongPress != null) {
+          if (onLongPress != null) {
             HapticFeedback.lightImpact();
-            this.onLongPress(message: message);
+            onLongPress(message);
           }
         },
         child: Opacity(
@@ -413,15 +419,18 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                   Container(
                                     margin: EdgeInsets.only(bottom: 5),
-                                    child: Text(body.trim(),
-                                        style: TextStyle(
-                                          color: textColor,
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .subtitle2
-                                              .fontSize,
-                                        )),
+                                    child: Text(
+                                      body.trim(),
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontStyle: fontStyle,
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .subtitle2
+                                            .fontSize,
+                                      ),
+                                    ),
                                   ),
                                   Flex(
                                     /// *** Message Status Row ***

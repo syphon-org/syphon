@@ -5,7 +5,7 @@ import 'dart:math';
 
 // Package imports:
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/values.dart';
 
 /**
  * https://matrix.org/docs/spec/client_server/latest#id183
@@ -38,15 +38,15 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * https://matrix.org/docs/spec/client_server/latest#id198
-   * 
-   * Login User
-   * 
-   *  Gets the homeserver's supported login types to authenticate
-   *  users. Clients should pick one of these and supply it as 
-   *  the type when logging in.
-   */
+  ///
+  /// Login User
+  ///
+  /// Gets the homeserver's supported login types to authenticate
+  /// users. Clients should pick one of these and supply it as
+  /// the type when logging in.
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
+  ///
   static FutureOr<dynamic> loginUser({
     String protocol,
     String homeserver,
@@ -74,6 +74,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -117,6 +118,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -146,6 +148,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -228,6 +231,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -243,6 +247,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(
@@ -265,6 +270,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.post(
@@ -314,6 +320,17 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  static Future<dynamic> checkVersion({
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
+  }) async {
+    String url = '$protocol$homeserver/_matrix/client/versions';
+
+    final response = await http.get(url);
+
+    return await json.decode(response.body);
+  }
+
   /**
    * Update User Password
    * 
@@ -334,6 +351,7 @@ abstract class Auth {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -392,6 +410,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 
@@ -421,6 +440,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
+      headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
 

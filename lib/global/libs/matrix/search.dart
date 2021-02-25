@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/values.dart';
 
 /**
  * https://matrix.org/docs/spec/client_server/latest#id295
@@ -28,7 +29,10 @@ class Search {
     String since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
-    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
 
     Map body = {
       "limit": 10,
@@ -54,7 +58,10 @@ class Search {
     String since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
-    Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
 
     Map body = {
       "limit": 20,

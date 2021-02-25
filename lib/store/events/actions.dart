@@ -69,6 +69,7 @@ ThunkAction<AppState> setMessages({
   int limit = 20,
 }) =>
     (Store<AppState> store) {
+      if (messages.isEmpty) return;
       return store.dispatch(SetMessages(roomId: room.id, messages: messages));
     };
 
@@ -76,6 +77,7 @@ ThunkAction<AppState> setReactions({
   List<Reaction> reactions,
 }) =>
     (Store<AppState> store) {
+      if (reactions.isEmpty) return;
       return store.dispatch(SetReactions(reactions: reactions));
     };
 
@@ -84,7 +86,8 @@ ThunkAction<AppState> setRedactions({
   List<Redaction> redactions,
 }) =>
     (Store<AppState> store) {
-      return store.dispatch(SetRedactions(redactions: redactions));
+      if (redactions.isEmpty) return;
+      store.dispatch(SetRedactions(redactions: redactions));
     };
 
 ThunkAction<AppState> setReceipts({
@@ -92,6 +95,7 @@ ThunkAction<AppState> setReceipts({
   Map<String, ReadReceipt> receipts,
 }) =>
     (Store<AppState> store) {
+      if (receipts.isEmpty) return;
       return store.dispatch(SetReceipts(roomId: room.id, receipts: receipts));
     };
 

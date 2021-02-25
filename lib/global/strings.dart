@@ -44,6 +44,8 @@ class Strings {
   static const labelNoMessages = 'no messages found';
   static const labelNoGroups = 'no groups found';
   static const labelDeletedMessage = 'This message was deleted';
+  static const labelOn = 'On';
+  static const labelOff = 'Off';
 
   // Buttons
   static const buttonLogin = 'log in';
@@ -99,12 +101,14 @@ class Strings {
       'Background connection enabled';
 
   // Content
+  static const contentTopicEmpty = 'No Topic Description';
   static const contentDeleteDevices =
       'You will have to sign in again on these devices if you remove them.';
 
   static const contentDeleteDeviceKeyWarning =
       "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
   static const contentEncryptedMessage = 'Encrypted Message';
+  static const contentDeletedMessage = 'This message was deleted';
 
   static const contentEmailRequirement =
       'This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information';
@@ -169,9 +173,13 @@ class Strings {
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
   static String formatUsernameHint({String homeserver, String username}) {
-    return homeserver.length != 0
-        ? '@${username != null && username.length > 0 ? username : 'username'}:$homeserver'
-        : '@${username != null && username.length > 0 ? username : 'username'}:matrix.org';
+    final usernameFormatted =
+        username != null && username.length > 0 ? username : 'username';
+    final alias = homeserver.length != 0
+        ? '@$usernameFormatted:$homeserver'
+        : '@$usernameFormatted:matrix.org';
+
+    return alias.replaceFirst('@', '', 1);
   }
 
   // Tooltips

@@ -17,6 +17,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -24,6 +25,87 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
+
+///
+/// Mutate Messages
+///
+/// Add/mutate to accomodate all the required, necessary
+/// mutations by matrix after the message has been sent
+/// such as reactions, redactions, and edits
+///
+ThunkAction<AppState> mutateMessages({List<Message> messages}) {
+  return (Store<AppState> store) async {
+    final reactions = store.state.eventStore.reactions;
+    final redactions = store.state.eventStore.redactions;
+
+    final revisedMessages = await compute(reviseMessagesBackground, {
+      'reactions': reactions,
+      'redactions': redactions,
+      'messages': messages,
+    });
+
+    return revisedMessages;
+  };
+}
+
+///
+/// Mutate Messages All
+///
+/// Add/mutate to accomodate all messages avaiable with
+/// the required, necessary mutations by matrix after the
+/// message has been sent (such as reactions, redactions, and edits)
+///
+ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
+  return (Store<AppState> store) async {
+    final reactions = store.state.eventStore.reactions;
+    final redactions = store.state.eventStore.redactions;
+    final roomMessages = store.state.eventStore.messages;
+
+    await Future.wait(roomMessages.entries.map((entry) async {
+      final roomId = entry.key;
+      final allMessages = entry.value;
+
+      final revisedMessages = await compute(reviseMessagesBackground, {
+        'reactions': reactions,
+        'redactions': redactions,
+        'messages': allMessages,
+      });
+
+      await store.dispatch(setMessages(
+        room: Room(id: roomId),
+        messages: revisedMessages,
+      ));
+    }));
+  };
+}
+
+///
+/// Mutate Messages All
+///
+/// Run through all room messages to accomodate the required,
+/// necessary mutations by matrix after the message has been sent
+/// such as reactions, redactions, and edits
+///
+ThunkAction<AppState> mutateMessagesRoom({Room room}) {
+  return (Store<AppState> store) async {
+    if (room.messagesNew.isEmpty) return;
+
+    final messages = store.state.eventStore.messages[room.id];
+    final reactions = store.state.eventStore.reactions;
+    final redactions = store.state.eventStore.redactions;
+
+    final revisedMessages = await compute(reviseMessagesBackground, {
+      'reactions': reactions,
+      'redactions': redactions,
+      'messages': messages,
+    });
+
+    store.dispatch(setMessages(
+      room: Room(id: room.id),
+      messages: revisedMessages,
+    ));
+  };
+}
 
 /// Send Message
 ThunkAction<AppState> sendMessage({

@@ -256,7 +256,7 @@ class GroupSearchState extends State<GroupSearchView> {
                 Container(
                   padding: Dimensions.listPadding,
                   child: Text(
-                    room.topic ?? 'No Topic Available',
+                    room.topic ?? Strings.contentTopicEmpty,
                     style: Theme.of(context).textTheme.caption,
                   ),
                 ),

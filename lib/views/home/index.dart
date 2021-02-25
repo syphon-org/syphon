@@ -284,12 +284,9 @@ class HomeViewState extends State<Home> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
-        final messagesLatest = latestMessages(messages);
-        final messagePreview = formatPreview(
-          room: room,
-          messages: messagesLatest,
-        );
+        final messageLatest = latestMessage(messages);
         final roomSettings = props.chatSettings[room.id] ?? null;
+        final preview = formatPreview(room: room, message: messageLatest);
 
         bool messagesNew = false;
         var backgroundColor;
@@ -324,19 +321,19 @@ class HomeViewState extends State<Home> {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
-        // it has undecrypted message contained within
-        if (messages != null &&
-            messages.length > 0 &&
-            messages[0].type == EventTypes.encrypted &&
-            messages[0].body.isEmpty) {
-          textStyle = TextStyle(fontStyle: FontStyle.italic);
-        }
-
-        // display message as being 'unread'
         if (messages != null && messages.isNotEmpty) {
-          final messageRecent = messagesLatest[0];
+          // it has undecrypted message contained within
+          if (messageLatest.type == EventTypes.encrypted &&
+              messageLatest.body.isEmpty) {
+            textStyle = TextStyle(fontStyle: FontStyle.italic);
+          }
 
-          if (room.lastRead < messageRecent.timestamp) {
+          if (messageLatest.body == null || messageLatest.body.isEmpty) {
+            textStyle = TextStyle(fontStyle: FontStyle.italic);
+          }
+
+          // display message as being 'unread'
+          if (room.lastRead < messageLatest.timestamp) {
             messagesNew = true;
             textStyle = textStyle.copyWith(
               color: Theme.of(context).textTheme.bodyText1.color,
@@ -516,7 +513,7 @@ class HomeViewState extends State<Home> {
                       ),
                       Container(
                         child: Text(
-                          messagePreview,
+                          preview,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.caption.merge(

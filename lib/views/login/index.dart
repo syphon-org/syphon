@@ -117,7 +117,7 @@ class LoginState extends State<Login> {
               disableSpacing: true,
               controller: usernameController,
               autofillHints: [AutofillHints.username],
-              formatters: [FilteringTextInputFormatter.deny(RegExp(r'@'))],
+              formatters: [FilteringTextInputFormatter.deny(RegExp(r'@@'))],
               onSubmitted: (text) {
                 FocusScope.of(context).requestFocus(passwordFocus);
               },
@@ -449,6 +449,15 @@ class _Props extends Equatable {
     @required this.onResetSession,
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        username,
+        password,
+        usernameHint,
+        isLoginAttemptable,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         username: store.state.authStore.username,
@@ -503,13 +512,4 @@ class _Props extends Equatable {
           return await store.dispatch(loginUser());
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        username,
-        password,
-        usernameHint,
-        isLoginAttemptable,
-      ];
 }

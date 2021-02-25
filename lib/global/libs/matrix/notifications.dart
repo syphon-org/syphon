@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/values.dart';
 
 abstract class Notifications {
   /**
@@ -111,6 +112,7 @@ abstract class Notifications {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -130,8 +132,6 @@ abstract class Notifications {
     if (profileTag != null) {
       body['profile_tag'] = profileTag;
     }
-
-    // return {'errcode': 'ya done'};
 
     final response = await http.post(
       url,

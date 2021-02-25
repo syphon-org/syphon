@@ -8,6 +8,7 @@ import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/rooms/state.dart';
 import 'package:syphon/store/sync/state.dart';
 
 class CacheStorage implements StorageEngine {
@@ -21,6 +22,7 @@ class CacheStorage implements StorageEngine {
       AuthStore(),
       SyncStore(),
       CryptoStore(),
+      RoomStore(),
     ];
 
     await Future.wait(stores.map((store) async {

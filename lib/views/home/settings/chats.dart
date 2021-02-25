@@ -71,9 +71,7 @@ class ChatPreferences extends StatelessWidget {
                                 title: Text(
                                   'Language',
                                 ),
-                                trailing: Text(
-                                  props.language,
-                                ),
+                                trailing: Text(props.language),
                               ),
                             ),
                             GestureDetector(
@@ -126,6 +124,63 @@ class ChatPreferences extends StatelessWidget {
                                 value: props.timeFormat24,
                                 onChanged: (value) =>
                                     props.onToggleTimeFormat(),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onToggleDismissKeyboard(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Dismiss Keyboard',
+                              ),
+                              subtitle: Text(
+                                'Dismiss the keyboard after sending a message',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.dismissKeyboard,
+                                onChanged: (value) =>
+                                    props.onToggleDismissKeyboard(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width,
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Ordering',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'Sort By',
+                                ),
+                                trailing: Text(
+                                  'Timestamp',
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => props.onDisabled(),
+                              child: ListTile(
+                                contentPadding: Dimensions.listPadding,
+                                title: Text(
+                                  'Group By',
+                                ),
+                                trailing: Text(
+                                  'None',
+                                  style: Theme.of(context).textTheme.subtitle1,
+                                ),
                               ),
                             ),
                           ],
@@ -229,22 +284,26 @@ class Props extends Equatable {
   final String language;
   final bool enterSend;
   final bool timeFormat24;
+  final bool dismissKeyboard;
   final String chatFontSize;
 
   final Function onDisabled;
   final Function onIncrementLanguage;
   final Function onToggleEnterSend;
   final Function onToggleTimeFormat;
+  final Function onToggleDismissKeyboard;
 
   Props({
     @required this.language,
     @required this.enterSend,
     @required this.chatFontSize,
     @required this.timeFormat24,
+    @required this.dismissKeyboard,
     @required this.onDisabled,
     @required this.onIncrementLanguage,
     @required this.onToggleEnterSend,
     @required this.onToggleTimeFormat,
+    @required this.onToggleDismissKeyboard,
   });
 
   @override
@@ -261,10 +320,12 @@ class Props extends Equatable {
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSend,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
+        dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {
           store.dispatch(addInfo(message: tr('alert-restart-app-effect')));
           store.dispatch(incrementLanguage(context));
         },
+        onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
         onDisabled: () => store.dispatch(addInProgress()),

@@ -5,15 +5,18 @@ import 'package:json_annotation/json_annotation.dart';
 // Project imports:
 import "package:syphon/global/themes.dart";
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
 
 part 'state.g.dart';
 
-// Next Field ID: 21
 @JsonSerializable()
 class SettingsStore extends Equatable {
+  @JsonKey(ignore: true)
+  final bool loading;
+
   final int primaryColor;
   final int accentColor;
   final int appBarColor;
@@ -28,9 +31,11 @@ class SettingsStore extends Equatable {
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
+  final bool dismissKeyboardEnabled;
 
   @JsonKey(nullable: true)
   final String messageSize;
+
   final String fontName;
   final String fontSize;
   final String language;
@@ -40,6 +45,8 @@ class SettingsStore extends Equatable {
 
   // Map<roomId, ChatSetting>
   final Map<String, ChatSetting> customChatSettings;
+  final List<String> sortGroups;
+  final String sortOrder;
 
   final NotificationSettings notificationSettings;
 
@@ -47,9 +54,6 @@ class SettingsStore extends Equatable {
 
   @JsonKey(ignore: true)
   final String pusherToken; // NOTE: can be device token for APNS
-
-  @JsonKey(ignore: true)
-  final bool loading;
 
   const SettingsStore({
     this.primaryColor = Colours.cyanSyphon,
@@ -62,6 +66,8 @@ class SettingsStore extends Equatable {
     this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
+    this.sortGroups = const [SortOptions.PINNED],
+    this.sortOrder = SortOrder.LATEST,
     this.enterSend = false,
     this.smsEnabled = false,
     this.readReceipts = false,
@@ -70,6 +76,7 @@ class SettingsStore extends Equatable {
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
+    this.dismissKeyboardEnabled = false,
     this.customChatSettings,
     this.devices = const [],
     this.loading = false,
@@ -97,6 +104,7 @@ class SettingsStore extends Equatable {
         notificationsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
+        dismissKeyboardEnabled,
         customChatSettings,
         devices,
         loading,
@@ -124,6 +132,7 @@ class SettingsStore extends Equatable {
     bool membershipEventsEnabled,
     bool roomTypeBadgesEnabled,
     bool timeFormat24Enabled,
+    bool dismissKeyboardEnabled,
     Map<String, ChatSetting> customChatSettings,
     NotificationSettings notificationSettings,
     List<Device> devices,
@@ -148,6 +157,8 @@ class SettingsStore extends Equatable {
             typingIndicators != null ? typingIndicators : this.typingIndicators,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
+        dismissKeyboardEnabled:
+            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
         membershipEventsEnabled:
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:
