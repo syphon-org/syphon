@@ -43,11 +43,11 @@ class EventStore extends Equatable {
     Map<String, Map<String, ReadReceipt>> receipts,
   }) =>
       EventStore(
-        events: events ?? this.events,
-        messages: messages ?? this.messages,
-        redactions: redactions ?? this.redactions,
-        reactions: reactions ?? this.reactions,
-        receipts: receipts ?? this.receipts,
+        events: events ?? this.events ?? Map(),
+        messages: messages ?? this.messages ?? Map(),
+        redactions: redactions ?? this.redactions ?? Map(),
+        reactions: reactions ?? this.reactions ?? Map(),
+        receipts: receipts ?? this.receipts ?? Map(),
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);

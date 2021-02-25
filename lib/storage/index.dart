@@ -9,6 +9,7 @@ import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
@@ -145,16 +146,16 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     }
 
     return {
-      'auth': auth,
-      'users': users,
-      'rooms': rooms,
-      'media': media,
-      'crypto': crypto,
-      'messages': messages.isNotEmpty ? messages : null,
-      'reactions': reactions,
-      'redactions': redactions,
-      'receipts': receipts,
-      'settings': settings,
+      StorageKeys.AUTH: auth,
+      StorageKeys.USERS: users,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.MEDIA: media,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.MESSAGES: messages.isNotEmpty ? messages : null,
+      StorageKeys.REACTIONS: reactions,
+      StorageKeys.REDACTIONS: redactions,
+      StorageKeys.RECEIPTS: receipts,
+      StorageKeys.SETTINGS: settings,
     };
   } catch (error) {
     printError('[loadStorage]  ${error.toString()}');

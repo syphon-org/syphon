@@ -12,6 +12,7 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 
 // Project imports:
 import 'package:syphon/store/crypto/state.dart';
@@ -163,30 +164,31 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
-      cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
+      authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
+      cryptoStore:
+          cryptoStore ?? preloaded[StorageKeys.CRYPTO] ?? CryptoStore(),
       mediaStore: mediaStore ??
           MediaStore().copyWith(
-            mediaCache: preloaded['media'],
+            mediaCache: preloaded[StorageKeys.MEDIA],
           ),
       roomStore: roomStore ??
           RoomStore().copyWith(
-            rooms: preloaded['rooms'] ?? {},
+            rooms: preloaded[StorageKeys.ROOMS] ?? {},
           ),
       userStore: userStore ??
           UserStore().copyWith(
-            users: preloaded['users'] ?? {},
+            users: preloaded[StorageKeys.USERS] ?? {},
           ),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
-            reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
-            redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded['receipts'] ??
-                Map<String, Map<String, ReadReceipt>>(),
+            messages: preloaded[StorageKeys.MESSAGES],
+            reactions: preloaded[StorageKeys.REACTIONS],
+            redactions: preloaded[StorageKeys.REDACTIONS],
+            receipts: preloaded[StorageKeys.RECEIPTS],
           ),
+      settingsStore:
+          settingsStore ?? preloaded[StorageKeys.SETTINGS] ?? SettingsStore(),
       syncStore: syncStore ?? SyncStore(),
-      settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),
     );
   }
 }
