@@ -13,6 +13,7 @@ import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
@@ -78,6 +79,7 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
         ));
       } catch (error) {
         // TODO: Error handling for mutating messages per room
+        debugPrint(error.toString());
       }
     }));
   };
@@ -104,7 +106,7 @@ ThunkAction<AppState> mutateMessagesRoom({Room room}) {
       'messages': messages,
     });
 
-    store.dispatch(setMessages(
+    await store.dispatch(setMessages(
       room: Room(id: room.id),
       messages: revisedMessages,
     ));

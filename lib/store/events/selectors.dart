@@ -22,23 +22,22 @@ List<Message> filterMessages(
 ) {
   final blocked = state.userStore.blocked;
 
+  // TODO: remove the replacement filter here, should be managed by the mutators
   return messages
     ..removeWhere(
-      (message) => blocked.contains(message.sender),
+      (message) => blocked.contains(message.sender) || message.replacement,
     );
 }
 
-List<Message> reviseMessages(
-  List<Message> messages,
-  AppState state,
-) {
-  final reactions = selectReactions(state);
-  final redactions = state.eventStore.redactions;
+List<Message> reviseMessagesBackground(Map params) {
+  List<Message> messages = params['messages'];
+  Map<String, Redaction> redactions = params['redactions'];
+  Map<String, List<Reaction>> reactions = params['reactions'];
 
-  return reviseMessagesAlt(messages, redactions, reactions);
+  return reviseMessagesFilter(messages, redactions, reactions);
 }
 
-List<Message> reviseMessagesAlt(
+List<Message> reviseMessagesFilter(
   List<Message> messages,
   Map<String, Redaction> redactions,
   Map<String, List<Reaction>> reactions,
@@ -53,14 +52,6 @@ List<Message> reviseMessagesAlt(
   );
 
   return List.from(messagesMap.values);
-}
-
-List<Message> reviseMessagesBackground(Map params) {
-  List<Message> messages = params['messages'];
-  Map<String, Redaction> redactions = params['redactions'];
-  Map<String, List<Reaction>> reactions = params['reactions'];
-
-  return reviseMessagesAlt(messages, redactions, reactions);
 }
 
 Map<String, Message> filterRedactions(
@@ -106,7 +97,7 @@ Map<String, Message> appendReactions(
 Map<String, Message> replaceEdited(List<Message> messages) {
   final replacements = List<Message>();
 
-  // create a map of messages for O(1) when replacing (O(N))
+  // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String, Message>.fromIterable(
     messages ?? [],
     key: (msg) => msg.id,
