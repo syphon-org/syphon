@@ -33,6 +33,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';

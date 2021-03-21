@@ -22,23 +22,22 @@ List<Message> filterMessages(
 ) {
   final blocked = state.userStore.blocked;
 
+  // TODO: remove the replacement filter here, should be managed by the mutators
   return messages
     ..removeWhere(
-      (message) => blocked.contains(message.sender),
+      (message) => blocked.contains(message.sender) || message.replacement,
     );
 }
 
-List<Message> reviseMessages(
-  List<Message> messages,
-  AppState state,
-) {
-  final reactions = selectReactions(state);
-  final redactions = state.eventStore.redactions;
+List<Message> reviseMessagesBackground(Map params) {
+  List<Message> messages = params['messages'];
+  Map<String, Redaction> redactions = params['redactions'];
+  Map<String, List<Reaction>> reactions = params['reactions'];
 
-  return reviseMessagesAlt(messages, redactions, reactions);
+  return reviseMessagesFilter(messages, redactions, reactions);
 }
 
-List<Message> reviseMessagesAlt(
+List<Message> reviseMessagesFilter(
   List<Message> messages,
   Map<String, Redaction> redactions,
   Map<String, List<Reaction>> reactions,
@@ -53,14 +52,6 @@ List<Message> reviseMessagesAlt(
   );
 
   return List.from(messagesMap.values);
-}
-
-List<Message> reviseMessagesBackground(Map params) {
-  List<Message> messages = params['messages'];
-  Map<String, Redaction> redactions = params['redactions'];
-  Map<String, List<Reaction>> reactions = params['reactions'];
-
-  return reviseMessagesAlt(messages, redactions, reactions);
 }
 
 Map<String, Message> filterRedactions(
@@ -106,7 +97,7 @@ Map<String, Message> appendReactions(
 Map<String, Message> replaceEdited(List<Message> messages) {
   final replacements = List<Message>();
 
-  // create a map of messages for O(1) when replacing (O(N))
+  // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String, Message>.fromIterable(
     messages ?? [],
     key: (msg) => msg.id,
@@ -123,21 +114,28 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   // iterate through replacements and modify messages as needed O(M + M)
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
-  for (Message replacement in replacements) {
-    final messageId = replacement.relatedEventId;
-    if (messagesMap.containsKey(messageId)) {
-      final messageEdited = messagesMap[messageId];
+  for (Message messageEdited in replacements) {
+    final messageIdOriginal = messageEdited.relatedEventId;
+    final messageOriginal = messagesMap[messageIdOriginal];
 
-      messagesMap[messageId] = messageEdited.copyWith(
-        edited: true,
-        body: replacement.body,
-        msgtype: replacement.msgtype,
-        edits: [messageEdited, ...(messageEdited.edits ?? List<Message>())],
-      );
+    if (messageOriginal != null) {
+      final validEdit = messageEdited.sender == messageOriginal.sender;
 
-      // remove replacements from the returned messages
-      messagesMap.remove(replacement.id);
+      if (validEdit) {
+        messagesMap[messageIdOriginal] = messageOriginal.copyWith(
+          edited: true,
+          body: messageEdited.body,
+          msgtype: messageEdited.msgtype,
+          edits: [
+            messageOriginal,
+            ...(messageOriginal.edits ?? List<Message>())
+          ],
+        );
+      }
     }
+
+    // remove replacements from the returned messages
+    messagesMap.remove(messageEdited.id);
   }
 
   return messagesMap;
