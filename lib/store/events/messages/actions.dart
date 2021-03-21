@@ -62,19 +62,23 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
     final roomMessages = store.state.eventStore.messages;
 
     await Future.wait(roomMessages.entries.map((entry) async {
-      final roomId = entry.key;
-      final allMessages = entry.value;
+      try {
+        final roomId = entry.key;
+        final allMessages = entry.value;
 
-      final revisedMessages = await compute(reviseMessagesBackground, {
-        'reactions': reactions,
-        'redactions': redactions,
-        'messages': allMessages,
-      });
+        final revisedMessages = await compute(reviseMessagesBackground, {
+          'reactions': reactions,
+          'redactions': redactions,
+          'messages': allMessages,
+        });
 
-      await store.dispatch(setMessages(
-        room: Room(id: roomId),
-        messages: revisedMessages,
-      ));
+        await store.dispatch(setMessages(
+          room: Room(id: roomId),
+          messages: revisedMessages,
+        ));
+      } catch (error) {
+        // TODO: Error handling for mutating messages per room
+      }
     }));
   };
 }

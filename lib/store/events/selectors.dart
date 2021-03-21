@@ -128,7 +128,7 @@ Map<String, Message> replaceEdited(List<Message> messages) {
     final messageOriginal = messagesMap[messageIdOriginal];
 
     if (messageOriginal != null) {
-      final validEdit = messageEdited.senderKey == messageOriginal.senderKey;
+      final validEdit = messageEdited.sender == messageOriginal.sender;
 
       if (validEdit) {
         messagesMap[messageIdOriginal] = messageOriginal.copyWith(
@@ -141,10 +141,10 @@ Map<String, Message> replaceEdited(List<Message> messages) {
           ],
         );
       }
-
-      // remove replacements from the returned messages
-      messagesMap.remove(messageEdited.id);
     }
+
+    // remove replacements from the returned messages
+    messagesMap.remove(messageEdited.id);
   }
 
   return messagesMap;

@@ -29,6 +29,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.get(
@@ -64,6 +65,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.get(
@@ -121,6 +123,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -171,6 +174,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     final response = await http.put(
@@ -206,6 +210,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -259,6 +264,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
@@ -296,6 +302,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {};
@@ -335,6 +342,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     // Use astrick to send to all known devices for user
@@ -367,6 +375,7 @@ abstract class Events {
 
     Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
     };
 
     Map body = {
