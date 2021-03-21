@@ -49,14 +49,6 @@ class NavigationService {
   }
 }
 
-class NavigationRouteIds {
-  static const Intro = '/intro';
-  static const Login = '/login';
-  static const SearchHomeservers = '/search/homeservers';
-  static const Signup = '/signup';
-  static const VerificationView = '/verification';
-}
-
 class NavigationProvider {
   static getRoutes() => <String, WidgetBuilder>{
         '/intro': (BuildContext context) => Intro(),
