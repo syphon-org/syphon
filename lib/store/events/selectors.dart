@@ -123,20 +123,27 @@ Map<String, Message> replaceEdited(List<Message> messages) {
   // iterate through replacements and modify messages as needed O(M + M)
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
-  for (Message replacement in replacements) {
-    final messageId = replacement.relatedEventId;
-    if (messagesMap.containsKey(messageId)) {
-      final messageEdited = messagesMap[messageId];
+  for (Message messageEdited in replacements) {
+    final messageIdOriginal = messageEdited.relatedEventId;
+    final messageOriginal = messagesMap[messageIdOriginal];
 
-      messagesMap[messageId] = messageEdited.copyWith(
-        edited: true,
-        body: replacement.body,
-        msgtype: replacement.msgtype,
-        edits: [messageEdited, ...(messageEdited.edits ?? List<Message>())],
-      );
+    if (messageOriginal != null) {
+      final validEdit = messageEdited.senderKey == messageOriginal.senderKey;
+
+      if (validEdit) {
+        messagesMap[messageIdOriginal] = messageOriginal.copyWith(
+          edited: true,
+          body: messageEdited.body,
+          msgtype: messageEdited.msgtype,
+          edits: [
+            messageOriginal,
+            ...(messageOriginal.edits ?? List<Message>())
+          ],
+        );
+      }
 
       // remove replacements from the returned messages
-      messagesMap.remove(replacement.id);
+      messagesMap.remove(messageEdited.id);
     }
   }
 
