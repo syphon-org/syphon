@@ -9,14 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -30,8 +27,6 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 final protocol = DotEnv().env['PROTOCOL'];
-
-class ResetEvents {}
 
 class SetEvents {
   final String roomId;
@@ -61,6 +56,28 @@ class SetRedactions {
   final List<Redaction> redactions;
   SetRedactions({this.redactions});
 }
+
+class LoadMessages {
+  final Map<String, List<Message>> messagesMap;
+  LoadMessages({this.messagesMap});
+}
+
+class LoadReactions {
+  final Map<String, List<Reaction>> reactionsMap;
+  LoadReactions({this.reactionsMap});
+}
+
+class LoadReceipts {
+  final Map<String, Map<String, ReadReceipt>> receiptsMap;
+  LoadReceipts({this.receiptsMap});
+}
+
+class LoadRedactions {
+  final Map<String, Redaction> redactionsMap;
+  LoadRedactions({this.redactionsMap});
+}
+
+class ResetEvents {}
 
 ThunkAction<AppState> setMessages({
   Room room,

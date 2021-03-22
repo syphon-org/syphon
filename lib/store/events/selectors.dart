@@ -95,7 +95,7 @@ Map<String, Message> appendReactions(
 }
 
 Map<String, Message> replaceEdited(List<Message> messages) {
-  final replacements = List<Message>();
+  final replacements = <Message>[];
 
   // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String, Message>.fromIterable(

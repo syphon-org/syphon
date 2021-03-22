@@ -42,9 +42,9 @@ class UserStore extends Equatable {
     List<String> blocked,
   }) =>
       UserStore(
-        users: users ?? this.users,
-        invites: invites ?? this.invites,
-        loading: loading ?? this.loading,
+        users: users ?? this.users ?? Map(),
+        invites: invites ?? this.invites ?? [],
+        loading: loading ?? this.loading ?? [],
         blocked: blocked ?? this.blocked,
       );
   Map<String, dynamic> toJson() => _$UserStoreToJson(this);

@@ -27,6 +27,12 @@ class MediaStatus {
   static const SUCCESS = 'success';
 }
 
+class LoadMedia {
+  final Map<String, Uint8List> media;
+
+  LoadMedia({this.media});
+}
+
 class UpdateMediaChecks {
   final String mxcUri;
   final String status;

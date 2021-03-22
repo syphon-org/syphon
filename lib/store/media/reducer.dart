@@ -8,6 +8,10 @@ import './state.dart';
 MediaStore mediaReducer(
     [MediaStore state = const MediaStore(), dynamic action]) {
   switch (action.runtimeType) {
+    case LoadMedia:
+      return state.copyWith(
+        mediaCache: action.media,
+      );
     case UpdateMediaCache:
       final mediaCache = Map<String, Uint8List>.from(
         state.mediaCache ?? const {},

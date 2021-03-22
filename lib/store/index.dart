@@ -110,6 +110,7 @@ Future<Store> initStore(Database cache, Database storage) async {
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: data),
     shouldSave: (Store<AppState> store, dynamic action) {
+      // only serialize state when hot cachable items are mutated
       switch (action.runtimeType) {
         case SetRoom:
         case SetOlmAccount:
@@ -118,7 +119,6 @@ Future<Store> initStore(Database cache, Database storage) async {
         case SetUser:
         case ResetCrypto:
         case ResetUser:
-          print('[initStore] saving ${action}');
           return true;
         default:
           return false;
@@ -145,6 +145,9 @@ Future<Store> initStore(Database cache, Database storage) async {
       alertMiddleware,
     ],
   );
+
+  // finish loading cold storage after app state init
+  loadStorageAsync(storage, store);
 
   return Future.value(store);
 }
