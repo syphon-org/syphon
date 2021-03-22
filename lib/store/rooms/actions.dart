@@ -14,13 +14,13 @@ import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:

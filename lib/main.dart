@@ -24,7 +24,7 @@ import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/home/home.dart';
 import 'package:syphon/views/intro/index.dart';
 import 'package:syphon/views/navigation.dart';
 

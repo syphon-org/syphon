@@ -17,8 +17,8 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/selectors.dart';
 import './widgets/profile-preview.dart';
 
-class SettingsScreen extends StatelessWidget {
-  SettingsScreen({Key key}) : super(key: key);
+class SettingsView extends StatelessWidget {
+  SettingsView({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(

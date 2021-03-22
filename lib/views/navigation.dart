@@ -10,7 +10,7 @@ import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/groups/group-create-public.dart';
 import 'package:syphon/views/home/groups/group-create.dart';
 import 'package:syphon/views/home/groups/invite-users.dart';
-import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/home/home.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/profile/index.dart';
 import 'package:syphon/views/home/search/search-groups.dart';
@@ -49,14 +49,6 @@ class NavigationService {
   }
 }
 
-class NavigationRouteIds {
-  static const Intro = '/intro';
-  static const Login = '/login';
-  static const SearchHomeservers = '/search/homeservers';
-  static const Signup = '/signup';
-  static const VerificationView = '/verification';
-}
-
 class NavigationProvider {
   static getRoutes() => <String, WidgetBuilder>{
         '/intro': (BuildContext context) => Intro(),
@@ -66,7 +58,7 @@ class NavigationProvider {
         '/reset': (BuildContext context) => PasswordResetView(),
         '/search/homeservers': (BuildContext context) => SearchHomeservers(),
         '/verification': (BuildContext context) => VerificationView(),
-        '/home': (BuildContext context) => Home(),
+        '/home': (BuildContext context) => HomeView(),
         '/home/chat': (BuildContext context) => ChatView(),
         '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
         '/home/chat/details': (BuildContext context) => MessageDetails(),
@@ -90,7 +82,7 @@ class NavigationProvider {
         '/chat-preferences': (BuildContext context) => ChatPreferences(),
         '/theming': (BuildContext context) => Theming(),
         '/devices': (BuildContext context) => DevicesView(),
-        '/settings': (BuildContext context) => SettingsScreen(),
+        '/settings': (BuildContext context) => SettingsView(),
         '/blocked': (BuildContext context) => BlockedUsersView(),
         '/loading': (BuildContext context) => Loading(),
       };

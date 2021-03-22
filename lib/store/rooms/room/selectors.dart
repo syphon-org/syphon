@@ -4,10 +4,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-List<Room> availableRooms(List<Room> rooms) {
-  return List.from(rooms.where((room) => !room.hidden));
-}
-
 String formatPreviewTopic(String fullTopic) {
   final topic = fullTopic ?? Strings.contentTopicEmpty;
   final topicTruncated = topic.length > 100 ? topic.substring(0, 100) : topic;

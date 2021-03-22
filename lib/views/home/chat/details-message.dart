@@ -13,7 +13,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';

@@ -7,6 +7,10 @@ Room selectRoom({AppState state, String id}) {
   return state.roomStore.rooms[id] ?? Room();
 }
 
+List<Room> availableRooms(List<Room> rooms) {
+  return List.from(rooms.where((room) => !room.hidden));
+}
+
 List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
   final List<Room> roomList = rooms != null ? rooms : [];
 

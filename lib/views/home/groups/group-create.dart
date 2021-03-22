@@ -77,7 +77,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      child: DialogEncryption(
+      builder: (context) => DialogEncryption(
         content: Strings.confirmationGroupEncryption,
         onAccept: () {
           this.setState(() {

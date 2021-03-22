@@ -4,11 +4,11 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 
 Future<void> saveEvents(
   List<Event> events, {

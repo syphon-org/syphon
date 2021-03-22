@@ -198,7 +198,7 @@ class ChatViewState extends State<ChatView> {
         return showDialog(
           context: context,
           barrierDismissible: false,
-          child: DialogEncryption(
+          builder: (context) => DialogEncryption(
             onAccept: () {
               props.onToggleEncryption();
 
