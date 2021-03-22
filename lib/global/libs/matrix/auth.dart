@@ -74,7 +74,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -118,7 +118,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -148,7 +148,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -231,7 +231,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -410,7 +410,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -440,7 +440,7 @@ abstract class Auth {
 
     final response = await http.post(
       url,
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
