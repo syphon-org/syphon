@@ -124,7 +124,7 @@ class ResetRooms {
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncRooms(Map roomData) {
+ThunkAction<AppState> syncRooms(Map roomsData) {
   return (Store<AppState> store) async {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
@@ -133,13 +133,13 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     final lastSince = store.state.syncStore.lastSince;
 
     // syncing null data happens sometimes?
-    if (roomData == null) {
+    if (roomsData == null) {
       return;
     }
 
-    await Future.wait(roomData.keys.map((id) async {
+    await Future.wait(roomsData.keys.map((id) async {
       try {
-        final json = roomData[id];
+        final json = roomsData[id];
         var room = rooms[id] ?? Room(id: id);
         var messages = <Message>[];
 

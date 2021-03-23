@@ -30,6 +30,9 @@ description: a privacy focused matrix client
 # $ flutter config --enable-linux-desktop
 # $ flutter config --no-enable-<type>-desktop
 
+# testing
+# - flutter test test # allows for local json stubs
+
 # asset generation
 # iOS icons - https://github.com/smallmuou/ios-icon-generator
 #           - run generation script for ios and macos (desktop and mobile)
@@ -130,6 +133,8 @@ dev_dependencies:
   json_serializable: ^3.5.0
   flutter_launcher_icons: "^0.7.5"
   build_runner: ^1.10.1
+  flutter_test:
+    sdk: flutter
 
 dependency_overrides:
   freezed: ^0.12.7

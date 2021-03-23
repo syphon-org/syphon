@@ -4,6 +4,7 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
@@ -48,6 +49,7 @@ class Room {
   @JsonKey(defaultValue: false)
   final bool hidden;
   final bool archived;
+  final bool backfilling; // indicates limited _was_ true and needs to fill gap
 
   final String nextHash; // most recent next_batch
   final String prevHash; // most recent prev_batch
@@ -99,9 +101,6 @@ class Room {
 
   @JsonKey(ignore: true)
   final bool limited;
-
-  @JsonKey(ignore: true)
-  final bool backfilling;
 
   @JsonKey(ignore: true)
   final bool syncing;
@@ -277,9 +276,6 @@ class Room {
     String lastSince,
     Map<String, dynamic> json,
   }) {
-    bool invite;
-    bool limited;
-
     List<Event> stateEvents = [];
     List<Event> accountEvents = [];
     List<Event> ephemeralEvents = [];
@@ -353,8 +349,6 @@ class Room {
           nextHash: lastSince,
         )
         .fromStateEvents(
-          invite: invite,
-          limited: limited,
           events: stateEvents,
           currentUser: currentUser,
           reactions: reactionEvents,
@@ -379,7 +373,7 @@ class Room {
   Room fromTimelineData({Map<String, dynamic> json, String nextHash}) {
     bool oldest = false;
     bool limited = false;
-    bool backfilling = this.backfilling;
+    bool backfilling = this.backfilling ?? false;
 
     String prevHash;
     String limitedHash;
@@ -388,14 +382,12 @@ class Room {
 
     if (json['timeline'] != null) {
       oldest = json['timeline']['oldest'];
-      limited = json['timeline']['limited'];
+      limited = json['timeline']['limited'] ?? limited;
       prevHash = json['timeline']['prev_batch'];
 
       // at the end of pagination, the 'end' or 'prev_batch' return from matrix
       // is null or not present in the payload
-      if (prevHash == null) {
-        oldest = true;
-      }
+      oldest = prevHash == null;
 
       // start syncing event gaps if limited but not currently syncing
       if (limited && !backfilling) {
@@ -408,7 +400,7 @@ class Room {
       }
 
       printDebug(
-        '[fromSync] ${this.id} limited ${limited} prevHash ${prevHash != null} oldestHash ${this.oldestHash != null}',
+        '[fromSync] ${this.id} backfilling ${backfilling} prevHash ${prevHash} oldestHash ${this.oldestHash}',
       );
     }
 
@@ -418,9 +410,7 @@ class Room {
       nextHash: nextHash,
       // most recent prev_batch from the last /sync
       prevHash: prevHash,
-      // only set limited from /sync if not currently syncing
-      limited: limited,
-      // only set limited from /sync if not currently syncing
+      // only set backfilling based on limited from /sync
       backfilling: backfilling,
       // most recent prev_batch when limited is true
       limitedHash: limitedHash,
@@ -461,7 +451,6 @@ class Room {
    */
   Room fromStateEvents({
     bool invite,
-    bool limited,
     User currentUser,
     List<Event> events,
     List<Reaction> reactions,
@@ -593,10 +582,7 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      usersNew: usersAdd ?? this.usersNew,
       direct: direct ?? this.direct,
-      invite: invite ?? this.invite,
-      limited: limited ?? this.limited,
       userIds: userIds != null ? userIds.toList() : this.userIds ?? [],
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
@@ -605,6 +591,7 @@ class Room {
       namePriority: namePriority,
       reactions: reactions,
       redactions: redactions,
+      usersNew: usersAdd ?? this.usersNew,
     );
   }
 
@@ -617,7 +604,6 @@ class Room {
    */
   Room fromMessageEvents({List<Message> messages = const []}) {
     try {
-      bool limited = this.limited;
       bool backfilling = this.backfilling;
       int lastUpdate = this.lastUpdate;
       final messageIds = this.messageIds ?? [];
@@ -636,19 +622,7 @@ class Room {
 
       // backfilling indicates need to fetch additional data for room timelines
       if (backfilling) {
-        // Check to see if the new messages contain those existing in cache
-        if (messages.isNotEmpty && messageIds.isNotEmpty) {
-          final messageKnown = messageIds.firstWhere(
-            (id) => id == messages[0].id,
-            orElse: () => null,
-          );
-
-          // Set limited to false if they now exist
-          limited = messageKnown != null;
-          backfilling = messageKnown != null;
-        }
-
-        // Set limited to false false if
+        // Set backfilling to false false if
         // - the oldest hash (lastHash) is non-existant
         // - the previous hash (most recent) is non-existant
         // - the oldest hash equals the previously fetched hash
@@ -656,6 +630,16 @@ class Room {
             this.oldestHash == null ||
             this.oldestHash == this.prevHash) {
           backfilling = false;
+        }
+
+        // Check to see if the new messages contain those existing in cache
+        if (messages.isNotEmpty && messageIds.isNotEmpty && backfilling) {
+          final messageKnown = messageIds.firstWhere(
+            (id) => id == messages[0].id,
+            orElse: () => null,
+          );
+
+          backfilling = messageKnown != null;
         }
       }
 
@@ -682,7 +666,6 @@ class Room {
         outbox: outbox,
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
-        limited: limited,
         backfilling: backfilling,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
