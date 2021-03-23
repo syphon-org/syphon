@@ -9,16 +9,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -39,7 +37,7 @@ ThunkAction<AppState> mutateMessages({List<Message> messages}) {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
 
-    final revisedMessages = await compute(reviseMessagesBackground, {
+    final revisedMessages = await compute(mutateMessagesBackground, {
       'reactions': reactions,
       'redactions': redactions,
       'messages': messages,
@@ -67,7 +65,7 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
         final roomId = entry.key;
         final allMessages = entry.value;
 
-        final revisedMessages = await compute(reviseMessagesBackground, {
+        final revisedMessages = await compute(mutateMessagesBackground, {
           'reactions': reactions,
           'redactions': redactions,
           'messages': allMessages,
@@ -100,7 +98,7 @@ ThunkAction<AppState> mutateMessagesRoom({Room room}) {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
 
-    final revisedMessages = await compute(reviseMessagesBackground, {
+    final revisedMessages = await compute(mutateMessagesBackground, {
       'reactions': reactions,
       'redactions': redactions,
       'messages': messages,

@@ -166,7 +166,8 @@ ThunkAction<AppState> fetchMessageEvents({
   Room room,
   String to,
   String from,
-  bool oldest = false,
+  bool oldest = false, // fetching from the oldest known batch
+  bool limited = false, // fetching using the last known limited batch
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
@@ -193,18 +194,16 @@ ThunkAction<AppState> fetchMessageEvents({
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
       // reuse the logic for syncing
-      await store.dispatch(
-        syncRooms({
-          '${room.id}': {
-            'timeline': {
-              'events': messages,
-              'last_hash': oldest ? end : null,
-              'prev_batch': end,
-              'limited': end == start ? false : null,
-            }
-          },
-        }),
-      );
+      await store.dispatch(syncRooms({
+        '${room.id}': {
+          'timeline': {
+            'events': messages,
+            'prev_batch': end,
+            'limited': limited,
+            'oldest': oldest,
+          }
+        },
+      }));
     } catch (error) {
       debugPrint('[fetchMessageEvents] error $error');
     } finally {

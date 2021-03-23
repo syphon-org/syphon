@@ -4,7 +4,6 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
@@ -50,9 +49,10 @@ class Room {
   final bool hidden;
   final bool archived;
 
-  final String lastHash; // oldest hash in timeline
-  final String prevHash; // most recent prev_batch (not the lastHash)
   final String nextHash; // most recent next_batch
+  final String prevHash; // most recent prev_batch
+  final String limitedHash; // most recent prev_batch when limited is true
+  final String oldestHash; // oldest prev_batch in timeline
 
   final int lastRead;
   final int lastUpdate;
@@ -65,13 +65,15 @@ class Room {
 
   // Associated user ids
   final List<String> userIds;
+
+  // Associated event ids
   final List<String> messageIds;
   final List<String> reactionIds;
   final List<Message> outbox;
 
-  // TODO: removed until state timeline work can be done
+  // TODO: remove temporary placeholders
   @JsonKey(ignore: true)
-  final List<Event> state;
+  final List<Event> state; // TODO: temp removed - implement state timeline
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -88,6 +90,7 @@ class Room {
   @JsonKey(ignore: true)
   final Map<String, User> usersNew;
 
+  // Ephemeral
   @JsonKey(ignore: true)
   final bool userTyping;
 
@@ -96,6 +99,9 @@ class Room {
 
   @JsonKey(ignore: true)
   final bool limited;
+
+  @JsonKey(ignore: true)
+  final bool backfilling;
 
   @JsonKey(ignore: true)
   final bool syncing;
@@ -130,6 +136,7 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.limited = false,
+    this.backfilling = false,
     this.draft = null,
     this.reply = null,
     this.userIds = const [],
@@ -152,9 +159,10 @@ class Room {
     this.drafting = false,
     this.hidden = false,
     this.archived = false,
-    this.lastHash,
     this.nextHash,
     this.prevHash,
+    this.oldestHash,
+    this.limitedHash,
     this.readReceipts,
     this.state,
   });
@@ -171,6 +179,7 @@ class Room {
     limited,
     syncing,
     sending,
+    backfilling,
     joinRule,
     lastRead,
     lastUpdate,
@@ -185,7 +194,7 @@ class Room {
     drafting,
     hidden,
     archived,
-    users,
+    usersNew,
     userIds,
     events,
     List<Message> outbox,
@@ -195,9 +204,10 @@ class Room {
     List<String> reactionIds,
     List<Redaction> redactions,
     Map<String, ReadReceipt> readReceipts,
-    lastHash,
-    prevHash,
     nextHash,
+    prevHash,
+    limitedHash,
+    oldestHash,
     state,
   }) =>
       Room(
@@ -216,6 +226,7 @@ class Room {
         sending: sending ?? this.sending ?? false,
         syncing: syncing ?? this.syncing ?? false,
         limited: limited ?? this.limited ?? false,
+        backfilling: backfilling ?? this.backfilling ?? false,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
@@ -231,10 +242,10 @@ class Room {
         messagesNew: messagesNew ?? this.messagesNew,
         reactions: reactions ?? this.reactions,
         redactions: redactions ?? this.redactions,
-        usersNew: users ?? this.usersNew,
+        usersNew: usersNew ?? this.usersNew,
         userIds: userIds ?? this.userIds,
         readReceipts: readReceipts ?? this.readReceipts,
-        lastHash: lastHash ?? this.lastHash,
+        oldestHash: oldestHash ?? this.oldestHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
         state: state ?? this.state,
@@ -268,8 +279,6 @@ class Room {
   }) {
     bool invite;
     bool limited;
-    String lastHash;
-    String prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
     List<Event> accountEvents = [];
@@ -291,7 +300,6 @@ class Room {
 
       stateEvents =
           stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-      invite = true;
     }
 
     if (json['ephemeral'] != null) {
@@ -311,16 +319,6 @@ class Room {
     // Find state and message updates from timeline
     // Encryption events are not transfered in the state section of /sync
     if (json['timeline'] != null) {
-      limited = json['timeline']['limited'];
-      lastHash = json['timeline']['last_hash'];
-      prevHash = json['timeline']['prev_batch'];
-
-      if (limited != null) {
-        printDebug(
-          '[fromSync] ${this.id} limited ${limited} lastHash ${lastHash != null} prevHash ${prevHash != null}',
-        );
-      }
-
       final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
       final List<Event> timelineEvents = List.from(
@@ -350,6 +348,10 @@ class Room {
         .fromAccountData(
           accountEvents,
         )
+        .fromTimelineData(
+          json: json,
+          nextHash: lastSince,
+        )
         .fromStateEvents(
           invite: invite,
           limited: limited,
@@ -360,14 +362,71 @@ class Room {
         )
         .fromMessageEvents(
           messages: messageEvents,
-          lastHash: lastHash,
-          prevHash: prevHash,
-          nextHash: lastSince,
         )
         .fromEphemeralEvents(
           events: ephemeralEvents,
           currentUser: currentUser,
         );
+  }
+
+  ///
+  /// From Timeline Data Parser
+  ///
+  /// Parses timeline related data and configures
+  /// backfilling messages if a /sync gap is present or
+  /// indicated with 'limited'
+  ///
+  Room fromTimelineData({Map<String, dynamic> json, String nextHash}) {
+    bool oldest = false;
+    bool limited = false;
+    bool backfilling = this.backfilling;
+
+    String prevHash;
+    String limitedHash;
+
+    final bool invite = json['invite_state'] != null;
+
+    if (json['timeline'] != null) {
+      oldest = json['timeline']['oldest'];
+      limited = json['timeline']['limited'];
+      prevHash = json['timeline']['prev_batch'];
+
+      // at the end of pagination, the 'end' or 'prev_batch' return from matrix
+      // is null or not present in the payload
+      if (prevHash == null) {
+        oldest = true;
+      }
+
+      // start syncing event gaps if limited but not currently syncing
+      if (limited && !backfilling) {
+        backfilling = true;
+      }
+
+      // replace the limitedHash with prev if currently backfilling
+      if (limited && backfilling) {
+        limitedHash = prevHash;
+      }
+
+      printDebug(
+        '[fromSync] ${this.id} limited ${limited} prevHash ${prevHash != null} oldestHash ${this.oldestHash != null}',
+      );
+    }
+
+    return this.copyWith(
+      invite: invite,
+      // next hash in the timeline
+      nextHash: nextHash,
+      // most recent prev_batch from the last /sync
+      prevHash: prevHash,
+      // only set limited from /sync if not currently syncing
+      limited: limited,
+      // only set limited from /sync if not currently syncing
+      backfilling: backfilling,
+      // most recent prev_batch when limited is true
+      limitedHash: limitedHash,
+      // oldest hash in the timeline - use prev_batch if null
+      oldestHash: oldest ? prevHash : this.oldestHash ?? prevHash,
+    );
   }
 
   /**
@@ -417,9 +476,8 @@ class Room {
     int lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String, User>.from(this.usersNew ?? {});
-    var userIdsRemove = List<String>();
-
+    final userIdsRemove = <String>[];
+    final usersAdd = Map<String, User>.from(this.usersNew ?? {});
     Set<String> userIds = Set<String>.from(this.userIds ?? []);
 
     events.forEach((event) {
@@ -535,7 +593,7 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: usersAdd ?? this.usersNew,
+      usersNew: usersAdd ?? this.usersNew,
       direct: direct ?? this.direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
@@ -557,17 +615,13 @@ class Room {
    * message events have side effects on room data
    * outside displaying messages
    */
-  Room fromMessageEvents({
-    List<Message> messages = const [],
-    String lastHash,
-    String prevHash, // previously fetched hash
-    String nextHash,
-  }) {
+  Room fromMessageEvents({List<Message> messages = const []}) {
     try {
-      bool limited;
+      bool limited = this.limited;
+      bool backfilling = this.backfilling;
       int lastUpdate = this.lastUpdate;
-      List<Message> outbox = List<Message>.from(this.outbox ?? []);
       final messageIds = this.messageIds ?? [];
+      final outbox = List<Message>.from(this.outbox ?? []);
 
       // Converting only message events
       final hasEncrypted = messages.firstWhere(
@@ -580,8 +634,8 @@ class Room {
         lastUpdate = messages[0].timestamp;
       }
 
-      // limited indicates need to fetch additional data for room timelines
-      if (this.limited) {
+      // backfilling indicates need to fetch additional data for room timelines
+      if (backfilling) {
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
           final messageKnown = messageIds.firstWhere(
@@ -591,16 +645,17 @@ class Room {
 
           // Set limited to false if they now exist
           limited = messageKnown != null;
+          backfilling = messageKnown != null;
         }
 
         // Set limited to false false if
         // - the oldest hash (lastHash) is non-existant
         // - the previous hash (most recent) is non-existant
         // - the oldest hash equals the previously fetched hash
-        if (this.lastHash == null ||
-            this.prevHash == null ||
-            this.lastHash == this.prevHash) {
-          limited = false;
+        if (this.prevHash == null ||
+            this.oldestHash == null ||
+            this.oldestHash == this.prevHash) {
+          backfilling = false;
         }
       }
 
@@ -627,15 +682,10 @@ class Room {
         outbox: outbox,
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
-        limited: limited ?? this.limited,
+        limited: limited,
+        backfilling: backfilling,
         encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
-        // oldest hash in the timeline
-        lastHash: lastHash ?? this.lastHash ?? prevHash,
-        // most recent prev_batch from the last /sync
-        prevHash: prevHash ?? this.prevHash,
-        // next hash in the timeline
-        nextHash: nextHash ?? this.nextHash,
       );
     } catch (error) {
       printError('[fromMessageEvents] $error');

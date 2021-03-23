@@ -11,6 +11,7 @@ import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:syphon/storage/constants.dart';
+import 'package:syphon/store/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
@@ -151,6 +152,8 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
 //
 void loadStorageAsync(Database storage, Store<AppState> store) async {
   try {
+    store.dispatch(ToggleLoadingStorage(loading: true));
+
     final rooms = await loadRooms(storage: storage);
     final users = await loadUsers(storage: storage);
     final media = await loadMediaAll(storage: storage);
@@ -218,6 +221,8 @@ void loadStorageAsync(Database storage, Store<AppState> store) async {
         }
       }
     }
+
+    store.dispatch(ToggleLoadingStorage(loading: false));
   } catch (error) {
     printError('[loadStorageAsync]  ${error.toString()}');
   }

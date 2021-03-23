@@ -74,7 +74,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
-  Widget defaultHome = Home();
+  Widget defaultHome = HomeView();
   StreamSubscription alertsListener;
 
   SyphonState({
@@ -139,14 +139,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void onMounted() {
     // init auth listener
     store.state.authStore.onAuthStateChanged.listen((user) {
-      if (user == null && defaultHome.runtimeType == Home) {
+      if (user == null && defaultHome.runtimeType == HomeView) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);
       } else if (user != null &&
           user.accessToken != null &&
           defaultHome.runtimeType == Intro) {
         // Default Authenticated App Home
-        defaultHome = Home();
+        defaultHome = HomeView();
         NavigationService.clearTo('/home', context);
       }
     });

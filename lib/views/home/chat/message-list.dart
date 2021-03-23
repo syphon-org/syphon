@@ -10,6 +10,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';

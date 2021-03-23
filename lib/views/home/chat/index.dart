@@ -452,7 +452,7 @@ class ChatViewState extends State<ChatView> {
                               maintainSize: false,
                               maintainAnimation: false,
                               maintainState: false,
-                              visible: props.room.lastHash == null,
+                              visible: props.room.oldestHash == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -669,13 +669,11 @@ class _Props extends Equatable {
       onLoadFirstBatch: () {
         final room = selectRoom(id: roomId, state: store.state);
         printDebug('[onLoadFirstBatch] ${room.id}');
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            from: room.nextHash,
-            limit: 25,
-          ),
-        );
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.nextHash,
+          limit: 25,
+        ));
       },
       onToggleReaction: ({Message message, String emoji}) {
         final room = selectRoom(id: roomId, state: store.state);
@@ -707,10 +705,10 @@ class _Props extends Equatable {
         //   );
         // }
 
-        // fetch messages beyond the oldest known message - lastHash
+        // fetch messages beyond the oldest known message - oldestHash
         return store.dispatch(fetchMessageEvents(
           room: room,
-          from: room.lastHash,
+          from: room.oldestHash,
           oldest: true,
         ));
       },

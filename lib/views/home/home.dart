@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 

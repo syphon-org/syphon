@@ -40,6 +40,7 @@ lib/generated_plugin_registrant.dart
 *.reflectable.dart
 *.flutter-plugins-dependencies
 *.g.dart
+*.freezed.dart
 
 # Code Counter Extension
 *.VSCodeCounter
