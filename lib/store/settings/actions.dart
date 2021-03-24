@@ -139,7 +139,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      debugPrint('[fetchRooms] error: $error');
+      printDebug('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

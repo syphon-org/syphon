@@ -3,12 +3,11 @@ import 'dart:async';
 
 // Flutter imports:
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/store/index.dart';
@@ -64,7 +63,7 @@ ThunkAction<AppState> addInfo({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] $type : $message');
+    printDebug('[$origin] $type : $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error);
@@ -80,7 +79,7 @@ ThunkAction<AppState> addConfirmation({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin|confirm] $message');
+    printDebug('[$origin|confirm] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error.toString());
@@ -96,7 +95,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] ${error.toString()}');
+    printDebug('[$origin] ${error.toString()}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error);

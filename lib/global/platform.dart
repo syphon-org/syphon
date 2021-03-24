@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
 
@@ -23,12 +25,13 @@ Future<void> initPlatformDependencies() async {
   // load correct environment configurations
   await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
 
-  // disable debugPrint when in release mode
+  // disable printDebug when in release mode
   if (kReleaseMode) {
-    debugPrint = (String message, {int wrapWidth}) {};
-    printDebug = (String message, {String title}) {};
+    Logger.level = Level.nothing;
     printInfo = (String message, {String title}) {};
     printError = (String message, {String title}) {};
+    printDebug = (String message, {String title}) {};
+    printWarning = (String message, {String title}) {};
   }
 
   // init platform overrides for compatability with dart libs

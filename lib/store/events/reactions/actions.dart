@@ -64,7 +64,7 @@ ThunkAction<AppState> sendReaction({
 
       return true;
     } catch (error) {
-      debugPrint('[sendReaction] $error');
+      printDebug('[sendReaction] $error');
       return false;
     } finally {
       store.dispatch(UpdateRoom(id: room.id, sending: false));

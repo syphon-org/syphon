@@ -125,11 +125,18 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ## 📐 Architecture
 
-### store
+### overview
 - views (flutter)
 - state (redux)
 - cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
 - storage (sembast + sqflite + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
+
+### overview (future)
+- views (flutter)
+- view-model (flutter_redux)
+- state (redux)
+- hot cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
+- storage (sqflite + sqlcipher + [floor orm](https://github.com/vitusortner/floor))
 
 ### assets
 - Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.

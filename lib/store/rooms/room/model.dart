@@ -20,9 +20,9 @@ import 'package:syphon/store/user/model.dart';
 part 'model.g.dart';
 
 class RoomPresets {
+  static const public = 'public_chat';
   static const private = 'private_chat';
   static const privateTrusted = 'trusted_private_chat';
-  static const public = 'public_chat';
 }
 
 @JsonSerializable()
@@ -43,8 +43,8 @@ class Room {
 
   final bool invite;
   final bool guestEnabled;
-  final bool encryptionEnabled;
   final bool worldReadable;
+  final bool encryptionEnabled;
 
   @JsonKey(defaultValue: false)
   final bool hidden;
@@ -58,6 +58,7 @@ class Room {
 
   final int lastRead;
   final int lastUpdate;
+  final int lastUpdateState;
   final int totalJoinedUsers;
   final int namePriority;
 
@@ -136,8 +137,8 @@ class Room {
     this.sending = false,
     this.limited = false,
     this.backfilling = false,
-    this.draft = null,
-    this.reply = null,
+    this.draft,
+    this.reply,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
@@ -148,6 +149,7 @@ class Room {
     this.redactions = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
+    this.lastUpdateState = 0,
     this.namePriority = 4,
     this.totalJoinedUsers = 0,
     this.guestEnabled = false,
@@ -182,6 +184,7 @@ class Room {
     joinRule,
     lastRead,
     lastUpdate,
+    lastUpdateState,
     namePriority,
     totalJoinedUsers,
     guestEnabled,
@@ -228,6 +231,7 @@ class Room {
         backfilling: backfilling ?? this.backfilling ?? false,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
+        lastUpdateState: lastUpdateState ?? this.lastUpdateState,
         namePriority: namePriority ?? this.namePriority,
         totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
         guestEnabled: guestEnabled ?? this.guestEnabled,
@@ -462,7 +466,7 @@ class Room {
     String joinRule;
     bool encryptionEnabled;
     bool direct = this.direct ?? false;
-    int lastUpdate = this.lastUpdate;
+    int lastUpdateState = this.lastUpdateState;
     int namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
     final userIdsRemove = <String>[];
@@ -472,7 +476,8 @@ class Room {
     events.forEach((event) {
       try {
         final timestamp = event.timestamp ?? 0;
-        lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
+        lastUpdateState =
+            timestamp > lastUpdateState ? event.timestamp : lastUpdateState;
 
         switch (event.type) {
           case 'm.room.name':
@@ -538,7 +543,7 @@ class Room {
             break;
         }
       } catch (error) {
-        debugPrint('[Room.fromStateEvents] ${error} ${event.type}');
+        printDebug('[Room.fromStateEvents] ${error} ${event.type}');
       }
     });
 
@@ -586,7 +591,8 @@ class Room {
       userIds: userIds != null ? userIds.toList() : this.userIds ?? [],
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
-      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      lastUpdateState:
+          lastUpdateState > 0 ? lastUpdateState : this.lastUpdateState,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,
@@ -604,16 +610,9 @@ class Room {
    */
   Room fromMessageEvents({List<Message> messages = const []}) {
     try {
-      bool backfilling = this.backfilling;
       int lastUpdate = this.lastUpdate;
+      bool backfilling = this.backfilling;
       final messageIds = this.messageIds ?? [];
-      final outbox = List<Message>.from(this.outbox ?? []);
-
-      // Converting only message events
-      final hasEncrypted = messages.firstWhere(
-        (msg) => msg.type == EventTypes.encrypted,
-        orElse: () => null,
-      );
 
       // See if the newest message has a greater timestamp
       if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
@@ -651,9 +650,10 @@ class Room {
       );
 
       // Remove outboxed messages
-      outbox.removeWhere(
-        (message) => messagesMap.containsKey(message.id),
-      );
+      final outbox = List<Message>.from(this.outbox ?? [])
+        ..removeWhere(
+          (message) => messagesMap.containsKey(message.id),
+        );
 
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
@@ -667,7 +667,6 @@ class Room {
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         backfilling: backfilling,
-        encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
       );
     } catch (error) {

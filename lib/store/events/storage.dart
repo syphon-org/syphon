@@ -223,7 +223,7 @@ Future<List<Message>> loadMessages(
 
     return messages;
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    printError(error.toString(), tag: 'loadMessages');
     return List();
   }
 }

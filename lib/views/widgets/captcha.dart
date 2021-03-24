@@ -56,7 +56,7 @@ class CaptchaState extends State<Captcha> {
   @protected
   void onMounted() {
     // Confirm public key is correct
-    // debugPrint('[captcha wrapper] ${this.publickey}');
+    // printDebug('[captcha wrapper] ${this.publickey}');
   }
 
   @override

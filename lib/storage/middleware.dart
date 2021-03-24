@@ -85,7 +85,6 @@ dynamic storageMiddleware<State>(
     case ResetCrypto:
       saveCrypto(store.state.cryptoStore, storage: Storage.main);
       break;
-
     default:
       break;
   }

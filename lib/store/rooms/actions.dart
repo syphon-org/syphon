@@ -302,7 +302,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRoom] ${roomId} $error');
+      printDebug('[fetchRoom] ${roomId} $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -337,14 +337,14 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
         try {
           store.dispatch(fetchRoom(room.id, fetchState: syncState));
         } catch (error) {
-          debugPrint('[fetchRoom(s)] ${room.id} $error');
+          printDebug('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
       }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRoom(s)] $error');
+      printDebug('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -387,11 +387,11 @@ ThunkAction<AppState> fetchDirectRooms() {
         try {
           store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
-          debugPrint('[fetchDirectRooms] $error');
+          printDebug('[fetchDirectRooms] $error');
         }
       }));
     } catch (error) {
-      debugPrint('[fetchDirectRooms] $error');
+      printDebug('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -526,7 +526,7 @@ ThunkAction<AppState> updateRoom({
 }) {
   return (Store<AppState> store) async {
     try {} catch (error) {
-      debugPrint('[updateRoom] $error');
+      printDebug('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -701,7 +701,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       // TODO: remove this in version 0.1.7
       // await store.dispatch(fetchDirectRooms());
     } catch (error) {
-      debugPrint('[toggleDirectRoom] $error');
+      printDebug('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -942,7 +942,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       await deleteRooms({room.id: room});
     } catch (error) {
-      debugPrint('[removeRoom] $error');
+      printDebug('[removeRoom] $error');
     } finally {
       if (room.direct) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
@@ -990,7 +990,7 @@ ThunkAction<AppState> leaveRoom({Room room}) {
       }
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      debugPrint('[leaveRoom] $error');
+      printDebug('[leaveRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -1006,7 +1006,7 @@ ThunkAction<AppState> archiveRoom({Room room}) {
     try {
       store.dispatch(AddArchive(roomId: room.id));
     } catch (error) {
-      debugPrint('[archiveRoom] $error');
+      printDebug('[archiveRoom] $error');
     }
   };
 }

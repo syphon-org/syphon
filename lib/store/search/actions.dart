@@ -235,7 +235,7 @@ ThunkAction<AppState> searchUsers({String searchText}) {
         totalResults: searchResults.length,
       ));
     } catch (error) {
-      debugPrint('[searchPublicRooms] $error');
+      printDebug('[searchPublicRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

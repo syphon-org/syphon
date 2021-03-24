@@ -163,7 +163,7 @@ ThunkAction<AppState> fetchThumbnail(
         status: MediaStatus.SUCCESS,
       ));
     } catch (error) {
-      debugPrint('[fetchThumbnail] $mxcUri $error');
+      printDebug('[fetchThumbnail] $mxcUri $error');
       store.dispatch(UpdateMediaChecks(
         mxcUri: mxcUri,
         status: MediaStatus.FAILURE,

@@ -9,17 +9,12 @@
  * 
  */
 
-import 'dart:collection';
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/redactions/model.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/model.dart';
 
 part 'parsers.freezed.dart';
 
@@ -27,15 +22,15 @@ part 'parsers.freezed.dart';
 abstract class EventPayload with _$EventPayload {
   factory EventPayload({
     List<Event> state,
+    List<Event> account,
+    List<Message> messages,
     List<Reaction> reactions,
     List<Redaction> redactions,
-    List<Message> messages,
-    Map<String, ReadReceipt> readReceipts,
-    Map<String, User> users,
+    List<Event> ephemeral,
   }) = _EventPayload;
 }
 
-Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
+EventPayload parseEvents(Map<String, dynamic> json) {
   List<Event> stateEvents = [];
   List<Event> accountEvents = [];
   List<Message> messageEvents = [];
@@ -99,12 +94,12 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
     }
   }
 
-  return {
-    'state': stateEvents,
-    'account': accountEvents,
-    'messages': messageEvents,
-    'redacted': redactedEvents,
-    'reactions': reactionEvents,
-    'ephemeral': ephemeralEvents,
-  };
+  return EventPayload(
+    state: stateEvents,
+    account: accountEvents,
+    messages: messageEvents,
+    reactions: reactionEvents,
+    redactions: redactedEvents,
+    ephemeral: ephemeralEvents,
+  );
 }

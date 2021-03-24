@@ -249,7 +249,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      debugPrint('[initOlmEncryption] $error');
+      printDebug('[initOlmEncryption] $error');
     }
   };
 }
@@ -329,7 +329,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // return the generated keys
       return deviceIdentityKeys;
     } catch (error) {
-      debugPrint('[generateIdentityKeys] $error');
+      printDebug('[generateIdentityKeys] $error');
       return null;
     }
   };
@@ -577,7 +577,7 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
           } catch (error) {
-            debugPrint('[sendSessionKeys] $error');
+            printDebug('[sendSessionKeys] $error');
           }
         },
       );
@@ -637,7 +637,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        debugPrint(
+        printDebug(
           '[claimOneTimeKeys] all key sharing sessions per device are ready',
         );
         return true;
@@ -790,7 +790,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
         return session;
       }
     } catch (error) {
-      debugPrint('[loadKeySessionOutbound] $error');
+      printDebug('[loadKeySessionOutbound] $error');
       return null;
     }
   };
@@ -826,7 +826,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         }
       }
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      printDebug('[loadKeySessionInbound] $error');
     }
 
     try {
@@ -851,7 +851,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      printDebug('[loadKeySessionInbound] $error');
     }
 
     return null;

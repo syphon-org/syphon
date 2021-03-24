@@ -36,17 +36,3 @@ Room parseRoom(Map params) {
     lastSince: lastSince,
   );
 }
-
-Map<String, dynamic> parseRoomSync(Map params) {
-  Map json = params['json'];
-  Room room = params['room'];
-  User currentUser = params['currentUser'];
-  String lastSince = params['lastSince'];
-
-  Map events = parseEvents(json);
-
-  return {
-    'room': room,
-    ...events,
-  };
-}

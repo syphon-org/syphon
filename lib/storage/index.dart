@@ -12,7 +12,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -75,18 +74,28 @@ Future<Database> initStorage() async {
 
     return Storage.main;
   } catch (error) {
-    debugPrint('[initStorage] $error');
+    printDebug('[initStorage] $error');
     return null;
   }
 }
 
-// // Closes and saves storage
+///
+/// Close Storage
+///
+/// Closes and saves storage
+///
 void closeStorage() async {
   if (Storage.main != null) {
     Storage.main.close();
   }
 }
 
+//
+// Delete Storage
+//
+// delete essential cold storage, usually done
+// when logging out of an account
+//
 Future<void> deleteStorage() async {
   try {
     DatabaseFactory storageFactory;
@@ -159,9 +168,9 @@ void loadStorageAsync(Database storage, Store<AppState> store) async {
     final media = await loadMediaAll(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = Map();
-    Map<String, List<Reaction>> reactions = Map();
-    Map<String, Map<String, ReadReceipt>> receipts = Map();
+    var messages = Map<String, List<Message>>();
+    var reactions = Map<String, List<Reaction>>();
+    var receipts = Map<String, Map<String, ReadReceipt>>();
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(

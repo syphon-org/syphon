@@ -86,7 +86,7 @@ class User extends Equatable {
         avatarUri: json['avatar_url'] as String,
       );
     } catch (error) {
-      debugPrint('[User.fromMatrix] $error');
+      printDebug('[User.fromMatrix] $error');
       return User();
     }
   }

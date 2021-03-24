@@ -42,7 +42,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      debugPrint('[BackgroundSync.init] ${error}');
+      printDebug('[BackgroundSync.init] ${error}');
       return null;
     }
   }
@@ -101,7 +101,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      debugPrint('[BackgroundSync] $error');
+      printDebug('[BackgroundSync] $error');
     }
   }
 }

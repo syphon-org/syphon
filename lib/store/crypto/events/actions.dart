@@ -117,7 +117,7 @@ ThunkAction<AppState> decryptMessageEvent({
 
       return event;
     } catch (error) {
-      debugPrint('[decryptMessageEvent] $error');
+      printDebug('[decryptMessageEvent] $error');
       return event;
     }
   };
@@ -326,11 +326,11 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
 
                   return await store.dispatch(syncRooms(room));
                 } catch (error) {
-                  debugPrint('[syncRooms|error] $error');
+                  printDebug('[syncRooms|error] $error');
                 }
               }
             } catch (error) {
-              debugPrint('[decryptKeyEvent|error] $error');
+              printDebug('[decryptKeyEvent|error] $error');
             }
 
             break;

@@ -10,6 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/selectors.dart';
@@ -685,7 +686,7 @@ class _Props extends Equatable {
             store.state.settingsStore.roomTypeBadgesEnabled ?? true,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onDebug: () async {
-          debugPrint('[onDebug] trigged debug function @ home');
+          printDebug('[onDebug] trigged debug function @ home');
         },
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());

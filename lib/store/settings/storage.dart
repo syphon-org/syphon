@@ -41,7 +41,7 @@ Future<SettingsStore> loadSettings({Database storage}) async {
 
     return SettingsStore.fromJson(json.decode(settings));
   } catch (error) {
-    printError(error.toString(), title: 'loadSettings');
+    printError(error.toString(), tag: 'loadSettings');
     return null;
   }
 }

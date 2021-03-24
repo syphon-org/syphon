@@ -33,7 +33,7 @@ ThunkAction<AppState> fetchNotifications() {
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[fetchNotificationPushers] $error');
+      printDebug('[fetchNotificationPushers] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -58,7 +58,7 @@ ThunkAction<AppState> fetchNotificationPushers() {
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[fetchNotificationPushers] $error');
+      printDebug('[fetchNotificationPushers] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -100,7 +100,7 @@ ThunkAction<AppState> setPusherDeviceToken(String token) {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetPusherToken(token: token));
     } catch (error) {
-      debugPrint('[setPusherDeviceToken] $error');
+      printDebug('[setPusherDeviceToken] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -142,7 +142,7 @@ ThunkAction<AppState> saveNotificationPusher({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[saveNotificationPusher] $error');
+      printDebug('[saveNotificationPusher] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

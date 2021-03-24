@@ -94,7 +94,7 @@ class SignupViewState extends State<SignupView> {
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
         } catch (error) {
-          debugPrint('Failed to parse stages');
+          printDebug('Failed to parse stages');
         }
 
         // dynamically add stages based on homeserver requirements

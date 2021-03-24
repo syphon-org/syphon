@@ -205,7 +205,7 @@ ThunkAction<AppState> fetchMessageEvents({
         },
       }));
     } catch (error) {
-      debugPrint('[fetchMessageEvents] error $error');
+      printDebug('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -243,7 +243,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
 
       return decryptedTimelineEvents;
     } catch (error) {
-      debugPrint(
+      printDebug(
         '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
       );
     } finally {
@@ -281,7 +281,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
         },
       }));
     } catch (error) {
-      debugPrint('[fetchStateEvents] $error');
+      printDebug('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
@@ -387,7 +387,7 @@ ThunkAction<AppState> sendReadReceipts({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.readReceipts) {
-        return debugPrint('[sendReadReceipts] read receipts disabled');
+        return printDebug('[sendReadReceipts] read receipts disabled');
       }
 
       final data = await MatrixApi.sendReadReceipts(
@@ -403,9 +403,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      debugPrint('[sendReadReceipts] sent ${message.id} $data');
+      printDebug('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      debugPrint('[sendReadReceipts] failed $error');
+      printDebug('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -425,7 +425,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicators) {
-        debugPrint('[sendTyping] typing indicators disabled');
+        printDebug('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -442,7 +442,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[sendTyping] $error');
+      printDebug('[sendTyping] $error');
     }
   };
 }
@@ -460,7 +460,7 @@ ThunkAction<AppState> deleteMessage({
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printDebug('[deleteMessage] $error');
     }
   };
 }
@@ -485,7 +485,7 @@ ThunkAction<AppState> redactEvent({
         eventId: event.id,
       );
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printDebug('[deleteMessage] $error');
     }
   };
 }

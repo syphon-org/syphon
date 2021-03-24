@@ -42,7 +42,7 @@ Future<CryptoStore> loadCrypto({Database storage}) async {
 
     return CryptoStore.fromJson(json.decode(crypto));
   } catch (error) {
-    printError(error.toString(), title: 'loadCrypto');
+    printError(error.toString(), tag: 'loadCrypto');
     return null;
   }
 }

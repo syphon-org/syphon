@@ -234,7 +234,7 @@ ThunkAction<AppState> startAuthObserver() {
         // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String payload) {
-            debugPrint('[onSelectNotification] payload');
+            printDebug('[onSelectNotification] payload');
           },
           onSaveToken: (token) {
             store.dispatch(setPusherDeviceToken(token));
@@ -323,7 +323,7 @@ ThunkAction<AppState> generateDeviceId({String salt}) {
 
       return device;
     } catch (error) {
-      debugPrint('[generateDeviceId] $error');
+      printDebug('[generateDeviceId] $error');
       return device;
     }
   };
@@ -547,7 +547,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
         availability: data['available'],
       ));
     } catch (error) {
-      debugPrint('[checkUsernameAvailability] $error');
+      printDebug('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -575,7 +575,7 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
         );
 
         if (currentStage.length > 0) {
-          debugPrint('[SetCredential] $currentStage');
+          printDebug('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -585,7 +585,7 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
         }
       }
     } catch (error) {
-      debugPrint('[setInteractiveAuth] $error');
+      printDebug('[setInteractiveAuth] $error');
     }
   };
 }
@@ -747,7 +747,7 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
       ));
       return true;
     } catch (error) {
-      debugPrint('[submitEmail] $error');
+      printDebug('[submitEmail] $error');
       store.dispatch(SetEmailValid(valid: false));
       store.dispatch(SetEmailAvailability(available: false));
       return false;
@@ -997,7 +997,7 @@ ThunkAction<AppState> updateCredential({
         ),
       ));
     } catch (error) {
-      debugPrint('[updateCredential] $error');
+      printDebug('[updateCredential] $error');
     }
   };
 }

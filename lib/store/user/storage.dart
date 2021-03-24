@@ -69,7 +69,7 @@ Future<Map<String, User>> loadUsers({
     printInfo('[users] loaded ${users.length}');
     return users;
   } catch (error) {
-    printError(error.toString(), title: 'loadUsers');
+    printError(error.toString(), tag: 'loadUsers');
     return null;
   }
 }

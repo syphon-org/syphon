@@ -35,7 +35,7 @@ Future<AuthStore> loadAuth({Database storage}) async {
 
     return AuthStore.fromJson(json.decode(auth));
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    printError(error.toString(), tag: 'loadAuth');
     return null;
   }
 }

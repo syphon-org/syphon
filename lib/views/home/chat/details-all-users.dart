@@ -14,7 +14,6 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';

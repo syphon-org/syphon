@@ -88,7 +88,7 @@ ThunkAction<AppState> startSyncObserver() {
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
-          debugPrint('[startSyncObserver] skipping sync, needs full sync');
+          printDebug('[startSyncObserver] skipping sync, needs full sync');
           return;
         }
 
@@ -104,12 +104,12 @@ ThunkAction<AppState> startSyncObserver() {
                 Duration(milliseconds: 1000 * backoffFactor),
               );
 
-          debugPrint(
+          printDebug(
             '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
           );
 
           if (backoffLimit == 1) {
-            debugPrint('[Sync Observer] forced retry timeout');
+            printDebug('[Sync Observer] forced retry timeout');
             await store.dispatch(fetchSync(
               since: store.state.syncStore.lastSince,
             ));
@@ -119,11 +119,11 @@ ThunkAction<AppState> startSyncObserver() {
         }
 
         if (store.state.syncStore.syncing) {
-          debugPrint('[startSyncObserver] still syncing');
+          printDebug('[startSyncObserver] still syncing');
           return;
         }
 
-        debugPrint('[startSyncObserver] running sync');
+        printDebug('[startSyncObserver] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -193,13 +193,13 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting sync *** ');
+      printDebug('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
       var filterId;
 
       if (isFullSync) {
-        debugPrint('[fetchSync] *** full sync running *** ');
+        printDebug('[fetchSync] *** full sync running *** ');
       }
 
       // Normal matrix /sync call to the homeserver (Threaded)
@@ -250,7 +250,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       ));
 
       if (isFullSync) {
-        debugPrint('[fetchSync] *** full sync completed ***');
+        printDebug('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
       store.dispatch(SetOffline(offline: true));

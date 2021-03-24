@@ -87,7 +87,7 @@ class IntroState extends State<Intro> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        child: Container(
+        builder: (context) => Container(
           constraints: BoxConstraints(
             minWidth: width * 0.9,
           ),

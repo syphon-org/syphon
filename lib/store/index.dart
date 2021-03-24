@@ -132,7 +132,7 @@ Future<Store> initStore(Database cache, Database storage) async {
   try {
     initialState = await persistor.load();
   } catch (error) {
-    debugPrint('[Redux Persist] $error');
+    printDebug('[Redux Persist] $error');
   }
 
   final Store<AppState> store = Store<AppState>(

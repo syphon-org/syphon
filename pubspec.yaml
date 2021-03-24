@@ -125,7 +125,8 @@ dependencies:
   emoji_picker: 0.1.0
   swipeable: 1.1.0
 
-  # fun
+  # tooling
+  logger: 0.9.4
   ansicolor: 1.1.1
 
 dev_dependencies:

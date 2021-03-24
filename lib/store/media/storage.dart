@@ -48,7 +48,7 @@ Future<Uint8List> loadMedia({
     return Uint8List.fromList(
         (dataBytes as List)?.map((e) => e as int)?.toList());
   } catch (error) {
-    printError(error.toString(), title: 'loadMedia');
+    printError(error.toString(), tag: 'loadMedia');
     return null;
   }
 }
@@ -80,7 +80,7 @@ Future<Map<String, Uint8List>> loadMediaAll({
 
     return media;
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaAll');
+    printError(error.toString(), tag: 'loadMediaAll');
     return null;
   }
 }
