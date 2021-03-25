@@ -12,7 +12,7 @@ import 'package:syphon/store/events/receipts/model.dart';
 Future<void> saveReceipts(
   Map<String, ReadReceipt> receipts, {
   Database storage,
-  bool ready,
+  bool ready = false,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
 

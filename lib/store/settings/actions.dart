@@ -12,6 +12,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -139,7 +140,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      printDebug('[fetchRooms] error: $error');
+      printDebug(error.toString(), tag: 'fetchDevices');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

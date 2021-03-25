@@ -2,36 +2,37 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/messages/storage.dart';
-import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/store/user/storage.dart';
 
 ///
-/// Messages Storage Middleware
+/// Receipts Storage Middleware
 ///
 /// Saves message data to cold storage based
 /// on which redux actions are fired, happens
 /// BEFORE updating state with
 ///
-dynamic storageMiddlewareMessages<State>(
+dynamic storageMiddlewareUsers<State>(
   Store<AppState> store,
   dynamic action,
   NextDispatcher next,
 ) {
   try {
     switch (action.runtimeType) {
-      case SetMessages:
-        final messages = (action as SetMessages).messages;
-        if (messages == null || messages.length == 0) {
+      case SetUsers:
+        final users = (action as SetUsers).users;
+        if (users == null || users.length == 0) {
           break;
         }
-        saveMessages(messages, storage: Storage.main);
+        saveUsers(users, storage: Storage.main);
         break;
       default:
         break;
     }
   } catch (error) {
-    printError(error.toString(), tag: 'storageMiddlewareMessages');
+    printError(error.toString(), tag: 'storageMiddlewareUsers');
   }
 
   next(action);

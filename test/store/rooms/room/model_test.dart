@@ -13,8 +13,8 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('[Room.fromTimelineData]', () {
-    test('Backfill should be true when payload is "limited"', () async {
+  group('Backfilling', () {
+    test('Room backfill should be true when payload is "limited"', () async {
       final room = Room();
 
       final file = new File('test/store/rooms/room/payload_limited.json');
@@ -28,7 +28,7 @@ void main() {
     });
 
     test(
-        'Backfill should remain true even after receiving a false "limited" payload ',
+        'Room backfill should remain true even after receiving a false "limited" payload ',
         () async {
       var file = new File('test/store/rooms/room/payload_limited.json');
       var json = jsonDecode(await file.readAsString());
@@ -55,29 +55,27 @@ void main() {
     });
   });
 
-  group('[Room.fromMessageEvents]', () {
-    test(
-        'Backfill should be false when payload returns known events or no prev_batch',
-        () async {
-      var file = new File('test/store/rooms/room/payload_limited.json');
-      var json = jsonDecode(await file.readAsString());
+  test(
+      'Room backfill should be false when payload returns known events or no prev_batch',
+      () async {
+    var file = new File('test/store/rooms/room/payload_limited.json');
+    var json = jsonDecode(await file.readAsString());
 
-      var roomId = '!726s6s6q:example.com';
-      var roomData = json['rooms']['join']['${roomId}'];
-      var room = Room(id: roomId);
+    var roomId = '!726s6s6q:example.com';
+    var roomData = json['rooms']['join']['${roomId}'];
+    var room = Room(id: roomId);
 
-      var roomUpdated = room.fromTimelineData(json: roomData);
+    var roomUpdated = room.fromTimelineData(json: roomData);
 
-      expect(roomUpdated.backfilling, true);
+    expect(roomUpdated.backfilling, true);
 
-      file = new File('test/store/rooms/room/payload_full.json');
-      json = jsonDecode(await file.readAsString());
+    file = new File('test/store/rooms/room/payload_full.json');
+    json = jsonDecode(await file.readAsString());
 
-      final events = parseEvents(json);
+    final events = parseEvents(json);
 
-      expect(roomUpdated.backfilling, false);
+    expect(roomUpdated.backfilling, false);
 
-      // roomUpdated = roomUpdated.fromMessageEvents(json: roomData);
-    });
+    // roomUpdated = roomUpdated.fromMessageEvents(json: roomData);
   });
 }

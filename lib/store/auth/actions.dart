@@ -5,9 +5,6 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-// Flutter imports:
-import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:crypt/crypt.dart';
 import 'package:device_info/device_info.dart';
@@ -15,7 +12,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
@@ -33,7 +29,6 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';

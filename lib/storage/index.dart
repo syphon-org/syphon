@@ -15,10 +15,13 @@ import 'package:syphon/store/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
+import 'package:syphon/store/events/redactions/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -233,6 +236,6 @@ void loadStorageAsync(Database storage, Store<AppState> store) async {
 
     store.dispatch(ToggleLoadingStorage(loading: false));
   } catch (error) {
-    printError('[loadStorageAsync]  ${error.toString()}');
+    printError(error.toString(), tag: "loadStorageAsync");
   }
 }

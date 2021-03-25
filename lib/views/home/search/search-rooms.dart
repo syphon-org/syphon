@@ -167,7 +167,6 @@ class RoomSearchState extends State<RoomSearchView> {
         } else if (roomColorDefaults.containsKey(room.id)) {
           backgroundColor = roomColorDefaults[room.id];
         } else {
-          printDebug('[ListView.builder] generating new color');
           backgroundColor = Colours.hashedColor(room.id);
           roomColorDefaults.putIfAbsent(
             room.id,

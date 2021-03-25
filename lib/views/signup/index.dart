@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/views/behaviors.dart';
@@ -94,7 +95,7 @@ class SignupViewState extends State<SignupView> {
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
         } catch (error) {
-          printDebug('Failed to parse stages');
+          printError(error.toString(), tag: "interactiveAuths Parsing");
         }
 
         // dynamically add stages based on homeserver requirements

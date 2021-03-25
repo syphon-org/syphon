@@ -14,6 +14,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -85,9 +86,7 @@ ThunkAction<AppState> uploadMedia({
 
       return data;
     } catch (error) {
-      store.dispatch(
-        addAlert(origin: 'uploadMedia', message: error),
-      );
+      store.dispatch(addAlert(origin: 'uploadMedia', message: error));
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -163,7 +162,7 @@ ThunkAction<AppState> fetchThumbnail(
         status: MediaStatus.SUCCESS,
       ));
     } catch (error) {
-      printDebug('[fetchThumbnail] $mxcUri $error');
+      printWarning('$mxcUri $error', tag: 'fetchThumbnail');
       store.dispatch(UpdateMediaChecks(
         mxcUri: mxcUri,
         status: MediaStatus.FAILURE,

@@ -1,7 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 
 part 'model.g.dart';
 
@@ -86,7 +86,7 @@ class User extends Equatable {
         avatarUri: json['avatar_url'] as String,
       );
     } catch (error) {
-      printDebug('[User.fromMatrix] $error');
+      printDebug(error.toString(), tag: 'User.fromMatix');
       return User();
     }
   }

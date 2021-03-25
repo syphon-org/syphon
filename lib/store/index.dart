@@ -9,6 +9,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/storage.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
@@ -20,13 +21,19 @@ import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
+import 'package:syphon/store/events/messages/middleware.dart';
+import 'package:syphon/store/events/reactions/middleware.dart';
+import 'package:syphon/store/events/receipts/middleware.dart';
+import 'package:syphon/store/events/redactions/middleware.dart';
 import 'package:syphon/store/events/reducer.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/middleware.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
+import 'package:syphon/store/user/middleware.dart';
 import 'package:syphon/store/user/reducer.dart';
 import 'package:syphon/store/user/state.dart';
 import './alerts/model.dart';
@@ -142,6 +149,12 @@ Future<Store> initStore(Database cache, Database storage) async {
       thunkMiddleware,
       persistor.createMiddleware(),
       storageMiddleware,
+      storageMiddlewareMessages,
+      storageMiddlewareReactions,
+      storageMiddlewareReceipts,
+      storageMiddlewareRedactions,
+      storageMiddlewareRooms,
+      storageMiddlewareUsers,
       alertMiddleware,
     ],
   );

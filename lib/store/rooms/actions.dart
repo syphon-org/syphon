@@ -13,6 +13,8 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
+import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -20,6 +22,7 @@ import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/redactions/model.dart';
+import 'package:syphon/store/events/redactions/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -164,19 +167,9 @@ ThunkAction<AppState> syncRooms(Map roomsData) {
           messages: room.messagesNew,
         ));
 
-        printDebug(
+        printInfo(
           '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
         );
-
-        // update cold storage
-        await Future.wait([
-          saveRooms({room.id: room}, storage: Storage.main),
-          saveMessages(messages, storage: Storage.main),
-          saveUsers(room.usersNew, storage: Storage.main),
-          saveReactions(room.reactions, storage: Storage.main),
-          saveRedactions(room.redactions, storage: Storage.main),
-          saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
-        ]);
 
         // update store
         await store.dispatch(setUsers(room.usersNew));
@@ -486,8 +479,6 @@ ThunkAction<AppState> createRoom({
       }
 
       await store.dispatch(SetRoom(room: room));
-
-      saveRooms({room.id: room}, storage: Storage.main);
 
       return room.id;
     } catch (error) {

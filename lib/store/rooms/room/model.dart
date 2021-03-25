@@ -403,8 +403,8 @@ class Room {
         limitedHash = prevHash;
       }
 
-      printDebug(
-        '[fromSync] ${this.id} backfilling ${backfilling} prevHash ${prevHash} oldestHash ${this.oldestHash}',
+      printInfo(
+        '[fromSync] ${this.id} backfilling $backfilling prevHash $prevHash hasOldest ${this.oldestHash != null}',
       );
     }
 
@@ -627,7 +627,8 @@ class Room {
         // - the oldest hash equals the previously fetched hash
         if (this.prevHash == null ||
             this.oldestHash == null ||
-            this.oldestHash == this.prevHash) {
+            this.oldestHash == this.prevHash ||
+            messages.isEmpty) {
           backfilling = false;
         }
 

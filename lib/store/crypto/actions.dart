@@ -20,6 +20,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -577,7 +578,7 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
           } catch (error) {
-            printDebug('[sendSessionKeys] $error');
+            printDebug(error.toString(), tag: 'sendSessionKeys');
           }
         },
       );
@@ -637,8 +638,9 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        printDebug(
-          '[claimOneTimeKeys] all key sharing sessions per device are ready',
+        printInfo(
+          'all key sharing sessions per device are ready',
+          tag: 'claimOneTimeKeys',
         );
         return true;
       }
@@ -790,7 +792,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
         return session;
       }
     } catch (error) {
-      printDebug('[loadKeySessionOutbound] $error');
+      printDebug(error.toString(), tag: "loadKeySessionOutbound");
       return null;
     }
   };
@@ -826,7 +828,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         }
       }
     } catch (error) {
-      printDebug('[loadKeySessionInbound] $error');
+      printDebug(error.toString(), tag: 'loadKeySessionInbound');
     }
 
     try {
@@ -851,7 +853,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      printDebug('[loadKeySessionInbound] $error');
+      printDebug(error.toString(), tag: 'loadKeySessionInbound');
     }
 
     return null;

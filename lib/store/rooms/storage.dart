@@ -6,6 +6,20 @@ import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+Future<void> saveRoom(
+  Room room, {
+  Database cache,
+  Database storage,
+}) async {
+  final store = StoreRef<String, String>(StorageKeys.ROOMS);
+  storage = storage ?? Storage.main;
+
+  return await storage.transaction((txn) async {
+    final record = store.record(room.id);
+    await record.put(txn, jsonEncode(room));
+  });
+}
+
 Future<void> saveRooms(
   Map<String, Room> rooms, {
   Database cache,
@@ -19,20 +33,6 @@ Future<void> saveRooms(
       final record = store.record(room.id);
       await record.put(txn, jsonEncode(room));
     }
-  });
-}
-
-Future<void> saveRoom(
-  Room room, {
-  Database cache,
-  Database storage,
-}) async {
-  final store = StoreRef<String, String>(StorageKeys.ROOMS);
-  storage = storage ?? Storage.main;
-
-  return await storage.transaction((txn) async {
-    final record = store.record(room.id);
-    await record.put(txn, jsonEncode(room));
   });
 }
 

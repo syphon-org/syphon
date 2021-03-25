@@ -2,7 +2,7 @@
 import 'dart:async';
 
 // Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' as tr;
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -52,7 +52,7 @@ ThunkAction<AppState> startAlertsObserver() {
 
 ThunkAction<AppState> addInProgress() {
   return (Store<AppState> store) async {
-    store.dispatch(addInfo(message: tr('alert-feature-in-progress')));
+    store.dispatch(addInfo(message: tr.tr('alert-feature-in-progress')));
   };
 }
 
@@ -63,7 +63,7 @@ ThunkAction<AppState> addInfo({
   error,
 }) {
   return (Store<AppState> store) async {
-    printDebug('[$origin] $type : $message');
+    printInfo(error.toString(), tag: origin);
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error);
@@ -79,7 +79,7 @@ ThunkAction<AppState> addConfirmation({
   error,
 }) {
   return (Store<AppState> store) async {
-    printDebug('[$origin|confirm] $message');
+    printInfo(error.toString(), tag: origin);
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
     final alert = Alert(type: type, message: message, error: error.toString());
@@ -95,10 +95,10 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    printDebug('[$origin] ${error.toString()}');
+    printWarning(error.toString(), tag: origin);
 
     final alertsObserver = store.state.alertsStore.alertsObserver;
-    final alert = Alert(type: type, message: message, error: error);
+    final alert = Alert(type: type, message: message, error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };

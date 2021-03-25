@@ -13,6 +13,7 @@ import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
@@ -117,7 +118,7 @@ ThunkAction<AppState> decryptMessageEvent({
 
       return event;
     } catch (error) {
-      printDebug('[decryptMessageEvent] $error');
+      printDebug(error.toString(), tag: 'decryptMessageEvent');
       return event;
     }
   };
@@ -326,11 +327,11 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
 
                   return await store.dispatch(syncRooms(room));
                 } catch (error) {
-                  printDebug('[syncRooms|error] $error');
+                  printError(error.toString(), tag: 'syncRooms');
                 }
               }
             } catch (error) {
-              printDebug('[decryptKeyEvent|error] $error');
+              printError(error.toString(), tag: 'decryptKeyEvent');
             }
 
             break;

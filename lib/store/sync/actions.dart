@@ -1,14 +1,11 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
 // Package imports:
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -88,7 +85,7 @@ ThunkAction<AppState> startSyncObserver() {
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
-          printDebug('[startSyncObserver] skipping sync, needs full sync');
+          printInfo('skipping sync, needs full sync', tag: 'startSyncObserver');
           return;
         }
 
@@ -104,12 +101,13 @@ ThunkAction<AppState> startSyncObserver() {
                 Duration(milliseconds: 1000 * backoffFactor),
               );
 
-          printDebug(
-            '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
+          printInfo(
+            'backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
+            tag: 'startSyncObserver',
           );
 
           if (backoffLimit == 1) {
-            printDebug('[Sync Observer] forced retry timeout');
+            printInfo('forced retry timeout', tag: "startSyncObserver");
             await store.dispatch(fetchSync(
               since: store.state.syncStore.lastSince,
             ));
@@ -119,11 +117,11 @@ ThunkAction<AppState> startSyncObserver() {
         }
 
         if (store.state.syncStore.syncing) {
-          printDebug('[startSyncObserver] still syncing');
+          printInfo('[startSyncObserver] still syncing');
           return;
         }
 
-        printDebug('[startSyncObserver] running sync');
+        printInfo('[startSyncObserver] running sync');
         store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
       },
     );
@@ -193,13 +191,13 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
 ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
-      printDebug('[fetchSync] *** starting sync *** ');
+      printInfo('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
       final isFullSync = since == null;
       var filterId;
 
       if (isFullSync) {
-        printDebug('[fetchSync] *** full sync running *** ');
+        printInfo('[fetchSync] *** full sync running *** ');
       }
 
       // Normal matrix /sync call to the homeserver (Threaded)
@@ -250,7 +248,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       ));
 
       if (isFullSync) {
-        printDebug('[fetchSync] *** full sync completed ***');
+        printInfo('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
       store.dispatch(SetOffline(offline: true));

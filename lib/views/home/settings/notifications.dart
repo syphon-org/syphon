@@ -14,6 +14,7 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -257,7 +258,7 @@ class _Props extends Equatable {
             store.dispatch(saveNotificationPusher(erase: true));
             store.dispatch(toggleNotifications());
           } catch (error) {
-            printDebug('[onToggleRemoteNotifications] $error');
+            printWarning(error.toString(), tag: 'onToggleRemoteNotifications');
           }
         },
         onTogglePusher: () async {

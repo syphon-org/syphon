@@ -15,6 +15,7 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redactions/model.dart';

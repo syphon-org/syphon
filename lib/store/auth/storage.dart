@@ -5,6 +5,11 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/state.dart';
 
+///
+/// Save Auth
+///
+/// saves auth state to cold storage
+///
 Future<void> saveAuth(
   AuthStore authStore, {
   Database storage,
@@ -17,12 +22,11 @@ Future<void> saveAuth(
   });
 }
 
-/**
- * Load Messages (Cold Storage)
- * 
- * In storage, messages are indexed by eventId
- * In redux, they're indexed by RoomID and placed in a list
- */
+///
+/// Load Auth
+///
+/// loads auth state from cold storage
+///
 Future<AuthStore> loadAuth({Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.AUTH);

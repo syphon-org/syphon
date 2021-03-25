@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:syphon/global/print.dart';
 
 // Project imports:
 import 'package:syphon/global/strings.dart';
@@ -77,7 +78,8 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
      */
   }
 
-  printDebug('[initNotifications] successfully initialized $pluginInstance');
+  printInfo('successfully initialized $pluginInstance',
+      tag: 'initNotifications');
   return pluginInstance;
 }
 
