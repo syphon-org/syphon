@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 
@@ -26,8 +26,6 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 /**
  * Background Sync Service (Android Only)
  * static class for managing service through app lifecycle
@@ -36,7 +34,7 @@ class BackgroundSync {
   static const service_id = 254;
   static const serviceTimeout = 55; // seconds
 
-  static Isolate backgroundIsolate;
+  static Isolate? backgroundIsolate;
 
   static Future<bool> init() async {
     try {
@@ -126,11 +124,11 @@ void notificationSyncIsolate() async {
     try {
       final secureStorage = FlutterSecureStorage();
 
+      userId = await secureStorage.read(key: Cache.userIdKey);
       protocol = await secureStorage.read(key: Cache.protocolKey);
+      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
-      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
-      userId = await secureStorage.read(key: Cache.userIdKey);
 
       roomNames = jsonDecode(
         await secureStorage.read(key: Cache.roomNamesKey),
@@ -211,7 +209,7 @@ FutureOr<dynamic> syncLoop({
      * the next foreground fetchSync will update the state
      */
     final data = await MatrixApi.sync(
-      protocol: protocol,
+      protocol: store.state.authStore.protocol,
       homeserver: homeserver,
       accessToken: accessToken,
       since: lastSinceNew ?? lastSince,

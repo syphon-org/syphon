@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -18,8 +18,6 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/storage.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class MediaStatus {
   static const FAILURE = 'failure';
@@ -64,7 +62,7 @@ ThunkAction<AppState> uploadMedia({
 
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.currentUser.homeserver,
         fileName: fileName,

@@ -34,7 +34,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -68,7 +68,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(accountData),
     );
@@ -106,7 +106,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -144,7 +144,7 @@ abstract class Users {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -174,7 +174,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -212,7 +212,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -250,7 +250,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -278,5 +278,5 @@ dynamic buildRoomMembersRequest({
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url, 'headers': headers};
+  return {'url': Uri.parse(url), 'headers': headers};
 }

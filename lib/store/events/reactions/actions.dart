@@ -4,7 +4,6 @@ import 'dart:math';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -19,8 +18,6 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 ThunkAction<AppState> toggleReaction({
   Room room,

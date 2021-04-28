@@ -1,5 +1,5 @@
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
@@ -9,8 +9,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/user/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class SetLoading {
   final bool loading;
@@ -71,7 +69,7 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchUserProfile(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: user.userId,
@@ -109,7 +107,7 @@ ThunkAction<AppState> toggleBlockUser({User user}) {
 
       // Pull remote direct room data
       final data = await MatrixApi.fetchAccountData(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
@@ -139,7 +137,7 @@ ThunkAction<AppState> toggleBlockUser({User user}) {
 
       // save blocked users list back to account_data remotely
       final saveData = await MatrixApi.updateBlockedUsers(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,

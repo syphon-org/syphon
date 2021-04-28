@@ -50,7 +50,7 @@ description: a privacy focused matrix client
 version: 0.1.7+171
 
 environment:
-  sdk: ">=2.9.0 <3.0.0" # <- modified to solve build_runner
+  sdk: ">=2.12.0 <3.0.0" # <- modified to solve build_runner
 
 dependencies:
   flutter:
@@ -119,7 +119,7 @@ dependencies:
   flutter_local_notifications: ^5.0.0+1
   flutter_material_color_picker: ^1.0.5
   palette_generator: ^0.3.0
-  # emoji_picker: 0.1.0
+  emoji_picker_flutter: ^1.0.3
   swipeable: 1.1.0
 
 dev_dependencies:

@@ -33,7 +33,7 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -73,7 +73,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -117,7 +117,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -147,7 +147,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -230,7 +230,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -251,7 +251,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -274,7 +274,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -297,7 +297,7 @@ abstract class Auth {
 
     url += username != null ? '?username=$username' : '';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -315,7 +315,7 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/.well-known/matrix/client';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -326,7 +326,7 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/versions';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -370,7 +370,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -409,7 +409,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -439,7 +439,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );

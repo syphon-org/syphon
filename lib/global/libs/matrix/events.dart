@@ -33,7 +33,7 @@ abstract class Events {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -69,7 +69,7 @@ abstract class Events {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -139,7 +139,7 @@ abstract class Events {
     }
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -178,7 +178,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(content),
     );
@@ -231,7 +231,7 @@ abstract class Events {
     }
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(message),
     );
@@ -276,7 +276,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -308,7 +308,7 @@ abstract class Events {
     Map body = {};
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -351,7 +351,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -384,7 +384,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -420,7 +420,7 @@ abstract class Events {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

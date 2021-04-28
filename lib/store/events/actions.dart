@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
@@ -28,8 +28,6 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class ResetEvents {}
 
@@ -157,7 +155,7 @@ ThunkAction<AppState> fetchMessageEvents({
       store.dispatch(UpdateRoom(id: room.id, syncing: true));
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
-        "protocol": protocol,
+        "protocol": store.state.authStore.protocol,
         "homeserver": store.state.authStore.user.homeserver,
         "accessToken": store.state.authStore.user.accessToken,
         "roomId": room.id,
@@ -247,7 +245,7 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
   return (Store<AppState> store) async {
     try {
       final stateEvents = await MatrixApi.fetchStateEvents(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         roomId: room.id,
@@ -375,7 +373,7 @@ ThunkAction<AppState> sendReadReceipts({
       }
 
       final data = await MatrixApi.sendReadReceipts(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -414,7 +412,7 @@ ThunkAction<AppState> sendTyping({
       }
 
       final data = await MatrixApi.sendTyping(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: roomId,

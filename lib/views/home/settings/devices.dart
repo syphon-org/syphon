@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -19,8 +19,6 @@ import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
-
-final String debug = DotEnv().env['DEBUG'];
 
 class DevicesView extends StatefulWidget {
   @override

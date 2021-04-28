@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:flutter/services.dart';
@@ -20,8 +20,6 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class SetTheme {
   final ThemeType theme;
@@ -123,7 +121,7 @@ ThunkAction<AppState> fetchDevices() {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchDevices(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
@@ -155,7 +153,7 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.updateDevice(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
@@ -189,7 +187,7 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
           store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceIds: [deviceId],
@@ -235,7 +233,7 @@ ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
           store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceIds: deviceIds,
@@ -455,7 +453,7 @@ ThunkAction<AppState> toggleNotifications() {
       if (enabled) {
         await BackgroundSync.init();
         BackgroundSync.start(
-          protocol: protocol,
+          protocol: store.state.authStore.protocol,
           homeserver: store.state.authStore.user.homeserver,
           accessToken: store.state.authStore.user.accessToken,
           lastSince: store.state.syncStore.lastSince,

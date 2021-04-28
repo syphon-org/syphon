@@ -1,5 +1,4 @@
 // Dart imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -10,14 +9,12 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 ThunkAction<AppState> fetchBaseUrl({Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkHomeserver(
-            protocol: protocol,
+            protocol: store.state.authStore.protocol,
             homeserver: homeserver.hostname,
           ) ??
           {};
@@ -53,7 +50,7 @@ ThunkAction<AppState> fetchServerVersion({Homeserver homeserver}) {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkVersion(
-            protocol: protocol,
+            protocol: store.state.authStore.protocol,
             homeserver: homeserver.hostname,
           ) ??
           {};

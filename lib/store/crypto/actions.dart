@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
@@ -36,8 +36,6 @@ import 'package:syphon/store/user/model.dart';
  * Outbound Key Session === Outbound Session (Algorithm.olmv1)
  * Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
  */
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class SetDeviceKeys {
   var deviceKeys;
@@ -344,7 +342,7 @@ ThunkAction<AppState> uploadIdentityKeys({DeviceKey deviceKey}) {
 
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: deviceKeyMap,
@@ -472,7 +470,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       };
 
       final data = await MatrixApi.uploadKeys(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         data: payload,
@@ -566,7 +564,7 @@ ThunkAction<AppState> updateKeySessions({
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
             final response = await MatrixApi.sendEventToDevice(
               trxId: randomNumber,
-              protocol: protocol,
+              protocol: store.state.authStore.protocol,
               accessToken: store.state.authStore.user.accessToken,
               homeserver: store.state.authStore.user.homeserver,
               eventType: EventTypes.encrypted,
@@ -645,7 +643,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // claim one time keys from matrix server
       final Map claimKeysResponse = await MatrixApi.claimKeys(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         oneTimeKeys: claimKeysPayload,
@@ -1036,7 +1034,7 @@ ThunkAction<AppState> fetchDeviceKeys({
       );
 
       final data = await MatrixApi.fetchKeys(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         lastSince: store.state.syncStore.lastSince,

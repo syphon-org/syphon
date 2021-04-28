@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
@@ -38,8 +38,6 @@ import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
 import 'room/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class SetLoading {
   final bool loading;
@@ -247,7 +245,7 @@ ThunkAction<AppState> fetchRoom(
 
       if (fetchState) {
         stateEvents = await MatrixApi.fetchStateEvents(
-          protocol: protocol,
+          protocol: store.state.authStore.protocol,
           homeserver: store.state.authStore.user.homeserver,
           accessToken: store.state.authStore.user.accessToken,
           roomId: roomId,
@@ -262,7 +260,7 @@ ThunkAction<AppState> fetchRoom(
         messageEvents = await compute(
           MatrixApi.fetchMessageEventsMapped,
           {
-            "protocol": protocol,
+            "protocol": store.state.authStore.protocol,
             "homeserver": store.state.authStore.user.homeserver,
             "accessToken": store.state.authStore.user.accessToken,
             "roomId": roomId,
@@ -315,7 +313,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.fetchRoomIds(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
@@ -359,7 +357,7 @@ ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.fetchDirectRoomIds(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
@@ -420,7 +418,7 @@ ThunkAction<AppState> createRoom({
       final inviteIds = invites.map((user) => user.userId).toList();
 
       final data = await MatrixApi.createRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         name: name,
@@ -617,7 +615,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 
       // Pull remote direct room data
       final data = await MatrixApi.fetchDirectRoomIds(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
@@ -672,7 +670,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       });
 
       final saveData = await MatrixApi.saveAccountData(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,
@@ -717,7 +715,7 @@ ThunkAction<AppState> updateRoomAvatar({String roomId, File localFile}) {
       };
 
       await MatrixApi.sendEvent(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: roomId,
@@ -755,7 +753,7 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
       };
 
       final data = await MatrixApi.sendEvent(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -784,7 +782,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.joinRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id ?? room.alias,
@@ -830,7 +828,7 @@ ThunkAction<AppState> inviteUser({
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.inviteUser(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -862,7 +860,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.joinRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -905,7 +903,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
 
       // submit a leave room request
       final leaveData = await MatrixApi.leaveRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -920,7 +918,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
       }
 
       final forgetData = await MatrixApi.forgetRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
@@ -969,7 +967,7 @@ ThunkAction<AppState> leaveRoom({Room room}) {
       }
 
       final deleteData = await MatrixApi.leaveRoom(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,

@@ -24,15 +24,16 @@ import 'package:syphon/global/values.dart';
 
 // PushConnector connector;
 
-FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
+FlutterLocalNotificationsPlugin? globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
-  Function onDidReceiveLocalNotification,
-  Function onSelectNotification,
-  Function onSaveToken,
-  Function onLaunch,
-  Function onResume,
-  Function onMessage,
+  Function? onLaunch,
+  Function? onResume,
+  Function? onMessage,
+  Function? onSaveToken,
+  Future<dynamic> Function(String?)? onSelectNotification,
+  Future<dynamic> Function(int, String?, String?, String?)?
+      onDidReceiveLocalNotification,
 }) async {
 // ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
   var initializationSettingsAndroid = AndroidInitializationSettings(
@@ -47,8 +48,8 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   );
 
   var initializationSettings = InitializationSettings(
-    initializationSettingsAndroid,
-    initializationSettingsIOS,
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
   );
 
   FlutterLocalNotificationsPlugin pluginInstance =
@@ -82,25 +83,25 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
 }
 
 Future<bool> promptNativeNotificationsRequest({
-  FlutterLocalNotificationsPlugin pluginInstance,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
-  final result = await pluginInstance
+  final result = await pluginInstance!
       .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
+          IOSFlutterLocalNotificationsPlugin>()!
+      .requestPermissions(
         alert: true,
         badge: true,
         sound: true,
       );
 
-  /** TODO: extract ios only apns and reenable
-  if (Platform.isIOS && connector != null) {
-    connector.requestNotificationPermissions();
-  } 
-   */
+  // TODO: extract ios only apns and reenable
+  // if (Platform.isIOS && connector != null) {
+  //   connector.requestNotificationPermissions();
+  // }
+  //
 
   // result means it's not needed, since it's iOS only
-  return result == null ? true : result;
+  return Future.value(result);
 }
 
 /**
@@ -116,9 +117,9 @@ Future<bool> promptNativeNotificationsRequest({
  * dissmissed
  */
 Future showBackgroundServiceNotification({
-  int notificationId,
+  int notificationId = 0,
   String debugContent = '',
-  FlutterLocalNotificationsPlugin pluginInstance,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
@@ -130,20 +131,20 @@ Future showBackgroundServiceNotification({
     autoCancel: false,
     showWhen: false,
     timeoutAfter: 65 * 1000, // Timeout if not set further
-    importance: Importance.None,
-    priority: Priority.Min,
-    visibility: NotificationVisibility.Secret,
+    importance: Importance.none,
+    priority: Priority.min,
+    visibility: NotificationVisibility.secret,
   );
 
   final platformChannelSpecifics = new NotificationDetails(
-    androidPlatformChannelSpecifics,
-    iOSPlatformChannelSpecifics,
+    android: androidPlatformChannelSpecifics,
+    iOS: iOSPlatformChannelSpecifics,
   );
 
   var backgroundNotificationContent =
       '${Strings.contentNotificationBackgroundService}';
 
-  await pluginInstance.show(
+  await pluginInstance?.show(
     notificationId,
     Values.default_channel_title,
     backgroundNotificationContent,
@@ -153,8 +154,8 @@ Future showBackgroundServiceNotification({
 
 Future showMessageNotification({
   int messageHash = 0,
-  String body,
-  FlutterLocalNotificationsPlugin pluginInstance,
+  String? body,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
@@ -163,17 +164,17 @@ Future showMessageNotification({
     Values.channel_name_messages,
     Values.channel_description,
     groupKey: Values.channel_group_key,
-    priority: Priority.High,
-    importance: Importance.Default,
-    visibility: NotificationVisibility.Private,
+    priority: Priority.high,
+    importance: Importance.defaultImportance,
+    visibility: NotificationVisibility.private,
   );
 
   final platformChannelSpecifics = NotificationDetails(
-    androidPlatformChannelSpecifics,
-    iOSPlatformChannelSpecifics,
+    android: androidPlatformChannelSpecifics,
+    iOS: iOSPlatformChannelSpecifics,
   );
 
-  await pluginInstance.show(
+  await pluginInstance?.show(
     messageHash,
     'New Message',
     body ?? 'Tap to open message',
@@ -182,9 +183,9 @@ Future showMessageNotification({
 }
 
 Future showDebugNotification({
-  int notificationId,
-  String customMessage,
-  FlutterLocalNotificationsPlugin pluginInstance,
+  int notificationId = 0,
+  String customMessage = 'Example Notification',
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
@@ -192,27 +193,27 @@ Future showDebugNotification({
     Values.channel_id,
     Values.channel_name_messages,
     Values.channel_description,
-    importance: Importance.Default,
-    priority: Priority.High,
+    importance: Importance.defaultImportance,
+    priority: Priority.high,
   );
 
   final platformChannelSpecifics = new NotificationDetails(
-    androidPlatformChannelSpecifics,
-    iOSPlatformChannelSpecifics,
+    android: androidPlatformChannelSpecifics,
+    iOS: iOSPlatformChannelSpecifics,
   );
 
   // Timer(Duration(seconds: 5), () async {
-  await pluginInstance.show(
-    notificationId ?? 0,
+  await pluginInstance?.show(
+    notificationId,
     'Debug Regular Notifcation',
-    customMessage ?? 'This is a test for styling notifications',
+    customMessage,
     platformChannelSpecifics,
   );
   // });
 }
 
 void dismissAllNotifications({
-  FlutterLocalNotificationsPlugin pluginInstance,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) {
-  pluginInstance.cancelAll();
+  pluginInstance?.cancelAll();
 }

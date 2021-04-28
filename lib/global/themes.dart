@@ -16,7 +16,7 @@ enum ThemeType {
 ///
 /// Written by TR_SLimey
 ///
-void initSystemTheme(ThemeType themeType, {bool statusTransparent}) {
+void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
   var themeNavbarColour;
   var themeNavbarIconBrightness;
 

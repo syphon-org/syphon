@@ -32,7 +32,7 @@ PODS:
   - DKPhotoGallery/Resource (0.0.17):
     - SDWebImage
     - SwiftyGif
-  - emoji_picker (0.0.3):
+  - emoji_picker_flutter (0.0.1):
     - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
@@ -92,7 +92,7 @@ PODS:
 
 DEPENDENCIES:
   - device_info (from `.symlinks/plugins/device_info/ios`)
-  - emoji_picker (from `.symlinks/plugins/emoji_picker/ios`)
+  - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
@@ -121,8 +121,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
-  emoji_picker:
-    :path: ".symlinks/plugins/emoji_picker/ios"
+  emoji_picker_flutter:
+    :path: ".symlinks/plugins/emoji_picker_flutter/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
@@ -154,13 +154,13 @@ SPEC CHECKSUMS:
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
-  emoji_picker: 0e868059aa18f9473d234f3d0701fbd4d5fd310c
+  emoji_picker_flutter: 4f9a1ac31d355e1bf9622a1e821a809149130127
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
+  image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
   OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
@@ -172,7 +172,7 @@ SPEC CHECKSUMS:
   SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
-  webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
+  webview_flutter: 9f491a9b5a66f2573946a389b2677987b0ff8c0b
 
 PODFILE CHECKSUM: 127d285aa3bfad2bbd68630172869bd951e40542
 

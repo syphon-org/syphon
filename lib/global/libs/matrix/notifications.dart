@@ -34,7 +34,7 @@ abstract class Notifications {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -60,7 +60,7 @@ abstract class Notifications {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -134,7 +134,7 @@ abstract class Notifications {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

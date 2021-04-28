@@ -72,19 +72,19 @@ class MessageListState extends State<MessageList> {
           ),
         ),
         child: EmojiPicker(
-            rows: 7,
-            columns: 9,
-            indicatorColor: Theme.of(context).accentColor,
-            bgColor: Theme.of(context).scaffoldBackgroundColor,
-            numRecommended: 10,
-            categoryIcons: CategoryIcons(
-              smileyIcon: CategoryIcon(icon: Icons.tag_faces_rounded),
-              objectIcon: CategoryIcon(icon: Icons.lightbulb),
-              travelIcon: CategoryIcon(icon: Icons.flight),
-              activityIcon: CategoryIcon(icon: Icons.sports_soccer),
-              symbolIcon: CategoryIcon(icon: Icons.tag),
+            config: Config(
+              columns: 9,
+              indicatorColor: Theme.of(context).accentColor,
+              bgColor: Theme.of(context).scaffoldBackgroundColor,
+              categoryIcons: CategoryIcons(
+                smileyIcon: Icons.tag_faces_rounded,
+                objectIcon: Icons.lightbulb,
+                travelIcon: Icons.flight,
+                activityIcon: Icons.sports_soccer,
+                symbolIcon: Icons.tag,
+              ),
             ),
-            onEmojiSelected: (emoji, category) {
+            onEmojiSelected: ( category, emoji) {
               props.onToggleReaction(
                 emoji: emoji.emoji,
                 message: message,
@@ -92,7 +92,7 @@ class MessageListState extends State<MessageList> {
 
               Navigator.pop(context, false);
               widget.onToggleSelectedMessage(null);
-            }),
+            }), 
       ),
     );
   }

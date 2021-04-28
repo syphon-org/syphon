@@ -24,7 +24,7 @@ abstract class Devices {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(url, headers: headers);
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     return await json.decode(response.body);
   }
@@ -53,7 +53,7 @@ abstract class Devices {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -152,7 +152,7 @@ abstract class Devices {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

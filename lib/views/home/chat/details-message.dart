@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
@@ -18,8 +18,6 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
-
-final String debug = DotEnv().env['DEBUG'];
 
 class MessageDetailArguments {
   final String roomId;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
@@ -21,8 +21,7 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
 
-final String debug = DotEnv().env['DEBUG'];
-final String protocol = DotEnv().env['PROTOCOL'];
+final bool debug = !kReleaseMode;
 
 class AdvancedView extends StatefulWidget {
   const AdvancedView({Key key}) : super(key: key);
@@ -74,15 +73,10 @@ class AdvancedViewState extends State<AdvancedView> {
               children: <Widget>[
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: debug,
                   child: ListTile(
                     dense: true,
-                    onTap: () => BackgroundSync.start(
-                      protocol: protocol,
-                      homeserver: props.currentUser.homeserver,
-                      accessToken: props.currentUser.accessToken,
-                      lastSince: props.lastSince,
-                    ),
+                    onTap: () => props.onStartBackgroundSync(),
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Start Background Service',
@@ -92,7 +86,7 @@ class AdvancedViewState extends State<AdvancedView> {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: debug,
                   child: ListTile(
                     dense: true,
                     onTap: () {
@@ -110,7 +104,7 @@ class AdvancedViewState extends State<AdvancedView> {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: debug,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -131,7 +125,7 @@ class AdvancedViewState extends State<AdvancedView> {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: debug,
                   child: ListTile(
                     dense: true,
                     onTap: () {
@@ -153,7 +147,7 @@ class AdvancedViewState extends State<AdvancedView> {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: debug,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -280,6 +274,7 @@ class _Props extends Equatable {
   final Function onManualSync;
   final Function onForceFullSync;
   final Function onForceFunction;
+  final Function onStartBackgroundSync;
 
   _Props({
     @required this.syncing,
@@ -291,6 +286,7 @@ class _Props extends Equatable {
     @required this.onForceFullSync,
     @required this.onToggleSyncing,
     @required this.onForceFunction,
+    @required this.onStartBackgroundSync,
   });
 
   @override
@@ -318,6 +314,14 @@ class _Props extends Equatable {
           } else {
             store.dispatch(startSyncObserver());
           }
+        },
+        onStartBackgroundSync: () async {
+          return BackgroundSync.start(
+            protocol: store.state.authStore.protocol,
+            homeserver: store.state.authStore.user.homeserver,
+            accessToken: store.state.authStore.user.accessToken,
+            lastSince: store.state.syncStore.lastSince,
+          );
         },
         onManualSync: () {
           store.dispatch(fetchSync(since: store.state.syncStore.lastSince));

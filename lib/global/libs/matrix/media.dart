@@ -57,7 +57,7 @@ class Media {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -126,7 +126,7 @@ dynamic buildMediaDownloadRequest({
   };
 
   return {
-    'url': url,
+    'url': Uri.parse(url),
     'headers': headers,
   };
 }
@@ -156,7 +156,7 @@ dynamic buildMediaUploadRequest({
   };
 
   return {
-    'url': url,
+    'url': Uri.parse(url),
     'headers': headers,
   };
 }

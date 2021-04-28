@@ -3,6 +3,7 @@ import 'dart:io';
 
 // Flutter imports:
 import 'package:emoji_picker/emoji_picker.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -244,21 +245,21 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
         child: EmojiPicker(
-            rows: 7,
-            columns: 9,
-            indicatorColor: Theme.of(context).accentColor,
-            bgColor: Theme.of(context).scaffoldBackgroundColor,
-            numRecommended: 10,
-            categoryIcons: CategoryIcons(
-              smileyIcon: CategoryIcon(icon: Icons.tag_faces_rounded),
-              objectIcon: CategoryIcon(icon: Icons.lightbulb),
-              travelIcon: CategoryIcon(icon: Icons.flight),
-              activityIcon: CategoryIcon(icon: Icons.sports_soccer),
-              symbolIcon: CategoryIcon(icon: Icons.tag),
+            config: Config(
+              columns: 9,
+              indicatorColor: Theme.of(context).accentColor,
+              bgColor: Theme.of(context).scaffoldBackgroundColor,
+              categoryIcons: CategoryIcons(
+                smileyIcon: Icons.tag_faces_rounded,
+                objectIcon: Icons.lightbulb,
+                travelIcon: Icons.flight,
+                activityIcon: Icons.sports_soccer,
+                symbolIcon: Icons.tag,
+              ),
             ),
-            onEmojiSelected: (emoji, category) {
+            onEmojiSelected: (category, emoji) {
               props.onToggleReaction(
-                emoji: emoji.emoji,
+                emoji: emoji,
                 message: message,
               );
 

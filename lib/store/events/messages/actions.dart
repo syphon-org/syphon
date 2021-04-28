@@ -4,7 +4,6 @@ import 'dart:math';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -24,8 +23,6 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 ///
 /// Mutate Messages
@@ -157,7 +154,7 @@ ThunkAction<AppState> sendMessage({
       ));
 
       final data = await MatrixApi.sendMessage(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         trxId: DateTime.now().millisecond.toString(),
@@ -274,7 +271,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
 
       final data = await MatrixApi.sendMessageEncrypted(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         unencryptedData: unencryptedData,
         accessToken: store.state.authStore.user.accessToken,

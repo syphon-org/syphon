@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -13,8 +12,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 
-final String debug = DotEnv().env['DEBUG'];
-final String protocol = DotEnv().env['PROTOCOL'];
+final bool debug = !kReleaseMode;
 
 class StorageView extends StatelessWidget {
   StorageView({Key key}) : super(key: key);
@@ -52,7 +50,7 @@ class StorageView extends StatelessWidget {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: !debug,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -67,7 +65,7 @@ class StorageView extends StatelessWidget {
                 ),
                 Visibility(
                   maintainSize: false,
-                  visible: debug == 'true',
+                  visible: !debug,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,

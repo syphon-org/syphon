@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -21,8 +21,6 @@ import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
-
-final protocol = DotEnv().env['PROTOCOL'];
 
 class ResetSearchResults {}
 
@@ -74,8 +72,11 @@ Future<String> fetchFavicon({String url}) async {
     final baseUrl = origins.length > 1
         ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
         : origins[0];
+    final fullUrl = 'https://$baseUrl';
 
-    final response = await http.get('https://$baseUrl').timeout(
+    final uri = Uri.parse(fullUrl);
+
+    final response = await http.get(uri).timeout(
           const Duration(seconds: 4),
         );
 
@@ -84,7 +85,7 @@ Future<String> fetchFavicon({String url}) async {
     final faviconShort = document.querySelector('link[rel="shortcut icon"]');
     final favicon = faviconShort != null ? faviconShort : faviconIcon;
 
-    var faviconUrl = 'https://$baseUrl';
+    var faviconUrl = fullUrl;
 
     if (favicon.attributes['href'].toString().contains('http')) {
       return favicon.attributes['href'];
@@ -173,7 +174,7 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
       final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer);
 
       final data = await MatrixApi.searchRooms(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
@@ -214,7 +215,7 @@ ThunkAction<AppState> searchUsers({String searchText}) {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.searchUsers(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,

@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
 
@@ -20,9 +19,6 @@ import 'package:syphon/store/sync/background/service.dart';
 /// to run Syphon on a specific platform
 ///
 Future<void> initPlatformDependencies() async {
-  // load correct environment configurations
-  await DotEnv().load(kReleaseMode ? '.env.release' : '.env.debug');
-
   // disable debugPrint when in release mode
   if (kReleaseMode) {
     debugPrint = (String message, {int wrapWidth}) {};

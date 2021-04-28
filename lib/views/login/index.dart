@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
@@ -28,6 +28,8 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
+
+final bool debug = !kReleaseMode;
 
 class Login extends StatefulWidget {
   final Store<AppState> store;
@@ -238,7 +240,7 @@ class LoginState extends State<Login> {
           actions: <Widget>[
             Visibility(
               maintainSize: false,
-              visible: DotEnv().env['DEBUG'] == 'true',
+              visible: debug,
               child: IconButton(
                 icon: Icon(Icons.settings),
                 iconSize: Dimensions.iconSizeLarge,

@@ -40,7 +40,7 @@ class Search {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -79,7 +79,7 @@ class Search {
     url += '?server=${server ?? homeserver}';
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

@@ -28,7 +28,7 @@ void printJson(Map jsonMap) {
 // time functions by wrapping them here - needs testing
 Future<void> timeWrapper(
   Future<dynamic> Function() function, {
-  String name,
+  String name = 'Anonymous',
 }) async {
   Stopwatch stopwatch = new Stopwatch()..start();
 

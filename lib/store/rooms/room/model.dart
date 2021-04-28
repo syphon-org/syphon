@@ -27,13 +27,13 @@ class RoomPresets {
 
 @JsonSerializable()
 class Room {
-  final String id;
-  final String name;
-  final String alias;
-  final String homeserver;
-  final String avatarUri;
-  final String topic;
-  final String joinRule; // "public", "knock", "invite", "private"
+  final String? id;
+  final String? name;
+  final String? alias;
+  final String? homeserver;
+  final String? avatarUri;
+  final String? topic;
+  final String? joinRule; // "public", "knock", "invite", "private"
 
   final bool direct;
   final bool sending;
