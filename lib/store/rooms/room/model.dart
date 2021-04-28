@@ -4,7 +4,6 @@ import 'dart:collection';
 // Package imports:
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
@@ -35,18 +34,13 @@ class Room {
   final String? topic;
   final String? joinRule; // "public", "knock", "invite", "private"
 
+  final bool drafting;
   final bool direct;
   final bool sending;
-
-  @JsonKey(defaultValue: false)
-  final bool drafting;
-
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
-
-  @JsonKey(defaultValue: false)
   final bool hidden;
   final bool archived;
 
@@ -60,8 +54,8 @@ class Room {
   final int namePriority;
 
   // Event lists and handlers
-  final Message draft;
-  final Message reply;
+  final Message? draft;
+  final Message? reply;
 
   // Associated user ids
   final List<String> userIds;
@@ -130,8 +124,8 @@ class Room {
     this.syncing = false,
     this.sending = false,
     this.limited = false,
-    this.draft = null,
-    this.reply = null,
+    this.draft,
+    this.reply,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},

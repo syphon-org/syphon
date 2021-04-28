@@ -45,7 +45,7 @@ void main() async {
   final store = await initStore(cache, storage);
 
   // init app
-  runApp(Syphon(store: store, cache: cache, storage: storage));
+  runApp(Syphon(store, cache, storage));
 }
 
 class Syphon extends StatefulWidget {
@@ -53,18 +53,17 @@ class Syphon extends StatefulWidget {
   final Database storage;
   final Store<AppState> store;
 
-  const Syphon({
-    Key key,
+  const Syphon(
     this.store,
     this.cache,
     this.storage,
-  }) : super(key: key);
+  );
 
   @override
   SyphonState createState() => SyphonState(
-        store: store,
-        cache: cache,
-        storage: storage,
+        store,
+        cache,
+        storage,
       );
 }
 
@@ -75,17 +74,17 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
   Widget defaultHome = Home();
-  StreamSubscription alertsListener;
+  StreamSubscription? alertsListener;
 
-  SyphonState({
+  SyphonState(
     this.store,
     this.cache,
     this.storage,
-  });
+  );
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
     // set system status bar to match theme.
@@ -173,21 +172,21 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       final alertMessage =
           alert.message ?? alert.error ?? 'Unknown Error Occured';
 
-      globalScaffold.currentState.showSnackBar(SnackBar(
+      globalScaffold.currentState?.showSnackBar(SnackBar(
         backgroundColor: color,
         content: Text(
           alertMessage,
           style: Theme.of(context)
               .textTheme
               .subtitle1
-              .copyWith(color: Colors.white),
+              ?.copyWith(color: Colors.white),
         ),
         duration: alert.duration,
         action: SnackBarAction(
           label: 'Dismiss',
           textColor: Colors.white,
           onPressed: () {
-            globalScaffold.currentState.removeCurrentSnackBar();
+            globalScaffold.currentState?.removeCurrentSnackBar();
           },
         ),
       ));
@@ -196,9 +195,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    if (alertsListener != null) {
-      alertsListener.cancel();
-    }
+    alertsListener!.cancel();
     store.dispatch(disposeDeepLinks());
     super.dispose();
   }
@@ -206,7 +203,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void deactivate() {
     closeCache(cache);
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());
     super.deactivate();

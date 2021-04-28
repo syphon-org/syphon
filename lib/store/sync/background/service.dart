@@ -41,7 +41,7 @@ class BackgroundSync {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
       debugPrint('[BackgroundSync.init] ${error}');
-      return null;
+      return false;
     }
   }
 
