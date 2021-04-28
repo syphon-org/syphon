@@ -195,7 +195,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    alertsListener!.cancel();
+    alertsListener?.cancel();
     store.dispatch(disposeDeepLinks());
     super.dispose();
   }
