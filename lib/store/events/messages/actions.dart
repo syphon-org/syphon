@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';

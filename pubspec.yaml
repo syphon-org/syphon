@@ -88,7 +88,7 @@ dependencies:
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
   # checked_yaml: ^2.0.1
-  json_annotation: ^4.0.1
+  json_annotation: ^4.0.0
   flutter_secure_storage: ^4.1.0
   # sqflite_sqlcipher: 1.1.2
 
@@ -124,7 +124,7 @@ dependencies:
   swipeable: 1.1.0
 
 dev_dependencies:
-  json_serializable: ^4.1.0
+  json_serializable: ^4.0.0
   flutter_launcher_icons: ^0.9.0
   build_runner: ^2.0.1
 
