@@ -52,7 +52,7 @@ description: a privacy focused matrix client
 version: 0.1.8+180
 
 environment:
-  sdk: ">=2.9.0 <3.0.0" # <- modified to solve build_runner
+  sdk: ">=2.12.0 <3.0.0" # <- modified to solve build_runner
 
 dependencies:
   flutter:
@@ -89,7 +89,6 @@ dependencies:
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
   # checked_yaml: ^2.0.1
-  json_annotation: ^4.0.0
   flutter_secure_storage: ^4.1.0
   # sqflite_sqlcipher: 1.1.2
 
@@ -124,10 +123,13 @@ dependencies:
   emoji_picker_flutter: ^1.0.3
   swipeable: 1.1.0
 
+  # json
+  json_annotation: 4.0.1
+
 dev_dependencies:
-  json_serializable: ^4.0.0
+  build_runner: ^1.12.2
+  json_serializable: 4.1.0
   flutter_launcher_icons: ^0.9.0
-  build_runner: ^2.0.1
 
 # dependency_overrides:
 # intl: ^0.17.0-nullsafety.2 # <-- override for desktop builds on dev channel
