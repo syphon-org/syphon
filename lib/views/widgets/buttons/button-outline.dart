@@ -35,15 +35,23 @@ class ButtonOutline extends StatelessWidget {
         ),
         child: TextButton(
           style: ButtonStyle(
-            backgroundColor: disabled ? Colors.grey : null,
+            foregroundColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) =>
+                  states.contains(MaterialState.disabled)
+                      ? Colors.grey[300]
+                      : Theme.of(context).primaryColor,
+            ),
+            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) =>
+                  states.contains(MaterialState.disabled) ? Colors.grey : null,
+            ),
+            shape: MaterialStateProperty.resolveWith<OutlinedBorder>(
+              (Set<MaterialState> states) => RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28.0),
+              ),
+            ),
           ),
-          disabledColor: Colors.grey,
-          disabledTextColor: Colors.grey[300],
           onPressed: disabled ? null : this.onPressed,
-          color: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28.0),
-          ),
           child: this.loading
               ? Container(
                   constraints: BoxConstraints(
@@ -66,7 +74,7 @@ class ButtonOutline extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
-                        color: Colors.white,
+                        color: disabled ? Colors.grey[300] : Colors.white,
                       ),
                     )),
         ),
