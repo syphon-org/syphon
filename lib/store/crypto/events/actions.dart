@@ -174,7 +174,8 @@ ThunkAction<AppState> encryptKeyContent({
     );
 
     // canoncially encode the json for encryption
-    final payloadEncoded = canonicalJson.encode(payload);
+    // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
+    final payloadEncoded = json.encode(payload);
     final payloadSerialized = utf8.decode(payloadEncoded);
     final payloadEncrypted = outboundKeySession.encrypt(payloadSerialized);
 

@@ -63,7 +63,6 @@ dependencies:
   # state
   expandable: ^5.0.1
   equatable: ^2.0.0
-  canonical_json: 1.0.0
   convert: ^3.0.0
   device_info: ^2.0.0
   redux: ^5.0.0
@@ -118,13 +117,17 @@ dependencies:
   fab_circular_menu: ^1.0.2
   smooth_page_indicator: ^0.3.0-nullsafety.0
   flutter_local_notifications: ^5.0.0+1
-  flutter_material_color_picker: ^1.0.5
+  flutter_colorpicker: ^0.4.0
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
   swipeable: 1.1.0
 
   # json
   json_annotation: 4.0.1
+
+  # UNSOUND NULL-SAFTEY
+  # canonical_json: 1.0.0
+  # flutter_material_color_picker: ^1.0.5
 
 dev_dependencies:
   build_runner: ^1.12.2
@@ -172,8 +175,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
   assets:
-    - ./.env.debug
-    - ./.env.release
     - assets/translations/en.json
     - assets/translations/ru.json
     - assets/graphics/undraw_sync_files.svg

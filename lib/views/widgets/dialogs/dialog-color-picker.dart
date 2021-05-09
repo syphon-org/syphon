@@ -1,9 +1,9 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 // Package imports:
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
@@ -41,8 +41,8 @@ class DialogColorPicker extends StatelessWidget {
         Container(
           width: width,
           height: 248,
-          child: MaterialColorPicker(
-            colors: const <ColorSwatch>[
+          child: BlockPicker(
+            availableColors: const <Color>[
               MaterialColor(
                 Colours.cyanSyphon,
                 <int, Color>{
@@ -81,9 +81,8 @@ class DialogColorPicker extends StatelessWidget {
                 },
               ),
             ],
-            onlyShadeSelection: true,
-            selectedColor: Color(currentColor),
-            onColorChange: (Color color) {
+            pickerColor: Color(currentColor),
+            onColorChanged: (Color color) {
               onSelectColor(color.value);
               Navigator.pop(context);
             },

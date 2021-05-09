@@ -302,7 +302,8 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // figerprint signature key pair generation for upload
-      final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
+      // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
+      final deviceKeysEncoded = json.encode(deviceIdentityKeys);
       final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
@@ -393,7 +394,8 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
       final oneTimeKey = {'key': value};
 
       // sign one time keys
-      final oneTimeKeyEncoded = canonicalJson.encode(oneTimeKey);
+    // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
+      final oneTimeKeyEncoded = json.encode(oneTimeKey);
       final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
       final oneTimeKeySigned = olmAccount.sign(oneTimeKeySerialized);
 
