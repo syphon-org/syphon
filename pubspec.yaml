@@ -52,7 +52,7 @@ description: a privacy focused matrix client
 version: 0.1.8+180
 
 environment:
-  sdk: ">=2.12.0 <3.0.0" # <- modified to solve build_runner
+  sdk: ">=2.9.0 <3.0.0" # <- modified to solve build_runner
 
 dependencies:
   flutter:

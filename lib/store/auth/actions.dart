@@ -180,7 +180,7 @@ StreamSubscription _sub;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
-        _sub = getUriLinksStream().listen((Uri uri) {
+        _sub = uriLinkStream.listen((Uri uri) {
           final token = uri.queryParameters['loginToken'];
           if (store.state.authStore.user.accessToken == null) {
             store.dispatch(loginUserSSO(token: token));

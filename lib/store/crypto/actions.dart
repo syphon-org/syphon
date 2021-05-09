@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:canonical_json/canonical_json.dart';
+// import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -304,7 +304,8 @@ ThunkAction<AppState> generateIdentityKeys() {
       // figerprint signature key pair generation for upload
       // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
       final deviceKeysEncoded = json.encode(deviceIdentityKeys);
-      final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
+      // utf8.decode(deviceKeysEncoded);
+      final deviceKeysSerialized = deviceKeysEncoded;
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
       var deviceKeysPayload = {'device_keys': deviceIdentityKeys};
@@ -394,9 +395,10 @@ ThunkAction<AppState> signOneTimeKeys(Map oneTimeKeys) {
       final oneTimeKey = {'key': value};
 
       // sign one time keys
-    // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
+      // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
       final oneTimeKeyEncoded = json.encode(oneTimeKey);
-      final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
+      //utf8.decode(oneTimeKeyEncoded);
+      final oneTimeKeySerialized = oneTimeKeyEncoded;
       final oneTimeKeySigned = olmAccount.sign(oneTimeKeySerialized);
 
       // add one time key in new keys map only

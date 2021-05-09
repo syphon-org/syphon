@@ -131,7 +131,7 @@ ThunkAction<AppState> fetchThumbnail(
       }
 
       final params = {
-        'protocol': protocol,
+        'protocol': store.state.authStore.protocol,
         'accessToken': store.state.authStore.user.accessToken,
         'homeserver': store.state.authStore.currentUser.homeserver,
         'mediaUri': mxcUri,

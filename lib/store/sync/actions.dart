@@ -202,7 +202,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // Normal matrix /sync call to the homeserver (Threaded)
       final data = await compute(MatrixApi.syncBackground, {
-        'protocol': protocol,
+        'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,

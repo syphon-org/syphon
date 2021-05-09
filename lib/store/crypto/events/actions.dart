@@ -5,11 +5,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:canonical_json/canonical_json.dart';
+// import 'package:canonical_json/canonical_json.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -176,7 +175,8 @@ ThunkAction<AppState> encryptKeyContent({
     // canoncially encode the json for encryption
     // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
     final payloadEncoded = json.encode(payload);
-    final payloadSerialized = utf8.decode(payloadEncoded);
+    // utf8.decode(payloadEncoded);
+    final payloadSerialized = payloadEncoded;
     final payloadEncrypted = outboundKeySession.encrypt(payloadSerialized);
 
     // save the outbound session after processing content
