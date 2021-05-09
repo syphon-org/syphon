@@ -74,7 +74,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
   Widget defaultHome = Home();
-  StreamSubscription? alertsListener;
+  StreamSubscription alertsListener;
 
   SyphonState(
     this.store,

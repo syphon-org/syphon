@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
@@ -1112,12 +1113,14 @@ ThunkAction<AppState> importDeviceKeysOwned() {
   return (Store<AppState> store) async {
     try {
       final authUser = store.state.authStore.user;
-      File file = await FilePicker.getFile(
+      FilePickerResult file = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['.json'],
       );
 
-      final importData = await json.decode(await file.readAsString());
+      final File keyFile = File(file.paths[0]);
+
+      final importData = await json.decode(await keyFile.readAsString());
 
       store.dispatch(
         SetOlmAccountBackup(

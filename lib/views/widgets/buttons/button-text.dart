@@ -24,8 +24,15 @@ class ButtonText extends StatelessWidget {
   final Function onPressed;
 
   @override
-  Widget build(BuildContext context) => FlatButton(
-        disabledTextColor: Colors.grey[300],
+  Widget build(BuildContext context) => TextButton(
+        style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) =>
+                states.contains(MaterialState.disabled)
+                    ? Colors.grey[300]
+                    : null,
+          ),
+        ),
         onPressed: disabled ? null : this.onPressed,
         child: this.loading
             ? Container(

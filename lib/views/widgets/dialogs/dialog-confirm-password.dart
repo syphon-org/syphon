@@ -100,7 +100,7 @@ class DialogConfirmPassword extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text('Cancel'),
                   onPressed: !props.loading
                       ? () {
@@ -111,7 +111,7 @@ class DialogConfirmPassword extends StatelessWidget {
                         }
                       : null,
                 ),
-                FlatButton(
+                TextButton(
                   child: !props.loading
                       ? Text('Confirm')
                       : Container(

@@ -113,9 +113,11 @@ class GroupSearchState extends State<GroupSearchView> {
             bottom: 8,
           ),
           child: ExpandablePanel(
-            hasIcon: false,
-            tapBodyToCollapse: true,
-            tapHeaderToExpand: true,
+            theme: ExpandableThemeData(
+              hasIcon: false,
+              tapBodyToCollapse: true,
+              tapHeaderToExpand: true,
+            ),
             header: ListTile(
               leading: Stack(
                 children: [

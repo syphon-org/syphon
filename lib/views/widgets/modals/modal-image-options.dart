@@ -59,14 +59,15 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final File image = await ImagePicker.pickImage(
+                final PickedFile image = await ImagePicker().getImage(
                   source: ImageSource.camera,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
                 );
 
+                final File imageFile = File(image.path);
                 if (this.onSetNewAvatar != null) {
-                  this.onSetNewAvatar(image: image);
+                  this.onSetNewAvatar(image: imageFile);
                 }
 
                 Navigator.pop(context);
@@ -85,14 +86,16 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final File image = await ImagePicker.pickImage(
+                final PickedFile image = await ImagePicker().getImage(
                   source: ImageSource.gallery,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
                 );
 
+                final File imageFile = File(image.path);
+
                 if (onSetNewAvatar != null) {
-                  onSetNewAvatar(image: image);
+                  onSetNewAvatar(image: imageFile);
                 }
                 Navigator.pop(context);
               },

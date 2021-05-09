@@ -341,7 +341,7 @@ class Props extends Equatable {
           if (authSession != null) {
             showDialog(
               context: context,
-              child: DialogConfirmPassword(
+              builder: (context) => DialogConfirmPassword(
                 key: Key(authSession),
                 onConfirm: () async {
                   final List<String> deviceIds =

@@ -11,27 +11,27 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/user/model.dart';
 
 class SetLoading {
-  final bool? loading;
+  final bool loading;
   SetLoading({this.loading});
 }
 
 class SaveUser {
-  final User? user;
+  final User user;
   SaveUser({this.user});
 }
 
 class SetUsers {
-  final Map<String, User>? users;
+  final Map<String, User> users;
   SetUsers({this.users});
 }
 
 class SetUsersBlocked {
-  final List<String>? userIds;
+  final List<String> userIds;
   SetUsersBlocked({this.userIds});
 }
 
 class SetUserInvites {
-  final List<User>? users;
+  final List<User> users;
   SetUserInvites({this.users});
 }
 
@@ -51,7 +51,7 @@ ThunkAction<AppState> setUsersBlocked(List<String> userIds) {
   };
 }
 
-ThunkAction<AppState> setUserInvites({List<User>? users}) {
+ThunkAction<AppState> setUserInvites({List<User> users}) {
   return (Store<AppState> store) {
     store.dispatch(SetUserInvites(users: users));
   };

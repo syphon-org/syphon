@@ -1,5 +1,5 @@
 // Flutter imports:
-import 'package:emoji_picker/emoji_picker.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +84,7 @@ class MessageListState extends State<MessageList> {
                 symbolIcon: Icons.tag,
               ),
             ),
-            onEmojiSelected: ( category, emoji) {
+            onEmojiSelected: (category, emoji) {
               props.onToggleReaction(
                 emoji: emoji.emoji,
                 message: message,
@@ -92,7 +92,7 @@ class MessageListState extends State<MessageList> {
 
               Navigator.pop(context, false);
               widget.onToggleSelectedMessage(null);
-            }), 
+            }),
       ),
     );
   }

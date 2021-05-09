@@ -26,13 +26,13 @@ class RoomPresets {
 
 @JsonSerializable()
 class Room {
-  final String? id;
-  final String? name;
-  final String? alias;
-  final String? homeserver;
-  final String? avatarUri;
-  final String? topic;
-  final String? joinRule; // "public", "knock", "invite", "private"
+  final String id;
+  final String name;
+  final String alias;
+  final String homeserver;
+  final String avatarUri;
+  final String topic;
+  final String joinRule; // "public", "knock", "invite", "private"
 
   final bool drafting;
   final bool direct;
@@ -54,8 +54,8 @@ class Room {
   final int namePriority;
 
   // Event lists and handlers
-  final Message? draft;
-  final Message? reply;
+  final Message draft;
+  final Message reply;
 
   // Associated user ids
   final List<String> userIds;

@@ -25,7 +25,7 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
 
       if (users[userId] != null) {
         final existingUser = users[userId];
-        users[userId] = existingUser!.copyWith(
+        users[userId] = existingUser.copyWith(
           avatarUri: user.avatarUri,
           displayName: user.displayName,
         );

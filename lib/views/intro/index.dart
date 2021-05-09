@@ -87,7 +87,7 @@ class IntroState extends State<Intro> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        child: Container(
+        builder: (context) => Container(
           constraints: BoxConstraints(
             minWidth: width * 0.9,
           ),
@@ -155,7 +155,7 @@ class IntroState extends State<Intro> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: FlatButton(
+                    child: TextButton(
                       child: Text('I Agree'),
                       onPressed: () async {
                         await store.dispatch(acceptAgreement());

@@ -231,13 +231,13 @@ class _Props extends Equatable {
                     Strings.confirmationNotifications,
                   ),
                   actions: <Widget>[
-                    FlatButton(
+                    TextButton(
                       child: Text('No'),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                     ),
-                    FlatButton(
+                    TextButton(
                       child: Text('Sure'),
                       onPressed: () async {
                         await store.dispatch(toggleNotifications());

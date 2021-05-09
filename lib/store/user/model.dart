@@ -7,14 +7,14 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class User extends Equatable {
-  final String? userId;
-  final String? deviceId; // current device id
-  final String? idserver;
-  final String? homeserver;
-  final String? homeserverName;
-  final String? accessToken;
-  final String? displayName;
-  final String? avatarUri;
+  final String userId;
+  final String deviceId; // current device id
+  final String idserver;
+  final String homeserver;
+  final String homeserverName;
+  final String accessToken;
+  final String displayName;
+  final String avatarUri;
 
   const User({
     this.userId,
@@ -28,13 +28,13 @@ class User extends Equatable {
   });
 
   User copyWith({
-    String? userId,
-    String? baseurl,
-    String? deviceId,
-    String? homeserver,
-    String? accessToken,
-    String? displayName,
-    String? avatarUri,
+    String userId,
+    String baseurl,
+    String deviceId,
+    String homeserver,
+    String accessToken,
+    String displayName,
+    String avatarUri,
   }) =>
       User(
         userId: userId ?? this.userId,
@@ -47,7 +47,7 @@ class User extends Equatable {
       );
 
   @override
-  List<Object?> get props => [
+  List<Object> get props => [
         userId,
         deviceId,
         idserver,

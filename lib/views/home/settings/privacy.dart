@@ -276,13 +276,13 @@ class Props extends Equatable {
               title: Text("Confirm Exporting Keys"),
               content: Text(Strings.contentDeleteDeviceKeyWarning),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text(Strings.buttonCancel),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
-                FlatButton(
+                TextButton(
                   child: Text(
                     'Export Keys',
                     style: TextStyle(
@@ -308,7 +308,7 @@ class Props extends Equatable {
               title: Text(Strings.titleDialogDeleteKeys),
               content: Text(Strings.confirmationDeleteKeys),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text(
                     Strings.buttonCancel,
                     style: Theme.of(context).textTheme.subtitle1,
@@ -317,7 +317,7 @@ class Props extends Equatable {
                     Navigator.of(context).pop();
                   },
                 ),
-                FlatButton(
+                TextButton(
                   child: Text(
                     Strings.buttonDeleteKeys,
                     style: Theme.of(context).textTheme.subtitle1.copyWith(

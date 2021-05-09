@@ -34,7 +34,7 @@ class BackgroundSync {
   static const service_id = 254;
   static const serviceTimeout = 55; // seconds
 
-  static Isolate? backgroundIsolate;
+  static Isolate backgroundIsolate;
 
   static Future<bool> init() async {
     try {
@@ -209,7 +209,7 @@ FutureOr<dynamic> syncLoop({
      * the next foreground fetchSync will update the state
      */
     final data = await MatrixApi.sync(
-      protocol: store.state.authStore.protocol,
+      protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
       since: lastSinceNew ?? lastSince,

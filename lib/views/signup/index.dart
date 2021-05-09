@@ -122,7 +122,7 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  void onDidChange(_Props props) {
+  void onDidChange(_Props oldProps, _Props props) {
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
         sections = sections

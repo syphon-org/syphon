@@ -94,9 +94,10 @@ Future<void> deleteStorage() async {
       );
     }
 
-    Storage.main = await storageFactory.deleteDatabase(
+    await storageFactory.deleteDatabase(
       Storage.mainLocation,
     );
+    Storage.main = null;
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
   }

@@ -30,9 +30,9 @@ String formatSenderInitials(String sender) {
 }
 
 String formatTimestampFull({
-  int? lastUpdateMillis,
+  int lastUpdateMillis,
   bool showTime = false,
-  String? timeFormat,
+  String timeFormat,
 }) {
   if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
 

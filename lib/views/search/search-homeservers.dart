@@ -112,8 +112,11 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                         child: Container(
                           padding: EdgeInsets.only(top: 8, bottom: 8),
                           child: ExpandablePanel(
-                            hasIcon: true,
-                            tapHeaderToExpand: false,
+                            theme: ExpandableThemeData(
+                              hasIcon: false,
+                              tapBodyToCollapse: true,
+                              tapHeaderToExpand: true,
+                            ),
                             header: ListTile(
                               leading: Avatar(
                                 size: Dimensions.avatarSizeMin,
@@ -131,6 +134,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ),
+                            collapsed: Row(),
                             expanded: Row(
                               children: <Widget>[
                                 Expanded(

@@ -1,8 +1,7 @@
 // Dart imports:
 import 'dart:io';
 
-// Flutter imports:
-import 'package:emoji_picker/emoji_picker.dart';
+// Flutter imports: ;
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -138,7 +137,7 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onUpdate(_Props props) {
+  onDidChange(_Props propsOld, _Props props) {
     if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
       this.setState(() {
         mediumType = MediumType.encryption;
@@ -199,7 +198,7 @@ class ChatViewState extends State<ChatView> {
         return showDialog(
           context: context,
           barrierDismissible: false,
-          child: DialogEncryption(
+          builder: (context) => DialogEncryption(
             onAccept: () {
               props.onToggleEncryption();
 
@@ -360,7 +359,7 @@ class ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onDidChange: onUpdate,
+        onDidChange: onDidChange,
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,

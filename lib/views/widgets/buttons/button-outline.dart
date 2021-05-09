@@ -33,7 +33,10 @@ class ButtonOutline extends StatelessWidget {
           minWidth: Dimensions.buttonWidthMin,
           maxWidth: Dimensions.buttonWidthMax,
         ),
-        child: FlatButton(
+        child: TextButton(
+          style: ButtonStyle(
+            backgroundColor: disabled ? Colors.grey : null,
+          ),
           disabledColor: Colors.grey,
           disabledTextColor: Colors.grey[300],
           onPressed: disabled ? null : this.onPressed,
