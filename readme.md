@@ -169,7 +169,7 @@ decoration: BoxDecoration(
 
 
 ## 📝 contributing
-- email contact@syphon.org if you'd like to get involved. there's a lot to do.
+- email hello@syphon.org if you'd like to get involved. there's a lot to do.
 - donations are welcome, but not required. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 
 ## from those who made it possible
