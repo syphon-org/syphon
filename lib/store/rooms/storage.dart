@@ -15,7 +15,7 @@ Future<void> saveRooms(
   storage = storage ?? Storage.main;
 
   return await storage!.transaction((txn) async {
-    for (Room room in rooms.values) {
+    for (Room? room in rooms.values) {
       final record = store.record(room.id);
       await record.put(txn, jsonEncode(room));
     }
@@ -52,14 +52,15 @@ Future<void> deleteRooms(
   });
 }
 
-Future<Map<String, Room>?> loadRooms({
+Future<Map<String, Room>> loadRooms({
   Database? cache,
   required Database storage,
   int offset = 0,
   int limit = 10,
 }) async {
+  final Map<String, Room> rooms = {};
+
   try {
-    final Map<String, Room> rooms = {};
     final store = StoreRef<String, String>(StorageKeys.ROOMS);
     final count = await store.count(storage);
 
@@ -85,17 +86,13 @@ Future<Map<String, Room>?> loadRooms({
       rooms.addAll(await (loadRooms(
         offset: offset + limit,
         storage: storage,
-      ) as FutureOr<Map<String, Room>>));
-    }
-
-    if (rooms.isEmpty) {
-      return null;
+      ) as Future<Map<String, Room>>));
     }
 
     printInfo('[rooms] loaded ${rooms.length.toString()}');
-    return rooms;
   } catch (error) {
     printError(error.toString(), title: 'loadRooms');
-    return null;
+  } finally {
+    return rooms;
   }
 }

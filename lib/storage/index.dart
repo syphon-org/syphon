@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class Storage {
   static const mainLocation = '${Values.appNameLabel}-main-storage.db';
 }
 
-Future<Database?> initStorage() async {
+FutureOr<Database?> initStorage() async {
   try {
     DatabaseFactory? storageFactory;
 
@@ -94,9 +95,8 @@ Future<void> deleteStorage() async {
       );
     }
 
-    await storageFactory.deleteDatabase(
-      Storage.mainLocation,
-    );
+    await storageFactory.deleteDatabase(Storage.mainLocation);
+
     Storage.main = null;
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
@@ -117,7 +117,7 @@ Future<void> deleteStorage() async {
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   try {
     final auth = await loadAuth(storage: storage);
-    final rooms = await (loadRooms(storage: storage) as FutureOr<Map<String, Room>>);
+    final rooms = await loadRooms(storage: storage);
     final users = await loadUsers(storage: storage);
     final media = await loadMediaAll(storage: storage);
     final crypto = await loadCrypto(storage: storage);

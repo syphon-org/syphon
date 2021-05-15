@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
@@ -42,7 +43,8 @@ Future<Map<String, ReadReceipt>> loadReceipts(
     final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
 
     final receiptsMap = Map<String, ReadReceipt>();
-    final records = await (store.records(messageIds).getSnapshots(storage) as FutureOr<List<RecordSnapshot<String, String>>>);
+    final records = await (store.records(messageIds).getSnapshots(storage)
+        as FutureOr<List<RecordSnapshot<String, String>>>);
 
     for (RecordSnapshot<String, String> record in records ?? []) {
       if (record != null) {

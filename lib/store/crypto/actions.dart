@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -692,7 +693,8 @@ ThunkAction<AppState> claimOneTimeKeys({
       // create sessions from new one time keys per device id
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
-        final deviceKey = store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
+        final deviceKey =
+            store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
         final keyId = Keys.identity(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys![keyId];
 
@@ -1096,7 +1098,8 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       var file = File(fileName);
 
       final user = store.state.authStore.user;
-      final deviceKey = store.state.cryptoStore.deviceKeysOwned[user.deviceId!]!;
+      final deviceKey =
+          store.state.cryptoStore.deviceKeysOwned[user.deviceId!]!;
 
       var exportData = {
         'account_key': store.state.cryptoStore.olmAccountKey,

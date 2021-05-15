@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -40,13 +41,14 @@ Future<Uint8List?> loadMedia({
   try {
     final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
-    final mediaData = await (store.record(mxcUri).get(storage) as FutureOr<String>);
+    final mediaData =
+        await (store.record(mxcUri).get(storage) as FutureOr<String>);
 
     final dataBytes = json.decode(mediaData);
 
     // Convert json decoded List<int> to Uint8List
     return Uint8List.fromList(
-        (dataBytes as List?)?.map((e) => e as int)?.toList());
+        (dataBytes as List)?.map((e) => e as int)?.toList());
   } catch (error) {
     printError(error.toString(), title: 'loadMedia');
     return null;
