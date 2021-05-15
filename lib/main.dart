@@ -40,7 +40,7 @@ void main() async {
   final cache = await initCache();
 
   // init cold storage and load backup cache
-  final storage = await (initStorage() as FutureOr<Database>);
+  final storage = await initStorage();
 
   // init redux store
   final store = await initStore(cache, storage);
@@ -51,7 +51,7 @@ void main() async {
 
 class Syphon extends StatefulWidget {
   final Database? cache;
-  final Database storage;
+  final Database? storage;
   final Store<AppState> store;
 
   const Syphon(
@@ -70,7 +70,7 @@ class Syphon extends StatefulWidget {
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final Database? cache;
-  final Database storage;
+  final Database? storage;
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 

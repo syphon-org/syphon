@@ -99,24 +99,24 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
   // create a map of messages for O(1) when replacing O(N)
-  final messagesMap = Map<String, Message?>.fromIterable(
+  final messagesMap = Map<String, Message>.fromIterable(
     messages,
-    key: (msg) => msg.id,
-    value: (msg) {
-      if (msg.replacement) {
-        replacements.add(msg);
+    key: (message) => message.id,
+    value: (message) {
+      if ((message as Message).replacement) {
+        replacements.add(message);
       }
 
-      return msg;
+      return message;
     },
   );
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)
-  replacements.sort((b, a) => a!.timestamp!.compareTo(b!.timestamp!));
+  replacements.sort((b, a) => a.timestamp!.compareTo(b.timestamp!));
 
-  for (Message? messageEdited in replacements) {
-    final messageIdOriginal = messageEdited!.relatedEventId;
+  for (Message messageEdited in replacements) {
+    final messageIdOriginal = messageEdited.relatedEventId!;
     final messageOriginal = messagesMap[messageIdOriginal];
 
     if (messageOriginal != null) {

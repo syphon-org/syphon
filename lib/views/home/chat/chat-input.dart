@@ -21,7 +21,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 
 class ChatInput extends StatefulWidget {
-  final String? roomId;
+  final String roomId;
   final bool enterSend;
   final Message? quotable;
   final String? mediumType;
@@ -189,7 +189,8 @@ class ChatInputState extends State<ChatInput> {
           var sendButton = InkWell(
             borderRadius: BorderRadius.circular(48),
             onLongPress: widget.onChangeMethod as void Function()?,
-            onTap: !sendable ? null : widget.onSubmitMessage as void Function()?,
+            onTap:
+                !sendable ? null : widget.onSubmitMessage as void Function()?,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Container(
@@ -207,7 +208,8 @@ class ChatInputState extends State<ChatInput> {
             sendButton = InkWell(
               borderRadius: BorderRadius.circular(48),
               onLongPress: widget.onChangeMethod as void Function()?,
-              onTap: !sendable ? null : widget.onSubmitMessage as void Function()?,
+              onTap:
+                  !sendable ? null : widget.onSubmitMessage as void Function()?,
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
                 child: Container(
@@ -251,7 +253,8 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText: replying ? widget.quotable!.sender : '',
+                              labelText:
+                                  replying ? widget.quotable!.sender : '',
                               labelStyle: TextStyle(
                                   color: Theme.of(context).accentColor),
                               contentPadding: Dimensions.inputContentPadding
@@ -326,7 +329,9 @@ class ChatInputState extends State<ChatInput> {
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !sendable ? null : widget.onSubmittedMessage as void Function(String)?,
+                      onSubmitted: !sendable
+                          ? null
+                          : widget.onSubmittedMessage as void Function(String)?,
                       style: TextStyle(
                         height: 1.5,
                         color: inputTextColor,
@@ -386,7 +391,7 @@ class _Props extends Equatable {
         enterSendEnabled,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         enterSendEnabled: store.state.settingsStore.enterSend ?? false,
         onSendTyping: ({typing, roomId}) => store.dispatch(

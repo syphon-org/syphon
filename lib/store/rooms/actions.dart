@@ -700,7 +700,10 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
 /**
  * Update room avatar
  */
-ThunkAction<AppState> updateRoomAvatar({String? roomId, File? localFile}) {
+ThunkAction<AppState> updateRoomAvatar({
+  required String roomId,
+  File? localFile,
+}) {
   return (Store<AppState> store) async {
     try {
       final data = await store.dispatch(uploadMedia(

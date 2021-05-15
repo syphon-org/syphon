@@ -97,7 +97,8 @@ class ChatDetailsState extends State<ChatDetailsView> {
   }
 
   @protected
-  void onBlockUser({required BuildContext context, required _Props props}) async {
+  void onBlockUser(
+      {required BuildContext context, required _Props props}) async {
     final user = props.users.firstWhere(
       (user) => user!.userId != props.currentUser.userId,
     );
@@ -160,7 +161,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(
         store,
-        arguments!.roomId,
+        arguments?.roomId,
       ),
       builder: (context, props) => Scaffold(
         backgroundColor: scaffordBackgroundColor,
@@ -574,38 +575,42 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-      loading: store.state.roomStore.loading,
-      room: selectRoom(id: roomId, state: store.state),
-      users: roomUsers(store.state, roomId),
-      currentUser: store.state.authStore.user,
-      messages: roomMessages(store.state, roomId),
-      onBlockUser: (User user) async {
-        await store.dispatch(toggleBlockUser(user: user));
-      },
-      onLeaveChat: () async {
-        await store.dispatch(removeRoom(room: Room(id: roomId)));
-      },
-      roomPrimaryColor: () {
-        final customChatSettings =
-            store.state.settingsStore.customChatSettings ??
-                Map<String, ChatSetting>();
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
+          loading: store.state.roomStore.loading,
+          room: selectRoom(id: roomId, state: store.state),
+          users: roomUsers(store.state, roomId),
+          currentUser: store.state.authStore.user,
+          messages: roomMessages(store.state, roomId),
+          onBlockUser: (User user) async {
+            await store.dispatch(toggleBlockUser(user: user));
+          },
+          onLeaveChat: () async {
+            await store.dispatch(removeRoom(
+              room: selectRoom(state: store.state, id: roomId),
+            ));
+          },
+          roomPrimaryColor: () {
+            final customChatSettings =
+                store.state.settingsStore.customChatSettings ??
+                    Map<String, ChatSetting>();
 
-        if (customChatSettings[roomId] != null) {
-          return customChatSettings[roomId]!.primaryColor != null
-              ? Color(customChatSettings[roomId]!.primaryColor!)
-              : Colors.grey;
-        }
+            if (customChatSettings[roomId] != null) {
+              return customChatSettings[roomId]!.primaryColor != null
+                  ? Color(customChatSettings[roomId]!.primaryColor!)
+                  : Colors.grey;
+            }
 
-        return Colours.hashedColor(roomId);
-      }(),
-      onSelectPrimaryColor: (color) {
-        store.dispatch(
-          updateRoomPrimaryColor(roomId: roomId, color: color),
-        );
-      },
-      onToggleDirectRoom: () {
-        final room = selectRoom(id: roomId, state: store.state);
-        store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct!));
-      });
+            return Colours.hashedColor(roomId);
+          }(),
+          onSelectPrimaryColor: (color) {
+            store.dispatch(
+              updateRoomPrimaryColor(roomId: roomId, color: color),
+            );
+          },
+          onToggleDirectRoom: () {
+            final room = selectRoom(id: roomId, state: store.state);
+            store
+                .dispatch(toggleDirectRoom(room: room, enabled: !room.direct!));
+          });
 }

@@ -669,7 +669,7 @@ ThunkAction<AppState> claimOneTimeKeys({
         // Must be without types for forEach
         deviceOneTimeKeys.forEach((deviceId, oneTimeKey) {
           // Parsing the oneTimeKey responses into the oneTimeKey model
-          final String? oneTimeKeyIdentity = oneTimeKey.keys.elementAt(0);
+          final String oneTimeKeyIdentity = oneTimeKey.keys.elementAt(0);
           final String? oneTimeKeyHash = oneTimeKey[oneTimeKeyIdentity]['key'];
           final oneTimeKeySignature = Map<String, String>.from(
             oneTimeKey[oneTimeKeyIdentity]['signatures'][userId],

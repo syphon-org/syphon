@@ -234,7 +234,8 @@ FutureOr<dynamic> syncLoop({
 
     // Filter each room through the parser
     rawRooms.forEach((roomId, json) {
-      final room = Room().fromSync(json: json, lastSince: lastSinceNew);
+      final room =
+          Room(id: roomId).fromSync(json: json, lastSince: lastSinceNew);
       final messagesNew = room.messagesNew;
 
       if (messagesNew.length == 1) {

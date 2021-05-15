@@ -101,9 +101,13 @@ AppState appReducer(AppState state, action) => AppState(
  * Initialize Store
  * - Hot redux state cache for top level data 
  */
-Future<Store<AppState>> initStore(Database? cache, Database storage) async {
-  // partially load storage to memory to rehydrate cache
-  final data = await loadStorage(storage);
+Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
+  var data;
+
+  if (storage != null) {
+    // partially load storage to memory to rehydrate cache
+    data = await loadStorage(storage);
+  }
 
   // Configure redux persist instance
   final persistor = Persistor<AppState>(

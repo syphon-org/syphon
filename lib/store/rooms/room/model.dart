@@ -27,7 +27,7 @@ class RoomPresets {
 
 @JsonSerializable()
 class Room {
-  final String? id;
+  final String id;
   final String? name;
   final String? alias;
   final String? homeserver;
@@ -113,7 +113,7 @@ class Room {
   }
 
   const Room({
-    this.id,
+    required this.id,
     this.name = 'Empty Chat',
     this.alias = '',
     this.homeserver,
@@ -252,7 +252,7 @@ class Room {
         syncing: false,
       );
     } catch (error) {
-      return Room();
+      return Room(id: json['room_id']);
     }
   }
 
@@ -465,7 +465,7 @@ class Room {
 
             // Cache user to rooms user cache if not present
             if (!usersAdd.containsKey(event.stateKey)) {
-              usersAdd[event.stateKey] = User(
+              usersAdd[event.stateKey!] = User(
                 userId: event.stateKey,
                 displayName: displayName,
                 avatarUri: memberAvatarUri,

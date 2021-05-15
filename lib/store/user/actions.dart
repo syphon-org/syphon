@@ -126,7 +126,7 @@ ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
 
       // toggle based on if the id is already present
       if (!usersBlocked.containsKey(user!.userId)) {
-        usersBlocked[user.userId] = {};
+        usersBlocked[user.userId!] = {};
       } else {
         usersBlocked.remove(user.userId);
       }

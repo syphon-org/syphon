@@ -197,10 +197,11 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         loading: store.state.roomStore.loading,
         searchText: store.state.searchStore.searchText,
-        room: store.state.roomStore.rooms[roomId!] ?? Room(),
+        room: store.state.roomStore.rooms[roomId!] ?? Room(id: roomId),
         usersFiltered: searchUsersLocal(
           store.state,
           roomId: roomId,

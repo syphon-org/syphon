@@ -582,151 +582,153 @@ class _Props extends Equatable {
         roomPrimaryColor,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-      room: selectRoom(id: roomId, state: store.state),
-      theme: store.state.settingsStore.theme,
-      userId: store.state.authStore.user.userId,
-      roomTypeBadgesEnabled:
-          store.state.settingsStore.roomTypeBadgesEnabled ?? true,
-      dismissKeyboardEnabled:
-          store.state.settingsStore.dismissKeyboardEnabled ?? false,
-      enterSendEnabled: store.state.settingsStore.enterSend ?? false,
-      loading: (store.state.roomStore.rooms[roomId!] ?? Room()).syncing,
-      messagesLength: store.state.eventStore.messages[roomId]?.length,
-      onSelectReply: (Message message) {
-        store.dispatch(selectReply(roomId: roomId, message: message));
-      },
-      roomPrimaryColor: () {
-        final customChatSettings =
-            store.state.settingsStore.customChatSettings ?? Map();
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
+          room: selectRoom(id: roomId, state: store.state),
+          theme: store.state.settingsStore.theme,
+          userId: store.state.authStore.user.userId,
+          roomTypeBadgesEnabled:
+              store.state.settingsStore.roomTypeBadgesEnabled,
+          dismissKeyboardEnabled:
+              store.state.settingsStore.dismissKeyboardEnabled,
+          enterSendEnabled: store.state.settingsStore.enterSend,
+          loading: selectRoom(state: store.state, id: roomId).syncing,
+          messagesLength: store.state.eventStore.messages[roomId]?.length,
+          onSelectReply: (Message message) {
+            store.dispatch(selectReply(roomId: roomId, message: message));
+          },
+          roomPrimaryColor: () {
+            final customChatSettings =
+                store.state.settingsStore.customChatSettings ?? Map();
 
-        if (customChatSettings[roomId] != null) {
-          return Color(customChatSettings[roomId]!.primaryColor!);
-        }
+            if (customChatSettings[roomId] != null) {
+              return Color(customChatSettings[roomId]!.primaryColor!);
+            }
 
-        return Colours.hashedColor(roomId);
-      }(),
-      onUpdateDeviceKeys: () async {
-        final room = store.state.roomStore.rooms[roomId]!;
+            return Colours.hashedColor(roomId);
+          }(),
+          onUpdateDeviceKeys: () async {
+            final room = store.state.roomStore.rooms[roomId]!;
 
-        final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(userIds: room.userIds),
-        );
+            final usersDeviceKeys = await store.dispatch(
+              fetchDeviceKeys(userIds: room.userIds),
+            );
 
-        store.dispatch(setDeviceKeys(usersDeviceKeys));
-      },
-      onSaveDraftMessage: ({
-        String? body,
-        String? type,
-      }) {
-        store.dispatch(saveDraft(
-          body: body,
-          type: type,
-          room: store.state.roomStore.rooms[roomId],
-        ));
-      },
-      onClearDraftMessage: ({
-        String? body,
-        String? type,
-      }) {
-        store.dispatch(clearDraft(
-          room: store.state.roomStore.rooms[roomId],
-        ));
-      },
-      onSendMessage: ({String? body, String? type}) async {
-        final room = store.state.roomStore.rooms[roomId]!;
+            store.dispatch(setDeviceKeys(usersDeviceKeys));
+          },
+          onSaveDraftMessage: ({
+            String? body,
+            String? type,
+          }) {
+            store.dispatch(saveDraft(
+              body: body,
+              type: type,
+              room: store.state.roomStore.rooms[roomId],
+            ));
+          },
+          onClearDraftMessage: ({
+            String? body,
+            String? type,
+          }) {
+            store.dispatch(clearDraft(
+              room: store.state.roomStore.rooms[roomId],
+            ));
+          },
+          onSendMessage: ({String? body, String? type}) async {
+            final room = store.state.roomStore.rooms[roomId]!;
 
-        final message = Message(
-          body: body,
-          type: type,
-        );
+            final message = Message(
+              body: body,
+              type: type,
+            );
 
-        if (room.encryptionEnabled!) {
-          return store.dispatch(sendMessageEncrypted(
-            room: room,
-            message: message,
-          ));
-        }
+            if (room.encryptionEnabled!) {
+              return store.dispatch(sendMessageEncrypted(
+                room: room,
+                message: message,
+              ));
+            }
 
-        return store.dispatch(sendMessage(
-          room: room,
-          message: message,
-        ));
-      },
-      onDeleteMessage: ({
-        Message? message,
-      }) {
-        if (message != null) {
-          store.dispatch(deleteMessage(message: message));
-        }
-      },
-      onAcceptInvite: () {
-        store.dispatch(acceptRoom(room: Room(id: roomId)));
-      },
-      onMarkRead: () {
-        store.dispatch(markRoomRead(roomId: roomId));
-      },
-      onLoadFirstBatch: () {
-        final room = selectRoom(id: roomId, state: store.state);
-        printDebug('[onLoadFirstBatch] ${room.id}');
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            from: room.nextHash,
-            limit: 25,
-          ),
-        );
-      },
-      onToggleReaction: ({Message? message, String? emoji}) {
-        final room = selectRoom(id: roomId, state: store.state);
+            return store.dispatch(sendMessage(
+              room: room,
+              message: message,
+            ));
+          },
+          onDeleteMessage: ({
+            Message? message,
+          }) {
+            if (message != null) {
+              store.dispatch(deleteMessage(message: message));
+            }
+          },
+          onAcceptInvite: () {
+            store.dispatch(acceptRoom(
+              room: selectRoom(state: store.state, id: roomId),
+            ));
+          },
+          onMarkRead: () {
+            store.dispatch(markRoomRead(roomId: roomId));
+          },
+          onLoadFirstBatch: () {
+            final room = selectRoom(id: roomId, state: store.state);
+            printDebug('[onLoadFirstBatch] ${room.id}');
 
-        store.dispatch(
-          toggleReaction(room: room, message: message, emoji: emoji),
-        );
-      },
-      onToggleEncryption: () {
-        final room = selectRoom(id: roomId, state: store.state);
-        store.dispatch(
-          toggleRoomEncryption(room: room),
-        );
-      },
-      onLoadMoreMessages: () {
-        final room = store.state.roomStore.rooms[roomId] ?? Room();
+            store.dispatch(fetchMessageEvents(
+              room: room,
+              from: room.nextHash,
+              limit: 25,
+            ));
+          },
+          onToggleReaction: ({Message? message, String? emoji}) {
+            final room = selectRoom(id: roomId, state: store.state);
 
-        // load message from cold storage
-        // TODO: paginate cold storage messages
-        // final messages = roomMessages(store.state, roomId);
-        // if (messages.length < room.messageIds.length) {
-        //   printDebug(
-        //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-        //   return store.dispatch(
-        //     loadMessageEvents(
-        //       room: room,
-        //       offset: messages.length,
-        //     ),
-        //   );
-        // }
+            store.dispatch(
+              toggleReaction(room: room, message: message, emoji: emoji),
+            );
+          },
+          onToggleEncryption: () {
+            final room = selectRoom(id: roomId, state: store.state);
+            store.dispatch(
+              toggleRoomEncryption(room: room),
+            );
+          },
+          onLoadMoreMessages: () {
+            final room = selectRoom(state: store.state, id: roomId);
 
-        // fetch messages beyond the oldest known message - lastHash
-        return store.dispatch(fetchMessageEvents(
-          room: room,
-          from: room.lastHash,
-          oldest: true,
-        ));
-      },
-      onCheatCode: () async {
-        // await store.dispatch(store.dispatch(generateDeviceId(
-        //   salt: store.state.authStore.username,
-        // )));
+            // load message from cold storage
+            // TODO: paginate cold storage messages
+            // final messages = roomMessages(store.state, roomId);
+            // if (messages.length < room.messageIds.length) {
+            //   printDebug(
+            //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
+            //   return store.dispatch(
+            //     loadMessageEvents(
+            //       room: room,
+            //       offset: messages.length,
+            //     ),
+            //   );
+            // }
 
-        final room = store.state.roomStore.rooms[roomId] ?? Room();
+            // fetch messages beyond the oldest known message - lastHash
+            return store.dispatch(fetchMessageEvents(
+              room: room,
+              from: room.lastHash,
+              oldest: true,
+            ));
+          },
+          onCheatCode: () async {
+            // await store.dispatch(store.dispatch(generateDeviceId(
+            //   salt: store.state.authStore.username,
+            // )));
 
-        store.dispatch(updateKeySessions(room: room));
+            final room = selectRoom(state: store.state, id: roomId);
 
-        final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(userIds: room.userIds),
-        );
+            store.dispatch(updateKeySessions(room: room));
 
-        printJson(usersDeviceKeys);
-      });
+            final usersDeviceKeys = await store.dispatch(
+              fetchDeviceKeys(userIds: room.userIds),
+            );
+
+            printJson(usersDeviceKeys);
+          });
 }

@@ -3,8 +3,7 @@ import 'package:syphon/store/index.dart';
 import './room/model.dart';
 
 Room selectRoom({required AppState state, String? id}) {
-  if (state.roomStore.rooms == null) return Room();
-  return state.roomStore.rooms[id!] ?? Room();
+  return state.roomStore.rooms[id] ?? Room(id: id ?? '');
 }
 
 List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {

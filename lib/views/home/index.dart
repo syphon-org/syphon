@@ -701,14 +701,10 @@ class _Props extends Equatable {
           return Future(() => true);
         },
         onLeaveChat: ({Room? room}) {
-          return store.dispatch(
-            leaveRoom(room: room),
-          );
+          return store.dispatch(leaveRoom(room: room));
         },
         onDeleteChat: ({Room? room}) {
-          return store.dispatch(
-            removeRoom(room: room),
-          );
+          return store.dispatch(removeRoom(room: room));
         },
         onSelectHelp: () async {
           try {

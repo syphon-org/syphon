@@ -62,7 +62,7 @@ class MessageWidget extends StatelessWidget {
       {},
       (mapped, reaction) => mapped
         ..update(
-          reaction.body,
+          reaction.body ?? '',
           (value) => (value + 1),
           ifAbsent: () => 1,
         ),
