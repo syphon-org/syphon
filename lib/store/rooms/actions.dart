@@ -124,7 +124,7 @@ class ResetRooms {
 ThunkAction<AppState> syncRooms(Map? roomData) {
   return (Store<AppState> store) async {
     // init new store containers
-    final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+    final rooms = store.state.roomStore.rooms;
     final user = store.state.authStore.user;
     final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
@@ -185,9 +185,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       ));
 
       // mutation filters - handles backfilling mutations
-      await store.dispatch(mutateMessagesRoom(
-        room: room,
-      ));
+      await store.dispatch(mutateMessagesRoom(room: room));
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
@@ -212,7 +210,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       // the end would be room.prevHash == room.lastHash
       // fetch previous messages since last /sync (a gap)
       // determined by the fromSync function of room
-      final roomUpdated = store.state.roomStore.rooms[room.id!];
+      final roomUpdated = store.state.roomStore.rooms[room.id];
       if (roomUpdated != null && room.limited) {
         store.dispatch(fetchMessageEvents(
           room: room,
@@ -540,7 +538,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      if (!store.state.settingsStore.readReceipts!) {
+      if (!store.state.settingsStore.readReceipts) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -548,7 +546,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.readReceipts!) {
+      if (store.state.settingsStore.readReceipts) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );
@@ -786,24 +784,19 @@ ThunkAction<AppState> joinRoom({Room? room}) {
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id ?? room.alias,
+        roomId: room!.alias ?? room.id,
       );
 
       if (data['errcode'] != null) {
         throw data['error'];
       }
 
-      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+      final rooms = store.state.roomStore.rooms;
 
-      Room joinedRoom = rooms.containsKey(room.id)
-          ? rooms[room.id!]!
-          : Room(
-              id: room.id,
-            );
+      Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
-      store.dispatch(SetRoom(
-        room: joinedRoom.copyWith(invite: false),
-      ));
+      store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(fetchRoom(joinedRoom.id));
@@ -871,17 +864,12 @@ ThunkAction<AppState> acceptRoom({Room? room}) {
         throw data['error'];
       }
 
-      final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
+      final rooms = store.state.roomStore.rooms;
 
-      Room joinedRoom = rooms.containsKey(room.id)
-          ? rooms[room.id!]!
-          : Room(
-              id: room.id,
-            );
+      Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
-      store.dispatch(SetRoom(
-        room: joinedRoom.copyWith(invite: false),
-      ));
+      store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(fetchRoom(joinedRoom.id));

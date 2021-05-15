@@ -319,7 +319,7 @@ class Props extends Equatable {
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         loading: store.state.settingsStore.loading,
-        devices: store.state.settingsStore.devices ?? const [],
+        devices: store.state.settingsStore.devices,
         session: store.state.authStore.session,
         currentDeviceId: store.state.authStore.user.deviceId,
         onDeleteDevices: (

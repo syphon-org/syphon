@@ -171,7 +171,7 @@ class Props extends Equatable {
         valid: store.state.authStore.credential!.value != null &&
             store.state.authStore.credential!.value!.length > 0,
         loading: store.state.settingsStore.loading,
-        devices: store.state.settingsStore.devices ?? const [],
+        devices: store.state.settingsStore.devices,
         onChangePassword: (password) {
           store.dispatch(updateCredential(value: password));
         },

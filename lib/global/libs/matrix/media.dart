@@ -47,7 +47,7 @@ class Media {
     String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
     String url =
-        '$protocol$homeserver/_matrix/media/r0/thumbnail/${mediaServer ?? homeserver}/$mediaId';
+        '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
 
     // Params
     url += '?height=${size}&width=${size}&method=${method}';

@@ -369,7 +369,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
       _Props(
         currentUser: store.state.authStore.user,
-        roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds ?? [])
+        roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
             .map((id) => store.state.userStore.users[id])
             .toList(),
         blockUser: (String userId) async {

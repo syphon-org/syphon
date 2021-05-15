@@ -320,7 +320,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
                                 Text(
-                                  props.room.id!,
+                                  props.room.id,
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context).textTheme.caption,
                                 ),

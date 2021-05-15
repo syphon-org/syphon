@@ -119,7 +119,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
-    final stores = Cache.cacheStores ?? {};
+    final stores = Cache.cacheStores;
 
     // decode each store cache synchronously
     stores.forEach((type, store) {
@@ -142,7 +142,8 @@ class CacheSerializer implements StateSerializer<AppState> {
             mediaStore = MediaStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SettingsStore':
-            settingsStore = SettingsStore.fromJson(store as Map<String, dynamic>);
+            settingsStore =
+                SettingsStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'UserStore':
             userStore = UserStore.fromJson(store as Map<String, dynamic>);

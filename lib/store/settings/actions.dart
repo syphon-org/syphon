@@ -422,7 +422,7 @@ ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(
       SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSend!,
+        enterSend: !store.state.settingsStore.enterSend,
       ),
     );
   };
@@ -446,7 +446,7 @@ ThunkAction<AppState> toggleNotifications() {
       pluginInstance: globalNotificationPluginInstance!,
     )) {
       store.dispatch(ToggleNotifications());
-      final enabled = store.state.settingsStore.notificationsEnabled!;
+      final enabled = store.state.settingsStore.notificationsEnabled;
       final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
         (roomId, room) => MapEntry(roomId, room.name),
       );

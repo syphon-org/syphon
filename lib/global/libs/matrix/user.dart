@@ -92,7 +92,7 @@ abstract class Users {
     String? homeserver = 'matrix.org',
     String? accessToken,
     String? userId,
-    Map<String, dynamic> blockUserList = const {"ignored_users": {}},
+    Map<String, dynamic> blockUserList = const {},
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${AccountDataTypes.ignoredUserList}';
@@ -102,7 +102,7 @@ abstract class Users {
     };
 
     final body = {
-      'ignored_users': blockUserList ?? {},
+      'ignored_users': blockUserList,
     };
 
     final saveResponse = await http.put(

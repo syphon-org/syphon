@@ -297,13 +297,12 @@ class Props extends Equatable {
         appBarColor:
             store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
         themeType: themeTypeName(store.state),
-        language: store.state.settingsStore.language ?? 'English',
-        fontName: store.state.settingsStore.fontName ?? 'Rubik',
-        fontSize: store.state.settingsStore.fontSize ?? 'Default',
-        messageSize: store.state.settingsStore.messageSize ?? 'Default',
-        avatarShape: store.state.settingsStore.avatarShape ?? 'Circle',
-        roomTypeBadgesEnabled:
-            store.state.settingsStore.roomTypeBadgesEnabled ?? true,
+        language: store.state.settingsStore.language,
+        fontName: store.state.settingsStore.fontName,
+        fontSize: store.state.settingsStore.fontSize,
+        messageSize: store.state.settingsStore.messageSize,
+        avatarShape: store.state.settingsStore.avatarShape,
+        roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
         ),

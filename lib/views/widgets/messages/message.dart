@@ -78,7 +78,7 @@ class MessageWidget extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
-        final reactionKey = reactionKeys[index]!;
+        final reactionKey = reactionKeys[index];
         final reactionCount = reactionCounts[index];
         return GestureDetector(
           onTap: () {

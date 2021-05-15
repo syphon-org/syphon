@@ -16,7 +16,6 @@ MediaStore mediaReducer(
       return state.copyWith(
         mediaCache: mediaCache,
       );
-      break;
     case UpdateMediaChecks:
       final mediaChecks = Map<String, String?>.from(
         state.mediaChecks ?? const {},
@@ -25,7 +24,6 @@ MediaStore mediaReducer(
       return state.copyWith(
         mediaChecks: mediaChecks,
       );
-      break;
     default:
       return state;
   }

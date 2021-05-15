@@ -239,8 +239,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                     ),
                   ),
                   Visibility(
-                    visible: props.searchText != null &&
-                        props.searchText.isNotEmpty &&
+                    visible: props.searchText.isNotEmpty &&
                         props.searchText.length > 0 &&
                         props.homeservers.isEmpty,
                     child: Container(
@@ -252,7 +251,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                         },
                         child: ListTile(
                           leading: Avatar(
-                            alt: props.searchText ?? '',
+                            alt: props.searchText,
                             size: Dimensions.avatarSizeMin,
                             url: props.homeserver.photoUrl != null
                                 ? props.homeserver.photoUrl
@@ -318,7 +317,7 @@ class _Props extends Equatable {
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults
             : store.state.searchStore.homeservers,
-        homeserver: store.state.authStore.homeserver ?? Homeserver(),
+        homeserver: store.state.authStore.homeserver,
         onSelect: (String hostname) {
           store.dispatch(selectHomeserver(hostname: hostname));
         },

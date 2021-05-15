@@ -533,7 +533,7 @@ ThunkAction<AppState> updateKeySessions({
       // one time keys that were saved from this call
       // global mutatable, this is real bad
       await store.dispatch(claimOneTimeKeys(room: room));
-      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed ?? {};
+      final oneTimeKeys = store.state.cryptoStore.oneTimeKeysClaimed;
 
       // For each one time key claimed
       // send a m.room_key event directly to each device
@@ -700,7 +700,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
         store.dispatch(createKeySessionOutbound(
           identityKey: identityKey,
-          oneTimeKey: oneTimeKey.keys!.values.elementAt(0),
+          oneTimeKey: oneTimeKey.keys.values.elementAt(0),
         ));
       });
       return true;

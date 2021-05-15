@@ -558,7 +558,7 @@ ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
   return (Store<AppState> store) async {
     try {
       final List<String> completed =
-          List<String>.from(auths!['completed'] ?? []) ?? [];
+          List<String>.from(auths!['completed'] ?? []);
 
       await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));

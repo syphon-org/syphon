@@ -209,9 +209,9 @@ class _Props extends Equatable {
   ) =>
       _Props(
         localNotificationsEnabled: Platform.isAndroid &&
-            store.state.settingsStore.notificationsEnabled!,
+            store.state.settingsStore.notificationsEnabled,
         remoteNotificationsEnabled:
-            Platform.isIOS && store.state.settingsStore.notificationsEnabled!,
+            Platform.isIOS && store.state.settingsStore.notificationsEnabled,
         httpPusherEnabled:
             store.state.settingsStore.notificationSettings != null,
         onToggleLocalNotifications: () {
@@ -222,7 +222,7 @@ class _Props extends Equatable {
             // If the platform is iOS, we'll want to confirm they understand
             // the native notification prompt
             if (Platform.isIOS &&
-                !store.state.settingsStore.notificationsEnabled!) {
+                !store.state.settingsStore.notificationsEnabled) {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(

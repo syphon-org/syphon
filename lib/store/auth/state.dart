@@ -183,7 +183,7 @@ class AuthStore extends Equatable {
         interactiveAuths: interactiveAuths ?? this.interactiveAuths,
         credential: credential ?? this.credential,
         creating: creating ?? this.creating,
-        stopgap: stopgap ?? this.stopgap,
+        stopgap: stopgap,
         verificationNeeded: verificationNeeded ?? this.verificationNeeded,
       );
 

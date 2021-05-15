@@ -412,10 +412,9 @@ class Room {
     int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String, User>.from(this.usersNew);
-    var userIdsRemove = <String>[];
-
-    Set<String?> userIds = Set<String?>.from(this.userIds);
+    Map<String, User> usersAdd = Map.from(this.usersNew);
+    Set<String> userIds = Set<String>.from(this.userIds);
+    List<String> userIdsRemove = [];
 
     events.forEach((event) {
       try {
@@ -530,11 +529,11 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: usersAdd ?? this.usersNew,
-      direct: direct ?? this.direct,
+      users: usersAdd,
+      direct: direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
-      userIds: userIds != null ? userIds.toList() : this.userIds ?? [],
+      userIds: userIds.toList(),
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
       lastUpdate: lastUpdate! > 0 ? lastUpdate : this.lastUpdate,
@@ -561,8 +560,8 @@ class Room {
     try {
       bool? limited;
       int? lastUpdate = this.lastUpdate;
-      List<Message> outbox = List<Message>.from(this.outbox ?? []);
-      final messageIds = this.messageIds ?? [];
+      List<Message> outbox = List<Message>.from(this.outbox);
+      final messageIds = this.messageIds;
 
       // Converting only message events
       final hasEncrypted = messages.firstWhereOrNull(
@@ -613,7 +612,7 @@ class Room {
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
-      final messageIdsAll = Set<String>.from(this.messageIds ?? [])
+      final messageIdsAll = Set<String>.from(this.messageIds)
         ..addAll(messageIdsNew);
 
       // Save values to room

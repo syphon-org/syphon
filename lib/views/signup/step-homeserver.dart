@@ -41,7 +41,7 @@ class HomeserverStepState extends State<HomeserverStep> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final hostname = store.state.authStore.hostname;
-    final homeserver = store.state.authStore.homeserver ?? Homeserver();
+    final homeserver = store.state.authStore.homeserver;
     homeserverController.text = homeserver.hostname ?? hostname;
   }
 

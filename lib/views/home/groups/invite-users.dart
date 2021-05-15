@@ -97,7 +97,8 @@ class InviteUsersState extends State<InviteUsersView> {
   @protected
   void onToggleInvite({User? user}) async {
     final List<User?> invitesUpdated = List.from(this.invites);
-    final userIndex = invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
+    final userIndex =
+        invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
 
     if (userIndex == -1) {
       invitesUpdated.add(user);
@@ -128,7 +129,8 @@ class InviteUsersState extends State<InviteUsersView> {
    * by the name searched
    */
   @protected
-  void onAttemptInvite({required BuildContext context, _Props? props, User? user}) async {
+  void onAttemptInvite(
+      {required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -545,7 +547,7 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
-        searchResults: store.state.searchStore.searchResults ?? [],
+        searchResults: store.state.searchStore.searchResults,
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },

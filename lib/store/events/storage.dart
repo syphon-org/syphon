@@ -163,14 +163,11 @@ Future<Map<String, List<Reaction>>> loadReactions(
         await (store.records(messageIds).getSnapshots(storage)
             as FutureOr<List<RecordSnapshot<String, String>>>);
 
-    for (RecordSnapshot<String, String> reactionList
-        in reactionsRecords ?? []) {
-      if (reactionList != null) {
-        final reactions = List.from(await json.decode(reactionList.value))
-            .map((json) => Reaction.fromJson(json))
-            .toList();
-        reactionsMap.putIfAbsent(reactionList.key, () => reactions);
-      }
+    for (RecordSnapshot<String, String> reactionList in reactionsRecords) {
+      final reactions = List.from(await json.decode(reactionList.value))
+          .map((json) => Reaction.fromJson(json))
+          .toList();
+      reactionsMap.putIfAbsent(reactionList.key, () => reactions);
     }
 
     return reactionsMap;
@@ -221,7 +218,7 @@ Future<List<Message>> loadMessages(
     final store = StoreRef<String?, String>(StorageKeys.MESSAGES);
 
     // TODO: properly paginate through cold storage messages instead of loading all
-    final messageIds = eventIds ?? []; //.skip(offset).take(limit).toList();
+    final messageIds = eventIds; //.skip(offset).take(limit).toList();
 
     final messagesPaginated = await (store.records(messageIds).get(storage)
         as FutureOr<List<String>>);

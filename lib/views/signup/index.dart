@@ -511,7 +511,7 @@ class _Props extends Equatable {
         user: store.state.authStore.user,
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
-        homeserver: store.state.authStore.homeserver ?? Homeserver(),
+        homeserver: store.state.authStore.homeserver,
         isHomeserverValid: store.state.authStore.homeserver.valid &&
             !store.state.authStore.loading,
         username: store.state.authStore.username,

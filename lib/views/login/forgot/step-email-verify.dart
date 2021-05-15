@@ -335,7 +335,7 @@ class _Props extends Equatable {
         onSetHomeserver: ({String? hostname}) {
           return store.dispatch(setHostname(hostname: hostname));
         },
-        onSelectHomeserver: (String homeserver) async {
+        onSelectHomeserver: (String? homeserver) async {
           final hostname = homeserver ?? store.state.authStore.hostname;
           final urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
 

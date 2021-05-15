@@ -682,8 +682,7 @@ class _Props extends Equatable {
           return false;
         }(),
         currentUser: store.state.authStore.user,
-        roomTypeBadgesEnabled:
-            store.state.settingsStore.roomTypeBadgesEnabled ?? true,
+        roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
         onDebug: () async {
           debugPrint('[onDebug] trigged debug function @ home');

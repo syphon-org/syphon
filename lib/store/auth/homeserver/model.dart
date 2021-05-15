@@ -1,9 +1,10 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-// part 'model.g.dart';
+part 'model.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class Homeserver extends Equatable {
   final String? hostname;
   final String? baseUrl;
@@ -77,11 +78,11 @@ class Homeserver extends Equatable {
         roomsTotal: roomsTotal ?? this.roomsTotal,
         founded: founded ?? this.founded,
         responseTime: responseTime ?? this.responseTime,
-        valid: valid ?? this.valid ?? false,
+        valid: valid ?? this.valid,
       );
 
-  // Map<String, dynamic> toJson() => _$CredentialToJson(this);
+  Map<String, dynamic> toJson() => _$HomeserverToJson(this);
 
-  // factory Credential.fromJson(Map<String, dynamic> json) =>
-  //     _$CredentialFromJson(json);
+  factory Homeserver.fromJson(Map<String, dynamic> json) =>
+      _$HomeserverFromJson(json);
 }

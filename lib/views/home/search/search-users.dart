@@ -89,7 +89,8 @@ class SearchUserState extends State<SearchUserView> {
   }
 
   @protected
-  void onMessageUser({required BuildContext context, _Props? props, User? user}) async {
+  void onMessageUser(
+      {required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -127,7 +128,8 @@ class SearchUserState extends State<SearchUserView> {
    * by the name searched
    */
   @protected
-  void onAttemptChat({required BuildContext context, _Props? props, User? user}) async {
+  void onAttemptChat(
+      {required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -392,7 +394,7 @@ class _Props extends Equatable {
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
         usersRecent: friendlyUsers(store.state),
-        searchResults: store.state.searchStore.searchResults ?? [],
+        searchResults: store.state.searchStore.searchResults,
         onSearch: (String text) {
           if (text.contains('@') && text.length == 1) {
             return;

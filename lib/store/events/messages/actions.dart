@@ -87,9 +87,9 @@ ThunkAction<AppState> mutateMessagesAll({List<String>? messages}) {
 /// necessary mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessagesRoom({Room? room}) {
+ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
   return (Store<AppState> store) async {
-    if (room!.messagesNew.isEmpty) return;
+    if (room.messagesNew.isEmpty) return;
 
     final messages = store.state.eventStore.messages[room.id];
     final reactions = store.state.eventStore.reactions;
@@ -119,7 +119,7 @@ ThunkAction<AppState> sendMessage({
 
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id!]!.reply;
+      final reply = store.state.roomStore.rooms[room.id]!.reply;
 
       // trim trailing whitespace
       message = message!.copyWith(body: message!.body!.trimRight());
@@ -198,7 +198,8 @@ ThunkAction<AppState> sendMessage({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
+      store
+          .dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
     }
   };
 }
@@ -222,7 +223,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id!]!.reply;
+      final reply = store.state.roomStore.rooms[room.id]!.reply;
 
       // trim trailing whitespace
       message = message!.copyWith(body: message!.body!.trimRight());
@@ -316,7 +317,8 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
+      store
+          .dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
     }
   };
 }

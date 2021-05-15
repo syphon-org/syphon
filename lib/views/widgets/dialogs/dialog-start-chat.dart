@@ -68,7 +68,7 @@ class DialogStartChat extends StatelessWidget {
                   ),
                   ButtonText(
                     textWidget: Text(
-                      action ?? Strings.buttonLetsChat,
+                      action,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     loading: creating,
@@ -110,7 +110,8 @@ class Props extends Equatable {
           return store.state.authStore.interactiveAuths['params']
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token, {required BuildContext context}) async {
+        onCompleteCaptcha: (String token,
+            {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

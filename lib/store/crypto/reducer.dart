@@ -65,11 +65,11 @@ CryptoStore cryptoReducer(
       );
     case AddInboundMessageSession:
       final messageSessionIndex = Map<String, Map<String, int?>>.from(
-        state.messageSessionIndexNEW ?? {},
+        state.messageSessionIndexNEW,
       );
 
       final messageSessionsInbound = Map<String, Map<String, String?>>.from(
-        state.inboundMessageSessions ?? {},
+        state.inboundMessageSessions,
       );
 
       // safety functions to catch newly cached store

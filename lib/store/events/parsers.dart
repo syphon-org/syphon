@@ -39,8 +39,8 @@ Map<String, dynamic> parseMessages({
 }) {
   bool? limited;
   int? lastUpdate = room.lastUpdate;
-  List<Message> outbox = List<Message>.from(room.outbox ?? []);
-  List<Message> messagesAll = List<Message>.from(existing ?? []);
+  List<Message> outbox = List<Message>.from(room.outbox);
+  List<Message> messagesAll = List<Message>.from(existing);
 
   // Converting only message events
   final hasEncrypted = messages.firstWhereOrNull(
