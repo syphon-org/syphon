@@ -21,24 +21,24 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 
 class ChatInput extends StatefulWidget {
-  final String roomId;
+  final String? roomId;
   final bool enterSend;
-  final Message quotable;
-  final String mediumType;
+  final Message? quotable;
+  final String? mediumType;
   final FocusNode focusNode;
   final TextEditingController controller;
 
-  final Function onSubmitMessage;
-  final Function onSubmittedMessage;
-  final Function onChangeMethod;
-  final Function onUpdateMessage;
-  final Function onCancelReply;
+  final Function? onSubmitMessage;
+  final Function? onSubmittedMessage;
+  final Function? onChangeMethod;
+  final Function? onUpdateMessage;
+  final Function? onCancelReply;
 
   const ChatInput({
-    Key key,
-    @required this.roomId,
-    @required this.focusNode,
-    @required this.controller,
+    Key? key,
+    required this.roomId,
+    required this.focusNode,
+    required this.controller,
     this.mediumType,
     this.quotable,
     this.enterSend = false,
@@ -55,18 +55,18 @@ class ChatInput extends StatefulWidget {
 
 class ChatInputState extends State<ChatInput> {
   ChatInputState({
-    Key key,
+    Key? key,
   }) : super();
 
   bool sendable = false;
 
-  Timer typingNotifier;
-  Timer typingNotifierTimeout;
+  Timer? typingNotifier;
+  Timer? typingNotifierTimeout;
 
   Color inputTextColor = const Color(Colours.blackDefault);
   Color inputColorBackground = const Color(Colours.greyEnabled);
   Color inputCursorColor = Colors.blueGrey;
-  Color sendButtonColor = const Color(Colours.greyDisabled);
+  Color? sendButtonColor = const Color(Colours.greyDisabled);
   String hintText = Strings.placeholderInputMatrixUnencrypted;
 
   @protected
@@ -75,13 +75,13 @@ class ChatInputState extends State<ChatInput> {
 
     if (draft != null && draft.type == MessageTypes.TEXT) {
       this.setState(() {
-        sendable = draft.body != null && draft.body.isNotEmpty;
+        sendable = draft.body != null && draft.body!.isNotEmpty;
       });
     }
 
     widget.focusNode.addListener(() {
       if (!widget.focusNode.hasFocus && this.typingNotifier != null) {
-        this.typingNotifier.cancel();
+        this.typingNotifier!.cancel();
         this.setState(() {
           typingNotifier = null;
         });
@@ -98,14 +98,14 @@ class ChatInputState extends State<ChatInput> {
   }
 
   @protected
-  onUpdate(String text, {_Props props}) {
+  onUpdate(String text, {_Props? props}) {
     this.setState(() {
       sendable = text != null && text.trim().isNotEmpty;
     });
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
-      props.onSendTyping(typing: true, roomId: props.room.id);
+      props!.onSendTyping(typing: true, roomId: props.room.id);
       this.setState(() {
         typingNotifier = Timer.periodic(
           Duration(milliseconds: 4000),
@@ -117,25 +117,25 @@ class ChatInputState extends State<ChatInput> {
     // Handle a timeout of the interval if the user idles with input focused
     if (widget.focusNode.hasFocus) {
       if (typingNotifierTimeout != null) {
-        this.typingNotifierTimeout.cancel();
+        this.typingNotifierTimeout!.cancel();
       }
 
       this.setState(() {
         typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
           if (typingNotifier != null) {
-            this.typingNotifier.cancel();
+            this.typingNotifier!.cancel();
             this.setState(() {
               typingNotifier = null;
               typingNotifierTimeout = null;
             });
             // run after to avoid flickering
-            props.onSendTyping(typing: false, roomId: props.room.id);
+            props!.onSendTyping(typing: false, roomId: props.room.id);
           }
         });
       });
     }
     if (widget.onUpdateMessage != null) {
-      widget.onUpdateMessage(text);
+      widget.onUpdateMessage!(text);
     }
   }
 
@@ -143,11 +143,11 @@ class ChatInputState extends State<ChatInput> {
   void dispose() {
     super.dispose();
     if (this.typingNotifier != null) {
-      this.typingNotifier.cancel();
+      this.typingNotifier!.cancel();
     }
 
     if (this.typingNotifierTimeout != null) {
-      this.typingNotifierTimeout.cancel();
+      this.typingNotifierTimeout!.cancel();
     }
   }
 
@@ -164,7 +164,7 @@ class ChatInputState extends State<ChatInput> {
           // dynamic dimensions
           final double messageInputWidth = width - 72;
           final bool replying =
-              widget.quotable != null && widget.quotable.sender != null;
+              widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
           if (widget.mediumType == MediumType.plaintext) {
@@ -188,8 +188,8 @@ class ChatInputState extends State<ChatInput> {
 
           var sendButton = InkWell(
             borderRadius: BorderRadius.circular(48),
-            onLongPress: widget.onChangeMethod,
-            onTap: !sendable ? null : widget.onSubmitMessage,
+            onLongPress: widget.onChangeMethod as void Function()?,
+            onTap: !sendable ? null : widget.onSubmitMessage as void Function()?,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Container(
@@ -206,8 +206,8 @@ class ChatInputState extends State<ChatInput> {
           if (widget.mediumType == MediumType.encryption) {
             sendButton = InkWell(
               borderRadius: BorderRadius.circular(48),
-              onLongPress: widget.onChangeMethod,
-              onTap: !sendable ? null : widget.onSubmitMessage,
+              onLongPress: widget.onChangeMethod as void Function()?,
+              onTap: !sendable ? null : widget.onSubmitMessage as void Function()?,
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
                 child: Container(
@@ -244,14 +244,14 @@ class ChatInputState extends State<ChatInput> {
                             autocorrect: false,
                             enableSuggestions: false,
                             controller: TextEditingController(
-                              text: replying ? widget.quotable.body : '',
+                              text: replying ? widget.quotable!.body : '',
                             ),
                             style: TextStyle(
                               color: inputTextColor,
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText: replying ? widget.quotable.sender : '',
+                              labelText: replying ? widget.quotable!.sender : '',
                               labelStyle: TextStyle(
                                   color: Theme.of(context).accentColor),
                               contentPadding: Dimensions.inputContentPadding
@@ -292,7 +292,7 @@ class ChatInputState extends State<ChatInput> {
                           right: 0,
                           bottom: 0,
                           child: IconButton(
-                            onPressed: () => widget.onCancelReply(),
+                            onPressed: () => widget.onCancelReply!(),
                             icon: Icon(
                               Icons.close,
                               size: Dimensions.iconSize,
@@ -326,7 +326,7 @@ class ChatInputState extends State<ChatInput> {
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !sendable ? null : widget.onSubmittedMessage,
+                      onSubmitted: !sendable ? null : widget.onSubmittedMessage as void Function(String)?,
                       style: TextStyle(
                         height: 1.5,
                         color: inputTextColor,
@@ -375,9 +375,9 @@ class _Props extends Equatable {
   final Function onSendTyping;
 
   _Props({
-    @required this.room,
-    @required this.enterSendEnabled,
-    @required this.onSendTyping,
+    required this.room,
+    required this.enterSendEnabled,
+    required this.onSendTyping,
   });
 
   @override
@@ -386,7 +386,7 @@ class _Props extends Equatable {
         enterSendEnabled,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         enterSendEnabled: store.state.settingsStore.enterSend ?? false,
         onSendTyping: ({typing, roomId}) => store.dispatch(

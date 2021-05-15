@@ -27,7 +27,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class GroupSearchView extends StatefulWidget {
-  const GroupSearchView({Key key}) : super(key: key);
+  const GroupSearchView({Key? key}) : super(key: key);
 
   @override
   GroupSearchState createState() => GroupSearchState();
@@ -36,7 +36,7 @@ class GroupSearchView extends StatefulWidget {
 class GroupSearchState extends State<GroupSearchView> {
   final searchInputFocusNode = FocusNode();
 
-  GroupSearchState({Key key});
+  GroupSearchState({Key? key});
 
   // componentDidMount(){}
   @override
@@ -128,7 +128,7 @@ class GroupSearchState extends State<GroupSearchView> {
                     background: hashedColor,
                   ),
                   Visibility(
-                    visible: !room.encryptionEnabled,
+                    visible: !room.encryptionEnabled!,
                     child: Positioned(
                       bottom: 0,
                       right: 0,
@@ -158,7 +158,7 @@ class GroupSearchState extends State<GroupSearchView> {
                     ),
                   ),
                   Visibility(
-                    visible: room.encryptionEnabled,
+                    visible: room.encryptionEnabled!,
                     child: Positioned(
                       bottom: 0,
                       right: 0,
@@ -187,7 +187,7 @@ class GroupSearchState extends State<GroupSearchView> {
                 children: [
                   Expanded(
                     child: Text(
-                      room.name,
+                      room.name!,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
@@ -265,7 +265,7 @@ class GroupSearchState extends State<GroupSearchView> {
                 Container(
                   padding: Dimensions.listPadding,
                   child: Text(
-                    room.name,
+                    room.name!,
                     textAlign: TextAlign.start,
                     softWrap: true,
                     style: Theme.of(context).textTheme.caption,
@@ -282,7 +282,7 @@ class GroupSearchState extends State<GroupSearchView> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.symmetric(vertical: 4),
-                              child: !room.encryptionEnabled
+                              child: !room.encryptionEnabled!
                                   ? Icon(
                                       Icons.lock_open,
                                       size: Dimensions.iconSizeLarge,
@@ -387,11 +387,11 @@ class _Props extends Equatable {
   final Function onSearch;
 
   _Props({
-    @required this.theme,
-    @required this.loading,
-    @required this.searchResults,
-    @required this.onJoin,
-    @required this.onSearch,
+    required this.theme,
+    required this.loading,
+    required this.searchResults,
+    required this.onJoin,
+    required this.onSearch,
   });
 
   @override
@@ -404,7 +404,7 @@ class _Props extends Equatable {
         loading: store.state.searchStore.loading,
         theme: store.state.settingsStore.theme,
         searchResults: store.state.searchStore.searchResults,
-        onJoin: ({Room room}) {
+        onJoin: ({Room? room}) {
           store.dispatch(joinRoom(room: room));
         },
         onSearch: (text) {

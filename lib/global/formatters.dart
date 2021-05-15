@@ -10,7 +10,7 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
   return '@$displayName:$homeserver';
 }
 
-String formatLanguageCode(String language) {
+String formatLanguageCode(String? language) {
   switch ((language ?? 'english').toLowerCase()) {
     case 'english':
       return 'en';
@@ -30,9 +30,9 @@ String formatSenderInitials(String sender) {
 }
 
 String formatTimestampFull({
-  int lastUpdateMillis,
+  int? lastUpdateMillis,
   bool showTime = false,
-  String timeFormat,
+  String? timeFormat,
 }) {
   if (lastUpdateMillis == null || lastUpdateMillis == 0) return '';
 
@@ -46,13 +46,13 @@ String formatTimestampFull({
 
 // 1237597223894 -> 30m, now, etc
 String formatTimestamp({
-  int lastUpdateMillis = 0,
+  int? lastUpdateMillis = 0,
   bool showTime = false,
   String timeFormat = '24hr',
 }) {
   if (lastUpdateMillis == 0) return '';
 
-  final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
+  final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis!);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
   final hourFormat = timeFormat == '24hr' ? 'H:mm' : 'h:mm';
 

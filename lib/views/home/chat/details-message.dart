@@ -20,8 +20,8 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 class MessageDetailArguments {
-  final String roomId;
-  final Message message;
+  final String? roomId;
+  final Message? message;
 
   MessageDetailArguments({
     this.message,
@@ -30,15 +30,15 @@ class MessageDetailArguments {
 }
 
 class MessageDetails extends StatelessWidget {
-  MessageDetails({Key key}) : super(key: key);
+  MessageDetails({Key? key}) : super(key: key);
 
   @protected
   Widget buildUserReadList(Props props, double width) {
     ReadReceipt readReceipts =
-        props.readReceipts[props.message.id] ?? ReadReceipt();
+        props.readReceipts[props.message!.id!] ?? ReadReceipt();
     Map<String, int> userReads = readReceipts.userReads ?? Map();
 
-    final List<User> users = userReads.keys
+    final List<User?> users = userReads.keys
         .map(
           (userId) => props.users[userId],
         )
@@ -56,16 +56,16 @@ class MessageDetails extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(
           store,
-          ModalRoute.of(context).settings.arguments,
+          ModalRoute.of(context)!.settings.arguments as MessageDetailArguments,
         ),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          final Message message = props.message;
+          final Message message = props.message!;
 
           final timestamp =
-              DateTime.fromMillisecondsSinceEpoch(message.timestamp);
+              DateTime.fromMillisecondsSinceEpoch(message.timestamp!);
           final received = DateTime.fromMillisecondsSinceEpoch(
-              message.received ?? message.timestamp);
+              message.received ?? message.timestamp!);
 
           final isUserSent = props.userId == message.sender;
 
@@ -182,7 +182,7 @@ class MessageDetails extends StatelessWidget {
                   ),
                   trailing: Container(
                     child: Text(
-                      message.sender,
+                      message.sender!,
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 14.0,
@@ -216,20 +216,20 @@ class MessageDetails extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final String userId;
-  final String roomId;
+  final String? userId;
+  final String? roomId;
   final ThemeType theme;
-  final Message message;
+  final Message? message;
   final Map<String, User> users;
   final Map<String, ReadReceipt> readReceipts;
 
   Props({
-    @required this.users,
-    @required this.theme,
-    @required this.roomId,
-    @required this.userId,
-    @required this.message,
-    @required this.readReceipts,
+    required this.users,
+    required this.theme,
+    required this.roomId,
+    required this.userId,
+    required this.message,
+    required this.readReceipts,
   });
 
   static Props mapStateToProps(
@@ -240,14 +240,14 @@ class Props extends Equatable {
         roomId: args.roomId,
         message: args.message,
         users: store.state.userStore.users,
-        readReceipts: store.state.eventStore.receipts[args.roomId] ??
+        readReceipts: store.state.eventStore.receipts[args.roomId!] ??
             Map<String, ReadReceipt>(),
         userId: store.state.authStore.user.userId,
         theme: store.state.settingsStore.theme,
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         theme,
         userId,
         readReceipts,

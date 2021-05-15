@@ -33,7 +33,7 @@ import './third.dart';
 // Local Components
 
 class Intro extends StatefulWidget {
-  const Intro({Key key}) : super(key: key);
+  const Intro({Key? key}) : super(key: key);
 
   IntroState createState() => IntroState();
 }
@@ -44,7 +44,7 @@ class IntroState extends State<Intro> {
   int currentStep = 0;
   bool onboarding = false;
   String loginText = Strings.buttonIntroExistQuestion;
-  PageController pageController;
+  PageController? pageController;
 
   final List<Widget> sections = [
     LandingSection(),
@@ -54,7 +54,7 @@ class IntroState extends State<Intro> {
     ActionSection(),
   ];
 
-  IntroState({Key key});
+  IntroState({Key? key});
 
   @override
   void initState() {
@@ -66,7 +66,7 @@ class IntroState extends State<Intro> {
       viewportFraction: 1.5,
     );
     // NOTE: SchedulerBinding still needed to have navigator context in dialogs
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       onMounted();
     });
   }
@@ -247,7 +247,7 @@ class IntroState extends State<Intro> {
                             );
                           }
 
-                          pageController.nextPage(
+                          pageController!.nextPage(
                             duration: Duration(
                               milliseconds: Values.animationDurationDefault,
                             ),
@@ -276,7 +276,7 @@ class IntroState extends State<Intro> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SmoothPageIndicator(
-                                  controller: pageController, // PageController
+                                  controller: pageController!, // PageController
                                   count: sections.length,
                                   effect: WormEffect(
                                     spacing: 16,
@@ -314,7 +314,7 @@ class IntroState extends State<Intro> {
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyText2
+                                          .bodyText2!
                                           .copyWith(
                                             color:
                                                 Theme.of(context).primaryColor,

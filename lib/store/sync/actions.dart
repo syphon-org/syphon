@@ -23,35 +23,35 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
 class SetBackoff {
-  final int backoff;
+  final int? backoff;
   SetBackoff({this.backoff});
 }
 
 class SetUnauthed {
-  final bool unauthed;
+  final bool? unauthed;
   SetUnauthed({this.unauthed});
 }
 
 class SetOffline {
-  final bool offline;
+  final bool? offline;
   SetOffline({this.offline});
 }
 
 class SetBackgrounded {
-  final bool backgrounded;
+  final bool? backgrounded;
   SetBackgrounded({this.backgrounded});
 }
 
 class SetSyncing {
-  final bool syncing;
+  final bool? syncing;
   SetSyncing({this.syncing});
 }
 
 class SetSynced {
-  final bool synced;
-  final bool syncing;
-  final String lastSince;
-  final int backoff;
+  final bool? synced;
+  final bool? syncing;
+  final String? lastSince;
+  final int? backoff;
 
   SetSynced({
     this.synced,
@@ -62,7 +62,7 @@ class SetSynced {
 }
 
 class SetSyncObserver {
-  final Timer syncObserver;
+  final Timer? syncObserver;
   SetSyncObserver({this.syncObserver});
 }
 
@@ -92,7 +92,7 @@ ThunkAction<AppState> startSyncObserver() {
 
         final backoff = store.state.syncStore.backoff;
         final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-          store.state.syncStore.lastAttempt,
+          store.state.syncStore.lastAttempt!,
         );
 
         if (backoff != 0) {
@@ -139,7 +139,7 @@ ThunkAction<AppState> startSyncObserver() {
 ThunkAction<AppState> stopSyncObserver() {
   return (Store<AppState> store) async {
     if (store.state.syncStore.syncObserver != null) {
-      store.state.syncStore.syncObserver.cancel();
+      store.state.syncStore.syncObserver!.cancel();
       store.dispatch(SetSyncObserver(syncObserver: null));
     }
   };
@@ -188,7 +188,7 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
  * Responsible for updates based on differences from Matrix
  *  
  */
-ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
+ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
@@ -226,9 +226,9 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       final nextBatch = data['next_batch'];
       final oneTimeKeyCount = data['device_one_time_keys_count'];
-      final Map<String, dynamic> rawJoined = data['rooms']['join'];
-      final Map<String, dynamic> rawInvites = data['rooms']['invite'];
-      final Map<String, dynamic> rawToDevice = data['to_device'];
+      final Map<String, dynamic>? rawJoined = data['rooms']['join'];
+      final Map<String, dynamic>? rawInvites = data['rooms']['invite'];
+      final Map<String, dynamic>? rawToDevice = data['to_device'];
 
       // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
@@ -259,7 +259,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       store.dispatch(SetBackoff(backoff: nextBackoff));
       store.dispatch(SetSyncing(syncing: false));
     } finally {
-      if (store.state.syncStore.backgrounded) {
+      if (store.state.syncStore.backgrounded!) {
         store.dispatch(setBackgrounded(false));
       }
     }

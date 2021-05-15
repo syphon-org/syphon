@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart' show IterableExtension;
 /**
  * 
  * Event Parsers
@@ -20,35 +21,34 @@ import 'package:syphon/store/user/model.dart';
 Room parseRoom(Map params) {
   Map json = params['json'];
   Room room = params['room'];
-  User currentUser = params['currentUser'];
-  String lastSince = params['lastSince'];
+  User? currentUser = params['currentUser'];
+  String? lastSince = params['lastSince'];
 
   // TODO: eventually remove the need for this with modular parsers
   return room.fromSync(
-    json: json,
+    json: json as Map<String, dynamic>,
     currentUser: currentUser,
     lastSince: lastSince,
   );
 }
 
 Map<String, dynamic> parseMessages({
-  Room room,
+  required Room room,
   List<Message> messages = const [],
   List<Message> existing = const [],
 }) {
-  bool limited;
-  int lastUpdate = room.lastUpdate;
+  bool? limited;
+  int? lastUpdate = room.lastUpdate;
   List<Message> outbox = List<Message>.from(room.outbox ?? []);
   List<Message> messagesAll = List<Message>.from(existing ?? []);
 
   // Converting only message events
-  final hasEncrypted = messages.firstWhere(
+  final hasEncrypted = messages.firstWhereOrNull(
     (msg) => msg.type == EventTypes.encrypted,
-    orElse: () => null,
   );
 
   // See if the newest message has a greater timestamp
-  if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
+  if (messages.isNotEmpty && lastUpdate! < messages[0].timestamp!) {
     lastUpdate = messages[0].timestamp;
   }
 
@@ -91,8 +91,8 @@ Map<String, dynamic> parseMessages({
   );
 
   // save messages and unique message id updates
-  final messageIdsAll = Set<String>.from(room.messageIds)
-    ..addAll(messagesAllMap.keys);
+  final messageIdsAll = Set<String?>.from(room.messageIds)
+    ..addAll(messagesAllMap.keys as Iterable<String?>);
 
   return {
     'messages': messages,
@@ -101,16 +101,16 @@ Map<String, dynamic> parseMessages({
       messageIds: messageIdsAll.toList(),
       limited: limited ?? room.limited,
       lastUpdate: lastUpdate ?? room.lastUpdate,
-      encryptionEnabled: room.encryptionEnabled || hasEncrypted != null,
+      encryptionEnabled: room.encryptionEnabled! || hasEncrypted != null,
     ),
   };
 }
 
 Map<String, dynamic> parseOptions(Map<String, dynamic> json) {
   bool invite;
-  bool limited;
-  String lastHash;
-  String prevHash;
+  bool? limited;
+  String? lastHash;
+  String? prevHash;
 
   invite = json['invite_state'] != null;
 

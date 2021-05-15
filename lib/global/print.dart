@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
 typedef PrintDebug = void Function(String message, {String title});
-typedef PrintError = void Function(String message, {String title});
+typedef PrintError = void Function(String message, {String? title});
 
-void _printInfo(String content, {String title}) {
+void _printInfo(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
   print(body);
 }
 
-void _printWarning(String content, {String title}) {
+void _printWarning(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
   print(body);
 }
 
-void _printError(String content, {String title}) {
+void _printError(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
   print(body);
 }
 
-void _printDebug(String content, {String title}) {
+void _printDebug(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
   debugPrint(body);
 }

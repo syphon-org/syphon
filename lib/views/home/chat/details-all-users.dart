@@ -27,13 +27,13 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ChatUsersDetailArguments {
-  final String roomId;
+  final String? roomId;
 
   ChatUsersDetailArguments({this.roomId});
 }
 
 class ChatUsersDetailView extends StatefulWidget {
-  const ChatUsersDetailView({Key key}) : super(key: key);
+  const ChatUsersDetailView({Key? key}) : super(key: key);
 
   @override
   ChatUsersDetailState createState() => ChatUsersDetailState();
@@ -42,7 +42,7 @@ class ChatUsersDetailView extends StatefulWidget {
 class ChatUsersDetailState extends State<ChatUsersDetailView> {
   final searchInputFocusNode = FocusNode();
 
-  ChatUsersDetailState({Key key});
+  ChatUsersDetailState({Key? key});
 
   bool loading = false;
 
@@ -73,9 +73,9 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 
   @protected
   onShowUserDetails({
-    BuildContext context,
-    String roomId,
-    String userId,
+    required BuildContext context,
+    String? roomId,
+    String? userId,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -120,8 +120,8 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   subtitle: Text(
-                    user.userId,
-                    style: Theme.of(context).textTheme.caption.merge(
+                    user.userId!,
+                    style: Theme.of(context).textTheme.caption!.merge(
                           TextStyle(
                             color: props.loading
                                 ? Color(Colours.greyDisabled)
@@ -138,13 +138,13 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatUsersDetailArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+    final ChatUsersDetailArguments? arguments =
+        ModalRoute.of(context)!.settings.arguments as ChatUsersDetailArguments?;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) =>
-          _Props.mapStateToProps(store, arguments.roomId),
+          _Props.mapStateToProps(store, arguments!.roomId),
       builder: (context, props) => Scaffold(
         appBar: AppBarSearch(
           title: Strings.titleRoomUsers,
@@ -177,30 +177,30 @@ class ChatUsersDetailState extends State<ChatUsersDetailView> {
 class _Props extends Equatable {
   final Room room;
   final bool loading;
-  final String searchText;
+  final String? searchText;
   final List<dynamic> usersFiltered;
 
   final Function onSearch;
 
   _Props({
-    @required this.room,
-    @required this.loading,
-    @required this.searchText,
-    @required this.usersFiltered,
-    @required this.onSearch,
+    required this.room,
+    required this.loading,
+    required this.searchText,
+    required this.usersFiltered,
+    required this.onSearch,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         searchText,
         usersFiltered,
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         loading: store.state.roomStore.loading,
         searchText: store.state.searchStore.searchText,
-        room: store.state.roomStore.rooms[roomId] ?? Room(),
+        room: store.state.roomStore.rooms[roomId!] ?? Room(),
         usersFiltered: searchUsersLocal(
           store.state,
           roomId: roomId,

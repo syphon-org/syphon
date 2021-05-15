@@ -22,7 +22,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class BlockedUsersView extends StatefulWidget {
-  const BlockedUsersView({Key key}) : super(key: key);
+  const BlockedUsersView({Key? key}) : super(key: key);
 
   @override
   BlockedUsersState createState() => BlockedUsersState();
@@ -31,7 +31,7 @@ class BlockedUsersView extends StatefulWidget {
 class BlockedUsersState extends State<BlockedUsersView> {
   bool loading = false;
 
-  BlockedUsersState({Key key});
+  BlockedUsersState({Key? key});
 
   // componentDidMount(){}
   @override
@@ -41,8 +41,8 @@ class BlockedUsersState extends State<BlockedUsersView> {
 
   @protected
   onShowUserDetails({
-    BuildContext context,
-    String userId,
+    required BuildContext context,
+    String? userId,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -60,7 +60,7 @@ class BlockedUsersState extends State<BlockedUsersView> {
         scrollDirection: Axis.vertical,
         itemCount: props.usersBlocked.length,
         itemBuilder: (BuildContext context, int index) {
-          final user = props.usersBlocked[index];
+          final user = props.usersBlocked[index]!;
 
           return GestureDetector(
             onTap: () => this.onShowUserDetails(
@@ -86,8 +86,8 @@ class BlockedUsersState extends State<BlockedUsersView> {
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   subtitle: Text(
-                    user.userId,
-                    style: Theme.of(context).textTheme.caption.merge(
+                    user.userId!,
+                    style: Theme.of(context).textTheme.caption!.merge(
                           TextStyle(
                             color: props.loading
                                 ? Color(Colours.greyDisabled)
@@ -132,11 +132,11 @@ class BlockedUsersState extends State<BlockedUsersView> {
 
 class _Props extends Equatable {
   final bool loading;
-  final List<User> usersBlocked;
+  final List<User?> usersBlocked;
 
   _Props({
-    @required this.loading,
-    @required this.usersBlocked,
+    required this.loading,
+    required this.usersBlocked,
   });
 
   @override

@@ -21,7 +21,7 @@ import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 // Styling
 
 class CaptchaStep extends StatefulWidget {
-  const CaptchaStep({Key key}) : super(key: key);
+  const CaptchaStep({Key? key}) : super(key: key);
 
   CaptchaStepState createState() => CaptchaStepState();
 }
@@ -147,9 +147,9 @@ class _Props extends Equatable {
   final Function onShowCaptcha;
 
   _Props({
-    @required this.loading,
-    @required this.completed,
-    @required this.onShowCaptcha,
+    required this.loading,
+    required this.completed,
+    required this.onShowCaptcha,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -163,7 +163,7 @@ class _Props extends Equatable {
             context: context,
             builder: (context) {
               return DialogCaptcha(
-                key: Key(authSession),
+                key: Key(authSession!),
                 onConfirm: () {},
               );
             },

@@ -34,13 +34,13 @@ import 'package:syphon/store/settings/state.dart';
  * Handles serialization, encryption, and storage for caching redux stores
  */
 class CacheSerializer implements StateSerializer<AppState> {
-  final Database cache;
-  final Map<String, dynamic> preloaded;
+  final Database? cache;
+  final Map<String, dynamic>? preloaded;
 
   CacheSerializer({this.cache, this.preloaded});
 
   @override
-  Uint8List encode(AppState state) {
+  Uint8List? encode(AppState state) {
     final List<Object> stores = [
       state.authStore,
       state.syncStore,
@@ -60,7 +60,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
-          String jsonEncoded;
+          String? jsonEncoded;
           String jsonEncrypted;
           String type = store.runtimeType.toString();
 
@@ -88,7 +88,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           try {
             // Stopwatch stopwatchSave = new Stopwatch()..start();
             final storeRef = StoreRef<String, String>.main();
-            await storeRef.record(type).put(cache, jsonEncrypted);
+            await storeRef.record(type).put(cache!, jsonEncrypted);
           } catch (error) {
             printError('[CacheSerializer] $error');
           }
@@ -107,15 +107,15 @@ class CacheSerializer implements StateSerializer<AppState> {
     return null;
   }
 
-  AppState decode(Uint8List data) {
-    AuthStore authStore;
-    SyncStore syncStore;
-    UserStore userStore;
-    CryptoStore cryptoStore;
-    MediaStore mediaStore;
-    RoomStore roomStore;
-    EventStore eventStore;
-    SettingsStore settingsStore;
+  AppState decode(Uint8List? data) {
+    AuthStore? authStore;
+    SyncStore? syncStore;
+    UserStore? userStore;
+    CryptoStore? cryptoStore;
+    MediaStore? mediaStore;
+    RoomStore? roomStore;
+    EventStore? eventStore;
+    SettingsStore? settingsStore;
 
     // Load stores previously fetched from cache,
     // mutable global due to redux_presist not extendable beyond Uint8List
@@ -130,28 +130,28 @@ class CacheSerializer implements StateSerializer<AppState> {
         // this stinks, but dart doesn't allow reflection for factories/contructors
         switch (type) {
           case 'AuthStore':
-            authStore = AuthStore.fromJson(store);
+            authStore = AuthStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SyncStore':
-            syncStore = SyncStore.fromJson(store);
+            syncStore = SyncStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'CryptoStore':
-            cryptoStore = CryptoStore.fromJson(store);
+            cryptoStore = CryptoStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'MediaStore':
-            mediaStore = MediaStore.fromJson(store);
+            mediaStore = MediaStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SettingsStore':
-            settingsStore = SettingsStore.fromJson(store);
+            settingsStore = SettingsStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'UserStore':
-            userStore = UserStore.fromJson(store);
+            userStore = UserStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'EventStore':
-            eventStore = EventStore.fromJson(store);
+            eventStore = EventStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'RoomStore':
-            roomStore = RoomStore.fromJson(store);
+            roomStore = RoomStore.fromJson(store as Map<String, dynamic>);
             break;
           default:
             break;
@@ -163,30 +163,30 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
-      cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
+      authStore: authStore ?? preloaded!['auth'] ?? AuthStore(),
+      cryptoStore: cryptoStore ?? preloaded!['crypto'] ?? CryptoStore(),
       mediaStore: mediaStore ??
           MediaStore().copyWith(
-            mediaCache: preloaded['media'],
+            mediaCache: preloaded!['media'],
           ),
       roomStore: roomStore ??
           RoomStore().copyWith(
-            rooms: preloaded['rooms'] ?? {},
+            rooms: preloaded!['rooms'] ?? {},
           ),
       userStore: userStore ??
           UserStore().copyWith(
-            users: preloaded['users'] ?? {},
+            users: preloaded!['users'] ?? {},
           ),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
-            reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
-            redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded['receipts'] ??
+            messages: preloaded!['messages'] ?? Map<String, List<Message>>(),
+            reactions: preloaded!['reactions'] ?? Map<String, List<Reaction>>(),
+            redactions: preloaded!['redactions'] ?? Map<String, Redaction>(),
+            receipts: preloaded!['receipts'] ??
                 Map<String, Map<String, ReadReceipt>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
-      settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),
+      settingsStore: preloaded!['settings'] ?? settingsStore ?? SettingsStore(),
     );
   }
 }

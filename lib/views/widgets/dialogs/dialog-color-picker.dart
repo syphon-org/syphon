@@ -10,7 +10,7 @@ import 'package:syphon/global/colours.dart';
 
 class DialogColorPicker extends StatelessWidget {
   DialogColorPicker({
-    Key key,
+    Key? key,
     this.title = 'Color Picker',
     this.resetColor,
     this.currentColor,
@@ -19,10 +19,10 @@ class DialogColorPicker extends StatelessWidget {
   }) : super(key: key);
 
   final String title;
-  final int resetColor;
-  final int currentColor;
-  final Function onCancel;
-  final Function onSelectColor;
+  final int? resetColor;
+  final int? currentColor;
+  final Function? onCancel;
+  final Function? onSelectColor;
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +81,9 @@ class DialogColorPicker extends StatelessWidget {
                 },
               ),
             ],
-            pickerColor: Color(currentColor),
+            pickerColor: Color(currentColor!),
             onColorChanged: (Color color) {
-              onSelectColor(color.value);
+              onSelectColor!(color.value);
               Navigator.pop(context);
             },
           ),
@@ -96,7 +96,7 @@ class DialogColorPicker extends StatelessWidget {
                 horizontal: 12,
               ),
               onPressed: () {
-                onSelectColor(resetColor ?? null);
+                onSelectColor!(resetColor ?? null);
                 Navigator.pop(context);
               },
               child: Text(
@@ -114,7 +114,7 @@ class DialogColorPicker extends StatelessWidget {
                   ),
                   onPressed: () {
                     if (onCancel != null) {
-                      onCancel();
+                      onCancel!();
                     }
                     Navigator.pop(context);
                   },

@@ -10,9 +10,9 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
 class ThirdSection extends StatelessWidget {
-  ThirdSection({Key key, this.title}) : super(key: key);
+  ThirdSection({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {

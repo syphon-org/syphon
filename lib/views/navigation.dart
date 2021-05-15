@@ -40,11 +40,11 @@ class NavigationService {
       new GlobalKey<NavigatorState>();
 
   static Future<dynamic> navigateTo(String routeName) {
-    return navigatorKey.currentState.pushNamed(routeName);
+    return navigatorKey.currentState!.pushNamed(routeName);
   }
 
   static Future<dynamic> clearTo(String routeName, BuildContext context) {
-    return navigatorKey.currentState
+    return navigatorKey.currentState!
         .pushNamedAndRemoveUntil(routeName, (_) => false);
   }
 }

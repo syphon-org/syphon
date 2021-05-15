@@ -31,8 +31,8 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 class ChatSettingsArguments {
-  final String roomId;
-  final String title;
+  final String? roomId;
+  final String? title;
 
   // Improve loading times
   ChatSettingsArguments({
@@ -42,14 +42,14 @@ class ChatSettingsArguments {
 }
 
 class ChatDetailsView extends StatefulWidget {
-  const ChatDetailsView({Key key}) : super(key: key);
+  const ChatDetailsView({Key? key}) : super(key: key);
 
   @override
   ChatDetailsState createState() => ChatDetailsState();
 }
 
 class ChatDetailsState extends State<ChatDetailsView> {
-  ChatDetailsState({Key key}) : super();
+  ChatDetailsState({Key? key}) : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
@@ -57,7 +57,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
   double headerOpacity = 1;
   double headerSize = 54;
-  List<User> usersList;
+  List<User>? usersList;
 
   @override
   void initState() {
@@ -97,9 +97,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
   }
 
   @protected
-  void onBlockUser({BuildContext context, _Props props}) async {
+  void onBlockUser({required BuildContext context, required _Props props}) async {
     final user = props.users.firstWhere(
-      (user) => user.userId != props.currentUser.userId,
+      (user) => user!.userId != props.currentUser.userId,
     );
     return await showDialog(
       context: context,
@@ -107,7 +107,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
       builder: (context) => DialogConfirm(
         title: "Block User",
         content:
-            "If you block ${user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+            "If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
         onConfirm: () async {
           await props.onBlockUser(user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -119,9 +119,9 @@ class ChatDetailsState extends State<ChatDetailsView> {
 
   @protected
   onShowColorPicker({
-    context,
-    int originalColor,
-    Function onSelectColor,
+    required context,
+    int? originalColor,
+    Function? onSelectColor,
   }) async {
     await showDialog(
       context: context,
@@ -148,8 +148,8 @@ class ChatDetailsState extends State<ChatDetailsView> {
     final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
-    final ChatSettingsArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+    final ChatSettingsArguments? arguments =
+        ModalRoute.of(context)!.settings.arguments as ChatSettingsArguments?;
 
     final scaffordBackgroundColor =
         Theme.of(context).brightness == Brightness.light
@@ -160,7 +160,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(
         store,
-        arguments.roomId,
+        arguments!.roomId,
       ),
       builder: (context, props) => Scaffold(
         backgroundColor: scaffordBackgroundColor,
@@ -185,11 +185,11 @@ class ChatDetailsState extends State<ChatDetailsView> {
                   ),
                   Flexible(
                     child: Text(
-                      arguments.title,
+                      arguments!.title!,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context)
                           .textTheme
-                          .bodyText1
+                          .bodyText1!
                           .copyWith(color: Colors.white),
                     ),
                   ),
@@ -314,12 +314,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  props.room.name,
+                                  props.room.name!,
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
                                 Text(
-                                  props.room.id,
+                                  props.room.id!,
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context).textTheme.caption,
                                 ),
@@ -330,12 +330,12 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 ),
                                 Visibility(
                                   visible: props.room.topic != null &&
-                                      props.room.topic.length > 0,
+                                      props.room.topic!.length > 0,
                                   maintainSize: false,
                                   child: Container(
                                     padding: EdgeInsets.only(top: 12),
                                     child: Text(
-                                      props.room.topic,
+                                      props.room.topic!,
                                       style: TextStyle(fontSize: 16),
                                     ),
                                   ),
@@ -388,7 +388,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ),
                               trailing: Container(
                                 child: Switch(
-                                  value: props.room.direct,
+                                  value: props.room.direct!,
                                   onChanged: (value) {
                                     props.onToggleDirectRoom();
                                   },
@@ -440,7 +440,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 'Default',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle1
+                                    .subtitle1!
                                     .copyWith(color: Colors.grey),
                               ),
                             ),
@@ -457,7 +457,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 'Default (Argon)',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle1
+                                    .subtitle1!
                                     .copyWith(color: Colors.grey),
                               ),
                             ),
@@ -492,7 +492,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             Visibility(
-                              visible: props.room.direct,
+                              visible: props.room.direct!,
                               child: ListTile(
                                 onTap: () => onBlockUser(
                                   context: context,
@@ -503,7 +503,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                   'Block User',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle1
+                                      .subtitle1!
                                       .copyWith(
                                         color: Colors.redAccent,
                                       ),
@@ -517,7 +517,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                                 'Leave Chat',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle1
+                                    .subtitle1!
                                     .copyWith(
                                       color: Colors.redAccent,
                                     ),
@@ -542,7 +542,7 @@ class _Props extends Equatable {
   final Room room;
   final bool loading;
   final User currentUser;
-  final List<User> users;
+  final List<User?> users;
   final Color roomPrimaryColor;
   final List<Message> messages;
 
@@ -553,16 +553,16 @@ class _Props extends Equatable {
   // final Function onViewEncryptionKeys;
 
   _Props({
-    @required this.room,
-    @required this.users,
-    @required this.loading,
-    @required this.messages,
-    @required this.currentUser,
-    @required this.onBlockUser,
-    @required this.onLeaveChat,
-    @required this.roomPrimaryColor,
-    @required this.onSelectPrimaryColor,
-    @required this.onToggleDirectRoom,
+    required this.room,
+    required this.users,
+    required this.loading,
+    required this.messages,
+    required this.currentUser,
+    required this.onBlockUser,
+    required this.onLeaveChat,
+    required this.roomPrimaryColor,
+    required this.onSelectPrimaryColor,
+    required this.onToggleDirectRoom,
     // @required this.onViewEncryptionKeys,
   });
 
@@ -574,7 +574,7 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
       loading: store.state.roomStore.loading,
       room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
@@ -592,8 +592,8 @@ class _Props extends Equatable {
                 Map<String, ChatSetting>();
 
         if (customChatSettings[roomId] != null) {
-          return customChatSettings[roomId].primaryColor != null
-              ? Color(customChatSettings[roomId].primaryColor)
+          return customChatSettings[roomId]!.primaryColor != null
+              ? Color(customChatSettings[roomId]!.primaryColor!)
               : Colors.grey;
         }
 
@@ -606,6 +606,6 @@ class _Props extends Equatable {
       },
       onToggleDirectRoom: () {
         final room = selectRoom(id: roomId, state: store.state);
-        store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
+        store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct!));
       });
 }

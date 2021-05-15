@@ -18,7 +18,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class ChatPreferences extends StatelessWidget {
-  ChatPreferences({Key key}) : super(key: key);
+  ChatPreferences({Key? key}) : super(key: key);
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
@@ -71,7 +71,7 @@ class ChatPreferences extends StatelessWidget {
                                 title: Text(
                                   'Language',
                                 ),
-                                trailing: Text(props.language),
+                                trailing: Text(props.language!),
                               ),
                             ),
                             GestureDetector(
@@ -105,7 +105,7 @@ class ChatPreferences extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.enterSend,
+                                value: props.enterSend!,
                                 onChanged: (enterSend) =>
                                     props.onToggleEnterSend(),
                               ),
@@ -121,7 +121,7 @@ class ChatPreferences extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.timeFormat24,
+                                value: props.timeFormat24!,
                                 onChanged: (value) =>
                                     props.onToggleTimeFormat(),
                               ),
@@ -137,7 +137,7 @@ class ChatPreferences extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.dismissKeyboard,
+                                value: props.dismissKeyboard!,
                                 onChanged: (value) =>
                                     props.onToggleDismissKeyboard(),
                               ),
@@ -281,10 +281,10 @@ class ChatPreferences extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final String language;
-  final bool enterSend;
-  final bool timeFormat24;
-  final bool dismissKeyboard;
+  final String? language;
+  final bool? enterSend;
+  final bool? timeFormat24;
+  final bool? dismissKeyboard;
   final String chatFontSize;
 
   final Function onDisabled;
@@ -294,20 +294,20 @@ class Props extends Equatable {
   final Function onToggleDismissKeyboard;
 
   Props({
-    @required this.language,
-    @required this.enterSend,
-    @required this.chatFontSize,
-    @required this.timeFormat24,
-    @required this.dismissKeyboard,
-    @required this.onDisabled,
-    @required this.onIncrementLanguage,
-    @required this.onToggleEnterSend,
-    @required this.onToggleTimeFormat,
-    @required this.onToggleDismissKeyboard,
+    required this.language,
+    required this.enterSend,
+    required this.chatFontSize,
+    required this.timeFormat24,
+    required this.dismissKeyboard,
+    required this.onDisabled,
+    required this.onIncrementLanguage,
+    required this.onToggleEnterSend,
+    required this.onToggleTimeFormat,
+    required this.onToggleDismissKeyboard,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         language,
         enterSend,
         chatFontSize,

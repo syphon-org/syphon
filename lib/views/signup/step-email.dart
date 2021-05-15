@@ -26,15 +26,15 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class EmailStep extends StatefulWidget {
-  const EmailStep({Key key}) : super(key: key);
+  const EmailStep({Key? key}) : super(key: key);
 
   EmailStepState createState() => EmailStepState();
 }
 
 class EmailStepState extends State<EmailStep> {
-  EmailStepState({Key key});
+  EmailStepState({Key? key});
 
-  Timer typingTimeout;
+  Timer? typingTimeout;
   final emailController = TextEditingController();
 
   @override
@@ -170,7 +170,7 @@ class EmailStepState extends State<EmailStep> {
                         child: Text(
                           '* Email is already in use by another user',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.caption.copyWith(
+                          style: Theme.of(context).textTheme.caption!.copyWith(
                                 color: Colors.red,
                               ),
                         ),
@@ -205,7 +205,7 @@ class EmailStepState extends State<EmailStep> {
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
-                        typingTimeout.cancel();
+                        typingTimeout!.cancel();
                         this.setState(() {
                           typingTimeout = null;
                         });
@@ -255,11 +255,11 @@ class _Props extends Equatable {
   final Function onSetEmail;
 
   _Props({
-    @required this.email,
-    @required this.isEmailValid,
-    @required this.isEmailAvailable,
-    @required this.loading,
-    @required this.onSetEmail,
+    required this.email,
+    required this.isEmailValid,
+    required this.isEmailAvailable,
+    required this.loading,
+    required this.onSetEmail,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -267,7 +267,7 @@ class _Props extends Equatable {
         isEmailValid: store.state.authStore.isEmailValid,
         isEmailAvailable: store.state.authStore.isEmailAvailable,
         loading: store.state.authStore.loading,
-        onSetEmail: ({String email}) {
+        onSetEmail: ({String? email}) {
           if (email != null) {
             store.dispatch(updateCredential(
               type: MatrixAuthTypes.EMAIL,

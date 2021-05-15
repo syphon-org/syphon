@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonSolid extends StatelessWidget {
   ButtonSolid({
-    Key key,
+    Key? key,
     this.text,
     this.textWidget,
     this.loading = false,
@@ -19,11 +19,11 @@ class ButtonSolid extends StatelessWidget {
 
   final bool loading;
   final bool disabled;
-  final double width;
-  final double height;
-  final String text;
-  final Widget textWidget;
-  final Function onPressed;
+  final double? width;
+  final double? height;
+  final String? text;
+  final Widget? textWidget;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -35,7 +35,7 @@ class ButtonSolid extends StatelessWidget {
         ),
         child: TextButton(
           style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) =>
                   states.contains(MaterialState.disabled)
                       ? Colors.grey[300]
@@ -53,7 +53,7 @@ class ButtonSolid extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: disabled ? null : this.onPressed,
+          onPressed: disabled ? null : this.onPressed as void Function()?,
           child: this.loading
               ? Container(
                   constraints: BoxConstraints(
@@ -69,9 +69,9 @@ class ButtonSolid extends StatelessWidget {
                   ),
                 )
               : (textWidget != null
-                  ? textWidget
+                  ? textWidget!
                   : Text(
-                      this.text,
+                      this.text!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w100,

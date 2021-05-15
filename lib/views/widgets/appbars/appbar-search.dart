@@ -10,7 +10,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 
 class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   AppBarSearch({
-    Key key,
+    Key? key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -31,15 +31,15 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final String label;
   final String tooltip;
-  final double elevation;
+  final double? elevation;
   final Duration throttle;
   final Brightness brightness;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
-  final Function onBack;
-  final Function onChange;
-  final Function onSearch;
-  final Function onToggleSearch;
+  final Function? onBack;
+  final Function? onChange;
+  final Function? onSearch;
+  final Function? onToggleSearch;
 
   @override
   AppBarSearchState createState() => AppBarSearchState();
@@ -52,19 +52,19 @@ class AppBarSearchState extends State<AppBarSearch> {
   final focusNode = FocusNode();
 
   bool searching = false;
-  Timer searchTimeout;
+  Timer? searchTimeout;
 
   @protected
-  void onChange({String text}) {
+  void onChange({String? text}) {
     if (widget.onChange != null) {
-      widget.onChange(text);
+      widget.onChange!(text);
     }
   }
 
   @protected
-  void onSearch({String text}) {
+  void onSearch({String? text}) {
     if (widget.onSearch != null) {
-      widget.onSearch(text);
+      widget.onSearch!(text);
     }
   }
 
@@ -73,7 +73,7 @@ class AppBarSearchState extends State<AppBarSearch> {
     super.initState();
 
     // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       if (widget.forceFocus) {
         onToggleSearch(context: context);
       }
@@ -89,7 +89,7 @@ class AppBarSearchState extends State<AppBarSearch> {
   }
 
   @protected
-  void onToggleSearch({BuildContext context}) {
+  void onToggleSearch({BuildContext? context}) {
     setState(() {
       searching = !searching;
     });
@@ -97,13 +97,13 @@ class AppBarSearchState extends State<AppBarSearch> {
       Timer(
         Duration(milliseconds: 5), // hack to focus after visibility change
         () => FocusScope.of(
-          context,
+          context!,
         ).requestFocus(
           widget.focusNode ?? focusNode,
         ),
       );
     } else {
-      FocusScope.of(context).unfocus();
+      FocusScope.of(context!).unfocus();
     }
   }
 
@@ -141,7 +141,7 @@ class AppBarSearchState extends State<AppBarSearch> {
                   focusNode: widget.focusNode ?? focusNode,
                   onChanged: (text) {
                     if (this.searchTimeout != null) {
-                      this.searchTimeout.cancel();
+                      this.searchTimeout!.cancel();
                       this.searchTimeout = null;
                     }
 

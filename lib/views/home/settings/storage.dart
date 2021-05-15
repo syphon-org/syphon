@@ -15,7 +15,7 @@ import 'package:syphon/store/index.dart';
 final bool debug = !kReleaseMode;
 
 class StorageView extends StatelessWidget {
-  StorageView({Key key}) : super(key: key);
+  StorageView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -90,8 +90,8 @@ class _Props extends Equatable {
   final Function onImportDeviceKey;
 
   _Props({
-    @required this.onExportDeviceKey,
-    @required this.onImportDeviceKey,
+    required this.onExportDeviceKey,
+    required this.onImportDeviceKey,
   });
 
   @override

@@ -41,8 +41,8 @@ import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class ChatViewArguements {
-  final String roomId;
-  final String title;
+  final String? roomId;
+  final String? title;
 
   // Improve loading times
   ChatViewArguements({
@@ -52,7 +52,7 @@ class ChatViewArguements {
 }
 
 class ChatView extends StatefulWidget {
-  const ChatView({Key key}) : super(key: key);
+  const ChatView({Key? key}) : super(key: key);
 
   @override
   ChatViewState createState() => ChatViewState();
@@ -60,11 +60,11 @@ class ChatView extends StatefulWidget {
 
 class ChatViewState extends State<ChatView> {
   bool sendable = false;
-  Message selectedMessage;
-  Map<String, Color> senderColors;
+  Message? selectedMessage;
+  Map<String, Color>? senderColors;
 
   bool loadMore = false;
-  String mediumType = MediumType.plaintext;
+  String? mediumType = MediumType.plaintext;
 
   final inputFieldNode = FocusNode();
   final editorController = TextEditingController();
@@ -83,7 +83,7 @@ class ChatViewState extends State<ChatView> {
     // only marked if read receipts are enabled
     props.onMarkRead();
 
-    if (props.room.invite) {
+    if (props.room.invite!) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -96,22 +96,22 @@ class ChatViewState extends State<ChatView> {
       );
     }
 
-    if (props.room.encryptionEnabled) {
+    if (props.room.encryptionEnabled!) {
       props.onUpdateDeviceKeys();
       this.setState(() {
         mediumType = MediumType.encryption;
       });
     }
 
-    if (props.messagesLength < 10) {
+    if (props.messagesLength! < 10) {
       props.onLoadFirstBatch();
     }
 
     if (draft != null && draft.type == MessageTypes.TEXT) {
       editorController.value = TextEditingValue(
-        text: draft.body,
+        text: draft.body!,
         selection: TextSelection.fromPosition(
-          TextPosition(offset: draft.body.length),
+          TextPosition(offset: draft.body!.length),
         ),
       );
     }
@@ -137,8 +137,8 @@ class ChatViewState extends State<ChatView> {
   }
 
   @protected
-  onDidChange(_Props propsOld, _Props props) {
-    if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
+  onDidChange(_Props? propsOld, _Props props) {
+    if (props.room.encryptionEnabled! && mediumType != MediumType.encryption) {
       this.setState(() {
         mediumType = MediumType.encryption;
       });
@@ -153,13 +153,13 @@ class ChatViewState extends State<ChatView> {
     super.dispose();
   }
 
-  onViewUserDetails({Message message, String userId}) {
+  onViewUserDetails({Message? message, String? userId}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
-        userId: userId ?? message.sender,
+        userId: userId ?? message!.sender,
       ),
     );
   }
@@ -178,13 +178,13 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  onToggleSelectedMessage(Message message) {
+  onToggleSelectedMessage(Message? message) {
     this.setState(() {
       selectedMessage = message;
     });
   }
 
-  onChangeMediumType({String newMediumType, _Props props}) {
+  onChangeMediumType({String? newMediumType, _Props? props}) {
     // noop
     if (mediumType == newMediumType) {
       return;
@@ -194,7 +194,7 @@ class ChatViewState extends State<ChatView> {
       // if the room has not enabled encryption
       // confirm with the user first before
       // attempting it
-      if (!props.room.encryptionEnabled) {
+      if (!props!.room.encryptionEnabled!) {
         return showDialog(
           context: context,
           barrierDismissible: false,
@@ -217,7 +217,7 @@ class ChatViewState extends State<ChatView> {
     } else {
       // allow other mediums for messages
       // unless they've encrypted the room
-      if (!props.room.encryptionEnabled) {
+      if (!props!.room.encryptionEnabled!) {
         setState(() {
           mediumType = newMediumType;
         });
@@ -225,7 +225,7 @@ class ChatViewState extends State<ChatView> {
     }
   }
 
-  onInputReaction({Message message, _Props props}) async {
+  onInputReaction({Message? message, _Props? props}) async {
     final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
       context: context,
@@ -257,7 +257,7 @@ class ChatViewState extends State<ChatView> {
               ),
             ),
             onEmojiSelected: (category, emoji) {
-              props.onToggleReaction(
+              props!.onToggleReaction(
                 emoji: emoji,
                 message: message,
               );
@@ -289,7 +289,7 @@ class ChatViewState extends State<ChatView> {
       ),
       items: [
         PopupMenuItem<String>(
-          enabled: !props.room.encryptionEnabled,
+          enabled: !props.room.encryptionEnabled!,
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -320,9 +320,9 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
         PopupMenuItem<String>(
-          enabled: props.room.direct,
+          enabled: props.room.direct!,
           child: GestureDetector(
-            onTap: !props.room.direct
+            onTap: !props.room.direct!
                 ? null
                 : () {
                     Navigator.pop(context);
@@ -363,7 +363,7 @@ class ChatViewState extends State<ChatView> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context).settings.arguments as ChatViewArguements)
+          (ModalRoute.of(context)!.settings.arguments as ChatViewArguements)
               .roomId,
         ),
         builder: (context, props) {
@@ -416,7 +416,7 @@ class ChatViewState extends State<ChatView> {
           }
 
           return Scaffold(
-            appBar: appBar,
+            appBar: appBar as PreferredSizeWidget?,
             backgroundColor: selectedMessage != null
                 ? Theme.of(context).scaffoldBackgroundColor.withAlpha(64)
                 : Theme.of(context).scaffoldBackgroundColor,
@@ -525,9 +525,9 @@ class ChatViewState extends State<ChatView> {
 
 class _Props extends Equatable {
   final Room room;
-  final String userId;
+  final String? userId;
   final bool loading;
-  final int messagesLength;
+  final int? messagesLength;
   final bool enterSendEnabled;
   final ThemeType theme;
   final Color roomPrimaryColor;
@@ -549,32 +549,32 @@ class _Props extends Equatable {
   final Function onSelectReply;
 
   _Props({
-    @required this.room,
-    @required this.theme,
-    @required this.userId,
-    @required this.loading,
-    @required this.messagesLength,
-    @required this.enterSendEnabled,
-    @required this.roomPrimaryColor,
-    @required this.roomTypeBadgesEnabled,
-    @required this.dismissKeyboardEnabled,
-    @required this.onUpdateDeviceKeys,
-    @required this.onSendMessage,
-    @required this.onDeleteMessage,
-    @required this.onSaveDraftMessage,
-    @required this.onClearDraftMessage,
-    @required this.onLoadMoreMessages,
-    @required this.onLoadFirstBatch,
-    @required this.onAcceptInvite,
-    @required this.onToggleEncryption,
-    @required this.onToggleReaction,
-    @required this.onCheatCode,
-    @required this.onMarkRead,
-    @required this.onSelectReply,
+    required this.room,
+    required this.theme,
+    required this.userId,
+    required this.loading,
+    required this.messagesLength,
+    required this.enterSendEnabled,
+    required this.roomPrimaryColor,
+    required this.roomTypeBadgesEnabled,
+    required this.dismissKeyboardEnabled,
+    required this.onUpdateDeviceKeys,
+    required this.onSendMessage,
+    required this.onDeleteMessage,
+    required this.onSaveDraftMessage,
+    required this.onClearDraftMessage,
+    required this.onLoadMoreMessages,
+    required this.onLoadFirstBatch,
+    required this.onAcceptInvite,
+    required this.onToggleEncryption,
+    required this.onToggleReaction,
+    required this.onCheatCode,
+    required this.onMarkRead,
+    required this.onSelectReply,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         room,
         userId,
         loading,
@@ -582,7 +582,7 @@ class _Props extends Equatable {
         roomPrimaryColor,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
       room: selectRoom(id: roomId, state: store.state),
       theme: store.state.settingsStore.theme,
       userId: store.state.authStore.user.userId,
@@ -591,7 +591,7 @@ class _Props extends Equatable {
       dismissKeyboardEnabled:
           store.state.settingsStore.dismissKeyboardEnabled ?? false,
       enterSendEnabled: store.state.settingsStore.enterSend ?? false,
-      loading: (store.state.roomStore.rooms[roomId] ?? Room()).syncing,
+      loading: (store.state.roomStore.rooms[roomId!] ?? Room()).syncing,
       messagesLength: store.state.eventStore.messages[roomId]?.length,
       onSelectReply: (Message message) {
         store.dispatch(selectReply(roomId: roomId, message: message));
@@ -601,13 +601,13 @@ class _Props extends Equatable {
             store.state.settingsStore.customChatSettings ?? Map();
 
         if (customChatSettings[roomId] != null) {
-          return Color(customChatSettings[roomId].primaryColor);
+          return Color(customChatSettings[roomId]!.primaryColor!);
         }
 
         return Colours.hashedColor(roomId);
       }(),
       onUpdateDeviceKeys: () async {
-        final room = store.state.roomStore.rooms[roomId];
+        final room = store.state.roomStore.rooms[roomId]!;
 
         final usersDeviceKeys = await store.dispatch(
           fetchDeviceKeys(userIds: room.userIds),
@@ -616,8 +616,8 @@ class _Props extends Equatable {
         store.dispatch(setDeviceKeys(usersDeviceKeys));
       },
       onSaveDraftMessage: ({
-        String body,
-        String type,
+        String? body,
+        String? type,
       }) {
         store.dispatch(saveDraft(
           body: body,
@@ -626,22 +626,22 @@ class _Props extends Equatable {
         ));
       },
       onClearDraftMessage: ({
-        String body,
-        String type,
+        String? body,
+        String? type,
       }) {
         store.dispatch(clearDraft(
           room: store.state.roomStore.rooms[roomId],
         ));
       },
-      onSendMessage: ({String body, String type}) async {
-        final room = store.state.roomStore.rooms[roomId];
+      onSendMessage: ({String? body, String? type}) async {
+        final room = store.state.roomStore.rooms[roomId]!;
 
         final message = Message(
           body: body,
           type: type,
         );
 
-        if (room.encryptionEnabled) {
+        if (room.encryptionEnabled!) {
           return store.dispatch(sendMessageEncrypted(
             room: room,
             message: message,
@@ -654,7 +654,7 @@ class _Props extends Equatable {
         ));
       },
       onDeleteMessage: ({
-        Message message,
+        Message? message,
       }) {
         if (message != null) {
           store.dispatch(deleteMessage(message: message));
@@ -677,7 +677,7 @@ class _Props extends Equatable {
           ),
         );
       },
-      onToggleReaction: ({Message message, String emoji}) {
+      onToggleReaction: ({Message? message, String? emoji}) {
         final room = selectRoom(id: roomId, state: store.state);
 
         store.dispatch(

@@ -14,17 +14,17 @@ import 'package:syphon/store/index.dart';
 
 class CardSection extends StatelessWidget {
   CardSection({
-    Key key,
+    Key? key,
     this.child,
     this.margin,
     this.padding,
     this.elevation,
   }) : super(key: key);
 
-  final Widget child;
-  final EdgeInsets margin;
-  final EdgeInsets padding;
-  final double elevation;
+  final Widget? child;
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
+  final double? elevation;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -67,7 +67,7 @@ class Props extends Equatable {
   final ThemeType type;
 
   Props({
-    @required this.type,
+    required this.type,
   });
 
   @override

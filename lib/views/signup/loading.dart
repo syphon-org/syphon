@@ -13,7 +13,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
 class Loading extends StatelessWidget {
-  Loading({Key key}) : super(key: key);
+  Loading({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

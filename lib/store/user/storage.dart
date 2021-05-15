@@ -7,10 +7,10 @@ import 'package:syphon/store/user/model.dart';
 
 Future<void> saveUsers(
   Map<String, User> users, {
-  Database cache,
-  Database storage,
+  Database? cache,
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.USERS);
+  final store = StoreRef<String?, String>(StorageKeys.USERS);
 
   return await storage.transaction((txn) async {
     for (User user in users.values) {
@@ -25,9 +25,9 @@ Future<void> saveUsers(
  * 
  * Example of useful recursion
  */
-Future<Map<String, User>> loadUsers({
-  Database cache,
-  Database storage,
+Future<Map<String, User>?> loadUsers({
+  Database? cache,
+  required Database storage,
   int offset = 0,
   int page = 5000,
 }) async {
@@ -56,10 +56,10 @@ Future<Map<String, User>> loadUsers({
     }
 
     if (offset < count) {
-      users.addAll(await loadUsers(
+      users.addAll(await (loadUsers(
         offset: offset + page,
         storage: storage,
-      ));
+      ) as FutureOr<Map<String, User>>));
     }
 
     if (users.isEmpty) {

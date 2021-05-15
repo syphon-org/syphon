@@ -35,7 +35,7 @@ final Duration nextAnimationDuration = Duration(
 );
 
 class SignupView extends StatefulWidget {
-  const SignupView({Key key}) : super(key: key);
+  const SignupView({Key? key}) : super(key: key);
 
   SignupViewState createState() => SignupViewState();
 }
@@ -44,8 +44,8 @@ class SignupViewState extends State<SignupView> {
   int currentStep = 0;
   bool validStep = false;
   bool onboarding = false;
-  StreamSubscription subscription;
-  PageController pageController;
+  late StreamSubscription subscription;
+  PageController? pageController;
 
   List<Widget> sections = [
     HomeserverStep(),
@@ -53,7 +53,7 @@ class SignupViewState extends State<SignupView> {
     PasswordStep(),
   ];
 
-  SignupViewState({Key key});
+  SignupViewState({Key? key});
 
   @override
   void initState() {
@@ -90,7 +90,7 @@ class SignupViewState extends State<SignupView> {
           this.sections.length < 4) {
         final newSections = List<Widget>.from(sections);
 
-        var newStages = [];
+        List<dynamic>? newStages = [];
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
         } catch (error) {
@@ -98,7 +98,7 @@ class SignupViewState extends State<SignupView> {
         }
 
         // dynamically add stages based on homeserver requirements
-        newStages.forEach((stage) {
+        newStages!.forEach((stage) {
           switch (stage) {
             case MatrixAuthTypes.EMAIL:
               newSections.add(EmailStep());
@@ -122,7 +122,7 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  void onDidChange(_Props oldProps, _Props props) {
+  void onDidChange(_Props? oldProps, _Props props) {
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
         sections = sections
@@ -154,7 +154,7 @@ class SignupViewState extends State<SignupView> {
       this.setState(() {
         currentStep = this.currentStep - 1;
       });
-      pageController.animateToPage(
+      pageController!.animateToPage(
         this.currentStep,
         duration: Duration(milliseconds: 275),
         curve: Curves.easeInOut,
@@ -163,7 +163,7 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  bool onCheckStepValid(_Props props, PageController controller) {
+  bool? onCheckStepValid(_Props props, PageController? controller) {
     final currentSection = this.sections[this.currentStep];
 
     switch (currentSection.runtimeType) {
@@ -187,13 +187,13 @@ class SignupViewState extends State<SignupView> {
   }
 
   @protected
-  Function onCompleteStep(_Props props, PageController controller) {
+  Function? onCompleteStep(_Props props, PageController? controller) {
     final currentSection = this.sections[this.currentStep];
     final lastStep = (this.sections.length - 1) == this.currentStep;
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () async {
-          var valid = true;
+          bool? valid = true;
 
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
@@ -204,8 +204,8 @@ class SignupViewState extends State<SignupView> {
             await props.onLoginSSO();
           }
 
-          if (valid) {
-            controller.nextPage(
+          if (valid!) {
+            controller!.nextPage(
               duration: nextAnimationDuration,
               curve: Curves.ease,
             );
@@ -213,7 +213,7 @@ class SignupViewState extends State<SignupView> {
         };
       case UsernameStep:
         return () {
-          controller.nextPage(
+          controller!.nextPage(
             duration: nextAnimationDuration,
             curve: Curves.ease,
           );
@@ -229,19 +229,19 @@ class SignupViewState extends State<SignupView> {
             }
           }
 
-          return await controller.nextPage(
+          return await controller!.nextPage(
             duration: nextAnimationDuration,
             curve: Curves.ease,
           );
         };
       case CaptchaStep:
         return () async {
-          var result = false;
+          bool? result = false;
           if (!props.completed.contains(MatrixAuthTypes.RECAPTCHA)) {
             result = await props.onCreateUser(enableErrors: lastStep);
           }
-          if (!result) {
-            controller.nextPage(
+          if (!result!) {
+            controller!.nextPage(
               duration: nextAnimationDuration,
               curve: Curves.ease,
             );
@@ -249,12 +249,12 @@ class SignupViewState extends State<SignupView> {
         };
       case TermsStep:
         return () async {
-          var result = false;
+          bool? result = false;
           if (!props.completed.contains(MatrixAuthTypes.TERMS)) {
             result = await props.onCreateUser(enableErrors: lastStep);
           }
-          if (!result) {
-            return controller.nextPage(
+          if (!result!) {
+            return controller!.nextPage(
               duration: nextAnimationDuration,
               curve: Curves.ease,
             );
@@ -270,7 +270,7 @@ class SignupViewState extends State<SignupView> {
         };
       case EmailStep:
         return () async {
-          var result = false;
+          bool? result = false;
           final validEmail = await props.onSubmitEmail();
 
           // don't run anything if email is already in use
@@ -284,13 +284,13 @@ class SignupViewState extends State<SignupView> {
           }
 
           // otherwise, send to the verification holding page
-          if (!result) {
+          if (!result!) {
             if (lastStep) {
               return Navigator.pushNamed(context, '/verification');
             }
 
             // or continue if not the last step
-            controller.nextPage(
+            controller!.nextPage(
               duration: nextAnimationDuration,
               curve: Curves.ease,
             );
@@ -396,7 +396,7 @@ class SignupViewState extends State<SignupView> {
                                     !onCheckStepValid(
                                       props,
                                       this.pageController,
-                                    ),
+                                    )!,
                                 onPressed: onCompleteStep(
                                   props,
                                   this.pageController,
@@ -422,7 +422,7 @@ class SignupViewState extends State<SignupView> {
                                 children: [
                                   SmoothPageIndicator(
                                     controller:
-                                        pageController, // PageController
+                                        pageController!, // PageController
                                     count: sections.length,
                                     effect: WormEffect(
                                       spacing: 16,
@@ -482,29 +482,29 @@ class _Props extends Equatable {
   final Function onSelectHomeserver;
 
   _Props({
-    @required this.user,
-    @required this.hostname,
-    @required this.homeserver,
-    @required this.isHomeserverValid,
-    @required this.username,
-    @required this.isUsernameValid,
-    @required this.isUsernameAvailable,
-    @required this.password,
-    @required this.isPasswordValid,
-    @required this.email,
-    @required this.isEmailValid,
-    @required this.creating,
-    @required this.captcha,
-    @required this.agreement,
-    @required this.loading,
-    @required this.verificationNeeded,
-    @required this.interactiveAuths,
-    @required this.completed,
-    @required this.onLoginSSO,
-    @required this.onCreateUser,
-    @required this.onSubmitEmail,
-    @required this.onResetCredential,
-    @required this.onSelectHomeserver,
+    required this.user,
+    required this.hostname,
+    required this.homeserver,
+    required this.isHomeserverValid,
+    required this.username,
+    required this.isUsernameValid,
+    required this.isUsernameAvailable,
+    required this.password,
+    required this.isPasswordValid,
+    required this.email,
+    required this.isEmailValid,
+    required this.creating,
+    required this.captcha,
+    required this.agreement,
+    required this.loading,
+    required this.verificationNeeded,
+    required this.interactiveAuths,
+    required this.completed,
+    required this.onLoginSSO,
+    required this.onCreateUser,
+    required this.onSubmitEmail,
+    required this.onResetCredential,
+    required this.onSelectHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -537,7 +537,7 @@ class _Props extends Equatable {
         onLoginSSO: () async {
           return await store.dispatch(loginUserSSO());
         },
-        onCreateUser: ({bool enableErrors}) async {
+        onCreateUser: ({bool? enableErrors}) async {
           return await store.dispatch(createUser(enableErrors: enableErrors));
         },
         onSelectHomeserver: (String hostname) async {

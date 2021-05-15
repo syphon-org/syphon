@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 import 'dart:io';
 
@@ -16,15 +16,15 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class Cache {
   // encryption references (in memory only)
-  static String ivKey;
-  static String ivKeyNext;
-  static String cryptKey;
+  static String? ivKey;
+  static String? ivKeyNext;
+  static String? cryptKey;
 
   // hot cachee refrences
-  static Database cacheMain;
+  static Database? cacheMain;
 
   // inital store caches for reload
-  static Map<String, Map> cacheStores = {};
+  static Map<String, Map?> cacheStores = {};
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
@@ -48,7 +48,7 @@ class Cache {
  * 
  * (needs cold storage extracted as it's own entity)
  */
-Future<Database> initCache() async {
+Future<Database?> initCache() async {
   // Configure cache encryption/decryption instance
   Cache.ivKey = await loadIV();
   Cache.ivKeyNext = await loadIVNext();
@@ -91,15 +91,15 @@ Future<Database> initCache() async {
 }
 
 // // Closes and saves storage
-void closeCache(Database cache) async {
+void closeCache(Database? cache) async {
   if (cache != null) {
     cache.close();
   }
 }
 
-Future<void> deleteCache({Database cache}) async {
+Future<void> deleteCache({Database? cache}) async {
   try {
-    var cacheFactory;
+    late var cacheFactory;
     var cachePath = '${Cache.cacheKeyMain}.db';
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -130,7 +130,7 @@ String generateKey() {
   return Key.fromSecureRandom(32).base64;
 }
 
-Future<void> saveIV(String iv) async {
+Future<void> saveIV(String? iv) async {
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
     return await FlutterSecureStorage().write(
@@ -143,7 +143,7 @@ Future<void> saveIV(String iv) async {
   try {
     final directory = await getApplicationSupportDirectory();
     return await File(join(directory.path, Cache.ivLocation)).create()
-      ..writeAsString(iv, flush: true);
+      ..writeAsString(iv!, flush: true);
   } catch (error) {
     printError('[saveIV] $error');
   }
@@ -174,7 +174,7 @@ Future<String> loadIV() async {
   return ivStored == null ? generateIV() : ivStored;
 }
 
-Future<void> saveIVNext(String iv) async {
+Future<void> saveIVNext(String? iv) async {
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
     return await FlutterSecureStorage().write(
@@ -187,7 +187,7 @@ Future<void> saveIVNext(String iv) async {
   try {
     final directory = await getApplicationSupportDirectory();
     return await File(join(directory.path, Cache.ivLocationNext)).create()
-      ..writeAsString(iv, flush: true);
+      ..writeAsString(iv!, flush: true);
   } catch (error) {
     printError('[saveIVNext] $error');
   }
@@ -224,7 +224,7 @@ Future<String> loadIVNext() async {
   return ivStored == null ? generateIV() : ivStored;
 }
 
-Future<String> loadKey() async {
+Future<String?> loadKey() async {
   final location = Cache.keyLocation;
   var key;
 

@@ -20,7 +20,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class PrivacyPreferences extends StatelessWidget {
-  PrivacyPreferences({Key key}) : super(key: key);
+  PrivacyPreferences({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -152,7 +152,7 @@ class PrivacyPreferences extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Switch(
-                              value: props.readReceipts,
+                              value: props.readReceipts!,
                               onChanged: (enterSend) =>
                                   props.onToggleReadReceipts(),
                             ),
@@ -168,7 +168,7 @@ class PrivacyPreferences extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Switch(
-                              value: props.typingIndicators,
+                              value: props.typingIndicators!,
                               onChanged: (enterSend) =>
                                   props.onToggleTypingIndicators(),
                             ),
@@ -192,7 +192,7 @@ class PrivacyPreferences extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: props.onImportDeviceKey,
+                              onTap: props.onImportDeviceKey as void Function()?,
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Import Keys',
@@ -232,8 +232,8 @@ class PrivacyPreferences extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final bool typingIndicators;
-  final bool readReceipts;
+  final bool? typingIndicators;
+  final bool? readReceipts;
 
   final Function onToggleTypingIndicators;
   final Function onToggleReadReceipts;
@@ -243,18 +243,18 @@ class Props extends Equatable {
   final Function onDisabled;
 
   Props({
-    @required this.onDisabled,
-    @required this.typingIndicators,
-    @required this.readReceipts,
-    @required this.onToggleTypingIndicators,
-    @required this.onToggleReadReceipts,
-    @required this.onExportDeviceKey,
-    @required this.onImportDeviceKey,
-    @required this.onDeleteDeviceKey,
+    required this.onDisabled,
+    required this.typingIndicators,
+    required this.readReceipts,
+    required this.onToggleTypingIndicators,
+    required this.onToggleReadReceipts,
+    required this.onExportDeviceKey,
+    required this.onImportDeviceKey,
+    required this.onDeleteDeviceKey,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         typingIndicators,
         readReceipts,
       ];
@@ -320,7 +320,7 @@ class Props extends Equatable {
                 TextButton(
                   child: Text(
                     Strings.buttonDeleteKeys,
-                    style: Theme.of(context).textTheme.subtitle1.copyWith(
+                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
                           color: Colors.redAccent,
                         ),
                   ),

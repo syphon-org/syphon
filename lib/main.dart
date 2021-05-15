@@ -39,7 +39,7 @@ void main() async {
   final cache = await initCache();
 
   // init cold storage and load backup cache
-  final storage = await initStorage();
+  final storage = await (initStorage() as FutureOr<Database>);
 
   // init redux store
   final store = await initStore(cache, storage);
@@ -49,7 +49,7 @@ void main() async {
 }
 
 class Syphon extends StatefulWidget {
-  final Database cache;
+  final Database? cache;
   final Database storage;
   final Store<AppState> store;
 
@@ -68,13 +68,13 @@ class Syphon extends StatefulWidget {
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  final Database cache;
+  final Database? cache;
   final Database storage;
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
   Widget defaultHome = Home();
-  StreamSubscription alertsListener;
+  StreamSubscription? alertsListener;
 
   SyphonState(
     this.store,
@@ -137,7 +137,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @protected
   void onMounted() {
     // init auth listener
-    store.state.authStore.onAuthStateChanged.listen((user) {
+    store.state.authStore.onAuthStateChanged!.listen((user) {
       if (user == null && defaultHome.runtimeType == Home) {
         defaultHome = Intro();
         NavigationService.clearTo('/intro', context);

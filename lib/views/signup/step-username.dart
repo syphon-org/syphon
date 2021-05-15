@@ -25,15 +25,15 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class UsernameStep extends StatefulWidget {
-  const UsernameStep({Key key}) : super(key: key);
+  const UsernameStep({Key? key}) : super(key: key);
 
   UsernameStepState createState() => UsernameStepState();
 }
 
 class UsernameStepState extends State<UsernameStep> {
-  UsernameStepState({Key key});
+  UsernameStepState({Key? key});
 
-  Timer typingTimeout;
+  Timer? typingTimeout;
   final usernameController = TextEditingController();
 
   @override
@@ -145,7 +145,7 @@ class UsernameStepState extends State<UsernameStep> {
 
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
-                        typingTimeout.cancel();
+                        typingTimeout!.cancel();
                         this.setState(() {
                           typingTimeout = null;
                         });
@@ -198,13 +198,13 @@ class _Props extends Equatable {
   final Function onCheckUsernameAvailability;
 
   _Props({
-    @required this.username,
-    @required this.fullUserId,
-    @required this.isUsernameValid,
-    @required this.isUsernameAvailable,
-    @required this.loading,
-    @required this.onSetUsername,
-    @required this.onCheckUsernameAvailability,
+    required this.username,
+    required this.fullUserId,
+    required this.isUsernameValid,
+    required this.isUsernameAvailable,
+    required this.loading,
+    required this.onSetUsername,
+    required this.onCheckUsernameAvailability,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -219,7 +219,7 @@ class _Props extends Equatable {
         onCheckUsernameAvailability: () {
           store.dispatch(checkUsernameAvailability());
         },
-        onSetUsername: ({String username}) {
+        onSetUsername: ({String? username}) {
           if (username != null) {
             store.dispatch(setUsername(username: username));
           } else {

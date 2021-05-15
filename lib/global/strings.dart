@@ -172,7 +172,7 @@ class Strings {
       'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
-  static String formatUsernameHint({String homeserver, String username}) {
+  static String formatUsernameHint({required String homeserver, String? username}) {
     final usernameFormatted =
         username != null && username.length > 0 ? username : 'username';
     final alias = homeserver.length != 0

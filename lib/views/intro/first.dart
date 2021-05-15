@@ -11,9 +11,9 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
 class FirstSection extends StatelessWidget {
-  FirstSection({Key key, this.title}) : super(key: key);
+  FirstSection({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {

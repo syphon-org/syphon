@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonOutline extends StatelessWidget {
   ButtonOutline({
-    Key key,
+    Key? key,
     this.text,
     this.loading = false,
     this.disabled = false,
@@ -19,11 +19,11 @@ class ButtonOutline extends StatelessWidget {
 
   final bool loading;
   final bool disabled;
-  final double width;
-  final double height;
-  final String text;
-  final Widget child;
-  final Function onPressed;
+  final double? width;
+  final double? height;
+  final String? text;
+  final Widget? child;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -35,13 +35,13 @@ class ButtonOutline extends StatelessWidget {
         ),
         child: TextButton(
           style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) =>
                   states.contains(MaterialState.disabled)
                       ? Colors.grey[300]
                       : Theme.of(context).primaryColor,
             ),
-            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) =>
                   states.contains(MaterialState.disabled) ? Colors.grey : null,
             ),
@@ -51,7 +51,7 @@ class ButtonOutline extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: disabled ? null : this.onPressed,
+          onPressed: disabled ? null : this.onPressed as void Function()?,
           child: this.loading
               ? Container(
                   constraints: BoxConstraints(
@@ -67,9 +67,9 @@ class ButtonOutline extends StatelessWidget {
                   ),
                 )
               : (child != null
-                  ? child
+                  ? child!
                   : Text(
-                      this.text,
+                      this.text!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w100,

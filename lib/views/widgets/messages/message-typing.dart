@@ -11,14 +11,14 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class MessageTypingWidget extends StatefulWidget {
-  final bool typing;
-  final List<String> usersTyping;
-  final Map<String, User> roomUsers;
-  final String selectedMessageId;
-  final Function onPressAvatar;
+  final bool? typing;
+  final List<String>? usersTyping;
+  final Map<String?, User?>? roomUsers;
+  final String? selectedMessageId;
+  final Function? onPressAvatar;
 
   MessageTypingWidget({
-    Key key,
+    Key? key,
     this.typing,
     this.usersTyping,
     this.roomUsers,
@@ -40,13 +40,13 @@ class MessageTypingState extends State<MessageTypingWidget>
   double fullSize = 1;
 
   @protected
-  wrapAnimation({Widget animatedWidget, int milliseconds}) =>
+  wrapAnimation({Widget? animatedWidget, int? milliseconds}) =>
       TweenAnimationBuilder(
-        tween: Tween<double>(begin: 0, end: widget.typing ? 1 : 0),
+        tween: Tween<double>(begin: 0, end: widget.typing! ? 1 : 0),
         duration: Duration(milliseconds: 250),
         curve: Curves.easeInOut,
         child: animatedWidget,
-        builder: (BuildContext context, double size, Widget child) =>
+        builder: (BuildContext context, double size, Widget? child) =>
             GestureDetector(
           onTap: () => setState(() {
             fullSize = fullSize == 1 ? 0.0 : 1;
@@ -85,9 +85,9 @@ class MessageTypingState extends State<MessageTypingWidget>
       opacity = widget.selectedMessageId != null ? 0.5 : 1.0;
     }
 
-    if (widget.usersTyping.length > 0) {
-      final usernamesTyping = widget.usersTyping;
-      userTyping = widget.roomUsers[usernamesTyping[0]] ?? User();
+    if (widget.usersTyping!.length > 0) {
+      final usernamesTyping = widget.usersTyping!;
+      userTyping = widget.roomUsers![usernamesTyping[0]] ?? User();
     }
 
     return Opacity(
@@ -117,7 +117,7 @@ class MessageTypingState extends State<MessageTypingWidget>
                         onTap: () {
                           if (widget.onPressAvatar != null) {
                             HapticFeedback.lightImpact();
-                            widget.onPressAvatar(userId: userTyping.userId);
+                            widget.onPressAvatar!(userId: userTyping.userId);
                           }
                         },
                         child: Container(

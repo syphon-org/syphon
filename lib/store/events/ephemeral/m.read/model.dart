@@ -5,8 +5,8 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class ReadReceipt {
-  final int latestRead;
-  final Map<String, int> userReads; // UserId -> timestamp
+  final int? latestRead;
+  final Map<String, int>? userReads; // UserId -> timestamp
 
   const ReadReceipt({
     this.latestRead = 0,

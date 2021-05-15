@@ -27,19 +27,19 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key key}) : super(key: key);
+  const ProfileView({Key? key}) : super(key: key);
 
   @override
   ProfileViewState createState() => ProfileViewState();
 }
 
 class ProfileViewState extends State<ProfileView> {
-  ProfileViewState({Key key}) : super();
+  ProfileViewState({Key? key}) : super();
 
-  File avatarFileNew;
+  File? avatarFileNew;
 
-  String userIdNew;
-  String displayNameNew;
+  String? userIdNew;
+  String? displayNameNew;
 
   final userIdController = TextEditingController();
   final displayNameController = TextEditingController();
@@ -48,19 +48,19 @@ class ProfileViewState extends State<ProfileView> {
 
   onMounted(_Props props) {
     displayNameController.value = TextEditingValue(
-      text: props.user.displayName,
+      text: props.user.displayName!,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: props.user.displayName.length,
+          offset: props.user.displayName!.length,
         ),
       ),
     );
 
     userIdController.value = TextEditingValue(
-      text: props.user.userId,
+      text: props.user.userId!,
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: props.user.userId.length,
+          offset: props.user.userId!.length,
         ),
       ),
     );
@@ -75,7 +75,7 @@ class ProfileViewState extends State<ProfileView> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
-        onSetNewAvatar: ({File image}) {
+        onSetNewAvatar: ({File? image}) {
           this.setState(() {
             avatarFileNew = image;
           });
@@ -108,7 +108,7 @@ class ProfileViewState extends State<ProfileView> {
           avatarWidget = ClipRRect(
             borderRadius: BorderRadius.circular(imageSize),
             child: Image.file(
-              this.avatarFileNew ?? props.user.avatarUri,
+              this.avatarFileNew ?? props.user.avatarUri as File,
               width: imageSize,
               height: imageSize,
               fit: BoxFit.cover,
@@ -307,10 +307,10 @@ class _Props extends Equatable {
   final Function onSaveProfile;
 
   _Props({
-    @required this.user,
-    @required this.theme,
-    @required this.loading,
-    @required this.onSaveProfile,
+    required this.user,
+    required this.theme,
+    required this.loading,
+    required this.onSaveProfile,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -318,9 +318,9 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
-          File avatarFileNew,
-          String userIdNew,
-          String displayNameNew,
+          File? avatarFileNew,
+          String? userIdNew,
+          String? displayNameNew,
         }) async {
           final currentUser = store.state.authStore.user;
 

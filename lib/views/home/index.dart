@@ -40,20 +40,20 @@ import 'package:syphon/views/widgets/containers/ring-actions.dart';
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
 class Home extends StatefulWidget {
-  const Home({Key key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   @override
   HomeViewState createState() => HomeViewState();
 }
 
 class HomeViewState extends State<Home> {
-  HomeViewState({Key key}) : super();
+  HomeViewState({Key? key}) : super();
 
   final GlobalKey<FabCircularMenuState> fabKey =
       GlobalKey<FabCircularMenuState>();
 
-  Room selectedRoom;
-  Map<String, Color> roomColorDefaults;
+  Room? selectedRoom;
+  late Map<String?, Color?> roomColorDefaults;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  onToggleRoomOptions({Room room}) {
+  onToggleRoomOptions({Room? room}) {
     this.setState(() {
       selectedRoom = room;
     });
@@ -76,7 +76,7 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext context, _Props props}) => AppBar(
+  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
         backgroundColor: Colors.grey[500],
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -102,11 +102,11 @@ class HomeViewState extends State<Home> {
             color: Colors.white,
             onPressed: () {
               Navigator.pushNamed(
-                context,
+                context!,
                 '/home/chat/settings',
                 arguments: ChatSettingsArguments(
-                  roomId: selectedRoom.id,
-                  title: selectedRoom.name,
+                  roomId: selectedRoom!.id,
+                  title: selectedRoom!.name,
                 ),
               );
             },
@@ -117,7 +117,7 @@ class HomeViewState extends State<Home> {
             tooltip: 'Archive Room',
             color: Colors.white,
             onPressed: () async {
-              await props.onArchiveRoom(room: this.selectedRoom);
+              await props!.onArchiveRoom(room: this.selectedRoom);
               this.setState(() {
                 selectedRoom = null;
               });
@@ -131,7 +131,7 @@ class HomeViewState extends State<Home> {
               tooltip: 'Leave Chat',
               color: Colors.white,
               onPressed: () async {
-                await props.onLeaveChat(room: this.selectedRoom);
+                await props!.onLeaveChat(room: this.selectedRoom);
                 this.setState(() {
                   selectedRoom = null;
                 });
@@ -139,14 +139,14 @@ class HomeViewState extends State<Home> {
             ),
           ),
           Visibility(
-            visible: this.selectedRoom.direct,
+            visible: this.selectedRoom!.direct!,
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
               tooltip: 'Delete Chat',
               color: Colors.white,
               onPressed: () async {
-                await props.onDeleteChat(room: this.selectedRoom);
+                await props!.onDeleteChat(room: this.selectedRoom);
                 this.setState(() {
                   selectedRoom = null;
                 });
@@ -164,7 +164,7 @@ class HomeViewState extends State<Home> {
       );
 
   @protected
-  Widget buildAppBar({BuildContext context, _Props props}) => AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -183,7 +183,7 @@ class HomeViewState extends State<Home> {
             ),
             Text(
               Values.appName,
-              style: Theme.of(context).textTheme.headline6.copyWith(
+              style: Theme.of(context).textTheme.headline6!.copyWith(
                     fontWeight: FontWeight.w400,
                     color: Colors.white,
                   ),
@@ -296,7 +296,7 @@ class HomeViewState extends State<Home> {
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
         if (roomSettings != null) {
-          primaryColor = Color(roomSettings.primaryColor);
+          primaryColor = Color(roomSettings.primaryColor!);
         } else if (roomColorDefaults.containsKey(room.id)) {
           primaryColor = roomColorDefaults[room.id];
         } else {
@@ -309,7 +309,7 @@ class HomeViewState extends State<Home> {
 
         // highlight selected rooms if necessary
         if (selectedRoom != null) {
-          if (selectedRoom.id != room.id) {
+          if (selectedRoom!.id != room.id) {
             backgroundColor = Theme.of(context).scaffoldBackgroundColor;
           } else {
             backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
@@ -323,20 +323,20 @@ class HomeViewState extends State<Home> {
 
         if (messages != null && messages.isNotEmpty) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted &&
-              messageLatest.body.isEmpty) {
+          if (messageLatest!.type == EventTypes.encrypted &&
+              messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
-          if (messageLatest.body == null || messageLatest.body.isEmpty) {
+          if (messageLatest.body == null || messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
           // display message as being 'unread'
-          if (room.lastRead < messageLatest.timestamp) {
+          if (room.lastRead! < messageLatest.timestamp!) {
             messagesNew = true;
             textStyle = textStyle.copyWith(
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyText1!.color,
               fontWeight: FontWeight.w500,
             );
           }
@@ -364,7 +364,7 @@ class HomeViewState extends State<Home> {
               color: backgroundColor, // if selected, color seperately
             ),
             padding: EdgeInsets.symmetric(
-              vertical: Theme.of(context).textTheme.subtitle1.fontSize,
+              vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
             ).add(Dimensions.appPaddingHorizontal),
             child: Flex(
               direction: Axis.horizontal,
@@ -382,7 +382,7 @@ class HomeViewState extends State<Home> {
                         background: primaryColor,
                       ),
                       Visibility(
-                        visible: !room.encryptionEnabled,
+                        visible: !room.encryptionEnabled!,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -404,7 +404,7 @@ class HomeViewState extends State<Home> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.invite!,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -441,7 +441,7 @@ class HomeViewState extends State<Home> {
                       Visibility(
                         visible: props.roomTypeBadgesEnabled &&
                             room.type == 'group' &&
-                            !room.invite,
+                            !room.invite!,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -463,7 +463,7 @@ class HomeViewState extends State<Home> {
                       Visibility(
                         visible: props.roomTypeBadgesEnabled &&
                             room.type == 'public' &&
-                            !room.invite,
+                            !room.invite!,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -499,7 +499,7 @@ class HomeViewState extends State<Home> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              room.name,
+                              room.name!,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
@@ -516,7 +516,7 @@ class HomeViewState extends State<Home> {
                           preview,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.caption.merge(
+                          style: Theme.of(context).textTheme.caption!.merge(
                                 textStyle,
                               ),
                         ),
@@ -550,7 +550,7 @@ class HomeViewState extends State<Home> {
           }
 
           return Scaffold(
-            appBar: currentAppBar,
+            appBar: currentAppBar as PreferredSizeWidget?,
             floatingActionButton: ActionRing(fabKey: fabKey),
             body: Align(
               alignment: Alignment.topCenter,
@@ -586,14 +586,14 @@ class HomeViewState extends State<Home> {
 
 class _Props extends Equatable {
   final List<Room> rooms;
-  final bool offline;
+  final bool? offline;
   final bool syncing;
   final bool unauthed;
   final bool roomTypeBadgesEnabled;
   final User currentUser;
   final ThemeType theme;
-  final Map<String, ChatSetting> chatSettings;
-  final Map<String, List<Message>> messages;
+  final Map<String?, ChatSetting> chatSettings;
+  final Map<String?, List<Message?>> messages;
 
   final Function onDebug;
   final Function onLeaveChat;
@@ -604,26 +604,26 @@ class _Props extends Equatable {
   final Function onFetchSyncForced;
 
   _Props({
-    @required this.rooms,
-    @required this.theme,
-    @required this.offline,
-    @required this.syncing,
-    @required this.unauthed,
-    @required this.messages,
-    @required this.currentUser,
-    @required this.chatSettings,
-    @required this.roomTypeBadgesEnabled,
-    @required this.onDebug,
-    @required this.onLeaveChat,
-    @required this.onDeleteChat,
-    @required this.onSelectHelp,
-    @required this.onArchiveRoom,
-    @required this.onMarkAllRead,
-    @required this.onFetchSyncForced,
+    required this.rooms,
+    required this.theme,
+    required this.offline,
+    required this.syncing,
+    required this.unauthed,
+    required this.messages,
+    required this.currentUser,
+    required this.chatSettings,
+    required this.roomTypeBadgesEnabled,
+    required this.onDebug,
+    required this.onLeaveChat,
+    required this.onDeleteChat,
+    required this.onSelectHelp,
+    required this.onArchiveRoom,
+    required this.onMarkAllRead,
+    required this.onFetchSyncForced,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         rooms,
         theme,
         syncing,
@@ -658,12 +658,12 @@ class _Props extends Equatable {
               .compareTo(Duration(seconds: 90));
 
           // syncing for the first time
-          if (syncing && !synced) {
+          if (syncing && !synced!) {
             return true;
           }
 
           // syncing for the first time since going offline
-          if (syncing && offline) {
+          if (syncing && offline!) {
             return true;
           }
 
@@ -673,7 +673,7 @@ class _Props extends Equatable {
           }
 
           // syncing for the first time in a while or restarting the app
-          if (syncing && (0 < isLastAttemptOld || backgrounded)) {
+          if (syncing && (0 < isLastAttemptOld || backgrounded!)) {
             return true;
           }
 
@@ -689,7 +689,7 @@ class _Props extends Equatable {
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
-        onArchiveRoom: ({Room room}) async {
+        onArchiveRoom: ({Room? room}) async {
           store.dispatch(archiveRoom(room: room));
         },
         onFetchSyncForced: () async {
@@ -698,12 +698,12 @@ class _Props extends Equatable {
           );
           return Future(() => true);
         },
-        onLeaveChat: ({Room room}) {
+        onLeaveChat: ({Room? room}) {
           return store.dispatch(
             leaveRoom(room: room),
           );
         },
-        onDeleteChat: ({Room room}) {
+        onDeleteChat: ({Room? room}) {
           return store.dispatch(
             removeRoom(room: room),
           );

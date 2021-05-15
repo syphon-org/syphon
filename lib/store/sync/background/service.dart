@@ -34,7 +34,7 @@ class BackgroundSync {
   static const service_id = 254;
   static const serviceTimeout = 55; // seconds
 
-  static Isolate backgroundIsolate;
+  static Isolate? backgroundIsolate;
 
   static Future<bool> init() async {
     try {
@@ -46,12 +46,12 @@ class BackgroundSync {
   }
 
   static void start({
-    String protocol,
-    String homeserver,
-    String accessToken,
-    String lastSince,
-    String currentUser,
-    Map<String, String> roomNames,
+    String? protocol,
+    String? homeserver,
+    String? accessToken,
+    String? lastSince,
+    String? currentUser,
+    Map<String, String?>? roomNames,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
@@ -114,12 +114,12 @@ class BackgroundSync {
  */
 void notificationSyncIsolate() async {
   try {
-    String protocol;
-    String homeserver;
-    String accessToken;
-    String lastSince;
-    String userId;
-    Map<String, dynamic> roomNames;
+    String? protocol;
+    String? homeserver;
+    String? accessToken;
+    String? lastSince;
+    String? userId;
+    Map<String, dynamic>? roomNames;
 
     try {
       final secureStorage = FlutterSecureStorage();
@@ -131,7 +131,7 @@ void notificationSyncIsolate() async {
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
 
       roomNames = jsonDecode(
-        await secureStorage.read(key: Cache.roomNamesKey),
+        await (secureStorage.read(key: Cache.roomNamesKey) as FutureOr<String>),
       );
     } catch (error) {
       print('[notificationSyncIsolate] $error');
@@ -175,8 +175,8 @@ void notificationSyncIsolate() async {
  *  Save Full Sync
  */
 FutureOr<dynamic> syncLoop({
-  Map params,
-  FlutterLocalNotificationsPlugin pluginInstance,
+  required Map params,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   try {
     final protocol = params['protocol'];
@@ -184,7 +184,7 @@ FutureOr<dynamic> syncLoop({
     final accessToken = params['accessToken'];
     final lastSince = params['lastSince'];
     final userId = params['userId'] ?? params['currentUser'];
-    final Map<String, dynamic> roomNames = params['roomNames'];
+    final Map<String, dynamic>? roomNames = params['roomNames'];
 
     if (accessToken == null || lastSince == null) {
       return;
@@ -238,31 +238,31 @@ FutureOr<dynamic> syncLoop({
       final messagesNew = room.messagesNew;
 
       if (messagesNew.length == 1) {
-        final String messageSender = messagesNew[0].sender;
+        final String? messageSender = messagesNew[0].sender;
         final String formattedSender = trimAlias(messageSender);
 
         if (!formattedSender.contains(userId)) {
-          if (room.direct) {
+          if (room.direct!) {
             return showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender sent a new message.',
-              pluginInstance: pluginInstance,
+              pluginInstance: pluginInstance!,
             );
           }
 
-          if (room.invite) {
+          if (room.invite!) {
             return showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender invited you to chat',
-              pluginInstance: pluginInstance,
+              pluginInstance: pluginInstance!,
             );
           }
 
-          final roomName = roomNames[roomId];
+          final roomName = roomNames![roomId];
           return showMessageNotification(
             messageHash: Random.secure().nextInt(20000),
             body: '$formattedSender sent a new message in $roomName',
-            pluginInstance: pluginInstance,
+            pluginInstance: pluginInstance!,
           );
         }
       }

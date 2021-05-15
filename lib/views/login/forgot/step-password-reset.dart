@@ -17,13 +17,13 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class PasswordResetStep extends StatefulWidget {
-  const PasswordResetStep({Key key}) : super(key: key);
+  const PasswordResetStep({Key? key}) : super(key: key);
 
   PasswordResetStepState createState() => PasswordResetStepState();
 }
 
 class PasswordResetStepState extends State<PasswordResetStep> {
-  PasswordResetStepState({Key key});
+  PasswordResetStepState({Key? key});
 
   bool visibility = false;
 
@@ -213,11 +213,11 @@ class _Props extends Equatable {
   final Function onChangePasswordConfirm;
 
   _Props({
-    @required this.password,
-    @required this.passwordConfirm,
-    @required this.isPasswordValid,
-    @required this.onChangePassword,
-    @required this.onChangePasswordConfirm,
+    required this.password,
+    required this.passwordConfirm,
+    required this.isPasswordValid,
+    required this.onChangePassword,
+    required this.onChangePasswordConfirm,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

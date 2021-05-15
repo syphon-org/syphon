@@ -24,7 +24,7 @@ import 'package:syphon/store/user/storage.dart';
 
 class Storage {
   // cold storage references
-  static Database main;
+  static Database? main;
 
   // preloaded cold storage data
   static Map<String, dynamic> storageData = {};
@@ -33,9 +33,9 @@ class Storage {
   static const mainLocation = '${Values.appNameLabel}-main-storage.db';
 }
 
-Future<Database> initStorage() async {
+Future<Database?> initStorage() async {
   try {
-    DatabaseFactory storageFactory;
+    DatabaseFactory? storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       // always open cold storage as sqflite
@@ -57,7 +57,7 @@ Future<Database> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: Cache.cryptKey);
+    final codec = getEncryptSembastCodec(password: Cache.cryptKey!);
 
     Storage.main = await storageFactory.openDatabase(
       Storage.mainLocation,
@@ -74,13 +74,13 @@ Future<Database> initStorage() async {
 // // Closes and saves storage
 void closeStorage() async {
   if (Storage.main != null) {
-    Storage.main.close();
+    Storage.main!.close();
   }
 }
 
 Future<void> deleteStorage() async {
   try {
-    DatabaseFactory storageFactory;
+    late DatabaseFactory storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       storageFactory = getDatabaseFactorySqflite(
@@ -117,16 +117,16 @@ Future<void> deleteStorage() async {
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   try {
     final auth = await loadAuth(storage: storage);
-    final rooms = await loadRooms(storage: storage);
+    final rooms = await (loadRooms(storage: storage) as FutureOr<Map<String, Room>>);
     final users = await loadUsers(storage: storage);
     final media = await loadMediaAll(storage: storage);
     final crypto = await loadCrypto(storage: storage);
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = Map();
+    Map<String?, List<Message>> messages = Map();
     Map<String, List<Reaction>> reactions = Map();
-    Map<String, Map<String, ReadReceipt>> receipts = Map();
+    Map<String?, Map<String, ReadReceipt>> receipts = Map();
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(

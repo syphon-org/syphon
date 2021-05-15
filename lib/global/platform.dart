@@ -21,10 +21,10 @@ import 'package:syphon/store/sync/background/service.dart';
 Future<void> initPlatformDependencies() async {
   // disable debugPrint when in release mode
   if (kReleaseMode) {
-    debugPrint = (String message, {int wrapWidth}) {};
-    printDebug = (String message, {String title}) {};
-    printInfo = (String message, {String title}) {};
-    printError = (String message, {String title}) {};
+    debugPrint = (String? message, {int? wrapWidth}) {};
+    printDebug = (String message, {String? title}) {};
+    printInfo = (String message, {String? title}) {};
+    printError = (String message, {String? title}) {};
   }
 
   // init platform overrides for compatability with dart libs

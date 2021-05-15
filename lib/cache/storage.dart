@@ -12,7 +12,7 @@ import 'package:syphon/store/rooms/state.dart';
 import 'package:syphon/store/sync/state.dart';
 
 class CacheStorage implements StorageEngine {
-  final Database cache;
+  final Database? cache;
 
   CacheStorage({this.cache});
 
@@ -31,7 +31,7 @@ class CacheStorage implements StorageEngine {
         // Fetch from database
         final table = StoreRef<String, String>.main();
         final record = table.record(store.runtimeType.toString());
-        final jsonEncrypted = await record.get(cache);
+        final jsonEncrypted = await record.get(cache!);
 
         // Decrypt from database
         final jsonDecoded = await compute(
@@ -58,7 +58,7 @@ class CacheStorage implements StorageEngine {
   }
 
   @override
-  Future<void> save(Uint8List data) {
+  Future<void> save(Uint8List? data) {
     return null;
   }
 }

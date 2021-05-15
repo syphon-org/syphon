@@ -15,7 +15,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ProfilePreview extends StatelessWidget {
-  ProfilePreview({Key key}) : super(key: key);
+  ProfilePreview({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -58,20 +58,20 @@ class ProfilePreview extends StatelessWidget {
 class _Props extends Equatable {
   final User user;
   final bool loading;
-  final String userId;
+  final String? userId;
   final String username;
-  final String avatarUri;
+  final String? avatarUri;
 
   _Props({
-    @required this.user,
-    @required this.userId,
-    @required this.loading,
-    @required this.username,
-    @required this.avatarUri,
+    required this.user,
+    required this.userId,
+    required this.loading,
+    required this.username,
+    required this.avatarUri,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         user,
         userId,
         loading,

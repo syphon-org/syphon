@@ -26,9 +26,9 @@ class DevicesView extends StatefulWidget {
 }
 
 class DeviceViewState extends State<DevicesView> {
-  DeviceViewState({Key key}) : super();
+  DeviceViewState({Key? key}) : super();
 
-  List<Device> selectedDevices;
+  List<Device?>? selectedDevices;
 
   @override
   void didChangeDependencies() {
@@ -44,7 +44,7 @@ class DeviceViewState extends State<DevicesView> {
   }
 
   @protected
-  onToggleAllDevices({List<Device> devices}) {
+  onToggleAllDevices({required List<Device> devices}) {
     var newSelectedDevices = this.selectedDevices ?? List<Device>();
 
     if (newSelectedDevices.length == devices.length) {
@@ -59,7 +59,7 @@ class DeviceViewState extends State<DevicesView> {
   }
 
   @protected
-  onToggleModifyDevice({Device device}) {
+  onToggleModifyDevice({Device? device}) {
     var newSelectedDevices = this.selectedDevices ?? List<Device>();
 
     if (newSelectedDevices.contains(device)) {
@@ -82,12 +82,12 @@ class DeviceViewState extends State<DevicesView> {
   }
 
   @protected
-  Widget buildDeviceOptionsBar({BuildContext context, Props props}) {
+  Widget buildDeviceOptionsBar({BuildContext? context, Props? props}) {
     var selfSelectedDevice;
 
     if (this.selectedDevices != null) {
-      selfSelectedDevice = this.selectedDevices.indexWhere(
-            (device) => device.deviceId == props.currentDeviceId,
+      selfSelectedDevice = this.selectedDevices!.indexWhere(
+            (device) => device!.deviceId == props!.currentDeviceId,
           );
     }
 
@@ -116,7 +116,7 @@ class DeviceViewState extends State<DevicesView> {
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Rename Device',
           color: Colors.white,
-          onPressed: this.selectedDevices.length != 1 ? null : () {},
+          onPressed: this.selectedDevices!.length != 1 ? null : () {},
         ),
         IconButton(
           icon: Icon(Icons.delete),
@@ -125,7 +125,7 @@ class DeviceViewState extends State<DevicesView> {
           color: Colors.white,
           onPressed: selfSelectedDevice != -1
               ? null
-              : () => props.onDeleteDevices(
+              : () => props!.onDeleteDevices(
                     context,
                     this.selectedDevices,
                     onComplete: () {},
@@ -136,18 +136,18 @@ class DeviceViewState extends State<DevicesView> {
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Select All',
           color: Colors.white,
-          onPressed: () => onToggleAllDevices(devices: props.devices),
+          onPressed: () => onToggleAllDevices(devices: props!.devices),
         ),
       ],
     );
   }
 
   @protected
-  Widget buildAppBar({BuildContext context, Props props}) {
+  Widget buildAppBar({BuildContext? context, Props? props}) {
     return AppBar(
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Navigator.pop(context, false),
+        onPressed: () => Navigator.pop(context!, false),
       ),
       title: Text(
         tr('title-view-devices'),
@@ -182,7 +182,7 @@ class DeviceViewState extends State<DevicesView> {
           }
 
           return Scaffold(
-            appBar: currentAppBar,
+            appBar: currentAppBar as PreferredSizeWidget?,
             body: Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Stack(
@@ -197,25 +197,25 @@ class DeviceViewState extends State<DevicesView> {
                     itemBuilder: (BuildContext context, int index) {
                       final device = props.devices[index];
 
-                      Color iconColor;
-                      Color backgroundColor;
+                      Color? iconColor;
+                      Color? backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
                       TextStyle textStyle = Theme.of(context)
                           .textTheme
-                          .caption
+                          .caption!
                           .copyWith(fontSize: 12);
                       bool isCurrentDevice =
                           props.currentDeviceId == device.deviceId;
 
-                      if (device.displayName.contains('Firefox') ||
-                          device.displayName.contains('Mac')) {
+                      if (device.displayName!.contains('Firefox') ||
+                          device.displayName!.contains('Mac')) {
                         deviceTypeIcon = Icons.laptop;
-                      } else if (device.displayName.contains('iOS')) {
+                      } else if (device.displayName!.contains('iOS')) {
                         deviceTypeIcon = Icons.phone_iphone;
                       }
 
                       if (this.selectedDevices != null &&
-                          this.selectedDevices.contains(device)) {
+                          this.selectedDevices!.contains(device)) {
                         backgroundColor = Colours.hashedColor(device.deviceId);
                         backgroundColor = Colors.grey[500];
                         textStyle = textStyle.copyWith(color: Colors.white);
@@ -262,12 +262,12 @@ class DeviceViewState extends State<DevicesView> {
                                 Column(
                                   children: <Widget>[
                                     Text(
-                                      device.displayName,
+                                      device.displayName!,
                                       textAlign: TextAlign.center,
                                       style: textStyle,
                                     ),
                                     Text(
-                                      device.deviceId,
+                                      device.deviceId!,
                                       overflow: TextOverflow.ellipsis,
                                       style: textStyle,
                                     ),
@@ -295,20 +295,20 @@ class DeviceViewState extends State<DevicesView> {
 
 class Props extends Equatable {
   final bool loading;
-  final String session;
+  final String? session;
   final List<Device> devices;
-  final String currentDeviceId;
+  final String? currentDeviceId;
 
   final Function onFetchDevices;
   final Function onDeleteDevices;
 
   Props({
-    @required this.loading,
-    @required this.devices,
-    @required this.session,
-    @required this.currentDeviceId,
-    @required this.onFetchDevices,
-    @required this.onDeleteDevices,
+    required this.loading,
+    required this.devices,
+    required this.session,
+    required this.currentDeviceId,
+    required this.onFetchDevices,
+    required this.onDeleteDevices,
   });
 
   @override
@@ -325,11 +325,11 @@ class Props extends Equatable {
         onDeleteDevices: (
           BuildContext context,
           List<Device> devices, {
-          Function onComplete,
+          Function? onComplete,
         }) async {
           if (devices.isEmpty) return;
 
-          final List<String> deviceIds =
+          final List<String?> deviceIds =
               devices.map((device) => device.deviceId).toList();
 
           if (devices.length == 1) {
@@ -344,7 +344,7 @@ class Props extends Equatable {
               builder: (context) => DialogConfirmPassword(
                 key: Key(authSession),
                 onConfirm: () async {
-                  final List<String> deviceIds =
+                  final List<String?> deviceIds =
                       devices.map((device) => device.deviceId).toList();
 
                   if (devices.length == 1) {

@@ -26,8 +26,8 @@ class MediaStatus {
 }
 
 class UpdateMediaChecks {
-  final String mxcUri;
-  final String status;
+  final String? mxcUri;
+  final String? status;
 
   UpdateMediaChecks({
     this.mxcUri,
@@ -36,8 +36,8 @@ class UpdateMediaChecks {
 }
 
 class UpdateMediaCache {
-  final String mxcUri;
-  final Uint8List data;
+  final String? mxcUri;
+  final Uint8List? data;
 
   UpdateMediaCache({
     this.mxcUri,
@@ -46,13 +46,13 @@ class UpdateMediaCache {
 }
 
 ThunkAction<AppState> uploadMedia({
-  File localFile,
-  String mediaName = 'photo',
+  File? localFile,
+  String? mediaName = 'photo',
 }) {
   return (Store<AppState> store) async {
     try {
       // Extension handling
-      final String fileType = lookupMimeType(localFile.path);
+      final String fileType = lookupMimeType(localFile!.path)!;
       final String fileExtension = fileType.split('/')[1];
 
       // Setting up params for upload
@@ -88,7 +88,7 @@ ThunkAction<AppState> uploadMedia({
 }
 
 ThunkAction<AppState> fetchThumbnail(
-    {String mxcUri, double size, bool force = false}) {
+    {String? mxcUri, double? size, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
@@ -105,8 +105,8 @@ ThunkAction<AppState> fetchThumbnail(
       }
 
       // Noop if currently checking or failed
-      if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri] == MediaStatus.CHECKING ||
+      if (mediaChecks!.containsKey(mxcUri) &&
+          (mediaChecks[mxcUri!] == MediaStatus.CHECKING ||
               mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {
         return;
@@ -118,10 +118,10 @@ ThunkAction<AppState> fetchThumbnail(
       ));
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.main)) {
+      if (await checkMedia(mxcUri, storage: Storage.main!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.main,
+          storage: Storage.main!,
         );
 
         if (storedData != null) {
@@ -149,7 +149,7 @@ ThunkAction<AppState> fetchThumbnail(
       final bodyBytes = data['bodyBytes'];
 
       store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes));
-      saveMedia(mxcUri, bodyBytes, storage: Storage.main);
+      saveMedia(mxcUri, bodyBytes, storage: Storage.main!);
       store.dispatch(UpdateMediaChecks(
         mxcUri: mxcUri,
         status: MediaStatus.SUCCESS,

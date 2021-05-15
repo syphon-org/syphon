@@ -17,37 +17,37 @@ import 'package:syphon/store/index.dart';
 
 class ActionRing extends StatelessWidget {
   ActionRing({
-    Key key,
+    Key? key,
     this.fabKey,
   }) : super(key: key);
 
-  final GlobalKey<FabCircularMenuState> fabKey;
+  final GlobalKey<FabCircularMenuState>? fabKey;
 
   @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/search');
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/user/search');
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/create');
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/create/public');
   }
 
@@ -123,7 +123,7 @@ class Props extends Equatable {
   final ThemeType type;
 
   Props({
-    @required this.type,
+    required this.type,
   });
 
   @override

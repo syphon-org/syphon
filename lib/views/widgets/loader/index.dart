@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class Loader extends StatelessWidget {
   Loader({
-    Key key,
+    Key? key,
     this.loading = false,
   }) : super(key: key);
 

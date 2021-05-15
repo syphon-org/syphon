@@ -36,10 +36,10 @@ class UserStore extends Equatable {
       ];
 
   UserStore copyWith({
-    bool loading,
-    List<User> invites,
-    Map<String, User> users,
-    List<String> blocked,
+    bool? loading,
+    List<User>? invites,
+    Map<String, User>? users,
+    List<String>? blocked,
   }) =>
       UserStore(
         users: users ?? this.users,

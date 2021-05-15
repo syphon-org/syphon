@@ -6,10 +6,10 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Pusher extends Equatable {
-  final String key;
-  final String kind;
-  final String appId;
-  final String appDisplayName;
+  final String? key;
+  final String? kind;
+  final String? appId;
+  final String? appDisplayName;
 
   const Pusher({
     this.key,
@@ -19,7 +19,7 @@ class Pusher extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         key,
         kind,
         appId,

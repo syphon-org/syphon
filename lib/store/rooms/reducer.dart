@@ -11,7 +11,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(loading: action.loading);
 
     case SetRooms:
-      final Map<String, Room> rooms = Map.fromIterable(
+      final Map<String?, Room?> rooms = Map.fromIterable(
         action.rooms,
         key: (room) => room.id,
         value: (room) => room,
@@ -19,15 +19,15 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case SetRoom:
-      final rooms = Map<String, Room>.from(state.rooms);
+      final rooms = Map<String?, Room?>.from(state.rooms);
       rooms[action.room.id] = action.room;
       return state.copyWith(rooms: rooms);
 
     case UpdateRoom:
-      final rooms = Map<String, Room>.from(state.rooms);
+      final rooms = Map<String?, Room>.from(state.rooms);
 
       if (rooms[action.id] != null) {
-        rooms[action.id] = rooms[action.id].copyWith(
+        rooms[action.id] = rooms[action.id]!.copyWith(
           draft: action.draft,
           reply: action.reply,
           sending: action.sending,
@@ -44,19 +44,19 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case SaveOutboxMessage:
-      final rooms = Map<String, Room>.from(state.rooms);
-      final outbox = List<Message>.from(rooms[action.id].outbox);
+      final rooms = Map<String?, Room>.from(state.rooms);
+      final outbox = List<Message?>.from(rooms[action.id]!.outbox);
       if (action.tempId != null) {
-        outbox.retainWhere((element) => element.id != action.tempId);
+        outbox.retainWhere((element) => element!.id != action.tempId);
       }
       outbox.add(action.pendingMessage);
-      rooms[action.id] = rooms[action.id].copyWith(outbox: outbox);
+      rooms[action.id] = rooms[action.id]!.copyWith(outbox: outbox);
       return state.copyWith(rooms: rooms);
 
     case DeleteOutboxMessage:
       final message = action.message;
-      final rooms = Map<String, Room>.from(state.rooms);
-      final room = rooms[message.roomId];
+      final rooms = Map<String?, Room>.from(state.rooms);
+      final room = rooms[message.roomId]!;
       final outbox = List<Message>.from(room.outbox);
 
       outbox.removeWhere((m) => m.id == message.id);
@@ -64,8 +64,8 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case AddArchive:
-      final rooms = Map<String, Room>.from(state.rooms);
-      final room = rooms[action.roomId];
+      final rooms = Map<String?, Room>.from(state.rooms);
+      final room = rooms[action.roomId]!;
 
       rooms[action.roomId] = room.copyWith(hidden: true);
 

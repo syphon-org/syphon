@@ -15,7 +15,7 @@ List<User> friendlyUsers(AppState state) {
   final rooms = state.roomStore.rooms.values;
   final users = state.userStore.users;
   final userCurrent = state.authStore.user;
-  final roomsDirect = rooms.where((room) => room.direct);
+  final roomsDirect = rooms.where((room) => room.direct!);
   final roomUserIdsList = roomsDirect.map((room) => room.userIds);
   final roomDirectUserIdsAll = roomUserIdsList.expand((pair) => pair).toList();
   final roomDirectUserIds = roomDirectUserIdsAll
@@ -25,7 +25,7 @@ List<User> friendlyUsers(AppState state) {
   return List.from(roomsDirectUsers);
 }
 
-Map<String, User> messageUsers({AppState state, String roomId}) {
+Map<String?, User?> messageUsers({required AppState state, String? roomId}) {
   final messages = state.eventStore.messages[roomId] ?? [];
   return Map.fromIterable(
     messages,
@@ -37,7 +37,7 @@ Map<String, User> messageUsers({AppState state, String roomId}) {
 /*
  * Getters
  */
-String trimAlias(String alias) {
+String trimAlias(String? alias) {
   // If user has yet to save a displayName, format the userId to show like one
   return alias != null ? alias.split(':')[0].replaceAll('@', '') : '';
 }
@@ -50,7 +50,7 @@ String formatUsername(User user) {
   return user.displayName ?? trimAlias(user.userId ?? '');
 }
 
-String formatInitials(String fullword) {
+String formatInitials(String? fullword) {
   //  -> ?
   if (fullword == null || fullword.isEmpty) {
     return '?';
@@ -78,15 +78,15 @@ String formatInitials(String fullword) {
   return initials.toUpperCase();
 }
 
-List<User> roomUsers(AppState state, String roomId) {
-  final room = state.roomStore.rooms[roomId] ?? Room(id: roomId);
+List<User?> roomUsers(AppState state, String? roomId) {
+  final room = state.roomStore.rooms[roomId!] ?? Room(id: roomId);
   return room.userIds.map((userId) => state.userStore.users[userId]).toList();
 }
 
-List<User> searchUsersLocal(
+List<User?> searchUsersLocal(
   AppState state, {
-  String roomId,
-  String searchText = '',
+  String? roomId,
+  String? searchText = '',
 }) {
   var users = roomUsers(state, roomId);
   if (searchText == null || searchText.isEmpty) {
@@ -95,7 +95,7 @@ List<User> searchUsersLocal(
 
   return List.from(users.where(
     (user) =>
-        (user.displayName ?? '').contains(searchText) ||
+        (user!.displayName ?? '').contains(searchText) ||
         (user.userId ?? '').contains(searchText),
   ));
 }

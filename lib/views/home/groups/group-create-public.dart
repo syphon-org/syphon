@@ -29,19 +29,19 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 class CreateGroupPublicView extends StatefulWidget {
-  const CreateGroupPublicView({Key key}) : super(key: key);
+  const CreateGroupPublicView({Key? key}) : super(key: key);
 
   @override
   CreateGroupPublicState createState() => CreateGroupPublicState();
 }
 
 class CreateGroupPublicState extends State<CreateGroupPublicView> {
-  CreateGroupPublicState({Key key}) : super();
+  CreateGroupPublicState({Key? key}) : super();
 
-  File avatar;
-  String name;
-  String topic;
-  String alias;
+  File? avatar;
+  String? name;
+  String? topic;
+  String? alias;
 
   final aliasFocus = FocusNode();
   final topicFocus = FocusNode();
@@ -86,7 +86,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
-        onSetNewAvatar: ({File image}) {
+        onSetNewAvatar: ({File? image}) {
           this.setState(() {
             avatar = image;
           });
@@ -116,7 +116,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
             ),
           );
 
-          if (this.name != null && this.name.isNotEmpty) {
+          if (this.name != null && this.name!.isNotEmpty) {
             avatarWidget = CircleAvatar(
               backgroundColor: Colours.hashedColor(this.name),
               child: Text(
@@ -133,7 +133,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
             avatarWidget = ClipRRect(
               borderRadius: BorderRadius.circular(imageSize),
               child: Image.file(
-                this.avatar,
+                this.avatar!,
                 width: imageSize,
                 height: imageSize,
                 fit: BoxFit.cover,
@@ -261,7 +261,7 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
                                                 ),
                                                 Visibility(
                                                   visible: this.alias != null &&
-                                                      this.alias.isNotEmpty,
+                                                      this.alias!.isNotEmpty,
                                                   maintainSize: true,
                                                   maintainState: true,
                                                   maintainAnimation: true,
@@ -506,23 +506,23 @@ class CreateGroupPublicState extends State<CreateGroupPublicView> {
 class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
-  final String homeserver;
+  final String? homeserver;
   final List<User> users;
 
   final Function onCreateRoomPublic;
   final Function onClearUserInvites;
 
   _Props({
-    @required this.users,
-    @required this.theme,
-    @required this.loading,
-    @required this.homeserver,
-    @required this.onCreateRoomPublic,
-    @required this.onClearUserInvites,
+    required this.users,
+    required this.theme,
+    required this.loading,
+    required this.homeserver,
+    required this.onCreateRoomPublic,
+    required this.onClearUserInvites,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         users,
         theme,
         loading,
@@ -538,11 +538,11 @@ class _Props extends Equatable {
           clearUserInvites(),
         ),
         onCreateRoomPublic: ({
-          File avatar,
-          String name,
-          String topic,
-          String alias,
-          List<User> invites,
+          File? avatar,
+          String? name,
+          String? topic,
+          String? alias,
+          List<User>? invites,
         }) async {
           final invites = store.state.userStore.invites;
 

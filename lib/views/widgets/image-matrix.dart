@@ -22,22 +22,22 @@ import 'package:syphon/store/media/actions.dart';
  * downloads the image and saves it to cache
  */
 class MatrixImage extends StatefulWidget {
-  final String mxcUri;
+  final String? mxcUri;
   final double width;
   final double height;
-  final double size;
+  final double? size;
   final double strokeWidth;
-  final String imageType;
+  final String? imageType;
   final BoxFit fit;
   final bool thumbnail;
   final bool disableRebuild;
   final bool forceLoading;
-  final Widget fallback;
+  final Widget? fallback;
   final Color fallbackColor;
 
   const MatrixImage({
-    Key key,
-    @required this.mxcUri,
+    Key? key,
+    required this.mxcUri,
     this.width = 48,
     this.height = 48,
     this.size,
@@ -59,7 +59,7 @@ class MatrixImageState extends State<MatrixImage> {
   final bool disableRebuild;
   final bool forceLoading;
 
-  Uint8List finalUriData;
+  Uint8List? finalUriData;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class MatrixImageState extends State<MatrixImage> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final mediaCache = store.state.mediaStore.mediaCache;
+    final mediaCache = store.state.mediaStore.mediaCache!;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
       store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
@@ -84,12 +84,12 @@ class MatrixImageState extends State<MatrixImage> {
     // Created in attempts to reduce framerate drop in chat details
     // not sure this actually works as it still drops on scroll
     if (this.disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
-      finalUriData = mediaCache[widget.mxcUri];
+      finalUriData = mediaCache[widget.mxcUri!];
     }
   }
 
   MatrixImageState({
-    Key key,
+    Key? key,
     this.forceLoading = false,
     this.disableRebuild = false,
   });
@@ -99,8 +99,8 @@ class MatrixImageState extends State<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final failed = props.mediaChecks[widget.mxcUri] != null &&
-              props.mediaChecks[widget.mxcUri] == MediaStatus.FAILURE;
+          final failed = props.mediaChecks[widget.mxcUri!] != null &&
+              props.mediaChecks[widget.mxcUri!] == MediaStatus.FAILURE;
           final loading =
               forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
 
@@ -135,7 +135,7 @@ class MatrixImageState extends State<MatrixImage> {
             height: widget.height,
             fit: widget.fit,
             image: MemoryImage(
-              props.mediaCache[widget.mxcUri] ?? finalUriData,
+              props.mediaCache[widget.mxcUri!] ?? finalUriData!,
             ),
           );
         },
@@ -147,8 +147,8 @@ class _Props extends Equatable {
   final Map<String, String> mediaChecks;
 
   _Props({
-    @required this.mediaCache,
-    @required this.mediaChecks,
+    required this.mediaCache,
+    required this.mediaChecks,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

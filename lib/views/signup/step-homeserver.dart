@@ -21,13 +21,13 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class HomeserverStep extends StatefulWidget {
-  const HomeserverStep({Key key}) : super(key: key);
+  const HomeserverStep({Key? key}) : super(key: key);
 
   HomeserverStepState createState() => HomeserverStepState();
 }
 
 class HomeserverStepState extends State<HomeserverStep> {
-  HomeserverStepState({Key key});
+  HomeserverStepState({Key? key});
 
   final homeserverController = TextEditingController();
 
@@ -119,8 +119,8 @@ class HomeserverStepState extends State<HomeserverStep> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       onWillChange: (oldProps, newProps) {
-        if (oldProps.homeserver.hostname != newProps.homeserver.hostname) {
-          homeserverController.text = newProps.homeserver.hostname;
+        if (oldProps!.homeserver.hostname != newProps.homeserver.hostname) {
+          homeserverController.text = newProps.homeserver.hostname!;
         }
       },
       builder: (context, props) {
@@ -185,10 +185,10 @@ class _Props extends Equatable {
   final Function onChangeHomeserver;
 
   _Props({
-    @required this.hostname,
-    @required this.homeserver,
-    @required this.onSetHostname,
-    @required this.onChangeHomeserver,
+    required this.hostname,
+    required this.homeserver,
+    required this.onSetHostname,
+    required this.onChangeHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

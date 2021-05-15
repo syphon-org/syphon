@@ -31,21 +31,21 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 class CreateGroupView extends StatefulWidget {
-  const CreateGroupView({Key key}) : super(key: key);
+  const CreateGroupView({Key? key}) : super(key: key);
 
   @override
   CreateGroupPublicState createState() => CreateGroupPublicState();
 }
 
 class CreateGroupPublicState extends State<CreateGroupView> {
-  CreateGroupPublicState({Key key}) : super();
+  CreateGroupPublicState({Key? key}) : super();
   final topicFocus = FocusNode();
   final nameController = TextEditingController();
   final topicController = TextEditingController();
 
-  File avatar;
-  String name;
-  String topic;
+  File? avatar;
+  String? name;
+  String? topic;
   bool encryption = false;
 
   @override
@@ -94,7 +94,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => ModalImageOptions(
-        onSetNewAvatar: ({File image}) {
+        onSetNewAvatar: ({File? image}) {
           this.setState(() {
             avatar = image;
           });
@@ -124,7 +124,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
             ),
           );
 
-          if (this.name != null && this.name.isNotEmpty) {
+          if (this.name != null && this.name!.isNotEmpty) {
             avatarWidget = CircleAvatar(
               backgroundColor: Colours.hashedColor(this.name),
               child: Text(
@@ -141,7 +141,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
             avatarWidget = ClipRRect(
               borderRadius: BorderRadius.circular(imageSize),
               child: Image.file(
-                this.avatar,
+                this.avatar!,
                 width: imageSize,
                 height: imageSize,
                 fit: BoxFit.cover,
@@ -521,7 +521,7 @@ class CreateGroupPublicState extends State<CreateGroupView> {
 
 class _Props extends Equatable {
   final bool loading;
-  final String homeserver;
+  final String? homeserver;
   final ThemeType theme;
   final List<User> users;
 
@@ -530,17 +530,17 @@ class _Props extends Equatable {
   final Function onClearUserInvites;
 
   _Props({
-    @required this.users,
-    @required this.theme,
-    @required this.loading,
-    @required this.homeserver,
-    @required this.onCreateGroup,
-    @required this.onDisabled,
-    @required this.onClearUserInvites,
+    required this.users,
+    required this.theme,
+    required this.loading,
+    required this.homeserver,
+    required this.onCreateGroup,
+    required this.onDisabled,
+    required this.onClearUserInvites,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         users,
         theme,
         loading,
@@ -557,10 +557,10 @@ class _Props extends Equatable {
           clearUserInvites(),
         ),
         onCreateGroup: ({
-          File avatar,
-          String name,
-          String topic,
-          bool encryption,
+          File? avatar,
+          String? name,
+          String? topic,
+          bool? encryption,
         }) async {
           final invites = store.state.userStore.invites;
 

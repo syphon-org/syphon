@@ -9,13 +9,13 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class SyncStore extends Equatable {
-  final bool synced;
-  final bool offline;
-  final bool backgrounded;
+  final bool? synced;
+  final bool? offline;
+  final bool? backgrounded;
 
-  final int lastUpdate; // Last timestamp for actual new info
-  final int lastAttempt; // last attempt to sync
-  final String lastSince; // Since we last checked for new info
+  final int? lastUpdate; // Last timestamp for actual new info
+  final int? lastAttempt; // last attempt to sync
+  final String? lastSince; // Since we last checked for new info
 
   @JsonKey(ignore: true)
   final int interval;
@@ -30,7 +30,7 @@ class SyncStore extends Equatable {
   final bool unauthed;
 
   @JsonKey(ignore: true)
-  final Timer syncObserver;
+  final Timer? syncObserver;
 
   const SyncStore({
     this.synced = false,
@@ -47,7 +47,7 @@ class SyncStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         synced,
         syncing,
         offline,
@@ -61,16 +61,16 @@ class SyncStore extends Equatable {
       ];
 
   SyncStore copyWith({
-    int backoff,
-    bool synced,
-    bool syncing,
-    bool offline,
-    bool unauthed,
-    bool backgrounded,
-    int lastUpdate,
-    int lastAttempt,
-    Timer syncObserver,
-    String lastSince,
+    int? backoff,
+    bool? synced,
+    bool? syncing,
+    bool? offline,
+    bool? unauthed,
+    bool? backgrounded,
+    int? lastUpdate,
+    int? lastAttempt,
+    Timer? syncObserver,
+    String? lastSince,
   }) =>
       SyncStore(
         synced: synced ?? this.synced,

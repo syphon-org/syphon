@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -50,7 +50,7 @@ void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
 }
 
 class Themes {
-  static Color backgroundBrightness(ThemeType type) {
+  static Color? backgroundBrightness(ThemeType type) {
     switch (type) {
       case ThemeType.LIGHT:
         return Colors.grey[200];
@@ -68,17 +68,17 @@ class Themes {
   }
 
   static ThemeData generateCustomTheme({
-    int primaryColorHex,
-    int accentColorHex,
-    int appBarColorHex,
-    String fontName,
-    String fontSize,
-    ThemeType themeType,
+    int? primaryColorHex,
+    int? accentColorHex,
+    int? appBarColorHex,
+    String? fontName,
+    String? fontSize,
+    ThemeType? themeType,
   }) {
     int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
     int accentColor = accentColorHex ?? Colours.cyanSyphon;
-    int appBarColor = appBarColorHex;
-    int scaffoldBackgroundColor = Colours.whiteDefault;
+    int? appBarColor = appBarColorHex;
+    int? scaffoldBackgroundColor = Colours.whiteDefault;
 
     var appBarElevation;
     var modalColor;
@@ -121,7 +121,7 @@ class Themes {
     var titleWeight = FontWeight.w400;
     var bodyWeight = FontWeight.w400;
 
-    double letterSpacing;
+    double? letterSpacing;
     switch (fontName) {
       case 'Rubik':
         titleWeight = FontWeight.w100;
@@ -180,7 +180,7 @@ class Themes {
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
-        color: Color(appBarColor ?? primaryColorHex),
+        color: Color(appBarColor ?? primaryColorHex!),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(

@@ -22,7 +22,7 @@ import 'package:syphon/store/index.dart';
 // Styling
 
 class TermsStep extends StatelessWidget {
-  TermsStep({Key key}) : super(key: key);
+  TermsStep({Key? key}) : super(key: key);
   final focusNode = FocusNode();
 
   @override
@@ -174,7 +174,7 @@ class TermsStep extends StatelessWidget {
                                     text: 'terms of service',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .subtitle1
+                                        .subtitle1!
                                         .copyWith(
                                           fontWeight: FontWeight.w400,
                                           decorationStyle:
@@ -205,10 +205,10 @@ class _Props extends Equatable {
   final Function onViewTermsOfService;
 
   _Props({
-    @required this.homeserver,
-    @required this.agreement,
-    @required this.onToggleAgreement,
-    @required this.onViewTermsOfService,
+    required this.homeserver,
+    required this.agreement,
+    required this.onToggleAgreement,
+    required this.onViewTermsOfService,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -230,7 +230,7 @@ class _Props extends Equatable {
       },
       onViewTermsOfService: () async {
         try {
-          final termsOfServiceUrl = store.state.authStore.credential.termsUrl;
+          final termsOfServiceUrl = store.state.authStore.credential!.termsUrl!;
           if (await canLaunch(termsOfServiceUrl)) {
             await launch(termsOfServiceUrl);
           } else {

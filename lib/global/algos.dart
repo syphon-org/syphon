@@ -19,7 +19,7 @@ List<int> fibonacci(int n) {
   return series;
 }
 
-void printJson(Map jsonMap) {
+void printJson(Map? jsonMap) {
   JsonEncoder encoder = new JsonEncoder.withIndent('  ');
   String prettyEvent = encoder.convert(jsonMap);
   debugPrint(prettyEvent, wrapWidth: 2048);

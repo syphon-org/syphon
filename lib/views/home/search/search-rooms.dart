@@ -31,12 +31,12 @@ import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class RoomSearchArguments {
-  User user;
+  User? user;
   RoomSearchArguments({this.user});
 }
 
 class RoomSearchView extends StatefulWidget {
-  const RoomSearchView({Key key}) : super(key: key);
+  const RoomSearchView({Key? key}) : super(key: key);
 
   @override
   RoomSearchState createState() => RoomSearchState();
@@ -45,9 +45,9 @@ class RoomSearchView extends StatefulWidget {
 class RoomSearchState extends State<RoomSearchView> {
   final searchInputFocusNode = FocusNode();
 
-  RoomSearchState({Key key});
+  RoomSearchState({Key? key});
 
-  Map<String, Color> roomColorDefaults;
+  late Map<String?, Color?> roomColorDefaults;
 
   @override
   void initState() {
@@ -83,8 +83,8 @@ class RoomSearchState extends State<RoomSearchView> {
     FocusScope.of(context).unfocus();
 
     final RoomSearchArguments arguments =
-        ModalRoute.of(context).settings.arguments;
-    final user = arguments.user;
+        ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
+    final user = arguments.user!;
     final username = formatUsername(user);
 
     return await showDialog(
@@ -163,7 +163,7 @@ class RoomSearchState extends State<RoomSearchView> {
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
         if (roomSettings != null) {
-          backgroundColor = Color(roomSettings.primaryColor);
+          backgroundColor = Color(roomSettings.primaryColor!);
         } else if (roomColorDefaults.containsKey(room.id)) {
           backgroundColor = roomColorDefaults[room.id];
         } else {
@@ -180,7 +180,7 @@ class RoomSearchState extends State<RoomSearchView> {
           onTap: () => this.onInviteUser(props, room),
           child: Container(
             padding: EdgeInsets.symmetric(
-              vertical: Theme.of(context).textTheme.subtitle1.fontSize,
+              vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
             ).add(Dimensions.appPaddingHorizontal),
             child: Flex(
               direction: Axis.horizontal,
@@ -198,7 +198,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         background: backgroundColor,
                       ),
                       Visibility(
-                        visible: room.encryptionEnabled,
+                        visible: room.encryptionEnabled!,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -217,7 +217,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.invite,
+                        visible: room.invite!,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -252,7 +252,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'group' && !room.invite,
+                        visible: room.type == 'group' && !room.invite!,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -272,7 +272,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'public' && !room.invite,
+                        visible: room.type == 'public' && !room.invite!,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -308,7 +308,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              room.name,
+                              room.name!,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
@@ -320,7 +320,7 @@ class RoomSearchState extends State<RoomSearchView> {
                           preview,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.caption.merge(
+                          style: Theme.of(context).textTheme.caption!.merge(
                                 previewStyle,
                               ),
                         ),
@@ -342,10 +342,10 @@ class RoomSearchState extends State<RoomSearchView> {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final RoomSearchArguments arguments =
-            ModalRoute.of(context).settings.arguments;
+            ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
         return Scaffold(
           appBar: AppBarSearch(
-            title: Strings.titleInvite + formatUsername(arguments.user),
+            title: Strings.titleInvite + formatUsername(arguments.user!),
             label: 'Search any room info...',
             tooltip: 'Search Joined Rooms',
             brightness: Brightness.dark,
@@ -375,18 +375,18 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
   final List<dynamic> searchResults;
-  final Map<String, ChatSetting> chatSettings;
+  final Map<String?, ChatSetting> chatSettings;
 
   final Function onSearch;
   final Function onSendInvite;
 
   _Props({
-    @required this.theme,
-    @required this.loading,
-    @required this.searchResults,
-    @required this.chatSettings,
-    @required this.onSearch,
-    @required this.onSendInvite,
+    required this.theme,
+    required this.loading,
+    required this.searchResults,
+    required this.chatSettings,
+    required this.onSearch,
+    required this.onSendInvite,
   });
 
   @override
@@ -405,7 +405,7 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchRooms(searchText: text));
         },
-        onSendInvite: ({Room room, User user}) {
+        onSendInvite: ({Room? room, User? user}) {
           store.dispatch(inviteUser(room: room, user: user));
         },
       );

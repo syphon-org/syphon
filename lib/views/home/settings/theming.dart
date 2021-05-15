@@ -19,7 +19,7 @@ import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 class Theming extends StatelessWidget {
-  Theming({Key key}) : super(key: key);
+  Theming({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -36,7 +36,7 @@ class Theming extends StatelessWidget {
               ),
               title: Text(
                 tr(StringKeys.titleViewTheming),
-                style: Theme.of(context).textTheme.headline6.copyWith(
+                style: Theme.of(context).textTheme.headline6!.copyWith(
                       color: Colors.white,
                     ),
               ),
@@ -255,25 +255,25 @@ class Props extends Equatable {
   final Function onIncrementAvatarShape;
 
   Props({
-    @required this.primaryColor,
-    @required this.accentColor,
-    @required this.appBarColor,
-    @required this.themeType,
-    @required this.language,
-    @required this.fontName,
-    @required this.fontSize,
-    @required this.messageSize,
-    @required this.avatarShape,
-    @required this.roomTypeBadgesEnabled,
-    @required this.onSelectPrimaryColor,
-    @required this.onSelectAccentColor,
-    @required this.onSelectAppBarColor,
-    @required this.onIncrementFontType,
-    @required this.onIncrementFontSize,
-    @required this.onIncrementTheme,
-    @required this.onToggleRoomTypeBadges,
-    @required this.onIncrementAvatarShape,
-    @required this.onIncrementMessageSize,
+    required this.primaryColor,
+    required this.accentColor,
+    required this.appBarColor,
+    required this.themeType,
+    required this.language,
+    required this.fontName,
+    required this.fontSize,
+    required this.messageSize,
+    required this.avatarShape,
+    required this.roomTypeBadgesEnabled,
+    required this.onSelectPrimaryColor,
+    required this.onSelectAccentColor,
+    required this.onSelectAppBarColor,
+    required this.onIncrementFontType,
+    required this.onIncrementFontSize,
+    required this.onIncrementTheme,
+    required this.onToggleRoomTypeBadges,
+    required this.onIncrementAvatarShape,
+    required this.onIncrementMessageSize,
   });
 
   @override

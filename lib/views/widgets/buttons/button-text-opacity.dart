@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonTextOpacity extends StatefulWidget {
   ButtonTextOpacity({
-    Key key,
+    Key? key,
     this.text,
     this.textWidget,
     this.loading = false,
@@ -18,10 +18,10 @@ class ButtonTextOpacity extends StatefulWidget {
 
   final bool loading;
   final bool disabled;
-  final String text;
-  final Widget textWidget;
-  final Color color;
-  final Function onPressed;
+  final String? text;
+  final Widget? textWidget;
+  final Color? color;
+  final Function? onPressed;
 
   @override
   ButtonTextState createState() => ButtonTextState();
@@ -38,7 +38,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
               ? null
               : () {
                   if (widget.onPressed != null) {
-                    widget.onPressed();
+                    widget.onPressed!();
                   }
                 },
           onTapDown: (details) => this.setState(() {
@@ -67,7 +67,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
               : (widget.textWidget != null
                   ? widget.textWidget
                   : Text(
-                      widget.text,
+                      widget.text!,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
@@ -80,7 +80,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                           if (widget.color != null) {
                             return widget.color;
                           }
-                          return Theme.of(context).textTheme.button.color;
+                          return Theme.of(context).textTheme.button!.color;
                         }(),
                       ),
                     )),

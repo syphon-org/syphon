@@ -26,7 +26,7 @@ final Duration nextAnimationDuration = Duration(
 );
 
 class PasswordResetView extends StatefulWidget {
-  const PasswordResetView({Key key}) : super(key: key);
+  const PasswordResetView({Key? key}) : super(key: key);
 
   PasswordResetState createState() => PasswordResetState();
 }
@@ -36,14 +36,14 @@ class PasswordResetState extends State<PasswordResetView> {
   bool naving = false;
   bool validStep = false;
   bool onboarding = false;
-  PageController pageController;
+  PageController? pageController;
 
   var sections = [
     PasswordResetStep(),
   ];
 
   PasswordResetState({
-    Key key,
+    Key? key,
   });
 
   @override
@@ -174,10 +174,10 @@ class _Props extends Equatable {
   final Function onResetPassword;
 
   _Props({
-    @required this.loading,
-    @required this.isPasswordValid,
-    @required this.interactiveAuths,
-    @required this.onResetPassword,
+    required this.loading,
+    required this.isPasswordValid,
+    required this.interactiveAuths,
+    required this.onResetPassword,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

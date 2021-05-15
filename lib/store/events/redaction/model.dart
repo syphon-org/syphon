@@ -7,7 +7,7 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Redaction extends Event {
-  final String redactId; // event_id
+  final String? redactId; // event_id
 
   const Redaction({
     id,

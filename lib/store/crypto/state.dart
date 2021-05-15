@@ -13,7 +13,7 @@ part 'state.g.dart';
 class CryptoStore extends Equatable {
   // Active olm account (loaded from olmAccountKey)
   @JsonKey(ignore: true)
-  final Account olmAccount;
+  final Account? olmAccount;
 
   // the private key for one time keys is saved in olm?
   // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
@@ -21,7 +21,7 @@ class CryptoStore extends Equatable {
   final Map oneTimeKeysOwned;
 
   // Serialized olm account
-  final String olmAccountKey;
+  final String? olmAccountKey;
 
   // Map<roomId, index(int)> // megolm - message index
   final Map<String, int> messageSessionIndex;
@@ -47,10 +47,10 @@ class CryptoStore extends Equatable {
   // Map<DeviceId, DeviceKey> deviceKeysOwned
   final Map<String, DeviceKey> deviceKeysOwned; // key is deviceId
 
-  final bool deviceKeysExist;
+  final bool? deviceKeysExist;
 
   // Track last known uploaded key amounts
-  final Map oneTimeKeysCounts;
+  final Map? oneTimeKeysCounts;
 
   final Map<String, OneTimeKey> oneTimeKeysClaimed;
 
@@ -72,7 +72,7 @@ class CryptoStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         olmAccount,
         olmAccountKey,
         messageSessionIndexNEW,

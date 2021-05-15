@@ -15,8 +15,8 @@ class Algorithms {
 }
 
 class Keys {
-  static fingerprint({String deviceId}) => '${Algorithms.ed25519}:$deviceId';
-  static identity({String deviceId}) => '${Algorithms.curve25591}:$deviceId';
+  static fingerprint({String? deviceId}) => '${Algorithms.ed25519}:$deviceId';
+  static identity({String? deviceId}) => '${Algorithms.curve25591}:$deviceId';
 }
 
 abstract class Encryption {
@@ -28,12 +28,12 @@ abstract class Encryption {
    * Returns the current devices and identity keys for the given users.
    */
   static Future<dynamic> fetchKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
-    String lastSince,
-    Map<String, dynamic> users = const {},
+    String? lastSince,
+    Map<String?, dynamic> users = const {},
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
@@ -67,9 +67,9 @@ abstract class Encryption {
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
+    String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
-    String lastSince,
+    String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
     String url =
@@ -103,9 +103,9 @@ abstract class Encryption {
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String from,
-    String to,
+    String? accessToken,
+    String? from,
+    String? to,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
@@ -130,10 +130,10 @@ abstract class Encryption {
    * 
    */
   static Future<dynamic> claimKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    Map oneTimeKeys,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    Map? oneTimeKeys,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
 
@@ -156,10 +156,10 @@ abstract class Encryption {
   }
 
   static Future<dynamic> uploadKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    Map data,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    Map? data,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 

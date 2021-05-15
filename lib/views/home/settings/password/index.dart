@@ -26,7 +26,7 @@ final Duration nextAnimationDuration = Duration(
 );
 
 class PasswordUpdateView extends StatefulWidget {
-  const PasswordUpdateView({Key key}) : super(key: key);
+  const PasswordUpdateView({Key? key}) : super(key: key);
 
   PasswordUpdateState createState() => PasswordUpdateState();
 }
@@ -36,13 +36,13 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
   bool naving = false;
   bool validStep = false;
   bool onboarding = false;
-  PageController pageController;
+  PageController? pageController;
 
   var sections = [
     PasswordStep(),
   ];
 
-  PasswordUpdateState({Key key});
+  PasswordUpdateState({Key? key});
 
   @override
   void initState() {
@@ -168,10 +168,10 @@ class _Props extends Equatable {
   final Function onSavePassword;
 
   _Props({
-    @required this.loading,
-    @required this.isPasswordValid,
-    @required this.interactiveAuths,
-    @required this.onSavePassword,
+    required this.loading,
+    required this.isPasswordValid,
+    required this.interactiveAuths,
+    required this.onSavePassword,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

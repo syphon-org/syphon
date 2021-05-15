@@ -13,12 +13,12 @@ EventStore eventReducer(
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
-      final events = Map<String, List<Event>>.from(state.events);
+      final events = Map<String?, List<Event>?>.from(state.events);
       events[roomId] = action.state;
       return state.copyWith(events: events);
 
     case SetReactions:
-      final reactionsUpdated = Map<String, List<Reaction>>.from(
+      final reactionsUpdated = Map<String?, List<Reaction>>.from(
         state.reactions,
       );
 
@@ -26,7 +26,7 @@ EventStore eventReducer(
         final exists = reactionsUpdated.containsKey(reaction.relEventId);
 
         if (exists) {
-          final existing = reactionsUpdated[reaction.relEventId];
+          final existing = reactionsUpdated[reaction.relEventId]!;
           if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
             reactionsUpdated[reaction.relEventId] = [...existing, reaction];
           }
@@ -42,14 +42,14 @@ EventStore eventReducer(
         return state;
       }
       final roomId = action.roomId;
-      final messages = Map<String, List<Message>>.from(state.messages);
+      final Map<String?, List<Message?>> messages = Map<String?, List<Message>>.from(state.messages);
 
-      final messagesOld = Map<String, Message>.fromIterable(
+      final messagesOld = Map<String?, Message?>.fromIterable(
         messages[roomId] ?? [],
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
-      final messagesNew = Map<String, Message>.fromIterable(
+      final messagesNew = Map<String?, Message?>.fromIterable(
         action.messages ?? [],
         key: (msg) => msg.id,
         value: (msg) => msg,
@@ -66,9 +66,9 @@ EventStore eventReducer(
         return state;
       }
 
-      final redactions = Map<String, Redaction>.from(state.redactions);
+      final redactions = Map<String?, Redaction?>.from(state.redactions);
 
-      final redactionsNew = Map<String, Redaction>.fromIterable(
+      final redactionsNew = Map<String?, Redaction?>.fromIterable(
         action.redactions ?? [],
         key: (redaction) => redaction.redactId,
         value: (redaction) => redaction,
@@ -92,7 +92,7 @@ EventStore eventReducer(
       );
 
       if (receiptsUpdated.containsKey(roomId)) {
-        receiptsUpdated[roomId].addAll(receiptsNew);
+        receiptsUpdated[roomId]!.addAll(receiptsNew);
       }
 
       return state.copyWith(receipts: receiptsUpdated);

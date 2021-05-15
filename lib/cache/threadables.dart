@@ -20,15 +20,15 @@ Future<String> encryptJsonBackground(Map params) async {
   return encrypted.base64;
 }
 
-Future<Map> decryptJsonBackground(Map params) async {
+Future<Map?> decryptJsonBackground(Map params) async {
   String ivKey = params['ivKey'];
   String ivKeyNext = params['ivKeyNext'];
-  String type = params['type'];
+  String? type = params['type'];
   String cryptKey = params['cryptKey'];
-  String jsonEncrypted = params['json'];
+  String? jsonEncrypted = params['json'];
 
-  String jsonDecrypted;
-  Map<String, dynamic> jsonDecoded = {};
+  String? jsonDecrypted;
+  Map<String, dynamic>? jsonDecoded = {};
 
   final iv = IV.fromBase64(ivKey);
   final ivNext = IV.fromBase64(ivKeyNext);
@@ -73,16 +73,16 @@ Future<Map> decryptJsonBackground(Map params) async {
 }
 
 // responsibile for both json serialization and encryption
-Future<String> serializeJsonBackground(Object store) async {
+Future<String?> serializeJsonBackground(Object store) async {
   try {
     final storageEngine = FlutterSecureStorage();
 
-    final ivKey = await storageEngine.read(
+    final ivKey = await (storageEngine.read(
       key: Cache.ivLocation,
-    );
-    final cryptKey = await storageEngine.read(
+    ) as FutureOr<String>);
+    final cryptKey = await (storageEngine.read(
       key: Cache.keyLocation,
-    );
+    ) as FutureOr<String>);
 
     final iv = IV.fromBase64(ivKey);
     final key = Key.fromBase64(cryptKey);

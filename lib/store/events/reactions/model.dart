@@ -7,9 +7,9 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Reaction extends Event {
-  final String body; // 'key' in matrix likely an emoji
-  final String relType;
-  final String relEventId;
+  final String? body; // 'key' in matrix likely an emoji
+  final String? relType;
+  final String? relEventId;
 
   const Reaction({
     id,

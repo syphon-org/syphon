@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonText extends StatelessWidget {
   ButtonText({
-    Key key,
+    Key? key,
     this.text,
     this.textWidget,
     this.loading = false,
@@ -18,22 +18,22 @@ class ButtonText extends StatelessWidget {
 
   final bool loading;
   final bool disabled;
-  final String text;
-  final Widget textWidget;
-  final Color color;
-  final Function onPressed;
+  final String? text;
+  final Widget? textWidget;
+  final Color? color;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) => TextButton(
         style: ButtonStyle(
-          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+          foregroundColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) =>
                 states.contains(MaterialState.disabled)
                     ? Colors.grey[300]
                     : null,
           ),
         ),
-        onPressed: disabled ? null : this.onPressed,
+        onPressed: disabled ? null : this.onPressed as void Function()?,
         child: this.loading
             ? Container(
                 constraints: BoxConstraints(
@@ -49,9 +49,9 @@ class ButtonText extends StatelessWidget {
                 ),
               )
             : (textWidget != null
-                ? textWidget
+                ? textWidget!
                 : Text(
-                    this.text,
+                    this.text!,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w100,

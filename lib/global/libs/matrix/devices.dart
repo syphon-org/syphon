@@ -14,9 +14,9 @@ abstract class Devices {
    * Gets all currently active pushers for the authenticated user.
    */
   static FutureOr<dynamic> fetchDevices({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/devices';
 
@@ -36,11 +36,11 @@ abstract class Devices {
    * Gets all currently active pushers for the authenticated user.
    */
   static FutureOr<dynamic> updateDevice({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String deviceId,
-    String displayName,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? deviceId,
+    String? displayName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/devices';
 
@@ -70,12 +70,12 @@ abstract class Devices {
   static FutureOr<dynamic> deleteDevice({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String deviceId,
-    String session,
-    String userId,
-    String authType,
-    String authValue,
+    String? accessToken,
+    String? deviceId,
+    String? session,
+    String? userId,
+    String? authType,
+    String? authValue,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
 
@@ -83,7 +83,7 @@ abstract class Devices {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body;
+    Map? body;
 
     if (session != null) {
       body = {
@@ -122,14 +122,14 @@ abstract class Devices {
  * Gets all currently active pushers for the authenticated user.
  */
   static FutureOr<dynamic> deleteDevices({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    List<String> deviceIds,
-    String session,
-    String userId,
-    String authType,
-    String authValue,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    List<String?>? deviceIds,
+    String? session,
+    String? userId,
+    String? authType,
+    String? authValue,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/delete_devices';
 

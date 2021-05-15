@@ -6,13 +6,13 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Rule extends Equatable {
-  final String id; // rule_id
-  final bool enabled;
-  final bool isDefault;
+  final String? id; // rule_id
+  final bool? enabled;
+  final bool? isDefault;
 
   // determine if these can be saved without being parsed
-  final List<Map<String, String>> conditions;
-  final List<dynamic> actions;
+  final List<Map<String, String>>? conditions;
+  final List<dynamic>? actions;
 
   const Rule({
     this.id,
@@ -23,7 +23,7 @@ class Rule extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         id,
         enabled,
         isDefault,

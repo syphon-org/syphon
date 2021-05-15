@@ -29,7 +29,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message> messages}) {
+ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -51,7 +51,7 @@ ThunkAction<AppState> mutateMessages({List<Message> messages}) {
 /// the required, necessary mutations by matrix after the
 /// message has been sent (such as reactions, redactions, and edits)
 ///
-ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
+ThunkAction<AppState> mutateMessagesAll({List<String>? messages}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -87,9 +87,9 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
 /// necessary mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessagesRoom({Room room}) {
+ThunkAction<AppState> mutateMessagesRoom({Room? room}) {
   return (Store<AppState> store) async {
-    if (room.messagesNew.isEmpty) return;
+    if (room!.messagesNew.isEmpty) return;
 
     final messages = store.state.eventStore.messages[room.id];
     final reactions = store.state.eventStore.reactions;
@@ -110,28 +110,28 @@ ThunkAction<AppState> mutateMessagesRoom({Room room}) {
 
 /// Send Message
 ThunkAction<AppState> sendMessage({
-  Room room,
-  Message message,
+  Room? room,
+  Message? message,
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, sending: true));
+      store.dispatch(UpdateRoom(id: room!.id, sending: true));
 
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id].reply;
+      final reply = store.state.roomStore.rooms[room.id!]!.reply;
 
       // trim trailing whitespace
-      message = message.copyWith(body: message.body.trimRight());
+      message = message!.copyWith(body: message!.body!.trimRight());
 
       // pending outbox message
-      var pending = Message(
+      Message? pending = Message(
         id: tempId,
-        body: message.body,
-        type: message.type,
+        body: message!.body,
+        type: message!.type,
         content: {
-          'body': message.body,
-          'msgtype': message.type ?? MessageTypes.TEXT,
+          'body': message!.body,
+          'msgtype': message!.type ?? MessageTypes.TEXT,
         },
         sender: store.state.authStore.user.userId,
         roomId: room.id,
@@ -157,7 +157,7 @@ ThunkAction<AppState> sendMessage({
         accessToken: store.state.authStore.user.accessToken,
         trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
-        message: pending.content,
+        message: pending!.content,
       );
 
       if (data['errcode'] != null) {
@@ -198,7 +198,7 @@ ThunkAction<AppState> sendMessage({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
     }
   };
 }
@@ -209,12 +209,12 @@ ThunkAction<AppState> sendMessage({
  * Specifically for sending encrypted messages using megolm
  */
 ThunkAction<AppState> sendMessageEncrypted({
-  Room room,
-  Message message, // body and type only for now
+  Room? room,
+  Message? message, // body and type only for now
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, sending: true));
+      store.dispatch(UpdateRoom(id: room!.id, sending: true));
 
       // send the key session - if one hasn't been sent
       // or created - to every user within the room
@@ -222,19 +222,19 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id].reply;
+      final reply = store.state.roomStore.rooms[room.id!]!.reply;
 
       // trim trailing whitespace
-      message = message.copyWith(body: message.body.trimRight());
+      message = message!.copyWith(body: message!.body!.trimRight());
 
       // pending outbox message
-      var pending = Message(
+      Message? pending = Message(
         id: tempId.toString(),
-        body: message.body,
-        type: message.type,
+        body: message!.body,
+        type: message!.type,
         content: {
-          'body': message.body,
-          'msgtype': message.type ?? MessageTypes.TEXT,
+          'body': message!.body,
+          'msgtype': message!.type ?? MessageTypes.TEXT,
         },
         sender: store.state.authStore.user.userId,
         roomId: room.id,
@@ -264,7 +264,7 @@ ThunkAction<AppState> sendMessageEncrypted({
         encryptMessageContent(
           roomId: room.id,
           eventType: EventTypes.message,
-          content: pending.content,
+          content: pending!.content,
         ),
       );
 
@@ -316,7 +316,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(id: room!.id, sending: false, reply: Message()));
     }
   };
 }

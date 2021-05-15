@@ -32,8 +32,8 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 final bool debug = !kReleaseMode;
 
 class Login extends StatefulWidget {
-  final Store<AppState> store;
-  const Login({Key key, this.store}) : super(key: key);
+  final Store<AppState>? store;
+  const Login({Key? key, this.store}) : super(key: key);
 
   @override
   LoginState createState() => LoginState();
@@ -45,7 +45,7 @@ class LoginState extends State<Login> {
   final passwordController = TextEditingController();
   bool visibility = false;
 
-  LoginState({Key key});
+  LoginState({Key? key});
 
   @override
   void initState() {
@@ -395,7 +395,7 @@ class LoginState extends State<Login> {
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .bodyText2
+                                    .bodyText2!
                                     .copyWith(
                                       color: Theme.of(context).primaryColor,
                                       decoration: TextDecoration.underline,
@@ -423,7 +423,7 @@ class _Props extends Equatable {
   final String password;
   final bool isLoginAttemptable;
   final String usernameHint;
-  final String loginType;
+  final String? loginType;
   final Homeserver homeserver;
 
   final Function onDebug;
@@ -435,20 +435,20 @@ class _Props extends Equatable {
   final Function onResetSession;
 
   _Props({
-    @required this.loading,
-    @required this.username,
-    @required this.password,
-    @required this.loginType,
-    @required this.homeserver,
-    @required this.isLoginAttemptable,
-    @required this.usernameHint,
-    @required this.onDebug,
-    @required this.onLoginUser,
-    @required this.onIncrementTheme,
-    @required this.onChangeUsername,
-    @required this.onChangePassword,
-    @required this.onChangeHomeserver,
-    @required this.onResetSession,
+    required this.loading,
+    required this.username,
+    required this.password,
+    required this.loginType,
+    required this.homeserver,
+    required this.isLoginAttemptable,
+    required this.usernameHint,
+    required this.onDebug,
+    required this.onLoginUser,
+    required this.onIncrementTheme,
+    required this.onChangeUsername,
+    required this.onChangePassword,
+    required this.onChangeHomeserver,
+    required this.onResetSession,
   });
 
   @override

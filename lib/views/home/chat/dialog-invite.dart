@@ -7,13 +7,13 @@ import 'package:syphon/global/strings.dart';
 
 class DialogInvite extends StatelessWidget {
   DialogInvite({
-    Key key,
+    Key? key,
     this.onAccept,
     this.onCancel,
   }) : super(key: key);
 
-  final Function onAccept;
-  final Function onCancel;
+  final Function? onAccept;
+  final Function? onCancel;
 
   @override
   Widget build(BuildContext context) => SimpleDialog(
@@ -44,7 +44,7 @@ class DialogInvite extends StatelessWidget {
                     ),
                     onPressed: () {
                       if (onCancel != null) {
-                        onCancel();
+                        onCancel!();
                       }
                     },
                     child: Text(
@@ -59,7 +59,7 @@ class DialogInvite extends StatelessWidget {
                     ),
                     onPressed: () {
                       if (onAccept != null) {
-                        onAccept();
+                        onAccept!();
                       }
 
                       Navigator.pop(context);

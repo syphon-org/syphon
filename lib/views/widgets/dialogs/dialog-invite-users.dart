@@ -16,7 +16,7 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogInviteUsers extends StatelessWidget {
   DialogInviteUsers({
-    Key key,
+    Key? key,
     this.users,
     this.title = 'Invite Users',
     this.content = Strings.confirmationAttemptChat,
@@ -28,9 +28,9 @@ class DialogInviteUsers extends StatelessWidget {
   final String title;
   final String content;
   final String action;
-  final List<User> users;
-  final Function onCancel;
-  final Function onInviteUsers;
+  final List<User?>? users;
+  final Function? onCancel;
+  final Function? onInviteUsers;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class DialogInviteUsers extends StatelessWidget {
                         creating = true;
                       });
                       if (onInviteUsers != null) {
-                        await onInviteUsers();
+                        await onInviteUsers!();
                       }
                     },
                   ),
@@ -94,14 +94,14 @@ class DialogInviteUsers extends StatelessWidget {
 
 class Props extends Equatable {
   final bool completed;
-  final String publicKey;
+  final String? publicKey;
 
   final Function onCompleteCaptcha;
 
   Props({
-    @required this.completed,
-    @required this.publicKey,
-    @required this.onCompleteCaptcha,
+    required this.completed,
+    required this.publicKey,
+    required this.onCompleteCaptcha,
   });
 
   static Props mapStateToProps(Store<AppState> store) => Props(
@@ -110,7 +110,7 @@ class Props extends Equatable {
           return store.state.authStore.interactiveAuths['params']
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token, {BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),
@@ -121,7 +121,7 @@ class Props extends Equatable {
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         completed,
         publicKey,
       ];

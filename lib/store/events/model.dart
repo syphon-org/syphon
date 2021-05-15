@@ -6,13 +6,13 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Event {
-  final String id; // event_id
-  final String userId;
-  final String roomId;
-  final String type;
-  final String sender;
-  final String stateKey;
-  final int timestamp;
+  final String? id; // event_id
+  final String? userId;
+  final String? roomId;
+  final String? type;
+  final String? sender;
+  final String? stateKey;
+  final int? timestamp;
 
   @JsonKey(ignore: true)
   final dynamic content;
@@ -61,13 +61,13 @@ class Event {
     final data = json.containsKey('redacts') ? json : null;
 
     return Event(
-      id: json['event_id'] as String,
-      userId: json['user_id'] as String,
-      roomId: json['room_id'] as String,
-      type: json['type'] as String,
-      sender: json['sender'] as String,
-      stateKey: json['state_key'] as String,
-      timestamp: json['origin_server_ts'] as int,
+      id: json['event_id'] as String?,
+      userId: json['user_id'] as String?,
+      roomId: json['room_id'] as String?,
+      type: json['type'] as String?,
+      sender: json['sender'] as String?,
+      stateKey: json['state_key'] as String?,
+      timestamp: json['origin_server_ts'] as int?,
       content: json['content'] as dynamic,
       data: data,
     );

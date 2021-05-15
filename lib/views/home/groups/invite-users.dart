@@ -36,27 +36,27 @@ import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class InviteUsersArguments {
-  final String roomId;
+  final String? roomId;
 
   InviteUsersArguments({this.roomId});
 }
 
 class InviteUsersView extends StatefulWidget {
-  const InviteUsersView({Key key}) : super(key: key);
+  const InviteUsersView({Key? key}) : super(key: key);
 
   @override
   InviteUsersState createState() => InviteUsersState();
 }
 
 class InviteUsersState extends State<InviteUsersView> {
-  InviteUsersState({Key key});
+  InviteUsersState({Key? key});
 
   final searchInputFocusNode = FocusNode();
   final avatarScrollController = ScrollController();
 
-  String searchable;
-  List<User> invites = [];
-  String creatingRoomDisplayName;
+  String? searchable;
+  List<User?> invites = [];
+  String? creatingRoomDisplayName;
 
   @override
   void didChangeDependencies() {
@@ -95,14 +95,14 @@ class InviteUsersState extends State<InviteUsersView> {
    * add/remove user to invite list
    */
   @protected
-  void onToggleInvite({User user}) async {
-    final List<User> invitesUpdated = List.from(this.invites);
-    final userIndex = invitesUpdated.indexWhere((u) => u.userId == user.userId);
+  void onToggleInvite({User? user}) async {
+    final List<User?> invitesUpdated = List.from(this.invites);
+    final userIndex = invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
 
     if (userIndex == -1) {
       invitesUpdated.add(user);
     } else {
-      invitesUpdated.removeWhere((u) => u.userId == user.userId);
+      invitesUpdated.removeWhere((u) => u!.userId == user!.userId);
     }
 
     this.setState(() {
@@ -110,7 +110,7 @@ class InviteUsersState extends State<InviteUsersView> {
     });
 
     if (invitesUpdated != null && invitesUpdated.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
         avatarScrollController.animateTo(
           avatarScrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: Values.animationDurationDefaultFast),
@@ -128,12 +128,12 @@ class InviteUsersState extends State<InviteUsersView> {
    * by the name searched
    */
   @protected
-  void onAttemptInvite({BuildContext context, _Props props, User user}) async {
+  void onAttemptInvite({required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try inviting ${user.displayName}',
+        title: 'Try inviting ${user!.displayName}',
         content: Strings.alertInviteUnknownUser,
         action: 'try invite',
         onStartChat: () {
@@ -153,7 +153,7 @@ class InviteUsersState extends State<InviteUsersView> {
   @protected
   void onConfirmInvites(_Props props) async {
     final InviteUsersArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final roomId = arguments.roomId;
 
     if (roomId != null && this.invites.length > 0) {
@@ -170,11 +170,11 @@ class InviteUsersState extends State<InviteUsersView> {
   Future<void> onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
     final InviteUsersArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments.roomId;
-    final room = store.state.roomStore.rooms[roomId];
+    final room = store.state.roomStore.rooms[roomId!];
 
     final multiple = this.invites.length > 1;
     final invitePlurialized = multiple ? 'Invites' : 'Invite';
@@ -184,7 +184,7 @@ class InviteUsersState extends State<InviteUsersView> {
       context: context,
       builder: (BuildContext context) => DialogInviteUsers(
         users: this.invites,
-        title: 'Invite To ${room.name}',
+        title: 'Invite To ${room!.name}',
         content: Strings.confirmationInvites +
             '\n\nSend ${this.invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?',
         action: 'send ${invitePlurialized.toLowerCase()}',
@@ -201,8 +201,8 @@ class InviteUsersState extends State<InviteUsersView> {
   }
 
   void onShowUserDetails({
-    BuildContext context,
-    User user,
+    required BuildContext context,
+    User? user,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -226,7 +226,7 @@ class InviteUsersState extends State<InviteUsersView> {
 
           final attemptableUser = User(
             displayName: searchText,
-            userId: searchable != null && searchable.contains(":")
+            userId: searchable != null && searchable!.contains(":")
                 ? searchable
                 : formatUserId(searchText),
           );
@@ -236,15 +236,15 @@ class InviteUsersState extends State<InviteUsersView> {
           );
 
           final showManualUser = searchable != null &&
-              searchable.length > 0 &&
+              searchable!.length > 0 &&
               foundResult < 0 &&
               !props.loading;
 
-          final usersList = searchable == null || searchable.isEmpty
+          final usersList = searchable == null || searchable!.isEmpty
               ? props.usersRecent
               : props.searchResults;
 
-          final usersListLabel = searchable == null || searchable.isEmpty
+          final usersListLabel = searchable == null || searchable!.isEmpty
               ? Strings.labelRecentUsers
               : Strings.labelSearchedUsers;
 
@@ -300,7 +300,7 @@ class InviteUsersState extends State<InviteUsersView> {
                         itemCount: this.invites.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (BuildContext context, int index) {
-                          final user = this.invites[index];
+                          final user = this.invites[index]!;
 
                           return Align(
                             child: GestureDetector(
@@ -332,11 +332,11 @@ class InviteUsersState extends State<InviteUsersView> {
                                     formatUsername(user),
                                     style: Theme.of(context)
                                         .textTheme
-                                        .caption
+                                        .caption!
                                         .copyWith(
                                           color: Theme.of(context)
                                               .textTheme
-                                              .bodyText1
+                                              .bodyText1!
                                               .color,
                                         ),
                                   ),
@@ -345,7 +345,7 @@ class InviteUsersState extends State<InviteUsersView> {
                                     size: Dimensions.avatarSizeMessage / 1.5,
                                     color: Theme.of(context)
                                         .textTheme
-                                        .bodyText1
+                                        .bodyText1!
                                         .color,
                                   ),
                                   onDeleted: () => onToggleInvite(user: user),
@@ -416,10 +416,10 @@ class InviteUsersState extends State<InviteUsersView> {
                                                 .bodyText1,
                                           ),
                                           subtitle: Text(
-                                            attemptableUser.userId,
+                                            attemptableUser.userId!,
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .caption
+                                                .caption!
                                                 .merge(
                                                   TextStyle(
                                                     color: props.loading
@@ -481,10 +481,10 @@ class InviteUsersState extends State<InviteUsersView> {
                                               .bodyText1,
                                         ),
                                         subtitle: Text(
-                                          user.userId,
+                                          user.userId!,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .caption
+                                              .caption!
                                               .merge(
                                                 TextStyle(
                                                   color: props.loading
@@ -530,14 +530,14 @@ class _Props extends Equatable {
   final Function onSendInvite;
 
   _Props({
-    @required this.theme,
-    @required this.loading,
-    @required this.usersRecent,
-    @required this.creatingRoom,
-    @required this.searchResults,
-    @required this.onSearch,
-    @required this.onAddInvites,
-    @required this.onSendInvite,
+    required this.theme,
+    required this.loading,
+    required this.usersRecent,
+    required this.creatingRoom,
+    required this.searchResults,
+    required this.onSearch,
+    required this.onAddInvites,
+    required this.onSendInvite,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -549,10 +549,10 @@ class _Props extends Equatable {
         onSearch: (text) {
           store.dispatch(searchUsers(searchText: text));
         },
-        onAddInvites: ({List<User> users}) async {
+        onAddInvites: ({List<User>? users}) async {
           return store.dispatch(setUserInvites(users: users));
         },
-        onSendInvite: ({Room room, User user}) {
+        onSendInvite: ({Room? room, User? user}) {
           store.dispatch(
             inviteUser(room: room, user: user),
           );

@@ -6,9 +6,9 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Message extends Event {
-  final bool pending;
-  final bool syncing;
-  final bool failed;
+  final bool? pending;
+  final bool? syncing;
+  final bool? failed;
 
   // message editing
   @JsonKey(defaultValue: false)
@@ -17,7 +17,7 @@ class Message extends Event {
   @JsonKey(defaultValue: false)
   final bool replacement;
 
-  final String relatedEventId;
+  final String? relatedEventId;
 
   @JsonKey(ignore: true)
   final List<Message> edits;
@@ -26,17 +26,17 @@ class Message extends Event {
   final List<Reaction> reactions;
 
   // Message Only
-  final String body;
-  final String msgtype;
-  final String format;
-  final String filename;
-  final String formattedBody;
-  final int received;
+  final String? body;
+  final String? msgtype;
+  final String? format;
+  final String? filename;
+  final String? formattedBody;
+  final int? received;
 
   // Encrypted Messages only
-  final String ciphertext;
-  final String algorithm;
-  final String senderKey; // Curve25519 device key which initiated the session
+  final String? ciphertext;
+  final String? algorithm;
+  final String? senderKey; // Curve25519 device key which initiated the session
 
   const Message({
     id,

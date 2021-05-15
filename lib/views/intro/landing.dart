@@ -13,9 +13,9 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 
 class LandingSection extends StatelessWidget {
-  LandingSection({Key key, this.title}) : super(key: key);
+  LandingSection({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class LandingSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .headline4
+                        .headline4!
                         .copyWith(fontSize: height < 569 ? 28 : null),
                   ),
                 ),
@@ -70,7 +70,7 @@ class LandingSection extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: Theme.of(context)
                       .textTheme
-                      .headline6
+                      .headline6!
                       .copyWith(fontSize: height < 569 ? 18 : null),
                 ),
               ],

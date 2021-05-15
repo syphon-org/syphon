@@ -24,17 +24,17 @@ import 'package:syphon/store/user/model.dart';
 final bool debug = !kReleaseMode;
 
 class AdvancedView extends StatefulWidget {
-  const AdvancedView({Key key}) : super(key: key);
+  const AdvancedView({Key? key}) : super(key: key);
 
   @override
   AdvancedViewState createState() => AdvancedViewState();
 }
 
 class AdvancedViewState extends State<AdvancedView> {
-  AdvancedViewState({Key key});
+  AdvancedViewState({Key? key});
 
-  String version;
-  String buildNumber;
+  String? version;
+  String? buildNumber;
 
   @override
   void initState() {
@@ -137,7 +137,7 @@ class AdvancedViewState extends State<AdvancedView> {
                         notificationId: BackgroundSync.service_id,
                         debugContent:
                             DateFormat('E h:mm ss a').format(DateTime.now()),
-                        pluginInstance: globalNotificationPluginInstance,
+                        pluginInstance: globalNotificationPluginInstance!,
                       );
                     },
                     contentPadding: Dimensions.listPadding,
@@ -171,7 +171,7 @@ class AdvancedViewState extends State<AdvancedView> {
                 ),
                 ListTile(
                   dense: true,
-                  onTap: props.onToggleSyncing,
+                  onTap: props.onToggleSyncing as void Function()?,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Toggle Syncing',
@@ -195,11 +195,11 @@ class AdvancedViewState extends State<AdvancedView> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing ? null : props.onManualSync,
+                    onTap: props.syncing ? null : props.onManualSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
-                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             color: props.syncing
                                 ? Color(Colours.greyDisabled)
                                 : null,
@@ -223,11 +223,11 @@ class AdvancedViewState extends State<AdvancedView> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing ? null : props.onForceFullSync,
+                    onTap: props.syncing ? null : props.onForceFullSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
-                      style: Theme.of(context).textTheme.subtitle1.copyWith(
+                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             color: props.syncing
                                 ? Color(Colours.greyDisabled)
                                 : null,
@@ -266,8 +266,8 @@ class AdvancedViewState extends State<AdvancedView> {
 class _Props extends Equatable {
   final bool syncing;
   final bool syncObserverActive;
-  final String language;
-  final String lastSince;
+  final String? language;
+  final String? lastSince;
   final User currentUser;
 
   final Function onToggleSyncing;
@@ -277,20 +277,20 @@ class _Props extends Equatable {
   final Function onStartBackgroundSync;
 
   _Props({
-    @required this.syncing,
-    @required this.language,
-    @required this.syncObserverActive,
-    @required this.currentUser,
-    @required this.lastSince,
-    @required this.onManualSync,
-    @required this.onForceFullSync,
-    @required this.onToggleSyncing,
-    @required this.onForceFunction,
-    @required this.onStartBackgroundSync,
+    required this.syncing,
+    required this.language,
+    required this.syncObserverActive,
+    required this.currentUser,
+    required this.lastSince,
+    required this.onManualSync,
+    required this.onForceFullSync,
+    required this.onToggleSyncing,
+    required this.onForceFunction,
+    required this.onStartBackgroundSync,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         syncing,
         lastSince,
         currentUser,
@@ -306,7 +306,7 @@ class _Props extends Equatable {
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,
         syncObserverActive: store.state.syncStore.syncObserver != null &&
-            store.state.syncStore.syncObserver.isActive,
+            store.state.syncStore.syncObserver!.isActive,
         onToggleSyncing: () {
           final observer = store.state.syncStore.syncObserver;
           if (observer != null && observer.isActive) {

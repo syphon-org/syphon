@@ -74,7 +74,7 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
       final data = {'errcode': 'Not Implemented'};
 
       if (data['errcode'] != null) {
-        throw data['error'];
+        throw data['error']!;
       }
     } catch (error) {
       printError('[fetchNotificationPusherRules] $error');

@@ -13,7 +13,7 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 
 class Avatar extends StatelessWidget {
   Avatar({
-    Key key,
+    Key? key,
     this.uri,
     this.url,
     this.alt,
@@ -27,13 +27,13 @@ class Avatar extends StatelessWidget {
 
   final bool force;
   final bool selected;
-  final String uri;
-  final String url;
-  final String alt;
+  final String? uri;
+  final String? url;
+  final String? alt;
   final double size;
-  final Color background;
-  final EdgeInsets margin;
-  final EdgeInsets padding;
+  final Color? background;
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -66,7 +66,7 @@ class Avatar extends StatelessWidget {
             avatarWidget = ClipRRect(
               borderRadius: borderRadius,
               child: Image(
-                image: NetworkImage(url),
+                image: NetworkImage(url!),
                 width: size,
                 height: size,
                 fit: BoxFit.fill,
@@ -141,14 +141,14 @@ class Avatar extends StatelessWidget {
 }
 
 class _Props extends Equatable {
-  final String avatarShape;
+  final String? avatarShape;
 
   _Props({
-    @required this.avatarShape,
+    required this.avatarShape,
   });
 
   @override
-  List<Object> get props => [avatarShape];
+  List<Object?> get props => [avatarShape];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         avatarShape: store.state.settingsStore.avatarShape,

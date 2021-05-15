@@ -13,9 +13,9 @@ import 'package:syphon/global/strings.dart';
 // Assets
 
 class SecondSection extends StatelessWidget {
-  SecondSection({Key key, this.title}) : super(key: key);
+  SecondSection({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {

@@ -12,17 +12,17 @@ import 'package:syphon/store/events/redaction/model.dart';
 ///
 ///
 Future<void> saveReceipts(
-  Map<String, ReadReceipt> receipts, {
-  Database storage,
-  bool ready,
+  Map<String, ReadReceipt>? receipts, {
+  Database? storage,
+  required bool ready,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
 
   // TODO: the initial sync loads way too many read receipts
   if (!ready) return;
 
-  return await storage.transaction((txn) async {
-    for (String key in receipts.keys) {
+  return await storage!.transaction((txn) async {
+    for (String key in receipts!.keys) {
       final record = store.record(key);
       await record.put(txn, json.encode(receipts[key]));
     }
@@ -35,14 +35,14 @@ Future<void> saveReceipts(
 /// Iterates through
 ///
 Future<Map<String, ReadReceipt>> loadReceipts(
-  List<String> messageIds, {
-  Database storage,
+  List<String?> messageIds, {
+  required Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
+    final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
 
     final receiptsMap = Map<String, ReadReceipt>();
-    final records = await store.records(messageIds).getSnapshots(storage);
+    final records = await (store.records(messageIds).getSnapshots(storage) as FutureOr<List<RecordSnapshot<String, String>>>);
 
     for (RecordSnapshot<String, String> record in records ?? []) {
       if (record != null) {

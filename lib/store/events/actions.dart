@@ -32,69 +32,69 @@ import 'package:syphon/store/rooms/room/model.dart';
 class ResetEvents {}
 
 class SetEvents {
-  final String roomId;
-  final List<Event> events;
+  final String? roomId;
+  final List<Event>? events;
   SetEvents({this.roomId, this.events});
 }
 
 class SetMessages {
-  final String roomId;
-  final List<Message> messages;
+  final String? roomId;
+  final List<Message>? messages;
   SetMessages({this.roomId, this.messages});
 }
 
 class SetReactions {
-  final String roomId;
-  final List<Reaction> reactions;
+  final String? roomId;
+  final List<Reaction>? reactions;
   SetReactions({this.roomId, this.reactions});
 }
 
 class SetReceipts {
-  final String roomId;
-  final Map<String, ReadReceipt> receipts;
+  final String? roomId;
+  final Map<String, ReadReceipt>? receipts;
   SetReceipts({this.roomId, this.receipts});
 }
 
 class SetRedactions {
-  final List<Redaction> redactions;
+  final List<Redaction>? redactions;
   SetRedactions({this.redactions});
 }
 
 ThunkAction<AppState> setMessages({
-  Room room,
-  List<Message> messages,
+  Room? room,
+  List<Message>? messages,
   int offset = 0,
   int limit = 20,
 }) =>
     (Store<AppState> store) {
-      if (messages.isEmpty) return;
-      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+      if (messages!.isEmpty) return;
+      return store.dispatch(SetMessages(roomId: room!.id, messages: messages));
     };
 
 ThunkAction<AppState> setReactions({
-  List<Reaction> reactions,
+  List<Reaction>? reactions,
 }) =>
     (Store<AppState> store) {
-      if (reactions.isEmpty) return;
+      if (reactions!.isEmpty) return;
       return store.dispatch(SetReactions(reactions: reactions));
     };
 
 ThunkAction<AppState> setRedactions({
-  String roomId,
-  List<Redaction> redactions,
+  String? roomId,
+  List<Redaction>? redactions,
 }) =>
     (Store<AppState> store) {
-      if (redactions.isEmpty) return;
+      if (redactions!.isEmpty) return;
       store.dispatch(SetRedactions(redactions: redactions));
     };
 
 ThunkAction<AppState> setReceipts({
-  Room room,
-  Map<String, ReadReceipt> receipts,
+  Room? room,
+  Map<String, ReadReceipt>? receipts,
 }) =>
     (Store<AppState> store) {
-      if (receipts.isEmpty) return;
-      return store.dispatch(SetReceipts(roomId: room.id, receipts: receipts));
+      if (receipts!.isEmpty) return;
+      return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
 /**
@@ -107,19 +107,19 @@ ThunkAction<AppState> setReceipts({
  * 
  */
 ThunkAction<AppState> loadMessagesCached({
-  Room room,
+  Room? room,
   int offset = 0,
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesStored = await loadMessages(
         room.messageIds,
-        storage: Storage.main,
+        storage: Storage.main!,
         offset: offset, // offset from the most recent eventId found
-        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
+        limit: !room.encryptionEnabled! ? limit : room.messageIds.length,
       );
 
       // load cold storage messages to state
@@ -130,7 +130,7 @@ ThunkAction<AppState> loadMessagesCached({
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
@@ -144,15 +144,15 @@ ThunkAction<AppState> loadMessagesCached({
  * Pulls next message events remote from homeserver
  */
 ThunkAction<AppState> fetchMessageEvents({
-  Room room,
-  String to,
-  String from,
+  Room? room,
+  String? to,
+  String? from,
   bool oldest = false,
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
         "protocol": store.state.authStore.protocol,
@@ -165,10 +165,10 @@ ThunkAction<AppState> fetchMessageEvents({
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
-      final String end = messagesJson['end'];
+      final String? end = messagesJson['end'];
 
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
-      final String start = messagesJson['start'];
+      final String? start = messagesJson['start'];
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
@@ -189,7 +189,7 @@ ThunkAction<AppState> fetchMessageEvents({
     } catch (error) {
       debugPrint('[fetchMessageEvents] error $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
@@ -199,11 +199,11 @@ ThunkAction<AppState> fetchMessageEvents({
  * 
  * Reattribute decrypted events to the timeline
  */
-ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
+ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic>? json) {
   return (Store<AppState> store) async {
     try {
       // First past to decrypt encrypted events
-      final List<dynamic> timelineEvents = json['timeline']['events'];
+      final List<dynamic> timelineEvents = json!['timeline']['events'];
 
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {
@@ -241,14 +241,14 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
  * state events can only be 
  * done from full state /sync data
  */
-ThunkAction<AppState> fetchStateEvents({Room room}) {
+ThunkAction<AppState> fetchStateEvents({Room? room}) {
   return (Store<AppState> store) async {
     try {
       final stateEvents = await MatrixApi.fetchStateEvents(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        roomId: room.id,
+        roomId: room!.id,
       );
 
       if (!(stateEvents is List) && stateEvents['errcode'] != null) {
@@ -265,15 +265,15 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
     } catch (error) {
       debugPrint('[fetchStateEvents] $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
 
-ThunkAction<AppState> clearDraft({Room room}) {
+ThunkAction<AppState> clearDraft({Room? room}) {
   return (Store<AppState> store) async {
     store.dispatch(UpdateRoom(
-      id: room.id,
+      id: room!.id,
       draft: Message(
         roomId: room.id,
         body: null,
@@ -284,12 +284,12 @@ ThunkAction<AppState> clearDraft({Room room}) {
 
 ThunkAction<AppState> saveDraft({
   final body,
-  String type = 'm.text',
-  Room room,
+  String? type = 'm.text',
+  Room? room,
 }) {
   return (Store<AppState> store) async {
     store.dispatch(UpdateRoom(
-      id: room.id,
+      id: room!.id,
       draft: Message(
         roomId: room.id,
         type: type,
@@ -301,11 +301,11 @@ ThunkAction<AppState> saveDraft({
 }
 
 ThunkAction<AppState> selectReply({
-  String roomId,
-  Message message,
+  String? roomId,
+  Message? message,
 }) {
   return (Store<AppState> store) async {
-    final room = store.state.roomStore.rooms[roomId];
+    final room = store.state.roomStore.rooms[roomId!]!;
     final reply = message == null ? Message() : message;
     store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
   };
@@ -320,15 +320,15 @@ ThunkAction<AppState> selectReply({
 ///
 ///
 ThunkAction<AppState> formatMessageReply(
-  Room room,
-  Message message,
+  Room? room,
+  Message? message,
   Message reply,
 ) {
   return (Store<AppState> store) async {
     try {
-      final body = '''> <${reply.sender}> ${reply.body}\n\n${message.body}''';
+      final body = '''> <${reply.sender}> ${reply.body}\n\n${message!.body}''';
       final formattedBody =
-          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
+          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room!.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
 
       return message.copyWith(
         body: body,
@@ -361,14 +361,14 @@ ThunkAction<AppState> formatMessageReply(
  * one http call
  */
 ThunkAction<AppState> sendReadReceipts({
-  Room room,
-  Message message,
+  Room? room,
+  Message? message,
   bool readAll = true,
 }) {
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceipts!) {
         return debugPrint('[sendReadReceipts] read receipts disabled');
       }
 
@@ -376,8 +376,8 @@ ThunkAction<AppState> sendReadReceipts({
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-        messageId: message.id,
+        roomId: room!.id,
+        messageId: message!.id,
         readAll: readAll,
       );
 
@@ -400,13 +400,13 @@ ThunkAction<AppState> sendReadReceipts({
  */
 
 ThunkAction<AppState> sendTyping({
-  String roomId,
-  bool typing = false,
+  String? roomId,
+  bool? typing = false,
 }) {
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.typingIndicators) {
+      if (!store.state.settingsStore.typingIndicators!) {
         debugPrint('[sendTyping] typing indicators disabled');
         return;
       }
@@ -434,11 +434,11 @@ ThunkAction<AppState> sendTyping({
  */
 
 ThunkAction<AppState> deleteMessage({
-  Message message,
+  Message? message,
 }) {
   return (Store<AppState> store) async {
     try {
-      if (message.pending || message.failed) {
+      if (message!.pending! || message.failed!) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {
@@ -454,8 +454,8 @@ ThunkAction<AppState> deleteMessage({
 /// can be removed first (like failed or pending sends)
 ///
 ThunkAction<AppState> redactEvent({
-  Room room,
-  Event event,
+  Room? room,
+  Event? event,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -463,8 +463,8 @@ ThunkAction<AppState> redactEvent({
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-        eventId: event.id,
+        roomId: room!.id,
+        eventId: event!.id,
       );
     } catch (error) {
       debugPrint('[deleteMessage] $error');

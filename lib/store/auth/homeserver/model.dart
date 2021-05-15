@@ -5,18 +5,18 @@ import 'package:equatable/equatable.dart';
 
 // @JsonSerializable()
 class Homeserver extends Equatable {
-  final String hostname;
-  final String baseUrl;
-  final String photoUrl;
-  final String identityUrl;
-  final String loginType;
+  final String? hostname;
+  final String? baseUrl;
+  final String? photoUrl;
+  final String? identityUrl;
+  final String? loginType;
 
-  final String location;
-  final String description;
-  final String founded;
-  final String responseTime;
-  final String usersActive;
-  final String roomsTotal;
+  final String? location;
+  final String? description;
+  final String? founded;
+  final String? responseTime;
+  final String? usersActive;
+  final String? roomsTotal;
 
   final bool valid;
 
@@ -36,7 +36,7 @@ class Homeserver extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         hostname,
         baseUrl,
         photoUrl,
@@ -52,18 +52,18 @@ class Homeserver extends Equatable {
       ];
 
   Homeserver copyWith({
-    String hostname,
-    String baseUrl,
-    String photoUrl,
-    String identityUrl,
-    String loginType,
-    String location,
-    String description,
-    String founded,
-    String responseTime,
-    String usersActive,
-    String roomsTotal,
-    bool valid,
+    String? hostname,
+    String? baseUrl,
+    String? photoUrl,
+    String? identityUrl,
+    String? loginType,
+    String? location,
+    String? description,
+    String? founded,
+    String? responseTime,
+    String? usersActive,
+    String? roomsTotal,
+    bool? valid,
   }) =>
       Homeserver(
         hostname: hostname ?? this.hostname,

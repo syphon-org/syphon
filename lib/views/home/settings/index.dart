@@ -18,7 +18,7 @@ import 'package:syphon/store/settings/selectors.dart';
 import './widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({Key key}) : super(key: key);
+  SettingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -104,7 +104,7 @@ class SettingsScreen extends StatelessWidget {
                               tr('list-item-settings-notification'),
                             ),
                             subtitle: Text(
-                              props.notificationsEnabled
+                              props.notificationsEnabled!
                                   ? Strings.labelOn
                                   : Strings.labelOff,
                               style: TextStyle(fontSize: 14.0),
@@ -252,25 +252,25 @@ class SettingsScreen extends StatelessWidget {
 class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
-  final bool notificationsEnabled;
-  final String font;
+  final bool? notificationsEnabled;
+  final String? font;
   final String theme;
 
   final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
-    @required this.font,
-    @required this.theme,
-    @required this.loading,
-    @required this.authLoading,
-    @required this.notificationsEnabled,
-    @required this.onDisabled,
-    @required this.onLogoutUser,
+    required this.font,
+    required this.theme,
+    required this.loading,
+    required this.authLoading,
+    required this.notificationsEnabled,
+    required this.onDisabled,
+    required this.onLogoutUser,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         theme,
         loading,
         authLoading,

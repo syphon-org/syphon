@@ -27,15 +27,15 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class EmailVerifyStep extends StatefulWidget {
-  const EmailVerifyStep({Key key}) : super(key: key);
+  const EmailVerifyStep({Key? key}) : super(key: key);
 
   EmailStepState createState() => EmailStepState();
 }
 
 class EmailStepState extends State<EmailVerifyStep> {
-  EmailStepState({Key key});
+  EmailStepState({Key? key});
 
-  Timer typingTimeout;
+  Timer? typingTimeout;
   final emailController = TextEditingController();
   final homeserverController = TextEditingController();
 
@@ -49,7 +49,7 @@ class EmailStepState extends State<EmailVerifyStep> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     emailController.text = store.state.authStore.email;
-    homeserverController.text = store.state.authStore.homeserver.hostname;
+    homeserverController.text = store.state.authStore.homeserver.hostname!;
   }
 
   @override
@@ -210,7 +210,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                       // Set new username
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
-                        typingTimeout.cancel();
+                        typingTimeout!.cancel();
                         this.setState(() {
                           typingTimeout = null;
                         });
@@ -310,15 +310,15 @@ class _Props extends Equatable {
   final Function onSelectHomeserver;
 
   _Props({
-    @required this.email,
-    @required this.hostname,
-    @required this.session,
-    @required this.loading,
-    @required this.isEmailValid,
-    @required this.isHomeserverValid,
-    @required this.onSetEmail,
-    @required this.onSetHomeserver,
-    @required this.onSelectHomeserver,
+    required this.email,
+    required this.hostname,
+    required this.session,
+    required this.loading,
+    required this.isEmailValid,
+    required this.isHomeserverValid,
+    required this.onSetEmail,
+    required this.onSetHomeserver,
+    required this.onSelectHomeserver,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -328,11 +328,11 @@ class _Props extends Equatable {
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
         session: store.state.authStore.session != null &&
-            store.state.authStore.session.length > 0,
+            store.state.authStore.session!.length > 0,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },
-        onSetHomeserver: ({String hostname}) {
+        onSetHomeserver: ({String? hostname}) {
           return store.dispatch(setHostname(hostname: hostname));
         },
         onSelectHomeserver: (String homeserver) async {

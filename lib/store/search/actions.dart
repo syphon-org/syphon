@@ -25,36 +25,36 @@ import 'package:syphon/store/user/model.dart';
 class ResetSearchResults {}
 
 class SetLoading {
-  final bool loading;
+  final bool? loading;
 
   SetLoading({this.loading});
 }
 
 class SetSearchText {
-  final String text;
+  final String? text;
 
   SetSearchText({this.text});
 }
 
 class SetHomeservers {
-  final List<dynamic> homeservers;
+  final List<dynamic>? homeservers;
 
   SetHomeservers({this.homeservers});
 }
 
 class UpdateHomeservers {
-  final List<dynamic> homeservers;
+  final List<dynamic>? homeservers;
 
   UpdateHomeservers({this.homeservers});
 }
 
 // sets the "since" variable for pagination
 class SetSearchResults {
-  final String since;
-  final int totalResults;
-  final bool hasMore;
-  final String searchText;
-  final List<dynamic> searchResults;
+  final String? since;
+  final int? totalResults;
+  final bool? hasMore;
+  final String? searchText;
+  final List<dynamic>? searchResults;
 
   SetSearchResults({
     this.searchResults,
@@ -65,7 +65,7 @@ class SetSearchResults {
   });
 }
 
-Future<String> fetchFavicon({String url}) async {
+Future<String?> fetchFavicon({String? url}) async {
   try {
     // get the root store
     final origins = url.toString().split('.');
@@ -83,7 +83,7 @@ Future<String> fetchFavicon({String url}) async {
     final document = parse(response.body);
     final faviconIcon = document.querySelector('link[rel="icon"]');
     final faviconShort = document.querySelector('link[rel="shortcut icon"]');
-    final favicon = faviconShort != null ? faviconShort : faviconIcon;
+    final favicon = faviconShort != null ? faviconShort : faviconIcon!;
 
     var faviconUrl = fullUrl;
 
@@ -96,7 +96,7 @@ Future<String> fetchFavicon({String url}) async {
     }
 
     return faviconUrl +
-        favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
+        favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
     printError(error.toString());
   }
@@ -104,13 +104,13 @@ Future<String> fetchFavicon({String url}) async {
   return null;
 }
 
-ThunkAction<AppState> searchHomeservers({String searchText}) {
+ThunkAction<AppState> searchHomeservers({String? searchText}) {
   return (Store<AppState> store) async {
     List<Homeserver> searchResults =
         (store.state.searchStore.homeservers as List<Homeserver>)
             .where((homeserver) =>
-                homeserver.hostname.contains(searchText) ||
-                homeserver.description.contains(searchText))
+                homeserver.hostname!.contains(searchText!) ||
+                homeserver.description!.contains(searchText))
             .toList();
 
     store.dispatch(SetSearchResults(
@@ -123,18 +123,18 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
 /** 
  *  Search Rooms (Locally)
  */
-ThunkAction<AppState> searchRooms({String searchText}) {
+ThunkAction<AppState> searchRooms({String? searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
       final rooms = store.state.roomStore.roomList;
-      List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
+      List<Room> searchResults = List.from(rooms.where((room) => !room.direct!));
 
-      if (searchText.length != 0) {
+      if (searchText!.length != 0) {
         searchResults = List.from(
           rooms.where((room) {
-            final fulltext = room.name + room.alias + room.topic;
+            final fulltext = room.name! + room.alias! + room.topic!;
             return fulltext.contains(searchText);
           }),
         );
@@ -155,14 +155,14 @@ ThunkAction<AppState> searchRooms({String searchText}) {
 /** 
  *  Search Rooms (Remote)
  */
-ThunkAction<AppState> searchPublicRooms({String searchable}) {
+ThunkAction<AppState> searchPublicRooms({String? searchable}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
       final homeserverName = store.state.authStore.user.homeserverName;
 
-      var searchText = searchable;
+      var searchText = searchable!;
       var searchServer = homeserverName;
 
       if (searchText.contains(':')) {
@@ -171,7 +171,7 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
         searchServer = filteredText[1];
       }
 
-      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer);
+      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer!);
 
       final data = await MatrixApi.searchRooms(
         protocol: store.state.authStore.protocol,
@@ -209,7 +209,7 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
 /** 
  *  search requires remote access
  */
-ThunkAction<AppState> searchUsers({String searchText}) {
+ThunkAction<AppState> searchUsers({String? searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -243,7 +243,7 @@ ThunkAction<AppState> searchUsers({String searchText}) {
   };
 }
 
-ThunkAction<AppState> setSearchText({String text}) {
+ThunkAction<AppState> setSearchText({String? text}) {
   return (Store<AppState> store) async {
     store.dispatch(SetSearchText(text: text));
   };

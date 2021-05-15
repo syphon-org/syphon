@@ -18,14 +18,14 @@ abstract class Rooms {
    * for new events
    */
   static Future<dynamic> sync({
-    String protocol = 'https://', // http or https ( or libp2p :D )
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String since,
-    bool fullState = false,
-    String setPresence,
-    int timeout = 10000,
-    String filter,
+    String? protocol = 'https://', // http or https ( or libp2p :D )
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? since,
+    bool? fullState = false,
+    String? setPresence,
+    int? timeout = 10000,
+    String? filter,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
@@ -57,13 +57,13 @@ abstract class Rooms {
    * https://matrix.org/docs/spec/client_server/latest#id251 
    */
   static Future<dynamic> syncBackground(Map params) async {
-    String protocol = params['protocol'];
-    String homeserver = params['homeserver'];
-    String accessToken = params['accessToken'];
-    String since = params['since'];
-    bool fullState = params['fullState'];
-    int timeout = params['timeout'];
-    String filter = params['filter'];
+    String? protocol = params['protocol'];
+    String? homeserver = params['homeserver'];
+    String? accessToken = params['accessToken'];
+    String? since = params['since'];
+    bool? fullState = params['fullState'];
+    int? timeout = params['timeout'];
+    String? filter = params['filter'];
 
     return await sync(
       protocol: protocol,
@@ -82,9 +82,9 @@ abstract class Rooms {
   static Future<dynamic> syncRoom({
     String protocol = 'https://', // http or https ( or libp2p :D )
     String homeserver = 'matrix.org',
-    String accessToken,
-    String since,
-    String roomId,
+    String? accessToken,
+    String? since,
+    String? roomId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
@@ -104,10 +104,10 @@ abstract class Rooms {
   }
 
   static Future<dynamic> fetchRoomIds({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/joined_rooms';
 
@@ -124,10 +124,10 @@ abstract class Rooms {
   }
 
   static Future<dynamic> fetchDirectRoomIds({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
@@ -151,12 +151,12 @@ abstract class Rooms {
   * 
   */
   static Future<dynamic> joinRoom({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
   }) async {
-    final parts = roomId.split(':');
+    final parts = roomId!.split(':');
     final serverName = parts.length > 0 ? parts[1] : homeserver;
     final roomIdFormatted = Uri.encodeComponent(roomId);
 
@@ -189,14 +189,14 @@ abstract class Rooms {
    * to the room, but had not joined, this call serves to reject the invite.
    */
   static Future<dynamic> createRoom({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String name,
-    String alias,
-    String topic,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? name,
+    String? alias,
+    String? topic,
     String visibility = 'private',
-    List<String> invites = const [],
+    List<String?> invites = const [],
     String chatTypePreset = "private_chat",
     bool isDirect = false,
   }) async {
@@ -249,10 +249,10 @@ abstract class Rooms {
    * before calling this API.
    */
   static Future<dynamic> leaveRoom({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
 
@@ -287,10 +287,10 @@ abstract class Rooms {
    * Must leave room before you can forget (The Way)
    */
   static Future<dynamic> forgetRoom({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
 
@@ -324,8 +324,8 @@ abstract class Rooms {
   static Future<dynamic> deleteRoomAlias({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String roomAlias,
+    String? accessToken,
+    String? roomAlias,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
@@ -354,10 +354,10 @@ abstract class Rooms {
   static Future<dynamic> createFilter({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? accessToken,
+    String? userId,
     bool lazyLoading = false,
-    Map filters,
+    Map? filters,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
 
@@ -366,7 +366,7 @@ abstract class Rooms {
       ...Values.defaultHeaders,
     };
 
-    Map body = filters;
+    Map? body = filters;
 
     if (lazyLoading) {
       body = {
@@ -395,10 +395,10 @@ abstract class Rooms {
   static Future<dynamic> fetchFilter({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String roomAlias,
-    String filterId,
-    String userId,
+    String? accessToken,
+    String? roomAlias,
+    String? filterId,
+    String? userId,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';

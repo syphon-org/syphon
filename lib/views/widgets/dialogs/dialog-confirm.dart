@@ -10,7 +10,7 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogConfirm extends StatelessWidget {
   DialogConfirm({
-    Key key,
+    Key? key,
     this.title = '',
     this.content = '',
     this.onConfirm,
@@ -19,8 +19,8 @@ class DialogConfirm extends StatelessWidget {
 
   final String title;
   final String content;
-  final Function onConfirm;
-  final Function onDismiss;
+  final Function? onConfirm;
+  final Function? onDismiss;
 
   @override
   Widget build(BuildContext context) => SimpleDialog(
@@ -38,14 +38,14 @@ class DialogConfirm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ButtonText(
-                  onPressed: () => onDismiss(),
+                  onPressed: () => onDismiss!(),
                   textWidget: Text(
                     Strings.buttonCancel,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
                 ButtonText(
-                  onPressed: () => onConfirm(),
+                  onPressed: () => onConfirm!(),
                   textWidget: Text(
                     Strings.buttonConfirm,
                     style: Theme.of(context).textTheme.subtitle1,

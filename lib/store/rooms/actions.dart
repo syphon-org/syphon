@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // Flutter imports:
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 
 // Package imports:
@@ -38,28 +39,28 @@ import 'package:syphon/store/user/model.dart';
 import 'room/model.dart';
 
 class SetLoading {
-  final bool loading;
+  final bool? loading;
   SetLoading({this.loading});
 }
 
 class SetRooms {
-  final List<Room> rooms;
+  final List<Room>? rooms;
   SetRooms({this.rooms});
 }
 
 class SetRoom {
-  final Room room;
+  final Room? room;
   SetRoom({this.room});
 }
 
 // Atomically Update specific room attributes
 class UpdateRoom {
-  final String id; // room id
-  final bool syncing;
-  final bool sending;
-  final Message draft;
-  final Message reply;
-  final int lastRead;
+  final String? id; // room id
+  final bool? syncing;
+  final bool? sending;
+  final Message? draft;
+  final Message? reply;
+  final int? lastRead;
 
   UpdateRoom({
     this.id,
@@ -72,19 +73,19 @@ class UpdateRoom {
 }
 
 class SetReply {
-  final bool clear;
-  final Message reply; // room id
+  final bool? clear;
+  final Message? reply; // room id
 
   SetReply({this.clear, this.reply});
 }
 
 class RemoveRoom {
-  final String roomId;
+  final String? roomId;
   RemoveRoom({this.roomId});
 }
 
 class AddArchive {
-  final String roomId;
+  final String? roomId;
   AddArchive({this.roomId});
 }
 
@@ -93,9 +94,9 @@ class AddArchive {
 ///
 /// tempId is for messages that have attempted sending but not finished
 class SaveOutboxMessage {
-  final String id; // room id
-  final String tempId;
-  final Message pendingMessage;
+  final String? id; // room id
+  final String? tempId;
+  final Message? pendingMessage;
 
   SaveOutboxMessage({
     this.id,
@@ -105,7 +106,7 @@ class SaveOutboxMessage {
 }
 
 class DeleteOutboxMessage {
-  final Message message; // room id
+  final Message? message; // room id
 
   DeleteOutboxMessage({this.message});
 }
@@ -120,7 +121,7 @@ class ResetRooms {
  * Helper action that will determine how to update a room
  * from data formatted like a sync request
  */
-ThunkAction<AppState> syncRooms(Map roomData) {
+ThunkAction<AppState> syncRooms(Map? roomData) {
   return (Store<AppState> store) async {
     // init new store containers
     final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
@@ -135,11 +136,11 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
-      Room room = rooms.containsKey(id) ? rooms[id] : Room(id: id);
-      List<Message> messages = List<Message>();
+      Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+      List<Message>? messages = List<Message>();
 
       // First past to decrypt encrypted events
-      if (room.encryptionEnabled) {
+      if (room.encryptionEnabled!) {
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
           decryptEvents(room, json),
@@ -160,12 +161,12 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
       // update cold storage
       await Future.wait([
-        saveUsers(room.usersNew, storage: Storage.main),
+        saveUsers(room.usersNew, storage: Storage.main!),
         saveRooms({room.id: room}, storage: Storage.main),
-        saveReactions(room.reactions, storage: Storage.main),
-        saveMessages(room.messagesNew, storage: Storage.main),
-        saveRedactions(room.redactions, storage: Storage.main),
-        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
+        saveReactions(room.reactions, storage: Storage.main!),
+        saveMessages(room.messagesNew, storage: Storage.main!),
+        saveRedactions(room.redactions, storage: Storage.main!),
+        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced!),
       ]);
 
       // mutation filters - handles previously fetched messages
@@ -211,7 +212,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       // the end would be room.prevHash == room.lastHash
       // fetch previous messages since last /sync (a gap)
       // determined by the fromSync function of room
-      final roomUpdated = store.state.roomStore.rooms[room.id];
+      final roomUpdated = store.state.roomStore.rooms[room.id!];
       if (roomUpdated != null && room.limited) {
         store.dispatch(fetchMessageEvents(
           room: room,
@@ -230,11 +231,11 @@ ThunkAction<AppState> syncRooms(Map roomData) {
  *  
  */
 ThunkAction<AppState> fetchRoom(
-  String roomId, {
+  String? roomId, {
   bool direct = false,
   bool fetchState = true,
   bool fetchMessages = true,
-  String userId,
+  String? userId,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -284,7 +285,7 @@ ThunkAction<AppState> fetchRoom(
       };
 
       if (direct) {
-        payload['$roomId']['account_data'] = {
+        payload['$roomId']!['account_data'] = {
           'events': [
             {"type": 'm.direct'}
           ]
@@ -396,24 +397,24 @@ ThunkAction<AppState> fetchDirectRooms() {
  * matrix and caching in the app
  */
 ThunkAction<AppState> createRoom({
-  String name,
-  String alias,
-  String topic,
-  File avatarFile,
-  String avatarUri,
-  List<User> invites,
+  String? name,
+  String? alias,
+  String? topic,
+  File? avatarFile,
+  String? avatarUri,
+  List<User?>? invites,
   bool isDirect = false,
-  bool encryption = false, // TODO: defaults without group E2EE for now
+  bool? encryption = false, // TODO: defaults without group E2EE for now
   String preset = RoomPresets.private,
 }) {
   return (Store<AppState> store) async {
-    Room room;
+    Room? room;
     try {
       store.dispatch(SetLoading(loading: true));
       await store.dispatch(stopSyncObserver());
 
       final currentUser = store.state.authStore.user;
-      final inviteIds = invites.map((user) => user.userId).toList();
+      final inviteIds = invites!.map((user) => user!.userId).toList();
 
       final data = await MatrixApi.createRoom(
         protocol: store.state.authStore.protocol,
@@ -435,7 +436,7 @@ ThunkAction<AppState> createRoom({
       room = Room(id: data['room_id']);
 
       // Add invites to the user list beforehand
-      final userInviteMap = Map<String, User>.fromIterable(
+      final userInviteMap = Map<String?, User?>.fromIterable(
         invites,
         key: (user) => user.userId,
         value: (user) => user,
@@ -445,7 +446,7 @@ ThunkAction<AppState> createRoom({
       room = room.copyWith(users: userInviteMap);
 
       if (isDirect) {
-        final directUser = invites[0];
+        final directUser = invites[0]!;
         room = room.copyWith(
           direct: true,
           name: directUser.displayName ?? directUser.userId,
@@ -464,7 +465,7 @@ ThunkAction<AppState> createRoom({
 
       // direct chats are encrypted by default
       // group e2ee is not done yet
-      if (encryption || isDirect) {
+      if (encryption! || isDirect) {
         await store.dispatch(toggleRoomEncryption(room: room));
       }
 
@@ -504,12 +505,12 @@ ThunkAction<AppState> createRoom({
  * matrix and caching in the app
  */
 ThunkAction<AppState> updateRoom({
-  String name,
-  String alias,
-  String topic,
-  File avatarFile,
-  String avatarUri,
-  List<User> invites,
+  String? name,
+  String? alias,
+  String? topic,
+  File? avatarFile,
+  String? avatarUri,
+  List<User>? invites,
   bool isDirect = false,
   String preset = RoomPresets.private,
 }) {
@@ -530,16 +531,16 @@ ThunkAction<AppState> updateRoom({
  * Send Fully Read or just Read receipts bundled into 
  * one http call
  */
-ThunkAction<AppState> markRoomRead({String roomId}) {
+ThunkAction<AppState> markRoomRead({String? roomId}) {
   return (Store<AppState> store) async {
     try {
-      final room = store.state.roomStore.rooms[roomId];
+      final room = store.state.roomStore.rooms[roomId!];
       if (room == null) {
         throw 'Room not found';
       }
 
       // mark read locally only
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceipts!) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -547,7 +548,7 @@ ThunkAction<AppState> markRoomRead({String roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.readReceipts) {
+      if (store.state.settingsStore.readReceipts!) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );
@@ -606,7 +607,7 @@ ThunkAction<AppState> markRoomsReadAll() {
  * Fetch the direct rooms list and recalculate it without the
  * given alias
  */
-ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
+ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -627,9 +628,8 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       final currentUser = store.state.authStore.user;
 
       // only the other user id, and not the user object, is needed here
-      final otherUserId = room.userIds.firstWhere(
+      final otherUserId = room!.userIds.firstWhereOrNull(
         (userId) => userId != currentUser.userId,
-        orElse: () => null,
       );
 
       if (otherUserId == null) {
@@ -640,7 +640,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
       Map directRoomUsers = data as Map<String, dynamic>;
       final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
-      if (usersDirectRooms.isEmpty && enabled) {
+      if (usersDirectRooms.isEmpty && enabled!) {
         directRoomUsers[otherUserId] = [room.id];
       }
 
@@ -652,7 +652,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
           return MapEntry(userId, updatedRooms);
         }
 
-        if (enabled) {
+        if (enabled!) {
           updatedRooms.add(room.id);
         } else {
           updatedRooms.removeWhere((roomId) => roomId == room.id);
@@ -700,7 +700,7 @@ ThunkAction<AppState> toggleDirectRoom({Room room, bool enabled}) {
 /**
  * Update room avatar
  */
-ThunkAction<AppState> updateRoomAvatar({String roomId, File localFile}) {
+ThunkAction<AppState> updateRoomAvatar({String? roomId, File? localFile}) {
   return (Store<AppState> store) async {
     try {
       final data = await store.dispatch(uploadMedia(
@@ -739,10 +739,10 @@ ThunkAction<AppState> updateRoomAvatar({String roomId, File localFile}) {
 /**
  * Toggle Room Encryption On (Only)
  */
-ThunkAction<AppState> toggleRoomEncryption({Room room}) {
+ThunkAction<AppState> toggleRoomEncryption({Room? room}) {
   return (Store<AppState> store) async {
     try {
-      if (room.encryptionEnabled) {
+      if (room!.encryptionEnabled!) {
         throw 'Room is already encrypted';
       }
 
@@ -776,14 +776,14 @@ ThunkAction<AppState> toggleRoomEncryption({Room room}) {
  * Not sure if this process is / will be any different
  * than accepting an invite
  */
-ThunkAction<AppState> joinRoom({Room room}) {
+ThunkAction<AppState> joinRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.joinRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id ?? room.alias,
+        roomId: room!.id ?? room.alias,
       );
 
       if (data['errcode'] != null) {
@@ -793,7 +793,7 @@ ThunkAction<AppState> joinRoom({Room room}) {
       final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
 
       Room joinedRoom = rooms.containsKey(room.id)
-          ? rooms[room.id]
+          ? rooms[room.id!]!
           : Room(
               id: room.id,
             );
@@ -818,8 +818,8 @@ ThunkAction<AppState> joinRoom({Room room}) {
  *  
  */
 ThunkAction<AppState> inviteUser({
-  Room room,
-  User user,
+  Room? room,
+  User? user,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -829,8 +829,8 @@ ThunkAction<AppState> inviteUser({
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-        userId: user.userId,
+        roomId: room!.id,
+        userId: user!.userId,
       );
 
       if (data['errcode'] != null) {
@@ -854,14 +854,14 @@ ThunkAction<AppState> inviteUser({
  * Not sure if this process is / will be any different
  * than joining a room
  */
-ThunkAction<AppState> acceptRoom({Room room}) {
+ThunkAction<AppState> acceptRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.joinRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
+        roomId: room!.id,
       );
 
       if (data['errcode'] != null) {
@@ -871,7 +871,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
       final rooms = store.state.roomStore.rooms ?? Map<String, Room>();
 
       Room joinedRoom = rooms.containsKey(room.id)
-          ? rooms[room.id]
+          ? rooms[room.id!]!
           : Room(
               id: room.id,
             );
@@ -894,7 +894,7 @@ ThunkAction<AppState> acceptRoom({Room room}) {
  * 
  * Both leaves and forgets room
  */
-ThunkAction<AppState> removeRoom({Room room}) {
+ThunkAction<AppState> removeRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -904,7 +904,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
+        roomId: room!.id,
       );
 
       // remove the room locally if it's already been removed remotely
@@ -933,7 +933,7 @@ ThunkAction<AppState> removeRoom({Room room}) {
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {
-      if (room.direct) {
+      if (room!.direct!) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 
@@ -955,12 +955,12 @@ ThunkAction<AppState> removeRoom({Room room}) {
  * the user can only delete if owning the room, or leave if
  * just a member
  */
-ThunkAction<AppState> leaveRoom({Room room}) {
+ThunkAction<AppState> leaveRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      if (room.direct) {
+      if (room!.direct!) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 
@@ -990,10 +990,10 @@ ThunkAction<AppState> leaveRoom({Room room}) {
  * 
  * Client side temporary hiding only
  */
-ThunkAction<AppState> archiveRoom({Room room}) {
+ThunkAction<AppState> archiveRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(AddArchive(roomId: room.id));
+      store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
       debugPrint('[archiveRoom] $error');
     }

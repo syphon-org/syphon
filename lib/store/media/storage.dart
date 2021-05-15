@@ -7,20 +7,20 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 
 Future<bool> checkMedia(
-  String mxcUri, {
-  Database storage,
+  String? mxcUri, {
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.MEDIA);
+  final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
   return await store.record(mxcUri).exists(storage);
 }
 
 Future<void> saveMedia(
-  String mxcUri,
-  Uint8List data, {
-  Database storage,
+  String? mxcUri,
+  Uint8List? data, {
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.MEDIA);
+  final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
   return await storage.transaction((txn) async {
     final record = store.record(mxcUri);
@@ -33,20 +33,20 @@ Future<void> saveMedia(
  * 
  * load one set of media data based on mxc uri
  */
-Future<Uint8List> loadMedia({
-  String mxcUri,
-  Database storage,
+Future<Uint8List?> loadMedia({
+  String? mxcUri,
+  required Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(StorageKeys.MEDIA);
+    final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
-    final mediaData = await store.record(mxcUri).get(storage);
+    final mediaData = await (store.record(mxcUri).get(storage) as FutureOr<String>);
 
     final dataBytes = json.decode(mediaData);
 
     // Convert json decoded List<int> to Uint8List
     return Uint8List.fromList(
-        (dataBytes as List)?.map((e) => e as int)?.toList());
+        (dataBytes as List?)?.map((e) => e as int)?.toList());
   } catch (error) {
     printError(error.toString(), title: 'loadMedia');
     return null;
@@ -58,8 +58,8 @@ Future<Uint8List> loadMedia({
  *  
  * load all media found within media storage
  */
-Future<Map<String, Uint8List>> loadMediaAll({
-  Database storage,
+Future<Map<String, Uint8List>?> loadMediaAll({
+  required Database storage,
 }) async {
   try {
     final Map<String, Uint8List> media = {};

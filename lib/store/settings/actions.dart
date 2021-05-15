@@ -27,43 +27,43 @@ class SetTheme {
 }
 
 class SetPrimaryColor {
-  final int color;
+  final int? color;
   SetPrimaryColor({this.color});
 }
 
 class SetAvatarShape {
-  final String avatarShape;
+  final String? avatarShape;
   SetAvatarShape({this.avatarShape});
 }
 
 class SetAccentColor {
-  final int color;
+  final int? color;
   SetAccentColor({this.color});
 }
 
 class SetAppBarColor {
-  final int color;
+  final int? color;
   SetAppBarColor({this.color});
 }
 
 class SetFontName {
-  final String fontName;
+  final String? fontName;
   SetFontName({this.fontName});
 }
 
 class SetFontSize {
-  final String fontSize;
+  final String? fontSize;
   SetFontSize({this.fontSize});
 }
 
 class SetMessageSize {
-  final String messageSize;
+  final String? messageSize;
   SetMessageSize({this.messageSize});
 }
 
 class SetRoomPrimaryColor {
-  final int color;
-  final String roomId;
+  final int? color;
+  final String? roomId;
 
   SetRoomPrimaryColor({
     this.color,
@@ -72,27 +72,27 @@ class SetRoomPrimaryColor {
 }
 
 class SetPusherToken {
-  final String token;
+  final String? token;
   SetPusherToken({this.token});
 }
 
 class SetLoading {
-  final bool loading;
+  final bool? loading;
   SetLoading({this.loading});
 }
 
 class SetDevices {
-  final List<Device> devices;
+  final List<Device>? devices;
   SetDevices({this.devices});
 }
 
 class SetLanguage {
-  final String language;
+  final String? language;
   SetLanguage({this.language});
 }
 
 class SetEnterSend {
-  final bool enterSend;
+  final bool? enterSend;
   SetEnterSend({this.enterSend});
 }
 
@@ -147,7 +147,7 @@ ThunkAction<AppState> fetchDevices() {
 /**
  * Fetch Active Devices for account
  */
-ThunkAction<AppState> updateDevice({String deviceId}) {
+ThunkAction<AppState> updateDevice({String? deviceId}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -178,7 +178,7 @@ ThunkAction<AppState> updateDevice({String deviceId}) {
  * Delete a single device
  * ** Fails after recent matix.org update **
  */
-ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
+ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -224,7 +224,7 @@ ThunkAction<AppState> deleteDevice({String deviceId, bool disableLoading}) {
 /**
  * Delete multiple devices
  */
-ThunkAction<AppState> deleteDevices({List<String> deviceIds}) {
+ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -422,7 +422,7 @@ ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(
       SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSend,
+        enterSend: !store.state.settingsStore.enterSend!,
       ),
     );
   };
@@ -443,11 +443,11 @@ ThunkAction<AppState> toggleMembershipEvents() {
 ThunkAction<AppState> toggleNotifications() {
   return (Store<AppState> store) async {
     if (await promptNativeNotificationsRequest(
-      pluginInstance: globalNotificationPluginInstance,
+      pluginInstance: globalNotificationPluginInstance!,
     )) {
       store.dispatch(ToggleNotifications());
-      final enabled = store.state.settingsStore.notificationsEnabled;
-      final Map<String, String> roomNames = store.state.roomStore.rooms.map(
+      final enabled = store.state.settingsStore.notificationsEnabled!;
+      final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
         (roomId, room) => MapEntry(roomId, room.name),
       );
       if (enabled) {
@@ -463,7 +463,7 @@ ThunkAction<AppState> toggleNotifications() {
 
         showBackgroundServiceNotification(
           notificationId: BackgroundSync.service_id,
-          pluginInstance: globalNotificationPluginInstance,
+          pluginInstance: globalNotificationPluginInstance!,
         );
       } else {
         BackgroundSync.stop();

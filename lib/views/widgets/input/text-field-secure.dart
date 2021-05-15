@@ -17,7 +17,7 @@ import 'package:syphon/global/dimensions.dart';
  */
 class TextFieldSecure extends StatelessWidget {
   TextFieldSecure({
-    Key key,
+    Key? key,
     this.label,
     this.hint,
     this.suffix,
@@ -42,20 +42,20 @@ class TextFieldSecure extends StatelessWidget {
   final bool obscureText;
   final bool disableSpacing;
   final int maxLines;
-  final Widget suffix; // include actions
-  final String hint;
-  final String label;
+  final Widget? suffix; // include actions
+  final String? hint;
+  final String? label;
   final TextAlign textAlign;
 
-  final FocusNode focusNode;
-  final TextInputAction textInputAction;
-  final TextEditingController controller;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final TextEditingController? controller;
   final List<TextInputFormatter> formatters;
 
-  final Function onChanged;
-  final Function onSubmitted;
-  final Function onEditingComplete;
-  final Iterable<String> autofillHints;
+  final Function? onChanged;
+  final Function? onSubmitted;
+  final Function? onEditingComplete;
+  final Iterable<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -69,10 +69,10 @@ class TextFieldSecure extends StatelessWidget {
           maxLines: maxLines,
           focusNode: focusNode,
           controller: controller,
-          onChanged: onChanged,
-          onSubmitted: onSubmitted,
+          onChanged: onChanged as void Function(String)?,
+          onSubmitted: onSubmitted as void Function(String)?,
           textInputAction: textInputAction,
-          onEditingComplete: onEditingComplete,
+          onEditingComplete: onEditingComplete as void Function()?,
           autocorrect: false,
           enableSuggestions: false,
           autofillHints: autofillHints,

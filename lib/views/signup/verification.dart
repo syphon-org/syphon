@@ -26,22 +26,22 @@ import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 // Assets
 
 class VerificationView extends StatefulWidget {
-  const VerificationView({Key key}) : super(key: key);
+  const VerificationView({Key? key}) : super(key: key);
 
   VerificationViewState createState() => VerificationViewState();
 }
 
 class VerificationViewState extends State<VerificationView>
     with WidgetsBindingObserver {
-  bool sending;
-  bool success;
+  late bool sending;
+  bool? success;
 
-  int sendAttempt;
+  late int sendAttempt;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
 
     this.setState(() {
       sending = false;
@@ -51,7 +51,7 @@ class VerificationViewState extends State<VerificationView>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -62,7 +62,7 @@ class VerificationViewState extends State<VerificationView>
 
     switch (state) {
       case AppLifecycleState.resumed:
-        if (success == null || !success) {
+        if (success == null || !success!) {
           final result = await props.onCreateUser(enableErrors: true);
           this.setState(() {
             success = result;
@@ -249,16 +249,16 @@ class _Props extends Equatable {
   final Function onResendVerification;
 
   _Props({
-    @required this.loading,
-    @required this.verification,
-    @required this.onCreateUser,
-    @required this.onResendVerification,
+    required this.loading,
+    required this.verification,
+    required this.onCreateUser,
+    required this.onResendVerification,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         verification: store.state.authStore.verificationNeeded,
-        onResendVerification: ({int sendAttempt}) async {
+        onResendVerification: ({int? sendAttempt}) async {
           return await store.dispatch(submitEmail(sendAttempt: sendAttempt));
         },
         onCreateUser: ({bool enableErrors = false}) async {

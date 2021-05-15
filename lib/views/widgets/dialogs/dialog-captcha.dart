@@ -18,13 +18,13 @@ import 'package:syphon/views/widgets/captcha.dart';
 
 class DialogCaptcha extends StatelessWidget {
   DialogCaptcha({
-    Key key,
+    Key? key,
     this.onConfirm,
     this.onCancel,
   }) : super(key: key);
 
-  final Function onConfirm;
-  final Function onCancel;
+  final Function? onConfirm;
+  final Function? onCancel;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -78,7 +78,7 @@ class DialogCaptcha extends StatelessWidget {
                   text: 'Cancel',
                   onPressed: () {
                     if (this.onCancel != null) {
-                      this.onCancel();
+                      this.onCancel!();
                     }
                     Navigator.of(context).pop();
                   },
@@ -92,14 +92,14 @@ class DialogCaptcha extends StatelessWidget {
 
 class Props extends Equatable {
   final bool completed;
-  final String publicKey;
+  final String? publicKey;
 
   final Function onCompleteCaptcha;
 
   Props({
-    @required this.completed,
-    @required this.publicKey,
-    @required this.onCompleteCaptcha,
+    required this.completed,
+    required this.publicKey,
+    required this.onCompleteCaptcha,
   });
 
   static Props mapStateToProps(Store<AppState> store) => Props(
@@ -108,7 +108,7 @@ class Props extends Equatable {
           return store.state.authStore.interactiveAuths['params']
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token, {BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),
@@ -119,7 +119,7 @@ class Props extends Equatable {
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         completed,
         publicKey,
       ];

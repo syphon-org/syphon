@@ -21,18 +21,18 @@ import 'package:syphon/views/widgets/messages/message-typing.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 class MessageList extends StatefulWidget {
-  final String roomId;
-  final Message selectedMessage;
+  final String? roomId;
+  final Message? selectedMessage;
   final ScrollController scrollController;
 
-  final Function onSelectReply;
-  final Function onViewUserDetails;
-  final void Function(Message) onToggleSelectedMessage;
+  final Function? onSelectReply;
+  final Function? onViewUserDetails;
+  final void Function(Message?)? onToggleSelectedMessage;
 
   const MessageList({
-    Key key,
-    @required this.roomId,
-    @required this.scrollController,
+    Key? key,
+    required this.roomId,
+    required this.scrollController,
     this.selectedMessage,
     this.onSelectReply,
     this.onViewUserDetails,
@@ -45,7 +45,7 @@ class MessageList extends StatefulWidget {
 
 class MessageListState extends State<MessageList> {
   MessageListState({
-    Key key,
+    Key? key,
   }) : super();
   final TextEditingController controller = TextEditingController();
 
@@ -53,7 +53,7 @@ class MessageListState extends State<MessageList> {
   onMounted(_Props props) {}
 
   @protected
-  onInputReaction({Message message, _Props props}) async {
+  onInputReaction({Message? message, _Props? props}) async {
     final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
       context: context,
@@ -85,13 +85,13 @@ class MessageListState extends State<MessageList> {
               ),
             ),
             onEmojiSelected: (category, emoji) {
-              props.onToggleReaction(
+              props!.onToggleReaction(
                 emoji: emoji.emoji,
                 message: message,
               );
 
               Navigator.pop(context, false);
-              widget.onToggleSelectedMessage(null);
+              widget.onToggleSelectedMessage!(null);
             }),
       ),
     );
@@ -105,7 +105,7 @@ class MessageListState extends State<MessageList> {
         onInitialBuild: onMounted,
         builder: (context, props) {
           return GestureDetector(
-            onTap: () => widget.onToggleSelectedMessage(null),
+            onTap: () => widget.onToggleSelectedMessage!(null),
             child: ListView(
               reverse: true,
               padding: EdgeInsets.only(bottom: 12),
@@ -119,7 +119,7 @@ class MessageListState extends State<MessageList> {
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
                   selectedMessageId: widget.selectedMessage != null
-                      ? widget.selectedMessage.id
+                      ? widget.selectedMessage!.id
                       : null,
                   onPressAvatar: widget.onViewUserDetails,
                 ),
@@ -133,7 +133,7 @@ class MessageListState extends State<MessageList> {
                   scrollDirection: Axis.vertical,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
-                    final message = props.messages[index];
+                    final message = props.messages[index]!;
                     final lastMessage =
                         index != 0 ? props.messages[index - 1] : null;
                     final nextMessage = index + 1 < props.messages.length
@@ -148,7 +148,7 @@ class MessageListState extends State<MessageList> {
                         props.currentUser.userId == message.sender;
 
                     final selectedMessageId = widget.selectedMessage != null
-                        ? widget.selectedMessage.id
+                        ? widget.selectedMessage!.id
                         : null;
 
                     final avatarUri = props.users[message.sender]?.avatarUri;
@@ -163,10 +163,10 @@ class MessageListState extends State<MessageList> {
                       avatarUri: avatarUri,
                       theme: props.theme,
                       fontSize: 14,
-                      timeFormat: props.timeFormat24Enabled ? '24hr' : '12hr',
+                      timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
                       onSwipe: props.onSelectReply,
                       onPressAvatar: widget.onViewUserDetails,
-                      onLongPress: (msg) => widget.onToggleSelectedMessage(msg),
+                      onLongPress: (msg) => widget.onToggleSelectedMessage!(msg),
                       onInputReaction: () => onInputReaction(
                         message: message,
                         props: props,
@@ -189,22 +189,22 @@ class _Props extends Equatable {
   final Room room;
   final ThemeType theme;
   final User currentUser;
-  final Map<String, User> users;
-  final List<Message> messages;
-  final bool timeFormat24Enabled;
+  final Map<String?, User?> users;
+  final List<Message?> messages;
+  final bool? timeFormat24Enabled;
 
   final Function onToggleReaction;
   final Function onSelectReply;
 
   _Props({
-    @required this.room,
-    @required this.theme,
-    @required this.users,
-    @required this.messages,
-    @required this.currentUser,
-    @required this.timeFormat24Enabled,
-    @required this.onToggleReaction,
-    @required this.onSelectReply,
+    required this.room,
+    required this.theme,
+    required this.users,
+    required this.messages,
+    required this.currentUser,
+    required this.timeFormat24Enabled,
+    required this.onToggleReaction,
+    required this.onSelectReply,
   });
 
   @override
@@ -214,7 +214,7 @@ class _Props extends Equatable {
         messages,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
         theme: store.state.settingsStore.theme,
         currentUser: store.state.authStore.user,
@@ -232,7 +232,7 @@ class _Props extends Equatable {
         onSelectReply: (Message message) {
           store.dispatch(selectReply(roomId: roomId, message: message));
         },
-        onToggleReaction: ({Message message, String emoji}) {
+        onToggleReaction: ({Message? message, String? emoji}) {
           final room = selectRoom(id: roomId, state: store.state);
 
           store.dispatch(

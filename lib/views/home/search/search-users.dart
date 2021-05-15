@@ -33,7 +33,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class SearchUserView extends StatefulWidget {
-  const SearchUserView({Key key}) : super(key: key);
+  const SearchUserView({Key? key}) : super(key: key);
 
   @override
   SearchUserState createState() => SearchUserState();
@@ -42,10 +42,10 @@ class SearchUserView extends StatefulWidget {
 class SearchUserState extends State<SearchUserView> {
   final searchInputFocusNode = FocusNode();
 
-  SearchUserState({Key key});
+  SearchUserState({Key? key});
 
-  String searchable;
-  String creatingRoomDisplayName;
+  String? searchable;
+  String? creatingRoomDisplayName;
 
   // componentDidMount(){}
   @override
@@ -74,8 +74,8 @@ class SearchUserState extends State<SearchUserView> {
 
   @protected
   onShowUserDetails({
-    BuildContext context,
-    User user,
+    required BuildContext context,
+    User? user,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -89,18 +89,18 @@ class SearchUserState extends State<SearchUserView> {
   }
 
   @protected
-  void onMessageUser({BuildContext context, _Props props, User user}) async {
+  void onMessageUser({required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Chat with ${formatUsername(user)}',
+        title: 'Chat with ${formatUsername(user!)}',
         content: Strings.confirmationStartChat,
         onStartChat: () async {
           this.setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props.onCreateChatDirect(user: user);
+          final newRoomId = await props!.onCreateChatDirect(user: user);
 
           Navigator.pop(context);
 
@@ -127,18 +127,18 @@ class SearchUserState extends State<SearchUserView> {
    * by the name searched
    */
   @protected
-  void onAttemptChat({BuildContext context, _Props props, User user}) async {
+  void onAttemptChat({required BuildContext context, _Props? props, User? user}) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${formatUsername(user)}',
+        title: 'Try chatting with ${formatUsername(user!)}',
         content: Strings.confirmationAttemptChat,
         onStartChat: () async {
           this.setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props.onCreateChatDirect(user: user);
+          final newRoomId = await props!.onCreateChatDirect(user: user);
 
           Navigator.pop(context);
 
@@ -163,7 +163,7 @@ class SearchUserState extends State<SearchUserView> {
 
     final attemptableUser = User(
       displayName: searchText,
-      userId: searchable != null && searchable.contains(":")
+      userId: searchable != null && searchable!.contains(":")
           ? searchable
           : formatUserId(searchText),
     );
@@ -173,16 +173,16 @@ class SearchUserState extends State<SearchUserView> {
     );
 
     final showManualUser =
-        searchable != null && searchable.length > 0 && foundResult < 0;
+        searchable != null && searchable!.length > 0 && foundResult < 0;
 
-    final usersList = searchable == null || searchable.isEmpty
+    final usersList = searchable == null || searchable!.isEmpty
         ? props.usersRecent
         : props.searchResults;
 
     return ListView(
       children: [
         Visibility(
-          visible: searchable == null || searchable.isEmpty,
+          visible: searchable == null || searchable!.isEmpty,
           child: Container(
             padding: EdgeInsets.only(
               left: 20,
@@ -225,8 +225,8 @@ class SearchUserState extends State<SearchUserView> {
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   subtitle: Text(
-                    attemptableUser.userId,
-                    style: Theme.of(context).textTheme.caption.merge(
+                    attemptableUser.userId!,
+                    style: Theme.of(context).textTheme.caption!.merge(
                           TextStyle(
                             color: props.loading
                                 ? Color(Colours.greyDisabled)
@@ -286,8 +286,8 @@ class SearchUserState extends State<SearchUserView> {
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
                     subtitle: Text(
-                      user.userId,
-                      style: Theme.of(context).textTheme.caption.merge(
+                      user.userId!,
+                      style: Theme.of(context).textTheme.caption!.merge(
                             TextStyle(
                               color: props.loading
                                   ? Color(Colours.greyDisabled)
@@ -378,13 +378,13 @@ class _Props extends Equatable {
   final Function onCreateChatDirect;
 
   _Props({
-    @required this.theme,
-    @required this.loading,
-    @required this.creatingRoom,
-    @required this.searchResults,
-    @required this.usersRecent,
-    @required this.onSearch,
-    @required this.onCreateChatDirect,
+    required this.theme,
+    required this.loading,
+    required this.creatingRoom,
+    required this.searchResults,
+    required this.usersRecent,
+    required this.onSearch,
+    required this.onCreateChatDirect,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -400,10 +400,10 @@ class _Props extends Equatable {
 
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateChatDirect: ({User user}) async {
+        onCreateChatDirect: ({User? user}) async {
           return store.dispatch(createRoom(
             isDirect: true,
-            invites: <User>[user],
+            invites: <User?>[user],
           ));
         },
       );

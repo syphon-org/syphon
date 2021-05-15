@@ -13,11 +13,11 @@ import 'package:syphon/global/dimensions.dart';
 
 class ModalImageOptions extends StatelessWidget {
   ModalImageOptions({
-    Key key,
+    Key? key,
     this.onSetNewAvatar,
   }) : super(key: key);
 
-  final Function onSetNewAvatar;
+  final Function? onSetNewAvatar;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -59,15 +59,15 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final PickedFile image = await ImagePicker().getImage(
+                final PickedFile image = await (ImagePicker().getImage(
                   source: ImageSource.camera,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                );
+                ) as FutureOr<PickedFile>);
 
                 final File imageFile = File(image.path);
                 if (this.onSetNewAvatar != null) {
-                  this.onSetNewAvatar(image: imageFile);
+                  this.onSetNewAvatar!(image: imageFile);
                 }
 
                 Navigator.pop(context);
@@ -86,16 +86,16 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final PickedFile image = await ImagePicker().getImage(
+                final PickedFile image = await (ImagePicker().getImage(
                   source: ImageSource.gallery,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                );
+                ) as FutureOr<PickedFile>);
 
                 final File imageFile = File(image.path);
 
                 if (onSetNewAvatar != null) {
-                  onSetNewAvatar(image: imageFile);
+                  onSetNewAvatar!(image: imageFile);
                 }
                 Navigator.pop(context);
               },

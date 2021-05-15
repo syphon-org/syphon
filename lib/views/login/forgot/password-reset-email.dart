@@ -27,7 +27,7 @@ final Duration nextAnimationDuration = Duration(
 );
 
 class PasswordResetEmailView extends StatefulWidget {
-  const PasswordResetEmailView({Key key}) : super(key: key);
+  const PasswordResetEmailView({Key? key}) : super(key: key);
 
   PasswordResetEmailState createState() => PasswordResetEmailState();
 }
@@ -36,14 +36,14 @@ class PasswordResetEmailState extends State<PasswordResetEmailView> {
   int sendAttempt = 1;
   bool loading = false;
   bool showConfirmation = false;
-  PageController pageController;
+  PageController? pageController;
 
   var sections = [
     EmailVerifyStep(),
   ];
 
   PasswordResetEmailState({
-    Key key,
+    Key? key,
   });
 
   @override
@@ -230,12 +230,12 @@ class _Props extends Equatable {
   final Function onConfirmVerification;
 
   _Props({
-    @required this.loading,
-    @required this.isEmailValid,
-    @required this.isHomeserverValid,
-    @required this.interactiveAuths,
-    @required this.onSendVerification,
-    @required this.onConfirmVerification,
+    required this.loading,
+    required this.isEmailValid,
+    required this.isHomeserverValid,
+    required this.interactiveAuths,
+    required this.onSendVerification,
+    required this.onConfirmVerification,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

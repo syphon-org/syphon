@@ -20,23 +20,23 @@ class AuthStore extends Equatable {
   final User user;
 
   @JsonKey()
-  final String session; // a.k.a sid or session id
+  final String? session; // a.k.a sid or session id
 
   @JsonKey()
-  final String clientSecret;
+  final String? clientSecret;
 
   @JsonKey()
-  final String protocol;
+  final String? protocol;
 
   User get currentUser => user;
 
-  final StreamController<User> authObserver;
+  final StreamController<User?>? authObserver;
 
-  Stream<User> get onAuthStateChanged =>
-      authObserver != null ? authObserver.stream : null;
+  Stream<User?>? get onAuthStateChanged =>
+      authObserver != null ? authObserver!.stream : null;
 
   // Interactive Auth Data
-  final Credential credential;
+  final Credential? credential;
   final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
 
@@ -99,7 +99,7 @@ class AuthStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         user,
         session,
         clientSecret,

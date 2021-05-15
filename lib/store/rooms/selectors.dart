@@ -2,9 +2,9 @@
 import 'package:syphon/store/index.dart';
 import './room/model.dart';
 
-Room selectRoom({AppState state, String id}) {
+Room selectRoom({required AppState state, String? id}) {
   if (state.roomStore.rooms == null) return Room();
-  return state.roomStore.rooms[id] ?? Room();
+  return state.roomStore.rooms[id!] ?? Room();
 }
 
 List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
@@ -53,5 +53,5 @@ List<Room> sortedPrioritizedRooms(List<Room> rooms) {
     return 0;
   });
 
-  return sortedList;
+  return sortedList as List<Room>;
 }

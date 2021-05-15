@@ -7,13 +7,13 @@ import 'package:syphon/global/strings.dart';
 
 class DialogEncryption extends StatelessWidget {
   DialogEncryption({
-    Key key,
+    Key? key,
     this.content = Strings.confirmationEncryption,
     this.onAccept,
   }) : super(key: key);
 
   final String content;
-  final Function onAccept;
+  final Function? onAccept;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class DialogEncryption extends StatelessWidget {
               ),
               onPressed: () async {
                 if (onAccept != null) {
-                  await onAccept();
+                  await onAccept!();
                 }
 
                 Navigator.pop(context);

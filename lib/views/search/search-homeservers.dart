@@ -26,18 +26,18 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class SearchHomeservers extends StatefulWidget {
-  const SearchHomeservers({Key key}) : super(key: key);
+  const SearchHomeservers({Key? key}) : super(key: key);
 
   @override
   SearchHomeserversState createState() => SearchHomeserversState();
 }
 
 class SearchHomeserversState extends State<SearchHomeservers> {
-  final Store<AppState> store;
+  final Store<AppState>? store;
   final searchInputFocusNode = FocusNode();
 
   bool searching = false;
-  SearchHomeserversState({Key key, this.store});
+  SearchHomeserversState({Key? key, this.store});
 
   @override
   void didChangeDependencies() {
@@ -102,7 +102,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                     itemCount: props.homeservers.length,
                     itemBuilder: (BuildContext context, int index) {
                       final Homeserver homeserver =
-                          props.homeservers[index] ?? Map();
+                          props.homeservers[index] ?? Map() as Homeserver;
 
                       return GestureDetector(
                         onTap: () {
@@ -126,11 +126,11 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                     Colours.hashedColor(homeserver.hostname),
                               ),
                               title: Text(
-                                homeserver.hostname,
+                                homeserver.hostname!,
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                               subtitle: Text(
-                                homeserver.description,
+                                homeserver.description!,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ),
@@ -220,7 +220,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver.responseTime + 'ms',
+                                        homeserver.responseTime! + 'ms',
                                         softWrap: true,
                                       ),
                                     ],
@@ -268,7 +268,7 @@ class SearchHomeserversState extends State<SearchHomeservers> {
                           ),
                           subtitle: Text(
                             'Try logging in with this server',
-                            style: Theme.of(context).textTheme.caption.merge(
+                            style: Theme.of(context).textTheme.caption!.merge(
                                   TextStyle(fontStyle: FontStyle.italic),
                                 ),
                           ),
@@ -294,13 +294,13 @@ class _Props extends Equatable {
   final Function onFetchHomeserverPreview;
 
   _Props({
-    @required this.loading,
-    @required this.homeservers,
-    @required this.searchText,
-    @required this.homeserver,
-    @required this.onSelect,
-    @required this.onSearch,
-    @required this.onFetchHomeserverPreview,
+    required this.loading,
+    required this.homeservers,
+    required this.searchText,
+    required this.homeserver,
+    required this.onSelect,
+    required this.onSearch,
+    required this.onFetchHomeserverPreview,
   });
 
   @override

@@ -56,14 +56,14 @@ SettingsStore settingsReducer(
       );
     case SetRoomPrimaryColor:
       final chatSettings =
-          Map<String, ChatSetting>.from(state.customChatSettings ?? Map());
+          Map<String?, ChatSetting>.from(state.customChatSettings ?? Map());
 
       // Initialize chat settings if null
       if (chatSettings[action.roomId] == null) {
         chatSettings[action.roomId] = ChatSetting();
       }
 
-      chatSettings[action.roomId] = chatSettings[action.roomId].copyWith(
+      chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
         primaryColor: action.color,
       );
       return state.copyWith(
@@ -83,23 +83,23 @@ SettingsStore settingsReducer(
       );
     case ToggleTypingIndicators:
       return state.copyWith(
-        typingIndicators: !state.typingIndicators,
+        typingIndicators: !state.typingIndicators!,
       );
     case ToggleTimeFormat:
       return state.copyWith(
-        timeFormat24Enabled: !state.timeFormat24Enabled,
+        timeFormat24Enabled: !state.timeFormat24Enabled!,
       );
     case ToggleDismissKeyboard:
       return state.copyWith(
-        dismissKeyboardEnabled: !state.dismissKeyboardEnabled,
+        dismissKeyboardEnabled: !state.dismissKeyboardEnabled!,
       );
     case ToggleReadReceipts:
       return state.copyWith(
-        readReceipts: !state.readReceipts,
+        readReceipts: !state.readReceipts!,
       );
     case ToggleMembershipEvents:
       return state.copyWith(
-        membershipEventsEnabled: !state.membershipEventsEnabled,
+        membershipEventsEnabled: !state.membershipEventsEnabled!,
       );
     case ToggleRoomTypeBadges:
       return state.copyWith(
@@ -107,7 +107,7 @@ SettingsStore settingsReducer(
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationsEnabled: !state.notificationsEnabled,
+        notificationsEnabled: !state.notificationsEnabled!,
       );
     default:
       return state;

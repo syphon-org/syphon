@@ -24,15 +24,15 @@ import 'package:syphon/global/values.dart';
 
 // PushConnector connector;
 
-FlutterLocalNotificationsPlugin globalNotificationPluginInstance;
+FlutterLocalNotificationsPlugin? globalNotificationPluginInstance;
 
 Future<FlutterLocalNotificationsPlugin> initNotifications({
-  Function onLaunch,
-  Function onResume,
-  Function onMessage,
-  Function onSaveToken,
-  Future<dynamic> Function(String) onSelectNotification,
-  Future<dynamic> Function(int, String, String, String)
+  Function? onLaunch,
+  Function? onResume,
+  Function? onMessage,
+  Function? onSaveToken,
+  Future<dynamic> Function(String?)? onSelectNotification,
+  Future<dynamic> Function(int, String?, String?, String?)?
       onDidReceiveLocalNotification,
 }) async {
 // ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
@@ -83,11 +83,11 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
 }
 
 Future<bool> promptNativeNotificationsRequest({
-  FlutterLocalNotificationsPlugin pluginInstance,
+  required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final result = await pluginInstance
       .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
+          IOSFlutterLocalNotificationsPlugin>()!
       .requestPermissions(
         alert: true,
         badge: true,
@@ -119,7 +119,7 @@ Future<bool> promptNativeNotificationsRequest({
 Future showBackgroundServiceNotification({
   int notificationId = 0,
   String debugContent = '',
-  FlutterLocalNotificationsPlugin pluginInstance,
+  required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
@@ -154,8 +154,8 @@ Future showBackgroundServiceNotification({
 
 Future showMessageNotification({
   int messageHash = 0,
-  String body,
-  FlutterLocalNotificationsPlugin pluginInstance,
+  String? body,
+  required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
@@ -185,7 +185,7 @@ Future showMessageNotification({
 Future showDebugNotification({
   int notificationId = 0,
   String customMessage = 'Example Notification',
-  FlutterLocalNotificationsPlugin pluginInstance,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
 
@@ -213,7 +213,7 @@ Future showDebugNotification({
 }
 
 void dismissAllNotifications({
-  FlutterLocalNotificationsPlugin pluginInstance,
+  FlutterLocalNotificationsPlugin? pluginInstance,
 }) {
   pluginInstance?.cancelAll();
 }

@@ -10,17 +10,17 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogExplaination extends StatelessWidget {
   DialogExplaination({
-    Key key,
+    Key? key,
     this.user,
     this.title = '',
     this.content = '',
     this.onConfirm,
   }) : super(key: key);
 
-  final User user;
+  final User? user;
   final String title;
   final String content;
-  final Function onConfirm;
+  final Function? onConfirm;
 
   @override
   Widget build(BuildContext context) => SimpleDialog(

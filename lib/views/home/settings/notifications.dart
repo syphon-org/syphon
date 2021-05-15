@@ -22,7 +22,7 @@ import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class NotificationSettingsView extends StatelessWidget {
-  NotificationSettingsView({Key key}) : super(key: key);
+  NotificationSettingsView({Key? key}) : super(key: key);
 
   @protected
   void onToggleNotifications(_Props props) async {
@@ -80,7 +80,7 @@ class NotificationSettingsView extends StatelessWidget {
                             TextSpan(
                               text: ' without ',
                               style:
-                                  Theme.of(context).textTheme.caption.copyWith(
+                                  Theme.of(context).textTheme.caption!.copyWith(
                                         fontWeight: FontWeight.w500,
                                       ),
                             ),
@@ -189,12 +189,12 @@ class _Props extends Equatable {
   final Function onTogglePusher;
 
   _Props({
-    @required this.localNotificationsEnabled,
-    @required this.remoteNotificationsEnabled,
-    @required this.httpPusherEnabled,
-    @required this.onToggleLocalNotifications,
-    @required this.onToggleRemoteNotifications,
-    @required this.onTogglePusher,
+    required this.localNotificationsEnabled,
+    required this.remoteNotificationsEnabled,
+    required this.httpPusherEnabled,
+    required this.onToggleLocalNotifications,
+    required this.onToggleRemoteNotifications,
+    required this.onTogglePusher,
   });
 
   @override
@@ -209,9 +209,9 @@ class _Props extends Equatable {
   ) =>
       _Props(
         localNotificationsEnabled: Platform.isAndroid &&
-            store.state.settingsStore.notificationsEnabled,
+            store.state.settingsStore.notificationsEnabled!,
         remoteNotificationsEnabled:
-            Platform.isIOS && store.state.settingsStore.notificationsEnabled,
+            Platform.isIOS && store.state.settingsStore.notificationsEnabled!,
         httpPusherEnabled:
             store.state.settingsStore.notificationSettings != null,
         onToggleLocalNotifications: () {
@@ -222,7 +222,7 @@ class _Props extends Equatable {
             // If the platform is iOS, we'll want to confirm they understand
             // the native notification prompt
             if (Platform.isIOS &&
-                !store.state.settingsStore.notificationsEnabled) {
+                !store.state.settingsStore.notificationsEnabled!) {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(

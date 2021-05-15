@@ -19,20 +19,20 @@ import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class UserDetailsArguments {
-  final User user;
+  final User? user;
 
   UserDetailsArguments({this.user});
 }
 
 class UserDetailsView extends StatefulWidget {
-  const UserDetailsView({Key key}) : super(key: key);
+  const UserDetailsView({Key? key}) : super(key: key);
 
   @override
   UserDetailsState createState() => UserDetailsState();
 }
 
 class UserDetailsState extends State<UserDetailsView> {
-  UserDetailsState({Key key}) : super();
+  UserDetailsState({Key? key}) : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
@@ -40,7 +40,7 @@ class UserDetailsState extends State<UserDetailsView> {
 
   double headerOpacity = 1;
   double headerSize = 54;
-  List<User> usersList;
+  List<User>? usersList;
 
   @override
   void initState() {
@@ -74,14 +74,14 @@ class UserDetailsState extends State<UserDetailsView> {
   }
 
   @protected
-  void onBlockUser({BuildContext context, _Props props}) async {
+  void onBlockUser({required BuildContext context, _Props? props}) async {
     return await showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
         title: "Block User",
         content:
-            "If you block ${props.user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+            "If you block ${props!.user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
         onConfirm: () async {
           await props.blockUser(props.user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -93,9 +93,9 @@ class UserDetailsState extends State<UserDetailsView> {
 
   @protected
   onShowColorPicker({
-    context,
-    int originalColor,
-    Function onSelectColor,
+    required context,
+    int? originalColor,
+    Function? onSelectColor,
   }) async {
     await showDialog(
       context: context,
@@ -117,9 +117,9 @@ class UserDetailsState extends State<UserDetailsView> {
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
     final UserDetailsArguments arguments =
-        ModalRoute.of(context).settings.arguments;
+        ModalRoute.of(context)!.settings.arguments as UserDetailsArguments;
 
-    final user = arguments.user;
+    final user = arguments.user!;
     final userColor = Colours.hashedColor(user.userId);
     final scaffordBackgroundColor =
         Theme.of(context).brightness == Brightness.light
@@ -152,7 +152,7 @@ class UserDetailsState extends State<UserDetailsView> {
                   ),
                   Flexible(
                     child: Text(
-                      user.displayName ?? user.userId,
+                      user.displayName ?? user.userId!,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white,
@@ -319,10 +319,10 @@ class _Props extends Equatable {
   final Function sendMessage;
 
   _Props({
-    @required this.user,
-    @required this.loading,
-    @required this.blockUser,
-    @required this.sendMessage,
+    required this.user,
+    required this.loading,
+    required this.blockUser,
+    required this.sendMessage,
   });
 
   @override

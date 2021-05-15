@@ -15,27 +15,27 @@ import 'package:syphon/store/index.dart';
 import './model.dart';
 
 class SetLoading {
-  final bool loading;
+  final bool? loading;
   SetLoading({this.loading});
 }
 
 class SetAlertsObserver {
-  final StreamController<Alert> alertsObserver;
+  final StreamController<Alert>? alertsObserver;
   SetAlertsObserver({this.alertsObserver});
 }
 
 class AddAlert {
-  final Alert alert;
+  final Alert? alert;
   AddAlert({this.alert});
 }
 
 class AddSuccess {
-  final Alert alert;
+  final Alert? alert;
   AddSuccess({this.alert});
 }
 
 class RemoveAlert {
-  final Alert alert;
+  final Alert? alert;
   RemoveAlert({this.alert});
 }
 
@@ -66,7 +66,7 @@ ThunkAction<AppState> addInfo({
   return (Store<AppState> store) async {
     debugPrint('[$origin] $type : $message');
 
-    final alertsObserver = store.state.alertsStore.alertsObserver;
+    final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(type: type, message: message, error: error);
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
@@ -76,13 +76,13 @@ ThunkAction<AppState> addInfo({
 ThunkAction<AppState> addConfirmation({
   String type = 'success',
   String origin = 'Unknown',
-  String message,
+  String? message,
   error,
 }) {
   return (Store<AppState> store) async {
     debugPrint('[$origin|confirm] $message');
 
-    final alertsObserver = store.state.alertsStore.alertsObserver;
+    final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(type: type, message: message, error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
@@ -98,7 +98,7 @@ ThunkAction<AppState> addAlert({
   return (Store<AppState> store) async {
     debugPrint('[$origin] ${error.toString()}');
 
-    final alertsObserver = store.state.alertsStore.alertsObserver;
+    final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(type: type, message: message, error: error);
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
@@ -107,6 +107,6 @@ ThunkAction<AppState> addAlert({
 
 ThunkAction<AppState> stopAlertsObserver() {
   return (Store<AppState> store) async {
-    store.state.alertsStore.alertsObserver.close();
+    store.state.alertsStore.alertsObserver!.close();
   };
 }

@@ -18,13 +18,13 @@ import 'package:syphon/global/values.dart';
  * by certain matrix servers -_-
  */
 class Captcha extends StatefulWidget {
-  final String publicKey;
+  final String? publicKey;
   final Function onVerified;
 
   const Captcha({
-    Key key,
-    @required this.publicKey,
-    @required this.onVerified,
+    Key? key,
+    required this.publicKey,
+    required this.onVerified,
   }) : super(
           key: key,
         );
@@ -37,8 +37,8 @@ class Captcha extends StatefulWidget {
 }
 
 class CaptchaState extends State<Captcha> {
-  final String publickey;
-  final Function onVerified;
+  final String? publickey;
+  final Function? onVerified;
 
   final Completer<WebViewController> controller =
       Completer<WebViewController>();
@@ -48,7 +48,7 @@ class CaptchaState extends State<Captcha> {
     super.initState();
 
     // NOTE: SchedulerBinding still needed to have navigator context in dialogs
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       onMounted();
     });
   }
@@ -65,7 +65,7 @@ class CaptchaState extends State<Captcha> {
   }
 
   CaptchaState({
-    Key key,
+    Key? key,
     this.publickey,
     this.onVerified,
   });
@@ -88,7 +88,7 @@ class CaptchaState extends State<Captcha> {
                 token = token.substring(7);
               }
               if (this.onVerified != null) {
-                this.onVerified(token);
+                this.onVerified!(token);
               }
             },
           ),

@@ -22,11 +22,11 @@ import 'package:syphon/global/values.dart';
 
 class Search {
   static FutureOr<dynamic> searchUsers({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String searchText,
-    String since,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? searchText,
+    String? since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
     Map<String, String> headers = {
@@ -49,13 +49,13 @@ class Search {
   }
 
   static FutureOr<dynamic> searchRooms({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String searchText,
-    String server,
-    bool global,
-    String since,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? searchText,
+    String? server,
+    bool? global,
+    String? since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
     Map<String, String> headers = {

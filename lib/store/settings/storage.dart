@@ -13,7 +13,7 @@ import 'package:syphon/store/settings/state.dart';
  */
 Future<void> saveSettings(
   SettingsStore settingsStore, {
-  Database storage,
+  required Database storage,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.SETTINGS);
 
@@ -29,7 +29,7 @@ Future<void> saveSettings(
  * In storage, the Settings store is saved in it's entirety 
  * in a separate thread/isolate 
  */
-Future<SettingsStore> loadSettings({Database storage}) async {
+Future<SettingsStore?> loadSettings({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.SETTINGS);
 
