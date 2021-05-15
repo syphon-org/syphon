@@ -243,27 +243,30 @@ FutureOr<dynamic> syncLoop({
 
         if (!formattedSender.contains(userId)) {
           if (room.direct!) {
-            return showMessageNotification(
+            showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender sent a new message.',
               pluginInstance: pluginInstance!,
             );
+            return;
           }
 
           if (room.invite!) {
-            return showMessageNotification(
+            showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender invited you to chat',
               pluginInstance: pluginInstance!,
             );
+            return;
           }
 
           final roomName = roomNames![roomId];
-          return showMessageNotification(
+          showMessageNotification(
             messageHash: Random.secure().nextInt(20000),
             body: '$formattedSender sent a new message in $roomName',
             pluginInstance: pluginInstance!,
           );
+          return;
         }
       }
     });

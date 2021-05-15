@@ -250,7 +250,8 @@ ThunkAction<AppState> startAuthObserver() {
 
     // init current auth state and set auth state listener
     onAuthStateChanged(user);
-    store.state.authStore.onAuthStateChanged!.listen(onAuthStateChanged as void Function(User?)?);
+    store.state.authStore.onAuthStateChanged!
+        .listen(onAuthStateChanged as void Function(User?)?);
   };
 }
 
@@ -946,7 +947,7 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
       return true;
     } catch (error) {
       store.dispatch(
-        addAlert(origin: 'updateAvatar', message: error.error),
+        addAlert(origin: 'updateAvatar', message: error),
       );
       return false;
     } finally {
@@ -1037,7 +1038,8 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
-    final List<dynamic> homeserversJson = await (JackApi.fetchPublicServers() as FutureOr<List<dynamic>>);
+    final List<dynamic> homeserversJson =
+        await (JackApi.fetchPublicServers() as FutureOr<List<dynamic>>);
 
     // parse homeserver data
     final List<Homeserver> homserverData = homeserversJson.map((data) {
@@ -1070,7 +1072,8 @@ ThunkAction<AppState> fetchHomeservers() {
     // find favicons for all the homeservers
     final homeservers = await Future.wait(
       homserverData.map((homeserver) async {
-        final url = await (fetchFavicon(url: homeserver.hostname) as FutureOr<String>);
+        final url =
+            await (fetchFavicon(url: homeserver.hostname) as FutureOr<String>);
         final uri = Uri.parse(url);
         try {
           final response = await http.get(uri);

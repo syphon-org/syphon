@@ -12,7 +12,8 @@ List<Message> roomMessages(AppState state, String? roomId) {
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
-  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? []) as Map<String, List<Reaction>>;
+  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? [])
+      as Map<String, List<Reaction>>;
 }
 
 // remove messages from blocked users
@@ -30,7 +31,7 @@ List<Message?> filterMessages(
 }
 
 List<Message> reviseMessagesBackground(Map params) {
-  List<Message>? messages = params['messages'];
+  List<Message> messages = params['messages'] ?? [];
   Map<String, Redaction> redactions = params['redactions'];
   Map<String, List<Reaction>> reactions = params['reactions'];
 
@@ -38,7 +39,7 @@ List<Message> reviseMessagesBackground(Map params) {
 }
 
 List<Message> reviseMessagesFilter(
-  List<Message>? messages,
+  List<Message> messages,
   Map<String, Redaction> redactions,
   Map<String, List<Reaction>> reactions,
 ) {
@@ -94,12 +95,12 @@ Map<String?, Message?> appendReactions(
   return messages;
 }
 
-Map<String?, Message?> replaceEdited(List<Message>? messages) {
-  final replacements = List<Message?>();
+Map<String?, Message?> replaceEdited(List<Message> messages) {
+  final replacements = <Message>[];
 
   // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String?, Message?>.fromIterable(
-    messages ?? [],
+    messages,
     key: (msg) => msg.id,
     value: (msg) {
       if (msg.replacement) {
@@ -126,10 +127,7 @@ Map<String?, Message?> replaceEdited(List<Message>? messages) {
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,
-          edits: [
-            messageOriginal,
-            ...(messageOriginal.edits ?? List<Message>())
-          ],
+          edits: [messageOriginal, ...(messageOriginal.edits)],
         );
       }
     }
@@ -152,7 +150,7 @@ Message? latestMessage(List<Message?> messages) {
 }
 
 List<Message?> latestMessages(List<Message?> messages) {
-  final sortedList = messages ?? [];
+  final sortedList = messages;
 
   // sort descending
   sortedList.sort((a, b) {

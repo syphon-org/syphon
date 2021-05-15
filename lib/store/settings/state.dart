@@ -23,23 +23,21 @@ class SettingsStore extends Equatable {
   final int? brightness;
   final ThemeType theme;
 
-  final bool? enterSend; // TODO: rename *enabled
-  final bool? smsEnabled;
-  final bool? readReceipts; // TODO: rename *enabled
-  final bool? typingIndicators; // TODO: rename *enabled
-  final bool? notificationsEnabled;
-  final bool? membershipEventsEnabled;
-  final bool? roomTypeBadgesEnabled;
-  final bool? timeFormat24Enabled;
-  final bool? dismissKeyboardEnabled;
+  final bool enterSend; // TODO: rename *enabled
+  final bool smsEnabled;
+  final bool readReceipts; // TODO: rename *enabled
+  final bool typingIndicators; // TODO: rename *enabled
+  final bool notificationsEnabled;
+  final bool membershipEventsEnabled;
+  final bool roomTypeBadgesEnabled;
+  final bool timeFormat24Enabled;
+  final bool dismissKeyboardEnabled;
 
-  @JsonKey(nullable: true)
-  final String? messageSize;
-
-  final String? fontName;
-  final String? fontSize;
-  final String? language;
-  final String? avatarShape;
+  final String fontName;
+  final String fontSize;
+  final String language;
+  final String avatarShape;
+  final String messageSize;
 
   final List<Device> devices;
 

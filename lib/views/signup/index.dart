@@ -508,6 +508,7 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        user: store.state.authStore.user,
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver ?? Homeserver(),

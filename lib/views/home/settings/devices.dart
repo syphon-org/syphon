@@ -45,7 +45,7 @@ class DeviceViewState extends State<DevicesView> {
 
   @protected
   onToggleAllDevices({required List<Device> devices}) {
-    var newSelectedDevices = this.selectedDevices ?? List<Device>();
+    var newSelectedDevices = this.selectedDevices ?? <Device>[];
 
     if (newSelectedDevices.length == devices.length) {
       newSelectedDevices = [];
@@ -60,7 +60,7 @@ class DeviceViewState extends State<DevicesView> {
 
   @protected
   onToggleModifyDevice({Device? device}) {
-    var newSelectedDevices = this.selectedDevices ?? List<Device>();
+    var newSelectedDevices = this.selectedDevices ?? <Device>[];
 
     if (newSelectedDevices.contains(device)) {
       newSelectedDevices.remove(device);

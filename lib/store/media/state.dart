@@ -36,7 +36,7 @@ class MediaStore extends Equatable {
     return MediaStore(
       mediaCache: (json['mediaCache'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(
-            k, Uint8List.fromList((e as List)?.map((e) => e as int)?.toList())),
+            k, Uint8List.fromList((e as List).map((e) => e as int).toList())),
       ),
       mediaChecks: (json['mediaChecks'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, e as String),

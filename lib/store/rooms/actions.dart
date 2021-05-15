@@ -137,7 +137,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
     await Future.wait(roomData.keys.map((id) async {
       final json = roomData[id];
       Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
-      List<Message>? messages = List<Message>();
+      List<Message> messages = [];
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled!) {
@@ -192,9 +192,9 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
         users: Map<String, User>(),
-        messagesNew: List<Message>(),
-        reactions: List<Reaction>(),
-        redactions: List<Redaction>(),
+        messagesNew: [],
+        reactions: [],
+        redactions: [],
         readReceipts: Map<String, ReadReceipt>(),
       );
 

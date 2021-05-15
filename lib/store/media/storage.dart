@@ -47,8 +47,13 @@ Future<Uint8List?> loadMedia({
     final dataBytes = json.decode(mediaData);
 
     // Convert json decoded List<int> to Uint8List
+    if (dataBytes == null) {
+      return null;
+    }
+
     return Uint8List.fromList(
-        (dataBytes as List)?.map((e) => e as int)?.toList());
+      (dataBytes as List).map((e) => e as int).toList(),
+    );
   } catch (error) {
     printError(error.toString(), title: 'loadMedia');
     return null;
@@ -75,7 +80,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
       // TODO: sometimes, a null gets saved to cold storage
       if (data != null) {
         media[record.key] = Uint8List.fromList(
-          (data as List)?.map((e) => e as int)?.toList(),
+          (data as List).map((e) => e as int).toList(),
         );
       }
     }

@@ -412,10 +412,10 @@ class Room {
     int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String?, User>.from(this.usersNew ?? {});
-    var userIdsRemove = List<String?>();
+    var usersAdd = Map<String?, User>.from(this.usersNew);
+    var userIdsRemove = <String>[];
 
-    Set<String?> userIds = Set<String?>.from(this.userIds ?? []);
+    Set<String?> userIds = Set<String?>.from(this.userIds);
 
     events.forEach((event) {
       try {
@@ -473,7 +473,7 @@ class Room {
             }
 
             if (membership == 'leave') {
-              userIdsRemove.add(event.stateKey);
+              userIdsRemove.add(event.stateKey!);
             }
 
             break;
@@ -490,7 +490,7 @@ class Room {
       }
     });
 
-    userIds = userIds..addAll(usersAdd.keys ?? []);
+    userIds = userIds..addAll(usersAdd.keys);
     userIds = userIds..removeWhere((id) => userIdsRemove.contains(id));
 
     try {
@@ -679,7 +679,9 @@ class Room {
                 readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceipts[key]!.userReads!.addAll(readReceiptsNew.userReads!);
+                readReceipts[key]!
+                    .userReads!
+                    .addAll(readReceiptsNew.userReads!);
               }
             });
             break;

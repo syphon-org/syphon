@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
@@ -142,7 +140,7 @@ Future<void> saveIV(String? iv) async {
   // desktop
   try {
     final directory = await getApplicationSupportDirectory();
-    return await File(join(directory.path, Cache.ivLocation)).create()
+    await File(join(directory.path, Cache.ivLocation)).create()
       ..writeAsString(iv!, flush: true);
   } catch (error) {
     printError('[saveIV] $error');
@@ -186,7 +184,7 @@ Future<void> saveIVNext(String? iv) async {
   // desktop
   try {
     final directory = await getApplicationSupportDirectory();
-    return await File(join(directory.path, Cache.ivLocationNext)).create()
+    await File(join(directory.path, Cache.ivLocationNext)).create()
       ..writeAsString(iv!, flush: true);
   } catch (error) {
     printError('[saveIVNext] $error');

@@ -59,6 +59,6 @@ class CacheStorage implements StorageEngine {
 
   @override
   Future<void> save(Uint8List? data) {
-    return null;
+    return Future.value();
   }
 }

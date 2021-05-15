@@ -104,7 +104,8 @@ class AppBarChatState extends State<AppBarChat> {
   }
 
   @protected
-  void onBlockUser({required BuildContext context, required _Props props}) async {
+  void onBlockUser(
+      {required BuildContext context, required _Props props}) async {
     final user = props.roomUsers.firstWhere(
       (user) => user!.userId != props.currentUser.userId,
     );
@@ -282,67 +283,70 @@ class AppBarChatState extends State<AppBarChat> {
               ),
             ),
             RoundedPopupMenu<ChatOptions>(
-              onSelected: (ChatOptions result) {
-                switch (result) {
-                  case ChatOptions.inviteFriends:
-                    Navigator.pushNamed(
-                      context,
-                      '/home/user/invite',
-                      arguments: InviteUsersArguments(
-                        roomId: widget.room!.id,
-                      ),
-                    );
-                    break;
-                  case ChatOptions.chatSettings:
-                    Navigator.pushNamed(
-                      context,
-                      '/home/chat/settings',
-                      arguments: ChatSettingsArguments(
-                        roomId: widget.room!.id,
-                        title: widget.room!.name,
-                      ),
-                    );
-                    break;
-                  case ChatOptions.blockUser:
-                    return onBlockUser(context: context, props: props);
-                  default:
-                    break;
-                }
-              },
-              icon: Icon(Icons.more_vert, color: Colors.white),
-              itemBuilder: (BuildContext context) =>
-                  <PopupMenuEntry<ChatOptions>?>[
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.search,
-                  child: Text('Search'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.allMedia,
-                  child: Text('All Media'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  value: ChatOptions.chatSettings,
-                  child: Text('Chat Settings'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  value: ChatOptions.inviteFriends,
-                  child: Text('Invite Friends'),
-                ),
-                !widget.room!.direct!
-                    ? null
-                    : const PopupMenuItem<ChatOptions>(
-                        value: ChatOptions.blockUser,
-                        child: Text('Block User'),
-                      ),
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.muteNotifications,
-                  child: Text('Mute Notifications'),
-                ),
-              ],
-            )
+                onSelected: (ChatOptions result) {
+                  switch (result) {
+                    case ChatOptions.inviteFriends:
+                      Navigator.pushNamed(
+                        context,
+                        '/home/user/invite',
+                        arguments: InviteUsersArguments(
+                          roomId: widget.room!.id,
+                        ),
+                      );
+                      break;
+                    case ChatOptions.chatSettings:
+                      Navigator.pushNamed(
+                        context,
+                        '/home/chat/settings',
+                        arguments: ChatSettingsArguments(
+                          roomId: widget.room!.id,
+                          title: widget.room!.name,
+                        ),
+                      );
+                      break;
+                    case ChatOptions.blockUser:
+                      return onBlockUser(context: context, props: props);
+                    default:
+                      break;
+                  }
+                },
+                icon: Icon(Icons.more_vert, color: Colors.white),
+                itemBuilder: (BuildContext context) {
+                  final menu = <PopupMenuEntry<ChatOptions>>[
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.search,
+                      child: Text('Search'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.allMedia,
+                      child: Text('All Media'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.chatSettings,
+                      child: Text('Chat Settings'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.inviteFriends,
+                      child: Text('Invite Friends'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.muteNotifications,
+                      child: Text('Mute Notifications'),
+                    ),
+                  ];
+
+                  if (widget.room!.direct!) {
+                    menu.add(const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.blockUser,
+                      child: Text('Block User'),
+                    ));
+                  }
+
+                  return menu;
+                })
           ],
         ),
       );
@@ -362,7 +366,8 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         currentUser: store.state.authStore.user,
         roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds ?? [])
             .map((id) => store.state.userStore.users[id])
