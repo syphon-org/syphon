@@ -412,7 +412,7 @@ class Room {
     int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String?, User>.from(this.usersNew);
+    var usersAdd = Map<String, User>.from(this.usersNew);
     var userIdsRemove = <String>[];
 
     Set<String?> userIds = Set<String?>.from(this.userIds);

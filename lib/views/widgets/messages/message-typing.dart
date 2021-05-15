@@ -13,7 +13,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 class MessageTypingWidget extends StatefulWidget {
   final bool? typing;
   final List<String>? usersTyping;
-  final Map<String?, User?>? roomUsers;
+  final Map<String, User?>? roomUsers;
   final String? selectedMessageId;
   final Function? onPressAvatar;
 

@@ -400,7 +400,7 @@ ThunkAction<AppState> sendTyping({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.typingIndicators!) {
+      if (!store.state.settingsStore.typingIndicators) {
         debugPrint('[sendTyping] typing indicators disabled');
         return;
       }

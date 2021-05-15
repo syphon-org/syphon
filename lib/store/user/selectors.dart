@@ -25,7 +25,7 @@ List<User> friendlyUsers(AppState state) {
   return List.from(roomsDirectUsers);
 }
 
-Map<String?, User?> messageUsers({required AppState state, String? roomId}) {
+Map<String, User?> messageUsers({required AppState state, String? roomId}) {
   final messages = state.eventStore.messages[roomId] ?? [];
   return Map.fromIterable(
     messages,

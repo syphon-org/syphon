@@ -166,7 +166,8 @@ class MessageListState extends State<MessageList> {
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
                       onSwipe: props.onSelectReply,
                       onPressAvatar: widget.onViewUserDetails,
-                      onLongPress: (msg) => widget.onToggleSelectedMessage!(msg),
+                      onLongPress: (msg) =>
+                          widget.onToggleSelectedMessage!(msg),
                       onInputReaction: () => onInputReaction(
                         message: message,
                         props: props,
@@ -189,7 +190,7 @@ class _Props extends Equatable {
   final Room room;
   final ThemeType theme;
   final User currentUser;
-  final Map<String?, User?> users;
+  final Map<String, User?> users;
   final List<Message?> messages;
   final bool? timeFormat24Enabled;
 
@@ -214,7 +215,8 @@ class _Props extends Equatable {
         messages,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
         theme: store.state.settingsStore.theme,
         currentUser: store.state.authStore.user,

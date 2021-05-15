@@ -53,7 +53,7 @@ class HomeViewState extends State<Home> {
       GlobalKey<FabCircularMenuState>();
 
   Room? selectedRoom;
-  late Map<String?, Color?> roomColorDefaults;
+  late Map<String, Color?> roomColorDefaults;
 
   @override
   void initState() {
@@ -76,7 +76,8 @@ class HomeViewState extends State<Home> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) =>
+      AppBar(
         backgroundColor: Colors.grey[500],
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -164,7 +165,8 @@ class HomeViewState extends State<Home> {
       );
 
   @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) =>
+      AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -592,8 +594,8 @@ class _Props extends Equatable {
   final bool roomTypeBadgesEnabled;
   final User currentUser;
   final ThemeType theme;
-  final Map<String?, ChatSetting> chatSettings;
-  final Map<String?, List<Message?>> messages;
+  final Map<String, ChatSetting> chatSettings;
+  final Map<String, List<Message?>> messages;
 
   final Function onDebug;
   final Function onLeaveChat;

@@ -33,7 +33,7 @@ abstract class Encryption {
     String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
     String? lastSince,
-    Map<String?, dynamic> users = const {},
+    Map<String, dynamic> users = const {},
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 

@@ -42,7 +42,7 @@ class SettingsStore extends Equatable {
   final List<Device> devices;
 
   // Map<roomId, ChatSetting>
-  final Map<String?, ChatSetting>? customChatSettings;
+  final Map<String, ChatSetting>? customChatSettings;
   final List<String> sortGroups;
   final String? sortOrder;
 
@@ -131,7 +131,7 @@ class SettingsStore extends Equatable {
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
-    Map<String?, ChatSetting>? customChatSettings,
+    Map<String, ChatSetting>? customChatSettings,
     NotificationSettings? notificationSettings,
     List<Device>? devices,
     bool? loading,

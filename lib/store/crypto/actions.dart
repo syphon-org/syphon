@@ -1034,7 +1034,7 @@ ThunkAction<AppState> fetchDeviceKeys({
 }) {
   return (Store<AppState> store) async {
     try {
-      final Map<String?, dynamic> userIdMap = Map.fromIterable(
+      final Map<String, dynamic> userIdMap = Map.fromIterable(
         userIds!,
         key: (userId) => userId,
         value: (userId) => const [],

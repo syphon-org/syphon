@@ -12,10 +12,10 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class EventStore extends Equatable {
-  final Map<String?, List<Event>?> events; // roomId indexed
-  final Map<String?, Redaction?> redactions; // eventId indexed
-  final Map<String?, List<Message?>> messages; // roomId indexed
-  final Map<String?, List<Reaction>> reactions; // eventId indexed
+  final Map<String, List<Event>?> events; // roomId indexed
+  final Map<String, Redaction?> redactions; // eventId indexed
+  final Map<String, List<Message?>> messages; // roomId indexed
+  final Map<String, List<Reaction>> reactions; // eventId indexed
   final Map<String, Map<String, ReadReceipt>> receipts; // eventId indexed
 
   const EventStore({
@@ -36,10 +36,10 @@ class EventStore extends Equatable {
       ];
 
   EventStore copyWith({
-    Map<String?, List<Event>?>? events,
-    Map<String?, List<Message?>>? messages,
-    Map<String?, Redaction?>? redactions,
-    Map<String?, List<Reaction>>? reactions,
+    Map<String, List<Event>?>? events,
+    Map<String, List<Message?>>? messages,
+    Map<String, Redaction?>? redactions,
+    Map<String, List<Reaction>>? reactions,
     Map<String, Map<String, ReadReceipt>>? receipts,
   }) =>
       EventStore(

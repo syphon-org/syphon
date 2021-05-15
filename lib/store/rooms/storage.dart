@@ -7,7 +7,7 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Future<void> saveRooms(
-  Map<String?, Room> rooms, {
+  Map<String, Room> rooms, {
   Database? cache,
   Database? storage,
 }) async {
@@ -37,7 +37,7 @@ Future<void> saveRoom(
 }
 
 Future<void> deleteRooms(
-  Map<String?, Room?> rooms, {
+  Map<String, Room?> rooms, {
   Database? cache,
   Database? storage,
 }) async {

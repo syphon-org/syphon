@@ -145,7 +145,8 @@ ThunkAction<AppState> encryptKeyContent({
     final userFingerprintKey = userIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
-    final fingerprintKeyId = Keys.fingerprint(deviceId: recipientKeys!.deviceId);
+    final fingerprintKeyId =
+        Keys.fingerprint(deviceId: recipientKeys!.deviceId);
     final identityKeyId = Keys.identity(deviceId: recipientKeys.deviceId);
     final fingerprintKey = recipientKeys.keys![fingerprintKeyId]; // recipient
     final identityKey = recipientKeys.keys![identityKeyId]!; // recipient
@@ -323,7 +324,7 @@ ThunkAction<AppState> syncDevice(Map? toDeviceRaw) {
                 try {
                   // redecrypt events in the room with new key
                   final roomId = eventDecrypted['content']['room_id'];
-                  Map<String?, dynamic> room = {roomId: {}};
+                  Map<String, dynamic> room = {roomId: {}};
 
                   return await store.dispatch(syncRooms(room));
                 } catch (error) {

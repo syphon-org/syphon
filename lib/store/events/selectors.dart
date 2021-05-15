@@ -55,8 +55,8 @@ List<Message> reviseMessagesFilter(
   return List.from(messagesMap.values);
 }
 
-Map<String?, Message?> filterRedactions(
-  Map<String?, Message?> messages, {
+Map<String, Message?> filterRedactions(
+  Map<String, Message?> messages, {
   required Map<String, Redaction> redactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
@@ -69,8 +69,8 @@ Map<String?, Message?> filterRedactions(
   return messages;
 }
 
-Map<String?, Message?> appendReactions(
-  Map<String?, Message?> messages, {
+Map<String, Message?> appendReactions(
+  Map<String, Message?> messages, {
   Map<String, Redaction>? redactions,
   required Map<String, List<Reaction>> reactions,
 }) {
@@ -95,11 +95,11 @@ Map<String?, Message?> appendReactions(
   return messages;
 }
 
-Map<String?, Message?> replaceEdited(List<Message> messages) {
+Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
   // create a map of messages for O(1) when replacing O(N)
-  final messagesMap = Map<String?, Message?>.fromIterable(
+  final messagesMap = Map<String, Message?>.fromIterable(
     messages,
     key: (msg) => msg.id,
     value: (msg) {

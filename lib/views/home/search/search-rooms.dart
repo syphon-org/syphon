@@ -47,7 +47,7 @@ class RoomSearchState extends State<RoomSearchView> {
 
   RoomSearchState({Key? key});
 
-  late Map<String?, Color?> roomColorDefaults;
+  late Map<String, Color?> roomColorDefaults;
 
   @override
   void initState() {
@@ -375,7 +375,7 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType theme;
   final List<dynamic> searchResults;
-  final Map<String?, ChatSetting> chatSettings;
+  final Map<String, ChatSetting> chatSettings;
 
   final Function onSearch;
   final Function onSendInvite;

@@ -122,7 +122,7 @@ ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
       }
 
       // Pull the direct room for that specific user
-      Map<String?, dynamic> usersBlocked = data['ignored_users'] ?? {};
+      Map<String, dynamic> usersBlocked = data['ignored_users'] ?? {};
 
       // toggle based on if the id is already present
       if (!usersBlocked.containsKey(user!.userId)) {

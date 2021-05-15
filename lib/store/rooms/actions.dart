@@ -436,7 +436,7 @@ ThunkAction<AppState> createRoom({
       room = Room(id: data['room_id']);
 
       // Add invites to the user list beforehand
-      final userInviteMap = Map<String?, User?>.fromIterable(
+      final userInviteMap = Map<String, User?>.fromIterable(
         invites,
         key: (user) => user.userId,
         value: (user) => user,

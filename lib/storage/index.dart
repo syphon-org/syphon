@@ -124,9 +124,9 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String?, List<Message>> messages = Map();
+    Map<String, List<Message>> messages = Map();
     Map<String, List<Reaction>> reactions = Map();
-    Map<String?, Map<String, ReadReceipt>> receipts = Map();
+    Map<String, Map<String, ReadReceipt>> receipts = Map();
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(

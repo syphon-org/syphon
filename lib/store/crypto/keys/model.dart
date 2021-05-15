@@ -8,15 +8,15 @@ part 'model.g.dart';
 class OneTimeKey extends Equatable {
   final String? userId;
   final String? deviceId;
-  final Map<String?, String?>? keys; // Map<identityKey, key>
+  final Map<String, String?> keys; // Map<identityKey, key>
   // Map<identityKey, <deviceId, signature>>
-  final Map<String?, Map<String, String>>? signatures;
+  final Map<String, Map<String, String>> signatures;
 
   const OneTimeKey({
     this.userId,
     this.deviceId,
-    this.keys,
-    this.signatures,
+    this.keys = const {},
+    this.signatures = const {},
   });
 
   @override

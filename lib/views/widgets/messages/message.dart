@@ -58,7 +58,7 @@ class MessageWidget extends StatelessWidget {
     BuildContext context,
     MainAxisAlignment alignment,
   ) {
-    final reactionsMap = message.reactions.fold<Map<String?, int>>(
+    final reactionsMap = message.reactions.fold<Map<String, int>>(
       {},
       (mapped, reaction) => mapped
         ..update(
@@ -495,7 +495,8 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent! && !message.failed!,
+                                        visible:
+                                            isUserSent! && !message.failed!,
                                         child: Stack(children: [
                                           Visibility(
                                             visible: message.pending!,
