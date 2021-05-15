@@ -16,7 +16,7 @@ Future<void> saveRooms(
 
   return await storage!.transaction((txn) async {
     for (Room? room in rooms.values) {
-      final record = store.record(room.id);
+      final record = store.record(room!.id);
       await record.put(txn, jsonEncode(room));
     }
   });
@@ -92,7 +92,6 @@ Future<Map<String, Room>> loadRooms({
     printInfo('[rooms] loaded ${rooms.length.toString()}');
   } catch (error) {
     printError(error.toString(), title: 'loadRooms');
-  } finally {
-    return rooms;
   }
+  return rooms;
 }
