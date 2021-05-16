@@ -389,7 +389,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                               ),
                               trailing: Container(
                                 child: Switch(
-                                  value: props.room.direct!,
+                                  value: props.room.direct,
                                   onChanged: (value) {
                                     props.onToggleDirectRoom();
                                   },
@@ -493,7 +493,7 @@ class ChatDetailsState extends State<ChatDetailsView> {
                         child: Column(
                           children: [
                             Visibility(
-                              visible: props.room.direct!,
+                              visible: props.room.direct,
                               child: ListTile(
                                 onTap: () => onBlockUser(
                                   context: context,
@@ -610,7 +610,6 @@ class _Props extends Equatable {
           },
           onToggleDirectRoom: () {
             final room = selectRoom(id: roomId, state: store.state);
-            store
-                .dispatch(toggleDirectRoom(room: room, enabled: !room.direct!));
+            store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
           });
 }

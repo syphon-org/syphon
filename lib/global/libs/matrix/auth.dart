@@ -28,8 +28,8 @@ abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
   static Future<dynamic> loginType({
-    String? protocol,
-    String? homeserver,
+    required String protocol,
+    required String homeserver,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
@@ -48,8 +48,8 @@ abstract class Auth {
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
   ///
   static Future<dynamic> loginUser({
-    String? protocol,
-    String? homeserver,
+    required String protocol,
+    required String homeserver,
     String type = "m.login.password",
     String? username,
     String? password,
@@ -310,8 +310,8 @@ abstract class Auth {
    *  Used to check what types of logins are available on the server
    */
   static Future<dynamic> checkHomeserver({
-    String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String protocol = 'https://',
+    String homeserver = 'matrix.org',
   }) async {
     String url = '$protocol$homeserver/.well-known/matrix/client';
 

@@ -9,13 +9,13 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 
-ThunkAction<AppState> fetchBaseUrl({Homeserver? homeserver}) {
+ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkHomeserver(
             protocol: store.state.authStore.protocol,
-            homeserver: homeserver!.hostname,
+            homeserver: homeserver.hostname!,
           ) ??
           {};
 
@@ -38,32 +38,28 @@ ThunkAction<AppState> fetchBaseUrl({Homeserver? homeserver}) {
         identityUrl: identityUrl,
       );
     } catch (error) {
-      return homeserver!.copyWith(
+      return homeserver.copyWith(
         valid: false,
       );
     }
   };
 }
 
-ThunkAction<AppState> fetchServerVersion({Homeserver? homeserver}) {
+ThunkAction<AppState> fetchServerVersion({required Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkVersion(
             protocol: store.state.authStore.protocol,
-            homeserver: homeserver!.hostname,
+            homeserver: homeserver.hostname!,
           ) ??
           {};
 
       final versionExists = response['versions'] != null;
 
-      return homeserver.copyWith(
-        valid: versionExists,
-      );
+      return homeserver.copyWith(valid: versionExists);
     } catch (error) {
-      return homeserver!.copyWith(
-        valid: false,
-      );
+      return homeserver.copyWith(valid: false);
     }
   };
 }

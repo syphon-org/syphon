@@ -5,7 +5,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 List<Room> availableRooms(List<Room> rooms) {
-  return List.from(rooms.where((room) => !room.hidden!));
+  return List.from(rooms.where((room) => !room.hidden));
 }
 
 String formatPreviewTopic(String? fullTopic) {
@@ -31,7 +31,7 @@ String formatPreview({required Room room, Message? message}) {
   // Show topic if the user has joined a group but not sent
   if (message == null) {
     // romm is just an invite
-    if (room.invite!) {
+    if (room.invite) {
       return 'Invite to chat';
     }
 

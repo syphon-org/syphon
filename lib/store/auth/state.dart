@@ -26,7 +26,7 @@ class AuthStore extends Equatable {
   final String? clientSecret;
 
   @JsonKey()
-  final String? protocol;
+  final String protocol;
 
   User get currentUser => user;
 
@@ -70,9 +70,9 @@ class AuthStore extends Equatable {
     this.authObserver,
     this.protocol = 'https://',
     this.email = '',
-    this.username = '', // null
-    this.password = '', // null
-    this.passwordCurrent = '', // null
+    this.username = '',
+    this.password = '',
+    this.passwordCurrent = '',
     this.passwordConfirm = '',
     this.agreement = false,
     this.captcha = false,

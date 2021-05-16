@@ -97,15 +97,15 @@ class Room {
 
   @JsonKey(ignore: true)
   String get type {
-    if (joinRule == 'public' || worldReadable!) {
+    if (joinRule == 'public' || worldReadable) {
       return 'public';
     }
 
-    if (direct!) {
+    if (direct) {
       return 'direct';
     }
 
-    if (invite!) {
+    if (invite) {
       return 'invite';
     }
 
@@ -408,7 +408,7 @@ class Room {
     String? topic;
     String? joinRule;
     bool? encryptionEnabled;
-    bool direct = this.direct ?? false;
+    bool direct = this.direct;
     int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 

@@ -924,7 +924,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {
-      if (room!.direct!) {
+      if (room!.direct) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 
@@ -951,7 +951,7 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      if (room!.direct!) {
+      if (room!.direct) {
         await store.dispatch(toggleDirectRoom(room: room, enabled: false));
       }
 

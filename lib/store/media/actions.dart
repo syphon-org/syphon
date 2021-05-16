@@ -94,18 +94,13 @@ ThunkAction<AppState> fetchThumbnail(
       final mediaCache = store.state.mediaStore.mediaCache;
       final mediaChecks = store.state.mediaStore.mediaChecks;
 
-      // Noop if cache is corrupted
-      if (mediaCache == null) {
-        return;
-      }
-
       // Noop if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
       // Noop if currently checking or failed
-      if (mediaChecks!.containsKey(mxcUri) &&
+      if (mediaChecks.containsKey(mxcUri) &&
           (mediaChecks[mxcUri!] == MediaStatus.CHECKING ||
               mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {

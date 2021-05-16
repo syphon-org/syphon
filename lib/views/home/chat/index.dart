@@ -320,9 +320,9 @@ class ChatViewState extends State<ChatView> {
           ),
         ),
         PopupMenuItem<String>(
-          enabled: props.room.direct!,
+          enabled: props.room.direct,
           child: GestureDetector(
-            onTap: !props.room.direct!
+            onTap: !props.room.direct
                 ? null
                 : () {
                     Navigator.pop(context);

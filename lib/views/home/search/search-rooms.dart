@@ -217,7 +217,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.invite!,
+                        visible: room.invite,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -252,7 +252,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'group' && !room.invite!,
+                        visible: room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -272,7 +272,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         ),
                       ),
                       Visibility(
-                        visible: room.type == 'public' && !room.invite!,
+                        visible: room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

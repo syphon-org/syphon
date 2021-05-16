@@ -140,7 +140,7 @@ class HomeViewState extends State<Home> {
             ),
           ),
           Visibility(
-            visible: this.selectedRoom!.direct!,
+            visible: this.selectedRoom!.direct,
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
@@ -406,7 +406,7 @@ class HomeViewState extends State<Home> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.invite!,
+                        visible: props.roomTypeBadgesEnabled && room.invite,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -443,7 +443,7 @@ class HomeViewState extends State<Home> {
                       Visibility(
                         visible: props.roomTypeBadgesEnabled &&
                             room.type == 'group' &&
-                            !room.invite!,
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -465,7 +465,7 @@ class HomeViewState extends State<Home> {
                       Visibility(
                         visible: props.roomTypeBadgesEnabled &&
                             room.type == 'public' &&
-                            !room.invite!,
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

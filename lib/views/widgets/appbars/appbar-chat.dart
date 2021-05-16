@@ -211,7 +211,7 @@ class AppBarChatState extends State<AppBarChat> {
                       Visibility(
                         visible: widget.badgesEnabled &&
                             widget.room!.type == 'group' &&
-                            !widget.room!.invite!,
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -233,7 +233,7 @@ class AppBarChatState extends State<AppBarChat> {
                       Visibility(
                         visible: widget.badgesEnabled &&
                             widget.room!.type == 'public' &&
-                            !widget.room!.invite!,
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -338,7 +338,7 @@ class AppBarChatState extends State<AppBarChat> {
                     ),
                   ];
 
-                  if (widget.room!.direct!) {
+                  if (widget.room!.direct) {
                     menu.add(const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.blockUser,
                       child: Text('Block User'),

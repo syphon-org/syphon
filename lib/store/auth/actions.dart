@@ -33,7 +33,6 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -180,6 +179,10 @@ late StreamSubscription _sub;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
+        if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+          return;
+        }
+
         _sub = uriLinkStream.listen((Uri? uri) {
           final token = uri!.queryParameters['loginToken'];
           if (store.state.authStore.user.accessToken == null) {
@@ -335,7 +338,7 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
-      Homeserver? homeserver = store.state.authStore.homeserver;
+      var homeserver = store.state.authStore.homeserver;
       final username = store.state.authStore.username.replaceAll('@', '');
       final password = store.state.authStore.password;
       final protocol = store.state.authStore.protocol;
@@ -349,9 +352,9 @@ ThunkAction<AppState> loginUser() {
       } catch (error) {/* still attempt login */}
 
       final data = await MatrixApi.loginUser(
-        protocol: store.state.authStore.protocol,
+        protocol: protocol,
         type: MatrixAuthTypes.PASSWORD,
-        homeserver: homeserver!.baseUrl,
+        homeserver: homeserver.baseUrl!,
         username: username,
         password: password,
         deviceId: device.deviceId,
@@ -1134,7 +1137,7 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
     try {
       final response = await MatrixApi.loginType(
             protocol: store.state.authStore.protocol,
-            homeserver: homeserver.baseUrl,
+            homeserver: homeserver.baseUrl!,
           ) ??
           {};
 

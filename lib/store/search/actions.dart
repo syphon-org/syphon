@@ -129,7 +129,7 @@ ThunkAction<AppState> searchRooms({String? searchText}) {
       store.dispatch(SetLoading(loading: true));
 
       final rooms = store.state.roomStore.roomList;
-      List<Room> searchResults = List.from(rooms.where((room) => !room.direct!));
+      List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
 
       if (searchText!.length != 0) {
         searchResults = List.from(
