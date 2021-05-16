@@ -62,7 +62,7 @@ dependencies:
 
   swipeable:
     git:
-      url: git@github.com:ereio/swipeable.git
+      url: https://github.com/ereio/swipeable.git
       ref: null-safety
 
   # state
