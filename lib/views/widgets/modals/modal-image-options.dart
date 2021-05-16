@@ -64,7 +64,7 @@ class ModalImageOptions extends StatelessWidget {
                   source: ImageSource.camera,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                ) as FutureOr<PickedFile>);
+                ) as Future<PickedFile>);
 
                 final File imageFile = File(image.path);
                 if (this.onSetNewAvatar != null) {
@@ -91,7 +91,7 @@ class ModalImageOptions extends StatelessWidget {
                   source: ImageSource.gallery,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                ) as FutureOr<PickedFile>);
+                ) as Future<PickedFile>);
 
                 final File imageFile = File(image.path);
 

@@ -140,7 +140,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       List<Message> messages = [];
 
       // First past to decrypt encrypted events
-      if (room.encryptionEnabled!) {
+      if (room.encryptionEnabled) {
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
           decryptEvents(room, json),
@@ -155,7 +155,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
         'lastSince': lastSince,
       });
 
-      printDebug(
+      printInfo(
         '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
       );
 
@@ -743,7 +743,7 @@ ThunkAction<AppState> updateRoomAvatar({
 ThunkAction<AppState> toggleRoomEncryption({Room? room}) {
   return (Store<AppState> store) async {
     try {
-      if (room!.encryptionEnabled!) {
+      if (room!.encryptionEnabled) {
         throw 'Room is already encrypted';
       }
 

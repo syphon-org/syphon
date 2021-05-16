@@ -198,7 +198,7 @@ class RoomSearchState extends State<RoomSearchView> {
                         background: backgroundColor,
                       ),
                       Visibility(
-                        visible: room.encryptionEnabled!,
+                        visible: room.encryptionEnabled,
                         child: Positioned(
                           bottom: 0,
                           right: 0,

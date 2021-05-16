@@ -187,7 +187,7 @@ class AppBarChatState extends State<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: !widget.room!.encryptionEnabled!,
+                        visible: !widget.room!.encryptionEnabled,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

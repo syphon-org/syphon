@@ -66,6 +66,6 @@ Future<void> initPlatformDependencies() async {
   // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
-    printDebug('[main] background service started $backgroundSyncStatus');
+    printInfo('[main] background service started $backgroundSyncStatus');
   }
 }

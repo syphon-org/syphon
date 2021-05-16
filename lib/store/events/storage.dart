@@ -118,8 +118,8 @@ Future<void> saveReactions(
           var reactionsUpdated = [reaction];
 
           if (exists) {
-            final existingRaw = await (record.get(storage) as FutureOr<String>);
-            final existingJson = List.from(await json.decode(existingRaw));
+            final existingRaw = await record.get(storage);
+            final existingJson = List.from(await json.decode(existingRaw!));
             final existingList = List.from(existingJson.map(
               (json) => Reaction.fromJson(json),
             ));
@@ -129,10 +129,7 @@ Future<void> saveReactions(
             );
 
             if (!exists) {
-              reactionsUpdated = [
-                ...existingList as Iterable<Reaction>,
-                reaction
-              ];
+              reactionsUpdated = [...existingList, reaction];
             }
           }
 
@@ -160,14 +157,15 @@ Future<Map<String, List<Reaction>>> loadReactions(
     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
     final reactionsMap = Map<String, List<Reaction>>();
     final reactionsRecords =
-        await (store.records(messageIds).getSnapshots(storage)
-            as FutureOr<List<RecordSnapshot<String, String>>>);
+        await store.records(messageIds).getSnapshots(storage);
 
-    for (RecordSnapshot<String, String> reactionList in reactionsRecords) {
-      final reactions = List.from(await json.decode(reactionList.value))
-          .map((json) => Reaction.fromJson(json))
-          .toList();
-      reactionsMap.putIfAbsent(reactionList.key, () => reactions);
+    for (RecordSnapshot<String?, String>? reactionList in reactionsRecords) {
+      if (reactionList != null) {
+        final reactions = List.from(await json.decode(reactionList.value))
+            .map((json) => Reaction.fromJson(json))
+            .toList();
+        reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
+      }
     }
 
     return reactionsMap;
@@ -194,10 +192,9 @@ Future<void> saveMessages(
 Future<Message> loadMessage(String eventId, {required Database storage}) async {
   final store = StoreRef<String, String>(StorageKeys.MESSAGES);
 
-  final message =
-      await (store.record(eventId).get(storage) as FutureOr<String>);
+  final message = await store.record(eventId).get(storage);
 
-  return Message.fromJson(json.decode(message));
+  return Message.fromJson(json.decode(message!));
 }
 
 /**
@@ -207,7 +204,7 @@ Future<Message> loadMessage(String eventId, {required Database storage}) async {
  * In redux, they're indexed by RoomID and placed in a list
  */
 Future<List<Message>> loadMessages(
-  List<String?> eventIds, {
+  List<String> eventIds, {
   required Database storage,
   int offset = 0,
   int limit = 20, // default amount loaded
@@ -220,11 +217,12 @@ Future<List<Message>> loadMessages(
     // TODO: properly paginate through cold storage messages instead of loading all
     final messageIds = eventIds; //.skip(offset).take(limit).toList();
 
-    final messagesPaginated = await (store.records(messageIds).get(storage)
-        as FutureOr<List<String>>);
+    final messagesPaginated = await store.records(messageIds).get(storage);
 
-    for (String message in messagesPaginated) {
-      messages.add(Message.fromJson(json.decode(message)));
+    for (String? message in messagesPaginated) {
+      if (message != null) {
+        messages.add(Message.fromJson(json.decode(message)));
+      }
     }
 
     return messages;

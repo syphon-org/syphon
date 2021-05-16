@@ -17,6 +17,7 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
 // Project imports:
@@ -46,7 +47,7 @@ class SetDeviceKeys {
 
 // Set currently authenticated users keys
 class SetDeviceKeysOwned {
-  var deviceKeysOwned;
+  Map<String, DeviceKey>? deviceKeysOwned;
   SetDeviceKeysOwned({this.deviceKeysOwned});
 }
 
@@ -137,7 +138,7 @@ class ResetCrypto {}
  */
 ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
   return (Store<AppState> store) async {
-    var currentKeys = Map<String, DeviceKey?>.from(
+    Map<String, DeviceKey> currentKeys = Map.from(
       store.state.cryptoStore.deviceKeysOwned,
     );
 
@@ -182,41 +183,6 @@ ThunkAction<AppState> deleteDeviceKeys() {
 }
 
 /**
- * Init Key Encryption
- */
-ThunkAction<AppState> initKeyEncryption(User user) {
-  return (Store<AppState> store) async {
-    // fetch device keys and pull out key based on device id
-    final ownedDeviceKeys = (await store.dispatch(
-          fetchDeviceKeysOwned(user),
-        )) ??
-        {};
-
-    await store.dispatch(initOlmEncryption(user));
-
-    // check if key exists for this device
-    if (!ownedDeviceKeys.containsKey(user.deviceId)) {
-      // generate a key if none exist locally and remotely
-      await store.dispatch(generateIdentityKeys());
-
-      final deviceId = store.state.authStore.user.deviceId;
-      final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId!];
-
-      // upload the key intended for this device
-      await store.dispatch(uploadIdentityKeys(deviceKey: deviceKey));
-    } else {
-      // if a key exists remotely, mark that it does
-      // the user will be prompted to import in "home"
-      // if they have no local keys
-      store.dispatch(toggleDeviceKeysExist(true));
-    }
-
-    // append all keys uploaded remotely
-    store.dispatch(setDeviceKeysOwned(ownedDeviceKeys));
-  };
-}
-
-/**
  * 
  * Initing Olm Account
  * 
@@ -251,6 +217,41 @@ ThunkAction<AppState> initOlmEncryption(User user) {
     } catch (error) {
       debugPrint('[initOlmEncryption] $error');
     }
+  };
+}
+
+/**
+ * Init Key Encryption
+ */
+ThunkAction<AppState> initKeyEncryption(User user) {
+  return (Store<AppState> store) async {
+    // fetch device keys and pull out key based on device id
+    final Map<String, DeviceKey> ownedDeviceKeys = await store.dispatch(
+          fetchDeviceKeysOwned(user),
+        ) ??
+        {};
+
+    await store.dispatch(initOlmEncryption(user));
+
+    // check if key exists for this device
+    if (!ownedDeviceKeys.containsKey(user.deviceId)) {
+      // generate a key if none exist locally and remotely
+      await store.dispatch(generateIdentityKeys());
+
+      final deviceId = store.state.authStore.user.deviceId;
+      final deviceKey = store.state.cryptoStore.deviceKeysOwned[deviceId];
+
+      // upload the key intended for this device
+      await store.dispatch(uploadIdentityKeys(deviceKey: deviceKey!));
+    } else {
+      // if a key exists remotely, mark that it does
+      // the user will be prompted to import in "home"
+      // if they have no local keys
+      store.dispatch(toggleDeviceKeysExist(true));
+    }
+
+    // append all keys uploaded remotely
+    store.dispatch(setDeviceKeysOwned(ownedDeviceKeys));
   };
 }
 
@@ -303,9 +304,9 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // figerprint signature key pair generation for upload
-      // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
-      final deviceKeysEncoded = json.encode(deviceIdentityKeys);
+      // warn: seems to work without canonical_json lib
       // utf8.decode(deviceKeysEncoded);
+      final deviceKeysEncoded = json.encode(deviceIdentityKeys);
       final deviceKeysSerialized = deviceKeysEncoded;
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
@@ -322,14 +323,12 @@ ThunkAction<AppState> generateIdentityKeys() {
         deviceKeysPayload['device_keys'],
       );
 
-      store.dispatch(SetDeviceKeysOwned(
-        deviceKeysOwned: {
-          authUser.deviceId: deviceKeysOwned,
-        },
+      await store.dispatch(SetDeviceKeysOwned(
+        deviceKeysOwned: {authUser.deviceId!: deviceKeysOwned},
       ));
 
       // return the generated keys
-      return deviceIdentityKeys;
+      return deviceKeysOwned;
     } catch (error) {
       debugPrint('[generateIdentityKeys] $error');
       return null;
@@ -337,11 +336,11 @@ ThunkAction<AppState> generateIdentityKeys() {
   };
 }
 
-ThunkAction<AppState> uploadIdentityKeys({DeviceKey? deviceKey}) {
+ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
   return (Store<AppState> store) async {
     try {
       final deviceKeyMap = {
-        'device_keys': deviceKey!.toMatrix(),
+        'device_keys': deviceKey.toMatrix(),
       };
 
       // upload the public device keys
@@ -648,12 +647,12 @@ ThunkAction<AppState> claimOneTimeKeys({
       }
 
       // claim one time keys from matrix server
-      final Map claimKeysResponse = await (MatrixApi.claimKeys(
+      final Map claimKeysResponse = await MatrixApi.claimKeys(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         oneTimeKeys: claimKeysPayload,
-      ) as FutureOr<Map<dynamic, dynamic>>);
+      );
 
       if (claimKeysResponse['errcode'] != null ||
           claimKeysResponse['failures'].isNotEmpty) {
@@ -1123,7 +1122,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       FilePickerResult file = await (FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['.json'],
-      ) as FutureOr<FilePickerResult>);
+      ) as Future<FilePickerResult>);
 
       final File keyFile = File(file.paths[0]!);
 
@@ -1138,7 +1137,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
       store.dispatch(
         SetDeviceKeysOwned(
           deviceKeysOwned: {
-            authUser.deviceId: DeviceKey.fromMatrix(
+            authUser.deviceId!: DeviceKey.fromMatrix(
               importData['device_keys'],
             ),
           },

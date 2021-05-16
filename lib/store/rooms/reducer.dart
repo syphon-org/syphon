@@ -11,7 +11,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(loading: action.loading);
 
     case SetRooms:
-      final Map<String, Room?> rooms = Map.fromIterable(
+      final Map<String, Room> rooms = Map.fromIterable(
         action.rooms,
         key: (room) => room.id,
         value: (room) => room,
@@ -19,7 +19,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case SetRoom:
-      final rooms = Map<String, Room?>.from(state.rooms);
+      final rooms = Map<String, Room>.from(state.rooms);
       rooms[action.room.id] = action.room;
       return state.copyWith(rooms: rooms);
 
@@ -45,9 +45,9 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
 
     case SaveOutboxMessage:
       final rooms = Map<String, Room>.from(state.rooms);
-      final outbox = List<Message?>.from(rooms[action.id]!.outbox);
+      final outbox = List<Message>.from(rooms[action.id]!.outbox);
       if (action.tempId != null) {
-        outbox.retainWhere((element) => element!.id != action.tempId);
+        outbox.retainWhere((element) => element.id != action.tempId);
       }
       outbox.add(action.pendingMessage);
       rooms[action.id] = rooms[action.id]!.copyWith(outbox: outbox);

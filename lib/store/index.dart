@@ -9,6 +9,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/storage.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
@@ -122,7 +123,7 @@ Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
         case SetUser:
         case ResetCrypto:
         case ResetUser:
-          print('[initStore] saving ${action}');
+          printInfo('[initStore] persistor saving from ${action.runtimeType}');
           return true;
         default:
           return false;

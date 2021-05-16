@@ -83,7 +83,7 @@ class ChatViewState extends State<ChatView> {
     // only marked if read receipts are enabled
     props.onMarkRead();
 
-    if (props.room.invite!) {
+    if (props.room.invite) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -96,7 +96,7 @@ class ChatViewState extends State<ChatView> {
       );
     }
 
-    if (props.room.encryptionEnabled!) {
+    if (props.room.encryptionEnabled) {
       props.onUpdateDeviceKeys();
       this.setState(() {
         mediumType = MediumType.encryption;
@@ -138,7 +138,7 @@ class ChatViewState extends State<ChatView> {
 
   @protected
   onDidChange(_Props? propsOld, _Props props) {
-    if (props.room.encryptionEnabled! && mediumType != MediumType.encryption) {
+    if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
       this.setState(() {
         mediumType = MediumType.encryption;
       });
@@ -194,7 +194,7 @@ class ChatViewState extends State<ChatView> {
       // if the room has not enabled encryption
       // confirm with the user first before
       // attempting it
-      if (!props!.room.encryptionEnabled!) {
+      if (!props!.room.encryptionEnabled) {
         return showDialog(
           context: context,
           barrierDismissible: false,
@@ -217,7 +217,7 @@ class ChatViewState extends State<ChatView> {
     } else {
       // allow other mediums for messages
       // unless they've encrypted the room
-      if (!props!.room.encryptionEnabled!) {
+      if (!props!.room.encryptionEnabled) {
         setState(() {
           mediumType = newMediumType;
         });
@@ -289,7 +289,7 @@ class ChatViewState extends State<ChatView> {
       ),
       items: [
         PopupMenuItem<String>(
-          enabled: !props.room.encryptionEnabled!,
+          enabled: !props.room.encryptionEnabled,
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -642,7 +642,7 @@ class _Props extends Equatable {
               type: type,
             );
 
-            if (room.encryptionEnabled!) {
+            if (room.encryptionEnabled) {
               return store.dispatch(sendMessageEncrypted(
                 room: room,
                 message: message,

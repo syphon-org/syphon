@@ -319,7 +319,7 @@ class HomeViewState extends State<Home> {
         }
 
         // show draft inidicator if it's an empty room
-        if (messages == null || messages.length < 1) {
+        if (room.drafting || messages.length < 1) {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
@@ -384,7 +384,7 @@ class HomeViewState extends State<Home> {
                         background: primaryColor,
                       ),
                       Visibility(
-                        visible: !room.encryptionEnabled!,
+                        visible: !room.encryptionEnabled,
                         child: Positioned(
                           bottom: 0,
                           right: 0,
@@ -595,7 +595,7 @@ class _Props extends Equatable {
   final User currentUser;
   final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
-  final Map<String, List<Message?>> messages;
+  final Map<String, List<Message>?> messages;
 
   final Function onDebug;
   final Function onLeaveChat;

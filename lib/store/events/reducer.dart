@@ -23,15 +23,16 @@ EventStore eventReducer(
       );
 
       for (Reaction reaction in action.reactions ?? []) {
-        final exists = reactionsUpdated.containsKey(reaction.relEventId);
+        final reactionEventId = reaction.relEventId;
+        final exists = reactionsUpdated.containsKey(reactionEventId);
 
         if (exists) {
-          final existing = reactionsUpdated[reaction.relEventId]!;
+          final existing = reactionsUpdated[reactionEventId]!;
           if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
-            reactionsUpdated[reaction.relEventId!] = [...existing, reaction];
+            reactionsUpdated[reactionEventId!] = [...existing, reaction];
           }
-        } else {
-          reactionsUpdated[reaction.relEventId!] = [reaction];
+        } else if (reactionEventId != null) {
+          reactionsUpdated[reactionEventId] = [reaction];
         }
       }
 
@@ -42,15 +43,14 @@ EventStore eventReducer(
         return state;
       }
       final roomId = action.roomId;
-      final Map<String, List<Message?>> messages =
-          Map<String, List<Message>>.from(state.messages);
+      final Map<String, List<Message>> messages = Map.from(state.messages);
 
-      final messagesOld = Map<String, Message?>.fromIterable(
+      final messagesOld = Map<String, Message>.fromIterable(
         messages[roomId] ?? [],
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
-      final messagesNew = Map<String, Message?>.fromIterable(
+      final messagesNew = Map<String, Message>.fromIterable(
         action.messages ?? [],
         key: (msg) => msg.id,
         value: (msg) => msg,
@@ -67,9 +67,9 @@ EventStore eventReducer(
         return state;
       }
 
-      final redactions = Map<String, Redaction?>.from(state.redactions);
+      final redactions = Map<String, Redaction>.from(state.redactions);
 
-      final redactionsNew = Map<String, Redaction?>.fromIterable(
+      final redactionsNew = Map<String, Redaction>.fromIterable(
         action.redactions ?? [],
         key: (redaction) => redaction.redactId,
         value: (redaction) => redaction,

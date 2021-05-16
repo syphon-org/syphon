@@ -30,7 +30,7 @@ CryptoStore cryptoReducer(
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
     case AddOutboundKeySession:
-      final outboundSessions = Map<String, String?>.from(
+      final outboundSessions = Map<String, String>.from(
         state.outboundKeySessions,
       );
 
@@ -40,7 +40,7 @@ CryptoStore cryptoReducer(
         outboundKeySessions: outboundSessions,
       );
     case AddInboundKeySession:
-      final inboundKeySessions = Map<String, String?>.from(
+      final inboundKeySessions = Map<String, String>.from(
         state.inboundKeySessions,
       );
 
@@ -50,7 +50,7 @@ CryptoStore cryptoReducer(
         inboundKeySessions: inboundKeySessions,
       );
     case AddOutboundMessageSession:
-      final outboundMessageSessions = Map<String, String?>.from(
+      final outboundMessageSessions = Map<String, String>.from(
         state.outboundMessageSessions,
       );
 

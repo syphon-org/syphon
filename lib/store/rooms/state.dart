@@ -30,9 +30,8 @@ class RoomStore extends Equatable {
       ];
 
   RoomStore copyWith({
-    rooms,
-    loading,
-    lastSince,
+    bool? loading,
+    Map<String, Room>? rooms,
   }) =>
       RoomStore(
         rooms: rooms ?? this.rooms,

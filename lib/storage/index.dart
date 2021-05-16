@@ -34,7 +34,7 @@ class Storage {
   static const mainLocation = '${Values.appNameLabel}-main-storage.db';
 }
 
-FutureOr<Database?> initStorage() async {
+Future<Database?> initStorage() async {
   try {
     DatabaseFactory? storageFactory;
 
@@ -124,9 +124,9 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = Map();
-    Map<String, List<Reaction>> reactions = Map();
-    Map<String, Map<String, ReadReceipt>> receipts = Map();
+    Map<String, List<Message>> messages = {};
+    Map<String, List<Reaction>> reactions = {};
+    Map<String, Map<String, ReadReceipt>> receipts = {};
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(
@@ -147,7 +147,7 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
 
     return {
       'auth': auth,
-      'users': users,
+      'users': users.isNotEmpty ? users : null,
       'rooms': rooms,
       'media': media,
       'crypto': crypto,

@@ -41,10 +41,9 @@ Future<Uint8List?> loadMedia({
   try {
     final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
-    final mediaData =
-        await (store.record(mxcUri).get(storage) as FutureOr<String>);
+    final mediaData = await store.record(mxcUri).get(storage);
 
-    final dataBytes = json.decode(mediaData);
+    final dataBytes = json.decode(mediaData!);
 
     // Convert json decoded List<int> to Uint8List
     if (dataBytes == null) {

@@ -210,12 +210,11 @@ ThunkAction<AppState> startAuthObserver() {
       throw 'Cannot call startAuthObserver with an existing instance';
     }
 
-    store.dispatch(
-      SetAuthObserver(authObserver: StreamController<User>.broadcast()),
-    );
+    store.dispatch(SetAuthObserver(
+      authObserver: StreamController<User?>.broadcast(),
+    ));
 
-    final user = store.state.authStore.user;
-    final Function onAuthStateChanged = (User user) async {
+    final Function onAuthStateChanged = (User? user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -230,8 +229,9 @@ ThunkAction<AppState> startAuthObserver() {
         // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String? payload) {
-            debugPrint('[onSelectNotification] payload');
-          } as Future<dynamic> Function(String?)?,
+            debugPrint('[onSelectNotification] payload $payload');
+            return Future.value(true);
+          },
           onSaveToken: (token) {
             store.dispatch(setPusherDeviceToken(token));
           },
@@ -249,9 +249,13 @@ ThunkAction<AppState> startAuthObserver() {
     };
 
     // init current auth state and set auth state listener
-    onAuthStateChanged(user);
-    store.state.authStore.onAuthStateChanged!
-        .listen(onAuthStateChanged as void Function(User?)?);
+    // onAuthStateChanged(user);
+    store.state.authStore.onAuthStateChanged!.listen(
+      onAuthStateChanged as Function(User?),
+    );
+
+    final user = store.state.authStore.user;
+    store.state.authStore.authObserver!.add(user);
   };
 }
 
@@ -1039,7 +1043,7 @@ ThunkAction<AppState> fetchHomeservers() {
     store.dispatch(SetLoading(loading: true));
 
     final List<dynamic> homeserversJson =
-        await (JackApi.fetchPublicServers() as FutureOr<List<dynamic>>);
+        await (JackApi.fetchPublicServers() as Future<List<dynamic>>);
 
     // parse homeserver data
     final List<Homeserver> homserverData = homeserversJson.map((data) {
@@ -1072,9 +1076,8 @@ ThunkAction<AppState> fetchHomeservers() {
     // find favicons for all the homeservers
     final homeservers = await Future.wait(
       homserverData.map((homeserver) async {
-        final url =
-            await (fetchFavicon(url: homeserver.hostname) as FutureOr<String>);
-        final uri = Uri.parse(url);
+        final url = await fetchFavicon(url: homeserver.hostname);
+        final uri = Uri.parse(url!);
         try {
           final response = await http.get(uri);
 

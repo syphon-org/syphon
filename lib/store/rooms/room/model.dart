@@ -35,15 +35,15 @@ class Room {
   final String? topic;
   final String? joinRule; // "public", "knock", "invite", "private"
 
-  final bool? drafting;
-  final bool? direct;
-  final bool? sending;
-  final bool? invite;
-  final bool? guestEnabled;
-  final bool? encryptionEnabled;
-  final bool? worldReadable;
-  final bool? hidden;
-  final bool? archived;
+  final bool drafting;
+  final bool direct;
+  final bool sending;
+  final bool invite;
+  final bool guestEnabled;
+  final bool encryptionEnabled;
+  final bool worldReadable;
+  final bool hidden;
+  final bool archived;
 
   final String? lastHash; // oldest hash in timeline
   final String? prevHash; // most recent prev_batch (not the lastHash)
@@ -60,9 +60,9 @@ class Room {
 
   // Associated user ids
   final List<String> userIds;
-  final List<String?> messageIds;
+  final List<String> messageIds;
   final List<String> reactionIds;
-  final List<Message?> outbox;
+  final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
   @JsonKey(ignore: true)
@@ -120,11 +120,14 @@ class Room {
     this.avatarUri,
     this.topic = '',
     this.joinRule = 'private',
+    this.drafting = false,
     this.invite = false,
     this.direct = false,
     this.syncing = false,
     this.sending = false,
     this.limited = false,
+    this.hidden = false,
+    this.archived = false,
     this.draft,
     this.reply,
     this.userIds = const [],
@@ -144,9 +147,6 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.usersTyping = const [],
-    this.drafting = false,
-    this.hidden = false,
-    this.archived = false,
     this.lastHash,
     this.nextHash,
     this.prevHash,
@@ -161,11 +161,14 @@ class Room {
     avatar,
     avatarUri,
     topic,
-    invite,
+    bool? invite,
     bool? direct,
-    limited,
-    syncing,
-    sending,
+    bool? limited,
+    bool? syncing,
+    bool? sending,
+    bool? drafting,
+    bool? hidden,
+    bool? archived,
     joinRule,
     lastRead,
     lastUpdate,
@@ -177,16 +180,13 @@ class Room {
     usersTyping,
     draft,
     reply,
-    drafting,
-    hidden,
-    archived,
     users,
     userIds,
     events,
-    List<Message?>? outbox,
+    List<Message>? outbox,
     List<Message>? messagesNew,
-    List<Event>? reactions,
-    List<String?>? messageIds,
+    List<Reaction>? reactions,
+    List<String>? messageIds,
     List<String>? reactionIds,
     List<Redaction>? redactions,
     Map<String, ReadReceipt>? readReceipts,
@@ -203,14 +203,14 @@ class Room {
         joinRule: joinRule ?? this.joinRule,
         avatarUri: avatarUri ?? this.avatarUri,
         homeserver: homeserver ?? this.homeserver,
-        drafting: drafting ?? this.drafting ?? false,
+        drafting: drafting ?? this.drafting,
         invite: invite ?? this.invite,
         direct: direct ?? this.direct,
-        hidden: hidden ?? this.hidden ?? false,
-        archived: archived ?? this.archived ?? false,
-        sending: sending ?? this.sending ?? false,
-        syncing: syncing ?? this.syncing ?? false,
-        limited: limited ?? this.limited ?? false,
+        hidden: hidden ?? this.hidden,
+        archived: archived ?? this.archived,
+        sending: sending ?? this.sending,
+        syncing: syncing ?? this.syncing,
+        limited: limited ?? this.limited,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
@@ -224,7 +224,7 @@ class Room {
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
-        reactions: reactions as List<Reaction>? ?? this.reactions,
+        reactions: reactions ?? this.reactions,
         redactions: redactions ?? this.redactions,
         usersNew: users ?? this.usersNew,
         userIds: userIds ?? this.userIds,
@@ -311,7 +311,7 @@ class Room {
       prevHash = json['timeline']['prev_batch'];
 
       if (limited != null) {
-        printDebug(
+        printInfo(
           '[fromSync] ${this.id} limited ${limited} lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
@@ -577,9 +577,8 @@ class Room {
       if (this.limited) {
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
-          final messageKnown = messageIds.firstWhere(
+          final messageKnown = messageIds.firstWhereOrNull(
             (id) => id == messages[0].id,
-            orElse: () => null,
           );
 
           // Set limited to false if they now exist
@@ -621,7 +620,7 @@ class Room {
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
-        encryptionEnabled: this.encryptionEnabled! || hasEncrypted != null,
+        encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // oldest hash in the timeline
         lastHash: lastHash ?? this.lastHash ?? prevHash,

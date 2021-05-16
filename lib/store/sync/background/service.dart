@@ -129,10 +129,9 @@ void notificationSyncIsolate() async {
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      final roomNamesData = await secureStorage.read(key: Cache.roomNamesKey);
 
-      roomNames = jsonDecode(
-        await (secureStorage.read(key: Cache.roomNamesKey) as FutureOr<String>),
-      );
+      roomNames = jsonDecode(roomNamesData!);
     } catch (error) {
       print('[notificationSyncIsolate] $error');
     }
@@ -174,7 +173,7 @@ void notificationSyncIsolate() async {
 /** 
  *  Save Full Sync
  */
-FutureOr<dynamic> syncLoop({
+Future<dynamic> syncLoop({
   required Map params,
   FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
@@ -243,7 +242,7 @@ FutureOr<dynamic> syncLoop({
         final String formattedSender = trimAlias(messageSender);
 
         if (!formattedSender.contains(userId)) {
-          if (room.direct!) {
+          if (room.direct) {
             showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender sent a new message.',
@@ -252,7 +251,7 @@ FutureOr<dynamic> syncLoop({
             return;
           }
 
-          if (room.invite!) {
+          if (room.invite) {
             showMessageNotification(
               messageHash: Random.secure().nextInt(20000),
               body: '$formattedSender invited you to chat',

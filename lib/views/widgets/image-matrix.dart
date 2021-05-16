@@ -75,7 +75,7 @@ class MatrixImageState extends State<MatrixImage> {
   @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final mediaCache = store.state.mediaStore.mediaCache!;
+    final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
       store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
@@ -152,10 +152,8 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        mediaCache:
-            store.state.mediaStore.mediaCache ?? Map<String, Uint8List>(),
-        mediaChecks:
-            store.state.mediaStore.mediaChecks ?? Map<String, String>(),
+        mediaCache: store.state.mediaStore.mediaCache,
+        mediaChecks: store.state.mediaStore.mediaChecks,
       );
 
   @override

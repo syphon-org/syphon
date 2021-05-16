@@ -56,9 +56,8 @@ Map<String, dynamic> parseMessages({
   if (room.limited) {
     // Check to see if the new messages contain those existing in cache
     if (messages.isNotEmpty && room.messageIds.isNotEmpty) {
-      final messageLatest = room.messageIds.firstWhere(
+      final String? messageLatest = room.messageIds.firstWhereOrNull(
         (id) => id == messages[0].id,
-        orElse: () => null,
       );
       // Set limited to false if they now exist
       limited = messageLatest != null;
@@ -79,7 +78,7 @@ Map<String, dynamic> parseMessages({
   messagesAll.addAll(messages);
 
   // Map messages to ids to filter out ids and outbox
-  final messagesAllMap = HashMap.fromIterable(
+  final messagesAllMap = HashMap<String, dynamic>.fromIterable(
     messagesAll,
     key: (message) => message.id,
     value: (message) => message,
@@ -91,8 +90,8 @@ Map<String, dynamic> parseMessages({
   );
 
   // save messages and unique message id updates
-  final messageIdsAll = Set<String?>.from(room.messageIds)
-    ..addAll(messagesAllMap.keys as Iterable<String?>);
+  final messageIdsAll = Set<String>.from(room.messageIds)
+    ..addAll(messagesAllMap.keys);
 
   return {
     'messages': messages,
@@ -101,7 +100,7 @@ Map<String, dynamic> parseMessages({
       messageIds: messageIdsAll.toList(),
       limited: limited ?? room.limited,
       lastUpdate: lastUpdate ?? room.lastUpdate,
-      encryptionEnabled: room.encryptionEnabled! || hasEncrypted != null,
+      encryptionEnabled: room.encryptionEnabled || hasEncrypted != null,
     ),
   };
 }

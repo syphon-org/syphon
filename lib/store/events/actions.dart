@@ -113,7 +113,7 @@ ThunkAction<AppState> loadMessagesCached({
         room.messageIds,
         storage: Storage.main!,
         offset: offset, // offset from the most recent eventId found
-        limit: !room.encryptionEnabled! ? limit : room.messageIds.length,
+        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );
 
       // load cold storage messages to state

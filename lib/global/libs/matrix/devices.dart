@@ -13,7 +13,7 @@ abstract class Devices {
    * HTTP:GET
    * Gets all currently active pushers for the authenticated user.
    */
-  static FutureOr<dynamic> fetchDevices({
+  static Future<dynamic> fetchDevices({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
@@ -35,7 +35,7 @@ abstract class Devices {
    * HTTP:PUT
    * Gets all currently active pushers for the authenticated user.
    */
-  static FutureOr<dynamic> updateDevice({
+  static Future<dynamic> updateDevice({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
@@ -67,7 +67,7 @@ abstract class Devices {
  * HTTP:DELETE
  * Gets all currently active pushers for the authenticated user.
  */
-  static FutureOr<dynamic> deleteDevice({
+  static Future<dynamic> deleteDevice({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
     String? accessToken,
@@ -121,7 +121,7 @@ abstract class Devices {
  * HTTP:DELETE
  * Gets all currently active pushers for the authenticated user.
  */
-  static FutureOr<dynamic> deleteDevices({
+  static Future<dynamic> deleteDevices({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,

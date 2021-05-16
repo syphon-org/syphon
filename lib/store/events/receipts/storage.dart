@@ -43,13 +43,12 @@ Future<Map<String, ReadReceipt>> loadReceipts(
     final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
 
     final receiptsMap = Map<String, ReadReceipt>();
-    final records = await (store.records(messageIds).getSnapshots(storage)
-        as FutureOr<List<RecordSnapshot<String, String>>>);
+    final records = await store.records(messageIds).getSnapshots(storage);
 
-    for (RecordSnapshot<String, String> record in records) {
+    for (RecordSnapshot<String?, String>? record in records) {
       if (record != null) {
         final receipt = ReadReceipt.fromJson(await json.decode(record.value));
-        receiptsMap.putIfAbsent(record.key, () => receipt);
+        receiptsMap.putIfAbsent(record.key!, () => receipt);
       }
     }
     return receiptsMap;

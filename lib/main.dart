@@ -35,7 +35,6 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
-  print('WHAT');
   // init hot cache and cold storage
   final cache = await initCache();
 

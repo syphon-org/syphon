@@ -15,11 +15,6 @@ class CryptoStore extends Equatable {
   @JsonKey(ignore: true)
   final Account? olmAccount;
 
-  // the private key for one time keys is saved in olm?
-  // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
-  @JsonKey(ignore: true)
-  final Map oneTimeKeysOwned;
-
   // Serialized olm account
   final String? olmAccountKey;
 
@@ -66,7 +61,6 @@ class CryptoStore extends Equatable {
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
-    this.oneTimeKeysOwned = const {},
     this.deviceKeysExist = false,
     this.oneTimeKeysCounts,
   });
@@ -84,7 +78,6 @@ class CryptoStore extends Equatable {
         deviceKeys,
         deviceKeysOwned,
         deviceKeysExist,
-        oneTimeKeysOwned,
         oneTimeKeysClaimed,
         oneTimeKeysCounts
       ];
@@ -98,10 +91,9 @@ class CryptoStore extends Equatable {
     inboundKeySessions,
     outboundKeySessions,
     messageSessionIndex,
-    deviceKeys,
-    deviceKeysOwned,
-    deviceKeysExist,
-    oneTimeKeysOwned,
+    bool? deviceKeysExist,
+    Map<String, DeviceKey>? deviceKeysOwned,
+    Map<String, Map<String, DeviceKey>>? deviceKeys,
     oneTimeKeysClaimed,
     oneTimeKeysCounts,
   }) =>
@@ -119,10 +111,8 @@ class CryptoStore extends Equatable {
         outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
         deviceKeys: deviceKeys ?? this.deviceKeys,
         deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
-        oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,
         oneTimeKeysClaimed: oneTimeKeysClaimed ?? this.oneTimeKeysClaimed,
-        deviceKeysExist:
-            deviceKeysExist != null ? deviceKeysExist : this.deviceKeysExist,
+        deviceKeysExist: deviceKeysExist ?? this.deviceKeysExist,
         oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
       );
 

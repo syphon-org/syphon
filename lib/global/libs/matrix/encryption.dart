@@ -129,7 +129,7 @@ abstract class Encryption {
    * Claims one-time keys for use in pre-key messages.
    * 
    */
-  static Future<dynamic> claimKeys({
+  static Future<Map<String, dynamic>> claimKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,

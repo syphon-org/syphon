@@ -77,15 +77,11 @@ Future<String?> serializeJsonBackground(Object store) async {
   try {
     final storageEngine = FlutterSecureStorage();
 
-    final ivKey = await (storageEngine.read(
-      key: Cache.ivLocation,
-    ) as FutureOr<String>);
-    final cryptKey = await (storageEngine.read(
-      key: Cache.keyLocation,
-    ) as FutureOr<String>);
+    final ivKey = await storageEngine.read(key: Cache.ivLocation);
+    final cryptKey = await storageEngine.read(key: Cache.keyLocation);
 
-    final iv = IV.fromBase64(ivKey);
-    final key = Key.fromBase64(cryptKey);
+    final iv = IV.fromBase64(ivKey!);
+    final key = Key.fromBase64(cryptKey!);
 
     final jsonEncoded = jsonEncode(store);
 

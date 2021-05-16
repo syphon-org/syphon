@@ -128,7 +128,7 @@ class GroupSearchState extends State<GroupSearchView> {
                     background: hashedColor,
                   ),
                   Visibility(
-                    visible: !room.encryptionEnabled!,
+                    visible: !room.encryptionEnabled,
                     child: Positioned(
                       bottom: 0,
                       right: 0,
@@ -158,7 +158,7 @@ class GroupSearchState extends State<GroupSearchView> {
                     ),
                   ),
                   Visibility(
-                    visible: room.encryptionEnabled!,
+                    visible: room.encryptionEnabled,
                     child: Positioned(
                       bottom: 0,
                       right: 0,
@@ -282,7 +282,7 @@ class GroupSearchState extends State<GroupSearchView> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.symmetric(vertical: 4),
-                              child: !room.encryptionEnabled!
+                              child: !room.encryptionEnabled
                                   ? Icon(
                                       Icons.lock_open,
                                       size: Dimensions.iconSizeLarge,

@@ -27,7 +27,7 @@ class MatrixAuthTypes {
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
-  static FutureOr<dynamic> loginType({
+  static Future<dynamic> loginType({
     String? protocol,
     String? homeserver,
   }) async {
@@ -47,7 +47,7 @@ abstract class Auth {
   ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
   ///
-  static FutureOr<dynamic> loginUser({
+  static Future<dynamic> loginUser({
     String? protocol,
     String? homeserver,
     String type = "m.login.password",
@@ -90,7 +90,7 @@ abstract class Auth {
    *  users. Clients should pick one of these and supply it as 
    *  the type when logging in.
    */
-  static FutureOr<dynamic> loginUserToken({
+  static Future<dynamic> loginUserToken({
     String? protocol,
     String? homeserver,
     String type = MatrixAuthTypes.TOKEN,
@@ -130,7 +130,7 @@ abstract class Auth {
    * 
    * inhibit_login automatically logs in the user after creation 
    */
-  static FutureOr<dynamic> registerEmail({
+  static Future<dynamic> registerEmail({
     String? protocol,
     String? homeserver,
     String? clientSecret,
@@ -160,7 +160,7 @@ abstract class Auth {
    * 
    * inhibit_login automatically logs in the user after creation 
    */
-  static FutureOr<dynamic> registerUser({
+  static Future<dynamic> registerUser({
     String? protocol,
     String? homeserver,
     String? username,
@@ -337,7 +337,7 @@ abstract class Auth {
    * https://matrix.org/docs/spec/client_server/latest#id198
    * 
    */
-  static FutureOr<dynamic> updatePassword({
+  static Future<dynamic> updatePassword({
     String? protocol,
     String? homeserver,
     String? accessToken,
@@ -383,7 +383,7 @@ abstract class Auth {
   ///
   /// Actually reset the password after verification
   ///
-  static FutureOr<dynamic> resetPassword({
+  static Future<dynamic> resetPassword({
     String? protocol,
     String? homeserver,
     String? clientSecret,
@@ -422,7 +422,7 @@ abstract class Auth {
   ///
   /// Returns a token to verify the password reset
   /// request for a specifed email address
-  static FutureOr<dynamic> sendPasswordResetEmail({
+  static Future<dynamic> sendPasswordResetEmail({
     String? protocol,
     String? homeserver,
     String? clientSecret,

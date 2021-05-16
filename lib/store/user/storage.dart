@@ -26,7 +26,7 @@ Future<void> saveUsers(
  * 
  * Example of useful recursion
  */
-Future<Map<String, User>?> loadUsers({
+Future<Map<String, User>> loadUsers({
   Database? cache,
   required Database storage,
   int offset = 0,
@@ -57,20 +57,20 @@ Future<Map<String, User>?> loadUsers({
     }
 
     if (offset < count) {
-      users.addAll(await (loadUsers(
+      users.addAll(await loadUsers(
         offset: offset + page,
         storage: storage,
-      ) as FutureOr<Map<String, User>>));
+      ));
     }
 
     if (users.isEmpty) {
-      return null;
+      return {};
     }
 
     printInfo('[users] loaded ${users.length}');
     return users;
   } catch (error) {
     printError(error.toString(), title: 'loadUsers');
-    return null;
+    return {};
   }
 }
