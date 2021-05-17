@@ -62,6 +62,7 @@ class Room {
   final List<String> userIds;
   final List<String> messageIds;
   final List<String> reactionIds;
+  @JsonKey(ignore: true)
   final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
@@ -560,7 +561,6 @@ class Room {
     try {
       bool? limited;
       int? lastUpdate = this.lastUpdate;
-      List<Message> outbox = List<Message>.from(this.outbox);
       final messageIds = this.messageIds;
 
       // Converting only message events
@@ -603,11 +603,6 @@ class Room {
         value: (message) => message,
       );
 
-      // Remove outboxed messages
-      outbox.removeWhere(
-        (message) => messagesMap.containsKey(message.id),
-      );
-
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
@@ -616,7 +611,6 @@ class Room {
 
       // Save values to room
       return this.copyWith(
-        outbox: outbox,
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,

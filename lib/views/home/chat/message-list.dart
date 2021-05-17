@@ -133,7 +133,7 @@ class MessageListState extends State<MessageList> {
                   scrollDirection: Axis.vertical,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
-                    final message = props.messages[index]!;
+                    final message = props.messages[index];
                     final lastMessage =
                         index != 0 ? props.messages[index - 1] : null;
                     final nextMessage = index + 1 < props.messages.length
@@ -191,7 +191,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final User currentUser;
   final Map<String, User?> users;
-  final List<Message?> messages;
+  final List<Message> messages;
   final bool? timeFormat24Enabled;
 
   final Function onToggleReaction;
@@ -225,8 +225,8 @@ class _Props extends Equatable {
         messages: latestMessages(
           filterMessages(
             combineOutbox(
+              outbox: roomOutbox(store.state, roomId),
               messages: roomMessages(store.state, roomId),
-              outbox: selectRoom(id: roomId, state: store.state).outbox,
             ),
             store.state,
           ),

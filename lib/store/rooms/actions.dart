@@ -89,28 +89,6 @@ class AddArchive {
   AddArchive({this.roomId});
 }
 
-///
-/// Save Outbox Message
-///
-/// tempId is for messages that have attempted sending but not finished
-class SaveOutboxMessage {
-  final String? id; // room id
-  final String? tempId;
-  final Message? pendingMessage;
-
-  SaveOutboxMessage({
-    this.id,
-    this.tempId,
-    this.pendingMessage,
-  });
-}
-
-class DeleteOutboxMessage {
-  final Message? message; // room id
-
-  DeleteOutboxMessage({this.message});
-}
-
 class ResetRooms {
   ResetRooms();
 }
@@ -176,12 +154,16 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
 
       // update store
       await store.dispatch(setUsers(room.usersNew));
-      await store.dispatch(setMessages(room: room, messages: messages));
       await store.dispatch(setReactions(reactions: room.reactions));
       await store.dispatch(setRedactions(redactions: room.redactions));
       await store.dispatch(setReceipts(
         room: room,
         receipts: room.readReceipts,
+      ));
+      await store.dispatch(setMessages(
+        room: room,
+        messages: messages,
+        outbox: room.outbox,
       ));
 
       // mutation filters - handles backfilling mutations
@@ -189,10 +171,11 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
 
       // TODO: remove with parsers - clear users from parsed room objects
       room = room.copyWith(
-        users: Map<String, User>(),
-        messagesNew: [],
+        outbox: [],
         reactions: [],
         redactions: [],
+        messagesNew: [],
+        users: Map<String, User>(),
         readReceipts: Map<String, ReadReceipt>(),
       );
 

@@ -26,7 +26,7 @@ import 'package:syphon/global/values.dart';
 
 FlutterLocalNotificationsPlugin? globalNotificationPluginInstance;
 
-Future<FlutterLocalNotificationsPlugin> initNotifications({
+Future<FlutterLocalNotificationsPlugin?> initNotifications({
   Function? onLaunch,
   Function? onResume,
   Function? onMessage,
@@ -35,6 +35,11 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   Future<dynamic> Function(int, String?, String?, String?)?
       onDidReceiveLocalNotification,
 }) async {
+  // Currently mobile only
+  if (!(Platform.isIOS || Platform.isAndroid)) {
+    return Future.value();
+  }
+
 // ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
   var initializationSettingsAndroid = AndroidInitializationSettings(
     'ic_launcher_foreground',
@@ -79,6 +84,7 @@ Future<FlutterLocalNotificationsPlugin> initNotifications({
   }
 
   debugPrint('[initNotifications] successfully initialized $pluginInstance');
+  globalNotificationPluginInstance = pluginInstance;
   return pluginInstance;
 }
 

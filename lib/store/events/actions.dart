@@ -32,9 +32,15 @@ class SetEvents {
 }
 
 class SetMessages {
-  final String? roomId;
-  final List<Message>? messages;
-  SetMessages({this.roomId, this.messages});
+  final String roomId;
+  final List<Message> messages;
+  final List<Message> outbox;
+
+  SetMessages({
+    required this.roomId,
+    this.messages = const [],
+    this.outbox = const [],
+  });
 }
 
 class SetReactions {
@@ -54,15 +60,45 @@ class SetRedactions {
   SetRedactions({this.redactions});
 }
 
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but
+/// are still in an unknown state remotely
+///
+class SaveOutboxMessage {
+  final String tempId;
+  final Message pendingMessage;
+
+  SaveOutboxMessage({
+    required this.tempId,
+    required this.pendingMessage,
+  });
+}
+
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but
+/// are still in an unknown state remotely
+///
+class DeleteOutboxMessage {
+  final Message message; // room id
+
+  DeleteOutboxMessage({required this.message});
+}
+
 ThunkAction<AppState> setMessages({
-  Room? room,
-  List<Message>? messages,
-  int offset = 0,
-  int limit = 20,
+  required Room room,
+  List<Message> messages = const [],
+  List<Message> outbox = const [],
 }) =>
     (Store<AppState> store) {
-      if (messages!.isEmpty) return;
-      return store.dispatch(SetMessages(roomId: room!.id, messages: messages));
+      if (messages.isEmpty && outbox.isEmpty) return;
+
+      return store.dispatch(
+        SetMessages(roomId: room.id, messages: messages, outbox: outbox),
+      );
     };
 
 ThunkAction<AppState> setReactions({
@@ -117,10 +153,7 @@ ThunkAction<AppState> loadMessagesCached({
       );
 
       // load cold storage messages to state
-      store.dispatch(SetMessages(
-        roomId: room.id,
-        messages: messagesStored,
-      ));
+      store.dispatch(SetMessages(roomId: room.id, messages: messagesStored));
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
@@ -427,12 +460,10 @@ ThunkAction<AppState> sendTyping({
  * Delete Room Event (For Outbox, Local, and Remote)
  */
 
-ThunkAction<AppState> deleteMessage({
-  Message? message,
-}) {
+ThunkAction<AppState> deleteMessage({required Message message}) {
   return (Store<AppState> store) async {
     try {
-      if (message!.pending! || message.failed!) {
+      if (message.pending! || message.failed!) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {

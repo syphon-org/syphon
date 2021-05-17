@@ -137,7 +137,7 @@ void notificationSyncIsolate() async {
     }
 
     // Init notifiations for background service and new messages/events
-    FlutterLocalNotificationsPlugin pluginInstance = await initNotifications();
+    final pluginInstance = (await initNotifications())!;
 
     showBackgroundServiceNotification(
       notificationId: BackgroundSync.service_id,

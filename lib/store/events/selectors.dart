@@ -11,14 +11,18 @@ List<Message> roomMessages(AppState state, String? roomId) {
   return List.from(state.eventStore.messages[roomId] ?? []);
 }
 
+List<Message> roomOutbox(AppState state, String? roomId) {
+  return List.from((state.eventStore.outbox[roomId] ?? {}).values);
+}
+
 Map<String, List<Reaction>> selectReactions(AppState state) {
   return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? [])
       as Map<String, List<Reaction>>;
 }
 
 // remove messages from blocked users
-List<Message?> filterMessages(
-  List<Message?> messages,
+List<Message> filterMessages(
+  List<Message> messages,
   AppState state,
 ) {
   final blocked = state.userStore.blocked;
@@ -26,7 +30,7 @@ List<Message?> filterMessages(
   // TODO: remove the replacement filter here, should be managed by the mutators
   return messages
     ..removeWhere(
-      (message) => blocked.contains(message!.sender) || message.replacement,
+      (message) => blocked.contains(message.sender) || message.replacement,
     );
 }
 
@@ -139,26 +143,26 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
-Message? latestMessage(List<Message?> messages) {
+Message? latestMessage(List<Message> messages) {
   // sort descending
   if (messages.isEmpty) {
     return null;
   }
 
   return messages.fold(messages[0],
-      (newest, msg) => msg!.timestamp! > newest!.timestamp! ? msg : newest);
+      (newest, msg) => msg.timestamp! > newest!.timestamp! ? msg : newest);
 }
 
-List<Message?> latestMessages(List<Message?> messages) {
+List<Message> latestMessages(List<Message> messages) {
   final sortedList = messages;
 
   // sort descending
   sortedList.sort((a, b) {
-    if (a!.pending! && !b!.pending!) {
+    if (a.pending! && !b.pending!) {
       return -1;
     }
 
-    if (a.timestamp! > b!.timestamp!) {
+    if (a.timestamp! > b.timestamp!) {
       return -1;
     }
     if (a.timestamp! < b.timestamp!) {
@@ -171,10 +175,7 @@ List<Message?> latestMessages(List<Message?> messages) {
   return sortedList;
 }
 
-List<Message?> combineOutbox({
-  List<Message>? messages,
-  List<Message?>? outbox,
-}) {
+List<Message> combineOutbox({List<Message>? messages, List<Message>? outbox}) {
   return [outbox, messages].expand((x) => x!).toList();
 }
 

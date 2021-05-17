@@ -230,7 +230,7 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(initKeyEncryption(user));
 
         // init notifications
-        globalNotificationPluginInstance = await initNotifications(
+        await initNotifications(
           onSelectNotification: (String? payload) {
             debugPrint('[onSelectNotification] payload $payload');
             return Future.value(true);

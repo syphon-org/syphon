@@ -85,7 +85,7 @@ class Theming extends StatelessWidget {
                                 DialogColorPicker(
                               title: 'Select Accent Color',
                               resetColor: Colours.cyanSyphon,
-                              currentColor: props.primaryColor,
+                              currentColor: props.accentColor,
                               onSelectColor: props.onSelectAccentColor,
                             ),
                           ),
