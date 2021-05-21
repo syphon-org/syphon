@@ -29,12 +29,13 @@ class Values {
   static const captchaMatrixPublicKey =
       '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
 
-  static const supportEmail = 'support@syphon.org';
+  static const supportEmail = 'hello@syphon.org';
 
   static const matrixSSOUrl =
       '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
+
   static const openHelpUrl =
-      'mailto:$supportEmail?subject=Syphon%20App%20Help&body=Leave%20your%20feedback%20or%20question%20here';
+      'mailto:$supportEmail?subject=Syphon%20Support%20-%20App&body=Hey%20Syphon%20Team%2C%0D%0A%0D%0A%3CLeave%20your%20feedback%2C%20questions%20or%20concerns%20here%3E%0D%0A%0D%0AThanks!';
 
   static const openSourceLibraries = [
     {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
