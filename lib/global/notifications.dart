@@ -136,10 +136,11 @@ Future showBackgroundServiceNotification({
     ongoing: true,
     autoCancel: false,
     showWhen: false,
-    timeoutAfter: 65 * 1000, // Timeout if not set further
+    // Timeout if not repeatedly set by the background service
+    timeoutAfter: Values.serviceNotificationTimeoutDuration,
     importance: Importance.none,
     priority: Priority.min,
-    visibility: NotificationVisibility.secret,
+    visibility: NotificationVisibility.private,
   );
 
   final platformChannelSpecifics = new NotificationDetails(
@@ -186,6 +187,63 @@ Future showMessageNotification({
     body ?? 'Tap to open message',
     platformChannelSpecifics,
   );
+}
+
+Future showMessageNotificationTest({
+  int messageHash = 0,
+  String? body,
+  required FlutterLocalNotificationsPlugin pluginInstance,
+}) async {
+  const String groupKey = 'com.android.example';
+  const String groupChannelId = 'grouped channel id';
+  const String groupChannelName = 'grouped channel name';
+  const String groupChannelDescription = 'grouped channel description';
+// example based on https://developer.android.com/training/notify-user/group.html
+  const AndroidNotificationDetails firstNotificationAndroidSpecifics =
+      AndroidNotificationDetails(
+          groupChannelId, groupChannelName, groupChannelDescription,
+          setAsGroupSummary: true,
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          groupKey: groupKey);
+  const NotificationDetails firstNotificationPlatformSpecifics =
+      NotificationDetails(android: firstNotificationAndroidSpecifics);
+  await pluginInstance.show(1, 'XYZ URI', 'You will not believe...',
+      firstNotificationPlatformSpecifics);
+  const AndroidNotificationDetails secondNotificationAndroidSpecifics =
+      AndroidNotificationDetails(
+          groupChannelId, groupChannelName, groupChannelDescription,
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          groupKey: groupKey);
+  const NotificationDetails secondNotificationPlatformSpecifics =
+      NotificationDetails(android: secondNotificationAndroidSpecifics);
+  await pluginInstance.show(2, 'ABC 123', 'Please join us to celebrate the...',
+      secondNotificationPlatformSpecifics);
+
+  // Create the summary notification to support older devices that pre-date
+  /// Android 7.0 (API level 24).
+  ///
+  /// Recommended to create this regardless as the behaviour may vary as
+  /// mentioned in https://developer.android.com/training/notify-user/group
+  const List<String> lines = <String>[
+    'ABC 123 Check this out',
+    'XYZ URI    Launch Party'
+  ];
+  const InboxStyleInformation inboxStyleInformation = InboxStyleInformation(
+      lines,
+      contentTitle: '2 messages',
+      summaryText: 'janedoe@example.com');
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+          groupChannelId, groupChannelName, groupChannelDescription,
+          styleInformation: inboxStyleInformation,
+          groupKey: groupKey,
+          setAsGroupSummary: true);
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await pluginInstance.show(
+      3, 'Attention', 'Two messages', platformChannelSpecifics);
 }
 
 Future showDebugNotification({

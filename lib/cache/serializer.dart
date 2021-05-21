@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:redux_persist/redux_persist.dart';
@@ -35,9 +34,9 @@ import 'package:syphon/store/settings/state.dart';
  */
 class CacheSerializer implements StateSerializer<AppState> {
   final Database? cache;
-  final Map<String, dynamic>? preloaded;
+  final Map<String, dynamic> preloaded;
 
-  CacheSerializer({this.cache, this.preloaded});
+  CacheSerializer({this.cache, this.preloaded = const {}});
 
   @override
   Uint8List? encode(AppState state) {
@@ -164,30 +163,30 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     return AppState(
       loading: false,
-      authStore: authStore ?? preloaded!['auth'] ?? AuthStore(),
-      cryptoStore: cryptoStore ?? preloaded!['crypto'] ?? CryptoStore(),
+      authStore: authStore ?? preloaded['auth'] ?? AuthStore(),
+      cryptoStore: cryptoStore ?? preloaded['crypto'] ?? CryptoStore(),
       mediaStore: mediaStore ??
           MediaStore().copyWith(
-            mediaCache: preloaded!['media'],
+            mediaCache: preloaded['media'],
           ),
       roomStore: roomStore ??
           RoomStore().copyWith(
-            rooms: preloaded!['rooms'] ?? {},
+            rooms: preloaded['rooms'] ?? {},
           ),
       userStore: userStore ??
           UserStore().copyWith(
-            users: preloaded!['users'] ?? {},
+            users: preloaded['users'] ?? {},
           ),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages: preloaded!['messages'] ?? Map<String, List<Message>>(),
-            reactions: preloaded!['reactions'] ?? Map<String, List<Reaction>>(),
-            redactions: preloaded!['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded!['receipts'] ??
+            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
+            reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
+            redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
+            receipts: preloaded['receipts'] ??
                 Map<String, Map<String, ReadReceipt>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
-      settingsStore: preloaded!['settings'] ?? settingsStore ?? SettingsStore(),
+      settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),
     );
   }
 }

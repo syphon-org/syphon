@@ -12,12 +12,12 @@ class Values {
   static const defaultLanguage = 'en-US';
 
   // Notifications and Background service
-  static const channel_id = '${appName}_notifications';
+  static const channel_id = '${appNameLabel}_notifications';
   static const channel_id_background_service =
       '${appName}_background_notification';
   static const default_channel_title = '$appName';
 
-  static const channel_group_key = 'Messages';
+  static const channel_group_key = 'org.tether.tether.MESSAGES';
   static const channel_name_messages = 'Messages';
   static const channel_name_background_service = 'Background Sync';
   static const channel_description =
@@ -57,6 +57,7 @@ class Values {
   // Animations
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;
+  static const serviceNotificationTimeoutDuration = 65000; // millis
 
   static const defaultHeaders = {'Content-type': 'application/json'};
   static const fontFamilies = [

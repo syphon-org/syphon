@@ -129,8 +129,8 @@ class AdvancedViewState extends State<AdvancedView> {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      showDebugNotification(
-                        pluginInstance: globalNotificationPluginInstance,
+                      showMessageNotificationTest(
+                        pluginInstance: globalNotificationPluginInstance!,
                       );
 
                       showBackgroundServiceNotification(
@@ -195,7 +195,9 @@ class AdvancedViewState extends State<AdvancedView> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing ? null : props.onManualSync as void Function()?,
+                    onTap: props.syncing
+                        ? null
+                        : props.onManualSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
@@ -223,7 +225,9 @@ class AdvancedViewState extends State<AdvancedView> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing ? null : props.onForceFullSync as void Function()?,
+                    onTap: props.syncing
+                        ? null
+                        : props.onForceFullSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
