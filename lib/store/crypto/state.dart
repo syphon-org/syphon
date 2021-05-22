@@ -42,7 +42,7 @@ class CryptoStore extends Equatable {
   final bool? deviceKeysExist;
 
   // Track last known uploaded key amounts
-  final Map? oneTimeKeysCounts;
+  final Map<String, int> oneTimeKeysCounts;
 
   final Map<String, OneTimeKey> oneTimeKeysClaimed;
 
@@ -58,7 +58,7 @@ class CryptoStore extends Equatable {
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
     this.deviceKeysExist = false,
-    this.oneTimeKeysCounts,
+    this.oneTimeKeysCounts = const {},
   });
 
   @override
@@ -89,7 +89,7 @@ class CryptoStore extends Equatable {
     Map<String, DeviceKey>? deviceKeysOwned,
     Map<String, Map<String, DeviceKey>>? deviceKeys,
     Map<String, OneTimeKey>? oneTimeKeysClaimed,
-    oneTimeKeysCounts,
+    Map<String, int>? oneTimeKeysCounts,
   }) =>
       CryptoStore(
         olmAccount: olmAccount ?? this.olmAccount,

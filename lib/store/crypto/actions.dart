@@ -23,6 +23,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -419,9 +420,11 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
   };
 }
 
-ThunkAction<AppState> updateOneTimeKeyCounts(Map? oneTimeKeysCounts) {
+ThunkAction<AppState> updateOneTimeKeyCounts(
+  Map<String, int> oneTimeKeysCounts,
+) {
   return (Store<AppState> store) async {
-    // Confirm user has generated an olm account
+    // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
     if (accessToken == null) {
       return;
@@ -434,9 +437,11 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map? oneTimeKeysCounts) {
     }
 
     // if the key count hasn't changed, don't update it
-    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts ?? {};
+    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts;
+
     if (currentKeyCount[Algorithms.signedcurve25519] ==
-        oneTimeKeysCounts![Algorithms.signedcurve25519]) {
+            oneTimeKeysCounts[Algorithms.signedcurve25519] &&
+        currentKeyCount.isNotEmpty) {
       return;
     }
 
@@ -492,7 +497,9 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       await store.dispatch(saveOlmAccount());
 
       // register new key counts
-      store.dispatch(updateOneTimeKeyCounts(data['one_time_key_counts']));
+      store.dispatch(updateOneTimeKeyCounts(
+        Map<String, int>.from(data['one_time_key_counts']),
+      ));
     } catch (error) {
       store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
     }
@@ -510,13 +517,13 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
  * https://matrix.org/docs/spec/client_server/latest#id461
  */
 ThunkAction<AppState> updateKeySessions({
-  Room? room,
+  required Room room,
 }) {
   return (Store<AppState> store) async {
     try {
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
-        exportMessageSession(roomId: room!.id),
+        exportMessageSession(roomId: room.id),
       );
 
       final roomKeyEventContent = {
@@ -538,10 +545,6 @@ ThunkAction<AppState> updateKeySessions({
       // For each one time key claimed
       // send a m.room_key event directly to each device
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
-
-      debugPrint(
-        '[updateKeySessions] claimOneTimeKeys COMPLETED ${devicesOneTimeKeys.length}',
-      );
 
       final requestsSendToDevicee = devicesOneTimeKeys.map(
         (oneTimeKey) async {
@@ -581,6 +584,12 @@ ThunkAction<AppState> updateKeySessions({
               content: payload,
             );
 
+            debugPrint(
+              '[sendEventToDevice] COMPLETED ${randomNumber} ${store.state.authStore.protocol}${store.state.authStore.user.homeserver}',
+            );
+
+            printJson(response);
+
             if (response['errcode'] != null) {
               throw response['error'];
             }
@@ -604,16 +613,15 @@ ThunkAction<AppState> updateKeySessions({
   };
 }
 
-/**
- * Claims keys for devices and creates key sharing session
- * 
- *  */
+///
+/// Claims keys for devices and creates key sharing session
+///
 ThunkAction<AppState> claimOneTimeKeys({
-  Room? room,
+  required Room room,
 }) {
   return (Store<AppState> store) async {
     try {
-      final roomUserIds = room!.userIds;
+      final roomUserIds = room.userIds;
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
       final currentUser = store.state.authStore.user;
@@ -656,6 +664,13 @@ ThunkAction<AppState> claimOneTimeKeys({
         return true;
       }
 
+      debugPrint('[claimKeysPayload]');
+      printJson(claimKeysPayload);
+
+      debugPrint(
+        '[sendEventToDevice] COMPLETED ${store.state.authStore.protocol}${store.state.authStore.user.homeserver}',
+      );
+
       // claim one time keys from matrix server
       final Map claimKeysResponse = await MatrixApi.claimKeys(
         protocol: store.state.authStore.protocol,
@@ -663,6 +678,9 @@ ThunkAction<AppState> claimOneTimeKeys({
         homeserver: store.state.authStore.user.homeserver,
         oneTimeKeys: claimKeysPayload,
       );
+
+      debugPrint('[claimKeysResponse]');
+      printJson(claimKeysResponse);
 
       if (claimKeysResponse['errcode'] != null ||
           claimKeysResponse['failures'].isNotEmpty) {
@@ -696,6 +714,7 @@ ThunkAction<AppState> claimOneTimeKeys({
           );
         });
       });
+
       // cache of one time keys
       await store.dispatch(setOneTimeKeysClaimed(oneTimekeys));
 
@@ -714,13 +733,10 @@ ThunkAction<AppState> claimOneTimeKeys({
       });
       return true;
     } catch (error) {
-      store.dispatch(
-        addAlert(
-          type: 'warning',
-          message: error.toString(),
-          origin: 'claimOneTimeKeys',
-        ),
-      );
+      store.dispatch(addAlert(
+        origin: 'claimOneTimeKeys',
+        message: error.toString(),
+      ));
       return false;
     }
   };

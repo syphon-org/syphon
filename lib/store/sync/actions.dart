@@ -221,9 +221,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       // TODO: Unfiltered
       // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       // final Map presence = data['presence'];
-
       final nextBatch = data['next_batch'];
-      final oneTimeKeyCount = data['device_one_time_keys_count'];
+      final Map oneTimeKeyCount = data['device_one_time_keys_count'];
       final Map<String, dynamic>? rawJoined = data['rooms']['join'];
       final Map<String, dynamic>? rawInvites = data['rooms']['invite'];
       final Map<String, dynamic>? rawToDevice = data['to_device'];
@@ -236,7 +235,9 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       await store.dispatch(syncDevice(rawToDevice ?? {}));
 
       // Update encryption one time key count
-      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
+      store.dispatch(updateOneTimeKeyCounts(
+        Map<String, int>.from(oneTimeKeyCount),
+      ));
 
       // WARN: may finish a sync poll after logging out
       // TODO: cancel in progress sync polls?

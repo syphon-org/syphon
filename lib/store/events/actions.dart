@@ -226,11 +226,11 @@ ThunkAction<AppState> fetchMessageEvents({
  * 
  * Reattribute decrypted events to the timeline
  */
-ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic>? json) {
+ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     try {
       // First past to decrypt encrypted events
-      final List<dynamic> timelineEvents = json!['timeline']['events'];
+      final List<dynamic> timelineEvents = json['timeline']['events'];
 
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {

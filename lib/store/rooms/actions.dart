@@ -111,7 +111,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
     }
 
     await Future.wait(roomData.keys.map((id) async {
-      final json = roomData[id];
+      final Map json = roomData[id] ?? {};
       Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
       List<Message> messages = [];
 
@@ -119,7 +119,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       if (room.encryptionEnabled) {
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
-          decryptEvents(room, json),
+          decryptEvents(room, Map<String, dynamic>.from(json)),
         );
       }
 
@@ -831,14 +831,14 @@ ThunkAction<AppState> inviteUser({
  * Not sure if this process is / will be any different
  * than joining a room
  */
-ThunkAction<AppState> acceptRoom({Room? room}) {
+ThunkAction<AppState> acceptRoom({required Room room}) {
   return (Store<AppState> store) async {
     try {
       final data = await MatrixApi.joinRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
+        roomId: room.id,
       );
 
       if (data['errcode'] != null) {

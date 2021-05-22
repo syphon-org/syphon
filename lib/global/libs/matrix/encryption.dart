@@ -143,6 +143,7 @@ abstract class Encryption {
     };
 
     Map body = {
+      "timeout": 10000,
       'one_time_keys': oneTimeKeys,
     };
 
