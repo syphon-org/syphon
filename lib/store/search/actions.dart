@@ -197,6 +197,7 @@ ThunkAction<AppState> searchPublicRooms({String? searchable}) {
       ));
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'searchPublicRooms',
         message: 'Failed to search rooms',
         error: error,
       ));

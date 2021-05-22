@@ -175,9 +175,10 @@ ThunkAction<AppState> deleteDeviceKeys() {
     try {
       store.dispatch(ResetCrypto());
     } catch (error) {
-      store.dispatch(
-        addAlert(error: error, origin: 'deleteDeviceKeys'),
-      );
+      store.dispatch(addAlert(
+        origin: 'deleteDeviceKeys',
+        error: error,
+      ));
     }
   };
 }
@@ -589,7 +590,10 @@ ThunkAction<AppState> updateKeySessions({
       await Future.wait(requestsSendToDevicee);
       await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
-      store.dispatch(addAlert(message: error, error: error));
+      store.dispatch(addAlert(
+          origin: "updateKeySessions",
+          message: error.toString(),
+          error: error));
     }
   };
 }
@@ -707,7 +711,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       store.dispatch(
         addAlert(
           type: 'warning',
-          message: error,
+          message: error.toString(),
           origin: 'claimOneTimeKeys',
         ),
       );

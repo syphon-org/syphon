@@ -91,8 +91,8 @@ ThunkAction<AppState> addConfirmation({
 
 ThunkAction<AppState> addAlert({
   type = 'warning',
-  origin = 'Unknown',
-  message,
+  required String origin,
+  String message = "No Message",
   error,
 }) {
   return (Store<AppState> store) async {

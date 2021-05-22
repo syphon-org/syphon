@@ -37,6 +37,8 @@ class SetUserInvites {
 
 class ClearUserInvites {}
 
+class ResetUsers {}
+
 ThunkAction<AppState> setUsers(Map<String, User> users) {
   return (Store<AppState> store) {
     if (users.isEmpty) return;

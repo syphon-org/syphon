@@ -593,7 +593,9 @@ class _Props extends Equatable {
               store.state.settingsStore.dismissKeyboardEnabled,
           enterSendEnabled: store.state.settingsStore.enterSend,
           loading: selectRoom(state: store.state, id: roomId).syncing,
-          messagesLength: store.state.eventStore.messages[roomId]?.length,
+          messagesLength: store.state.eventStore.messages.containsKey(roomId)
+              ? store.state.eventStore.messages[roomId]?.length
+              : 0,
           onSelectReply: (Message message) {
             store.dispatch(selectReply(roomId: roomId, message: message));
           },

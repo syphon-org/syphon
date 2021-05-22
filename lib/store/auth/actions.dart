@@ -33,6 +33,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -40,6 +41,7 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../user/model.dart';
@@ -193,6 +195,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         });
       } on PlatformException {
         addAlert(
+          origin: 'initDeepLinks',
           message:
               'Failed to SSO Login, please try again later or contact support',
         );
@@ -218,6 +221,7 @@ ThunkAction<AppState> startAuthObserver() {
     ));
 
     final Function onAuthStateChanged = (User? user) async {
+      print('running as expected');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -244,28 +248,28 @@ ThunkAction<AppState> startAuthObserver() {
         store.dispatch(startSyncObserver());
       } else {
         await store.dispatch(stopSyncObserver());
-        store.dispatch(ResetSync());
-        store.dispatch(ResetRooms());
-        store.dispatch(ResetUser());
-        store.dispatch(ResetCrypto());
+
+        // wipe sensitive redux state
+        await store.dispatch(ResetRooms());
+        await store.dispatch(ResetEvents());
+        await store.dispatch(ResetUsers());
+        await store.dispatch(ResetSync());
+        await store.dispatch(ResetCrypto());
+        await store.dispatch(ResetAuthStore());
       }
     };
 
-    // init current auth state and set auth state listener
-    // onAuthStateChanged(user);
+    // set auth state listener
     store.state.authStore.onAuthStateChanged!.listen(
       onAuthStateChanged as Function(User?),
     );
-
-    final user = store.state.authStore.user;
-    store.state.authStore.authObserver!.add(user);
   };
 }
 
 ThunkAction<AppState> stopAuthObserver() {
   return (Store<AppState> store) async {
     if (store.state.authStore.authObserver != null) {
-      store.state.authStore.authObserver!.close();
+      store.state.authStore.authObserver?.close();
       store.dispatch(SetAuthObserver(authObserver: null));
     }
   };
@@ -373,7 +377,7 @@ ThunkAction<AppState> loginUser() {
         user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
       ));
 
-      store.state.authStore.authObserver!.add(
+      store.state.authStore.authObserver?.add(
         store.state.authStore.user,
       );
 
@@ -381,7 +385,7 @@ ThunkAction<AppState> loginUser() {
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUser",
-        message: error,
+        message: error.toString(),
         error: error,
       ));
     } finally {
@@ -446,7 +450,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUserSSO",
-        message: error,
+        message: error.toString(),
         error: error,
       ));
     } finally {
@@ -491,12 +495,13 @@ ThunkAction<AppState> logoutUser() {
       await deleteStorage();
       await initStorage();
 
-      // tell authObserver to wipe auth user
+      // tell authObserver to wipe store user and other data
       store.state.authStore.authObserver!.add(null);
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'logoutUser',
         error: error,
-        message: error,
+        message: error.toString(),
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -635,6 +640,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
       return true;
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'checkPasswordResetVerification',
         error: error,
         message: 'Please click the emailed verify link before continuing',
       ));
@@ -673,7 +679,7 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String? password}) {
       ));
       return true;
     } catch (error) {
-      store.dispatch(addAlert(error: error));
+      store.dispatch(addAlert(origin: 'resetPassword', error: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -689,7 +695,6 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       final email = store.state.authStore.email;
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
-      final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.sendPasswordResetEmail(
         protocol: store.state.authStore.protocol,
@@ -710,7 +715,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       ));
       return true;
     } catch (error) {
-      store.dispatch(addAlert(error: error));
+      store.dispatch(addAlert(origin: 'sendPasswordResetEmail', error: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -783,7 +788,6 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
-      final protocol = store.state.authStore.protocol;
       final authType = session != null ? credential!.type : loginType;
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
@@ -840,9 +844,11 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
     } catch (error) {
       printError('[createUser] error $error');
       if (enableErrors) {
-        store.dispatch(
-          addAlert(message: 'Failed to signup', error: error),
-        );
+        store.dispatch(addAlert(
+          origin: "createUser",
+          message: 'Failed to signup',
+          error: error,
+        ));
       }
       return false;
     } finally {
@@ -927,7 +933,9 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
       }
       return true;
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateDisplayName', message: error));
+      store.dispatch(
+        addAlert(origin: 'updateDisplayName', message: error.toString()),
+      );
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -954,7 +962,7 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
       return true;
     } catch (error) {
       store.dispatch(
-        addAlert(origin: 'updateAvatar', message: error),
+        addAlert(origin: 'updateAvatar', message: error.toString()),
       );
       return false;
     } finally {
@@ -1121,7 +1129,7 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
       }
     } catch (error) {
       printError('[selectHomserver] $error');
-      addInfo(message: error);
+      addInfo(message: error.toString());
 
       store.dispatch(SetLoading(loading: false));
 

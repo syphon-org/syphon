@@ -64,37 +64,37 @@ CryptoStore cryptoReducer(
         outboundMessageSessions: outboundMessageSessions,
       );
     case AddInboundMessageSession:
-      final messageSessionIndex = Map<String, Map<String, int?>>.from(
-        state.messageSessionIndexNEW,
+      final messageSessionIndex = Map<String, Map<String, int>>.from(
+        state.messageSessionIndex,
       );
 
-      final messageSessionsInbound = Map<String, Map<String, String?>>.from(
+      final messageSessionsInbound = Map<String, Map<String, String>>.from(
         state.inboundMessageSessions,
       );
 
       // safety functions to catch newly cached store
-      messageSessionIndex.putIfAbsent(action.roomId, () => Map<String, int?>());
+      messageSessionIndex.putIfAbsent(action.roomId, () => Map<String, int>());
       messageSessionsInbound.putIfAbsent(
         action.roomId,
-        () => Map<String, String?>(),
+        () => Map<String, String>(),
       );
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String?> messageSessionInboundNew = {
+      final Map<String, String> messageSessionInboundNew = {
         action.identityKey: action.session
       };
 
       messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
 
       // add or update inbound message index by roomId + identity
-      final Map<String, int?> messageSessionIndexUpdated = {
+      final Map<String, int> messageSessionIndexUpdated = {
         action.identityKey: action.messageIndex
       };
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 
       return state.copyWith(
-        messageSessionIndexNEW: messageSessionIndex,
+        messageSessionIndex: messageSessionIndex,
         inboundMessageSessions: messageSessionsInbound,
       );
     case ToggleDeviceKeysExist:

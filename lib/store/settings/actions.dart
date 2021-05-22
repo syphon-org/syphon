@@ -164,7 +164,7 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: error,
+        message: error.toString(),
         origin: 'updateDevice',
       ));
     } finally {
@@ -212,7 +212,7 @@ ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: error,
+        message: error.toString(),
         origin: 'deleteDevice',
       ));
     } finally {
@@ -256,7 +256,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: error,
+        message: error.toString(),
         origin: 'deleteDevice(s)',
       ));
     } finally {

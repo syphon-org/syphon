@@ -142,13 +142,8 @@ class IntroScreenState extends State<IntroScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Container(
+                    padding: EdgeInsets.all(16),
                     child: TextButton(
                       child: Text(
                         Strings.buttonAgree,

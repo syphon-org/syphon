@@ -78,7 +78,7 @@ ThunkAction<AppState> uploadMedia({
       return data;
     } catch (error) {
       store.dispatch(
-        addAlert(origin: 'uploadMedia', message: error),
+        addAlert(origin: 'uploadMedia', message: error.toString()),
       );
       return null;
     } finally {
