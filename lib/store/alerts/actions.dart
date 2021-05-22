@@ -92,14 +92,17 @@ ThunkAction<AppState> addConfirmation({
 ThunkAction<AppState> addAlert({
   type = 'warning',
   required String origin,
-  String message = "No Message",
+  String message = "",
   error,
 }) {
   return (Store<AppState> store) async {
     debugPrint('[$origin] ${error.toString()}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
-    final alert = Alert(type: type, message: message, error: error.toString());
+    final alert = Alert(
+        type: type,
+        message: message.isNotEmpty ? message : error.toString(),
+        error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };

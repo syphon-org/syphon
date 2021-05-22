@@ -66,9 +66,7 @@ class SetSyncObserver {
   SetSyncObserver({this.syncObserver});
 }
 
-class ResetSync {
-  ResetSync();
-}
+class ResetSync {}
 
 /**
  * Default Room Sync Observer
@@ -137,7 +135,7 @@ ThunkAction<AppState> startSyncObserver() {
  * every few seconds
  */
 ThunkAction<AppState> stopSyncObserver() {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     if (store.state.syncStore.syncObserver != null) {
       store.state.syncStore.syncObserver!.cancel();
       store.dispatch(SetSyncObserver(syncObserver: null));
@@ -235,17 +233,21 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       await store.dispatch(syncRooms(rawInvites));
 
       // Updates for device specific data (mostly room encryption)
-      await store.dispatch(syncDevice(rawToDevice));
+      await store.dispatch(syncDevice(rawToDevice ?? {}));
 
       // Update encryption one time key count
       store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
 
-      // Update synced to indicate init sync and next batch id (lastSince)
-      store.dispatch(SetSynced(
-        synced: true,
-        syncing: false,
-        lastSince: nextBatch,
-      ));
+      // WARN: may finish a sync poll after logging out
+      // TODO: cancel in progress sync polls?
+      if (store.state.authStore.user.accessToken != null) {
+        // Update synced to indicate init sync and next batch id (lastSince)
+        store.dispatch(SetSynced(
+          synced: true,
+          syncing: false,
+          lastSince: nextBatch,
+        ));
+      }
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync completed ***');
@@ -259,7 +261,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       store.dispatch(SetBackoff(backoff: nextBackoff));
       store.dispatch(SetSyncing(syncing: false));
     } finally {
-      if (store.state.syncStore.backgrounded!) {
+      if (store.state.syncStore.backgrounded) {
         store.dispatch(setBackgrounded(false));
       }
     }

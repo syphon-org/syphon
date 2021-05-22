@@ -102,10 +102,10 @@ ThunkAction<AppState> setMessages({
     };
 
 ThunkAction<AppState> setReactions({
-  List<Reaction>? reactions,
+  List<Reaction> reactions = const [],
 }) =>
     (Store<AppState> store) {
-      if (reactions!.isEmpty) return;
+      if (reactions.isEmpty) return;
       return store.dispatch(SetReactions(reactions: reactions));
     };
 

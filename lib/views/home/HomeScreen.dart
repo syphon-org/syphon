@@ -660,12 +660,12 @@ class _Props extends Equatable {
               .compareTo(Duration(seconds: 90));
 
           // syncing for the first time
-          if (syncing && !synced!) {
+          if (syncing && !synced) {
             return true;
           }
 
           // syncing for the first time since going offline
-          if (syncing && offline!) {
+          if (syncing && offline) {
             return true;
           }
 
@@ -675,7 +675,7 @@ class _Props extends Equatable {
           }
 
           // syncing for the first time in a while or restarting the app
-          if (syncing && (0 < isLastAttemptOld || backgrounded!)) {
+          if (syncing && (0 < isLastAttemptOld || backgrounded)) {
             return true;
           }
 

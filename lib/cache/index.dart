@@ -29,6 +29,7 @@ class Cache {
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
+  static const cachePath = '${Cache.cacheKeyMain}.db';
 
   // cache key identifiers
   static const ivLocation = '${Values.appNameLabel}@ivKey';
@@ -51,7 +52,7 @@ class Cache {
  */
 Future<Database?> initCache() async {
   try {
-    var cachePath = '${Cache.cacheKeyMain}.db';
+    var cachePath;
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -59,7 +60,7 @@ Future<Database?> initCache() async {
 
       var directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cachePath = join(directory.path, Cache.cachePath);
       cacheFactory = databaseFactoryIo;
     }
 
@@ -103,12 +104,12 @@ void closeCache(Database? cache) async {
 Future<void> deleteCache({Database? cache}) async {
   try {
     late var cacheFactory;
-    var cachePath = '${Cache.cacheKeyMain}.db';
+    var cachePath = Cache.cachePath;
 
     if (Platform.isAndroid || Platform.isIOS) {
       var directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cachePath = join(directory.path, cachePath);
       cacheFactory = databaseFactoryIo;
     }
 

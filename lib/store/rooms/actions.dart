@@ -17,9 +17,7 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
-import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/storage.dart';
 
 // Project imports:
@@ -144,7 +142,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
         saveReactions(room.reactions, storage: Storage.main!),
         saveMessages(room.messagesNew, storage: Storage.main!),
         saveRedactions(room.redactions, storage: Storage.main!),
-        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced!),
+        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
       ]);
 
       // mutation filters - handles previously fetched messages

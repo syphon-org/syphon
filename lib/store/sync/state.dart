@@ -9,9 +9,9 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class SyncStore extends Equatable {
-  final bool? synced;
-  final bool? offline;
-  final bool? backgrounded;
+  final bool synced;
+  final bool offline;
+  final bool backgrounded;
 
   final int? lastUpdate; // Last timestamp for actual new info
   final int? lastAttempt; // last attempt to sync

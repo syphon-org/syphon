@@ -1,8 +1,11 @@
 // Project imports:
+import 'package:syphon/global/print.dart';
+
 import './actions.dart';
 import './state.dart';
 
 SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
+  printDebug('[syncReducer] ${action.runtimeType}');
   switch (action.runtimeType) {
     case SetSyncing:
       return state.copyWith(

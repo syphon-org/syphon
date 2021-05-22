@@ -12,6 +12,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
@@ -105,14 +106,12 @@ ThunkAction<AppState> decryptMessageEvent({
       // Return the content to be sent or processed
       event['content'] = json.decode(payloadScrubbed)['content'];
 
-      if (messageSession != null) {
-        await store.dispatch(saveMessageSessionInbound(
-          roomId: roomId,
-          identityKey: identityKey,
-          session: messageSession,
-          messageIndex: payloadDecrypted.message_index,
-        ));
-      }
+      await store.dispatch(saveMessageSessionInbound(
+        roomId: roomId,
+        identityKey: identityKey,
+        session: messageSession,
+        messageIndex: payloadDecrypted.message_index,
+      ));
 
       return event;
     } catch (error) {
@@ -218,9 +217,7 @@ ThunkAction<AppState> encryptKeyContent({
  * 
  * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
  */
-ThunkAction<AppState> decryptKeyEvent({
-  Map? event,
-}) {
+ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
@@ -230,7 +227,7 @@ ThunkAction<AppState> decryptKeyEvent({
     final identityKeyOwned = deviceKey.keys![deviceKeyId];
 
     // Extract the payload meant for this device by identity
-    final Map content = event!['content'];
+    final Map content = event['content'];
     final identityKeySender = content['sender_key'];
     final ciphertextContent = content['ciphertext'][identityKeyOwned];
 
@@ -294,16 +291,18 @@ ThunkAction<AppState> saveSessionKey({
   };
 }
 
-ThunkAction<AppState> syncDevice(Map? toDeviceRaw) {
+ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
   return (Store<AppState> store) async {
     try {
       // Extract the new events
-      final List<dynamic> events = toDeviceRaw!['events'];
+      final List<dynamic> events = toDeviceRaw['events'];
 
       // Parse and decrypt necessary events
       await Future.wait(events.map((event) async {
         final eventType = event['type'];
         final identityKeySender = event['content']['sender_key'];
+
+        printDebug('[syncDevice] ${eventType}');
 
         switch (eventType) {
           case EventTypes.encrypted:

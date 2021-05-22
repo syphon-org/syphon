@@ -13,7 +13,7 @@ EventStore eventReducer(
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
-      final events = Map<String, List<Event>?>.from(state.events);
+      final events = Map<String, List<Event>>.from(state.events);
       events[roomId] = action.state;
       return state.copyWith(events: events);
 

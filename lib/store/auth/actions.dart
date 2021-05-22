@@ -15,7 +15,6 @@ import 'package:device_info/device_info.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
@@ -221,7 +220,7 @@ ThunkAction<AppState> startAuthObserver() {
     ));
 
     final Function onAuthStateChanged = (User? user) async {
-      print('running as expected');
+      printDebug('[onAuthStateChanged] ${user}');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -245,7 +244,7 @@ ThunkAction<AppState> startAuthObserver() {
         );
 
         // start syncing for user
-        store.dispatch(startSyncObserver());
+        await store.dispatch(startSyncObserver());
       } else {
         await store.dispatch(stopSyncObserver());
 
@@ -253,9 +252,9 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(ResetRooms());
         await store.dispatch(ResetEvents());
         await store.dispatch(ResetUsers());
-        await store.dispatch(ResetSync());
         await store.dispatch(ResetCrypto());
         await store.dispatch(ResetAuthStore());
+        await store.dispatch(ResetSync());
       }
     };
 
@@ -486,7 +485,6 @@ ThunkAction<AppState> logoutUser() {
           throw Exception(data['error']);
         }
       }
-
       // wipe cache
       await deleteCache();
       await initCache();
@@ -495,8 +493,8 @@ ThunkAction<AppState> logoutUser() {
       await deleteStorage();
       await initStorage();
 
-      // tell authObserver to wipe store user and other data
-      store.state.authStore.authObserver!.add(null);
+      // // tell authObserver to wipe store user and other data
+      // store.state.authStore.authObserver!.add(null);
     } catch (error) {
       store.dispatch(addAlert(
         origin: 'logoutUser',
@@ -529,9 +527,9 @@ ThunkAction<AppState> fetchAuthUserProfile() {
       ));
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'fetchAuthUserProfile',
         error: error,
         message: 'Failed to fetch current user profile',
-        origin: 'fetchAuthUserProfile',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
