@@ -22,6 +22,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 
 class ChatInput extends StatefulWidget {
   final String roomId;
+  final bool sending;
   final bool enterSend;
   final Message? quotable;
   final String? mediumType;
@@ -41,6 +42,7 @@ class ChatInput extends StatefulWidget {
     required this.controller,
     this.mediumType,
     this.quotable,
+    this.sending = false,
     this.enterSend = false,
     this.onUpdateMessage,
     this.onChangeMethod,
@@ -75,7 +77,8 @@ class ChatInputState extends State<ChatInput> {
 
     if (draft != null && draft.type == MessageTypes.TEXT) {
       this.setState(() {
-        sendable = draft.body != null && draft.body!.isNotEmpty;
+        sendable =
+            !widget.sending && draft.body != null && draft.body!.isNotEmpty;
       });
     }
 
@@ -100,7 +103,7 @@ class ChatInputState extends State<ChatInput> {
   @protected
   onUpdate(String text, {_Props? props}) {
     this.setState(() {
-      sendable = text != null && text.trim().isNotEmpty;
+      sendable = !widget.sending && text.trim().isNotEmpty;
     });
 
     // start an interval for updating typing status
@@ -167,8 +170,9 @@ class ChatInputState extends State<ChatInput> {
               widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
+          final isSendable = sendable && !widget.sending;
           if (widget.mediumType == MediumType.plaintext) {
-            if (sendable) {
+            if (isSendable) {
               if (Theme.of(context).accentColor !=
                   Theme.of(context).primaryColor) {
                 sendButtonColor = Theme.of(context).accentColor;
@@ -181,7 +185,7 @@ class ChatInputState extends State<ChatInput> {
           if (widget.mediumType == MediumType.encryption) {
             hintText = Strings.placeholderInputMatrixEncrypted;
 
-            if (sendable) {
+            if (isSendable) {
               sendButtonColor = Theme.of(context).primaryColor;
             }
           }
@@ -190,7 +194,7 @@ class ChatInputState extends State<ChatInput> {
             borderRadius: BorderRadius.circular(48),
             onLongPress: widget.onChangeMethod as void Function()?,
             onTap:
-                !sendable ? null : widget.onSubmitMessage as void Function()?,
+                !isSendable ? null : widget.onSubmitMessage as void Function()?,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Container(
@@ -208,8 +212,9 @@ class ChatInputState extends State<ChatInput> {
             sendButton = InkWell(
               borderRadius: BorderRadius.circular(48),
               onLongPress: widget.onChangeMethod as void Function()?,
-              onTap:
-                  !sendable ? null : widget.onSubmitMessage as void Function()?,
+              onTap: !isSendable
+                  ? null
+                  : widget.onSubmitMessage as void Function()?,
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
                 child: Container(

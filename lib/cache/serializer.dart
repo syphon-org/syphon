@@ -47,57 +47,43 @@ class CacheSerializer implements StateSerializer<AppState> {
       state.roomStore,
     ];
 
+    // TODO: clean this up, this is only needed because the CacheSerializer
+    // is not reset when logging in and logging out
+    var localcache = Cache.cacheMain ?? cache;
+
     // Queue up a cache saving will wait
     // if the previously schedule task has not finished
     Future.microtask(() async {
-      // create a new IV for the encrypted cache
-      Cache.ivKey = generateIV();
-
-      // backup the IV in case the app is force closed before caching finishes
-      await saveIVNext(Cache.ivKey);
-
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
-          String? jsonEncoded;
-          String jsonEncrypted;
           String type = store.runtimeType.toString();
 
-          // serialize the store contents
-          try {
-            jsonEncoded = json.encode(store);
-          } catch (error) {
-            printError(
-              '[CacheSerializer] ${type} failed $error',
-            );
-          }
+          final json = jsonEncode(store);
 
           // encrypt the store contents
-          jsonEncrypted = await compute(
+          final jsonEncrypted = await compute(
             encryptJsonBackground,
             {
-              'ivKey': Cache.ivKey,
-              'cryptKey': Cache.cryptKey,
               'type': type,
-              'json': jsonEncoded,
+              'json': json,
+              'cryptKey': Cache.cryptKey,
             },
             debugLabel: 'encryptJsonBackground',
           );
 
           try {
-            // Stopwatch stopwatchSave = new Stopwatch()..start();
             final storeRef = StoreRef<String, String>.main();
-            await storeRef.record(type).put(cache!, jsonEncrypted);
+            await storeRef.record(type).put(localcache!, jsonEncrypted);
           } catch (error) {
-            printError('[CacheSerializer] $error');
+            printError('[CacheSerializer|storage] $error');
           }
         } catch (error) {
-          printError('[CacheSerializer] $error');
+          printError(
+            '[CacheSerializer|encryption] ${store.runtimeType.toString()} $error',
+          );
         }
       }));
-
-      // Rotate encryption for the next save
-      await saveIV(Cache.ivKey);
 
       return Future.value(null);
     });

@@ -539,6 +539,10 @@ ThunkAction<AppState> updateKeySessions({
       // send a m.room_key event directly to each device
       final List<OneTimeKey> devicesOneTimeKeys = List.from(oneTimeKeys.values);
 
+      debugPrint(
+        '[updateKeySessions] claimOneTimeKeys COMPLETED ${devicesOneTimeKeys.length}',
+      );
+
       final requestsSendToDevicee = devicesOneTimeKeys.map(
         (oneTimeKey) async {
           try {
@@ -580,6 +584,8 @@ ThunkAction<AppState> updateKeySessions({
             if (response['errcode'] != null) {
               throw response['error'];
             }
+
+            debugPrint('[sendSessionKeys] success!');
           } catch (error) {
             debugPrint('[sendSessionKeys] $error');
           }

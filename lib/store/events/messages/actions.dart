@@ -217,9 +217,13 @@ ThunkAction<AppState> sendMessageEncrypted({
     try {
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
+      debugPrint('[sendMessageEncrypted] SENDING');
+
       // send the key session - if one hasn't been sent
       // or created - to every user within the room
       await store.dispatch(updateKeySessions(room: room));
+
+      debugPrint('[sendMessageEncrypted] updateKeySessions COMPLETED');
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();

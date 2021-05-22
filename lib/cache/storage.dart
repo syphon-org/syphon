@@ -37,11 +37,9 @@ class CacheStorage implements StorageEngine {
         final jsonDecoded = await compute(
           decryptJsonBackground,
           {
-            'ivKey': Cache.ivKey,
-            'ivKeyNext': Cache.ivKeyNext,
-            'cryptKey': Cache.cryptKey,
             'type': type,
             'json': jsonEncrypted,
+            'cryptKey': Cache.cryptKey,
           },
           debugLabel: 'decryptJsonBackground',
         );

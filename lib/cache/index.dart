@@ -32,8 +32,6 @@ class Cache {
   static const cachePath = '${Cache.cacheKeyMain}.db';
 
   // cache key identifiers
-  static const ivLocation = '${Values.appNameLabel}@ivKey';
-  static const ivLocationNext = '${Values.appNameLabel}@ivKeyNext';
   static const keyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
@@ -52,7 +50,7 @@ class Cache {
  */
 Future<Database?> initCache() async {
   try {
-    var cachePath;
+    var cachePath = Cache.cachePath;
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -65,8 +63,6 @@ Future<Database?> initCache() async {
     }
 
     // Configure cache encryption/decryption instance
-    Cache.ivKey = await loadIV();
-    Cache.ivKeyNext = await loadIVNext();
     Cache.cryptKey = await loadKey();
 
     /// Supports Windows/Linux/MacOS for now.
@@ -126,104 +122,8 @@ Future<void> deleteCache({Database? cache}) async {
   }
 }
 
-String generateIV() {
-  return Key.fromSecureRandom(16).base64;
-}
-
 String generateKey() {
   return Key.fromSecureRandom(32).base64;
-}
-
-Future<void> saveIV(String? iv) async {
-  // mobile
-  if (Platform.isAndroid || Platform.isIOS) {
-    final storage = Cache.storage!;
-
-    return await storage.write(key: Cache.ivLocation, value: iv);
-  }
-
-  // desktop
-  try {
-    final directory = await getApplicationSupportDirectory();
-    await File(join(directory.path, Cache.ivLocation)).create()
-      ..writeAsString(iv!, flush: true);
-  } catch (error) {
-    printError('[saveIV] $error');
-  }
-
-  // error
-  return null;
-}
-
-Future<String> loadIV() async {
-  final location = Cache.ivLocation;
-  var ivStored;
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    final storage = Cache.storage!;
-    ivStored = await storage.read(key: location);
-  }
-
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    try {
-      final directory = await getApplicationSupportDirectory();
-      ivStored = await File(join(directory.path, location)).readAsString();
-    } catch (error) {
-      printError('[loadIV] $error');
-    }
-  }
-  // Create a encryptionKey if a serialized one is not found
-  return ivStored == null ? generateIV() : ivStored;
-}
-
-Future<void> saveIVNext(String? iv) async {
-  // mobile
-  if (Platform.isAndroid || Platform.isIOS) {
-    final storage = Cache.storage!;
-    return await storage.write(
-      key: Cache.ivLocationNext,
-      value: iv,
-    );
-  }
-
-  // desktop
-  try {
-    final directory = await getApplicationSupportDirectory();
-    await File(join(directory.path, Cache.ivLocationNext)).create()
-      ..writeAsString(iv!, flush: true);
-  } catch (error) {
-    printError('[saveIVNext] $error');
-  }
-
-  // desktop
-  return null;
-}
-
-Future<String> loadIVNext() async {
-  final location = Cache.ivLocationNext;
-
-  var ivStored;
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    try {
-      final storage = Cache.storage!;
-      ivStored = await storage.read(key: location);
-    } catch (error) {
-      printError('[loadIVNext] $error');
-    }
-  }
-
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    try {
-      final directory = await getApplicationSupportDirectory();
-      ivStored = await File(join(directory.path, location)).readAsString();
-    } catch (error) {
-      printError('[loadIVNext] $error');
-    }
-  }
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivStored == null ? generateIV() : ivStored;
 }
 
 Future<String?> loadKey() async {

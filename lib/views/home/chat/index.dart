@@ -59,7 +59,7 @@ class ChatView extends StatefulWidget {
 }
 
 class ChatViewState extends State<ChatView> {
-  bool sendable = false;
+  bool sending = false;
   Message? selectedMessage;
   Map<String, Color>? senderColors;
 
@@ -166,7 +166,7 @@ class ChatViewState extends State<ChatView> {
 
   onSubmitMessage(_Props props) async {
     this.setState(() {
-      sendable = false;
+      sending = true;
     });
     props.onSendMessage(
       body: editorController.text,
@@ -176,6 +176,9 @@ class ChatViewState extends State<ChatView> {
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
     }
+    this.setState(() {
+      sending = false;
+    });
   }
 
   onToggleSelectedMessage(Message? message) {
@@ -508,6 +511,7 @@ class ChatViewState extends State<ChatView> {
                         enterSend: props.enterSendEnabled,
                         controller: editorController,
                         quotable: props.room.reply,
+                        sending: sending,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSubmitMessage(props),
@@ -673,7 +677,6 @@ class _Props extends Equatable {
           },
           onLoadFirstBatch: () {
             final room = selectRoom(id: roomId, state: store.state);
-            printDebug('[onLoadFirstBatch] ${room.id}');
 
             store.dispatch(fetchMessageEvents(
               room: room,

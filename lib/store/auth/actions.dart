@@ -220,7 +220,6 @@ ThunkAction<AppState> startAuthObserver() {
     ));
 
     final Function onAuthStateChanged = (User? user) async {
-      printDebug('[onAuthStateChanged] ${user}');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 

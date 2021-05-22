@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -296,6 +297,8 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
     try {
       // Extract the new events
       final List<dynamic> events = toDeviceRaw['events'];
+      printDebug('[syncDevice]');
+      printJson(toDeviceRaw);
 
       // Parse and decrypt necessary events
       await Future.wait(events.map((event) async {
