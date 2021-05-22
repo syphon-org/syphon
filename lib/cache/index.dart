@@ -18,8 +18,11 @@ class Cache {
   static String? ivKeyNext;
   static String? cryptKey;
 
-  // hot cachee refrences
+  // hot cache refrences
   static Database? cacheMain;
+
+// Global hot cache storage reference to prevent redundent storage loading
+  static FlutterSecureStorage? storage;
 
   // inital store caches for reload
   static Map<String, Map?> cacheStores = {};
@@ -47,21 +50,23 @@ class Cache {
  * (needs cold storage extracted as it's own entity)
  */
 Future<Database?> initCache() async {
-  // Configure cache encryption/decryption instance
-  Cache.ivKey = await loadIV();
-  Cache.ivKeyNext = await loadIVNext();
-  Cache.cryptKey = await loadKey();
-
   try {
     var cachePath = '${Cache.cacheKeyMain}.db';
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
+      Cache.storage = FlutterSecureStorage();
+
       var directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
       cacheFactory = databaseFactoryIo;
     }
+
+    // Configure cache encryption/decryption instance
+    Cache.ivKey = await loadIV();
+    Cache.ivKeyNext = await loadIVNext();
+    Cache.cryptKey = await loadKey();
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -131,10 +136,9 @@ String generateKey() {
 Future<void> saveIV(String? iv) async {
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
-    return await FlutterSecureStorage().write(
-      key: Cache.ivLocation,
-      value: iv,
-    );
+    final storage = Cache.storage!;
+
+    return await storage.write(key: Cache.ivLocation, value: iv);
   }
 
   // desktop
@@ -155,8 +159,7 @@ Future<String> loadIV() async {
   var ivStored;
 
   if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
-
+    final storage = Cache.storage!;
     ivStored = await storage.read(key: location);
   }
 
@@ -175,7 +178,8 @@ Future<String> loadIV() async {
 Future<void> saveIVNext(String? iv) async {
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
-    return await FlutterSecureStorage().write(
+    final storage = Cache.storage!;
+    return await storage.write(
       key: Cache.ivLocationNext,
       value: iv,
     );
@@ -200,9 +204,8 @@ Future<String> loadIVNext() async {
   var ivStored;
 
   if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
-
     try {
+      final storage = Cache.storage!;
       ivStored = await storage.read(key: location);
     } catch (error) {
       printError('[loadIVNext] $error');
@@ -228,7 +231,7 @@ Future<String?> loadKey() async {
 
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
+    final storage = Cache.storage!;
 
     // try to read key
     try {

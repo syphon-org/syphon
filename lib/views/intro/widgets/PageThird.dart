@@ -7,13 +7,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
-// Assets
-
-class SecondSection extends StatelessWidget {
-  SecondSection({Key? key, this.title}) : super(key: key);
+class ThirdPage extends StatelessWidget {
+  ThirdPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
@@ -30,44 +27,30 @@ class SecondSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Container(
-          width: widthScale,
+          padding: EdgeInsets.only(bottom: 16),
           constraints: BoxConstraints(
             maxWidth: widthScale,
             maxHeight: heightScale,
           ),
           child: SvgPicture.asset(
-            Assets.heroIntroConnection,
-            semanticsLabel: Strings.semanticsPrivateMessage,
+            Assets.heroIntroGroupChat,
+            semanticsLabel: Strings.semanticsIntroThird,
           ),
         ),
         Flexible(
           flex: 0,
           child: Flex(
             direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              RichText(
+              Text(
+                Strings.contentIntroThird,
                 textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: Strings.contentIntroSecondPartOne,
-                  style: Theme.of(context).textTheme.subtitle1,
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: Strings.contentIntroSecondPartBold,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    TextSpan(
-                      text: Strings.contentIntroSecondPartTwo,
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ],
-                ),
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ],
           ),
-        )
+        ),
       ],
     ));
   }

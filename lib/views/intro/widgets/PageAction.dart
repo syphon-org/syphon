@@ -9,8 +9,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
-class ActionSection extends StatelessWidget {
-  ActionSection({Key? key, this.title}) : super(key: key);
+class ActionPage extends StatelessWidget {
+  ActionPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 

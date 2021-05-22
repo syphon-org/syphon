@@ -21,26 +21,26 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/signup/step-captcha.dart';
-import 'package:syphon/views/signup/step-email.dart';
-import 'package:syphon/views/signup/step-terms.dart';
+import 'package:syphon/views/signup/widgets/StepCaptcha.dart';
+import 'package:syphon/views/signup/widgets/StepEmail.dart';
+import 'package:syphon/views/signup/widgets/StepTerms.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import './step-homeserver.dart';
-import './step-password.dart';
-import './step-username.dart';
+import 'widgets/StepHomeserver.dart';
+import 'widgets/StepPassword.dart';
+import 'widgets/StepUsername.dart';
 
 // Styling Widgets
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class SignupView extends StatefulWidget {
-  const SignupView({Key? key}) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({Key? key}) : super(key: key);
 
-  SignupViewState createState() => SignupViewState();
+  SignupScreenState createState() => SignupScreenState();
 }
 
-class SignupViewState extends State<SignupView> {
+class SignupScreenState extends State<SignupScreen> {
   int currentStep = 0;
   bool validStep = false;
   bool onboarding = false;
@@ -53,7 +53,7 @@ class SignupViewState extends State<SignupView> {
     PasswordStep(),
   ];
 
-  SignupViewState({Key? key});
+  SignupScreenState({Key? key});
 
   @override
   void initState() {

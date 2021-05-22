@@ -223,10 +223,7 @@ Future<dynamic> syncLoop({
     try {
       final secureStorage = FlutterSecureStorage();
 
-      await secureStorage.write(
-        key: Cache.lastSinceKey,
-        value: lastSinceNew,
-      );
+      await secureStorage.write(key: Cache.lastSinceKey, value: lastSinceNew);
     } catch (error) {
       print('[syncLoop] $error');
     }

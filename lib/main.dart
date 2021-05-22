@@ -24,8 +24,8 @@ import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/views/home/index.dart';
-import 'package:syphon/views/intro/index.dart';
+import 'package:syphon/views/home/HomeScreen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
 import 'package:syphon/views/navigation.dart';
 
 void main() async {
@@ -73,7 +73,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final Store<AppState> store;
   final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
-  Widget defaultHome = Home();
+  Widget defaultHome = HomeScreen();
   StreamSubscription? alertsListener;
 
   SyphonState(
@@ -105,7 +105,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final authed = currentUser.accessToken != null;
 
     if (!authed) {
-      defaultHome = Intro();
+      defaultHome = IntroScreen();
     }
   }
 
@@ -138,14 +138,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void onMounted() {
     // init auth listener
     store.state.authStore.onAuthStateChanged!.listen((user) {
-      if (user == null && defaultHome.runtimeType == Home) {
-        defaultHome = Intro();
+      if (user == null && defaultHome.runtimeType == HomeScreen) {
+        defaultHome = IntroScreen();
         NavigationService.clearTo('/intro', context);
       } else if (user != null &&
           user.accessToken != null &&
-          defaultHome.runtimeType == Intro) {
+          defaultHome.runtimeType == IntroScreen) {
         // Default Authenticated App Home
-        defaultHome = Home();
+        defaultHome = HomeScreen();
         NavigationService.clearTo('/home', context);
       }
     });

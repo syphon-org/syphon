@@ -12,8 +12,8 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 
-class LandingSection extends StatelessWidget {
-  LandingSection({Key? key, this.title}) : super(key: key);
+class LandingPage extends StatelessWidget {
+  LandingPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 

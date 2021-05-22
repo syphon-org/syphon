@@ -64,6 +64,7 @@ class Strings {
   static const buttonBlocKUser = 'block user';
   static const buttonDeleteKeys = 'delete keys';
   static const buttonResetPassword = 'reset password';
+  static const buttonAgree = 'I Agree';
 
   // Text Buttons
   static const buttonTextSignup = "button-text-signup";
@@ -172,7 +173,8 @@ class Strings {
       'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
-  static String formatUsernameHint({required String homeserver, String? username}) {
+  static String formatUsernameHint(
+      {required String homeserver, String? username}) {
     final usernameFormatted =
         username != null && username.length > 0 ? username : 'username';
     final alias = homeserver.length != 0

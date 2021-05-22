@@ -7,10 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Project imports:
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
-class ThirdSection extends StatelessWidget {
-  ThirdSection({Key? key, this.title}) : super(key: key);
+// Assets
+
+class SecondPage extends StatelessWidget {
+  SecondPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
@@ -27,30 +30,44 @@ class ThirdSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(bottom: 16),
+          width: widthScale,
           constraints: BoxConstraints(
             maxWidth: widthScale,
             maxHeight: heightScale,
           ),
           child: SvgPicture.asset(
-            Assets.heroIntroGroupChat,
-            semanticsLabel: Strings.semanticsIntroThird,
+            Assets.heroIntroConnection,
+            semanticsLabel: Strings.semanticsPrivateMessage,
           ),
         ),
         Flexible(
           flex: 0,
           child: Flex(
             direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                Strings.contentIntroThird,
+              RichText(
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.subtitle1,
+                text: TextSpan(
+                  text: Strings.contentIntroSecondPartOne,
+                  style: Theme.of(context).textTheme.subtitle1,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: Strings.contentIntroSecondPartBold,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    TextSpan(
+                      text: Strings.contentIntroSecondPartTwo,
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
+        )
       ],
     ));
   }

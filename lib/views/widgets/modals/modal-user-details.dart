@@ -36,7 +36,8 @@ class ModalUserDetails extends StatelessWidget {
   final bool? nested; // pop context twice when double nested in a view
 
   @protected
-  void onNavigateToProfile({required BuildContext context, required _Props props}) async {
+  void onNavigateToProfile(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/user/details',
@@ -47,7 +48,8 @@ class ModalUserDetails extends StatelessWidget {
   }
 
   @protected
-  void onNavigateToInvite({required BuildContext context, required _Props props}) async {
+  void onNavigateToInvite(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/rooms/search',
@@ -58,7 +60,8 @@ class ModalUserDetails extends StatelessWidget {
   }
 
   @protected
-  void onMessageUser({required BuildContext context, required _Props props}) async {
+  void onMessageUser(
+      {required BuildContext context, required _Props props}) async {
     final user = props.user;
     return await showDialog(
       context: context,
@@ -309,10 +312,10 @@ class _Props extends Equatable {
         onBlockUser: (User user) async {
           await store.dispatch(toggleBlockUser(user: user));
         },
-        onCreateChatDirect: ({User? user}) async => store.dispatch(
+        onCreateChatDirect: ({required User user}) async => store.dispatch(
           createRoom(
             isDirect: true,
-            invites: <User?>[user],
+            invites: <User>[user],
           ),
         ),
       );

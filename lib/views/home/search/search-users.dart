@@ -128,13 +128,16 @@ class SearchUserState extends State<SearchUserView> {
    * by the name searched
    */
   @protected
-  void onAttemptChat(
-      {required BuildContext context, _Props? props, User? user}) async {
+  void onAttemptChat({
+    required User user,
+    required BuildContext context,
+    _Props? props,
+  }) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${formatUsername(user!)}',
+        title: 'Try chatting with ${formatUsername(user)}',
         content: Strings.confirmationAttemptChat,
         onStartChat: () async {
           this.setState(() {
@@ -205,7 +208,7 @@ class SearchUserState extends State<SearchUserView> {
         Visibility(
           visible: showManualUser,
           child: GestureDetector(
-            onTap: () => this.onAttemptChat(
+            onTap: () => onAttemptChat(
               props: props,
               context: context,
               user: attemptableUser,
@@ -402,10 +405,10 @@ class _Props extends Equatable {
 
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateChatDirect: ({User? user}) async {
+        onCreateChatDirect: ({required User user}) async {
           return store.dispatch(createRoom(
             isDirect: true,
-            invites: <User?>[user],
+            invites: <User>[user],
           ));
         },
       );

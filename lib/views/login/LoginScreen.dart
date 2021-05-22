@@ -31,21 +31,21 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 final bool debug = !kReleaseMode;
 
-class Login extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   final Store<AppState>? store;
-  const Login({Key? key, this.store}) : super(key: key);
+  const LoginScreen({Key? key, this.store}) : super(key: key);
 
   @override
-  LoginState createState() => LoginState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginState extends State<Login> {
+class LoginScreenState extends State<LoginScreen> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   bool visibility = false;
 
-  LoginState({Key? key});
+  LoginScreenState({Key? key});
 
   @override
   void initState() {

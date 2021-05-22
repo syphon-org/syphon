@@ -190,7 +190,7 @@ class _Props extends Equatable {
   final Room room;
   final ThemeType theme;
   final User currentUser;
-  final Map<String, User?> users;
+  final Map<String, User> users;
   final List<Message> messages;
   final bool? timeFormat24Enabled;
 

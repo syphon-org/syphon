@@ -16,10 +16,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 
-// Store
-
-// Styling
-
 class CaptchaStep extends StatefulWidget {
   const CaptchaStep({Key? key}) : super(key: key);
 

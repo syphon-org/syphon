@@ -19,19 +19,13 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
-// Store
+class VerificationScreen extends StatefulWidget {
+  const VerificationScreen({Key? key}) : super(key: key);
 
-// Styling
-
-// Assets
-
-class VerificationView extends StatefulWidget {
-  const VerificationView({Key? key}) : super(key: key);
-
-  VerificationViewState createState() => VerificationViewState();
+  VerificationScreenState createState() => VerificationScreenState();
 }
 
-class VerificationViewState extends State<VerificationView>
+class VerificationScreenState extends State<VerificationScreen>
     with WidgetsBindingObserver {
   late bool sending;
   bool? success;

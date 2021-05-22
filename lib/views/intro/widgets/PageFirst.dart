@@ -10,8 +10,8 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
-class FirstSection extends StatelessWidget {
-  FirstSection({Key? key, this.title}) : super(key: key);
+class FirstPage extends StatelessWidget {
+  FirstPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 

@@ -18,31 +18,31 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/views/login/forgot/step-password-reset.dart';
+import 'package:syphon/views/login/forgot/widgets/PageEmailVerify.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
-class PasswordResetView extends StatefulWidget {
-  const PasswordResetView({Key? key}) : super(key: key);
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
-  PasswordResetState createState() => PasswordResetState();
+  ForgotPasswordState createState() => ForgotPasswordState();
 }
 
-class PasswordResetState extends State<PasswordResetView> {
-  int currentStep = 0;
-  bool naving = false;
-  bool validStep = false;
-  bool onboarding = false;
+class ForgotPasswordState extends State<ForgotPasswordScreen> {
+  int sendAttempt = 1;
+  bool loading = false;
+  bool showConfirmation = false;
   PageController? pageController;
 
   var sections = [
-    PasswordResetStep(),
+    EmailVerifyStep(),
   ];
 
-  PasswordResetState({
+  ForgotPasswordState({
     Key? key,
   });
 
@@ -53,6 +53,26 @@ class PasswordResetState extends State<PasswordResetView> {
       initialPage: 0,
       keepPage: false,
       viewportFraction: 1.5,
+    );
+  }
+
+  onShowConfirmDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => DialogExplaination(
+        title: Strings.titleDialogVerifyEmailRequirement,
+        content: Strings.contentConfirmPasswordReset,
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  onVerificationConfirmed() {
+    Navigator.pushNamed(
+      context,
+      '/reset',
     );
   }
 
@@ -112,13 +132,6 @@ class PasswordResetState extends State<PasswordResetView> {
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
                                 children: sections,
-                                onPageChanged: (index) {
-                                  setState(() {
-                                    currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
-                                  });
-                                },
                               ),
                             ),
                           ],
@@ -131,27 +144,68 @@ class PasswordResetState extends State<PasswordResetView> {
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
-                              width: width * 0.66,
                               height: Dimensions.inputHeight,
                               constraints: BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
-                                maxWidth: Dimensions.buttonWidthMax,
                               ),
-                              child: ButtonSolid(
-                                text: Strings.buttonResetPassword,
-                                loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
-                                onPressed: () async {
-                                  final result = await props.onResetPassword();
+                              child: Stack(
+                                children: [
+                                  Visibility(
+                                    visible: !showConfirmation,
+                                    child: ButtonSolid(
+                                      text: Strings.buttonSendVerification,
+                                      loading: loading,
+                                      disabled: !props.isEmailValid ||
+                                          !props.isHomeserverValid,
+                                      onPressed: () async {
+                                        this.setState(() {
+                                          loading = true;
+                                        });
 
-                                  if (result) {
-                                    Navigator.popUntil(
-                                      context,
-                                      ModalRoute.withName('/login'),
-                                    );
-                                  }
-                                },
+                                        final result = await props
+                                            .onSendVerification(sendAttempt);
+
+                                        if (result) {
+                                          onShowConfirmDialog();
+                                          this.setState(() {
+                                            sendAttempt += 1;
+                                            showConfirmation = true;
+                                          });
+                                        }
+
+                                        this.setState(() {
+                                          loading = false;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: showConfirmation,
+                                    child: ButtonSolid(
+                                      text: Strings.buttonConfirmVerification,
+                                      loading: props.loading || this.loading,
+                                      disabled: !props.isEmailValid,
+                                      onPressed: () async {
+                                        this.setState(() {
+                                          loading = true;
+                                        });
+
+                                        final result =
+                                            await props.onConfirmVerification();
+
+                                        if (result) {
+                                          onVerificationConfirmed();
+                                        } else {
+                                          onShowConfirmDialog();
+                                        }
+
+                                        this.setState(() {
+                                          loading = false;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -169,24 +223,38 @@ class PasswordResetState extends State<PasswordResetView> {
 
 class _Props extends Equatable {
   final bool loading;
-  final bool isPasswordValid;
+  final bool isEmailValid;
+  final bool isHomeserverValid;
   final Map interactiveAuths;
-  final Function onResetPassword;
+  final Function onSendVerification;
+  final Function onConfirmVerification;
 
   _Props({
     required this.loading,
-    required this.isPasswordValid,
+    required this.isEmailValid,
+    required this.isHomeserverValid,
     required this.interactiveAuths,
-    required this.onResetPassword,
+    required this.onSendVerification,
+    required this.onConfirmVerification,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid: store.state.authStore.isPasswordValid,
+        isEmailValid: store.state.authStore.isEmailValid,
+        isHomeserverValid: store.state.authStore.isHomeserverValid,
         interactiveAuths: store.state.authStore.interactiveAuths,
-        onResetPassword: () async {
+        onConfirmVerification: () async {
+          return true;
+          // TODO: find a way to check if they've clicked the link
+          // without invalidating the token, sending a blank password
+          // doesn't work
+          // return await store.dispatch(
+          //   checkPasswordResetVerification(sendAttempt: 0),
+          // );
+        },
+        onSendVerification: (int sendAttempt) async {
           return await store.dispatch(
-            resetPassword(password: store.state.authStore.password),
+            sendPasswordResetEmail(sendAttempt: sendAttempt),
           );
         },
       );
@@ -194,7 +262,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         loading,
-        isPasswordValid,
+        isEmailValid,
         interactiveAuths,
       ];
 }

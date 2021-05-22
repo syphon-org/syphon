@@ -383,7 +383,7 @@ ThunkAction<AppState> createRoom({
   String? topic,
   File? avatarFile,
   String? avatarUri,
-  List<User?>? invites,
+  List<User> invites = const <User>[],
   bool isDirect = false,
   bool? encryption = false, // TODO: defaults without group E2EE for now
   String preset = RoomPresets.private,
@@ -395,7 +395,7 @@ ThunkAction<AppState> createRoom({
       await store.dispatch(stopSyncObserver());
 
       final currentUser = store.state.authStore.user;
-      final inviteIds = invites!.map((user) => user!.userId).toList();
+      final inviteIds = invites.map((user) => user.userId).toList();
 
       final data = await MatrixApi.createRoom(
         protocol: store.state.authStore.protocol,
@@ -417,7 +417,7 @@ ThunkAction<AppState> createRoom({
       room = Room(id: data['room_id']);
 
       // Add invites to the user list beforehand
-      final userInviteMap = Map<String, User?>.fromIterable(
+      final userInviteMap = Map<String, User>.fromIterable(
         invites,
         key: (user) => user.userId,
         value: (user) => user,
@@ -427,18 +427,18 @@ ThunkAction<AppState> createRoom({
       room = room.copyWith(users: userInviteMap);
 
       if (isDirect) {
-        final directUser = invites[0]!;
+        final User directUser = invites[0];
         room = room.copyWith(
           direct: true,
           name: directUser.displayName ?? directUser.userId,
           userIds: [
-            directUser.userId,
-            currentUser.userId,
-          ],
+            directUser.userId!,
+            currentUser.userId!,
+          ] as List<String>,
           users: {
-            directUser.userId: directUser,
-            currentUser.userId: currentUser
-          },
+            directUser.userId!: directUser,
+            currentUser.userId!: currentUser
+          } as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));

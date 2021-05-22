@@ -10,7 +10,7 @@ import 'package:syphon/views/home/chat/index.dart';
 import 'package:syphon/views/home/groups/group-create-public.dart';
 import 'package:syphon/views/home/groups/group-create.dart';
 import 'package:syphon/views/home/groups/invite-users.dart';
-import 'package:syphon/views/home/index.dart';
+import 'package:syphon/views/home/HomeScreen.dart';
 import 'package:syphon/views/home/profile/details-user.dart';
 import 'package:syphon/views/home/profile/index.dart';
 import 'package:syphon/views/home/search/search-groups.dart';
@@ -26,14 +26,14 @@ import 'package:syphon/views/home/settings/password/index.dart';
 import 'package:syphon/views/home/settings/privacy.dart';
 import 'package:syphon/views/home/settings/storage.dart';
 import 'package:syphon/views/home/settings/theming.dart';
-import 'package:syphon/views/login/forgot/password-reset-email.dart';
-import 'package:syphon/views/login/forgot/password-reset.dart';
-import 'package:syphon/views/search/search-homeservers.dart';
-import 'package:syphon/views/intro/index.dart';
-import 'package:syphon/views/login/index.dart';
-import 'package:syphon/views/signup/index.dart';
-import 'package:syphon/views/signup/loading.dart';
-import 'package:syphon/views/signup/verification.dart';
+import 'package:syphon/views/login/forgot/PasswordForgotScreen.dart';
+import 'package:syphon/views/login/forgot/PasswordResetScreen.dart';
+import 'package:syphon/views/search/SearchHomeserverScreen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/login/LoginScreen.dart';
+import 'package:syphon/views/signup/SignupScreen.dart';
+import 'package:syphon/views/signup/LoadingScreen.dart';
+import 'package:syphon/views/signup/VerificationScreen.dart';
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -49,24 +49,17 @@ class NavigationService {
   }
 }
 
-class NavigationRouteIds {
-  static const Intro = '/intro';
-  static const Login = '/login';
-  static const SearchHomeservers = '/search/homeservers';
-  static const Signup = '/signup';
-  static const VerificationView = '/verification';
-}
-
 class NavigationProvider {
   static getRoutes() => <String, WidgetBuilder>{
-        '/intro': (BuildContext context) => Intro(),
-        '/login': (BuildContext context) => Login(),
-        '/signup': (BuildContext context) => SignupView(),
-        '/forgot': (BuildContext context) => PasswordResetEmailView(),
-        '/reset': (BuildContext context) => PasswordResetView(),
-        '/search/homeservers': (BuildContext context) => SearchHomeservers(),
-        '/verification': (BuildContext context) => VerificationView(),
-        '/home': (BuildContext context) => Home(),
+        '/intro': (BuildContext context) => IntroScreen(),
+        '/login': (BuildContext context) => LoginScreen(),
+        '/signup': (BuildContext context) => SignupScreen(),
+        '/forgot': (BuildContext context) => ForgotPasswordScreen(),
+        '/reset': (BuildContext context) => ResetPasswordScreen(),
+        '/search/homeservers': (BuildContext context) =>
+            SearchHomeserverScreen(),
+        '/verification': (BuildContext context) => VerificationScreen(),
+        '/home': (BuildContext context) => HomeScreen(),
         '/home/chat': (BuildContext context) => ChatView(),
         '/home/chat/settings': (BuildContext context) => ChatDetailsView(),
         '/home/chat/details': (BuildContext context) => MessageDetails(),
@@ -92,6 +85,6 @@ class NavigationProvider {
         '/devices': (BuildContext context) => DevicesView(),
         '/settings': (BuildContext context) => SettingsScreen(),
         '/blocked': (BuildContext context) => BlockedUsersView(),
-        '/loading': (BuildContext context) => Loading(),
+        '/loading': (BuildContext context) => LoadingScreen(),
       };
 }

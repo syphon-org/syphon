@@ -20,25 +20,19 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import './action.dart';
-import './first.dart';
-import './landing.dart';
-import './second.dart';
-import './third.dart';
+import 'widgets/PageAction.dart';
+import 'widgets/PageFirst.dart';
+import 'widgets/PageLanding.dart';
+import 'widgets/PageSecond.dart';
+import 'widgets/PageThird.dart';
 
-// Store
+class IntroScreen extends StatefulWidget {
+  const IntroScreen({Key? key}) : super(key: key);
 
-// Styling Widgets
-
-// Local Components
-
-class Intro extends StatefulWidget {
-  const Intro({Key? key}) : super(key: key);
-
-  IntroState createState() => IntroState();
+  IntroScreenState createState() => IntroScreenState();
 }
 
-class IntroState extends State<Intro> {
+class IntroScreenState extends State<IntroScreen> {
   final String title = 'Intro';
 
   int currentStep = 0;
@@ -47,14 +41,14 @@ class IntroState extends State<Intro> {
   PageController? pageController;
 
   final List<Widget> sections = [
-    LandingSection(),
-    FirstSection(),
-    SecondSection(),
-    ThirdSection(),
-    ActionSection(),
+    LandingPage(),
+    FirstPage(),
+    SecondPage(),
+    ThirdPage(),
+    ActionPage(),
   ];
 
-  IntroState({Key? key});
+  IntroScreenState({Key? key});
 
   @override
   void initState() {
@@ -156,7 +150,10 @@ class IntroState extends State<Intro> {
                       Navigator.pop(context);
                     },
                     child: TextButton(
-                      child: Text('I Agree'),
+                      child: Text(
+                        Strings.buttonAgree,
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
                       onPressed: () async {
                         await store.dispatch(acceptAgreement());
                         Navigator.of(context).pop();

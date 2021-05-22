@@ -25,19 +25,19 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
-class SearchHomeservers extends StatefulWidget {
-  const SearchHomeservers({Key? key}) : super(key: key);
+class SearchHomeserverScreen extends StatefulWidget {
+  const SearchHomeserverScreen({Key? key}) : super(key: key);
 
   @override
-  SearchHomeserversState createState() => SearchHomeserversState();
+  SearchHomeserverScreenState createState() => SearchHomeserverScreenState();
 }
 
-class SearchHomeserversState extends State<SearchHomeservers> {
+class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
   final Store<AppState>? store;
   final searchInputFocusNode = FocusNode();
 
   bool searching = false;
-  SearchHomeserversState({Key? key, this.store});
+  SearchHomeserverScreenState({Key? key, this.store});
 
   @override
   void didChangeDependencies() {

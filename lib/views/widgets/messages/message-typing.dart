@@ -12,16 +12,16 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class MessageTypingWidget extends StatefulWidget {
   final bool? typing;
-  final List<String>? usersTyping;
-  final Map<String, User?>? roomUsers;
+  final List<String> usersTyping;
+  final Map<String, User> roomUsers;
   final String? selectedMessageId;
   final Function? onPressAvatar;
 
   MessageTypingWidget({
     Key? key,
     this.typing,
-    this.usersTyping,
-    this.roomUsers,
+    this.usersTyping = const [],
+    this.roomUsers = const {},
     this.selectedMessageId,
     this.onPressAvatar,
   }) : super(key: key);
@@ -85,9 +85,9 @@ class MessageTypingState extends State<MessageTypingWidget>
       opacity = widget.selectedMessageId != null ? 0.5 : 1.0;
     }
 
-    if (widget.usersTyping!.length > 0) {
-      final usernamesTyping = widget.usersTyping!;
-      userTyping = widget.roomUsers![usernamesTyping[0]] ?? User();
+    if (widget.usersTyping.length > 0) {
+      final usernamesTyping = widget.usersTyping;
+      userTyping = widget.roomUsers[usernamesTyping[0]] ?? User();
     }
 
     return Opacity(

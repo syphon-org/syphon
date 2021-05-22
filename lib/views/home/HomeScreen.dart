@@ -39,15 +39,15 @@ import 'package:syphon/views/widgets/containers/ring-actions.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  HomeViewState createState() => HomeViewState();
+  HomeState createState() => HomeState();
 }
 
-class HomeViewState extends State<Home> {
-  HomeViewState({Key? key}) : super();
+class HomeState extends State<HomeScreen> {
+  HomeState({Key? key}) : super();
 
   final GlobalKey<FabCircularMenuState> fabKey =
       GlobalKey<FabCircularMenuState>();

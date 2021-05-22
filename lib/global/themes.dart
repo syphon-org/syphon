@@ -1,5 +1,3 @@
-
-
 // Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -170,10 +168,12 @@ class Themes {
       // Core UI\
       dialogBackgroundColor: modalColor,
       focusColor: Color(primaryColor),
-      cursorColor: Color(primaryColor),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: Color(primaryColor),
+        selectionColor: Color(primaryColor).withAlpha(100),
+        selectionHandleColor: Color(primaryColor),
+      ),
       iconTheme: IconThemeData(color: iconColor),
-      textSelectionColor: Color(primaryColor).withAlpha(100),
-      textSelectionHandleColor: Color(primaryColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
           ? Color(scaffoldBackgroundColor)
           : null,
