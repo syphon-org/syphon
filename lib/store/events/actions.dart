@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -182,13 +184,13 @@ ThunkAction<AppState> fetchMessageEvents({
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
-        "protocol": store.state.authStore.protocol,
-        "homeserver": store.state.authStore.user.homeserver,
-        "accessToken": store.state.authStore.user.accessToken,
-        "roomId": room.id,
-        "to": to,
-        "from": from,
-        "limit": limit,
+        'protocol': store.state.authStore.protocol,
+        'homeserver': store.state.authStore.user.homeserver,
+        'accessToken': store.state.authStore.user.accessToken,
+        'roomId': room.id,
+        'to': to,
+        'from': from,
+        'limit': limit,
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
@@ -203,7 +205,7 @@ ThunkAction<AppState> fetchMessageEvents({
       // reuse the logic for syncing
       await store.dispatch(
         syncRooms({
-          '${room.id}': {
+          room.id: {
             'timeline': {
               'events': messages,
               'last_hash': oldest ? end : null,
@@ -232,16 +234,31 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
 
-      var sentRequest = false;
+      bool sentKeyRequest = false;
 
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {
         final eventType = event['type'];
         switch (eventType) {
           case EventTypes.encrypted:
-            return await store.dispatch(
-              decryptMessageEvent(roomId: room.id, event: event),
-            );
+            try {
+              return await store.dispatch(
+                decryptMessageEvent(roomId: room.id, event: event),
+              );
+            } catch (error) {
+              debugPrint('[decryptMessageEvent] $error');
+              printJson(event);
+
+              if (!sentKeyRequest) {
+                sentKeyRequest = true;
+                store.dispatch(sendKeyRequest(
+                  event: Event.fromMatrix(event),
+                  roomId: room.id,
+                ));
+              }
+
+              return event;
+            }
           default:
             return event;
         }
@@ -285,7 +302,7 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
       }
 
       await store.dispatch(syncRooms({
-        '${room.id}': {
+        room.id: {
           'state': {
             'events': stateEvents,
           },
@@ -361,19 +378,19 @@ ThunkAction<AppState> formatMessageReply(
 
       return message.copyWith(
         body: body,
-        format: "org.matrix.custom.html",
+        format: 'org.matrix.custom.html',
         formattedBody: formattedBody,
         content: {
-          "body": body,
-          "format": "org.matrix.custom.html",
-          "formatted_body": formattedBody,
+          'body': body,
+          'format': 'org.matrix.custom.html',
+          'formatted_body': formattedBody,
           // m.relates_to below is not necessary in the unencrypted part of the
           // message according to the spec but Element web and android seem to
           // do it so I'm leaving it here
-          "m.relates_to": {
-            "m.in_reply_to": {"event_id": "${reply.id}"}
+          'm.relates_to': {
+            'm.in_reply_to': {'event_id': reply.id}
           },
-          "msgtype": message.type
+          'msgtype': message.type
         },
       );
     } catch (error) {
@@ -465,7 +482,7 @@ ThunkAction<AppState> sendTyping({
 ThunkAction<AppState> deleteMessage({required Message message}) {
   return (Store<AppState> store) async {
     try {
-      if (message.pending! || message.failed!) {
+      if (message.pending || message.failed) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {

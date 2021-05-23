@@ -29,7 +29,7 @@ import 'package:syphon/views/home/settings/settings-theming-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/loading-screen.dart';

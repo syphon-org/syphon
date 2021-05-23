@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -117,6 +118,7 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
+        printJson(json);
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
           decryptEvents(room, Map<String, dynamic>.from(json)),

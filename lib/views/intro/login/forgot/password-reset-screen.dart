@@ -1,8 +1,3 @@
-// Dart imports:
-import 'dart:async';
-
-// Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +13,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/views/login/forgot/widgets/PagePasswordReset.dart';
+import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 final Duration nextAnimationDuration = Duration(

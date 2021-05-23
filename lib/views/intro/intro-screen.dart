@@ -5,13 +5,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
 // Package imports:
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
 // Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -20,11 +17,13 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'widgets/PageAction.dart';
-import 'widgets/PageFirst.dart';
-import 'widgets/PageLanding.dart';
-import 'widgets/PageSecond.dart';
-import 'widgets/PageThird.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
+
+import 'widgets/page-action.dart';
+import 'widgets/page-description-first.dart';
+import 'widgets/page-description-second.dart';
+import 'widgets/page-description-third.dart';
+import 'widgets/page-landing.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -42,13 +41,13 @@ class IntroScreenState extends State<IntroScreen> {
 
   final List<Widget> sections = [
     LandingPage(),
-    FirstPage(),
-    SecondPage(),
-    ThirdPage(),
+    FirstDescriptionPage(),
+    SecondDescriptionPage(),
+    ThirdDescriptionPage(),
     ActionPage(),
   ];
 
-  IntroScreenState({Key? key});
+  IntroScreenState();
 
   @override
   void initState() {

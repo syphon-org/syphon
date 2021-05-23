@@ -9,15 +9,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
-class ThirdPage extends StatelessWidget {
-  ThirdPage({Key? key, this.title}) : super(key: key);
+class ThirdDescriptionPage extends StatelessWidget {
+  const ThirdDescriptionPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
 
     final widthScale = width * 0.8;
     final heightScale = height / 2.5;

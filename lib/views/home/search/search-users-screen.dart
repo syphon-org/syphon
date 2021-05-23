@@ -41,12 +41,11 @@ class SearchUserScreen extends StatefulWidget {
 class SearchUserState extends State<SearchUserScreen> {
   final searchInputFocusNode = FocusNode();
 
-  SearchUserState({Key? key});
+  SearchUserState();
 
-  String? searchable;
+  String searchable = '';
   String? creatingRoomDisplayName;
 
-  // componentDidMount(){}
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -88,9 +87,9 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  void onMessageUser(
+  Future onMessageUser(
       {required BuildContext context, _Props? props, User? user}) async {
-    return await showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
@@ -127,12 +126,12 @@ class SearchUserState extends State<SearchUserScreen> {
    * by the name searched
    */
   @protected
-  void onAttemptChat({
+  Future onAttemptChat({
     required User user,
     required BuildContext context,
     _Props? props,
   }) async {
-    return await showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
@@ -163,11 +162,11 @@ class SearchUserState extends State<SearchUserScreen> {
 
   @protected
   Widget buildUserList(BuildContext context, _Props props) {
-    final searchText = searchable ?? '';
+    final searchText = searchable;
 
     final attemptableUser = User(
       displayName: searchText,
-      userId: searchable != null && searchable!.contains(":")
+      userId: searchable.isNotEmpty && searchable.contains(':')
           ? searchable
           : formatUserId(searchText),
     );
@@ -176,17 +175,15 @@ class SearchUserState extends State<SearchUserScreen> {
       (result) => result.userId.contains(searchText),
     );
 
-    final showManualUser =
-        searchable != null && searchable!.length > 0 && foundResult < 0;
+    final showManualUser = searchable.isNotEmpty && foundResult < 0;
 
-    final usersList = searchable == null || searchable!.isEmpty
-        ? props.usersRecent
-        : props.searchResults;
+    final usersList =
+        searchable.isEmpty ? props.usersRecent : props.searchResults;
 
     return ListView(
       children: [
         Visibility(
-          visible: searchable == null || searchable!.isEmpty,
+          visible: searchable.isEmpty,
           child: Container(
             padding: EdgeInsets.only(
               left: 20,
@@ -196,7 +193,26 @@ class SearchUserState extends State<SearchUserScreen> {
             child: Row(
               children: [
                 Text(
-                  'Recent Users',
+                  Strings.labelRecentUsers,
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Visibility(
+          visible: searchable.isNotEmpty,
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 16,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  Strings.labelSearchResults,
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.subtitle2,
                 ),
@@ -399,6 +415,10 @@ class _Props extends Equatable {
         searchResults: store.state.searchStore.searchResults,
         onSearch: (String text) {
           if (text.contains('@') && text.length == 1) {
+            return;
+          }
+
+          if (text.isEmpty) {
             return;
           }
 

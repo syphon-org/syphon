@@ -8,10 +8,13 @@ analyzer:
 linter:
   rules:
     # Disabled
+    file_names: false
     type_annotate_public_apis: false
     avoid_classes_with_only_static_members: false
     always_declare_return_types: false # can be explicit in declaration
     constant_identifier_names: false
+    avoid_escaping_inner_quotes: false
+    prefer_for_elements_to_map_fromIterable: false # that syntax is challenging, will change if becomes standard
 
     # Enabled
     prefer_single_quotes: true

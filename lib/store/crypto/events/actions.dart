@@ -81,48 +81,40 @@ ThunkAction<AppState> decryptMessageEvent({
   Map event = const {},
 }) {
   return (Store<AppState> store) async {
-    try {
-      // Pull out event data
-      final Map content = event['content'];
-      final String identityKey = content['sender_key'];
+    // Pull out event data
+    final Map content = event['content'];
+    final String identityKey = content['sender_key'];
 
-      // return already decrypted events
-      if (content['ciphertext'] == null) {
-        return event;
-      }
-
-      // Load and deserialize session
-      final olm.InboundGroupSession messageSession = await store.dispatch(
-        loadMessageSessionInbound(
-          roomId: roomId,
-          identityKey: identityKey,
-        ),
-      );
-
-      // Decrypt the payload with the session
-      final payloadDecrypted = messageSession.decrypt(content['ciphertext']);
-      final payloadScrubbed = payloadDecrypted.plaintext
-          .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
-          .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
-
-      // Return the content to be sent or processed
-      event['content'] = json.decode(payloadScrubbed)['content'];
-
-      await store.dispatch(saveMessageSessionInbound(
-        roomId: roomId,
-        identityKey: identityKey,
-        session: messageSession,
-        messageIndex: payloadDecrypted.message_index,
-      ));
-
-      return event;
-    } catch (error) {
-      debugPrint('[decryptMessageEvent] $error');
-      printJson(event);
-
-      // TODO: request keys here
+    // return already decrypted events
+    if (content['ciphertext'] == null) {
       return event;
     }
+
+    // Load and deserialize session
+    final olm.InboundGroupSession messageSession = await store.dispatch(
+      loadMessageSessionInbound(
+        roomId: roomId,
+        identityKey: identityKey,
+      ),
+    );
+
+    // Decrypt the payload with the session
+    final payloadDecrypted = messageSession.decrypt(content['ciphertext']);
+    final payloadScrubbed = payloadDecrypted.plaintext
+        .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
+        .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
+
+    // Return the content to be sent or processed
+    event['content'] = json.decode(payloadScrubbed)['content'];
+
+    await store.dispatch(saveMessageSessionInbound(
+      roomId: roomId,
+      identityKey: identityKey,
+      session: messageSession,
+      messageIndex: payloadDecrypted.message_index,
+    ));
+
+    return event;
   };
 }
 
@@ -160,10 +152,10 @@ ThunkAction<AppState> encryptKeyContent({
       'sender': userCurrent.userId,
       'sender_device': userCurrent.deviceId,
       'recipient': recipient,
-      "recipient_keys": {
+      'recipient_keys': {
         Algorithms.ed25519: fingerprintKey,
       },
-      "keys": {
+      'keys': {
         Algorithms.ed25519: userFingerprintKey,
       },
       'type': eventType,

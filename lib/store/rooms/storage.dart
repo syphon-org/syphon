@@ -6,7 +6,7 @@ import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-Future<void> saveRooms(
+Future saveRooms(
   Map<String, Room> rooms, {
   Database? cache,
   Database? storage,
@@ -14,29 +14,29 @@ Future<void> saveRooms(
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
   storage = storage ?? Storage.main;
 
-  return await storage!.transaction((txn) async {
-    for (Room? room in rooms.values) {
-      final record = store.record(room!.id);
+  return storage!.transaction((txn) async {
+    for (final Room? room in rooms.values) {
+      final record = store.record(room?.id);
       await record.put(txn, jsonEncode(room));
     }
   });
 }
 
-Future<void> saveRoom(
-  Room? room, {
+Future saveRoom(
+  Room room, {
   Database? cache,
   Database? storage,
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
   storage = storage ?? Storage.main;
 
-  return await storage!.transaction((txn) async {
-    final record = store.record(room!.id);
+  return storage!.transaction((txn) async {
+    final record = store.record(room.id);
     await record.put(txn, jsonEncode(room));
   });
 }
 
-Future<void> deleteRooms(
+Future deleteRooms(
   Map<String, Room?> rooms, {
   Database? cache,
   Database? storage,
@@ -44,9 +44,9 @@ Future<void> deleteRooms(
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
   storage = storage ?? Storage.main;
 
-  return await storage!.transaction((txn) async {
+  return storage!.transaction((txn) async {
     for (Room? room in rooms.values) {
-      final record = store.record(room!.id);
+      final record = store.record(room?.id);
       await record.delete(txn);
     }
   });

@@ -158,7 +158,7 @@ List<Message> latestMessages(List<Message> messages) {
 
   // sort descending
   sortedList.sort((a, b) {
-    if (a.pending! && !b.pending!) {
+    if (a.pending && !b.pending) {
       return -1;
     }
 

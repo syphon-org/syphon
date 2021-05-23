@@ -46,7 +46,9 @@ dynamic storageMiddleware<State>(
         //   '[storageMiddleware] saving room ${action.runtimeType.toString()}',
         // );
         final room = store.state.roomStore.rooms[action.id];
-        saveRoom(room, storage: Storage.main);
+        if (room != null) {
+          saveRoom(room, storage: Storage.main);
+        }
       }
       break;
     case SetTheme:

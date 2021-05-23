@@ -33,7 +33,7 @@ class CryptoStore extends Equatable {
   // Map<identityKey, serializedSession>  // olmv1 - key-sharing per identity
   final Map<String, String> outboundKeySessions;
 
-  // Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
+  /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   final Map<String, Map<String, DeviceKey>> deviceKeys;
 
   // Map<DeviceId, DeviceKey> deviceKeysOwned

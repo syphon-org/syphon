@@ -23,7 +23,7 @@ class Strings {
   static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
   static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
-  static const titleDialogTerms = "Confirm Terms Of Service";
+  static const titleDialogTerms = 'Confirm Terms Of Service';
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
@@ -35,11 +35,12 @@ class Strings {
 
   // Labels
   static const labelSyncing = 'syncing chats...';
-  static const labelSearchForHomeservers = "Search for homeservers...";
+  static const labelSearchForHomeservers = 'Search for homeservers...';
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelUsersSection = 'Users';
   static const labelRecentUsers = 'Recent Users';
+  static const labelSearchResults = 'Search Results';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
   static const labelNoGroups = 'no groups found';
@@ -67,8 +68,6 @@ class Strings {
   static const buttonAgree = 'I Agree';
 
   // Text Buttons
-  static const buttonTextSignup = "button-text-signup";
-
   static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';

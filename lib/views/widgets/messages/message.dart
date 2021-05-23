@@ -187,10 +187,12 @@ class MessageWidget extends StatelessWidget {
     final selected =
         selectedMessageId != null && selectedMessageId == message.id;
 
+    // emoji input button needs space
+    final hasReactions = message.reactions.isNotEmpty || selected;
+    final isRead = message.timestamp! < lastRead!;
+
     var textColor = Colors.white;
     var showSender = true;
-    // emoji input button needs space
-    var hasReactions = message.reactions.length > 0 || selected;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     Color? bubbleColor = Colours.hashedColor(message.sender);
@@ -202,7 +204,6 @@ class MessageWidget extends StatelessWidget {
     var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
-    var isRead = message.timestamp! < lastRead!;
     var status = timeFormat == 'full'
         ? formatTimestampFull(
             lastUpdateMillis: message.timestamp,
@@ -279,7 +280,7 @@ class MessageWidget extends StatelessWidget {
       zIndex = -10.0;
     }
 
-    if (message.failed!) {
+    if (message.failed) {
       status = Strings.errorMessageSendingFailed;
     }
 
@@ -321,6 +322,7 @@ class MessageWidget extends StatelessWidget {
             child: Flex(
               direction: Axis.horizontal,
               mainAxisAlignment: alignmentMessage,
+              // ignore: avoid_redundant_argument_values
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Icon(Icons.reply, size: Dimensions.iconSizeLarge),
@@ -361,9 +363,9 @@ class MessageWidget extends StatelessWidget {
                         maintainSize: !messageOnly,
                         child: GestureDetector(
                           onTap: () {
-                            if (this.onPressAvatar != null) {
+                            if (onPressAvatar != null) {
                               HapticFeedback.lightImpact();
-                              this.onPressAvatar!(message: message);
+                              onPressAvatar!(message: message);
                             }
                           },
                           child: Container(
@@ -482,7 +484,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent! && message.failed!,
+                                        visible: isUserSent! && message.failed,
                                         child: Container(
                                           width: Dimensions.indicatorSize,
                                           height: Dimensions.indicatorSize,
@@ -495,11 +497,10 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible:
-                                            isUserSent! && !message.failed!,
+                                        visible: isUserSent! && !message.failed,
                                         child: Stack(children: [
                                           Visibility(
-                                            visible: message.pending!,
+                                            visible: message.pending,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -511,16 +512,11 @@ class MessageWidget extends StatelessWidget {
                                             ),
                                           ),
                                           Visibility(
-                                            visible: !message.pending!,
+                                            visible: !message.pending,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
                                               margin: EdgeInsets.only(left: 4),
-                                              child: Icon(
-                                                Icons.check,
-                                                size: 10,
-                                                color: indicatorIconColor,
-                                              ),
                                               decoration: ShapeDecoration(
                                                 color: indicatorColor,
                                                 shape: CircleBorder(
@@ -530,19 +526,19 @@ class MessageWidget extends StatelessWidget {
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Visibility(
-                                            visible: !message.syncing!,
-                                            child: Container(
-                                              width: Dimensions.indicatorSize,
-                                              height: Dimensions.indicatorSize,
-                                              margin: EdgeInsets.only(left: 11),
                                               child: Icon(
                                                 Icons.check,
                                                 size: 10,
                                                 color: indicatorIconColor,
                                               ),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: !message.syncing,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 11),
                                               decoration: ShapeDecoration(
                                                 color: indicatorColor,
                                                 shape: CircleBorder(
@@ -551,6 +547,11 @@ class MessageWidget extends StatelessWidget {
                                                     width: isRead ? 1.5 : 1,
                                                   ),
                                                 ),
+                                              ),
+                                              child: Icon(
+                                                Icons.check,
+                                                size: 10,
+                                                color: indicatorIconColor,
                                               ),
                                             ),
                                           ),

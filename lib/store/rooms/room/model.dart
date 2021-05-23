@@ -610,7 +610,7 @@ class Room {
         ..addAll(messageIdsNew);
 
       // Save values to room
-      return this.copyWith(
+      return copyWith(
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
@@ -683,7 +683,7 @@ class Room {
       });
     } catch (error) {}
 
-    return this.copyWith(
+    return copyWith(
       userTyping: userTyping,
       usersTyping: usersTyping,
       readReceipts: readReceipts,

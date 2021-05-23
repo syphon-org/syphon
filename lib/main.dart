@@ -25,9 +25,10 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/views/home/home-screen.dart';
-import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
+// ignore: avoid_void_async
 void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,7 +123,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         initSystemTheme(currentTheme, statusTransparent: false);
         break;
       case AppLifecycleState.inactive:
-        break;
         break;
       case AppLifecycleState.paused:
         store.dispatch(setBackgrounded(true));
@@ -235,7 +235,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           startLocale:
               Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
-          supportedLocales: [Locale('en'), Locale('ru')],
+          supportedLocales: const [Locale('en'), Locale('ru')],
           child: StoreConnector<AppState, SettingsStore>(
             distinct: true,
             converter: (store) => store.state.settingsStore,
