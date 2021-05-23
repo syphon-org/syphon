@@ -24,7 +24,7 @@ import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/views/home/HomeScreen.dart';
+import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/intro/IntroScreen.dart';
 import 'package:syphon/views/navigation.dart';
 
@@ -157,7 +157,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // init alerts listener
     alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
-      var color;
+      Color? color;
 
       switch (alert.type) {
         case 'error':

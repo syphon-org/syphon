@@ -4,6 +4,8 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
 
 class Algorithms {
@@ -37,13 +39,13 @@ abstract class Encryption {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "timeout": timeout,
+    final Map body = {
+      'timeout': timeout,
       'device_keys': users,
       'token': lastSince,
     };
@@ -143,7 +145,7 @@ abstract class Encryption {
     };
 
     Map body = {
-      "timeout": 10000,
+      'timeout': 10000,
       'one_time_keys': oneTimeKeys,
     };
 
@@ -176,5 +178,60 @@ abstract class Encryption {
     );
 
     return await json.decode(response.body);
+  }
+
+  ///
+  /// Request Keys
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#m-room-key-request
+  ///
+  /// Returns the current devices and identity keys for the given users.
+  ///
+  static Future<dynamic> requestKeys({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? requestId,
+    String? roomId,
+    String? userId,
+    String? deviceId,
+    String? senderKey,
+    String? sessionId,
+  }) async {
+    Map content = {
+      'content': {
+        'action': 'request',
+        // 'LWKAFEZEIV',
+        'requesting_device_id': deviceId,
+        'request_id': requestId,
+        'body': {
+          // '!UhmfsSdxgBXFBiXnKG:matrix.org',
+          'room_id': roomId,
+          'algorithm': Algorithms.megolmv1,
+          // '5XivQ5GjANSUvZv2m9HYrtVOxKUkL2lDHWiNMmH11hQ',
+          'sender_key': senderKey,
+          // '6EtPICxnz4yq4/93qTVULhtiHE0R99qnABI8oN5o4wY'
+          'session_id': sessionId
+        }
+      },
+      'type': EventTypes.roomKeyRequest,
+      'sender': userId //'@ereio:matrix.org'
+    };
+
+    // format payload for toDevice events
+    final payload = {
+      userId: {
+        deviceId: content,
+      },
+    };
+
+    return MatrixApi.sendEventToDevice(
+      protocol: protocol,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      eventType: EventTypes.roomKeyRequest,
+      trxId: DateTime.now().millisecond.toString(),
+      content: payload,
+    );
   }
 }

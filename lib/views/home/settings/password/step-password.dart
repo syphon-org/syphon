@@ -163,7 +163,7 @@ class PasswordStepState extends State<PasswordStep> {
                           }
 
                           // Do your stuff
-                          this.setState(() {
+                          setState(() {
                             visibility = !this.visibility;
                           });
 

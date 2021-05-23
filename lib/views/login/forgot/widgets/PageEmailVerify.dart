@@ -211,7 +211,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
                         typingTimeout!.cancel();
-                        this.setState(() {
+                        setState(() {
                           typingTimeout = null;
                         });
                       }
@@ -222,7 +222,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                         () {
                           props.onSelectHomeserver(hostname);
 
-                          this.setState(() {
+                          setState(() {
                             typingTimeout = null;
                           });
                         },

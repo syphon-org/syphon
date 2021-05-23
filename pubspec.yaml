@@ -135,6 +135,7 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
 
 dev_dependencies:
+  lint: ^1.5.3
   # build_runner: ^1.12.2
   build_runner: ^2.0.2
   # json_serializable: 4.1.0

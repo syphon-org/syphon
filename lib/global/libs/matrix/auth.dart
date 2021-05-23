@@ -103,8 +103,8 @@ abstract class Auth {
 
     Map body = {
       'type': type,
-      "token": token,
-      "trx_id": Random().nextInt(1 << 32),
+      'token': token,
+      'trx_id': Random().nextInt(1 << 32),
       // "session": session,
     };
 

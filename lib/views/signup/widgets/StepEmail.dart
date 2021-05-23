@@ -206,7 +206,7 @@ class EmailStepState extends State<EmailStep> {
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
                         typingTimeout!.cancel();
-                        this.setState(() {
+                        setState(() {
                           typingTimeout = null;
                         });
                       }
@@ -215,7 +215,7 @@ class EmailStepState extends State<EmailStep> {
                       typingTimeout = Timer(
                         Duration(milliseconds: 1000),
                         () {
-                          this.setState(() {
+                          setState(() {
                             typingTimeout = null;
                           });
                         },

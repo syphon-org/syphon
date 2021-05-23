@@ -584,12 +584,6 @@ ThunkAction<AppState> updateKeySessions({
               content: payload,
             );
 
-            debugPrint(
-              '[sendEventToDevice] COMPLETED ${randomNumber} ${store.state.authStore.protocol}${store.state.authStore.user.homeserver}',
-            );
-
-            printJson(response);
-
             if (response['errcode'] != null) {
               throw response['error'];
             }
@@ -664,13 +658,6 @@ ThunkAction<AppState> claimOneTimeKeys({
         return true;
       }
 
-      debugPrint('[claimKeysPayload]');
-      printJson(claimKeysPayload);
-
-      debugPrint(
-        '[sendEventToDevice] COMPLETED ${store.state.authStore.protocol}${store.state.authStore.user.homeserver}',
-      );
-
       // claim one time keys from matrix server
       final Map claimKeysResponse = await MatrixApi.claimKeys(
         protocol: store.state.authStore.protocol,
@@ -678,9 +665,6 @@ ThunkAction<AppState> claimOneTimeKeys({
         homeserver: store.state.authStore.user.homeserver,
         oneTimeKeys: claimKeysPayload,
       );
-
-      debugPrint('[claimKeysResponse]');
-      printJson(claimKeysResponse);
 
       if (claimKeysResponse['errcode'] != null ||
           claimKeysResponse['failures'].isNotEmpty) {

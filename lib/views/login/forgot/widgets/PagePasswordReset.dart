@@ -136,7 +136,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                           }
 
                           // Do your stuff
-                          this.setState(() {
+                          setState(() {
                             visibility = !this.visibility;
                           });
 

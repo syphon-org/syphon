@@ -19,7 +19,9 @@ List<User> friendlyUsers(AppState state) {
   final roomUserIdsList = roomsDirect.map((room) => room.userIds);
   final roomDirectUserIdsAll = roomUserIdsList.expand((pair) => pair).toList();
   final roomDirectUserIds = roomDirectUserIdsAll
-    ..retainWhere((userId) => userId != userCurrent.userId);
+    ..retainWhere(
+      (userId) => userId != userCurrent.userId && users.containsKey(userId),
+    );
   final roomsDirectUsers = roomDirectUserIds.map((userId) => users[userId]);
 
   return List.from(roomsDirectUsers);

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/chat/details-message-screen.dart';
 
 class AppBarMessageOptions extends StatefulWidget
     implements PreferredSizeWidget {

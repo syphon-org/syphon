@@ -12,7 +12,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 
 class Avatar extends StatelessWidget {
-  Avatar({
+  const Avatar({
     Key? key,
     this.uri,
     this.url,
@@ -40,7 +40,7 @@ class Avatar extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          Color backgroundColor =
+          final Color backgroundColor =
               uri != null || url != null ? Colors.transparent : Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
@@ -49,7 +49,7 @@ class Avatar extends StatelessWidget {
             borderRadius = BorderRadius.circular(size / 3);
           }
 
-          dynamic avatarWidget = ClipRRect(
+          Widget avatarWidget = ClipRRect(
             borderRadius: borderRadius,
             child: Text(
               formatInitials(alt ?? ''),
@@ -81,7 +81,6 @@ class Avatar extends StatelessWidget {
                 mxcUri: uri,
                 width: size,
                 height: size,
-                fit: BoxFit.fill,
                 fallbackColor: Colors.transparent,
               ),
             );
@@ -98,12 +97,12 @@ class Avatar extends StatelessWidget {
                 Container(
                   width: size,
                   height: size,
-                  child: Center(child: avatarWidget),
                   decoration: BoxDecoration(
                       borderRadius: borderRadius,
                       color: uri == null && url == null && !force
                           ? background ?? backgroundColor
                           : Colors.transparent),
+                  child: Center(child: avatarWidget),
                 ),
                 Visibility(
                   visible: selected,
@@ -116,7 +115,6 @@ class Avatar extends StatelessWidget {
                           color: Theme.of(context).accentColor,
                           border: Border.all(
                             color: Colors.white,
-                            width: 1,
                           ),
                           borderRadius:
                               BorderRadius.circular(Dimensions.badgeAvatarSize),
@@ -143,14 +141,13 @@ class Avatar extends StatelessWidget {
 class _Props extends Equatable {
   final String? avatarShape;
 
-  _Props({
+  const _Props({
     required this.avatarShape,
   });
 
   @override
   List<Object?> get props => [avatarShape];
 
-  static _Props mapStateToProps(Store<AppState> store) => _Props(
-        avatarShape: store.state.settingsStore.avatarShape,
-      );
+  _Props.mapStateToProps(Store<AppState> store)
+      : avatarShape = store.state.settingsStore.avatarShape;
 }

@@ -147,7 +147,7 @@ class AppBarSearchState extends State<AppBarSearch> {
 
                     this.onChange(text: text);
 
-                    this.setState(() {
+                    setState(() {
                       searchTimeout = Timer(widget.throttle, () {
                         this.onSearch(text: text);
                       });

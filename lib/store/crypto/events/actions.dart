@@ -16,6 +16,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -75,15 +76,15 @@ ThunkAction<AppState> encryptMessageContent({
  * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
  */
 ThunkAction<AppState> decryptMessageEvent({
-  String? roomId,
+  required String roomId,
   String eventType = EventTypes.encrypted,
-  Map? event,
+  Map event = const {},
 }) {
   return (Store<AppState> store) async {
     try {
       // Pull out event data
-      final Map content = event!['content'];
-      final identityKey = content['sender_key'];
+      final Map content = event['content'];
+      final String identityKey = content['sender_key'];
 
       // return already decrypted events
       if (content['ciphertext'] == null) {
@@ -117,6 +118,9 @@ ThunkAction<AppState> decryptMessageEvent({
       return event;
     } catch (error) {
       debugPrint('[decryptMessageEvent] $error');
+      printJson(event);
+
+      // TODO: request keys here
       return event;
     }
   };
@@ -305,8 +309,6 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
         final eventType = event['type'];
         final identityKeySender = event['content']['sender_key'];
 
-        printDebug('[syncDevice] ${eventType}');
-
         switch (eventType) {
           case EventTypes.encrypted:
             try {
@@ -342,46 +344,6 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
             break;
         }
       }));
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'syncDevice',
-      ));
-    }
-  };
-}
-
-// TODO: refactor sync device and/or use this one?
-ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
-  return (Store<AppState> store) async {
-    try {
-      // Extract the new events
-      final List<dynamic> events = dataToDevice['events'];
-
-      // Parse and decrypt necessary events
-      for (final event in events) {
-        final eventType = event['type'];
-        final identityKeySender = event['content']['sender_key'];
-
-        switch (eventType) {
-          case EventTypes.encrypted:
-            final eventDecrypted = await store.dispatch(
-              decryptKeyEvent(event: event),
-            );
-
-            if (EventTypes.roomKey == eventDecrypted['type']) {
-              await store.dispatch(
-                saveSessionKey(
-                  event: eventDecrypted,
-                  identityKey: identityKeySender,
-                ),
-              );
-            }
-            break;
-          default:
-            break;
-        }
-      }
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

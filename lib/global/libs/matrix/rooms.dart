@@ -39,7 +39,7 @@ abstract class Rooms {
         ? '&filter={"room":{"state": {"lazy_load_members":true}, "timeline": {"lazy_load_members":true}}}'
         : '';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 

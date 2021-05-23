@@ -41,13 +41,13 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                     widget.onPressed!();
                   }
                 },
-          onTapDown: (details) => this.setState(() {
+          onTapDown: (details) => setState(() {
             opacity = 0.4;
           }),
-          onTapCancel: () => this.setState(() {
+          onTapCancel: () => setState(() {
             opacity = 1;
           }),
-          onTapUp: (details) => this.setState(() {
+          onTapUp: (details) => setState(() {
             opacity = 1;
           }),
           child: widget.loading

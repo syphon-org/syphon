@@ -17,9 +17,9 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/home/profile/details-user.dart';
-import 'package:syphon/views/home/search/search-rooms.dart';
+import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/profile/profile-user-screen.dart';
+import 'package:syphon/views/home/search/search-rooms-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 

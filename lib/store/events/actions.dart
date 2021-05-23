@@ -232,6 +232,8 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
 
+      var sentRequest = false;
+
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {
         final eventType = event['type'];

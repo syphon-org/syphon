@@ -233,3 +233,46 @@ flutter_recaptcha_v2: 0.1.0 used as reference for webview captcha
     }
   }
 ```
+
+
+```dart
+// TODO: refactor sync device and/or use this one?
+ThunkAction<AppState> syncDeviceNew(Map dataToDevice) {
+  return (Store<AppState> store) async {
+    try {
+      // Extract the new events
+      final List<dynamic> events = dataToDevice['events'];
+
+      // Parse and decrypt necessary events
+      for (final event in events) {
+        final eventType = event['type'];
+        final identityKeySender = event['content']['sender_key'];
+
+        switch (eventType) {
+          case EventTypes.encrypted:
+            final eventDecrypted = await store.dispatch(
+              decryptKeyEvent(event: event),
+            );
+
+            if (EventTypes.roomKey == eventDecrypted['type']) {
+              await store.dispatch(
+                saveSessionKey(
+                  event: eventDecrypted,
+                  identityKey: identityKeySender,
+                ),
+              );
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        origin: 'syncDevice',
+      ));
+    }
+  };
+}
+```

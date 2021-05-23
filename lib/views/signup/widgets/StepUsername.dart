@@ -146,7 +146,7 @@ class UsernameStepState extends State<UsernameStep> {
                       // clear current timeout if something changed
                       if (typingTimeout != null) {
                         typingTimeout!.cancel();
-                        this.setState(() {
+                        setState(() {
                           typingTimeout = null;
                         });
                       }
@@ -156,7 +156,7 @@ class UsernameStepState extends State<UsernameStep> {
                         Duration(milliseconds: 1000),
                         () {
                           props.onCheckUsernameAvailability();
-                          this.setState(() {
+                          setState(() {
                             typingTimeout = null;
                           });
                         },
