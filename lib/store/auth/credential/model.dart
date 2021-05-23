@@ -9,9 +9,9 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Credential extends Equatable {
-  final String type;
-  final String value;
-  final Map<String, dynamic> params;
+  final String? type;
+  final String? value;
+  final Map<String, dynamic>? params;
 
   const Credential({
     this.type,
@@ -19,18 +19,18 @@ class Credential extends Equatable {
     this.params = const {},
   });
 
-  String get termsUrl {
+  String? get termsUrl {
     if (this.params == null) {
       return null;
     }
 
     // TODO: use localization code to find the right one here
-    return params[MatrixAuthTypes.TERMS]['policies']['privacy_policy']['en']
+    return params![MatrixAuthTypes.TERMS]['policies']['privacy_policy']['en']
         ['url'];
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         type,
         value,
         params,

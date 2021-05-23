@@ -4,10 +4,10 @@ import 'package:syphon/store/auth/homeserver/model.dart';
 
 class SearchStore extends Equatable {
   final bool loading;
-  final String since;
-  final bool hasMore;
+  final String? since;
+  final bool? hasMore;
   final int totalResults;
-  final String searchText;
+  final String? searchText;
   final List<dynamic> searchResults;
   final List<dynamic> homeservers;
 
@@ -22,7 +22,7 @@ class SearchStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         since,
         loading,
         homeservers,

@@ -21,12 +21,12 @@ import 'package:syphon/global/values.dart';
  */
 
 class Search {
-  static FutureOr<dynamic> searchUsers({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String searchText,
-    String since,
+  static Future<dynamic> searchUsers({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? searchText,
+    String? since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
     Map<String, String> headers = {
@@ -40,7 +40,7 @@ class Search {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -48,14 +48,14 @@ class Search {
     return json.decode(response.body);
   }
 
-  static FutureOr<dynamic> searchRooms({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String searchText,
-    String server,
-    bool global,
-    String since,
+  static Future<dynamic> searchRooms({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? searchText,
+    String? server,
+    bool? global,
+    String? since,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
     Map<String, String> headers = {
@@ -79,7 +79,7 @@ class Search {
     url += '?server=${server ?? homeserver}';
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

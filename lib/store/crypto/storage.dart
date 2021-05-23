@@ -14,7 +14,7 @@ import 'package:syphon/store/crypto/state.dart';
  */
 Future<void> saveCrypto(
   CryptoStore cryptoStore, {
-  Database storage,
+  required Database storage,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.CRYPTO);
 
@@ -30,7 +30,7 @@ Future<void> saveCrypto(
  * In storage, the crypto store is saved in it's entirety 
  * in a separate thread/isolate 
  */
-Future<CryptoStore> loadCrypto({Database storage}) async {
+Future<CryptoStore?> loadCrypto({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.CRYPTO);
 

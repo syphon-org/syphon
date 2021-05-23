@@ -21,7 +21,7 @@ class Dimensions {
   static const double avatarSizeLarge = 84;
   static const double avatarSizeMessage = 28;
   static const double avatarSizeDetails = 120;
-  static double avatarFontSize({double size = 32}) => (size / 2.22);
+  static double avatarFontSize({double size = 32}) => size / 2.22;
 
   static const double listAvatarHeighttMax = 72;
 
@@ -73,7 +73,7 @@ class Dimensions {
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
-  static const EdgeInsets inputContentPadding = const EdgeInsets.symmetric(
+  static const EdgeInsets inputContentPadding = EdgeInsets.symmetric(
     vertical: 4.0,
     horizontal: 20.0,
   );
@@ -86,29 +86,30 @@ class Dimensions {
   );
 
   // Lists
-  static const heroPadding = EdgeInsets.symmetric(
+  static const EdgeInsets heroPadding = EdgeInsets.symmetric(
     vertical: 24,
     horizontal: 12,
   );
 
-  static const listPadding = EdgeInsets.symmetric(
+  static const EdgeInsets listPadding = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 8,
   );
 
-  static const listPaddingSettings = EdgeInsets.symmetric(
+  static const EdgeInsets listPaddingSettings = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 4,
   );
 
-  static listPaddingDynamic({width = 500}) => EdgeInsets.only(
+  static EdgeInsets listPaddingDynamic({double width = 500}) => EdgeInsets.only(
         left: width * 0.04,
         right: width * 0.04,
         top: 4,
         bottom: 8,
       );
 
-  static listTitlePaddingDynamic({width = 500}) => EdgeInsets.only(
+  static EdgeInsets listTitlePaddingDynamic({double width = 500}) =>
+      EdgeInsets.only(
         left: width * 0.04,
         right: width * 0.04,
         top: 6,
@@ -127,22 +128,22 @@ class Dimensions {
   );
 
   // Content
-  static contentWidth(BuildContext context) {
+  static double contentWidth(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.width * 0.75;
   }
 
-  static contentWidthWide(BuildContext context) {
+  static double contentWidthWide(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.width * 0.8;
   }
 
-  static const contentPadding = EdgeInsets.symmetric(
+  static const EdgeInsets contentPadding = EdgeInsets.symmetric(
     horizontal: 32,
     vertical: 8,
   );
 
-  static contentPaddingDynamic({width = 500}) {
+  static EdgeInsets contentPaddingDynamic({double width = 500}) {
     return EdgeInsets.symmetric(
       horizontal: width * 0.04,
       vertical: 4,
@@ -161,13 +162,14 @@ class Dimensions {
   // Modals
   static const double defaultModalHeight = 256;
   static const double defaultModalHeightMax = 456;
-  static modalHeightDefault(BuildContext context) {
+
+  static double modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;
   }
 
   // Action Rin
-  static actionRingDefaultWidth(BuildContext context) {
+  static double actionRingDefaultWidth(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.width < 400 ? size.width : size.width * 0.9;
   }

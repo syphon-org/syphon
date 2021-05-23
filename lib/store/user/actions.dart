@@ -1,5 +1,5 @@
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
@@ -10,34 +10,34 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/user/model.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 class SetLoading {
-  final bool loading;
+  final bool? loading;
   SetLoading({this.loading});
 }
 
 class SaveUser {
-  final User user;
+  final User? user;
   SaveUser({this.user});
 }
 
 class SetUsers {
-  final Map<String, User> users;
+  final Map<String, User>? users;
   SetUsers({this.users});
 }
 
 class SetUsersBlocked {
-  final List<String> userIds;
+  final List<String?>? userIds;
   SetUsersBlocked({this.userIds});
 }
 
 class SetUserInvites {
-  final List<User> users;
+  final List<User>? users;
   SetUserInvites({this.users});
 }
 
 class ClearUserInvites {}
+
+class ResetUsers {}
 
 ThunkAction<AppState> setUsers(Map<String, User> users) {
   return (Store<AppState> store) {
@@ -47,13 +47,13 @@ ThunkAction<AppState> setUsers(Map<String, User> users) {
   };
 }
 
-ThunkAction<AppState> setUsersBlocked(List<String> userIds) {
+ThunkAction<AppState> setUsersBlocked(List<String?> userIds) {
   return (Store<AppState> store) {
     store.dispatch(SetUsersBlocked(userIds: userIds));
   };
 }
 
-ThunkAction<AppState> setUserInvites({List<User> users}) {
+ThunkAction<AppState> setUserInvites({List<User>? users}) {
   return (Store<AppState> store) {
     store.dispatch(SetUserInvites(users: users));
   };
@@ -71,7 +71,7 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchUserProfile(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: user.userId,
@@ -102,14 +102,14 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
  * Fetch the blocked user list and recalculate
  * events without the given user id
  */
-ThunkAction<AppState> toggleBlockUser({User user}) {
+ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
       // Pull remote direct room data
       final data = await MatrixApi.fetchAccountData(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
@@ -127,8 +127,8 @@ ThunkAction<AppState> toggleBlockUser({User user}) {
       Map<String, dynamic> usersBlocked = data['ignored_users'] ?? {};
 
       // toggle based on if the id is already present
-      if (!usersBlocked.containsKey(user.userId)) {
-        usersBlocked[user.userId] = {};
+      if (!usersBlocked.containsKey(user!.userId)) {
+        usersBlocked[user.userId!] = {};
       } else {
         usersBlocked.remove(user.userId);
       }
@@ -139,7 +139,7 @@ ThunkAction<AppState> toggleBlockUser({User user}) {
 
       // save blocked users list back to account_data remotely
       final saveData = await MatrixApi.updateBlockedUsers(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         userId: store.state.authStore.user.userId,

@@ -9,11 +9,11 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class ChatSetting extends Equatable {
-  final String roomId;
-  final int primaryColor;
-  final bool smsEnabled;
-  final bool notificationsEnabled;
-  final String language;
+  final String? roomId;
+  final int? primaryColor;
+  final bool? smsEnabled;
+  final bool? notificationsEnabled;
+  final String? language;
 
   const ChatSetting({
     this.roomId,
@@ -24,7 +24,7 @@ class ChatSetting extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         roomId,
         primaryColor,
         smsEnabled,
@@ -33,11 +33,11 @@ class ChatSetting extends Equatable {
       ];
 
   ChatSetting copyWith({
-    String roomId,
-    String language,
-    bool smsEnabled,
-    int primaryColor,
-    bool notificationsEnabled,
+    String? roomId,
+    String? language,
+    bool? smsEnabled,
+    int? primaryColor,
+    bool? notificationsEnabled,
   }) =>
       ChatSetting(
         roomId: roomId ?? this.roomId,

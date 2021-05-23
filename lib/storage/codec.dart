@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:meta/meta.dart';
 import 'package:sembast/src/api/v2/sembast.dart';
 
 var _random = Random.secure();
@@ -72,8 +71,8 @@ class _EncryptDecoder extends Converter<String, dynamic> {
 
 /// Salsa20 based Codec
 class _EncryptCodec extends Codec<dynamic, String> {
-  _EncryptEncoder _encoder;
-  _EncryptDecoder _decoder;
+  late _EncryptEncoder _encoder;
+  late _EncryptDecoder _decoder;
 
   _EncryptCodec(Uint8List passwordBytes) {
     var salsa20 = Salsa20(Key(passwordBytes));
@@ -112,7 +111,6 @@ const _encryptCodecSignature = 'encrypt';
 ///
 /// // ...your database is ready to use
 /// ```
-SembastCodec getEncryptSembastCodec({@required String password}) =>
-    SembastCodec(
-        signature: _encryptCodecSignature,
-        codec: _EncryptCodec(_generateEncryptPassword(password)));
+SembastCodec getEncryptSembastCodec({required String password}) => SembastCodec(
+    signature: _encryptCodecSignature,
+    codec: _EncryptCodec(_generateEncryptPassword(password)));

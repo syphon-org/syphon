@@ -17,37 +17,37 @@ import 'package:syphon/store/index.dart';
 
 class ActionRing extends StatelessWidget {
   ActionRing({
-    Key key,
+    Key? key,
     this.fabKey,
   }) : super(key: key);
 
-  final GlobalKey<FabCircularMenuState> fabKey;
+  final GlobalKey<FabCircularMenuState>? fabKey;
 
   @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/search');
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/user/search');
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/create');
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
-    fabKey.currentState.close();
+    fabKey!.currentState!.close();
     Navigator.pushNamed(context, '/home/groups/create/public');
   }
 
@@ -59,10 +59,12 @@ class ActionRing extends StatelessWidget {
         fabOpenIcon: Icon(
           Icons.bubble_chart,
           size: Dimensions.iconSizeLarge,
+          semanticLabel: 'Open Actions Ring',
           color: Colors.white,
         ),
         fabCloseIcon: Icon(
           Icons.close,
+          semanticLabel: 'Close Actions Ring',
           color: Colors.white,
         ),
         fabColor: Theme.of(context).primaryColor,
@@ -78,7 +80,6 @@ class ActionRing extends StatelessWidget {
             onPressed: () => onNavigateToCreateGroupPublic(context),
             child: SvgPicture.asset(
               Assets.iconPublicAddBeing,
-              semanticsLabel: 'Create A Public Room',
               color: Colors.white,
             ),
           ),
@@ -89,7 +90,6 @@ class ActionRing extends StatelessWidget {
             onPressed: () => onNavigateToCreateGroup(context),
             child: SvgPicture.asset(
               Assets.iconGroupAddBeing,
-              semanticsLabel: 'Create A Public Room',
               color: Colors.white,
             ),
           ),
@@ -100,7 +100,6 @@ class ActionRing extends StatelessWidget {
             onPressed: () => onNavigateToDraft(context),
             child: SvgPicture.asset(
               Assets.iconPersonAddBeing,
-              semanticsLabel: 'Create A Public Room',
               color: Colors.white,
             ),
           ),
@@ -111,7 +110,6 @@ class ActionRing extends StatelessWidget {
             onPressed: () => onNavigateToPublicSearch(context),
             child: SvgPicture.asset(
               Assets.iconSearchPublicCondensedBeing,
-              semanticsLabel: 'Search Public Groups',
               color: Colors.white,
             ),
           ),
@@ -123,7 +121,7 @@ class Props extends Equatable {
   final ThemeType type;
 
   Props({
-    @required this.type,
+    required this.type,
   });
 
   @override

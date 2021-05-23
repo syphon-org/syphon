@@ -6,9 +6,9 @@ import 'package:equatable/equatable.dart';
 
 class Alert {
   final String type;
-  final String message;
+  final String? message;
   final Duration duration;
-  final String error;
+  final String? error;
 
   const Alert({
     this.type = 'warning',
@@ -21,9 +21,9 @@ class Alert {
 class AlertsStore extends Equatable {
   final bool loading;
   final List<Alert> alerts;
-  final StreamController<Alert> alertsObserver;
+  final StreamController<Alert>? alertsObserver;
 
-  Stream<Alert> get onAlertsChanged => alertsObserver.stream;
+  Stream<Alert> get onAlertsChanged => alertsObserver!.stream;
 
   const AlertsStore({
     this.loading = false,

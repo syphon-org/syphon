@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
@@ -7,10 +8,10 @@ import 'package:syphon/store/user/model.dart';
 
 Future<void> saveUsers(
   Map<String, User> users, {
-  Database cache,
-  Database storage,
+  Database? cache,
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.USERS);
+  final store = StoreRef<String?, String>(StorageKeys.USERS);
 
   return await storage.transaction((txn) async {
     for (User user in users.values) {
@@ -26,8 +27,8 @@ Future<void> saveUsers(
  * Example of useful recursion
  */
 Future<Map<String, User>> loadUsers({
-  Database cache,
-  Database storage,
+  Database? cache,
+  required Database storage,
   int offset = 0,
   int page = 5000,
 }) async {
@@ -63,13 +64,13 @@ Future<Map<String, User>> loadUsers({
     }
 
     if (users.isEmpty) {
-      return null;
+      return {};
     }
 
     printInfo('[users] loaded ${users.length}');
     return users;
   } catch (error) {
     printError(error.toString(), title: 'loadUsers');
-    return null;
+    return {};
   }
 }

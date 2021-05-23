@@ -13,21 +13,13 @@ part 'state.g.dart';
 class CryptoStore extends Equatable {
   // Active olm account (loaded from olmAccountKey)
   @JsonKey(ignore: true)
-  final Account olmAccount;
-
-  // the private key for one time keys is saved in olm?
-  // Map<UserId, Map<DeviceId, OneTimeKey> deviceKeys
-  @JsonKey(ignore: true)
-  final Map oneTimeKeysOwned;
+  final Account? olmAccount;
 
   // Serialized olm account
-  final String olmAccountKey;
-
-  // Map<roomId, index(int)> // megolm - message index
-  final Map<String, int> messageSessionIndex;
+  final String? olmAccountKey;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
-  final Map<String, Map<String, int>> messageSessionIndexNEW;
+  final Map<String, Map<String, int>> messageSessionIndex;
 
   // Map<roomId, serializedSession> // megolm - messages
   final Map<String, String> outboundMessageSessions;
@@ -47,10 +39,10 @@ class CryptoStore extends Equatable {
   // Map<DeviceId, DeviceKey> deviceKeysOwned
   final Map<String, DeviceKey> deviceKeysOwned; // key is deviceId
 
-  final bool deviceKeysExist;
+  final bool? deviceKeysExist;
 
   // Track last known uploaded key amounts
-  final Map oneTimeKeysCounts;
+  final Map<String, int> oneTimeKeysCounts;
 
   final Map<String, OneTimeKey> oneTimeKeysClaimed;
 
@@ -62,48 +54,42 @@ class CryptoStore extends Equatable {
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
     this.messageSessionIndex = const {},
-    this.messageSessionIndexNEW = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
-    this.oneTimeKeysOwned = const {},
     this.deviceKeysExist = false,
-    this.oneTimeKeysCounts,
+    this.oneTimeKeysCounts = const {},
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         olmAccount,
         olmAccountKey,
-        messageSessionIndexNEW,
+        messageSessionIndex,
         inboundMessageSessions,
         outboundMessageSessions,
         inboundKeySessions,
         outboundKeySessions,
-        messageSessionIndex,
         deviceKeys,
         deviceKeysOwned,
         deviceKeysExist,
-        oneTimeKeysOwned,
         oneTimeKeysClaimed,
         oneTimeKeysCounts
       ];
 
   CryptoStore copyWith({
-    olmAccount,
-    olmAccountKey,
-    messageSessionIndexNEW,
-    inboundMessageSessions,
-    outboundMessageSessions,
-    inboundKeySessions,
-    outboundKeySessions,
-    messageSessionIndex,
-    deviceKeys,
-    deviceKeysOwned,
-    deviceKeysExist,
-    oneTimeKeysOwned,
-    oneTimeKeysClaimed,
-    oneTimeKeysCounts,
+    Account? olmAccount,
+    String? olmAccountKey,
+    Map<String, Map<String, int>>? messageSessionIndex,
+    Map<String, Map<String, String>>? inboundMessageSessions,
+    Map<String, String>? outboundMessageSessions,
+    Map<String, String>? inboundKeySessions,
+    Map<String, String>? outboundKeySessions,
+    bool? deviceKeysExist,
+    Map<String, DeviceKey>? deviceKeysOwned,
+    Map<String, Map<String, DeviceKey>>? deviceKeys,
+    Map<String, OneTimeKey>? oneTimeKeysClaimed,
+    Map<String, int>? oneTimeKeysCounts,
   }) =>
       CryptoStore(
         olmAccount: olmAccount ?? this.olmAccount,
@@ -112,17 +98,13 @@ class CryptoStore extends Equatable {
             inboundMessageSessions ?? this.inboundMessageSessions,
         outboundMessageSessions:
             outboundMessageSessions ?? this.outboundMessageSessions,
-        messageSessionIndexNEW:
-            messageSessionIndexNEW ?? this.messageSessionIndexNEW,
         messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
         inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
         outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
         deviceKeys: deviceKeys ?? this.deviceKeys,
         deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
-        oneTimeKeysOwned: oneTimeKeysOwned ?? this.oneTimeKeysOwned,
         oneTimeKeysClaimed: oneTimeKeysClaimed ?? this.oneTimeKeysClaimed,
-        deviceKeysExist:
-            deviceKeysExist != null ? deviceKeysExist : this.deviceKeysExist,
+        deviceKeysExist: deviceKeysExist ?? this.deviceKeysExist,
         oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
       );
 

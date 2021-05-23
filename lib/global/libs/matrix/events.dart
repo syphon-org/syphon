@@ -20,10 +20,10 @@ abstract class Events {
    * Get the state events for the current state of a room.
    */
   static Future<dynamic> fetchStateEvents({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
@@ -33,7 +33,7 @@ abstract class Events {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -45,13 +45,13 @@ abstract class Events {
    * https://matrix.org/docs/spec/client_server/latest#id261
    */
   static Future<dynamic> fetchMessageEvents({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String from,
-    String to,
-    int limit = 10, // default limit by matrix
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? from,
+    String? to,
+    int? limit = 10, // default limit by matrix
     bool desc = true, // direction of events
   }) async {
     String url =
@@ -69,7 +69,7 @@ abstract class Events {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -107,16 +107,16 @@ abstract class Events {
    */
 
   static Future<dynamic> sendMessageEncrypted({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    Map unencryptedData,
-    String accessToken,
-    String trxId,
-    String roomId,
-    String senderKey,
-    String ciphertext,
-    String sessionId,
-    String deviceId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    Map? unencryptedData,
+    String? accessToken,
+    String? trxId,
+    String? roomId,
+    String? senderKey,
+    String? ciphertext,
+    String? sessionId,
+    String? deviceId,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
@@ -139,7 +139,7 @@ abstract class Events {
     }
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -159,13 +159,13 @@ abstract class Events {
    * it will be used by the server to ensure idempotency of requests. <- really a requestId
    */
   static Future<dynamic> sendEvent({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String eventType,
-    String stateKey,
-    Map content,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? eventType,
+    String? stateKey,
+    Map? content,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/$eventType';
@@ -178,7 +178,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(content),
     );
@@ -198,12 +198,12 @@ abstract class Events {
    * it will be used by the server to ensure idempotency of requests. <- really a requestId
    */
   static Future<dynamic> sendMessage({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String trxId,
-    Map message,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? trxId,
+    Map? message,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
@@ -214,7 +214,7 @@ abstract class Events {
     };
 
     Map body = {
-      "body": message['body'],
+      "body": message!['body'],
       "msgtype": message['msgtype'] ?? 'm.text',
     };
 
@@ -231,7 +231,7 @@ abstract class Events {
     }
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(message),
     );
@@ -252,12 +252,12 @@ abstract class Events {
    */
   static Future<dynamic> sendReaction({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String reaction,
-    String roomId,
-    String messageId,
-    String trxId,
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? reaction,
+    String? roomId,
+    String? messageId,
+    String? trxId,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
@@ -276,7 +276,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -291,11 +291,11 @@ abstract class Events {
   ///
   static Future<dynamic> redactEvent({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String eventId,
-    String trxId,
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? eventId,
+    String? trxId,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
@@ -308,7 +308,7 @@ abstract class Events {
     Map body = {};
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -328,14 +328,14 @@ abstract class Events {
    * The device ID may also be *, meaning all known devices for the user.
    */
   static Future<dynamic> sendEventToDevice({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
     String trxId = '0', // just a random string to denote uniqueness
-    String eventType,
-    String userId,
-    String deviceId,
-    Map content,
+    String? eventType,
+    String? userId,
+    String? deviceId,
+    Map? content,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/sendToDevice/$eventType/$trxId';
@@ -351,7 +351,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -363,12 +363,12 @@ abstract class Events {
    * Send Typing Event 
    */
   static Future<dynamic> sendTyping({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String userId,
-    bool typing,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? userId,
+    bool? typing,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/typing/$userId';
@@ -384,7 +384,7 @@ abstract class Events {
     };
 
     final response = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -398,12 +398,12 @@ abstract class Events {
    * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
    */
   static Future<dynamic> sendReadMarkers({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String messageId,
-    String lastRead,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? messageId,
+    String? lastRead,
     bool readAll = true,
   }) async {
     String url =
@@ -420,7 +420,7 @@ abstract class Events {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

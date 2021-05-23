@@ -23,15 +23,16 @@ EventStore eventReducer(
       );
 
       for (Reaction reaction in action.reactions ?? []) {
-        final exists = reactionsUpdated.containsKey(reaction.relEventId);
+        final reactionEventId = reaction.relEventId;
+        final exists = reactionsUpdated.containsKey(reactionEventId);
 
         if (exists) {
-          final existing = reactionsUpdated[reaction.relEventId];
+          final existing = reactionsUpdated[reactionEventId]!;
           if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
-            reactionsUpdated[reaction.relEventId] = [...existing, reaction];
+            reactionsUpdated[reactionEventId!] = [...existing, reaction];
           }
-        } else {
-          reactionsUpdated[reaction.relEventId] = [reaction];
+        } else if (reactionEventId != null) {
+          reactionsUpdated[reactionEventId] = [reaction];
         }
       }
 
@@ -41,25 +42,76 @@ EventStore eventReducer(
       if (action.messages.isEmpty) {
         return state;
       }
-      final roomId = action.roomId;
-      final messages = Map<String, List<Message>>.from(state.messages);
 
+      final roomId = (action as SetMessages).roomId;
+
+      final Map<String, List<Message>> messages = Map.from(state.messages);
+
+      // convert to map to merge old and new messages based on ids
       final messagesOld = Map<String, Message>.fromIterable(
         messages[roomId] ?? [],
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
+
       final messagesNew = Map<String, Message>.fromIterable(
-        action.messages ?? [],
+        action.messages,
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
 
+      // prioritize new message data though over the old (invalidates using Set)
       final messagesAll = messagesOld..addAll(messagesNew);
-
       messages[roomId] = messagesAll.values.toList();
 
+      // remove locally saved outbox messages if they've now been received from a server
+      if (state.outbox.containsKey(roomId) &&
+          state.outbox[roomId]!.isNotEmpty) {
+        final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
+
+        // removed based on eventId, not tempId
+        outbox.removeWhere(
+          (tempId, outmessage) => messagesAll.containsKey(outmessage.id),
+        );
+
+        final outboxNew = Map<String, Map<String, Message>>.from(state.outbox);
+
+        outboxNew[roomId] = outbox;
+
+        return state.copyWith(messages: messages, outbox: outboxNew);
+      }
+
+      // otherwise, save messages
       return state.copyWith(messages: messages);
+
+    case SaveOutboxMessage:
+      final tempId = (action as SaveOutboxMessage).tempId;
+      final message = action.pendingMessage;
+      final roomId = message.roomId!;
+
+      final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
+
+      outbox.addAll({tempId: message});
+
+      final outboxNew = Map<String, Map<String, Message>>.from(state.outbox);
+
+      outboxNew[roomId] = outbox;
+
+      return state.copyWith(outbox: outboxNew);
+
+    case DeleteOutboxMessage:
+      final message = (action as DeleteOutboxMessage).message;
+      final roomId = message.roomId!;
+
+      final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
+
+      outbox.removeWhere((tempId, outmessage) => message.id == outmessage.id);
+
+      final outboxNew = Map<String, Map<String, Message>>.from(state.outbox);
+
+      outboxNew[roomId] = outbox;
+
+      return state.copyWith(outbox: outboxNew);
 
     case SetRedactions:
       if (action.redactions.isEmpty) {
@@ -92,7 +144,7 @@ EventStore eventReducer(
       );
 
       if (receiptsUpdated.containsKey(roomId)) {
-        receiptsUpdated[roomId].addAll(receiptsNew);
+        receiptsUpdated[roomId]!.addAll(receiptsNew);
       }
 
       return state.copyWith(receipts: receiptsUpdated);

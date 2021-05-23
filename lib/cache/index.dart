@@ -14,22 +14,24 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class Cache {
   // encryption references (in memory only)
-  static String ivKey;
-  static String ivKeyNext;
-  static String cryptKey;
+  static String? ivKey;
+  static String? ivKeyNext;
+  static String? cryptKey;
 
-  // hot cachee refrences
-  static Database cacheMain;
+  // hot cache refrences
+  static Database? cacheMain;
+
+// Global hot cache storage reference to prevent redundent storage loading
+  static FlutterSecureStorage? storage;
 
   // inital store caches for reload
-  static Map<String, Map> cacheStores = {};
+  static Map<String, Map?> cacheStores = {};
 
   // cache storage identifiers
   static const cacheKeyMain = '${Values.appNameLabel}-main-cache';
+  static const cachePath = '${Cache.cacheKeyMain}.db';
 
   // cache key identifiers
-  static const ivLocation = '${Values.appNameLabel}@ivKey';
-  static const ivLocationNext = '${Values.appNameLabel}@ivKeyNext';
   static const keyLocation = '${Values.appNameLabel}@cryptKey';
 
   // background data identifiers
@@ -46,22 +48,22 @@ class Cache {
  * 
  * (needs cold storage extracted as it's own entity)
  */
-Future<Database> initCache() async {
-  // Configure cache encryption/decryption instance
-  Cache.ivKey = await loadIV();
-  Cache.ivKeyNext = await loadIVNext();
-  Cache.cryptKey = await loadKey();
-
+Future<Database?> initCache() async {
   try {
-    var cachePath = '${Cache.cacheKeyMain}.db';
+    var cachePath = Cache.cachePath;
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
+      Cache.storage = FlutterSecureStorage();
+
       var directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cachePath = join(directory.path, Cache.cachePath);
       cacheFactory = databaseFactoryIo;
     }
+
+    // Configure cache encryption/decryption instance
+    Cache.cryptKey = await loadKey();
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -89,21 +91,21 @@ Future<Database> initCache() async {
 }
 
 // // Closes and saves storage
-void closeCache(Database cache) async {
+void closeCache(Database? cache) async {
   if (cache != null) {
     cache.close();
   }
 }
 
-Future<void> deleteCache({Database cache}) async {
+Future<void> deleteCache({Database? cache}) async {
   try {
-    var cacheFactory;
-    var cachePath = '${Cache.cacheKeyMain}.db';
+    late var cacheFactory;
+    var cachePath = Cache.cachePath;
 
     if (Platform.isAndroid || Platform.isIOS) {
       var directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, '${Cache.cacheKeyMain}.db');
+      cachePath = join(directory.path, cachePath);
       cacheFactory = databaseFactoryIo;
     }
 
@@ -120,115 +122,17 @@ Future<void> deleteCache({Database cache}) async {
   }
 }
 
-String generateIV() {
-  return Key.fromSecureRandom(16).base64;
-}
-
 String generateKey() {
   return Key.fromSecureRandom(32).base64;
 }
 
-Future<void> saveIV(String iv) async {
-  // mobile
-  if (Platform.isAndroid || Platform.isIOS) {
-    return await FlutterSecureStorage().write(
-      key: Cache.ivLocation,
-      value: iv,
-    );
-  }
-
-  // desktop
-  try {
-    final directory = await getApplicationSupportDirectory();
-    return await File(join(directory.path, Cache.ivLocation)).create()
-      ..writeAsString(iv, flush: true);
-  } catch (error) {
-    printError('[saveIV] $error');
-  }
-
-  // error
-  return null;
-}
-
-Future<String> loadIV() async {
-  final location = Cache.ivLocation;
-  var ivStored;
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
-
-    ivStored = await storage.read(key: location);
-  }
-
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    try {
-      final directory = await getApplicationSupportDirectory();
-      ivStored = await File(join(directory.path, location)).readAsString();
-    } catch (error) {
-      printError('[loadIV] $error');
-    }
-  }
-  // Create a encryptionKey if a serialized one is not found
-  return ivStored == null ? generateIV() : ivStored;
-}
-
-Future<void> saveIVNext(String iv) async {
-  // mobile
-  if (Platform.isAndroid || Platform.isIOS) {
-    return await FlutterSecureStorage().write(
-      key: Cache.ivLocationNext,
-      value: iv,
-    );
-  }
-
-  // desktop
-  try {
-    final directory = await getApplicationSupportDirectory();
-    return await File(join(directory.path, Cache.ivLocationNext)).create()
-      ..writeAsString(iv, flush: true);
-  } catch (error) {
-    printError('[saveIVNext] $error');
-  }
-
-  // desktop
-  return null;
-}
-
-Future<String> loadIVNext() async {
-  final location = Cache.ivLocationNext;
-
-  var ivStored;
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
-
-    try {
-      ivStored = await storage.read(key: location);
-    } catch (error) {
-      printError('[loadIVNext] $error');
-    }
-  }
-
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    try {
-      final directory = await getApplicationSupportDirectory();
-      ivStored = await File(join(directory.path, location)).readAsString();
-    } catch (error) {
-      printError('[loadIVNext] $error');
-    }
-  }
-
-  // Create a encryptionKey if a serialized one is not found
-  return ivStored == null ? generateIV() : ivStored;
-}
-
-Future<String> loadKey() async {
+Future<String?> loadKey() async {
   final location = Cache.keyLocation;
   var key;
 
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
-    final storage = FlutterSecureStorage();
+    final storage = Cache.storage!;
 
     // try to read key
     try {

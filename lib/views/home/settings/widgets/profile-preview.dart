@@ -14,13 +14,44 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
+///
+/// TODO: Convert to cleaner ViewModel convention
+/// https://github.com/brianegan/flutter_redux/issues/214
+///
+class _Props extends Equatable {
+  // ignore: unused_field
+  final Store<AppState> _store;
+
+  final User user;
+  final bool loading;
+  final String? userId;
+  final String? username;
+  final String? avatarUri;
+
+  @override
+  List<Object?> get props => [
+        user,
+        userId,
+        loading,
+        username,
+        avatarUri,
+      ];
+
+  _Props(this._store)
+      : user = _store.state.authStore.user,
+        userId = _store.state.authStore.user.userId,
+        loading = _store.state.authStore.loading,
+        username = formatUsername(_store.state.authStore.user),
+        avatarUri = _store.state.authStore.user.avatarUri;
+}
+
 class ProfilePreview extends StatelessWidget {
-  ProfilePreview({Key key}) : super(key: key);
+  ProfilePreview({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props(store),
         builder: (context, props) => Container(
           child: Row(
             children: <Widget>[
@@ -52,47 +83,5 @@ class ProfilePreview extends StatelessWidget {
             ],
           ),
         ),
-      );
-}
-
-class _Props extends Equatable {
-  final User user;
-  final bool loading;
-  final String userId;
-  final String username;
-  final String avatarUri;
-
-  _Props({
-    @required this.user,
-    @required this.userId,
-    @required this.loading,
-    @required this.username,
-    @required this.avatarUri,
-  });
-
-  @override
-  List<Object> get props => [
-        user,
-        userId,
-        loading,
-        username,
-        avatarUri,
-      ];
-
-  // Lots of null checks in case the user signed out where
-  // this widget is displaying, could probably be less coupled..
-  static _Props mapStateToProps(
-    Store<AppState> store,
-  ) =>
-      _Props(
-        user: store.state.authStore.user ?? const User(),
-        userId: store.state.authStore.user != null
-            ? store.state.authStore.user.userId
-            : '',
-        loading: store.state.authStore.loading,
-        username: formatUsername(
-          store.state.authStore.user ?? const User(),
-        ),
-        avatarUri: (store.state.authStore.user ?? const User()).avatarUri,
       );
 }

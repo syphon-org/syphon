@@ -63,7 +63,7 @@ SettingsStore settingsReducer(
         chatSettings[action.roomId] = ChatSetting();
       }
 
-      chatSettings[action.roomId] = chatSettings[action.roomId].copyWith(
+      chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
         primaryColor: action.color,
       );
       return state.copyWith(
@@ -103,7 +103,7 @@ SettingsStore settingsReducer(
       );
     case ToggleRoomTypeBadges:
       return state.copyWith(
-        roomTypeBadgesEnabled: !(state.roomTypeBadgesEnabled ?? true),
+        roomTypeBadgesEnabled: !state.roomTypeBadgesEnabled,
       );
     case ToggleNotifications:
       return state.copyWith(

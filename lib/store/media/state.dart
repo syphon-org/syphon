@@ -15,14 +15,14 @@ class MediaStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         mediaCache,
         mediaChecks,
       ];
 
   MediaStore copyWith({
-    mediaCache,
-    mediaChecks,
+    Map<String, Uint8List>? mediaCache,
+    Map<String, String>? mediaChecks,
   }) =>
       MediaStore(
         mediaCache: mediaCache ?? this.mediaCache,
@@ -34,12 +34,12 @@ class MediaStore extends Equatable {
   // Would repeatedly update even if a locally cached version matched
   factory MediaStore.fromJson(Map<String, dynamic> json) {
     return MediaStore(
-      mediaCache: (json['mediaCache'] as Map<String, dynamic>)?.map(
-        (k, e) => MapEntry(
-            k, Uint8List.fromList((e as List)?.map((e) => e as int)?.toList())),
-      ),
-      mediaChecks: (json['mediaChecks'] as Map<String, dynamic>)?.map(
+      mediaChecks: (json['mediaChecks'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, e as String),
+      ),
+      mediaCache: (json['mediaCache'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(
+            k, Uint8List.fromList((e as List).map((e) => e as int).toList())),
       ),
     );
   }
@@ -47,8 +47,8 @@ class MediaStore extends Equatable {
   Map<String, dynamic> toJson() => _$MediaStoreToJson(this);
   Map<String, dynamic> _$MediaStoreToJson(MediaStore instance) =>
       <String, dynamic>{
-        'mediaCache': instance.mediaCache
-            .map((key, value) => MapEntry(key, value as List<int>)),
+        'mediaCache':
+            instance.mediaCache.map((key, value) => MapEntry(key, value)),
         'mediaChecks': instance.mediaChecks,
       };
 }

@@ -1,5 +1,4 @@
 // Dart imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -10,15 +9,13 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
-ThunkAction<AppState> fetchBaseUrl({Homeserver homeserver}) {
+ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkHomeserver(
-            protocol: protocol,
-            homeserver: homeserver.hostname,
+            protocol: store.state.authStore.protocol,
+            homeserver: homeserver.hostname!,
           ) ??
           {};
 
@@ -48,25 +45,21 @@ ThunkAction<AppState> fetchBaseUrl({Homeserver homeserver}) {
   };
 }
 
-ThunkAction<AppState> fetchServerVersion({Homeserver homeserver}) {
+ThunkAction<AppState> fetchServerVersion({required Homeserver homeserver}) {
   return (Store<AppState> store) async {
     // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkVersion(
-            protocol: protocol,
-            homeserver: homeserver.hostname,
+            protocol: store.state.authStore.protocol,
+            homeserver: homeserver.hostname!,
           ) ??
           {};
 
       final versionExists = response['versions'] != null;
 
-      return homeserver.copyWith(
-        valid: versionExists,
-      );
+      return homeserver.copyWith(valid: versionExists);
     } catch (error) {
-      return homeserver.copyWith(
-        valid: false,
-      );
+      return homeserver.copyWith(valid: false);
     }
   };
 }

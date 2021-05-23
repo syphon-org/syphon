@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -13,8 +13,6 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 /**
  * Fetch Remote Push Notification Service Rules
  */
@@ -24,7 +22,7 @@ ThunkAction<AppState> fetchNotifications() {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchNotifications(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
@@ -49,7 +47,7 @@ ThunkAction<AppState> fetchNotificationPushers() {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchNotificationPushers(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
       );
@@ -76,7 +74,7 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
       final data = {'errcode': 'Not Implemented'};
 
       if (data['errcode'] != null) {
-        throw data['error'];
+        throw data['error']!;
       }
     } catch (error) {
       printError('[fetchNotificationPusherRules] $error');
@@ -127,7 +125,7 @@ ThunkAction<AppState> saveNotificationPusher({
       );
 
       final data = await MatrixApi.saveNotificationPusher(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         kind: erase ? null : kind,

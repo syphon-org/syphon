@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
@@ -12,9 +13,9 @@ import 'package:syphon/store/events/redaction/model.dart';
 
 Future<void> saveEvents(
   List<Event> events, {
-  Database storage,
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.EVENTS);
+  final store = StoreRef<String?, String>(StorageKeys.EVENTS);
 
   return await storage.transaction((txn) async {
     for (Event event in events) {
@@ -26,15 +27,15 @@ Future<void> saveEvents(
 
 Future<void> deleteEvents(
   List<Event> events, {
-  Database storage,
+  Database? storage,
 }) async {
   final stores = [
-    StoreRef<String, String>(StorageKeys.MESSAGES),
-    StoreRef<String, String>(StorageKeys.REACTIONS),
+    StoreRef<String?, String>(StorageKeys.MESSAGES),
+    StoreRef<String?, String>(StorageKeys.REACTIONS),
   ];
 
-  return await Future.wait(stores.map((store) async {
-    return await storage.transaction((txn) async {
+  await Future.wait(stores.map((store) async {
+    return await storage!.transaction((txn) async {
       for (Event event in events) {
         final record = store.record(event.id);
         await record.delete(storage);
@@ -51,10 +52,10 @@ Future<void> deleteEvents(
 ///
 Future<void> saveRedactions(
   List<Redaction> redactions, {
-  Database storage,
+  required Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(StorageKeys.REDACTIONS);
+    final store = StoreRef<String?, String>(StorageKeys.REDACTIONS);
 
     return await storage.transaction((txn) async {
       for (Redaction redaction in redactions) {
@@ -76,7 +77,7 @@ Future<void> saveRedactions(
 /// another parser/filter/selector
 ///
 Future<Map<String, Redaction>> loadRedactions({
-  Database storage,
+  required Database storage,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.REDACTIONS);
 
@@ -103,10 +104,10 @@ Future<Map<String, Redaction>> loadRedactions({
 ///
 Future<void> saveReactions(
   List<Reaction> reactions, {
-  Database storage,
+  required Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(StorageKeys.REACTIONS);
+    final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
 
     return await storage.transaction((txn) async {
       for (Reaction reaction in reactions) {
@@ -118,7 +119,7 @@ Future<void> saveReactions(
 
           if (exists) {
             final existingRaw = await record.get(storage);
-            final existingJson = List.from(await json.decode(existingRaw));
+            final existingJson = List.from(await json.decode(existingRaw!));
             final existingList = List.from(existingJson.map(
               (json) => Reaction.fromJson(json),
             ));
@@ -149,37 +150,36 @@ Future<void> saveReactions(
 /// this done with O(1) by reference with message ids being the key
 ///
 Future<Map<String, List<Reaction>>> loadReactions(
-  List<String> messageIds, {
-  Database storage,
+  List<String?> messageIds, {
+  required Database storage,
 }) async {
   try {
-    final store = StoreRef<String, String>(StorageKeys.REACTIONS);
+    final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
     final reactionsMap = Map<String, List<Reaction>>();
     final reactionsRecords =
         await store.records(messageIds).getSnapshots(storage);
 
-    for (RecordSnapshot<String, String> reactionList
-        in reactionsRecords ?? []) {
+    for (RecordSnapshot<String?, String>? reactionList in reactionsRecords) {
       if (reactionList != null) {
         final reactions = List.from(await json.decode(reactionList.value))
             .map((json) => Reaction.fromJson(json))
             .toList();
-        reactionsMap.putIfAbsent(reactionList.key, () => reactions);
+        reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
       }
     }
 
     return reactionsMap;
   } catch (error) {
-    printError(error);
+    printError(error.toString());
     return Map();
   }
 }
 
 Future<void> saveMessages(
   List<Message> messages, {
-  Database storage,
+  required Database storage,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.MESSAGES);
+  final store = StoreRef<String?, String>(StorageKeys.MESSAGES);
 
   return await storage.transaction((txn) async {
     for (Message message in messages) {
@@ -189,12 +189,12 @@ Future<void> saveMessages(
   });
 }
 
-Future<Message> loadMessage(String eventId, {Database storage}) async {
+Future<Message> loadMessage(String eventId, {required Database storage}) async {
   final store = StoreRef<String, String>(StorageKeys.MESSAGES);
 
   final message = await store.record(eventId).get(storage);
 
-  return Message.fromJson(json.decode(message));
+  return Message.fromJson(json.decode(message!));
 }
 
 /**
@@ -205,27 +205,29 @@ Future<Message> loadMessage(String eventId, {Database storage}) async {
  */
 Future<List<Message>> loadMessages(
   List<String> eventIds, {
-  Database storage,
+  required Database storage,
   int offset = 0,
   int limit = 20, // default amount loaded
 }) async {
   final List<Message> messages = [];
 
   try {
-    final store = StoreRef<String, String>(StorageKeys.MESSAGES);
+    final store = StoreRef<String?, String>(StorageKeys.MESSAGES);
 
     // TODO: properly paginate through cold storage messages instead of loading all
-    final messageIds = eventIds ?? []; //.skip(offset).take(limit).toList();
+    final messageIds = eventIds; //.skip(offset).take(limit).toList();
 
     final messagesPaginated = await store.records(messageIds).get(storage);
 
-    for (String message in messagesPaginated) {
-      messages.add(Message.fromJson(json.decode(message)));
+    for (String? message in messagesPaginated) {
+      if (message != null) {
+        messages.add(Message.fromJson(json.decode(message)));
+      }
     }
 
     return messages;
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
-    return List();
+    return [];
   }
 }

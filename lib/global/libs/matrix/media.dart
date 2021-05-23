@@ -14,10 +14,10 @@ import 'package:http/http.dart' as http;
  */
 class Media {
   static Future<dynamic> fetchThumbnail(Map params) async {
-    String protocol = params['protocol'];
-    String homeserver = params['homeserver'];
-    String accessToken = params['accessToken'];
-    String serverName = params['serverName'];
+    String? protocol = params['protocol'];
+    String? homeserver = params['homeserver'];
+    String? accessToken = params['accessToken'];
+    String? serverName = params['serverName'];
     String mediaUri = params['mediaUri'];
 
     return await fetchThumbnailUnmapped(
@@ -32,11 +32,11 @@ class Media {
   }
 
   static Future<dynamic> fetchThumbnailUnmapped({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String serverName,
-    String mediaUri,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? serverName,
+    required String mediaUri,
     String method = 'crop',
     int size = 52,
   }) async {
@@ -47,7 +47,7 @@ class Media {
     String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
     String url =
-        '$protocol$homeserver/_matrix/media/r0/thumbnail/${mediaServer ?? homeserver}/$mediaId';
+        '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
 
     // Params
     url += '?height=${size}&width=${size}&method=${method}';
@@ -57,7 +57,7 @@ class Media {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -70,13 +70,13 @@ class Media {
   }
 
   static Future<dynamic> uploadMedia({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String fileName,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? fileName,
     String fileType = 'application/jpeg', // Content-Type: application/pdf
-    Stream<List<int>> fileStream,
-    int fileLength,
+    required Stream<List<int>> fileStream,
+    int? fileLength,
   }) async {
     String url = '$protocol$homeserver/_matrix/media/r0/upload';
 
@@ -111,9 +111,9 @@ class Media {
 dynamic buildMediaDownloadRequest({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
-  String accessToken,
-  String serverName,
-  String mediaUri,
+  String? accessToken,
+  String? serverName,
+  required String mediaUri,
 }) {
   final List<String> mediaUriParts = mediaUri.split('/');
   final String mediaId = mediaUriParts[mediaUriParts.length - 1];
@@ -126,7 +126,7 @@ dynamic buildMediaDownloadRequest({
   };
 
   return {
-    'url': url,
+    'url': Uri.parse(url),
     'headers': headers,
   };
 }
@@ -139,10 +139,10 @@ dynamic buildMediaDownloadRequest({
 dynamic buildMediaUploadRequest({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
-  String accessToken,
-  String fileName,
+  String? accessToken,
+  String? fileName,
   String fileType = 'application/jpeg', // Content-Type: application/pdf
-  int fileLength,
+  int? fileLength,
 }) {
   String url = '$protocol$homeserver/_matrix/media/r0/upload';
 
@@ -156,7 +156,7 @@ dynamic buildMediaUploadRequest({
   };
 
   return {
-    'url': url,
+    'url': Uri.parse(url),
     'headers': headers,
   };
 }

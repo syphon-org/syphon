@@ -27,13 +27,13 @@ class MatrixAuthTypes {
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
-  static FutureOr<dynamic> loginType({
-    String protocol,
-    String homeserver,
+  static Future<dynamic> loginType({
+    required String protocol,
+    required String homeserver,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -47,14 +47,14 @@ abstract class Auth {
   ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
   ///
-  static FutureOr<dynamic> loginUser({
-    String protocol,
-    String homeserver,
+  static Future<dynamic> loginUser({
+    required String protocol,
+    required String homeserver,
     String type = "m.login.password",
-    String username,
-    String password,
-    String deviceId,
-    String deviceName,
+    String? username,
+    String? password,
+    String? deviceId,
+    String? deviceName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
@@ -73,7 +73,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -90,21 +90,21 @@ abstract class Auth {
    *  users. Clients should pick one of these and supply it as 
    *  the type when logging in.
    */
-  static FutureOr<dynamic> loginUserToken({
-    String protocol,
-    String homeserver,
+  static Future<dynamic> loginUserToken({
+    String? protocol,
+    String? homeserver,
     String type = MatrixAuthTypes.TOKEN,
-    String token,
-    String session,
-    String deviceId,
-    String deviceName,
+    String? token,
+    String? session,
+    String? deviceId,
+    String? deviceName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/login';
 
     Map body = {
       'type': type,
-      "token": token,
-      "trx_id": Random().nextInt(1 << 32),
+      'token': token,
+      'trx_id': Random().nextInt(1 << 32),
       // "session": session,
     };
 
@@ -117,7 +117,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -130,12 +130,12 @@ abstract class Auth {
    * 
    * inhibit_login automatically logs in the user after creation 
    */
-  static FutureOr<dynamic> registerEmail({
-    String protocol,
-    String homeserver,
-    String clientSecret,
-    String email,
-    int sendAttempt = 1,
+  static Future<dynamic> registerEmail({
+    String? protocol,
+    String? homeserver,
+    String? clientSecret,
+    String? email,
+    int? sendAttempt = 1,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
@@ -147,7 +147,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -160,17 +160,17 @@ abstract class Auth {
    * 
    * inhibit_login automatically logs in the user after creation 
    */
-  static FutureOr<dynamic> registerUser({
-    String protocol,
-    String homeserver,
-    String username,
-    String password,
-    String session,
-    String authType = MatrixAuthTypes.DUMMY,
-    String authValue,
-    Map authParams,
-    String deviceId,
-    String deviceName,
+  static Future<dynamic> registerUser({
+    String? protocol,
+    String? homeserver,
+    String? username,
+    String? password,
+    String? session,
+    String? authType = MatrixAuthTypes.DUMMY,
+    String? authValue,
+    Map? authParams,
+    String? deviceId,
+    String? deviceName,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/register';
 
@@ -205,7 +205,7 @@ abstract class Auth {
           'auth': {
             'type': MatrixAuthTypes.EMAIL,
             "threepid_creds": {
-              "sid": authParams['sid'],
+              "sid": authParams!['sid'],
               "client_secret": authParams['client_secret'],
             },
             "threepidCreds": {
@@ -230,7 +230,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -239,9 +239,9 @@ abstract class Auth {
   }
 
   static Future<dynamic> logoutUser({
-    String protocol,
-    String homeserver,
-    String accessToken,
+    String? protocol,
+    String? homeserver,
+    String? accessToken,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/logout';
 
@@ -251,7 +251,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -262,9 +262,9 @@ abstract class Auth {
    * Logout User Everywhere
    */
   static Future<dynamic> logoutUserEverywhere({
-    String protocol,
-    String homeserver,
-    String accessToken,
+    String? protocol,
+    String? homeserver,
+    String? accessToken,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/logout/all';
 
@@ -274,7 +274,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -289,15 +289,15 @@ abstract class Auth {
    *  Used to check what types of logins are available on the server
    */
   static Future<dynamic> checkUsernameAvailability({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String username,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? username,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/register/available';
 
     url += username != null ? '?username=$username' : '';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -315,18 +315,18 @@ abstract class Auth {
   }) async {
     String url = '$protocol$homeserver/.well-known/matrix/client';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
 
   static Future<dynamic> checkVersion({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
   }) async {
     String url = '$protocol$homeserver/_matrix/client/versions';
 
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -337,15 +337,15 @@ abstract class Auth {
    * https://matrix.org/docs/spec/client_server/latest#id198
    * 
    */
-  static FutureOr<dynamic> updatePassword({
-    String protocol,
-    String homeserver,
-    String accessToken,
+  static Future<dynamic> updatePassword({
+    String? protocol,
+    String? homeserver,
+    String? accessToken,
     String type = 'm.login.password',
-    String userId,
-    String session,
-    String password,
-    String currentPassword,
+    String? userId,
+    String? session,
+    String? password,
+    String? currentPassword,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
@@ -370,7 +370,7 @@ abstract class Auth {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -383,12 +383,12 @@ abstract class Auth {
   ///
   /// Actually reset the password after verification
   ///
-  static FutureOr<dynamic> resetPassword({
-    String protocol,
-    String homeserver,
-    String clientSecret,
-    String passwordNew,
-    String session,
+  static Future<dynamic> resetPassword({
+    String? protocol,
+    String? homeserver,
+    String? clientSecret,
+    String? passwordNew,
+    String? session,
     int sendAttempt = 1,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/account/password';
@@ -409,7 +409,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );
@@ -422,11 +422,11 @@ abstract class Auth {
   ///
   /// Returns a token to verify the password reset
   /// request for a specifed email address
-  static FutureOr<dynamic> sendPasswordResetEmail({
-    String protocol,
-    String homeserver,
-    String clientSecret,
-    String email,
+  static Future<dynamic> sendPasswordResetEmail({
+    String? protocol,
+    String? homeserver,
+    String? clientSecret,
+    String? email,
     int sendAttempt = 1,
   }) async {
     String url =
@@ -439,7 +439,7 @@ abstract class Auth {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {'Content-type': 'application/json'},
       body: json.encode(body),
     );

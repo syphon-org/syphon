@@ -20,13 +20,13 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class PasswordStep extends StatefulWidget {
-  const PasswordStep({Key key}) : super(key: key);
+  const PasswordStep({Key? key}) : super(key: key);
 
   PasswordStepState createState() => PasswordStepState();
 }
 
 class PasswordStepState extends State<PasswordStep> {
-  PasswordStepState({Key key});
+  PasswordStepState({Key? key});
 
   bool visibility = false;
   FocusNode currentFocusNode = FocusNode();
@@ -163,7 +163,7 @@ class PasswordStepState extends State<PasswordStep> {
                           }
 
                           // Do your stuff
-                          this.setState(() {
+                          setState(() {
                             visibility = !this.visibility;
                           });
 
@@ -243,13 +243,13 @@ class _Props extends Equatable {
   final Function onChangeCurrentPassword;
 
   _Props({
-    @required this.password,
-    @required this.passwordCurrent,
-    @required this.passwordConfirm,
-    @required this.isPasswordValid,
-    @required this.onChangePassword,
-    @required this.onChangePasswordConfirm,
-    @required this.onChangeCurrentPassword,
+    required this.password,
+    required this.passwordCurrent,
+    required this.passwordConfirm,
+    required this.isPasswordValid,
+    required this.onChangePassword,
+    required this.onChangePasswordConfirm,
+    required this.onChangeCurrentPassword,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

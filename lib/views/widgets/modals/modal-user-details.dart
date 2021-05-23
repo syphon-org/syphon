@@ -17,26 +17,27 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/home/profile/details-user.dart';
-import 'package:syphon/views/home/search/search-rooms.dart';
+import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/profile/profile-user-screen.dart';
+import 'package:syphon/views/home/search/search-rooms-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class ModalUserDetails extends StatelessWidget {
   ModalUserDetails({
-    Key key,
+    Key? key,
     this.user,
     this.userId,
     this.nested,
   }) : super(key: key);
 
-  final User user;
-  final String userId;
-  final bool nested; // pop context twice when double nested in a view
+  final User? user;
+  final String? userId;
+  final bool? nested; // pop context twice when double nested in a view
 
   @protected
-  void onNavigateToProfile({BuildContext context, _Props props}) async {
+  void onNavigateToProfile(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/user/details',
@@ -47,7 +48,8 @@ class ModalUserDetails extends StatelessWidget {
   }
 
   @protected
-  void onNavigateToInvite({BuildContext context, _Props props}) async {
+  void onNavigateToInvite(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/rooms/search',
@@ -58,7 +60,8 @@ class ModalUserDetails extends StatelessWidget {
   }
 
   @protected
-  void onMessageUser({BuildContext context, _Props props}) async {
+  void onMessageUser(
+      {required BuildContext context, required _Props props}) async {
     final user = props.user;
     return await showDialog(
       context: context,
@@ -72,7 +75,7 @@ class ModalUserDetails extends StatelessWidget {
 
           Navigator.pop(context);
 
-          if (nested) {
+          if (nested!) {
             Navigator.pop(context);
           }
 
@@ -151,7 +154,7 @@ class ModalUserDetails extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             style:
-                                Theme.of(context).textTheme.subtitle1.copyWith(
+                                Theme.of(context).textTheme.subtitle1!.copyWith(
                                       fontWeight: FontWeight.w500,
                                     ),
                           ),
@@ -268,12 +271,12 @@ class _Props extends Equatable {
   final Function onCreateChatDirect;
 
   _Props({
-    @required this.user,
-    @required this.users,
-    @required this.loading,
-    @required this.blocked,
-    @required this.onCreateChatDirect,
-    @required this.onBlockUser,
+    required this.user,
+    required this.users,
+    required this.loading,
+    required this.blocked,
+    required this.onCreateChatDirect,
+    required this.onBlockUser,
   });
 
   @override
@@ -284,8 +287,8 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(
     Store<AppState> store, {
-    User user,
-    String userId,
+    User? user,
+    String? userId,
   }) =>
       _Props(
         user: () {
@@ -305,11 +308,11 @@ class _Props extends Equatable {
         }(),
         users: store.state.userStore.users,
         loading: store.state.userStore.loading,
-        blocked: store.state.userStore.blocked.contains(userId ?? user.userId),
+        blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
         onBlockUser: (User user) async {
           await store.dispatch(toggleBlockUser(user: user));
         },
-        onCreateChatDirect: ({User user}) async => store.dispatch(
+        onCreateChatDirect: ({required User user}) async => store.dispatch(
           createRoom(
             isDirect: true,
             invites: <User>[user],

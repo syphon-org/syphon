@@ -19,19 +19,25 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
       final user = action.user as User;
       final users = Map<String, User>.from(state.users);
 
-      if (users[user.userId] != null) {
-        final existingUser = users[user.userId];
-        users[user.userId] = existingUser.copyWith(
+      final userId = user.userId;
+
+      if (userId == null) return state;
+
+      if (users[userId] != null) {
+        final existingUser = users[userId]!;
+        users[userId] = existingUser.copyWith(
           avatarUri: user.avatarUri,
           displayName: user.displayName,
         );
       } else {
-        users[user.userId] = user;
+        users[userId] = user;
       }
 
       return state.copyWith(users: users);
     case ClearUserInvites:
       return state.copyWith(invites: const []);
+    case ResetUsers:
+      return UserStore();
     default:
       return state;
   }

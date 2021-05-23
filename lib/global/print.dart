@@ -1,28 +1,24 @@
-import 'package:ansicolor/ansicolor.dart';
 import 'package:flutter/material.dart';
 
 typedef PrintDebug = void Function(String message, {String title});
-typedef PrintError = void Function(String message, {String title});
+typedef PrintError = void Function(String message, {String? title});
 
-void _printInfo(String content, {String title}) {
-  final pen = AnsiPen()..white(bold: true);
+void _printInfo(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
-  print(pen(body));
+  print(body);
 }
 
-void _printWarning(String content, {String title}) {
-  final pen = AnsiPen()..yellow(bold: true);
+void _printWarning(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
-  print(pen(body));
+  print(body);
 }
 
-void _printError(String content, {String title}) {
-  final pen = AnsiPen()..red(bold: true);
+void _printError(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
-  print(pen(body));
+  print(body);
 }
 
-void _printDebug(String content, {String title}) {
+void _printDebug(String content, {String? title}) {
   final body = title != null ? '[$title] $content' : content;
   debugPrint(body);
 }

@@ -7,7 +7,7 @@ import 'package:syphon/store/auth/state.dart';
 
 Future<void> saveAuth(
   AuthStore authStore, {
-  Database storage,
+  required Database storage,
 }) async {
   final store = StoreRef<String, String>(StorageKeys.AUTH);
 
@@ -23,7 +23,7 @@ Future<void> saveAuth(
  * In storage, messages are indexed by eventId
  * In redux, they're indexed by RoomID and placed in a list
  */
-Future<AuthStore> loadAuth({Database storage}) async {
+Future<AuthStore?> loadAuth({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.AUTH);
 

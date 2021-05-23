@@ -32,6 +32,7 @@ class EventTypes {
   static const powerLevels = 'm.room.power_levels';
   static const encryption = 'm.room.encryption';
   static const roomKey = 'm.room_key';
+  static const roomKeyRequest = 'm.room_key_request';
 }
 
 class MessageTypes {

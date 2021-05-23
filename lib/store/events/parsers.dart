@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart' show IterableExtension;
 /**
  * 
  * Event Parsers
@@ -20,35 +21,34 @@ import 'package:syphon/store/user/model.dart';
 Room parseRoom(Map params) {
   Map json = params['json'];
   Room room = params['room'];
-  User currentUser = params['currentUser'];
-  String lastSince = params['lastSince'];
+  User? currentUser = params['currentUser'];
+  String? lastSince = params['lastSince'];
 
   // TODO: eventually remove the need for this with modular parsers
   return room.fromSync(
-    json: json,
+    json: json as Map<String, dynamic>,
     currentUser: currentUser,
     lastSince: lastSince,
   );
 }
 
 Map<String, dynamic> parseMessages({
-  Room room,
+  required Room room,
   List<Message> messages = const [],
   List<Message> existing = const [],
 }) {
-  bool limited;
-  int lastUpdate = room.lastUpdate;
-  List<Message> outbox = List<Message>.from(room.outbox ?? []);
-  List<Message> messagesAll = List<Message>.from(existing ?? []);
+  bool? limited;
+  int? lastUpdate = room.lastUpdate;
+  List<Message> outbox = List<Message>.from(room.outbox);
+  List<Message> messagesAll = List<Message>.from(existing);
 
   // Converting only message events
-  final hasEncrypted = messages.firstWhere(
+  final hasEncrypted = messages.firstWhereOrNull(
     (msg) => msg.type == EventTypes.encrypted,
-    orElse: () => null,
   );
 
   // See if the newest message has a greater timestamp
-  if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
+  if (messages.isNotEmpty && lastUpdate! < messages[0].timestamp!) {
     lastUpdate = messages[0].timestamp;
   }
 
@@ -56,9 +56,8 @@ Map<String, dynamic> parseMessages({
   if (room.limited) {
     // Check to see if the new messages contain those existing in cache
     if (messages.isNotEmpty && room.messageIds.isNotEmpty) {
-      final messageLatest = room.messageIds.firstWhere(
+      final String? messageLatest = room.messageIds.firstWhereOrNull(
         (id) => id == messages[0].id,
-        orElse: () => null,
       );
       // Set limited to false if they now exist
       limited = messageLatest != null;
@@ -79,7 +78,7 @@ Map<String, dynamic> parseMessages({
   messagesAll.addAll(messages);
 
   // Map messages to ids to filter out ids and outbox
-  final messagesAllMap = HashMap.fromIterable(
+  final messagesAllMap = HashMap<String, dynamic>.fromIterable(
     messagesAll,
     key: (message) => message.id,
     value: (message) => message,
@@ -108,9 +107,9 @@ Map<String, dynamic> parseMessages({
 
 Map<String, dynamic> parseOptions(Map<String, dynamic> json) {
   bool invite;
-  bool limited;
-  String lastHash;
-  String prevHash;
+  bool? limited;
+  String? lastHash;
+  String? prevHash;
 
   invite = json['invite_state'] != null;
 

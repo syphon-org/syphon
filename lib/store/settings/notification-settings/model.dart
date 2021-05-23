@@ -10,13 +10,13 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class NotificationSettings extends Equatable {
-  final List<Rule> rules;
-  final List<Pusher> pushers;
+  final List<Rule>? rules;
+  final List<Pusher>? pushers;
 
   const NotificationSettings({this.pushers, this.rules});
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         pushers,
         rules,
       ];

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -22,41 +22,39 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 class ResetSearchResults {}
 
 class SetLoading {
-  final bool loading;
+  final bool? loading;
 
   SetLoading({this.loading});
 }
 
 class SetSearchText {
-  final String text;
+  final String? text;
 
   SetSearchText({this.text});
 }
 
 class SetHomeservers {
-  final List<dynamic> homeservers;
+  final List<dynamic>? homeservers;
 
   SetHomeservers({this.homeservers});
 }
 
 class UpdateHomeservers {
-  final List<dynamic> homeservers;
+  final List<dynamic>? homeservers;
 
   UpdateHomeservers({this.homeservers});
 }
 
 // sets the "since" variable for pagination
 class SetSearchResults {
-  final String since;
-  final int totalResults;
-  final bool hasMore;
-  final String searchText;
-  final List<dynamic> searchResults;
+  final String? since;
+  final int? totalResults;
+  final bool? hasMore;
+  final String? searchText;
+  final List<dynamic>? searchResults;
 
   SetSearchResults({
     this.searchResults,
@@ -67,24 +65,27 @@ class SetSearchResults {
   });
 }
 
-Future<String> fetchFavicon({String url}) async {
+Future<String?> fetchFavicon({String? url}) async {
   try {
     // get the root store
     final origins = url.toString().split('.');
     final baseUrl = origins.length > 1
         ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
         : origins[0];
+    final fullUrl = 'https://$baseUrl';
 
-    final response = await http.get('https://$baseUrl').timeout(
+    final uri = Uri.parse(fullUrl);
+
+    final response = await http.get(uri).timeout(
           const Duration(seconds: 4),
         );
 
     final document = parse(response.body);
     final faviconIcon = document.querySelector('link[rel="icon"]');
     final faviconShort = document.querySelector('link[rel="shortcut icon"]');
-    final favicon = faviconShort != null ? faviconShort : faviconIcon;
+    final favicon = faviconShort != null ? faviconShort : faviconIcon!;
 
-    var faviconUrl = 'https://$baseUrl';
+    var faviconUrl = fullUrl;
 
     if (favicon.attributes['href'].toString().contains('http')) {
       return favicon.attributes['href'];
@@ -95,7 +96,7 @@ Future<String> fetchFavicon({String url}) async {
     }
 
     return faviconUrl +
-        favicon.attributes['href'].replaceAll('...', '').replaceAll('//', '/');
+        favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
     printError(error.toString());
   }
@@ -103,13 +104,13 @@ Future<String> fetchFavicon({String url}) async {
   return null;
 }
 
-ThunkAction<AppState> searchHomeservers({String searchText}) {
+ThunkAction<AppState> searchHomeservers({String? searchText}) {
   return (Store<AppState> store) async {
     List<Homeserver> searchResults =
         (store.state.searchStore.homeservers as List<Homeserver>)
             .where((homeserver) =>
-                homeserver.hostname.contains(searchText) ||
-                homeserver.description.contains(searchText))
+                homeserver.hostname!.contains(searchText!) ||
+                homeserver.description!.contains(searchText))
             .toList();
 
     store.dispatch(SetSearchResults(
@@ -122,7 +123,7 @@ ThunkAction<AppState> searchHomeservers({String searchText}) {
 /** 
  *  Search Rooms (Locally)
  */
-ThunkAction<AppState> searchRooms({String searchText}) {
+ThunkAction<AppState> searchRooms({String? searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -130,10 +131,10 @@ ThunkAction<AppState> searchRooms({String searchText}) {
       final rooms = store.state.roomStore.roomList;
       List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
 
-      if (searchText.length != 0) {
+      if (searchText!.length != 0) {
         searchResults = List.from(
           rooms.where((room) {
-            final fulltext = room.name + room.alias + room.topic;
+            final fulltext = room.name! + room.alias! + room.topic!;
             return fulltext.contains(searchText);
           }),
         );
@@ -154,14 +155,14 @@ ThunkAction<AppState> searchRooms({String searchText}) {
 /** 
  *  Search Rooms (Remote)
  */
-ThunkAction<AppState> searchPublicRooms({String searchable}) {
+ThunkAction<AppState> searchPublicRooms({String? searchable}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
       final homeserverName = store.state.authStore.user.homeserverName;
 
-      var searchText = searchable;
+      var searchText = searchable!;
       var searchServer = homeserverName;
 
       if (searchText.contains(':')) {
@@ -170,10 +171,10 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
         searchServer = filteredText[1];
       }
 
-      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer);
+      final isUrl = RegExp(Values.urlRegex).hasMatch(searchServer!);
 
       final data = await MatrixApi.searchRooms(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
@@ -196,6 +197,7 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
       ));
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'searchPublicRooms',
         message: 'Failed to search rooms',
         error: error,
       ));
@@ -208,13 +210,13 @@ ThunkAction<AppState> searchPublicRooms({String searchable}) {
 /** 
  *  search requires remote access
  */
-ThunkAction<AppState> searchUsers({String searchText}) {
+ThunkAction<AppState> searchUsers({String? searchText}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.searchUsers(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         searchText: searchText,
@@ -242,7 +244,7 @@ ThunkAction<AppState> searchUsers({String searchText}) {
   };
 }
 
-ThunkAction<AppState> setSearchText({String text}) {
+ThunkAction<AppState> setSearchText({String? text}) {
   return (Store<AppState> store) async {
     store.dispatch(SetSearchText(text: text));
   };

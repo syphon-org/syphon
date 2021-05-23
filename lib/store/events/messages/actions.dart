@@ -4,16 +4,13 @@ import 'dart:math';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
@@ -25,8 +22,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 ///
 /// Mutate Messages
 ///
@@ -34,7 +29,7 @@ final protocol = DotEnv().env['PROTOCOL'];
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message> messages}) {
+ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -56,7 +51,7 @@ ThunkAction<AppState> mutateMessages({List<Message> messages}) {
 /// the required, necessary mutations by matrix after the
 /// message has been sent (such as reactions, redactions, and edits)
 ///
-ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
+ThunkAction<AppState> mutateMessagesAll({List<String>? messages}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -92,7 +87,7 @@ ThunkAction<AppState> mutateMessagesAll({List<String> messages}) {
 /// necessary mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessagesRoom({Room room}) {
+ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
   return (Store<AppState> store) async {
     if (room.messagesNew.isEmpty) return;
 
@@ -115,8 +110,8 @@ ThunkAction<AppState> mutateMessagesRoom({Room room}) {
 
 /// Send Message
 ThunkAction<AppState> sendMessage({
-  Room room,
-  Message message,
+  required Room room,
+  required Message message,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -124,13 +119,13 @@ ThunkAction<AppState> sendMessage({
 
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id].reply;
+      final reply = store.state.roomStore.rooms[room.id]!.reply;
 
       // trim trailing whitespace
-      message = message.copyWith(body: message.body.trimRight());
+      message = message.copyWith(body: message.body!.trimRight());
 
       // pending outbox message
-      var pending = Message(
+      Message pending = Message(
         id: tempId,
         body: message.body,
         type: message.type,
@@ -150,25 +145,25 @@ ThunkAction<AppState> sendMessage({
           formatMessageReply(room, pending, reply),
         );
       }
+
       // Save unsent message to outbox
       store.dispatch(SaveOutboxMessage(
-        id: room.id,
+        tempId: tempId,
         pendingMessage: pending,
       ));
 
       final data = await MatrixApi.sendMessage(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        trxId: DateTime.now().millisecond.toString(),
         roomId: room.id,
         message: pending.content,
+        trxId: DateTime.now().millisecond.toString(),
       );
 
       if (data['errcode'] != null) {
         store.dispatch(SaveOutboxMessage(
-          id: room.id,
-          tempId: tempId.toString(),
+          tempId: tempId,
           pendingMessage: pending.copyWith(
             timestamp: DateTime.now().millisecondsSinceEpoch,
             pending: false,
@@ -183,8 +178,7 @@ ThunkAction<AppState> sendMessage({
       // Update sent message with event id but needs
       // to be syncing to remove from outbox
       store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        tempId: tempId.toString(),
+        tempId: tempId,
         pendingMessage: pending.copyWith(
           id: data['event_id'],
           timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -194,16 +188,18 @@ ThunkAction<AppState> sendMessage({
 
       return true;
     } catch (error) {
-      store.dispatch(
-        addAlert(
-          error: error,
-          message: error.toString(),
-          origin: 'sendMessage',
-        ),
-      );
+      store.dispatch(addAlert(
+        error: error,
+        message: error.toString(),
+        origin: 'sendMessage',
+      ));
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(
+        id: room.id,
+        sending: false,
+        reply: Message(),
+      ));
     }
   };
 }
@@ -214,8 +210,8 @@ ThunkAction<AppState> sendMessage({
  * Specifically for sending encrypted messages using megolm
  */
 ThunkAction<AppState> sendMessageEncrypted({
-  Room room,
-  Message message, // body and type only for now
+  required Room room,
+  required Message message, // body and type only for now
 }) {
   return (Store<AppState> store) async {
     try {
@@ -227,14 +223,15 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id].reply;
+      final reply = store.state.roomStore.rooms[room.id]!.reply;
 
       // trim trailing whitespace
-      message = message.copyWith(body: message.body.trimRight());
+      message = message.copyWith(body: message.body!.trimRight());
 
       // pending outbox message
-      var pending = Message(
-        id: tempId.toString(),
+      Message pending = Message(
+        id: tempId,
+        roomId: room.id,
         body: message.body,
         type: message.type,
         content: {
@@ -242,7 +239,6 @@ ThunkAction<AppState> sendMessageEncrypted({
           'msgtype': message.type ?? MessageTypes.TEXT,
         },
         sender: store.state.authStore.user.userId,
-        roomId: room.id,
         timestamp: DateTime.now().millisecondsSinceEpoch,
         pending: true,
         syncing: true,
@@ -260,7 +256,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       }
 
       store.dispatch(SaveOutboxMessage(
-        id: room.id,
+        tempId: tempId,
         pendingMessage: pending,
       ));
 
@@ -274,7 +270,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
 
       final data = await MatrixApi.sendMessageEncrypted(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         unencryptedData: unencryptedData,
         accessToken: store.state.authStore.user.accessToken,
@@ -288,8 +284,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       if (data['errcode'] != null) {
         store.dispatch(SaveOutboxMessage(
-          id: room.id,
-          tempId: tempId.toString(),
+          tempId: tempId,
           pendingMessage: pending.copyWith(
             timestamp: DateTime.now().millisecondsSinceEpoch,
             pending: false,
@@ -302,14 +297,14 @@ ThunkAction<AppState> sendMessageEncrypted({
       }
 
       store.dispatch(SaveOutboxMessage(
-        id: room.id,
-        tempId: tempId.toString(),
+        tempId: tempId,
         pendingMessage: pending.copyWith(
           id: data['event_id'],
           timestamp: DateTime.now().millisecondsSinceEpoch,
           syncing: true,
         ),
       ));
+
       return true;
     } catch (error) {
       store.dispatch(

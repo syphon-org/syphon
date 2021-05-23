@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonOutline extends StatelessWidget {
   ButtonOutline({
-    Key key,
+    Key? key,
     this.text,
     this.loading = false,
     this.disabled = false,
@@ -19,11 +19,11 @@ class ButtonOutline extends StatelessWidget {
 
   final bool loading;
   final bool disabled;
-  final double width;
-  final double height;
-  final String text;
-  final Widget child;
-  final Function onPressed;
+  final double? width;
+  final double? height;
+  final String? text;
+  final Widget? child;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -33,14 +33,25 @@ class ButtonOutline extends StatelessWidget {
           minWidth: Dimensions.buttonWidthMin,
           maxWidth: Dimensions.buttonWidthMax,
         ),
-        child: FlatButton(
-          disabledColor: Colors.grey,
-          disabledTextColor: Colors.grey[300],
-          onPressed: disabled ? null : this.onPressed,
-          color: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28.0),
+        child: TextButton(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) =>
+                  states.contains(MaterialState.disabled)
+                      ? Colors.grey[300]
+                      : Theme.of(context).primaryColor,
+            ),
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) =>
+                  states.contains(MaterialState.disabled) ? Colors.grey : null,
+            ),
+            shape: MaterialStateProperty.resolveWith<OutlinedBorder>(
+              (Set<MaterialState> states) => RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28.0),
+              ),
+            ),
           ),
+          onPressed: disabled ? null : this.onPressed as void Function()?,
           child: this.loading
               ? Container(
                   constraints: BoxConstraints(
@@ -56,14 +67,14 @@ class ButtonOutline extends StatelessWidget {
                   ),
                 )
               : (child != null
-                  ? child
+                  ? child!
                   : Text(
-                      this.text,
+                      this.text!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
-                        color: Colors.white,
+                        color: disabled ? Colors.grey[300] : Colors.white,
                       ),
                     )),
         ),

@@ -1,4 +1,6 @@
 // Project imports:
+import 'package:syphon/global/print.dart';
+
 import './actions.dart';
 import './state.dart';
 
@@ -65,11 +67,11 @@ CryptoStore cryptoReducer(
       );
     case AddInboundMessageSession:
       final messageSessionIndex = Map<String, Map<String, int>>.from(
-        state.messageSessionIndexNEW ?? {},
+        state.messageSessionIndex,
       );
 
       final messageSessionsInbound = Map<String, Map<String, String>>.from(
-        state.inboundMessageSessions ?? {},
+        state.inboundMessageSessions,
       );
 
       // safety functions to catch newly cached store
@@ -84,17 +86,17 @@ CryptoStore cryptoReducer(
         action.identityKey: action.session
       };
 
-      messageSessionsInbound[action.roomId].addAll(messageSessionInboundNew);
+      messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
 
       // add or update inbound message index by roomId + identity
       final Map<String, int> messageSessionIndexUpdated = {
         action.identityKey: action.messageIndex
       };
 
-      messageSessionIndex[action.roomId].addAll(messageSessionIndexUpdated);
+      messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 
       return state.copyWith(
-        messageSessionIndexNEW: messageSessionIndex,
+        messageSessionIndex: messageSessionIndex,
         inboundMessageSessions: messageSessionsInbound,
       );
     case ToggleDeviceKeysExist:

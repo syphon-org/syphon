@@ -11,11 +11,10 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:crypt/crypt.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 // Project imports:
@@ -33,7 +32,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -41,136 +40,133 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../user/model.dart';
 
-// Store
-
-final protocol = DotEnv().env['PROTOCOL'];
-
 class SetLoading {
-  final bool loading;
+  final bool? loading;
   SetLoading({this.loading});
 }
 
 class SetCreating {
-  final bool creating;
+  final bool? creating;
   SetCreating({this.creating});
 }
 
 class SetUser {
-  final User user;
+  final User? user;
   SetUser({this.user});
 }
 
 class SetClientSecret {
-  final String clientSecret;
+  final String? clientSecret;
   SetClientSecret({this.clientSecret});
 }
 
 class SetHostname {
-  final String hostname;
+  final String? hostname;
   SetHostname({this.hostname});
 }
 
 class SetHomeserver {
-  final Homeserver homeserver;
+  final Homeserver? homeserver;
   SetHomeserver({this.homeserver});
 }
 
 class SetUsername {
-  final String username;
+  final String? username;
   SetUsername({this.username});
 }
 
 class SetUsernameValid {
-  final bool valid;
+  final bool? valid;
   SetUsernameValid({this.valid});
 }
 
 class SetStopgap {
-  final bool stopgap;
+  final bool? stopgap;
   SetStopgap({this.stopgap});
 }
 
 class SetPassword {
-  final String password;
+  final String? password;
   SetPassword({this.password});
 }
 
 class SetPasswordCurrent {
-  final String password;
+  final String? password;
   SetPasswordCurrent({this.password});
 }
 
 class SetPasswordConfirm {
-  final String password;
+  final String? password;
   SetPasswordConfirm({this.password});
 }
 
 class SetPasswordValid {
-  final bool valid;
+  final bool? valid;
   SetPasswordValid({this.valid});
 }
 
 class SetEmail {
-  final String email;
+  final String? email;
   SetEmail({this.email});
 }
 
 class SetEmailValid {
-  final bool valid;
+  final bool? valid;
   SetEmailValid({this.valid});
 }
 
 class SetEmailAvailability {
-  final bool available;
+  final bool? available;
   SetEmailAvailability({this.available});
 }
 
 class SetAgreement {
-  final bool agreement;
+  final bool? agreement;
   SetAgreement({this.agreement});
 }
 
 class SetCaptcha {
-  final bool completed;
+  final bool? completed;
   SetCaptcha({this.completed});
 }
 
 class SetUsernameAvailability {
-  final bool availability;
+  final bool? availability;
   SetUsernameAvailability({this.availability});
 }
 
 class SetAuthObserver {
-  final StreamController authObserver;
+  final StreamController? authObserver;
   SetAuthObserver({this.authObserver});
 }
 
 class SetSession {
-  final String session;
+  final String? session;
   SetSession({this.session});
 }
 
 class SetCompleted {
-  final List<String> completed;
+  final List<String>? completed;
   SetCompleted({this.completed});
 }
 
 class SetCredential {
-  final Credential credential;
+  final Credential? credential;
   SetCredential({this.credential});
 }
 
 class SetVerificationNeeded {
-  final bool needed;
+  final bool? needed;
   SetVerificationNeeded({this.needed});
 }
 
 class SetInteractiveAuths {
-  final Map interactiveAuths;
+  final Map? interactiveAuths;
   SetInteractiveAuths({this.interactiveAuths});
 }
 
@@ -180,12 +176,16 @@ class ResetOnboarding {}
 
 class ResetAuthStore {}
 
-StreamSubscription _sub;
+late StreamSubscription _sub;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
-        _sub = getUriLinksStream().listen((Uri uri) {
-          final token = uri.queryParameters['loginToken'];
+        if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+          return;
+        }
+
+        _sub = uriLinkStream.listen((Uri? uri) {
+          final token = uri!.queryParameters['loginToken'];
           if (store.state.authStore.user.accessToken == null) {
             store.dispatch(loginUserSSO(token: token));
           }
@@ -194,6 +194,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         });
       } on PlatformException {
         addAlert(
+          origin: 'initDeepLinks',
           message:
               'Failed to SSO Login, please try again later or contact support',
         );
@@ -214,12 +215,11 @@ ThunkAction<AppState> startAuthObserver() {
       throw 'Cannot call startAuthObserver with an existing instance';
     }
 
-    store.dispatch(
-      SetAuthObserver(authObserver: StreamController<User>.broadcast()),
-    );
+    store.dispatch(SetAuthObserver(
+      authObserver: StreamController<User?>.broadcast(),
+    ));
 
-    final user = store.state.authStore.user;
-    final Function onAuthStateChanged = (User user) async {
+    final Function onAuthStateChanged = (User? user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -232,9 +232,10 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(initKeyEncryption(user));
 
         // init notifications
-        globalNotificationPluginInstance = await initNotifications(
-          onSelectNotification: (String payload) {
-            debugPrint('[onSelectNotification] payload');
+        await initNotifications(
+          onSelectNotification: (String? payload) {
+            debugPrint('[onSelectNotification] payload $payload');
+            return Future.value(true);
           },
           onSaveToken: (token) {
             store.dispatch(setPusherDeviceToken(token));
@@ -242,26 +243,31 @@ ThunkAction<AppState> startAuthObserver() {
         );
 
         // start syncing for user
-        store.dispatch(startSyncObserver());
+        await store.dispatch(startSyncObserver());
       } else {
         await store.dispatch(stopSyncObserver());
-        store.dispatch(ResetSync());
-        store.dispatch(ResetRooms());
-        store.dispatch(ResetUser());
-        store.dispatch(ResetCrypto());
+
+        // wipe sensitive redux state
+        await store.dispatch(ResetRooms());
+        await store.dispatch(ResetEvents());
+        await store.dispatch(ResetUsers());
+        await store.dispatch(ResetCrypto());
+        await store.dispatch(ResetAuthStore());
+        await store.dispatch(ResetSync());
       }
     };
 
-    // init current auth state and set auth state listener
-    onAuthStateChanged(user);
-    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
+    // set auth state listener
+    store.state.authStore.onAuthStateChanged!.listen(
+      onAuthStateChanged as Function(User?),
+    );
   };
 }
 
 ThunkAction<AppState> stopAuthObserver() {
   return (Store<AppState> store) async {
     if (store.state.authStore.authObserver != null) {
-      store.state.authStore.authObserver.close();
+      store.state.authStore.authObserver?.close();
       store.dispatch(SetAuthObserver(authObserver: null));
     }
   };
@@ -273,7 +279,7 @@ ThunkAction<AppState> stopAuthObserver() {
  * Used in matrix to distinguish devices
  * for encryption and verification
  */
-ThunkAction<AppState> generateDeviceId({String salt}) {
+ThunkAction<AppState> generateDeviceId({String? salt}) {
   return (Store<AppState> store) async {
     // Wait at least 2 seconds until you can attempt to login again
     // includes processing time by authenticating matrix server
@@ -337,6 +343,7 @@ ThunkAction<AppState> loginUser() {
       var homeserver = store.state.authStore.homeserver;
       final username = store.state.authStore.username.replaceAll('@', '');
       final password = store.state.authStore.password;
+      final protocol = store.state.authStore.protocol;
 
       final Device device = await store.dispatch(
         generateDeviceId(salt: username),
@@ -349,7 +356,7 @@ ThunkAction<AppState> loginUser() {
       final data = await MatrixApi.loginUser(
         protocol: protocol,
         type: MatrixAuthTypes.PASSWORD,
-        homeserver: homeserver.baseUrl,
+        homeserver: homeserver.baseUrl!,
         username: username,
         password: password,
         deviceId: device.deviceId,
@@ -368,7 +375,7 @@ ThunkAction<AppState> loginUser() {
         user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
       ));
 
-      store.state.authStore.authObserver.add(
+      store.state.authStore.authObserver?.add(
         store.state.authStore.user,
       );
 
@@ -376,7 +383,7 @@ ThunkAction<AppState> loginUser() {
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUser",
-        message: error,
+        message: error.toString(),
         error: error,
       ));
     } finally {
@@ -385,7 +392,7 @@ ThunkAction<AppState> loginUser() {
   };
 }
 
-ThunkAction<AppState> loginUserSSO({String token}) {
+ThunkAction<AppState> loginUserSSO({String? token}) {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
@@ -405,13 +412,14 @@ ThunkAction<AppState> loginUserSSO({String token}) {
       }
 
       final username = store.state.authStore.username;
+      final protocol = store.state.authStore.protocol;
 
       final Device device = await store.dispatch(
         generateDeviceId(salt: username),
       );
 
       final data = await MatrixApi.loginUserToken(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         type: MatrixAuthTypes.TOKEN,
         homeserver: homeserver.baseUrl,
         token: token,
@@ -432,7 +440,7 @@ ThunkAction<AppState> loginUserSSO({String token}) {
         user: User.fromMatrix(data),
       ));
 
-      store.state.authStore.authObserver.add(
+      store.state.authStore.authObserver!.add(
         store.state.authStore.user,
       );
 
@@ -440,7 +448,7 @@ ThunkAction<AppState> loginUserSSO({String token}) {
     } catch (error) {
       store.dispatch(addAlert(
         origin: "loginUserSSO",
-        message: error,
+        message: error.toString(),
         error: error,
       ));
     } finally {
@@ -461,22 +469,21 @@ ThunkAction<AppState> logoutUser() {
         throw Exception('Unavailable user data');
       }
       final temp = '${store.state.authStore.user.accessToken}';
-      store.state.authStore.authObserver.add(null);
+      store.state.authStore.authObserver!.add(null);
 
       final data = await MatrixApi.logoutUser(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: temp,
       );
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.unknown_token) {
-          store.state.authStore.authObserver.add(null);
+          store.state.authStore.authObserver!.add(null);
         } else {
           throw Exception(data['error']);
         }
       }
-
       // wipe cache
       await deleteCache();
       await initCache();
@@ -485,12 +492,13 @@ ThunkAction<AppState> logoutUser() {
       await deleteStorage();
       await initStorage();
 
-      // tell authObserver to wipe auth user
-      store.state.authStore.authObserver.add(null);
+      // // tell authObserver to wipe store user and other data
+      // store.state.authStore.authObserver!.add(null);
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'logoutUser',
         error: error,
-        message: error,
+        message: error.toString(),
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -504,7 +512,7 @@ ThunkAction<AppState> fetchAuthUserProfile() {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.fetchUserProfile(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.currentUser.userId,
@@ -518,9 +526,9 @@ ThunkAction<AppState> fetchAuthUserProfile() {
       ));
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'fetchAuthUserProfile',
         error: error,
         message: 'Failed to fetch current user profile',
-        origin: 'fetchAuthUserProfile',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -534,7 +542,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.checkUsernameAvailability(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.homeserver.baseUrl,
         username: store.state.authStore.username,
       );
@@ -555,11 +563,11 @@ ThunkAction<AppState> checkUsernameAvailability() {
   };
 }
 
-ThunkAction<AppState> setInteractiveAuths({Map auths}) {
+ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
   return (Store<AppState> store) async {
     try {
       final List<String> completed =
-          List<String>.from(auths['completed'] ?? []) ?? [];
+          List<String>.from(auths!['completed'] ?? []);
 
       await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));
@@ -598,16 +606,17 @@ ThunkAction<AppState> setInteractiveAuths({Map auths}) {
 /// doesn't work
 ThunkAction<AppState> checkPasswordResetVerification({
   int sendAttempt = 1,
-  String password,
+  String? password,
 }) {
   return (Store<AppState> store) async {
     try {
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
       final session = store.state.authStore.session;
+      final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
@@ -628,6 +637,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
       return true;
     } catch (error) {
       store.dispatch(addAlert(
+        origin: 'checkPasswordResetVerification',
         error: error,
         message: 'Please click the emailed verify link before continuing',
       ));
@@ -636,7 +646,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
   };
 }
 
-ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
+ThunkAction<AppState> resetPassword({int sendAttempt = 1, String? password}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -644,9 +654,10 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
       final session = store.state.authStore.session;
+      final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
@@ -665,7 +676,7 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String password}) {
       ));
       return true;
     } catch (error) {
-      store.dispatch(addAlert(error: error));
+      store.dispatch(addAlert(origin: 'resetPassword', error: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -683,7 +694,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       final clientSecret = store.state.authStore.clientSecret;
 
       final data = await MatrixApi.sendPasswordResetEmail(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
@@ -701,7 +712,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       ));
       return true;
     } catch (error) {
-      store.dispatch(addAlert(error: error));
+      store.dispatch(addAlert(origin: 'sendPasswordResetEmail', error: error));
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -709,7 +720,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
   };
 }
 
-ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
+ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -717,15 +728,16 @@ ThunkAction<AppState> submitEmail({int sendAttempt = 1}) {
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final emailSubmitted = store.state.authStore.email;
       final clientSecret = store.state.authStore.clientSecret;
-      final currentCredential = store.state.authStore.credential;
+      final currentCredential = store.state.authStore.credential!;
+      final protocol = store.state.authStore.protocol;
 
-      if (currentCredential.params.containsValue(emailSubmitted) &&
-          sendAttempt < 2) {
+      if (currentCredential.params!.containsValue(emailSubmitted) &&
+          sendAttempt! < 2) {
         return true;
       }
 
       final data = await MatrixApi.registerEmail(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: homeserver,
         email: store.state.authStore.email,
         clientSecret: clientSecret,
@@ -773,16 +785,16 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
-      final authType = session != null ? credential.type : loginType;
-      final authValue = session != null ? credential.value : null;
-      final authParams = session != null ? credential.params : null;
+      final authType = session != null ? credential!.type : loginType;
+      final authValue = session != null ? credential!.value : null;
+      final authParams = session != null ? credential!.params : null;
 
       final device = await store.dispatch(generateDeviceId(
         salt: store.state.authStore.username,
       ));
 
       final data = await MatrixApi.registerUser(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
@@ -796,7 +808,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       if (data['errcode'] != null) {
         if (data['errcode'] == MatrixErrors.not_authorized &&
-            credential.type == MatrixAuthTypes.EMAIL) {
+            credential!.type == MatrixAuthTypes.EMAIL) {
           store.dispatch(SetVerificationNeeded(needed: true));
           return false;
         }
@@ -820,7 +832,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       store.dispatch(SetUser(user: User.fromMatrix(data)));
 
-      store.state.authStore.authObserver.add(
+      store.state.authStore.authObserver!.add(
         store.state.authStore.user,
       );
 
@@ -829,9 +841,11 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
     } catch (error) {
       printError('[createUser] error $error');
       if (enableErrors) {
-        store.dispatch(
-          addAlert(message: 'Failed to signup', error: error),
-        );
+        store.dispatch(addAlert(
+          origin: "createUser",
+          message: 'Failed to signup',
+          error: error,
+        ));
       }
       return false;
     } finally {
@@ -848,9 +862,11 @@ ThunkAction<AppState> updatePassword(String password) {
 
       var data;
 
+      final protocol = store.state.authStore.protocol;
+
       // Call just to get interactive auths
       data = await MatrixApi.updatePassword(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         password: password,
@@ -864,7 +880,7 @@ ThunkAction<AppState> updatePassword(String password) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
         data = await MatrixApi.updatePassword(
-          protocol: protocol,
+          protocol: store.state.authStore.protocol,
           homeserver: store.state.authStore.user.homeserver,
           accessToken: store.state.authStore.user.accessToken,
           userId: store.state.authStore.user.userId,
@@ -902,7 +918,7 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
       store.dispatch(SetLoading(loading: true));
 
       final data = await MatrixApi.updateDisplayName(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         userId: store.state.authStore.user.userId,
@@ -914,7 +930,9 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
       }
       return true;
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateDisplayName', message: error));
+      store.dispatch(
+        addAlert(origin: 'updateDisplayName', message: error.toString()),
+      );
       return false;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -922,12 +940,12 @@ ThunkAction<AppState> updateDisplayName(String newDisplayName) {
   };
 }
 
-ThunkAction<AppState> updateAvatar({File localFile}) {
+ThunkAction<AppState> updateAvatar({File? localFile}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final String displayName = store.state.authStore.user.displayName;
+      final String? displayName = store.state.authStore.user.displayName;
 
       final data = await store.dispatch(uploadMedia(
         localFile: localFile,
@@ -941,7 +959,7 @@ ThunkAction<AppState> updateAvatar({File localFile}) {
       return true;
     } catch (error) {
       store.dispatch(
-        addAlert(origin: 'updateAvatar', message: error.error),
+        addAlert(origin: 'updateAvatar', message: error.toString()),
       );
       return false;
     } finally {
@@ -956,10 +974,10 @@ ThunkAction<AppState> updateAvatar({File localFile}) {
  * Helper action - no try catch as it's meant to be
  * included in other update actions
  */
-ThunkAction<AppState> updateAvatarUri({String mxcUri}) {
+ThunkAction<AppState> updateAvatarUri({String? mxcUri}) {
   return (Store<AppState> store) async {
     final data = await MatrixApi.updateAvatarUri(
-      protocol: protocol,
+      protocol: store.state.authStore.protocol,
       homeserver: store.state.authStore.user.homeserver,
       accessToken: store.state.authStore.user.accessToken,
       userId: store.state.authStore.user.userId,
@@ -982,13 +1000,13 @@ ThunkAction<AppState> setLoading(bool loading) {
  * Update current interactive auth attempt
  */
 ThunkAction<AppState> updateCredential({
-  String type,
-  String value,
-  Map<String, String> params,
+  String? type,
+  String? value,
+  Map<String, String>? params,
 }) {
   return (Store<AppState> store) {
     try {
-      final currentCredential = store.state.authStore.credential;
+      final currentCredential = store.state.authStore.credential!;
       store.dispatch(SetCredential(
         credential: currentCredential.copyWith(
           type: type,
@@ -1015,7 +1033,7 @@ ThunkAction<AppState> resetSession() {
   };
 }
 
-ThunkAction<AppState> selectHomeserver({String hostname}) {
+ThunkAction<AppState> selectHomeserver({String? hostname}) {
   return (Store<AppState> store) async {
     final Homeserver homeserver = await store.dispatch(
       fetchHomeserver(hostname: hostname),
@@ -1032,7 +1050,8 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
-    final List<dynamic> homeserversJson = await JackApi.fetchPublicServers();
+    final List<dynamic> homeserversJson =
+        await (JackApi.fetchPublicServers() as Future<List<dynamic>>);
 
     // parse homeserver data
     final List<Homeserver> homserverData = homeserversJson.map((data) {
@@ -1065,12 +1084,13 @@ ThunkAction<AppState> fetchHomeservers() {
     // find favicons for all the homeservers
     final homeservers = await Future.wait(
       homserverData.map((homeserver) async {
-        final faviconUrl = await fetchFavicon(url: homeserver.hostname);
+        final url = await fetchFavicon(url: homeserver.hostname);
+        final uri = Uri.parse(url!);
         try {
-          final response = await http.get(faviconUrl);
+          final response = await http.get(uri);
 
           if (response.statusCode == 200) {
-            return homeserver.copyWith(photoUrl: faviconUrl);
+            return homeserver.copyWith(photoUrl: url);
           }
         } catch (error) {/* noop */}
 
@@ -1084,7 +1104,7 @@ ThunkAction<AppState> fetchHomeservers() {
   };
 }
 
-ThunkAction<AppState> fetchHomeserver({String hostname}) {
+ThunkAction<AppState> fetchHomeserver({String? hostname}) {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
     var homeserver = Homeserver(hostname: hostname);
@@ -1106,7 +1126,7 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
       }
     } catch (error) {
       printError('[selectHomserver] $error');
-      addInfo(message: error);
+      addInfo(message: error.toString());
 
       store.dispatch(SetLoading(loading: false));
 
@@ -1121,8 +1141,8 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
     // fetch homeserver login type
     try {
       final response = await MatrixApi.loginType(
-            protocol: protocol,
-            homeserver: homeserver.baseUrl,
+            protocol: store.state.authStore.protocol,
+            homeserver: homeserver.baseUrl!,
           ) ??
           {};
 
@@ -1137,26 +1157,26 @@ ThunkAction<AppState> fetchHomeserver({String hostname}) {
   };
 }
 
-ThunkAction<AppState> initClientSecret({String hostname}) =>
+ThunkAction<AppState> initClientSecret({String? hostname}) =>
     (Store<AppState> store) {
       store.dispatch(SetClientSecret(
         clientSecret: generateClientSecret(length: 24),
       ));
     };
 
-ThunkAction<AppState> setHostname({String hostname}) =>
+ThunkAction<AppState> setHostname({String? hostname}) =>
     (Store<AppState> store) {
-      store.dispatch(SetHostname(hostname: hostname.trim()));
+      store.dispatch(SetHostname(hostname: hostname!.trim()));
     };
 
-ThunkAction<AppState> setHomeserver({Homeserver homeserver}) =>
+ThunkAction<AppState> setHomeserver({Homeserver? homeserver}) =>
     (Store<AppState> store) {
       store.dispatch(SetHomeserver(homeserver: homeserver));
     };
 
-ThunkAction<AppState> setEmail({String email}) {
+ThunkAction<AppState> setEmail({String? email}) {
   return (Store<AppState> store) {
-    final validEmail = RegExp(Values.emailRegex).hasMatch(email);
+    final validEmail = RegExp(Values.emailRegex).hasMatch(email!);
 
     store.dispatch(SetEmailValid(
       valid: email != null && email.length > 0 && validEmail,
@@ -1166,20 +1186,20 @@ ThunkAction<AppState> setEmail({String email}) {
   };
 }
 
-ThunkAction<AppState> setUsername({String username}) {
+ThunkAction<AppState> setUsername({String? username}) {
   return (Store<AppState> store) {
     store.dispatch(
         SetUsernameValid(valid: username != null && username.length > 0));
-    store.dispatch(SetUsername(username: username.trim()));
+    store.dispatch(SetUsername(username: username!.trim()));
   };
 }
 
-ThunkAction<AppState> resolveUsername({String username}) {
+ThunkAction<AppState> resolveUsername({String? username}) {
   return (Store<AppState> store) {
     final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
 
-    var formatted = username.trim();
+    var formatted = username!.trim();
     if (formatted.length > 1) {
       formatted = formatted.replaceFirst('@', '', 1);
     }
@@ -1200,7 +1220,7 @@ ThunkAction<AppState> resolveUsername({String username}) {
   };
 }
 
-ThunkAction<AppState> setLoginPassword({String password}) =>
+ThunkAction<AppState> setLoginPassword({String? password}) =>
     (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
 
@@ -1210,7 +1230,7 @@ ThunkAction<AppState> setLoginPassword({String password}) =>
     };
 
 ThunkAction<AppState> setPassword({
-  String password,
+  String? password,
   bool ignoreConfirm = false,
 }) {
   return (Store<AppState> store) {
@@ -1228,13 +1248,13 @@ ThunkAction<AppState> setPassword({
   };
 }
 
-ThunkAction<AppState> setPasswordCurrent({String password}) {
+ThunkAction<AppState> setPasswordCurrent({String? password}) {
   return (Store<AppState> store) {
     store.dispatch(SetPasswordCurrent(password: password));
   };
 }
 
-ThunkAction<AppState> setPasswordConfirm({String password}) {
+ThunkAction<AppState> setPasswordConfirm({String? password}) {
   return (Store<AppState> store) {
     store.dispatch(SetPasswordConfirm(password: password));
 
@@ -1249,7 +1269,7 @@ ThunkAction<AppState> setPasswordConfirm({String password}) {
   };
 }
 
-ThunkAction<AppState> toggleAgreement({bool agreement}) {
+ThunkAction<AppState> toggleAgreement({bool? agreement}) {
   return (Store<AppState> store) {
     store.dispatch(SetAgreement(
       agreement: agreement ?? !store.state.authStore.agreement,
@@ -1257,7 +1277,7 @@ ThunkAction<AppState> toggleAgreement({bool agreement}) {
   };
 }
 
-ThunkAction<AppState> toggleCaptcha({bool completed}) {
+ThunkAction<AppState> toggleCaptcha({bool? completed}) {
   return (Store<AppState> store) async {
     store.dispatch(
       SetCaptcha(completed: completed ?? !store.state.authStore.captcha),

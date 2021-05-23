@@ -7,12 +7,12 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class DeviceKey extends Equatable {
-  final String userId;
-  final String deviceId;
-  final List<String> algorithms;
-  final Map<String, String> keys;
-  final Map<String, dynamic> signatures;
-  final Map<String, String> extras;
+  final String? userId;
+  final String? deviceId;
+  final List<String>? algorithms;
+  final Map<String, String>? keys;
+  final Map<String, dynamic>? signatures;
+  final Map<String, String>? extras;
 
   const DeviceKey({
     this.userId,
@@ -24,7 +24,7 @@ class DeviceKey extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         userId,
         deviceId,
         algorithms,

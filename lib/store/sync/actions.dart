@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -22,38 +22,36 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 class SetBackoff {
-  final int backoff;
+  final int? backoff;
   SetBackoff({this.backoff});
 }
 
 class SetUnauthed {
-  final bool unauthed;
+  final bool? unauthed;
   SetUnauthed({this.unauthed});
 }
 
 class SetOffline {
-  final bool offline;
+  final bool? offline;
   SetOffline({this.offline});
 }
 
 class SetBackgrounded {
-  final bool backgrounded;
+  final bool? backgrounded;
   SetBackgrounded({this.backgrounded});
 }
 
 class SetSyncing {
-  final bool syncing;
+  final bool? syncing;
   SetSyncing({this.syncing});
 }
 
 class SetSynced {
-  final bool synced;
-  final bool syncing;
-  final String lastSince;
-  final int backoff;
+  final bool? synced;
+  final bool? syncing;
+  final String? lastSince;
+  final int? backoff;
 
   SetSynced({
     this.synced,
@@ -64,13 +62,11 @@ class SetSynced {
 }
 
 class SetSyncObserver {
-  final Timer syncObserver;
+  final Timer? syncObserver;
   SetSyncObserver({this.syncObserver});
 }
 
-class ResetSync {
-  ResetSync();
-}
+class ResetSync {}
 
 /**
  * Default Room Sync Observer
@@ -94,7 +90,7 @@ ThunkAction<AppState> startSyncObserver() {
 
         final backoff = store.state.syncStore.backoff;
         final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-          store.state.syncStore.lastAttempt,
+          store.state.syncStore.lastAttempt!,
         );
 
         if (backoff != 0) {
@@ -139,9 +135,9 @@ ThunkAction<AppState> startSyncObserver() {
  * every few seconds
  */
 ThunkAction<AppState> stopSyncObserver() {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     if (store.state.syncStore.syncObserver != null) {
-      store.state.syncStore.syncObserver.cancel();
+      store.state.syncStore.syncObserver!.cancel();
       store.dispatch(SetSyncObserver(syncObserver: null));
     }
   };
@@ -190,7 +186,7 @@ ThunkAction<AppState> setBackgrounded(bool backgrounded) {
  * Responsible for updates based on differences from Matrix
  *  
  */
-ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
+ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
@@ -204,7 +200,7 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
 
       // Normal matrix /sync call to the homeserver (Threaded)
       final data = await compute(MatrixApi.syncBackground, {
-        'protocol': protocol,
+        'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': forceFull || store.state.roomStore.rooms == null,
@@ -225,29 +221,34 @@ ThunkAction<AppState> fetchSync({String since, bool forceFull = false}) {
       // TODO: Unfiltered
       // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       // final Map presence = data['presence'];
-
       final nextBatch = data['next_batch'];
-      final oneTimeKeyCount = data['device_one_time_keys_count'];
-      final Map<String, dynamic> rawJoined = data['rooms']['join'];
-      final Map<String, dynamic> rawInvites = data['rooms']['invite'];
-      final Map<String, dynamic> rawToDevice = data['to_device'];
+      final Map oneTimeKeyCount = data['device_one_time_keys_count'];
+      final Map<String, dynamic>? rawJoined = data['rooms']['join'];
+      final Map<String, dynamic>? rawInvites = data['rooms']['invite'];
+      final Map<String, dynamic>? rawToDevice = data['to_device'];
 
       // Updates for rooms
       await store.dispatch(syncRooms(rawJoined));
       await store.dispatch(syncRooms(rawInvites));
 
       // Updates for device specific data (mostly room encryption)
-      await store.dispatch(syncDevice(rawToDevice));
+      await store.dispatch(syncDevice(rawToDevice ?? {}));
 
       // Update encryption one time key count
-      store.dispatch(updateOneTimeKeyCounts(oneTimeKeyCount));
-
-      // Update synced to indicate init sync and next batch id (lastSince)
-      store.dispatch(SetSynced(
-        synced: true,
-        syncing: false,
-        lastSince: nextBatch,
+      store.dispatch(updateOneTimeKeyCounts(
+        Map<String, int>.from(oneTimeKeyCount),
       ));
+
+      // WARN: may finish a sync poll after logging out
+      // TODO: cancel in progress sync polls?
+      if (store.state.authStore.user.accessToken != null) {
+        // Update synced to indicate init sync and next batch id (lastSince)
+        store.dispatch(SetSynced(
+          synced: true,
+          syncing: false,
+          lastSince: nextBatch,
+        ));
+      }
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync completed ***');

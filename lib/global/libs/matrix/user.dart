@@ -20,10 +20,10 @@ abstract class Users {
    * to clients in the top-level account_data.
    */
   static Future<dynamic> fetchAccountData({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
     String type = AccountDataTypes.direct,
   }) async {
     String url =
@@ -34,7 +34,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -53,12 +53,12 @@ abstract class Users {
    * to clients in the top-level account_data.
    */
   static Future<dynamic> saveAccountData({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
     String type = AccountDataTypes.direct,
-    Map accountData,
+    Map? accountData,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
@@ -68,7 +68,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(accountData),
     );
@@ -88,11 +88,11 @@ abstract class Users {
    * to clients in the top-level account_data.
    */
   static Future<dynamic> updateBlockedUsers({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
-    Map<String, dynamic> blockUserList = const {"ignored_users": {}},
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
+    Map<String, dynamic> blockUserList = const {},
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/${AccountDataTypes.ignoredUserList}';
@@ -102,11 +102,11 @@ abstract class Users {
     };
 
     final body = {
-      'ignored_users': blockUserList ?? {},
+      'ignored_users': blockUserList,
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -126,11 +126,11 @@ abstract class Users {
    * to clients in the top-level account_data.
    */
   static Future<dynamic> inviteUser({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String roomId,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+    String? userId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
 
@@ -144,7 +144,7 @@ abstract class Users {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -162,10 +162,10 @@ abstract class Users {
    * e.g. you need to have their access_token.
    */
   static Future<dynamic> fetchUserProfile({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId';
 
@@ -174,7 +174,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -193,12 +193,12 @@ abstract class Users {
    * e.g. you need to have their access_token.
    */
   static Future<dynamic> updateDisplayName({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
-    String displayName,
-    Map accountData,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
+    String? displayName,
+    Map? accountData,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
@@ -212,7 +212,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -232,11 +232,11 @@ abstract class Users {
    * you need to have their access_token.
    */
   static Future<dynamic> updateAvatarUri({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String userId,
-    String avatarUri,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
+    String? avatarUri,
   }) async {
     String url =
         '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
@@ -250,7 +250,7 @@ abstract class Users {
     };
 
     final saveResponse = await http.put(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -271,12 +271,12 @@ abstract class Users {
 dynamic buildRoomMembersRequest({
   String protocol = 'https://',
   String homeserver = 'matrix.org',
-  String accessToken,
-  String roomId,
+  String? accessToken,
+  String? roomId,
 }) {
   String url = '$protocol$homeserver/_matrix/client/r0/rooms/${roomId}/members';
 
   Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 
-  return {'url': url, 'headers': headers};
+  return {'url': Uri.parse(url), 'headers': headers};
 }

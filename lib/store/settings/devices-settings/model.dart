@@ -6,11 +6,11 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Device extends Equatable {
-  final String deviceId;
-  final String deviceIdPrivate;
-  final String displayName;
-  final String lastSeenIp;
-  final int lastSeenTs;
+  final String? deviceId;
+  final String? deviceIdPrivate;
+  final String? displayName;
+  final String? lastSeenIp;
+  final int? lastSeenTs;
 
   const Device({
     this.deviceId,
@@ -21,7 +21,7 @@ class Device extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         deviceId,
         deviceIdPrivate,
         displayName,
@@ -30,11 +30,11 @@ class Device extends Equatable {
       ];
 
   Device copyWith({
-    String deviceId,
-    String deviceIdPrivate,
-    String displayName,
-    String lastSeenIp,
-    int lastSeenTs,
+    String? deviceId,
+    String? deviceIdPrivate,
+    String? displayName,
+    String? lastSeenIp,
+    int? lastSeenTs,
   }) =>
       Device(
         deviceId: deviceId ?? this.deviceId,

@@ -8,7 +8,7 @@ List<Room> availableRooms(List<Room> rooms) {
   return List.from(rooms.where((room) => !room.hidden));
 }
 
-String formatPreviewTopic(String fullTopic) {
+String formatPreviewTopic(String? fullTopic) {
   final topic = fullTopic ?? Strings.contentTopicEmpty;
   final topicTruncated = topic.length > 100 ? topic.substring(0, 100) : topic;
   return topicTruncated.replaceAll('\n', ' ');
@@ -22,10 +22,10 @@ String formatTotalUsers(int totalUsers) {
   return totalUsers.toString();
 }
 
-String formatPreview({Room room, Message message}) {
+String formatPreview({required Room room, Message? message}) {
   // Prioritize drafts for any room, regardless of state
-  if (room.draft != null && room.draft.body != null) {
-    return 'Draft: ${formatPreviewMessage(room.draft.body)}';
+  if (room.draft != null && room.draft!.body != null) {
+    return 'Draft: ${formatPreviewMessage(room.draft!.body!)}';
   }
 
   // Show topic if the user has joined a group but not sent
@@ -36,7 +36,7 @@ String formatPreview({Room room, Message message}) {
     }
 
     // room was created, but no messages or topic
-    if (room.topic == null || room.topic.length < 1) {
+    if (room.topic == null || room.topic!.length < 1) {
       return 'No messages yet';
     }
 
@@ -51,18 +51,18 @@ String formatPreview({Room room, Message message}) {
   }
 
   // message hasn't been decrypted
-  if (message.type == EventTypes.encrypted && message.body.isEmpty) {
+  if (message.type == EventTypes.encrypted && message.body!.isEmpty) {
     return Strings.contentEncryptedMessage;
   }
 
-  return formatPreviewMessage(message.body);
+  return formatPreviewMessage(message.body!);
 }
 
-String formatRoomName({Room room}) {
-  final name = room.name;
+String formatRoomName({required Room room}) {
+  final name = room.name!;
   return name.length > 22 ? '${name.substring(0, 22)}...' : name;
 }
 
-String formatRoomInitials({Room room}) {
-  return room.name.substring(0, 2).toUpperCase();
+String formatRoomInitials({required Room room}) {
+  return room.name!.substring(0, 2).toUpperCase();
 }

@@ -11,13 +11,10 @@ class Message extends Event {
   final bool failed;
 
   // message editing
-  @JsonKey(defaultValue: false)
   final bool edited;
-
-  @JsonKey(defaultValue: false)
   final bool replacement;
 
-  final String relatedEventId;
+  final String? relatedEventId;
 
   @JsonKey(ignore: true)
   final List<Message> edits;
@@ -26,17 +23,18 @@ class Message extends Event {
   final List<Reaction> reactions;
 
   // Message Only
-  final String body;
-  final String msgtype;
-  final String format;
-  final String filename;
-  final String formattedBody;
-  final int received;
+  final String? body;
+  final String? msgtype;
+  final String? format;
+  final String? filename;
+  final String? formattedBody;
+  final int? received;
 
   // Encrypted Messages only
-  final String ciphertext;
-  final String algorithm;
-  final String senderKey; // Curve25519 device key which initiated the session
+  final String? ciphertext;
+  final String? algorithm;
+  final String? sessionId;
+  final String? senderKey; // Curve25519 device key which initiated the session
 
   const Message({
     id,
@@ -47,24 +45,24 @@ class Message extends Event {
     stateKey,
     timestamp,
     content,
-    data,
     this.body,
     this.msgtype,
     this.format,
     this.filename,
     this.formattedBody,
+    this.received,
     this.ciphertext,
     this.senderKey,
     this.algorithm,
-    this.received,
+    this.sessionId,
+    this.relatedEventId,
+    this.edited = false,
     this.syncing = false,
     this.pending = false,
     this.failed = false,
     this.replacement = false,
-    this.relatedEventId,
     this.edits = const [],
     this.reactions = const [],
-    this.edited = false,
   }) : super(
           id: id,
           userId: userId,
@@ -94,12 +92,13 @@ class Message extends Event {
     ciphertext,
     senderKey,
     algorithm,
+    sessionId,
     received,
-    syncing = false,
-    pending = false,
-    failed = false,
-    replacement = false,
-    edited = false,
+    bool? syncing,
+    bool? pending,
+    bool? failed,
+    bool? replacement,
+    bool? edited,
     relatedEventId,
     edits,
     reactions,
@@ -118,15 +117,16 @@ class Message extends Event {
         msgtype: msgtype ?? this.msgtype,
         format: format ?? this.format,
         filename: filename ?? this.filename,
+        received: received ?? this.received,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
         algorithm: algorithm ?? this.algorithm,
-        syncing: syncing ?? this.syncing ?? false,
-        pending: pending ?? this.pending ?? false,
-        failed: failed ?? this.failed ?? false,
-        received: received ?? this.received,
-        replacement: replacement ?? this.replacement ?? false,
-        edited: edited ?? this.edited ?? false,
+        sessionId: sessionId ?? this.sessionId,
+        syncing: syncing ?? this.syncing,
+        pending: pending ?? this.pending,
+        failed: failed ?? this.failed,
+        replacement: replacement ?? this.replacement,
+        edited: edited ?? this.edited,
         relatedEventId: relatedEventId ?? this.relatedEventId,
         edits: edits ?? this.edits,
         reactions: reactions ?? this.reactions,
@@ -169,6 +169,7 @@ class Message extends Event {
         ciphertext: event.content['ciphertext'] ?? '',
         algorithm: event.content['algorithm'],
         senderKey: event.content['sender_key'],
+        sessionId: event.content['session_id'],
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,

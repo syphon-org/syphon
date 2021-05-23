@@ -17,7 +17,7 @@ class RoomStore extends Equatable {
   final bool loading;
 
   @JsonKey(ignore: true)
-  List<Room> get roomList => rooms != null ? List<Room>.from(rooms.values) : [];
+  List<Room> get roomList => List<Room>.from(rooms.values);
 
   const RoomStore({
     this.rooms = const {},
@@ -30,9 +30,8 @@ class RoomStore extends Equatable {
       ];
 
   RoomStore copyWith({
-    rooms,
-    loading,
-    lastSince,
+    bool? loading,
+    Map<String, Room>? rooms,
   }) =>
       RoomStore(
         rooms: rooms ?? this.rooms,

@@ -57,3 +57,6 @@ Flutter.podspec
 
 # vscode workspace
 *.code-workspace
+
+# flutter version mgmt
+.fvm/flutter_sdk

@@ -16,7 +16,7 @@ enum ThemeType {
 ///
 /// Written by TR_SLimey
 ///
-void initSystemTheme(ThemeType themeType, {bool statusTransparent}) {
+void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
   var themeNavbarColour;
   var themeNavbarIconBrightness;
 
@@ -48,7 +48,7 @@ void initSystemTheme(ThemeType themeType, {bool statusTransparent}) {
 }
 
 class Themes {
-  static Color backgroundBrightness(ThemeType type) {
+  static Color? backgroundBrightness(ThemeType type) {
     switch (type) {
       case ThemeType.LIGHT:
         return Colors.grey[200];
@@ -66,17 +66,17 @@ class Themes {
   }
 
   static ThemeData generateCustomTheme({
-    int primaryColorHex,
-    int accentColorHex,
-    int appBarColorHex,
-    String fontName,
-    String fontSize,
-    ThemeType themeType,
+    int? primaryColorHex,
+    int? accentColorHex,
+    int? appBarColorHex,
+    String? fontName,
+    String? fontSize,
+    ThemeType? themeType,
   }) {
     int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
     int accentColor = accentColorHex ?? Colours.cyanSyphon;
-    int appBarColor = appBarColorHex;
-    int scaffoldBackgroundColor = Colours.whiteDefault;
+    int? appBarColor = appBarColorHex;
+    int? scaffoldBackgroundColor = Colours.whiteDefault;
 
     var appBarElevation;
     var modalColor;
@@ -119,7 +119,7 @@ class Themes {
     var titleWeight = FontWeight.w400;
     var bodyWeight = FontWeight.w400;
 
-    double letterSpacing;
+    double? letterSpacing;
     switch (fontName) {
       case 'Rubik':
         titleWeight = FontWeight.w100;
@@ -168,17 +168,19 @@ class Themes {
       // Core UI\
       dialogBackgroundColor: modalColor,
       focusColor: Color(primaryColor),
-      cursorColor: Color(primaryColor),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: Color(primaryColor),
+        selectionColor: Color(primaryColor).withAlpha(100),
+        selectionHandleColor: Color(primaryColor),
+      ),
       iconTheme: IconThemeData(color: iconColor),
-      textSelectionColor: Color(primaryColor).withAlpha(100),
-      textSelectionHandleColor: Color(primaryColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
           ? Color(scaffoldBackgroundColor)
           : null,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
-        color: Color(appBarColor ?? primaryColorHex),
+        color: Color(appBarColor ?? primaryColorHex!),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(

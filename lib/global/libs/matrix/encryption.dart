@@ -4,6 +4,8 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
 
 class Algorithms {
@@ -15,8 +17,8 @@ class Algorithms {
 }
 
 class Keys {
-  static fingerprint({String deviceId}) => '${Algorithms.ed25519}:$deviceId';
-  static identity({String deviceId}) => '${Algorithms.curve25591}:$deviceId';
+  static fingerprint({String? deviceId}) => '${Algorithms.ed25519}:$deviceId';
+  static identity({String? deviceId}) => '${Algorithms.curve25591}:$deviceId';
 }
 
 abstract class Encryption {
@@ -28,28 +30,28 @@ abstract class Encryption {
    * Returns the current devices and identity keys for the given users.
    */
   static Future<dynamic> fetchKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
-    String lastSince,
+    String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "timeout": timeout,
+    final Map body = {
+      'timeout': timeout,
       'device_keys': users,
       'token': lastSince,
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -67,9 +69,9 @@ abstract class Encryption {
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
+    String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
-    String lastSince,
+    String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
     String url =
@@ -80,7 +82,7 @@ abstract class Encryption {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -103,9 +105,9 @@ abstract class Encryption {
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
-    String accessToken,
-    String from,
-    String to,
+    String? accessToken,
+    String? from,
+    String? to,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
@@ -114,7 +116,7 @@ abstract class Encryption {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -129,11 +131,11 @@ abstract class Encryption {
    * Claims one-time keys for use in pre-key messages.
    * 
    */
-  static Future<dynamic> claimKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    Map oneTimeKeys,
+  static Future<Map<String, dynamic>> claimKeys({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    Map? oneTimeKeys,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
 
@@ -143,11 +145,12 @@ abstract class Encryption {
     };
 
     Map body = {
+      'timeout': 10000,
       'one_time_keys': oneTimeKeys,
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
@@ -156,10 +159,10 @@ abstract class Encryption {
   }
 
   static Future<dynamic> uploadKeys({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    Map data,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    Map? data,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 
@@ -169,11 +172,66 @@ abstract class Encryption {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(data),
     );
 
     return await json.decode(response.body);
+  }
+
+  ///
+  /// Request Keys
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#m-room-key-request
+  ///
+  /// Returns the current devices and identity keys for the given users.
+  ///
+  static Future<dynamic> requestKeys({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? requestId,
+    String? roomId,
+    String? userId,
+    String? deviceId,
+    String? senderKey,
+    String? sessionId,
+  }) async {
+    Map content = {
+      'content': {
+        'action': 'request',
+        // 'LWKAFEZEIV',
+        'requesting_device_id': deviceId,
+        'request_id': requestId,
+        'body': {
+          // '!UhmfsSdxgBXFBiXnKG:matrix.org',
+          'room_id': roomId,
+          'algorithm': Algorithms.megolmv1,
+          // '5XivQ5GjANSUvZv2m9HYrtVOxKUkL2lDHWiNMmH11hQ',
+          'sender_key': senderKey,
+          // '6EtPICxnz4yq4/93qTVULhtiHE0R99qnABI8oN5o4wY'
+          'session_id': sessionId
+        }
+      },
+      'type': EventTypes.roomKeyRequest,
+      'sender': userId //'@ereio:matrix.org'
+    };
+
+    // format payload for toDevice events
+    final payload = {
+      userId: {
+        deviceId: content,
+      },
+    };
+
+    return MatrixApi.sendEventToDevice(
+      protocol: protocol,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      eventType: EventTypes.roomKeyRequest,
+      trxId: DateTime.now().millisecond.toString(),
+      content: payload,
+    );
   }
 }

@@ -17,13 +17,13 @@ import 'package:syphon/store/settings/devices-settings/model.dart';
 
 class DialogConfirmPassword extends StatelessWidget {
   DialogConfirmPassword({
-    Key key,
+    Key? key,
     this.onConfirm,
     this.onCancel,
   }) : super(key: key);
 
-  final Function onConfirm;
-  final Function onCancel;
+  final Function? onConfirm;
+  final Function? onCancel;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -100,18 +100,18 @@ class DialogConfirmPassword extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text('Cancel'),
                   onPressed: !props.loading
                       ? () {
                           if (this.onCancel != null) {
-                            this.onCancel();
+                            this.onCancel!();
                           }
                           Navigator.of(context).pop();
                         }
                       : null,
                 ),
-                FlatButton(
+                TextButton(
                   child: !props.loading
                       ? Text('Confirm')
                       : Container(
@@ -131,7 +131,7 @@ class DialogConfirmPassword extends StatelessWidget {
                       ? null
                       : () {
                           if (this.onConfirm != null) {
-                            this.onConfirm();
+                            this.onConfirm!();
                           }
                           Navigator.of(context).pop();
                         },
@@ -151,10 +151,10 @@ class Props extends Equatable {
   final Function onChangePassword;
 
   Props({
-    @required this.valid,
-    @required this.loading,
-    @required this.devices,
-    @required this.onChangePassword,
+    required this.valid,
+    required this.loading,
+    required this.devices,
+    required this.onChangePassword,
   });
 
   @override
@@ -168,10 +168,10 @@ class Props extends Equatable {
     Store<AppState> store,
   ) =>
       Props(
-        valid: store.state.authStore.credential.value != null &&
-            store.state.authStore.credential.value.length > 0,
+        valid: store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.length > 0,
         loading: store.state.settingsStore.loading,
-        devices: store.state.settingsStore.devices ?? const [],
+        devices: store.state.settingsStore.devices,
         onChangePassword: (password) {
           store.dispatch(updateCredential(value: password));
         },

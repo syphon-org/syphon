@@ -7,14 +7,14 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class User extends Equatable {
-  final String userId;
-  final String deviceId; // current device id
-  final String idserver;
-  final String homeserver;
-  final String homeserverName;
-  final String accessToken;
-  final String displayName;
-  final String avatarUri;
+  final String? userId;
+  final String? deviceId; // current device id
+  final String? idserver;
+  final String? homeserver;
+  final String? homeserverName;
+  final String? accessToken;
+  final String? displayName;
+  final String? avatarUri;
 
   const User({
     this.userId,
@@ -28,13 +28,13 @@ class User extends Equatable {
   });
 
   User copyWith({
-    String userId,
-    String baseurl,
-    String deviceId,
-    String homeserver,
-    String accessToken,
-    String displayName,
-    String avatarUri,
+    String? userId,
+    String? baseurl,
+    String? deviceId,
+    String? homeserver,
+    String? accessToken,
+    String? displayName,
+    String? avatarUri,
   }) =>
       User(
         userId: userId ?? this.userId,
@@ -47,7 +47,7 @@ class User extends Equatable {
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         userId,
         deviceId,
         idserver,
@@ -76,14 +76,14 @@ class User extends Equatable {
       }
 
       return User(
-        userId: json['user_id'] as String,
-        deviceId: json['device_id'] as String,
-        idserver: (idserver ?? json['home_server']) as String,
-        homeserver: (homeserver ?? json['home_server']) as String,
-        homeserverName: json['home_server'] as String,
-        displayName: json['display_name'] as String,
-        accessToken: json['access_token'] as String,
-        avatarUri: json['avatar_url'] as String,
+        userId: json['user_id'] as String?,
+        deviceId: json['device_id'] as String?,
+        idserver: (idserver ?? json['home_server']) as String?,
+        homeserver: (homeserver ?? json['home_server']) as String?,
+        homeserverName: json['home_server'] as String?,
+        displayName: json['display_name'] as String?,
+        accessToken: json['access_token'] as String?,
+        avatarUri: json['avatar_url'] as String?,
       );
     } catch (error) {
       debugPrint('[User.fromMatrix] $error');

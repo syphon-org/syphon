@@ -1,22 +1,23 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-// part 'model.g.dart';
+part 'model.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class Homeserver extends Equatable {
-  final String hostname;
-  final String baseUrl;
-  final String photoUrl;
-  final String identityUrl;
-  final String loginType;
+  final String? hostname;
+  final String? baseUrl;
+  final String? photoUrl;
+  final String? identityUrl;
+  final String? loginType;
 
-  final String location;
-  final String description;
-  final String founded;
-  final String responseTime;
-  final String usersActive;
-  final String roomsTotal;
+  final String? location;
+  final String? description;
+  final String? founded;
+  final String? responseTime;
+  final String? usersActive;
+  final String? roomsTotal;
 
   final bool valid;
 
@@ -36,7 +37,7 @@ class Homeserver extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         hostname,
         baseUrl,
         photoUrl,
@@ -52,18 +53,18 @@ class Homeserver extends Equatable {
       ];
 
   Homeserver copyWith({
-    String hostname,
-    String baseUrl,
-    String photoUrl,
-    String identityUrl,
-    String loginType,
-    String location,
-    String description,
-    String founded,
-    String responseTime,
-    String usersActive,
-    String roomsTotal,
-    bool valid,
+    String? hostname,
+    String? baseUrl,
+    String? photoUrl,
+    String? identityUrl,
+    String? loginType,
+    String? location,
+    String? description,
+    String? founded,
+    String? responseTime,
+    String? usersActive,
+    String? roomsTotal,
+    bool? valid,
   }) =>
       Homeserver(
         hostname: hostname ?? this.hostname,
@@ -77,11 +78,11 @@ class Homeserver extends Equatable {
         roomsTotal: roomsTotal ?? this.roomsTotal,
         founded: founded ?? this.founded,
         responseTime: responseTime ?? this.responseTime,
-        valid: valid ?? this.valid ?? false,
+        valid: valid ?? this.valid,
       );
 
-  // Map<String, dynamic> toJson() => _$CredentialToJson(this);
+  Map<String, dynamic> toJson() => _$HomeserverToJson(this);
 
-  // factory Credential.fromJson(Map<String, dynamic> json) =>
-  //     _$CredentialFromJson(json);
+  factory Homeserver.fromJson(Map<String, dynamic> json) =>
+      _$HomeserverFromJson(json);
 }

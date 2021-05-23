@@ -7,8 +7,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/home/chat/details-all-users.dart';
-import 'package:syphon/views/home/groups/invite-users.dart';
+import 'package:syphon/views/home/chat/details-all-users-screen.dart';
+import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -20,7 +20,7 @@ import 'package:syphon/views/widgets/modals/modal-user-details.dart';
  */
 class ListUserBubbles extends StatelessWidget {
   ListUserBubbles({
-    Key key,
+    Key? key,
     this.users = const [],
     this.roomId = '',
     this.invite = false,
@@ -31,13 +31,13 @@ class ListUserBubbles extends StatelessWidget {
   final int max;
   final bool invite;
   final bool forceOption;
-  final String roomId;
-  final List<User> users;
+  final String? roomId;
+  final List<User?> users;
 
   @protected
   onShowUserDetails({
-    BuildContext context,
-    User user,
+    required BuildContext context,
+    User? user,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -60,7 +60,7 @@ class ListUserBubbles extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
-              final user = users[index];
+              final user = users[index]!;
 
               return Align(
                 child: GestureDetector(
@@ -124,7 +124,7 @@ class ListUserBubbles extends StatelessWidget {
                           ),
                           border: Border.all(
                             width: 1,
-                            color: Theme.of(context).textTheme.caption.color,
+                            color: Theme.of(context).textTheme.caption!.color!,
                           ),
                         ),
                         child: Icon(
@@ -132,7 +132,7 @@ class ListUserBubbles extends StatelessWidget {
                           size: invite
                               ? Dimensions.iconSize
                               : Dimensions.iconSizeLarge,
-                          color: Theme.of(context).textTheme.caption.color,
+                          color: Theme.of(context).textTheme.caption!.color,
                         ),
                       ),
                     ),

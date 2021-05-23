@@ -15,12 +15,12 @@ abstract class Notifications {
    * Gets all currently active pushers for the authenticated user.
    */
   static Future<dynamic> fetchNotifications({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String from,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? from,
     int limit = 10,
-    String only,
+    String? only,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/notifications';
 
@@ -34,7 +34,7 @@ abstract class Notifications {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -49,9 +49,9 @@ abstract class Notifications {
    * Gets all currently active pushers for the authenticated user.
    */
   static Future<dynamic> fetchNotificationPushers({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/pushers';
 
@@ -60,7 +60,7 @@ abstract class Notifications {
     };
 
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: headers,
     );
 
@@ -94,18 +94,18 @@ abstract class Notifications {
    * in the JSON body.
    */
   static Future<dynamic> saveNotificationPusher({
-    String protocol = 'https://',
-    String homeserver = 'matrix.org',
-    String accessToken,
-    String pushKey, // required
-    String kind = 'http', // required
-    String appId, // required
-    String appDisplayName, // required
-    String deviceDisplayName, // required
-    String profileTag,
-    String lang, // required
-    String dataUrl, // required
-    String append,
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? pushKey, // required
+    String? kind = 'http', // required
+    String? appId, // required
+    String? appDisplayName, // required
+    String? deviceDisplayName, // required
+    String? profileTag,
+    String? lang, // required
+    String? dataUrl, // required
+    String? append,
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/pushers/set';
     String pushGateway = '$protocol$homeserver/_matrix/push/v1/notify';
@@ -134,7 +134,7 @@ abstract class Notifications {
     }
 
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );

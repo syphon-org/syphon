@@ -1,22 +1,16 @@
-// Dart imports:
-import 'dart:math';
-
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -29,52 +23,86 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 class ResetEvents {}
 
 class SetEvents {
-  final String roomId;
-  final List<Event> events;
+  final String? roomId;
+  final List<Event>? events;
   SetEvents({this.roomId, this.events});
 }
 
 class SetMessages {
   final String roomId;
   final List<Message> messages;
-  SetMessages({this.roomId, this.messages});
+  final List<Message> outbox;
+
+  SetMessages({
+    required this.roomId,
+    this.messages = const [],
+    this.outbox = const [],
+  });
 }
 
 class SetReactions {
-  final String roomId;
-  final List<Reaction> reactions;
+  final String? roomId;
+  final List<Reaction>? reactions;
   SetReactions({this.roomId, this.reactions});
 }
 
 class SetReceipts {
-  final String roomId;
-  final Map<String, ReadReceipt> receipts;
+  final String? roomId;
+  final Map<String, ReadReceipt>? receipts;
   SetReceipts({this.roomId, this.receipts});
 }
 
 class SetRedactions {
-  final List<Redaction> redactions;
+  final List<Redaction>? redactions;
   SetRedactions({this.redactions});
 }
 
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but
+/// are still in an unknown state remotely
+///
+class SaveOutboxMessage {
+  final String tempId;
+  final Message pendingMessage;
+
+  SaveOutboxMessage({
+    required this.tempId,
+    required this.pendingMessage,
+  });
+}
+
+///
+/// Save Outbox Message
+///
+/// tempId is for messages that have attempted sending but
+/// are still in an unknown state remotely
+///
+class DeleteOutboxMessage {
+  final Message message; // room id
+
+  DeleteOutboxMessage({required this.message});
+}
+
 ThunkAction<AppState> setMessages({
-  Room room,
-  List<Message> messages,
-  int offset = 0,
-  int limit = 20,
+  required Room room,
+  List<Message> messages = const [],
+  List<Message> outbox = const [],
 }) =>
     (Store<AppState> store) {
-      if (messages.isEmpty) return;
-      return store.dispatch(SetMessages(roomId: room.id, messages: messages));
+      if (messages.isEmpty && outbox.isEmpty) return;
+
+      return store.dispatch(
+        SetMessages(roomId: room.id, messages: messages, outbox: outbox),
+      );
     };
 
 ThunkAction<AppState> setReactions({
-  List<Reaction> reactions,
+  List<Reaction> reactions = const [],
 }) =>
     (Store<AppState> store) {
       if (reactions.isEmpty) return;
@@ -82,21 +110,21 @@ ThunkAction<AppState> setReactions({
     };
 
 ThunkAction<AppState> setRedactions({
-  String roomId,
-  List<Redaction> redactions,
+  String? roomId,
+  List<Redaction>? redactions,
 }) =>
     (Store<AppState> store) {
-      if (redactions.isEmpty) return;
+      if (redactions!.isEmpty) return;
       store.dispatch(SetRedactions(redactions: redactions));
     };
 
 ThunkAction<AppState> setReceipts({
-  Room room,
-  Map<String, ReadReceipt> receipts,
+  Room? room,
+  Map<String, ReadReceipt>? receipts,
 }) =>
     (Store<AppState> store) {
-      if (receipts.isEmpty) return;
-      return store.dispatch(SetReceipts(roomId: room.id, receipts: receipts));
+      if (receipts!.isEmpty) return;
+      return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
 /**
@@ -109,30 +137,27 @@ ThunkAction<AppState> setReceipts({
  * 
  */
 ThunkAction<AppState> loadMessagesCached({
-  Room room,
+  Room? room,
   int offset = 0,
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesStored = await loadMessages(
         room.messageIds,
-        storage: Storage.main,
+        storage: Storage.main!,
         offset: offset, // offset from the most recent eventId found
         limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );
 
       // load cold storage messages to state
-      store.dispatch(SetMessages(
-        roomId: room.id,
-        messages: messagesStored,
-      ));
+      store.dispatch(SetMessages(roomId: room.id, messages: messagesStored));
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
@@ -146,18 +171,18 @@ ThunkAction<AppState> loadMessagesCached({
  * Pulls next message events remote from homeserver
  */
 ThunkAction<AppState> fetchMessageEvents({
-  Room room,
-  String to,
-  String from,
+  Room? room,
+  String? to,
+  String? from,
   bool oldest = false,
   int limit = 20,
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room.id, syncing: true));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
-        "protocol": protocol,
+        "protocol": store.state.authStore.protocol,
         "homeserver": store.state.authStore.user.homeserver,
         "accessToken": store.state.authStore.user.accessToken,
         "roomId": room.id,
@@ -167,10 +192,10 @@ ThunkAction<AppState> fetchMessageEvents({
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
-      final String end = messagesJson['end'];
+      final String? end = messagesJson['end'];
 
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
-      final String start = messagesJson['start'];
+      final String? start = messagesJson['start'];
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
@@ -191,7 +216,7 @@ ThunkAction<AppState> fetchMessageEvents({
     } catch (error) {
       debugPrint('[fetchMessageEvents] error $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
@@ -206,6 +231,8 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
     try {
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
+
+      var sentRequest = false;
 
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {
@@ -243,14 +270,14 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
  * state events can only be 
  * done from full state /sync data
  */
-ThunkAction<AppState> fetchStateEvents({Room room}) {
+ThunkAction<AppState> fetchStateEvents({Room? room}) {
   return (Store<AppState> store) async {
     try {
       final stateEvents = await MatrixApi.fetchStateEvents(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
-        roomId: room.id,
+        roomId: room!.id,
       );
 
       if (!(stateEvents is List) && stateEvents['errcode'] != null) {
@@ -267,15 +294,15 @@ ThunkAction<AppState> fetchStateEvents({Room room}) {
     } catch (error) {
       debugPrint('[fetchStateEvents] $error');
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
   };
 }
 
-ThunkAction<AppState> clearDraft({Room room}) {
+ThunkAction<AppState> clearDraft({Room? room}) {
   return (Store<AppState> store) async {
     store.dispatch(UpdateRoom(
-      id: room.id,
+      id: room!.id,
       draft: Message(
         roomId: room.id,
         body: null,
@@ -286,12 +313,12 @@ ThunkAction<AppState> clearDraft({Room room}) {
 
 ThunkAction<AppState> saveDraft({
   final body,
-  String type = 'm.text',
-  Room room,
+  String? type = 'm.text',
+  Room? room,
 }) {
   return (Store<AppState> store) async {
     store.dispatch(UpdateRoom(
-      id: room.id,
+      id: room!.id,
       draft: Message(
         roomId: room.id,
         type: type,
@@ -303,11 +330,11 @@ ThunkAction<AppState> saveDraft({
 }
 
 ThunkAction<AppState> selectReply({
-  String roomId,
-  Message message,
+  String? roomId,
+  Message? message,
 }) {
   return (Store<AppState> store) async {
-    final room = store.state.roomStore.rooms[roomId];
+    final room = store.state.roomStore.rooms[roomId!]!;
     final reply = message == null ? Message() : message;
     store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
   };
@@ -322,15 +349,15 @@ ThunkAction<AppState> selectReply({
 ///
 ///
 ThunkAction<AppState> formatMessageReply(
-  Room room,
-  Message message,
+  Room? room,
+  Message? message,
   Message reply,
 ) {
   return (Store<AppState> store) async {
     try {
-      final body = '''> <${reply.sender}> ${reply.body}\n\n${message.body}''';
+      final body = '''> <${reply.sender}> ${reply.body}\n\n${message!.body}''';
       final formattedBody =
-          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
+          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room!.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
 
       return message.copyWith(
         body: body,
@@ -363,8 +390,8 @@ ThunkAction<AppState> formatMessageReply(
  * one http call
  */
 ThunkAction<AppState> sendReadReceipts({
-  Room room,
-  Message message,
+  Room? room,
+  Message? message,
   bool readAll = true,
 }) {
   return (Store<AppState> store) async {
@@ -375,11 +402,11 @@ ThunkAction<AppState> sendReadReceipts({
       }
 
       final data = await MatrixApi.sendReadReceipts(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-        messageId: message.id,
+        roomId: room!.id,
+        messageId: message!.id,
         readAll: readAll,
       );
 
@@ -402,8 +429,8 @@ ThunkAction<AppState> sendReadReceipts({
  */
 
 ThunkAction<AppState> sendTyping({
-  String roomId,
-  bool typing = false,
+  String? roomId,
+  bool? typing = false,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -414,7 +441,7 @@ ThunkAction<AppState> sendTyping({
       }
 
       final data = await MatrixApi.sendTyping(
-        protocol: protocol,
+        protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: roomId,
@@ -435,12 +462,10 @@ ThunkAction<AppState> sendTyping({
  * Delete Room Event (For Outbox, Local, and Remote)
  */
 
-ThunkAction<AppState> deleteMessage({
-  Message message,
-}) {
+ThunkAction<AppState> deleteMessage({required Message message}) {
   return (Store<AppState> store) async {
     try {
-      if (message.pending || message.failed) {
+      if (message.pending! || message.failed!) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {
@@ -456,8 +481,8 @@ ThunkAction<AppState> deleteMessage({
 /// can be removed first (like failed or pending sends)
 ///
 ThunkAction<AppState> redactEvent({
-  Room room,
-  Event event,
+  Room? room,
+  Event? event,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -465,8 +490,8 @@ ThunkAction<AppState> redactEvent({
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room.id,
-        eventId: event.id,
+        roomId: room!.id,
+        eventId: event!.id,
       );
     } catch (error) {
       debugPrint('[deleteMessage] $error');

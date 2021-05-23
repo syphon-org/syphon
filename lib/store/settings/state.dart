@@ -17,10 +17,10 @@ class SettingsStore extends Equatable {
   @JsonKey(ignore: true)
   final bool loading;
 
-  final int primaryColor;
-  final int accentColor;
-  final int appBarColor;
-  final int brightness;
+  final int? primaryColor;
+  final int? accentColor;
+  final int? appBarColor;
+  final int? brightness;
   final ThemeType theme;
 
   final bool enterSend; // TODO: rename *enabled
@@ -33,27 +33,25 @@ class SettingsStore extends Equatable {
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
 
-  @JsonKey(nullable: true)
-  final String messageSize;
-
   final String fontName;
   final String fontSize;
   final String language;
   final String avatarShape;
+  final String messageSize;
 
   final List<Device> devices;
 
   // Map<roomId, ChatSetting>
-  final Map<String, ChatSetting> customChatSettings;
+  final Map<String, ChatSetting>? customChatSettings;
   final List<String> sortGroups;
-  final String sortOrder;
+  final String? sortOrder;
 
-  final NotificationSettings notificationSettings;
+  final NotificationSettings? notificationSettings;
 
-  final String alphaAgreement; // a timestamp of agreement for alpha TOS
+  final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
   @JsonKey(ignore: true)
-  final String pusherToken; // NOTE: can be device token for APNS
+  final String? pusherToken; // NOTE: can be device token for APNS
 
   const SettingsStore({
     this.primaryColor = Colours.cyanSyphon,
@@ -86,7 +84,7 @@ class SettingsStore extends Equatable {
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         primaryColor,
         accentColor,
         appBarColor,
@@ -114,31 +112,31 @@ class SettingsStore extends Equatable {
       ];
 
   SettingsStore copyWith({
-    int primaryColor,
-    int accentColor,
-    int appBarColor,
-    int brightness,
-    ThemeType theme,
-    String fontName,
-    String fontSize,
-    String language,
-    String messageSize,
-    String avatarShape,
-    bool smsEnabled,
-    bool enterSend,
-    bool readReceipts,
-    bool typingIndicators,
-    bool notificationsEnabled,
-    bool membershipEventsEnabled,
-    bool roomTypeBadgesEnabled,
-    bool timeFormat24Enabled,
-    bool dismissKeyboardEnabled,
-    Map<String, ChatSetting> customChatSettings,
-    NotificationSettings notificationSettings,
-    List<Device> devices,
-    bool loading,
-    String alphaAgreement,
-    String pusherToken, // NOTE: device token for APNS
+    int? primaryColor,
+    int? accentColor,
+    int? appBarColor,
+    int? brightness,
+    ThemeType? theme,
+    String? fontName,
+    String? fontSize,
+    String? language,
+    String? messageSize,
+    String? avatarShape,
+    bool? smsEnabled,
+    bool? enterSend,
+    bool? readReceipts,
+    bool? typingIndicators,
+    bool? notificationsEnabled,
+    bool? membershipEventsEnabled,
+    bool? roomTypeBadgesEnabled,
+    bool? timeFormat24Enabled,
+    bool? dismissKeyboardEnabled,
+    Map<String, ChatSetting>? customChatSettings,
+    NotificationSettings? notificationSettings,
+    List<Device>? devices,
+    bool? loading,
+    String? alphaAgreement,
+    String? pusherToken, // NOTE: device token for APNS
   }) =>
       SettingsStore(
         primaryColor: primaryColor ?? this.primaryColor,

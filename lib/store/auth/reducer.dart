@@ -68,7 +68,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
         interactiveAuths: null,
       );
     case ResetAuthStore:
-      return AuthStore();
+      // retain the app sessions auth observer only
+      return AuthStore(authObserver: state.authObserver);
     default:
       return state;
   }

@@ -1,5 +1,4 @@
 import 'package:redux/redux.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
@@ -31,7 +30,7 @@ dynamic storageMiddleware<State>(
       // printInfo(
       //   '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
       // );
-      saveAuth(store.state.authStore, storage: Storage.main);
+      saveAuth(store.state.authStore, storage: Storage.main!);
       break;
     // media store
     case UpdateMediaCache:
@@ -69,7 +68,7 @@ dynamic storageMiddleware<State>(
     case ToggleTimeFormat:
     case ToggleReadReceipts:
     case LogAppAgreement:
-      saveSettings(store.state.settingsStore, storage: Storage.main);
+      saveSettings(store.state.settingsStore, storage: Storage.main!);
       break;
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
@@ -83,7 +82,7 @@ dynamic storageMiddleware<State>(
     case AddOutboundMessageSession:
     case UpdateMessageSessionOutbound:
     case ResetCrypto:
-      saveCrypto(store.state.cryptoStore, storage: Storage.main);
+      saveCrypto(store.state.cryptoStore, storage: Storage.main!);
       break;
 
     default:

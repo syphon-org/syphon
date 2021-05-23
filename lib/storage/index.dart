@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ import 'package:syphon/store/user/storage.dart';
 
 class Storage {
   // cold storage references
-  static Database main;
+  static Database? main;
 
   // preloaded cold storage data
   static Map<String, dynamic> storageData = {};
@@ -33,9 +34,9 @@ class Storage {
   static const mainLocation = '${Values.appNameLabel}-main-storage.db';
 }
 
-Future<Database> initStorage() async {
+Future<Database?> initStorage() async {
   try {
-    DatabaseFactory storageFactory;
+    DatabaseFactory? storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       // always open cold storage as sqflite
@@ -57,7 +58,7 @@ Future<Database> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: Cache.cryptKey);
+    final codec = getEncryptSembastCodec(password: Cache.cryptKey!);
 
     Storage.main = await storageFactory.openDatabase(
       Storage.mainLocation,
@@ -74,13 +75,13 @@ Future<Database> initStorage() async {
 // // Closes and saves storage
 void closeStorage() async {
   if (Storage.main != null) {
-    Storage.main.close();
+    Storage.main!.close();
   }
 }
 
 Future<void> deleteStorage() async {
   try {
-    DatabaseFactory storageFactory;
+    late DatabaseFactory storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
       storageFactory = getDatabaseFactorySqflite(
@@ -94,9 +95,9 @@ Future<void> deleteStorage() async {
       );
     }
 
-    Storage.main = await storageFactory.deleteDatabase(
-      Storage.mainLocation,
-    );
+    await storageFactory.deleteDatabase(Storage.mainLocation);
+
+    Storage.main = null;
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
   }
@@ -123,9 +124,9 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = Map();
-    Map<String, List<Reaction>> reactions = Map();
-    Map<String, Map<String, ReadReceipt>> receipts = Map();
+    Map<String, List<Message>> messages = {};
+    Map<String, List<Reaction>> reactions = {};
+    Map<String, Map<String, ReadReceipt>> receipts = {};
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(
@@ -146,7 +147,7 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
 
     return {
       'auth': auth,
-      'users': users,
+      'users': users.isNotEmpty ? users : null,
       'rooms': rooms,
       'media': media,
       'crypto': crypto,

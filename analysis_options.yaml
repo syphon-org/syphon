@@ -1,0 +1,27 @@
+include: package:lint/analysis_options.yaml
+
+# TODO: implicit casts should be fine, but we'll play the game later
+analyzer:
+  strong-mode:
+    implicit-casts: true
+
+linter:
+  rules:
+    # Disabled
+    type_annotate_public_apis: false
+    avoid_classes_with_only_static_members: false
+    always_declare_return_types: false # can be explicit in declaration
+    constant_identifier_names: false
+
+    # Enabled
+    prefer_single_quotes: true
+
+    # sort_constructors_first: true
+    # prefer_double_quotes: true
+    # public_member_api_docs: true
+    # always_specify_types: true
+    # always_put_required_named_parameters_first: false
+
+    # TODO:
+    prefer_const_constructors: false
+    lines_longer_than_80_chars: false

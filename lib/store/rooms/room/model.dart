@@ -2,9 +2,9 @@
 import 'dart:collection';
 
 // Package imports:
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 
 // Project imports:
@@ -28,50 +28,46 @@ class RoomPresets {
 @JsonSerializable()
 class Room {
   final String id;
-  final String name;
-  final String alias;
-  final String homeserver;
-  final String avatarUri;
-  final String topic;
-  final String joinRule; // "public", "knock", "invite", "private"
+  final String? name;
+  final String? alias;
+  final String? homeserver;
+  final String? avatarUri;
+  final String? topic;
+  final String? joinRule; // "public", "knock", "invite", "private"
 
+  final bool drafting;
   final bool direct;
   final bool sending;
-
-  @JsonKey(defaultValue: false)
-  final bool drafting;
-
   final bool invite;
   final bool guestEnabled;
   final bool encryptionEnabled;
   final bool worldReadable;
-
-  @JsonKey(defaultValue: false)
   final bool hidden;
   final bool archived;
 
-  final String lastHash; // oldest hash in timeline
-  final String prevHash; // most recent prev_batch (not the lastHash)
-  final String nextHash; // most recent next_batch
+  final String? lastHash; // oldest hash in timeline
+  final String? prevHash; // most recent prev_batch (not the lastHash)
+  final String? nextHash; // most recent next_batch
 
-  final int lastRead;
-  final int lastUpdate;
-  final int totalJoinedUsers;
-  final int namePriority;
+  final int? lastRead;
+  final int? lastUpdate;
+  final int? totalJoinedUsers;
+  final int? namePriority;
 
   // Event lists and handlers
-  final Message draft;
-  final Message reply;
+  final Message? draft;
+  final Message? reply;
 
   // Associated user ids
   final List<String> userIds;
   final List<String> messageIds;
   final List<String> reactionIds;
+  @JsonKey(ignore: true)
   final List<Message> outbox;
 
   // TODO: removed until state timeline work can be done
   @JsonKey(ignore: true)
-  final List<Event> state;
+  final List<Event>? state;
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -83,7 +79,7 @@ class Room {
   final List<Message> messagesNew;
 
   @JsonKey(ignore: true)
-  final Map<String, ReadReceipt> readReceipts;
+  final Map<String, ReadReceipt>? readReceipts;
 
   @JsonKey(ignore: true)
   final Map<String, User> usersNew;
@@ -118,20 +114,23 @@ class Room {
   }
 
   const Room({
-    this.id,
+    required this.id,
     this.name = 'Empty Chat',
     this.alias = '',
     this.homeserver,
     this.avatarUri,
     this.topic = '',
     this.joinRule = 'private',
+    this.drafting = false,
     this.invite = false,
     this.direct = false,
     this.syncing = false,
     this.sending = false,
     this.limited = false,
-    this.draft = null,
-    this.reply = null,
+    this.hidden = false,
+    this.archived = false,
+    this.draft,
+    this.reply,
     this.userIds = const [],
     this.outbox = const [],
     this.usersNew = const {},
@@ -149,9 +148,6 @@ class Room {
     this.worldReadable = false,
     this.userTyping = false,
     this.usersTyping = const [],
-    this.drafting = false,
-    this.hidden = false,
-    this.archived = false,
     this.lastHash,
     this.nextHash,
     this.prevHash,
@@ -160,17 +156,20 @@ class Room {
   });
 
   Room copyWith({
-    String id,
-    String name,
-    String homeserver,
+    String? id,
+    String? name,
+    String? homeserver,
     avatar,
     avatarUri,
     topic,
-    invite,
-    bool direct,
-    limited,
-    syncing,
-    sending,
+    bool? invite,
+    bool? direct,
+    bool? limited,
+    bool? syncing,
+    bool? sending,
+    bool? drafting,
+    bool? hidden,
+    bool? archived,
     joinRule,
     lastRead,
     lastUpdate,
@@ -182,19 +181,16 @@ class Room {
     usersTyping,
     draft,
     reply,
-    drafting,
-    hidden,
-    archived,
-    users,
-    userIds,
+    Map<String, User>? users,
+    List<String>? userIds,
     events,
-    List<Message> outbox,
-    List<Message> messagesNew,
-    List<Event> reactions,
-    List<String> messageIds,
-    List<String> reactionIds,
-    List<Redaction> redactions,
-    Map<String, ReadReceipt> readReceipts,
+    List<Message>? outbox,
+    List<Message>? messagesNew,
+    List<Reaction>? reactions,
+    List<String>? messageIds,
+    List<String>? reactionIds,
+    List<Redaction>? redactions,
+    Map<String, ReadReceipt>? readReceipts,
     lastHash,
     prevHash,
     nextHash,
@@ -208,14 +204,14 @@ class Room {
         joinRule: joinRule ?? this.joinRule,
         avatarUri: avatarUri ?? this.avatarUri,
         homeserver: homeserver ?? this.homeserver,
-        drafting: drafting ?? this.drafting ?? false,
+        drafting: drafting ?? this.drafting,
         invite: invite ?? this.invite,
         direct: direct ?? this.direct,
-        hidden: hidden ?? this.hidden ?? false,
-        archived: archived ?? this.archived ?? false,
-        sending: sending ?? this.sending ?? false,
-        syncing: syncing ?? this.syncing ?? false,
-        limited: limited ?? this.limited ?? false,
+        hidden: hidden ?? this.hidden,
+        archived: archived ?? this.archived,
+        sending: sending ?? this.sending,
+        syncing: syncing ?? this.syncing,
+        limited: limited ?? this.limited,
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
@@ -257,19 +253,19 @@ class Room {
         syncing: false,
       );
     } catch (error) {
-      return Room();
+      return Room(id: json['room_id']);
     }
   }
 
   Room fromSync({
-    User currentUser,
-    String lastSince,
-    Map<String, dynamic> json,
+    User? currentUser,
+    String? lastSince,
+    required Map<String, dynamic> json,
   }) {
-    bool invite;
-    bool limited;
-    String lastHash;
-    String prevHash = this.prevHash;
+    bool? invite;
+    bool? limited;
+    String? lastHash;
+    String? prevHash = this.prevHash;
 
     List<Event> stateEvents = [];
     List<Event> accountEvents = [];
@@ -316,7 +312,7 @@ class Room {
       prevHash = json['timeline']['prev_batch'];
 
       if (limited != null) {
-        printDebug(
+        printInfo(
           '[fromSync] ${this.id} limited ${limited} lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
@@ -354,7 +350,7 @@ class Room {
           invite: invite,
           limited: limited,
           events: stateEvents,
-          currentUser: currentUser,
+          currentUser: currentUser!,
           reactions: reactionEvents,
           redactions: redactionEvents,
         )
@@ -401,35 +397,34 @@ class Room {
    * follows spec naming priority and thumbnail downloading
    */
   Room fromStateEvents({
-    bool invite,
-    bool limited,
-    User currentUser,
-    List<Event> events,
-    List<Reaction> reactions,
-    List<Redaction> redactions,
+    bool? invite,
+    bool? limited,
+    required User currentUser,
+    required List<Event> events,
+    List<Reaction>? reactions,
+    List<Redaction>? redactions,
   }) {
-    String name;
-    String avatarUri;
-    String topic;
-    String joinRule;
-    bool encryptionEnabled;
-    bool direct = this.direct ?? false;
-    int lastUpdate = this.lastUpdate;
-    int namePriority = this.namePriority != 4 ? this.namePriority : 4;
+    String? name;
+    String? avatarUri;
+    String? topic;
+    String? joinRule;
+    bool? encryptionEnabled;
+    bool direct = this.direct;
+    int? lastUpdate = this.lastUpdate;
+    int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    var usersAdd = Map<String, User>.from(this.usersNew ?? {});
-    var userIdsRemove = List<String>();
-
-    Set<String> userIds = Set<String>.from(this.userIds ?? []);
+    Map<String, User> usersAdd = Map.from(this.usersNew);
+    Set<String> userIds = Set<String>.from(this.userIds);
+    List<String> userIdsRemove = [];
 
     events.forEach((event) {
       try {
         final timestamp = event.timestamp ?? 0;
-        lastUpdate = timestamp > lastUpdate ? event.timestamp : lastUpdate;
+        lastUpdate = timestamp > lastUpdate! ? event.timestamp : lastUpdate;
 
         switch (event.type) {
           case 'm.room.name':
-            if (namePriority > 0) {
+            if (namePriority! > 0) {
               namePriority = 1;
               name = event.content['name'];
             }
@@ -443,13 +438,13 @@ class Room {
             break;
 
           case 'm.room.canonical_alias':
-            if (namePriority > 2) {
+            if (namePriority! > 2) {
               namePriority = 2;
               name = event.content['alias'];
             }
             break;
           case 'm.room.aliases':
-            if (namePriority > 3) {
+            if (namePriority! > 3) {
               namePriority = 3;
               name = event.content['aliases'][0];
             }
@@ -470,7 +465,7 @@ class Room {
 
             // Cache user to rooms user cache if not present
             if (!usersAdd.containsKey(event.stateKey)) {
-              usersAdd[event.stateKey] = User(
+              usersAdd[event.stateKey!] = User(
                 userId: event.stateKey,
                 displayName: displayName,
                 avatarUri: memberAvatarUri,
@@ -478,7 +473,7 @@ class Room {
             }
 
             if (membership == 'leave') {
-              userIdsRemove.add(event.stateKey);
+              userIdsRemove.add(event.stateKey!);
             }
 
             break;
@@ -495,7 +490,7 @@ class Room {
       }
     });
 
-    userIds = userIds..addAll(usersAdd.keys ?? []);
+    userIds = userIds..addAll(usersAdd.keys);
     userIds = userIds..removeWhere((id) => userIdsRemove.contains(id));
 
     try {
@@ -504,7 +499,7 @@ class Room {
           name == currentUser.displayName || name == currentUser.userId;
 
       // no name room check
-      if ((namePriority > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
+      if ((namePriority! > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
         // Filter out number of non current users to show preview of total
         final otherUsers = usersAdd.values.where(
           (user) =>
@@ -535,14 +530,14 @@ class Room {
     return this.copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: usersAdd ?? this.usersNew,
-      direct: direct ?? this.direct,
+      users: usersAdd,
+      direct: direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
-      userIds: userIds != null ? userIds.toList() : this.userIds ?? [],
+      userIds: userIds.toList(),
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
-      lastUpdate: lastUpdate > 0 ? lastUpdate : this.lastUpdate,
+      lastUpdate: lastUpdate! > 0 ? lastUpdate : this.lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,
@@ -559,24 +554,22 @@ class Room {
    */
   Room fromMessageEvents({
     List<Message> messages = const [],
-    String lastHash,
-    String prevHash, // previously fetched hash
-    String nextHash,
+    String? lastHash,
+    String? prevHash, // previously fetched hash
+    String? nextHash,
   }) {
     try {
-      bool limited;
-      int lastUpdate = this.lastUpdate;
-      List<Message> outbox = List<Message>.from(this.outbox ?? []);
-      final messageIds = this.messageIds ?? [];
+      bool? limited;
+      int? lastUpdate = this.lastUpdate;
+      final messageIds = this.messageIds;
 
       // Converting only message events
-      final hasEncrypted = messages.firstWhere(
+      final hasEncrypted = messages.firstWhereOrNull(
         (msg) => msg.type == EventTypes.encrypted,
-        orElse: () => null,
       );
 
       // See if the newest message has a greater timestamp
-      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
+      if (messages.isNotEmpty && lastUpdate! < messages[0].timestamp!) {
         lastUpdate = messages[0].timestamp;
       }
 
@@ -584,9 +577,8 @@ class Room {
       if (this.limited) {
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
-          final messageKnown = messageIds.firstWhere(
+          final messageKnown = messageIds.firstWhereOrNull(
             (id) => id == messages[0].id,
-            orElse: () => null,
           );
 
           // Set limited to false if they now exist
@@ -611,20 +603,14 @@ class Room {
         value: (message) => message,
       );
 
-      // Remove outboxed messages
-      outbox.removeWhere(
-        (message) => messagesMap.containsKey(message.id),
-      );
-
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
-      final messageIdsAll = Set<String>.from(this.messageIds ?? [])
+      final messageIdsAll = Set<String>.from(this.messageIds)
         ..addAll(messageIdsNew);
 
       // Save values to room
       return this.copyWith(
-        outbox: outbox,
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
@@ -648,8 +634,8 @@ class Room {
    * hashmap of eventIds linking them to users and timestamps
    */
   Room fromEphemeralEvents({
-    List<Event> events,
-    User currentUser,
+    required List<Event> events,
+    User? currentUser,
   }) {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
@@ -662,7 +648,7 @@ class Room {
             final List<dynamic> usersTypingList = event.content['user_ids'];
             usersTyping = List<String>.from(usersTypingList);
             usersTyping.removeWhere(
-              (user) => currentUser.userId == user,
+              (user) => currentUser!.userId == user,
             );
             userTyping = usersTyping.length > 0;
             break;
@@ -685,7 +671,9 @@ class Room {
                 readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceipts[key].userReads.addAll(readReceiptsNew.userReads);
+                readReceipts[key]!
+                    .userReads!
+                    .addAll(readReceiptsNew.userReads!);
               }
             });
             break;

@@ -22,14 +22,7 @@ class JackApi {
   static Future<dynamic> fetchPublicServers() async {
     String url = endpoints.elementAt(0);
 
-    Map<String, String> headers = {
-      // 'Authorization': 'Bearer $accessToken',
-    };
-
-    final response = await http.get(
-      url,
-      headers: headers,
-    );
+    final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }

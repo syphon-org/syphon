@@ -6,21 +6,21 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class OneTimeKey extends Equatable {
-  final String userId;
-  final String deviceId;
-  final Map<String, String> keys; // Map<identityKey, key>
+  final String? userId;
+  final String? deviceId;
+  final Map<String, String?> keys; // Map<identityKey, key>
   // Map<identityKey, <deviceId, signature>>
   final Map<String, Map<String, String>> signatures;
 
   const OneTimeKey({
     this.userId,
     this.deviceId,
-    this.keys,
-    this.signatures,
+    this.keys = const {},
+    this.signatures = const {},
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         userId,
         deviceId,
         keys,

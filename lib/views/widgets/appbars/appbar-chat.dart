@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -14,12 +14,14 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/details-chat.dart';
-import 'package:syphon/views/home/chat/index.dart';
-import 'package:syphon/views/home/groups/invite-users.dart';
+import 'package:syphon/views/home/chat/details-chat-screen.dart';
+import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+
+final bool debug = !kReleaseMode;
 
 enum ChatOptions {
   search,
@@ -32,7 +34,7 @@ enum ChatOptions {
 
 class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
   AppBarChat({
-    Key key,
+    Key? key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -53,19 +55,19 @@ class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
   final bool loading;
   final bool forceFocus;
   final bool badgesEnabled;
-  final Room room;
-  final Color color;
+  final Room? room;
+  final Color? color;
   final String title;
   final String label;
   final String tooltip;
-  final double elevation;
+  final double? elevation;
   final Brightness brightness;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
-  final Function onBack;
-  final Function onDebug;
-  final Function onSearch;
-  final Function onToggleSearch;
+  final Function? onBack;
+  final Function? onDebug;
+  final Function? onSearch;
+  final Function? onToggleSearch;
 
   @override
   AppBarChatState createState() => AppBarChatState();
@@ -78,14 +80,14 @@ class AppBarChatState extends State<AppBarChat> {
   final focusNode = FocusNode();
 
   bool searching = false;
-  Timer searchTimeout;
+  Timer? searchTimeout;
 
   @override
   void initState() {
     super.initState();
 
     // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       if (widget.forceFocus) {
         // TODO: implement chat searching
       }
@@ -102,9 +104,10 @@ class AppBarChatState extends State<AppBarChat> {
   }
 
   @protected
-  void onBlockUser({BuildContext context, _Props props}) async {
+  void onBlockUser(
+      {required BuildContext context, required _Props props}) async {
     final user = props.roomUsers.firstWhere(
-      (user) => user.userId != props.currentUser.userId,
+      (user) => user!.userId != props.currentUser.userId,
     );
     return await showDialog(
       context: context,
@@ -112,7 +115,7 @@ class AppBarChatState extends State<AppBarChat> {
       builder: (context) => DialogConfirm(
         title: "Block User",
         content:
-            "If you block ${user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+            "If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
         onConfirm: () async {
           await props.blockUser(user.userId);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -123,7 +126,7 @@ class AppBarChatState extends State<AppBarChat> {
   }
 
   @protected
-  void onToggleSearch({BuildContext context}) {
+  void onToggleSearch({BuildContext? context}) {
     setState(() {
       searching = !searching;
     });
@@ -131,13 +134,13 @@ class AppBarChatState extends State<AppBarChat> {
       Timer(
         Duration(milliseconds: 5), // hack to focus after visibility change
         () => FocusScope.of(
-          context,
+          context!,
         ).requestFocus(
           widget.focusNode ?? focusNode,
         ),
       );
     } else {
-      FocusScope.of(context).unfocus();
+      FocusScope.of(context!).unfocus();
     }
   }
 
@@ -145,7 +148,7 @@ class AppBarChatState extends State<AppBarChat> {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.room.id),
+            _Props.mapStateToProps(store, widget.room!.id),
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
@@ -156,7 +159,7 @@ class AppBarChatState extends State<AppBarChat> {
                 margin: EdgeInsets.only(left: 8),
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => widget.onBack(),
+                  onPressed: () => widget.onBack!(),
                 ),
               ),
               GestureDetector(
@@ -165,8 +168,8 @@ class AppBarChatState extends State<AppBarChat> {
                     context,
                     '/home/chat/settings',
                     arguments: ChatSettingsArguments(
-                      roomId: widget.room.id,
-                      title: widget.room.name,
+                      roomId: widget.room!.id,
+                      title: widget.room!.name,
                     ),
                   );
                 },
@@ -177,14 +180,14 @@ class AppBarChatState extends State<AppBarChat> {
                       Hero(
                         tag: "ChatAvatar",
                         child: Avatar(
-                          uri: widget.room.avatarUri,
+                          uri: widget.room!.avatarUri,
                           size: Dimensions.avatarSizeMin,
-                          alt: formatRoomInitials(room: widget.room),
+                          alt: formatRoomInitials(room: widget.room!),
                           background: widget.color,
                         ),
                       ),
                       Visibility(
-                        visible: !widget.room.encryptionEnabled,
+                        visible: !widget.room!.encryptionEnabled,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -207,8 +210,8 @@ class AppBarChatState extends State<AppBarChat> {
                       ),
                       Visibility(
                         visible: widget.badgesEnabled &&
-                            widget.room.type == 'group' &&
-                            !widget.room.invite,
+                            widget.room!.type == 'group' &&
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -229,8 +232,8 @@ class AppBarChatState extends State<AppBarChat> {
                       ),
                       Visibility(
                         visible: widget.badgesEnabled &&
-                            widget.room.type == 'public' &&
-                            !widget.room.invite,
+                            widget.room!.type == 'public' &&
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -255,11 +258,11 @@ class AppBarChatState extends State<AppBarChat> {
               ),
               Flexible(
                 child: Text(
-                  widget.room.name,
+                  widget.room!.name!,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)
                       .textTheme
-                      .bodyText1
+                      .bodyText1!
                       .copyWith(color: Colors.white),
                 ),
               ),
@@ -268,79 +271,82 @@ class AppBarChatState extends State<AppBarChat> {
           actions: <Widget>[
             Visibility(
               maintainSize: false,
-              visible: DotEnv().env['DEBUG'] == 'true',
+              visible: debug,
               child: IconButton(
                 icon: Icon(Icons.gamepad),
                 iconSize: Dimensions.buttonAppBarSize,
                 tooltip: 'Debug Room Function',
                 color: Colors.white,
                 onPressed: () {
-                  widget.onDebug();
+                  widget.onDebug!();
                 },
               ),
             ),
             RoundedPopupMenu<ChatOptions>(
-              onSelected: (ChatOptions result) {
-                switch (result) {
-                  case ChatOptions.inviteFriends:
-                    Navigator.pushNamed(
-                      context,
-                      '/home/user/invite',
-                      arguments: InviteUsersArguments(
-                        roomId: widget.room.id,
-                      ),
-                    );
-                    break;
-                  case ChatOptions.chatSettings:
-                    Navigator.pushNamed(
-                      context,
-                      '/home/chat/settings',
-                      arguments: ChatSettingsArguments(
-                        roomId: widget.room.id,
-                        title: widget.room.name,
-                      ),
-                    );
-                    break;
-                  case ChatOptions.blockUser:
-                    return onBlockUser(context: context, props: props);
-                  default:
-                    break;
-                }
-              },
-              icon: Icon(Icons.more_vert, color: Colors.white),
-              itemBuilder: (BuildContext context) =>
-                  <PopupMenuEntry<ChatOptions>>[
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.search,
-                  child: Text('Search'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.allMedia,
-                  child: Text('All Media'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  value: ChatOptions.chatSettings,
-                  child: Text('Chat Settings'),
-                ),
-                const PopupMenuItem<ChatOptions>(
-                  value: ChatOptions.inviteFriends,
-                  child: Text('Invite Friends'),
-                ),
-                !widget.room.direct
-                    ? null
-                    : const PopupMenuItem<ChatOptions>(
-                        value: ChatOptions.blockUser,
-                        child: Text('Block User'),
-                      ),
-                const PopupMenuItem<ChatOptions>(
-                  enabled: false,
-                  value: ChatOptions.muteNotifications,
-                  child: Text('Mute Notifications'),
-                ),
-              ],
-            )
+                onSelected: (ChatOptions result) {
+                  switch (result) {
+                    case ChatOptions.inviteFriends:
+                      Navigator.pushNamed(
+                        context,
+                        '/home/user/invite',
+                        arguments: InviteUsersArguments(
+                          roomId: widget.room!.id,
+                        ),
+                      );
+                      break;
+                    case ChatOptions.chatSettings:
+                      Navigator.pushNamed(
+                        context,
+                        '/home/chat/settings',
+                        arguments: ChatSettingsArguments(
+                          roomId: widget.room!.id,
+                          title: widget.room!.name,
+                        ),
+                      );
+                      break;
+                    case ChatOptions.blockUser:
+                      return onBlockUser(context: context, props: props);
+                    default:
+                      break;
+                  }
+                },
+                icon: Icon(Icons.more_vert, color: Colors.white),
+                itemBuilder: (BuildContext context) {
+                  final menu = <PopupMenuEntry<ChatOptions>>[
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.search,
+                      child: Text('Search'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.allMedia,
+                      child: Text('All Media'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.chatSettings,
+                      child: Text('Chat Settings'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.inviteFriends,
+                      child: Text('Invite Friends'),
+                    ),
+                    const PopupMenuItem<ChatOptions>(
+                      enabled: false,
+                      value: ChatOptions.muteNotifications,
+                      child: Text('Mute Notifications'),
+                    ),
+                  ];
+
+                  if (widget.room!.direct) {
+                    menu.add(const PopupMenuItem<ChatOptions>(
+                      value: ChatOptions.blockUser,
+                      child: Text('Block User'),
+                    ));
+                  }
+
+                  return menu;
+                })
           ],
         ),
       );
@@ -348,21 +354,22 @@ class AppBarChatState extends State<AppBarChat> {
 
 class _Props extends Equatable {
   final User currentUser;
-  final List<User> roomUsers;
+  final List<User?> roomUsers;
   final Function blockUser;
 
   _Props({
-    @required this.roomUsers,
-    @required this.currentUser,
-    @required this.blockUser,
+    required this.roomUsers,
+    required this.currentUser,
+    required this.blockUser,
   });
 
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         currentUser: store.state.authStore.user,
-        roomUsers: (store.state.roomStore.rooms[roomId].userIds ?? [])
+        roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
             .map((id) => store.state.userStore.users[id])
             .toList(),
         blockUser: (String userId) async {

@@ -2,9 +2,9 @@
 import 'dart:math';
 
 // Flutter imports:
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Package imports:
 import 'package:redux/redux.dart';
@@ -20,19 +20,16 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-final protocol = DotEnv().env['PROTOCOL'];
-
 ThunkAction<AppState> toggleReaction({
-  Room room,
-  Message message,
-  String emoji,
+  Room? room,
+  Message? message,
+  String? emoji,
 }) {
   return (Store<AppState> store) async {
     final user = store.state.authStore.user;
 
-    final reaction = message.reactions.firstWhere(
-        (reaction) => reaction.sender == user.userId && reaction.body == emoji,
-        orElse: () => null);
+    final reaction = message!.reactions.firstWhereOrNull(
+        (reaction) => reaction.sender == user.userId && reaction.body == emoji);
 
     if (reaction == null) {
       store.dispatch(sendReaction(message: message, room: room, emoji: emoji));
@@ -46,19 +43,19 @@ ThunkAction<AppState> toggleReaction({
 /// Send Reaction
 ///
 ThunkAction<AppState> sendReaction({
-  Room room,
-  Message message,
-  String emoji,
+  Room? room,
+  Message? message,
+  String? emoji,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(UpdateRoom(id: room.id, sending: true));
+    store.dispatch(UpdateRoom(id: room!.id, sending: true));
     try {
       await MatrixApi.sendReaction(
         trxId: DateTime.now().millisecond.toString(),
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
         roomId: room.id,
-        messageId: message.id,
+        messageId: message!.id,
         reaction: emoji,
       );
 

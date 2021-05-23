@@ -17,8 +17,8 @@ import 'package:syphon/views/widgets/messages/styles.dart';
 
 class MessageWidget extends StatelessWidget {
   MessageWidget({
-    Key key,
-    @required this.message,
+    Key? key,
+    required this.message,
     this.isUserSent,
     this.messageOnly = false,
     this.isLastSender = false,
@@ -38,20 +38,20 @@ class MessageWidget extends StatelessWidget {
 
   final Message message;
   final ThemeType theme;
-  final int lastRead;
+  final int? lastRead;
   final double fontSize;
   final bool isLastSender;
   final bool isNextSender;
-  final bool isUserSent;
+  final bool? isUserSent;
   final bool messageOnly;
   final String timeFormat;
-  final String avatarUri;
-  final String selectedMessageId;
-  final Function onSwipe;
-  final Function onPressAvatar;
-  final Function onInputReaction;
-  final Function onToggleReaction;
-  final void Function(Message) onLongPress;
+  final String? avatarUri;
+  final String? selectedMessageId;
+  final Function? onSwipe;
+  final Function? onPressAvatar;
+  final Function? onInputReaction;
+  final Function? onToggleReaction;
+  final void Function(Message)? onLongPress;
 
   @protected
   Widget buildReactions(
@@ -62,7 +62,7 @@ class MessageWidget extends StatelessWidget {
       {},
       (mapped, reaction) => mapped
         ..update(
-          reaction.body,
+          reaction.body ?? '',
           (value) => (value + 1),
           ifAbsent: () => 1,
         ),
@@ -83,7 +83,7 @@ class MessageWidget extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (this.onToggleReaction != null) {
-              this.onToggleReaction(reactionKey);
+              this.onToggleReaction!(reactionKey);
             }
           },
           child: Container(
@@ -104,7 +104,7 @@ class MessageWidget extends StatelessWidget {
                   reactionKey,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.subtitle1.color,
+                    color: Theme.of(context).textTheme.subtitle1!.color,
                     height: 1.35,
                   ),
                 ),
@@ -118,7 +118,7 @@ class MessageWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.subtitle1.color,
+                        color: Theme.of(context).textTheme.subtitle1!.color,
                         height: 1.35,
                       ),
                     ),
@@ -141,7 +141,7 @@ class MessageWidget extends StatelessWidget {
     final buildEmojiButton = GestureDetector(
       onTap: () {
         if (onInputReaction != null) {
-          onInputReaction();
+          onInputReaction!();
         }
       },
       child: ClipRRect(
@@ -193,7 +193,7 @@ class MessageWidget extends StatelessWidget {
     var hasReactions = message.reactions.length > 0 || selected;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
-    var bubbleColor = Colours.hashedColor(message.sender);
+    Color? bubbleColor = Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
@@ -202,7 +202,7 @@ class MessageWidget extends StatelessWidget {
     var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
-    var isRead = message.timestamp < lastRead;
+    var isRead = message.timestamp! < lastRead!;
     var status = timeFormat == 'full'
         ? formatTimestampFull(
             lastUpdateMillis: message.timestamp,
@@ -216,7 +216,7 @@ class MessageWidget extends StatelessWidget {
           );
 
     // Current User Bubble Styling
-    if (isUserSent) {
+    if (isUserSent!) {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
@@ -256,7 +256,7 @@ class MessageWidget extends StatelessWidget {
       }
     }
 
-    if (isUserSent) {
+    if (isUserSent!) {
       if (theme == ThemeType.DARK) {
         bubbleColor = Colors.grey[700];
       } else if (theme != ThemeType.LIGHT) {
@@ -279,7 +279,7 @@ class MessageWidget extends StatelessWidget {
       zIndex = -10.0;
     }
 
-    if (message.failed) {
+    if (message.failed!) {
       status = Strings.errorMessageSendingFailed;
     }
 
@@ -289,11 +289,11 @@ class MessageWidget extends StatelessWidget {
 
     String body = message.body ?? '';
     if (message.type == EventTypes.encrypted) {
-      if (message.body.isEmpty) {
+      if (message.body!.isEmpty) {
         body = Strings.contentEncryptedMessage;
       }
     } else {
-      if (message.body.isEmpty) {
+      if (message.body!.isEmpty) {
         body = Strings.contentDeletedMessage;
         fontStyle = FontStyle.italic;
       }
@@ -304,19 +304,19 @@ class MessageWidget extends StatelessWidget {
     }
 
     return Swipeable(
-      onSwipeLeft: isUserSent ? () => onSwipe(message) : null,
-      onSwipeRight: !isUserSent ? () => onSwipe(message) : null,
+      onSwipeLeft: isUserSent! ? () => onSwipe!(message) : null,
+      onSwipeRight: !isUserSent! ? () => onSwipe!(message) : null,
       background: Positioned(
         top: 0,
         bottom: 0,
-        left: !isUserSent ? 0 : null,
-        right: isUserSent ? 0 : null,
+        left: !isUserSent! ? 0 : null,
+        right: isUserSent! ? 0 : null,
         child: Opacity(
           // HACK: hide the reply icon under the message
           opacity: opacity == 0.5 ? 0 : 1,
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: isUserSent ? 24 : 50,
+              horizontal: isUserSent! ? 24 : 50,
             ),
             child: Flex(
               direction: Axis.horizontal,
@@ -333,7 +333,7 @@ class MessageWidget extends StatelessWidget {
         onLongPress: () {
           if (onLongPress != null) {
             HapticFeedback.lightImpact();
-            onLongPress(message);
+            onLongPress!(message);
           }
         },
         child: Opacity(
@@ -355,7 +355,7 @@ class MessageWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Visibility(
-                        visible: !isLastSender && !isUserSent && !messageOnly,
+                        visible: !isLastSender && !isUserSent! && !messageOnly,
                         maintainState: !messageOnly,
                         maintainAnimation: !messageOnly,
                         maintainSize: !messageOnly,
@@ -363,7 +363,7 @@ class MessageWidget extends StatelessWidget {
                           onTap: () {
                             if (this.onPressAvatar != null) {
                               HapticFeedback.lightImpact();
-                              this.onPressAvatar(message: message);
+                              this.onPressAvatar!(message: message);
                             }
                           },
                           child: Container(
@@ -404,11 +404,11 @@ class MessageWidget extends StatelessWidget {
                                 crossAxisAlignment: alignmentMessageText,
                                 children: <Widget>[
                                   Visibility(
-                                    visible: !isUserSent && showSender,
+                                    visible: !isUserSent! && showSender,
                                     child: Container(
                                       margin: EdgeInsets.only(bottom: 4),
                                       child: Text(
-                                        formatSender(message.sender),
+                                        formatSender(message.sender!),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: textColor,
@@ -427,7 +427,7 @@ class MessageWidget extends StatelessWidget {
                                         fontWeight: FontWeight.w300,
                                         fontSize: Theme.of(context)
                                             .textTheme
-                                            .subtitle2
+                                            .subtitle2!
                                             .fontSize,
                                       ),
                                     ),
@@ -440,7 +440,7 @@ class MessageWidget extends StatelessWidget {
                                     crossAxisAlignment: alignmentMessageText,
                                     children: [
                                       Visibility(
-                                        visible: !isUserSent &&
+                                        visible: !isUserSent! &&
                                             message.type ==
                                                 EventTypes.encrypted,
                                         child: Container(
@@ -467,7 +467,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent &&
+                                        visible: isUserSent! &&
                                             message.type ==
                                                 EventTypes.encrypted,
                                         child: Container(
@@ -482,7 +482,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent && message.failed,
+                                        visible: isUserSent! && message.failed!,
                                         child: Container(
                                           width: Dimensions.indicatorSize,
                                           height: Dimensions.indicatorSize,
@@ -495,10 +495,11 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent && !message.failed,
+                                        visible:
+                                            isUserSent! && !message.failed!,
                                         child: Stack(children: [
                                           Visibility(
-                                            visible: message.pending,
+                                            visible: message.pending!,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -510,7 +511,7 @@ class MessageWidget extends StatelessWidget {
                                             ),
                                           ),
                                           Visibility(
-                                            visible: !message.pending,
+                                            visible: !message.pending!,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -524,7 +525,7 @@ class MessageWidget extends StatelessWidget {
                                                 color: indicatorColor,
                                                 shape: CircleBorder(
                                                   side: BorderSide(
-                                                    color: indicatorIconColor,
+                                                    color: indicatorIconColor!,
                                                     width: isRead ? 1.5 : 1,
                                                   ),
                                                 ),
@@ -532,7 +533,7 @@ class MessageWidget extends StatelessWidget {
                                             ),
                                           ),
                                           Visibility(
-                                            visible: !message.syncing,
+                                            visible: !message.syncing!,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -563,8 +564,8 @@ class MessageWidget extends StatelessWidget {
                             Visibility(
                               visible: selected,
                               child: Positioned(
-                                left: isUserSent ? 0 : null,
-                                right: !isUserSent ? 0 : null,
+                                left: isUserSent! ? 0 : null,
+                                right: !isUserSent! ? 0 : null,
                                 bottom: 0,
                                 child: Container(
                                   height: Dimensions.iconSize,
@@ -573,7 +574,7 @@ class MessageWidget extends StatelessWidget {
                                   child: buildReactionsInput(
                                     context,
                                     alignmentReaction,
-                                    isUserSent,
+                                    isUserSent!,
                                   ),
                                 ),
                               ),
@@ -581,8 +582,8 @@ class MessageWidget extends StatelessWidget {
                             Visibility(
                               visible: hasReactions && !selected,
                               child: Positioned(
-                                left: isUserSent ? 0 : null,
-                                right: !isUserSent ? 0 : null,
+                                left: isUserSent! ? 0 : null,
+                                right: !isUserSent! ? 0 : null,
                                 bottom: 0,
                                 child: Container(
                                   height: Dimensions.iconSize,

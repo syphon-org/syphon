@@ -7,12 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/views/home/chat/details-message.dart';
+import 'package:syphon/views/home/chat/details-message-screen.dart';
 
 class AppBarMessageOptions extends StatefulWidget
     implements PreferredSizeWidget {
   AppBarMessageOptions({
-    Key key,
+    Key? key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -30,15 +30,15 @@ class AppBarMessageOptions extends StatefulWidget
   final String label;
   final String tooltip;
 
-  final Room room;
-  final Message message;
-  final double elevation;
+  final Room? room;
+  final Message? message;
+  final double? elevation;
   final Brightness brightness;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
-  final Function onCopy;
-  final Function onDelete;
-  final Function onDismiss;
+  final Function? onCopy;
+  final Function? onDelete;
+  final Function? onDismiss;
 
   @override
   AppBarMessageOptionState createState() => AppBarMessageOptionState();
@@ -51,7 +51,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   final focusNode = FocusNode();
 
   bool searching = false;
-  Timer searchTimeout;
+  Timer? searchTimeout;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 ),
                 onPressed: () {
                   if (widget.onDismiss != null) {
-                    widget.onDismiss();
+                    widget.onDismiss!();
                   }
                 },
               ),
@@ -92,13 +92,13 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 context,
                 '/home/chat/details',
                 arguments: MessageDetailArguments(
-                  roomId: widget.room.id,
+                  roomId: widget.room!.id,
                   message: widget.message,
                 ),
               );
 
               if (widget.onDismiss != null) {
-                widget.onDismiss();
+                widget.onDismiss!();
               }
             },
           ),
@@ -109,14 +109,14 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               color: Colors.white,
               onPressed: () {
                 if (widget.onDelete != null) {
-                  widget.onDelete();
+                  widget.onDelete!();
                 }
                 if (widget.onDismiss != null) {
-                  widget.onDismiss();
+                  widget.onDismiss!();
                 }
               }),
           Visibility(
-            visible: isTextMessage(message: widget.message),
+            visible: isTextMessage(message: widget.message!),
             child: IconButton(
               icon: Icon(Icons.content_copy),
               iconSize: 22.0,
@@ -125,12 +125,12 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               onPressed: () {
                 Clipboard.setData(
                   ClipboardData(
-                    text: widget.message.formattedBody ?? widget.message.body,
+                    text: widget.message!.formattedBody ?? widget.message!.body,
                   ),
                 );
 
                 if (widget.onDismiss != null) {
-                  widget.onDismiss();
+                  widget.onDismiss!();
                 }
               },
             ),
