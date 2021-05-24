@@ -26,10 +26,8 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 
-/**
- * Background Sync Service (Android Only)
- * static class for managing service through app lifecycle
- */
+/// Background Sync Service (Android Only)
+/// static class for managing service through app lifecycle
 class BackgroundSync {
   static const service_id = 254;
   static const serviceTimeout = 55; // seconds
@@ -40,7 +38,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      debugPrint('[BackgroundSync.init] ${error}');
+      debugPrint('[BackgroundSync.init] $error');
       return false;
     }
   }
@@ -104,14 +102,12 @@ class BackgroundSync {
   }
 }
 
-/**
- * Background Sync Job (Android Only)
- * 
- * Fetches data from matrix in background and displays
- * notifications without needing google play services
- * 
- * NOTE: https://github.com/flutter/flutter/issues/32164
- */
+/// Background Sync Job (Android Only)
+/// 
+/// Fetches data from matrix in background and displays
+/// notifications without needing google play services
+/// 
+/// NOTE: https://github.com/flutter/flutter/issues/32164
 void notificationSyncIsolate() async {
   try {
     String? protocol;
@@ -170,9 +166,7 @@ void notificationSyncIsolate() async {
   }
 }
 
-/** 
- *  Save Full Sync
- */
+///  Save Full Sync
 Future<dynamic> syncLoop({
   required Map params,
   FlutterLocalNotificationsPlugin? pluginInstance,

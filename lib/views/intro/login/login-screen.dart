@@ -239,7 +239,6 @@ class LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           actions: <Widget>[
             Visibility(
-              maintainSize: false,
               visible: debug,
               child: IconButton(
                 icon: Icon(Icons.settings),
@@ -304,7 +303,6 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                   Flexible(
                     flex: 4,
-                    fit: FlexFit.loose,
                     child: Container(
                       constraints: BoxConstraints(
                         minWidth: Dimensions.inputWidthMin,
@@ -365,7 +363,6 @@ class LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   Flexible(
-                    flex: 1,
                     child: Container(
                       height: Dimensions.inputHeight,
                       constraints: BoxConstraints(

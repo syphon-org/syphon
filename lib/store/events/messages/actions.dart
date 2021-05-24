@@ -204,11 +204,9 @@ ThunkAction<AppState> sendMessage({
   };
 }
 
-/**
- * Send Encrypted Messages
- * 
- * Specifically for sending encrypted messages using megolm
- */
+/// Send Encrypted Messages
+/// 
+/// Specifically for sending encrypted messages using megolm
 ThunkAction<AppState> sendMessageEncrypted({
   required Room room,
   required Message message, // body and type only for now
@@ -244,14 +242,14 @@ ThunkAction<AppState> sendMessageEncrypted({
         syncing: true,
       );
 
-      var unencryptedData = {};
+      final unencryptedData = {};
 
       if (reply != null && reply.body != null) {
         pending = await store.dispatch(
           formatMessageReply(room, pending, reply),
         );
-        unencryptedData["m.relates_to"] = {
-          "m.in_reply_to": {"event_id": "${reply.id}"}
+        unencryptedData['m.relates_to'] = {
+          'm.in_reply_to': {'event_id': '${reply.id}'}
         };
       }
 

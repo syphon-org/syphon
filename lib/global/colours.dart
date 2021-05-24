@@ -1,10 +1,8 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
-/**
- * British localization because
- * google monopolized the namespaces
- */
+/// British localization because
+/// google monopolized the namespaces
 class Colours {
   static const cyanSyphon = 0xff34C7B5;
   static const cyanSyphonAlpha = 0xAA34C7B5;
@@ -32,7 +30,7 @@ class Colours {
 
   static Color hashedColor(String? string) {
     final hashable = string ?? '123';
-    int hash = hashable.codeUnits.reduce((value, element) => value + element);
+    final int hash = hashable.codeUnits.reduce((value, element) => value + element);
     return Colours.chatColors[hash % Colours.chatColors.length];
   }
 

@@ -31,6 +31,7 @@ class Redaction extends Event {
           content: content,
         );
 
+  @override
   Redaction copyWith({
     id,
     type,
@@ -54,6 +55,7 @@ class Redaction extends Event {
         data: data,
       );
 
+  @override
   Map<String, dynamic> toJson() => _$RedactionToJson(this);
   factory Redaction.fromJson(Map<String, dynamic> json) =>
       _$RedactionFromJson(json);

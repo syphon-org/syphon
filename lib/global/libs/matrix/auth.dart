@@ -7,13 +7,11 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
 
-/**
- * https://matrix.org/docs/spec/client_server/latest#id183
- * 
- * Authentication Types
- * 
- * Can be used during actual login or interactive auth for confirmation
- */
+/// https://matrix.org/docs/spec/client_server/latest#id183
+/// 
+/// Authentication Types
+/// 
+/// Can be used during actual login or interactive auth for confirmation
 class MatrixAuthTypes {
   static const PASSWORD = 'm.login.password';
   static const RECAPTCHA = 'm.login.recaptcha';
@@ -31,7 +29,7 @@ abstract class Auth {
     required String protocol,
     required String homeserver,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
     final response = await http.get(Uri.parse(url));
 
@@ -50,17 +48,17 @@ abstract class Auth {
   static Future<dynamic> loginUser({
     required String protocol,
     required String homeserver,
-    String type = "m.login.password",
+    String type = 'm.login.password',
     String? username,
     String? password,
     String? deviceId,
     String? deviceName,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    Map body = {
+    final Map body = {
       'type': type,
-      "identifier": {"type": "m.id.user", "user": username},
+      'identifier': {'type': 'm.id.user', 'user': username},
       'password': password,
     };
 
@@ -99,9 +97,9 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    Map body = {
+    final Map body = {
       'type': type,
       'token': token,
       'trx_id': Random().nextInt(1 << 32),
@@ -125,11 +123,9 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * Register New User
-   * 
-   * inhibit_login automatically logs in the user after creation 
-   */
+  /// Register New User
+  /// 
+  /// inhibit_login automatically logs in the user after creation 
   static Future<dynamic> registerEmail({
     String? protocol,
     String? homeserver,
@@ -137,13 +133,13 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
 
-    Map body = {
-      "email": email,
-      "client_secret": clientSecret,
-      "send_attempt": sendAttempt,
+    final Map body = {
+      'email': email,
+      'client_secret': clientSecret,
+      'send_attempt': sendAttempt,
     };
 
     final response = await http.post(
@@ -155,11 +151,9 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * Register New User
-   * 
-   * inhibit_login automatically logs in the user after creation 
-   */
+  /// Register New User
+  /// 
+  /// inhibit_login automatically logs in the user after creation 
   static Future<dynamic> registerUser({
     String? protocol,
     String? homeserver,
@@ -172,7 +166,7 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/register';
+    final String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
       'username': username,
@@ -204,13 +198,13 @@ abstract class Auth {
         body = {
           'auth': {
             'type': MatrixAuthTypes.EMAIL,
-            "threepid_creds": {
-              "sid": authParams!['sid'],
-              "client_secret": authParams['client_secret'],
+            'threepid_creds': {
+              'sid': authParams!['sid'],
+              'client_secret': authParams['client_secret'],
             },
-            "threepidCreds": {
-              "sid": authParams['sid'],
-              "client_secret": authParams['client_secret'],
+            'threepidCreds': {
+              'sid': authParams['sid'],
+              'client_secret': authParams['client_secret'],
             }
           }
         };
@@ -226,7 +220,7 @@ abstract class Auth {
     }
 
     if (deviceId != null) {
-      body['initial_device_display_name'] = "$deviceName";
+      body['initial_device_display_name'] = '$deviceName';
     }
 
     final response = await http.post(
@@ -243,9 +237,9 @@ abstract class Auth {
     String? homeserver,
     String? accessToken,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/logout';
+    final String url = '$protocol$homeserver/_matrix/client/r0/logout';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -258,17 +252,15 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   * Logout User Everywhere
-   */
+  /// Logout User Everywhere
   static Future<dynamic> logoutUserEverywhere({
     String? protocol,
     String? homeserver,
     String? accessToken,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/logout/all';
+    final String url = '$protocol$homeserver/_matrix/client/r0/logout/all';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -281,13 +273,11 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   *  https://matrix.org/docs/spec/client_server/latest#id211 
-   * 
-   *  Check Username Availability
-   * 
-   *  Used to check what types of logins are available on the server
-   */
+  ///  https://matrix.org/docs/spec/client_server/latest#id211 
+  /// 
+  ///  Check Username Availability
+  /// 
+  ///  Used to check what types of logins are available on the server
   static Future<dynamic> checkUsernameAvailability({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -302,18 +292,16 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  /**
-   *  https://matrix.org/docs/spec/client_server/latest#id211 
-   * 
-   *  Check Username Availability
-   * 
-   *  Used to check what types of logins are available on the server
-   */
+  ///  https://matrix.org/docs/spec/client_server/latest#id211 
+  /// 
+  ///  Check Username Availability
+  /// 
+  ///  Used to check what types of logins are available on the server
   static Future<dynamic> checkHomeserver({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
   }) async {
-    String url = '$protocol$homeserver/.well-known/matrix/client';
+    final String url = '$protocol$homeserver/.well-known/matrix/client';
 
     final response = await http.get(Uri.parse(url));
 
@@ -324,19 +312,17 @@ abstract class Auth {
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/versions';
+    final String url = '$protocol$homeserver/_matrix/client/versions';
 
     final response = await http.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
 
-  /**
-   * Update User Password
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id198
-   * 
-   */
+  /// Update User Password
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#id198
+  /// 
   static Future<dynamic> updatePassword({
     String? protocol,
     String? homeserver,
@@ -347,14 +333,14 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
+    final Map body = {
       'new_password': password,
       'logout_devices': false,
     };
@@ -391,21 +377,21 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
-    Map body = {
-      "auth": {
-        "type": "m.login.email.identity",
-        "threepid_creds": {
-          "sid": session,
-          "client_secret": clientSecret,
+    final Map body = {
+      'auth': {
+        'type': 'm.login.email.identity',
+        'threepid_creds': {
+          'sid': session,
+          'client_secret': clientSecret,
         },
-        "threepidCreds": {
-          "sid": session,
-          "client_secret": clientSecret,
+        'threepidCreds': {
+          'sid': session,
+          'client_secret': clientSecret,
         }
       },
-      "new_password": passwordNew
+      'new_password': passwordNew
     };
 
     final response = await http.post(
@@ -429,13 +415,13 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
 
-    Map body = {
-      "email": email,
-      "client_secret": clientSecret,
-      "send_attempt": sendAttempt,
+    final Map body = {
+      'email': email,
+      'client_secret': clientSecret,
+      'send_attempt': sendAttempt,
     };
 
     final response = await http.post(

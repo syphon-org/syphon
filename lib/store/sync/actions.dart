@@ -68,19 +68,17 @@ class SetSyncObserver {
 
 class ResetSync {}
 
-/**
- * Default Room Sync Observer
- * 
- * This will be run after the initial sync. Following login or signup, users
- * will just have an observer that runs every second or so to sync with the server
- * only while the app is _active_ otherwise, it will be up to a background service
- * and a notification service to trigger syncs
- */
+/// Default Room Sync Observer
+/// 
+/// This will be run after the initial sync. Following login or signup, users
+/// will just have an observer that runs every second or so to sync with the server
+/// only while the app is _active_ otherwise, it will be up to a background service
+/// and a notification service to trigger syncs
 ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
     final interval = store.state.syncStore.interval;
 
-    Timer syncObserver = Timer.periodic(
+    final Timer syncObserver = Timer.periodic(
       Duration(seconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
@@ -128,12 +126,10 @@ ThunkAction<AppState> startSyncObserver() {
   };
 }
 
-/**
- * Stop Sync Observer 
- * 
- * Will prevent the app from syncing with the homeserver 
- * every few seconds
- */
+/// Stop Sync Observer 
+/// 
+/// Will prevent the app from syncing with the homeserver 
+/// every few seconds
 ThunkAction<AppState> stopSyncObserver() {
   return (Store<AppState> store) {
     if (store.state.syncStore.syncObserver != null) {
@@ -143,16 +139,14 @@ ThunkAction<AppState> stopSyncObserver() {
   };
 }
 
-/**
- * Initial Sync - Custom Solution for /sync
- * 
- * This will only be run on log in because the matrix protocol handles
- * initial syncing terribly. It's incredibly cumbersome to load thousands of events
- * for multiple rooms all at once in order to show the user just some room names
- * and timestamps. Lazy loading isn't always supported, so it's not a solid solution
- * 
- * TODO: potentially re-enable the fetch rooms function if lazy_load fails
- */
+/// Initial Sync - Custom Solution for /sync
+/// 
+/// This will only be run on log in because the matrix protocol handles
+/// initial syncing terribly. It's incredibly cumbersome to load thousands of events
+/// for multiple rooms all at once in order to show the user just some room names
+/// and timestamps. Lazy loading isn't always supported, so it's not a solid solution
+/// 
+/// TODO: potentially re-enable the fetch rooms function if lazy_load fails
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
@@ -166,26 +160,22 @@ ThunkAction<AppState> initialSync() {
   };
 }
 
-/**
- * 
- * Set Backgrounded
- * 
- * Mark when the app has been backgrounded to visualize loading feedback
- *  
- */
+/// 
+/// Set Backgrounded
+/// 
+/// Mark when the app has been backgrounded to visualize loading feedback
+///  
 ThunkAction<AppState> setBackgrounded(bool backgrounded) {
   return (Store<AppState> store) async {
     store.dispatch(SetBackgrounded(backgrounded: backgrounded));
   };
 }
 
-/**
- * 
- * Fetch Sync
- * 
- * Responsible for updates based on differences from Matrix
- *  
- */
+/// 
+/// Fetch Sync
+/// 
+/// Responsible for updates based on differences from Matrix
+///  
 ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {

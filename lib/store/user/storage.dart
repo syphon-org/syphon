@@ -21,11 +21,9 @@ Future<void> saveUsers(
   });
 }
 
-/**
- * Load Users (Cold Storage)
- * 
- * Example of useful recursion
- */
+/// Load Users (Cold Storage)
+/// 
+/// Example of useful recursion
 Future<Map<String, User>> loadUsers({
   Database? cache,
   required Database storage,

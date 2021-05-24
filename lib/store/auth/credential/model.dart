@@ -20,7 +20,7 @@ class Credential extends Equatable {
   });
 
   String? get termsUrl {
-    if (this.params == null) {
+    if (params == null) {
       return null;
     }
 

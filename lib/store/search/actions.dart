@@ -83,7 +83,7 @@ Future<String?> fetchFavicon({String? url}) async {
     final document = parse(response.body);
     final faviconIcon = document.querySelector('link[rel="icon"]');
     final faviconShort = document.querySelector('link[rel="shortcut icon"]');
-    final favicon = faviconShort != null ? faviconShort : faviconIcon!;
+    final favicon = faviconShort ?? faviconIcon!;
 
     var faviconUrl = fullUrl;
 
@@ -106,7 +106,7 @@ Future<String?> fetchFavicon({String? url}) async {
 
 ThunkAction<AppState> searchHomeservers({String? searchText}) {
   return (Store<AppState> store) async {
-    List<Homeserver> searchResults =
+    final List<Homeserver> searchResults =
         (store.state.searchStore.homeservers as List<Homeserver>)
             .where((homeserver) =>
                 homeserver.hostname!.contains(searchText!) ||
@@ -120,9 +120,7 @@ ThunkAction<AppState> searchHomeservers({String? searchText}) {
   };
 }
 
-/** 
- *  Search Rooms (Locally)
- */
+///  Search Rooms (Locally)
 ThunkAction<AppState> searchRooms({String? searchText}) {
   return (Store<AppState> store) async {
     try {
@@ -131,7 +129,7 @@ ThunkAction<AppState> searchRooms({String? searchText}) {
       final rooms = store.state.roomStore.roomList;
       List<Room> searchResults = List.from(rooms.where((room) => !room.direct));
 
-      if (searchText!.length != 0) {
+      if (searchText!.isNotEmpty) {
         searchResults = List.from(
           rooms.where((room) {
             final fulltext = room.name! + room.alias! + room.topic!;
@@ -152,9 +150,7 @@ ThunkAction<AppState> searchRooms({String? searchText}) {
   };
 }
 
-/** 
- *  Search Rooms (Remote)
- */
+///  Search Rooms (Remote)
 ThunkAction<AppState> searchPublicRooms({String? searchable}) {
   return (Store<AppState> store) async {
     try {
@@ -207,9 +203,7 @@ ThunkAction<AppState> searchPublicRooms({String? searchable}) {
   };
 }
 
-/** 
- *  search requires remote access
- */
+///  search requires remote access
 ThunkAction<AppState> searchUsers({String? searchText}) {
   return (Store<AppState> store) async {
     try {

@@ -1,7 +1,7 @@
-/**
- * Constants that cannot be localized
- * taken as a convention from Android
- */
+import 'package:flutter/foundation.dart';
+
+/// Constants that cannot be localized
+/// taken as a convention from Android
 class Values {
   static const appId = 'org.tether.tether';
   static const appName = 'Syphon';
@@ -15,13 +15,13 @@ class Values {
   static const channel_id = '${appNameLabel}_notifications';
   static const channel_id_background_service =
       '${appName}_background_notification';
-  static const default_channel_title = '$appName';
+  static const default_channel_title = appName;
 
   static const channel_group_key = 'org.tether.tether.MESSAGES';
   static const channel_name_messages = 'Messages';
   static const channel_name_background_service = 'Background Sync';
   static const channel_description =
-      '${appName} messaging client message and status notifications';
+      '$appName messaging client message and status notifications';
 
   static const captchaUrl =
       'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=';
@@ -38,7 +38,7 @@ class Values {
       'mailto:$supportEmail?subject=Syphon%20Support%20-%20App&body=Hey%20Syphon%20Team%2C%0D%0A%0D%0A%3CLeave%20your%20feedback%2C%20questions%20or%20concerns%20here%3E%0D%0A%0D%0AThanks!';
 
   static const openSourceLibraries = [
-    {"title": 'testing', 'license': 'MIT', 'version': '1.2.3'},
+    {'title': 'testing', 'license': 'MIT', 'version': '1.2.3'},
   ];
 
   static const homeserverDefault = 'matrix.org';
@@ -48,7 +48,7 @@ class Values {
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 
   static const urlRegex =
-      r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
+      r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)';
 
   static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
 
@@ -62,20 +62,23 @@ class Values {
   static const defaultHeaders = {'Content-type': 'application/json'};
   static const fontFamilies = [
     'Rubik',
-    "Roboto",
-    "Poppins",
-    "Inter",
+    'Roboto',
+    'Poppins',
+    'Inter',
   ];
 
   static const fontSizes = [
     'Small',
     'Default',
-    "Large",
+    'Large',
   ];
 
   static const messageSizes = [
     'Small',
     'Default',
-    "Large",
+    'Large',
   ];
 }
+
+// ignore: non_constant_identifier_names
+final bool DEBUG_MODE = !kReleaseMode;

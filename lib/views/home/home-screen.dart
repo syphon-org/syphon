@@ -605,7 +605,7 @@ class _Props extends Equatable {
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
-  _Props({
+  const _Props({
     required this.rooms,
     required this.theme,
     required this.offline,
@@ -637,7 +637,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         theme: store.state.settingsStore.theme,
-        rooms: availableRooms(sortedPrioritizedRooms(filterBlockedRooms(
+        rooms: availableRooms(sortPrioritizedRooms(filterBlockedRooms(
           store.state.roomStore.rooms.values.toList(),
           store.state.userStore.blocked,
         ))),

@@ -63,10 +63,10 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
   @protected
   void onCreateRoom(_Props props) async {
     final roomId = await props.onCreateRoomPublic(
-      avatar: this.avatar,
-      name: this.name,
-      topic: this.topic,
-      alias: this.alias,
+      avatar: avatar,
+      name: name,
+      topic: topic,
+      alias: alias,
     );
     if (roomId != null) {
       Navigator.pop(context);
@@ -116,11 +116,11 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
             ),
           );
 
-          if (this.name != null && this.name!.isNotEmpty) {
+          if (name != null && name!.isNotEmpty) {
             avatarWidget = CircleAvatar(
-              backgroundColor: Colours.hashedColor(this.name),
+              backgroundColor: Colours.hashedColor(name),
               child: Text(
-                formatInitials(this.name),
+                formatInitials(name),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.avatarFontSize(size: imageSize),
@@ -129,11 +129,11 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
             );
           }
 
-          if (this.avatar != null) {
+          if (avatar != null) {
             avatarWidget = ClipRRect(
               borderRadius: BorderRadius.circular(imageSize),
               child: Image.file(
-                this.avatar!,
+                avatar!,
                 width: imageSize,
                 height: imageSize,
                 fit: BoxFit.cover,
@@ -251,7 +251,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   padding: EdgeInsets.only(
                                                       bottom: 4),
                                                   child: Text(
-                                                    this.name ?? '',
+                                                    name ?? '',
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: Theme.of(context)
@@ -260,15 +260,14 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   ),
                                                 ),
                                                 Visibility(
-                                                  visible: this.alias != null &&
-                                                      this.alias!.isNotEmpty,
+                                                  visible: alias != null &&
+                                                      alias!.isNotEmpty,
                                                   maintainSize: true,
                                                   maintainState: true,
                                                   maintainAnimation: true,
                                                   child: Text(
                                                     formatAlias(
-                                                      resource:
-                                                          this.alias ?? '',
+                                                      resource: alias ?? '',
                                                       homeserver:
                                                           props.homeserver ??
                                                               '',
@@ -290,7 +289,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                         maxWidth: width / 1.5,
                                                       ),
                                                       child: Text(
-                                                        this.topic ?? '',
+                                                        topic ?? '',
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -463,7 +462,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                 loading: props.loading,
                                                 disabled: props.loading,
                                                 onPressed: () =>
-                                                    this.onCreateRoom(props),
+                                                    onCreateRoom(props),
                                               ),
                                             ),
                                             Container(
@@ -478,8 +477,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                               ),
                                               child: ButtonTextOpacity(
                                                 text: Strings.buttonQuit,
-                                                onPressed: () =>
-                                                    this.onQuit(props),
+                                                onPressed: () => onQuit(props),
                                               ),
                                             ),
                                           ],

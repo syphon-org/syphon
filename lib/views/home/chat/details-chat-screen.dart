@@ -328,7 +328,6 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 Visibility(
                                   visible: props.room.topic != null &&
                                       props.room.topic!.isNotEmpty,
-                                  maintainSize: false,
                                   child: Container(
                                     padding: EdgeInsets.only(top: 12),
                                     child: Text(

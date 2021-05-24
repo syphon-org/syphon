@@ -7,20 +7,18 @@ import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
 
 abstract class Devices {
-  /**
-   * https://matrix.org/docs/spec/client_server/latest#id472
-   * 
-   * HTTP:GET
-   * Gets all currently active pushers for the authenticated user.
-   */
+  /// https://matrix.org/docs/spec/client_server/latest#id472
+  /// 
+  /// HTTP:GET
+  /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchDevices({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/devices';
+    final String url = '$protocol$homeserver/_matrix/client/r0/devices';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -29,12 +27,10 @@ abstract class Devices {
     return await json.decode(response.body);
   }
 
-  /**
-   * https://matrix.org/docs/spec/client_server/latest#id412
-   *  
-   * HTTP:PUT
-   * Gets all currently active pushers for the authenticated user.
-   */
+  /// https://matrix.org/docs/spec/client_server/latest#id412
+  ///  
+  /// HTTP:PUT
+  /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> updateDevice({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -42,14 +38,14 @@ abstract class Devices {
     String? deviceId,
     String? displayName,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/devices';
+    final String url = '$protocol$homeserver/_matrix/client/r0/devices';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    Map body = {
-      "display_name": displayName,
+    final Map body = {
+      'display_name': displayName,
     };
 
     final response = await http.put(
@@ -77,9 +73,9 @@ abstract class Devices {
     String? authType,
     String? authValue,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
+    final String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -87,7 +83,7 @@ abstract class Devices {
 
     if (session != null) {
       body = {
-        "auth": {
+        'auth': {
           'session': session,
           'type': authType,
           'user': userId,
@@ -131,14 +127,14 @@ abstract class Devices {
     String? authType,
     String? authValue,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/delete_devices';
+    final String url = '$protocol$homeserver/_matrix/client/r0/delete_devices';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
+    final Map body = {
       'devices': deviceIds,
     };
 

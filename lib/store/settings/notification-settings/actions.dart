@@ -13,9 +13,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
-/**
- * Fetch Remote Push Notification Service Rules
- */
+/// Fetch Remote Push Notification Service Rules
 ThunkAction<AppState> fetchNotifications() {
   return (Store<AppState> store) async {
     try {
@@ -38,9 +36,7 @@ ThunkAction<AppState> fetchNotifications() {
   };
 }
 
-/**
- * Fetch Remote Push Notification Services
- */
+/// Fetch Remote Push Notification Services
 ThunkAction<AppState> fetchNotificationPushers() {
   return (Store<AppState> store) async {
     try {
@@ -63,9 +59,7 @@ ThunkAction<AppState> fetchNotificationPushers() {
   };
 }
 
-/**
- * Fetch Remote Push Notification Service Rules
- */
+/// Fetch Remote Push Notification Service Rules
 ThunkAction<AppState> fetchNotificationPusherRules() {
   return (Store<AppState> store) async {
     try {
@@ -84,14 +78,12 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
   };
 }
 
-/**
- * Set Pusher Device Token
- * 
- * NOTE: used to set iOS APNS token
- * 
- * Either the Apple Push Notification Service token for
- * this device or an email address for "email" notifications
- */
+/// Set Pusher Device Token
+/// 
+/// NOTE: used to set iOS APNS token
+/// 
+/// Either the Apple Push Notification Service token for
+/// this device or an email address for "email" notifications
 ThunkAction<AppState> setPusherDeviceToken(String token) {
   return (Store<AppState> store) async {
     try {
@@ -105,9 +97,7 @@ ThunkAction<AppState> setPusherDeviceToken(String token) {
   };
 }
 
-/**
- * Fetch Remote Push Notification Service
- */
+/// Fetch Remote Push Notification Service
 ThunkAction<AppState> saveNotificationPusher({
   String kind = 'http', // can be 'email' with token as email
   bool erase = false,

@@ -58,7 +58,7 @@ ThunkAction<AppState> uploadMedia({
       // Setting up params for upload
       final int fileLength = await localFile.length();
       final Stream<List<int>> fileStream = localFile.openRead();
-      final String fileName = '${mediaName}.${fileExtension}';
+      final String fileName = '$mediaName.$fileExtension';
 
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(

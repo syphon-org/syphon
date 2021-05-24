@@ -199,7 +199,7 @@ class Room {
       Room(
         id: id ?? this.id,
         name: name ?? this.name,
-        alias: alias ?? this.alias,
+        alias: alias ?? alias,
         topic: topic ?? this.topic,
         joinRule: joinRule ?? this.joinRule,
         avatarUri: avatarUri ?? this.avatarUri,
@@ -227,7 +227,7 @@ class Room {
         messagesNew: messagesNew ?? this.messagesNew,
         reactions: reactions ?? this.reactions,
         redactions: redactions ?? this.redactions,
-        usersNew: users ?? this.usersNew,
+        usersNew: users ?? usersNew,
         userIds: userIds ?? this.userIds,
         readReceipts: readReceipts ?? this.readReceipts,
         lastHash: lastHash ?? this.lastHash,
@@ -270,9 +270,9 @@ class Room {
     List<Event> stateEvents = [];
     List<Event> accountEvents = [];
     List<Event> ephemeralEvents = [];
-    List<Reaction> reactionEvents = [];
-    List<Message> messageEvents = [];
-    List<Redaction> redactionEvents = [];
+    final List<Reaction> reactionEvents = [];
+    final List<Message> messageEvents = [];
+    final List<Redaction> redactionEvents = [];
 
     // Find state only updates
     if (json['state'] != null) {
@@ -313,7 +313,7 @@ class Room {
 
       if (limited != null) {
         printInfo(
-          '[fromSync] ${this.id} limited ${limited} lastHash ${lastHash != null} prevHash ${prevHash != null}',
+          '[fromSync] ${id} limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
 
@@ -342,8 +342,7 @@ class Room {
       }
     }
 
-    return this
-        .fromAccountData(
+    return fromAccountData(
           accountEvents,
         )
         .fromStateEvents(
@@ -366,12 +365,10 @@ class Room {
         );
   }
 
-  /**
-   * 
-   * fromAccountData
-   * 
-   * Mostly used to assign is_direct 
-   */
+  /// 
+  /// fromAccountData
+  /// 
+  /// Mostly used to assign is_direct 
   Room fromAccountData(List<Event> accountDataEvents) {
     dynamic isDirect;
     try {
@@ -386,16 +383,14 @@ class Room {
       });
     } catch (error) {}
 
-    return this.copyWith(
-      direct: isDirect ?? this.direct,
+    return copyWith(
+      direct: isDirect ?? direct,
     );
   }
 
-  /**
-   * 
-   * Find details of room based on state events
-   * follows spec naming priority and thumbnail downloading
-   */
+  /// 
+  /// Find details of room based on state events
+  /// follows spec naming priority and thumbnail downloading
   Room fromStateEvents({
     bool? invite,
     bool? limited,
@@ -413,9 +408,9 @@ class Room {
     int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
-    Map<String, User> usersAdd = Map.from(this.usersNew);
+    final Map<String, User> usersAdd = Map.from(usersNew);
     Set<String> userIds = Set<String>.from(this.userIds);
-    List<String> userIdsRemove = [];
+    final List<String> userIdsRemove = [];
 
     events.forEach((event) {
       try {
@@ -486,7 +481,7 @@ class Room {
             break;
         }
       } catch (error) {
-        debugPrint('[Room.fromStateEvents] ${error} ${event.type}');
+        debugPrint('[Room.fromStateEvents] $error ${event.type}');
       }
     });
 
@@ -527,7 +522,7 @@ class Room {
       }
     } catch (error) {}
 
-    return this.copyWith(
+    return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
       users: usersAdd,
@@ -545,13 +540,11 @@ class Room {
     );
   }
 
-  /**
-   * fromMessageEvents
-   * 
-   * Update room based on messages events, many
-   * message events have side effects on room data
-   * outside displaying messages
-   */
+  /// fromMessageEvents
+  /// 
+  /// Update room based on messages events, many
+  /// message events have side effects on room data
+  /// outside displaying messages
   Room fromMessageEvents({
     List<Message> messages = const [],
     String? lastHash,
@@ -614,7 +607,7 @@ class Room {
         messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
-        encryptionEnabled: this.encryptionEnabled || hasEncrypted != null,
+        encryptionEnabled: encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         // oldest hash in the timeline
         lastHash: lastHash ?? this.lastHash ?? prevHash,
@@ -629,10 +622,8 @@ class Room {
     }
   }
 
-  /**
-   * Appends ephemeral events (mostly read receipts) to a
-   * hashmap of eventIds linking them to users and timestamps
-   */
+  /// Appends ephemeral events (mostly read receipts) to a
+  /// hashmap of eventIds linking them to users and timestamps
   Room fromEphemeralEvents({
     required List<Event> events,
     User? currentUser,
@@ -650,7 +641,7 @@ class Room {
             usersTyping.removeWhere(
               (user) => currentUser!.userId == user,
             );
-            userTyping = usersTyping.length > 0;
+            userTyping = usersTyping.isNotEmpty;
             break;
           case 'm.receipt':
             final Map<String, dynamic> receiptEventIds = event.content;

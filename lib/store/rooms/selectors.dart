@@ -7,7 +7,7 @@ Room selectRoom({required AppState state, String? id}) {
 }
 
 List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
-  final List<Room> roomList = rooms != null ? rooms : [];
+  final List<Room> roomList = rooms;
 
   return roomList
     ..removeWhere((room) =>
@@ -16,11 +16,9 @@ List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
     ..toList();
 }
 
-List<Room> sortedPrioritizedRooms(List<Room> rooms) {
-  final sortedList = rooms != null ? rooms : [];
-
+List<Room> sortPrioritizedRooms(List<Room> rooms) {
   // sort descending
-  sortedList.sort((a, b) {
+  rooms.sort((a, b) {
     // Prioritze draft rooms
     if (a.drafting && !b.drafting) {
       return -1;
@@ -42,15 +40,15 @@ List<Room> sortedPrioritizedRooms(List<Room> rooms) {
       return 1;
     }
     // Otherwise, use timestamp
-    if (a.lastUpdate > b.lastUpdate) {
+    if ((a.lastUpdate ?? 0) > (b.lastUpdate ?? 0)) {
       return -1;
     }
-    if (a.lastUpdate < b.lastUpdate) {
+    if ((a.lastUpdate ?? 0) < (b.lastUpdate ?? 0)) {
       return 1;
     }
 
     return 0;
   });
 
-  return sortedList as List<Room>;
+  return rooms;
 }

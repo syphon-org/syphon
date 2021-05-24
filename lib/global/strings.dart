@@ -1,11 +1,9 @@
 // Project imports:
 import 'package:syphon/global/values.dart';
 
-/**
- * Will be converted to
- * i18n json soon, but a "String" 
- * class below is just a stub for now
- */
+/// Will be converted to
+/// i18n json soon, but a "String" 
+/// class below is just a stub for now
 class Strings {
   // View Titles
   static const titleProfile = 'Set up Your Profile';
@@ -124,7 +122,7 @@ class Strings {
 
   // Confirmations
   static const confirmationDeleteKeys =
-      "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.";
+      'Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.';
 
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
@@ -175,8 +173,8 @@ class Strings {
   static String formatUsernameHint(
       {required String homeserver, String? username}) {
     final usernameFormatted =
-        username != null && username.length > 0 ? username : 'username';
-    final alias = homeserver.length != 0
+        username != null && username.isNotEmpty ? username : 'username';
+    final alias = homeserver.isNotEmpty
         ? '@$usernameFormatted:$homeserver'
         : '@$usernameFormatted:matrix.org';
 

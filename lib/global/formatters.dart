@@ -23,7 +23,7 @@ String formatLanguageCode(String? language) {
 
 // @again_guy:matrix.org -> ER
 String formatSenderInitials(String sender) {
-  var formattedSender = formatSender(sender).toUpperCase();
+  final formattedSender = formatSender(sender).toUpperCase();
   return formattedSender.length < 2
       ? formattedSender
       : formattedSender.substring(0, 2);

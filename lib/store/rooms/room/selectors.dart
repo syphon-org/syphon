@@ -36,7 +36,7 @@ String formatPreview({required Room room, Message? message}) {
     }
 
     // room was created, but no messages or topic
-    if (room.topic == null || room.topic!.length < 1) {
+    if (room.topic == null || room.topic!.isEmpty) {
       return 'No messages yet';
     }
 

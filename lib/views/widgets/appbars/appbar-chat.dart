@@ -270,7 +270,6 @@ class AppBarChatState extends State<AppBarChat> {
           ),
           actions: <Widget>[
             Visibility(
-              maintainSize: false,
               visible: debug,
               child: IconButton(
                 icon: Icon(Icons.gamepad),

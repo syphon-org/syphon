@@ -72,7 +72,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 child: Column(
               children: <Widget>[
                 Visibility(
-                  maintainSize: false,
                   visible: debug,
                   child: ListTile(
                     dense: true,
@@ -85,7 +84,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
                   visible: debug,
                   child: ListTile(
                     dense: true,
@@ -103,7 +101,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
                   visible: debug,
                   child: ListTile(
                     dense: true,
@@ -124,7 +121,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
                   visible: debug,
                   child: ListTile(
                     dense: true,
@@ -146,7 +142,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
                   visible: debug,
                   child: ListTile(
                     dense: true,

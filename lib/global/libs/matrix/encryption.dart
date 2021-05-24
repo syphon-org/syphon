@@ -23,13 +23,11 @@ class Keys {
 }
 
 abstract class Encryption {
-  /**
-   * Fetch Encryption Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id460
-   * 
-   * Returns the current devices and identity keys for the given users.
-   */
+  /// Fetch Encryption Keys
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#id460
+  /// 
+  /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -38,7 +36,7 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -60,13 +58,11 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * Fetch Room Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id460
-   * 
-   * Returns the current devices and identity keys for the given users.
-   */
+  /// Fetch Room Keys
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#id460
+  /// 
+  /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -75,10 +71,10 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -90,19 +86,17 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * 
-   * Fetch Key Changes
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
-   * 
-   * Gets a list of users who have updated their device identity keys since a previous sync token.
-   * 
-   * The server should include in the results any users who:
-   *   - currently share a room with the calling user (ie, both users have membership state join); and
-   *   - added new device identity keys or removed an existing device with identity keys, between from and to.
-   * 
-   */
+  /// 
+  /// Fetch Key Changes
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
+  /// 
+  /// Gets a list of users who have updated their device identity keys since a previous sync token.
+  /// 
+  /// The server should include in the results any users who:
+  ///   - currently share a room with the calling user (ie, both users have membership state join); and
+  ///   - added new device identity keys or removed an existing device with identity keys, between from and to.
+  /// 
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -110,9 +104,9 @@ abstract class Encryption {
     String? from,
     String? to,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -124,28 +118,26 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * Claim Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
-   * 
-   * Claims one-time keys for use in pre-key messages.
-   * 
-   */
+  /// Claim Keys
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
+  /// 
+  /// Claims one-time keys for use in pre-key messages.
+  /// 
   static Future<Map<String, dynamic>> claimKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
     Map? oneTimeKeys,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
+    final Map body = {
       'timeout': 10000,
       'one_time_keys': oneTimeKeys,
     };
@@ -165,9 +157,9 @@ abstract class Encryption {
     String? accessToken,
     Map? data,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };

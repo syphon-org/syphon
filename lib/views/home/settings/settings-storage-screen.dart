@@ -9,10 +9,9 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
-
-final bool debug = !kReleaseMode;
 
 class StorageSettingsScreen extends StatelessWidget {
   const StorageSettingsScreen({Key? key}) : super(key: key);
@@ -36,8 +35,7 @@ class StorageSettingsScreen extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
             ),
-            body: Container(
-                child: Column(
+            body: Column(
               children: <Widget>[
                 Container(
                   width: width,
@@ -49,8 +47,7 @@ class StorageSettingsScreen extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
-                  visible: !debug,
+                  visible: !DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -64,8 +61,7 @@ class StorageSettingsScreen extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  maintainSize: false,
-                  visible: !debug,
+                  visible: !DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -79,7 +75,7 @@ class StorageSettingsScreen extends StatelessWidget {
                   ),
                 ),
               ],
-            )),
+            ),
           );
         },
       );

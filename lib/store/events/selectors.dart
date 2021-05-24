@@ -35,9 +35,9 @@ List<Message> filterMessages(
 }
 
 List<Message> reviseMessagesBackground(Map params) {
-  List<Message> messages = params['messages'] ?? [];
-  Map<String, Redaction> redactions = params['redactions'];
-  Map<String, List<Reaction>> reactions = params['reactions'];
+  final List<Message> messages = params['messages'] ?? [];
+  final Map<String, Redaction> redactions = params['redactions'];
+  final Map<String, List<Reaction>> reactions = params['reactions'];
 
   return reviseMessagesFilter(messages, redactions, reactions);
 }

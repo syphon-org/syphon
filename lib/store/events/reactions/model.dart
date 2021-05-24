@@ -35,6 +35,7 @@ class Reaction extends Event {
           content: content,
         );
 
+  @override
   Reaction copyWith({
     id,
     type,
@@ -61,6 +62,7 @@ class Reaction extends Event {
         relEventId: relEventId ?? this.relEventId,
       );
 
+  @override
   Map<String, dynamic> toJson() => _$ReactionToJson(this);
   factory Reaction.fromJson(Map<String, dynamic> json) =>
       _$ReactionFromJson(json);

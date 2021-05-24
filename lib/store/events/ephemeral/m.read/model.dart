@@ -14,14 +14,14 @@ class ReadReceipt {
   });
 
   factory ReadReceipt.fromReceipt(Map<String, dynamic> receipt) {
-    var usersRead = Map<String, int>();
+    final usersRead = <String, int>{};
     var latestTimestamp = 0;
     final Map<String, dynamic> userTimestamps = receipt['m.read'];
 
     // { @someone:xxx.com: { ts: 15878525620000 }, @anotherone:somewhere.net: { ts: 1587852560000 } } }
     userTimestamps.forEach(
       (userId, value) {
-        var userTimestamp = (value['ts'] as int);
+        final userTimestamp = (value['ts'] as int);
         usersRead[userId] = userTimestamp;
         latestTimestamp =
             userTimestamp > latestTimestamp ? userTimestamp : latestTimestamp;
@@ -39,7 +39,7 @@ class ReadReceipt {
     latestRead,
   }) =>
       ReadReceipt(
-        userReads: usersRead ?? this.userReads,
+        userReads: usersRead ?? userReads,
         latestRead: latestRead ?? this.latestRead,
       );
 

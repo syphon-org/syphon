@@ -80,8 +80,8 @@ class AuthStore extends Equatable {
     this.hostname = Values.homeserverDefault,
     this.homeserver = const Homeserver(
       valid: true,
-      hostname: "matrix.org",
-      baseUrl: "matrix.org",
+      hostname: 'matrix.org',
+      baseUrl: 'matrix.org',
       loginType: MatrixAuthTypes.DUMMY,
     ),
     this.interactiveAuths = const {},
@@ -175,9 +175,7 @@ class AuthStore extends Equatable {
         isEmailValid: isEmailValid ?? this.isEmailValid,
         isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
         isUsernameValid: isUsernameValid ?? this.isUsernameValid,
-        isUsernameAvailable: isUsernameAvailable != null
-            ? isUsernameAvailable
-            : this.isUsernameAvailable,
+        isUsernameAvailable: isUsernameAvailable ?? this.isUsernameAvailable,
         isPasswordValid: isPasswordValid ?? this.isPasswordValid,
         isHomeserverValid: isHomeserverValid ?? this.isHomeserverValid,
         interactiveAuths: interactiveAuths ?? this.interactiveAuths,

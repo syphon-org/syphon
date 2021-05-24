@@ -29,11 +29,9 @@ Future<void> saveMedia(
   });
 }
 
-/**
- * Load Media (Cold Storage)
- * 
- * load one set of media data based on mxc uri
- */
+/// Load Media (Cold Storage)
+/// 
+/// load one set of media data based on mxc uri
 Future<Uint8List?> loadMedia({
   String? mxcUri,
   required Database storage,
@@ -59,11 +57,9 @@ Future<Uint8List?> loadMedia({
   }
 }
 
-/**
- * Load All Media (Cold Storage)
- *  
- * load all media found within media storage
- */
+/// Load All Media (Cold Storage)
+///  
+/// load all media found within media storage
 Future<Map<String, Uint8List>?> loadMediaAll({
   required Database storage,
 }) async {

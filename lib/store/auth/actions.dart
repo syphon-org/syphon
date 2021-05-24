@@ -190,7 +190,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
             store.dispatch(loginUserSSO(token: token));
           }
         }, onError: (err) {
-          printError('[streamUniLinks] error ${err}');
+          printError('[streamUniLinks] error $err');
         });
       } on PlatformException {
         addAlert(
@@ -273,12 +273,10 @@ ThunkAction<AppState> stopAuthObserver() {
   };
 }
 
-/**
- * Generate Device Id
- * 
- * Used in matrix to distinguish devices
- * for encryption and verification
- */
+/// Generate Device Id
+/// 
+/// Used in matrix to distinguish devices
+/// for encryption and verification
 ThunkAction<AppState> generateDeviceId({String? salt}) {
   return (Store<AppState> store) async {
     // Wait at least 2 seconds until you can attempt to login again
@@ -299,7 +297,7 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
     var deviceId;
 
     try {
-      final deviceInfoPlugin = new DeviceInfoPlugin();
+      final deviceInfoPlugin = DeviceInfoPlugin();
 
       // Find a unique value for the type of device
       if (Platform.isAndroid) {
@@ -382,7 +380,7 @@ ThunkAction<AppState> loginUser() {
       store.dispatch(ResetOnboarding());
     } catch (error) {
       store.dispatch(addAlert(
-        origin: "loginUser",
+        origin: 'loginUser',
         message: error.toString(),
         error: error,
       ));
@@ -407,7 +405,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
         if (await canLaunch(ssoUrl)) {
           return await launch(ssoUrl, forceSafariVC: false);
         } else {
-          throw 'Could not launch ${ssoUrl}';
+          throw 'Could not launch $ssoUrl';
         }
       }
 
@@ -447,7 +445,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       store.dispatch(ResetOnboarding());
     } catch (error) {
       store.dispatch(addAlert(
-        origin: "loginUserSSO",
+        origin: 'loginUserSSO',
         message: error.toString(),
         error: error,
       ));
@@ -468,7 +466,7 @@ ThunkAction<AppState> logoutUser() {
       if (store.state.authStore.user.homeserver == null) {
         throw Exception('Unavailable user data');
       }
-      final temp = '${store.state.authStore.user.accessToken}';
+      final temp = store.state.authStore.user.accessToken;
       store.state.authStore.authObserver!.add(null);
 
       final data = await MatrixApi.logoutUser(
@@ -708,7 +706,7 @@ ThunkAction<AppState> sendPasswordResetEmail({int sendAttempt = 1}) {
       store.dispatch(SetSession(session: data['sid']));
 
       await store.dispatch(addConfirmation(
-        message: 'Successfully sent password reset email to ${email}',
+        message: 'Successfully sent password reset email to $email',
       ));
       return true;
     } catch (error) {
@@ -769,12 +767,10 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
   };
 }
 
-/**
- * 
- * Create a user / Attempt creation
- * 
- * process references are in assets/cheatsheet.md
- */
+/// 
+/// Create a user / Attempt creation
+/// 
+/// process references are in assets/cheatsheet.md
 ThunkAction<AppState> createUser({enableErrors = false}) {
   return (Store<AppState> store) async {
     try {
@@ -842,7 +838,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       printError('[createUser] error $error');
       if (enableErrors) {
         store.dispatch(addAlert(
-          origin: "createUser",
+          origin: 'createUser',
           message: 'Failed to signup',
           error: error,
         ));
@@ -968,12 +964,10 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
   };
 }
 
-/**
- * updateAvatarUri
- * 
- * Helper action - no try catch as it's meant to be
- * included in other update actions
- */
+/// updateAvatarUri
+/// 
+/// Helper action - no try catch as it's meant to be
+/// included in other update actions
 ThunkAction<AppState> updateAvatarUri({String? mxcUri}) {
   return (Store<AppState> store) async {
     final data = await MatrixApi.updateAvatarUri(
@@ -996,9 +990,7 @@ ThunkAction<AppState> setLoading(bool loading) {
   };
 }
 
-/**
- * Update current interactive auth attempt
- */
+/// Update current interactive auth attempt
 ThunkAction<AppState> updateCredential({
   String? type,
   String? value,
@@ -1179,7 +1171,7 @@ ThunkAction<AppState> setEmail({String? email}) {
     final validEmail = RegExp(Values.emailRegex).hasMatch(email!);
 
     store.dispatch(SetEmailValid(
-      valid: email != null && email.length > 0 && validEmail,
+      valid: email != null && email.isNotEmpty && validEmail,
     ));
     store.dispatch(SetEmail(email: email));
     store.dispatch(SetEmailAvailability(available: true));
@@ -1189,7 +1181,7 @@ ThunkAction<AppState> setEmail({String? email}) {
 ThunkAction<AppState> setUsername({String? username}) {
   return (Store<AppState> store) {
     store.dispatch(
-        SetUsernameValid(valid: username != null && username.length > 0));
+        SetUsernameValid(valid: username != null && username.isNotEmpty));
     store.dispatch(SetUsername(username: username!.trim()));
   };
 }
@@ -1225,7 +1217,7 @@ ThunkAction<AppState> setLoginPassword({String? password}) =>
       store.dispatch(SetPassword(password: password));
 
       store.dispatch(SetPasswordValid(
-        valid: password != null && password.length > 0,
+        valid: password != null && password.isNotEmpty,
       ));
     };
 

@@ -87,7 +87,7 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: "Failed to load users profile",
+        message: 'Failed to load users profile',
         origin: 'fetchUserProfile',
       ));
     } finally {
@@ -96,12 +96,10 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
   };
 }
 
-/**
- * Toggle Block User
- * 
- * Fetch the blocked user list and recalculate
- * events without the given user id
- */
+/// Toggle Block User
+/// 
+/// Fetch the blocked user list and recalculate
+/// events without the given user id
 ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
   return (Store<AppState> store) async {
     try {
@@ -124,7 +122,7 @@ ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
       }
 
       // Pull the direct room for that specific user
-      Map<String, dynamic> usersBlocked = data['ignored_users'] ?? {};
+      final Map<String, dynamic> usersBlocked = data['ignored_users'] ?? {};
 
       // toggle based on if the id is already present
       if (!usersBlocked.containsKey(user!.userId)) {
@@ -152,7 +150,7 @@ ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        message: "Failed to toggle user on blocklist",
+        message: 'Failed to toggle user on blocklist',
         origin: 'toggleBlockUser',
       ));
     } finally {

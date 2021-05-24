@@ -15,6 +15,7 @@ linter:
     constant_identifier_names: false
     avoid_escaping_inner_quotes: false
     prefer_for_elements_to_map_fromIterable: false # that syntax is challenging, will change if becomes standard
+    prefer_conditional_assignment: false
 
     # Enabled
     prefer_single_quotes: true
@@ -28,3 +29,6 @@ linter:
     # TODO:
     prefer_const_constructors: false
     lines_longer_than_80_chars: false
+    avoid_redundant_argument_values: false
+    prefer_typing_uninitialized_variables: false
+    empty_catches: false

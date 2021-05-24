@@ -38,10 +38,6 @@ SettingsStore settingsReducer(
       return state.copyWith(
         avatarShape: action.avatarShape,
       );
-    case SetAppBarColor:
-      return state.copyWith(
-        appBarColor: action.color,
-      );
     case SetDevices:
       return state.copyWith(
         devices: action.devices,
@@ -56,7 +52,7 @@ SettingsStore settingsReducer(
       );
     case SetRoomPrimaryColor:
       final chatSettings =
-          Map<String, ChatSetting>.from(state.customChatSettings ?? Map());
+          Map<String, ChatSetting>.from(state.customChatSettings ?? {});
 
       // Initialize chat settings if null
       if (chatSettings[action.roomId] == null) {

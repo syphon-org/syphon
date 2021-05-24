@@ -23,11 +23,9 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
-/**
- * Encrypt event content with loaded outbound session for room
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
- */
+/// Encrypt event content with loaded outbound session for room
+/// 
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
 ThunkAction<AppState> encryptMessageContent({
   String? roomId,
   Map? content,
@@ -71,11 +69,9 @@ ThunkAction<AppState> encryptMessageContent({
   };
 }
 
-/**
- * Decrypt event content with loaded inbound|outbound session for room
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
- */
+/// Decrypt event content with loaded inbound|outbound session for room
+/// 
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
 ThunkAction<AppState> decryptMessageEvent({
   required String roomId,
   String eventType = EventTypes.encrypted,
@@ -119,14 +115,12 @@ ThunkAction<AppState> decryptMessageEvent({
   };
 }
 
-/**
- * Encrypt key sharing event content with loaded outbound session for a device
- * 
- * NOTE: Utilizes available one time keys pre-fetched 
- * and claimed by the current user
- * 
- * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
- */
+/// Encrypt key sharing event content with loaded outbound session for a device
+/// 
+/// NOTE: Utilizes available one time keys pre-fetched 
+/// and claimed by the current user
+/// 
+/// https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
 ThunkAction<AppState> encryptKeyContent({
   String? roomId,
   String? recipient,
@@ -205,15 +199,13 @@ ThunkAction<AppState> encryptKeyContent({
   };
 }
 
-/**
- * Decrypting toDevice event content with loaded 
- * key session (outbound | inbound) for that device
- * 
- * NOTE: Utilizes available one time keys pre-fetched 
- * and claimed by the current user
- * 
- * https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
- */
+/// Decrypting toDevice event content with loaded 
+/// key session (outbound | inbound) for that device
+/// 
+/// NOTE: Utilizes available one time keys pre-fetched 
+/// and claimed by the current user
+/// 
+/// https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
 ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
@@ -320,7 +312,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 try {
                   // redecrypt events in the room with new key
                   final roomId = eventDecrypted['content']['room_id'];
-                  Map<String, dynamic> room = {roomId: {}};
+                  final Map<String, dynamic> room = {roomId: {}};
 
                   return await store.dispatch(syncRooms(room));
                 } catch (error) {

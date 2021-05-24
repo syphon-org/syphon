@@ -19,10 +19,10 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 Room parseRoom(Map params) {
-  Map json = params['json'];
-  Room room = params['room'];
-  User? currentUser = params['currentUser'];
-  String? lastSince = params['lastSince'];
+  final Map json = params['json'];
+  final Room room = params['room'];
+  final User? currentUser = params['currentUser'];
+  final String? lastSince = params['lastSince'];
 
   // TODO: eventually remove the need for this with modular parsers
   return room.fromSync(
@@ -120,20 +120,20 @@ Map<String, dynamic> parseOptions(Map<String, dynamic> json) {
   }
 
   return {
-    "invite": invite,
-    "limited": limited,
-    "lastHash": lastHash,
-    "prevHash": prevHash,
+    'invite': invite,
+    'limited': limited,
+    'lastHash': lastHash,
+    'prevHash': prevHash,
   };
 }
 
 Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
   List<Event> stateEvents = [];
   List<Event> accountEvents = [];
-  List<Message> messageEvents = [];
+  final List<Message> messageEvents = [];
   List<Event> ephemeralEvents = [];
-  List<Reaction> reactionEvents = [];
-  List<Event> redactedEvents = [];
+  final List<Reaction> reactionEvents = [];
+  final List<Event> redactedEvents = [];
 
   if (json['state'] != null) {
     final List<dynamic> stateEventsRaw = json['state']['events'];
@@ -192,10 +192,10 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
   }
   return {
     'stateEvents': stateEvents,
-    "accountEvents": accountEvents,
-    "messageEvents": messageEvents,
-    "redactedEvents": redactedEvents,
-    "reactionEvents": reactionEvents,
-    "ephemeralEvents": ephemeralEvents,
+    'accountEvents': accountEvents,
+    'messageEvents': messageEvents,
+    'redactedEvents': redactedEvents,
+    'reactionEvents': reactionEvents,
+    'ephemeralEvents': ephemeralEvents,
   };
 }

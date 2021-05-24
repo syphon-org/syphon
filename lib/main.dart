@@ -116,6 +116,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   @override
+  // ignore: avoid_void_async
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:

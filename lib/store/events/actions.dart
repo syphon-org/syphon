@@ -128,15 +128,13 @@ ThunkAction<AppState> setReceipts({
       return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
-/**
- * Load Message Events
- * 
- * Pulls initial messages from storage or paginates through
- * those existing in cold storage depending on requests from client
- * 
- * Make sure these have been exhausted before calling fetchMessageEvents
- * 
- */
+/// Load Message Events
+/// 
+/// Pulls initial messages from storage or paginates through
+/// those existing in cold storage depending on requests from client
+/// 
+/// Make sure these have been exhausted before calling fetchMessageEvents
+/// 
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   int offset = 0,
@@ -163,14 +161,12 @@ ThunkAction<AppState> loadMessagesCached({
   };
 }
 
-/**
- * Fetch Message Events
- * 
- * https://matrix.org/docs/spec/client_server/latest#syncing
- * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
- * 
- * Pulls next message events remote from homeserver
- */
+/// Fetch Message Events
+/// 
+/// https://matrix.org/docs/spec/client_server/latest#syncing
+/// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
+/// 
+/// Pulls next message events remote from homeserver
 ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
@@ -222,11 +218,9 @@ ThunkAction<AppState> fetchMessageEvents({
   };
 }
 
-/**
- * Decrypt Events
- * 
- * Reattribute decrypted events to the timeline
- */
+/// Decrypt Events
+/// 
+/// Reattribute decrypted events to the timeline
 ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     try {
@@ -279,13 +273,11 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   };
 }
 
-/**
- *  
- * Fetch State Events
- * 
- * state events can only be 
- * done from full state /sync data
- */
+///  
+/// Fetch State Events
+/// 
+/// state events can only be 
+/// done from full state /sync data
 ThunkAction<AppState> fetchStateEvents({Room? room}) {
   return (Store<AppState> store) async {
     try {
@@ -296,7 +288,7 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         roomId: room!.id,
       );
 
-      if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+      if (stateEvents.runtimeType != List && stateEvents['errcode'] != null) {
         throw stateEvents['error'];
       }
 
@@ -351,7 +343,7 @@ ThunkAction<AppState> selectReply({
 }) {
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId!]!;
-    final reply = message == null ? Message() : message;
+    final reply = message ?? Message();
     store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
   };
 }
@@ -398,13 +390,11 @@ ThunkAction<AppState> formatMessageReply(
   };
 }
 
-/**
- * 
- * Read Message Marker
- * 
- * Send Fully Read or just Read receipts bundled into 
- * one http call
- */
+/// 
+/// Read Message Marker
+/// 
+/// Send Fully Read or just Read receipts bundled into 
+/// one http call
 ThunkAction<AppState> sendReadReceipts({
   Room? room,
   Message? message,
@@ -436,14 +426,12 @@ ThunkAction<AppState> sendReadReceipts({
     }
   };
 }
-/**
- * 
- * Read Message Marker
- * 
- * Send Fully Read or just Read receipts bundled into 
- * one http call
- */
 
+/// 
+/// Read Message Marker
+/// 
+/// Send Fully Read or just Read receipts bundled into 
+/// one http call
 ThunkAction<AppState> sendTyping({
   String? roomId,
   bool? typing = false,
@@ -474,10 +462,7 @@ ThunkAction<AppState> sendTyping({
   };
 }
 
-/**
- * Delete Room Event (For Outbox, Local, and Remote)
- */
-
+/// Delete Room Event (For Outbox, Local, and Remote)
 ThunkAction<AppState> deleteMessage({required Message message}) {
   return (Store<AppState> store) async {
     try {

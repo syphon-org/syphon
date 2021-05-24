@@ -75,10 +75,10 @@ CryptoStore cryptoReducer(
       );
 
       // safety functions to catch newly cached store
-      messageSessionIndex.putIfAbsent(action.roomId, () => Map<String, int>());
+      messageSessionIndex.putIfAbsent(action.roomId, () => <String, int>{});
       messageSessionsInbound.putIfAbsent(
         action.roomId,
-        () => Map<String, String>(),
+        () => <String, String>{},
       );
 
       // add or update inbound message session by roomId + identity

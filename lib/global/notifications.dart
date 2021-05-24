@@ -12,11 +12,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 
-/**
- * Notifications are handled by APNS when running in iOS
- * Only need to handle local notifications on desktop and android 
- *  https://matrix.org/docs/spec/client_server/latest#id470
- */
+/// Notifications are handled by APNS when running in iOS
+/// Only need to handle local notifications on desktop and android
+///  https://matrix.org/docs/spec/client_server/latest#id470
 
 // TODO: extract apns and re-enable
 // import 'package:flutter_apns/apns.dart';
@@ -41,23 +39,23 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   }
 
 // ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
-  var initializationSettingsAndroid = AndroidInitializationSettings(
+  final initializationSettingsAndroid = AndroidInitializationSettings(
     'ic_launcher_foreground',
   );
 
-  var initializationSettingsIOS = IOSInitializationSettings(
+  final initializationSettingsIOS = IOSInitializationSettings(
     requestSoundPermission: false,
     requestBadgePermission: false,
     requestAlertPermission: false,
     onDidReceiveLocalNotification: onDidReceiveLocalNotification,
   );
 
-  var initializationSettings = InitializationSettings(
+  final initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
     iOS: initializationSettingsIOS,
   );
 
-  FlutterLocalNotificationsPlugin pluginInstance =
+  final FlutterLocalNotificationsPlugin pluginInstance =
       FlutterLocalNotificationsPlugin();
 
   await pluginInstance.initialize(
@@ -110,24 +108,22 @@ Future<bool> promptNativeNotificationsRequest({
   return Future.value(result);
 }
 
-/**
- * Background Service Notification
- * 
- * NOTE: background connection updates are only available on
- * android. iOS uses APNS to update through push notifications
- * 
- * This is used in android to circumvent google play services
- * 
- * If the notification is not reinvoked after 61 seconds the service is
- * likely no longer running and the notification should be automatically
- * dissmissed
- */
+/// Background Service Notification
+///
+/// NOTE: background connection updates are only available on
+/// android. iOS uses APNS to update through push notifications
+///
+/// This is used in android to circumvent google play services
+///
+/// If the notification is not reinvoked after 61 seconds the service is
+/// likely no longer running and the notification should be automatically
+/// dissmissed
 Future showBackgroundServiceNotification({
   int notificationId = 0,
   String debugContent = '',
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id_background_service,
@@ -143,13 +139,13 @@ Future showBackgroundServiceNotification({
     visibility: NotificationVisibility.private,
   );
 
-  final platformChannelSpecifics = new NotificationDetails(
+  final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
     iOS: iOSPlatformChannelSpecifics,
   );
 
-  var backgroundNotificationContent =
-      '${Strings.contentNotificationBackgroundService}';
+  final backgroundNotificationContent =
+      Strings.contentNotificationBackgroundService;
 
   await pluginInstance.show(
     notificationId,
@@ -189,6 +185,9 @@ Future showMessageNotification({
   );
 }
 
+///
+/// example based on https://developer.android.com/training/notify-user/group.html
+///
 Future showMessageNotificationTest({
   int messageHash = 0,
   String? body,
@@ -198,7 +197,6 @@ Future showMessageNotificationTest({
   const String groupChannelId = 'grouped channel id';
   const String groupChannelName = 'grouped channel name';
   const String groupChannelDescription = 'grouped channel description';
-// example based on https://developer.android.com/training/notify-user/group.html
   const AndroidNotificationDetails firstNotificationAndroidSpecifics =
       AndroidNotificationDetails(
           groupChannelId, groupChannelName, groupChannelDescription,
@@ -251,7 +249,7 @@ Future showDebugNotification({
   String customMessage = 'Example Notification',
   FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
@@ -261,7 +259,7 @@ Future showDebugNotification({
     priority: Priority.high,
   );
 
-  final platformChannelSpecifics = new NotificationDetails(
+  final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
     iOS: iOSPlatformChannelSpecifics,
   );

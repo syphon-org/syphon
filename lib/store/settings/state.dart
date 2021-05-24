@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
-import "package:syphon/global/themes.dart";
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
@@ -149,10 +149,10 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
-        enterSend: enterSend != null ? enterSend : this.enterSend,
-        readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
+        enterSend: enterSend ?? this.enterSend,
+        readReceipts: readReceipts ?? this.readReceipts,
         typingIndicators:
-            typingIndicators != null ? typingIndicators : this.typingIndicators,
+            typingIndicators ?? this.typingIndicators,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:

@@ -451,9 +451,6 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              maintainSize: false,
-                              maintainAnimation: false,
-                              maintainState: false,
                               visible: props.room.lastHash == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
