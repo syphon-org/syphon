@@ -127,11 +127,11 @@ abstract class Events {
     };
 
     Map body = {
-      "algorithm": Algorithms.megolmv1, //  "m.megolm.v1.aes-sha2",
-      "sender_key": senderKey, // "<our curve25519 device key>",
-      "ciphertext": ciphertext, // "<encrypted payload>",
-      "session_id": sessionId, // "<outbound group session id>",
-      "device_id": deviceId, // "<our device ID>"
+      'algorithm': Algorithms.megolmv1, //  'm.megolm.v1.aes-sha2',
+      'sender_key': senderKey, // '<our curve25519 device key>',
+      'ciphertext': ciphertext, // '<encrypted payload>',
+      'session_id': sessionId, // '<outbound group session id>',
+      'device_id': deviceId, // '<our device ID>'
     };
 
     if (unencryptedData != null) {
@@ -214,8 +214,8 @@ abstract class Events {
     };
 
     Map body = {
-      "body": message!['body'],
-      "msgtype": message['msgtype'] ?? 'm.text',
+      'body': message!['body'],
+      'msgtype': message['msgtype'] ?? 'm.text',
     };
 
     if (message['format'] != null) {
@@ -268,10 +268,10 @@ abstract class Events {
     };
 
     Map body = {
-      "m.relates_to": {
-        "rel_type": "m.annotation",
-        "event_id": "$messageId",
-        "key": "$reaction"
+      'm.relates_to': {
+        'rel_type': 'm.annotation',
+        'event_id': '$messageId',
+        'key': '$reaction'
       }
     };
 
@@ -347,7 +347,7 @@ abstract class Events {
 
     // Use astrick to send to all known devices for user
     Map body = {
-      "messages": content,
+      'messages': content,
     };
 
     final response = await http.put(
@@ -379,8 +379,8 @@ abstract class Events {
     };
 
     Map body = {
-      "typing": typing,
-      "timeout": 5000,
+      'typing': typing,
+      'timeout': 5000,
     };
 
     final response = await http.put(

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -247,10 +246,10 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
               );
             } catch (error) {
               debugPrint('[decryptMessageEvent] $error');
-              printJson(event);
 
               if (!sentKeyRequest) {
                 sentKeyRequest = true;
+                debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
                 store.dispatch(sendKeyRequest(
                   event: Event.fromMatrix(event),
                   roomId: room.id,

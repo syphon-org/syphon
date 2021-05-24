@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:math';
 
 // Flutter imports:
+import 'package:canonical_json/canonical_json.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -305,20 +307,22 @@ ThunkAction<AppState> generateIdentityKeys() {
         'user_id': authUser.userId,
       };
 
-      // figerprint signature key pair generation for upload
+      // fingerprint signature key pair generation for upload
       // warn: seems to work without canonical_json lib
       // utf8.decode(deviceKeysEncoded);
-      final deviceKeysEncoded = json.encode(deviceIdentityKeys);
-      final deviceKeysSerialized = deviceKeysEncoded;
+      final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
+      final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
-      var deviceKeysPayload = {'device_keys': deviceIdentityKeys};
+      final deviceKeysPayload = {'device_keys': deviceIdentityKeys};
 
-      deviceKeysPayload['device_keys']!['signatures'] = {
+      deviceKeysPayload['device_keys']?['signatures'] = {
         authUser.userId: {
           fingerprintKeyName: deviceKeysSigned,
         }
       };
+
+      printJson(deviceKeysPayload);
 
       // cache current device key for authed user
       final deviceKeysOwned = DeviceKey.fromMatrix(
@@ -345,6 +349,9 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
         'device_keys': deviceKey.toMatrix(),
       };
 
+      printDebug('[uploadIdentityKeys] start');
+      printJson(deviceKeyMap);
+
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: store.state.authStore.protocol,
@@ -356,6 +363,9 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
+
+      printDebug('[uploadIdentityKeys] finish');
+      printJson(data);
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
@@ -397,10 +407,9 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
       final oneTimeKey = {'key': value};
 
       // sign one time keys
-      // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
-      final oneTimeKeyEncoded = json.encode(oneTimeKey);
-      //utf8.decode(oneTimeKeyEncoded);
-      final oneTimeKeySerialized = oneTimeKeyEncoded;
+      // TODO: confirm works with canonical_json
+      final oneTimeKeyEncoded = canonicalJson.encode(oneTimeKey);
+      final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
       final oneTimeKeySigned = olmAccount!.sign(oneTimeKeySerialized);
 
       // add one time key in new keys map only

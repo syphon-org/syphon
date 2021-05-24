@@ -56,9 +56,7 @@ class ChatInput extends StatefulWidget {
 }
 
 class ChatInputState extends State<ChatInput> {
-  ChatInputState({
-    Key? key,
-  }) : super();
+  ChatInputState() : super();
 
   bool sendable = false;
 
@@ -82,8 +80,8 @@ class ChatInputState extends State<ChatInput> {
     }
 
     widget.focusNode.addListener(() {
-      if (!widget.focusNode.hasFocus && this.typingNotifier != null) {
-        this.typingNotifier!.cancel();
+      if (!widget.focusNode.hasFocus && typingNotifier != null) {
+        typingNotifier!.cancel();
         setState(() {
           typingNotifier = null;
         });
@@ -119,13 +117,13 @@ class ChatInputState extends State<ChatInput> {
     // Handle a timeout of the interval if the user idles with input focused
     if (widget.focusNode.hasFocus) {
       if (typingNotifierTimeout != null) {
-        this.typingNotifierTimeout!.cancel();
+        typingNotifierTimeout!.cancel();
       }
 
       setState(() {
         typingNotifierTimeout = Timer(Duration(milliseconds: 4000), () {
           if (typingNotifier != null) {
-            this.typingNotifier!.cancel();
+            typingNotifier!.cancel();
             setState(() {
               typingNotifier = null;
               typingNotifierTimeout = null;
@@ -144,12 +142,12 @@ class ChatInputState extends State<ChatInput> {
   @override
   void dispose() {
     super.dispose();
-    if (this.typingNotifier != null) {
-      this.typingNotifier!.cancel();
+    if (typingNotifier != null) {
+      typingNotifier!.cancel();
     }
 
-    if (this.typingNotifierTimeout != null) {
-      this.typingNotifierTimeout!.cancel();
+    if (typingNotifierTimeout != null) {
+      typingNotifierTimeout!.cancel();
     }
   }
 
@@ -333,7 +331,7 @@ class ChatInputState extends State<ChatInput> {
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !sendable
+                      onSubmitted: !isSendable
                           ? null
                           : widget.onSubmittedMessage as void Function(String)?,
                       style: TextStyle(

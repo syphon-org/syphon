@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 // Flutter imports:
+import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -29,8 +30,8 @@ import 'package:syphon/store/rooms/actions.dart';
  */
 ThunkAction<AppState> encryptMessageContent({
   String? roomId,
-  String eventType = EventTypes.message,
   Map? content,
+  String eventType = EventTypes.message,
 }) {
   return (Store<AppState> store) async {
     // Load and deserialize session
@@ -170,10 +171,9 @@ ThunkAction<AppState> encryptKeyContent({
     );
 
     // canoncially encode the json for encryption
-    // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
-    final payloadEncoded = json.encode(payload);
-    // utf8.decode(payloadEncoded);
-    final payloadSerialized = payloadEncoded;
+    // TODO: CONFIRM WORKS WITHOUT canonical_json
+    final payloadEncoded = canonicalJson.encode(payload);
+    final payloadSerialized = utf8.decode(payloadEncoded);
     final payloadEncrypted = outboundKeySession.encrypt(payloadSerialized);
 
     // save the outbound session after processing content

@@ -65,6 +65,11 @@ dependencies:
       url: https://github.com/ereio/swipeable.git
       ref: null-safety
 
+  canonical_json:
+    git:
+      url: https://github.com/ereio/flutter_canonical_json
+      ref: main
+
   # state
   equatable: ^2.0.0
   expandable: ^5.0.1

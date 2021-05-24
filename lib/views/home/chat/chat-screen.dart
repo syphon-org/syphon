@@ -77,7 +77,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   @protected
-  void onMounted(_Props props) async {
+  Future onMounted(_Props props) async {
     final draft = props.room.draft;
 
     // only marked if read receipts are enabled
@@ -393,8 +393,7 @@ class ChatScreenState extends State<ChatScreen> {
               props.onCheatCode();
             },
             onBack: () {
-              if (editorController.text != null &&
-                  0 < editorController.text.length) {
+              if (editorController.text.isNotEmpty) {
                 props.onSaveDraftMessage(
                   body: editorController.text,
                   type: MessageTypes.TEXT,
@@ -640,7 +639,9 @@ class _Props extends Equatable {
               room: store.state.roomStore.rooms[roomId],
             ));
           },
-          onSendMessage: ({String? body, String? type}) async {
+          onSendMessage: ({required String body, String? type}) async {
+            if (body.isEmpty) return;
+
             final room = store.state.roomStore.rooms[roomId]!;
 
             final message = Message(

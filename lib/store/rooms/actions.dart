@@ -118,7 +118,6 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
 
       // First past to decrypt encrypted events
       if (room.encryptionEnabled) {
-        printJson(json);
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
           decryptEvents(room, Map<String, dynamic>.from(json)),

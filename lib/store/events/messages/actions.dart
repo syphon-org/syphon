@@ -264,8 +264,8 @@ ThunkAction<AppState> sendMessageEncrypted({
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
           roomId: room.id,
-          eventType: EventTypes.message,
           content: pending.content,
+          eventType: EventTypes.message,
         ),
       );
 

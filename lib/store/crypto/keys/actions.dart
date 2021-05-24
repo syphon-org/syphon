@@ -21,13 +21,12 @@ ThunkAction<AppState> sendKeyRequest({
 }) {
   return (Store<AppState> store) async {
     try {
-      printDebug('[sendKeyRequest] starting');
       final String deviceId = event.content['device_id'];
       final String senderKey = event.content['sender_key'];
       final String sessionId = event.content['session_id'];
 
-      // Unique, but different
-      final requestId = Crypt.sha256(sessionId, rounds: 10, salt: '1').hash;
+      // Just needs to be unique, but different
+      final requestId = Crypt.sha256(sessionId, rounds: 1000, salt: '').hash;
 
       final currentUser = store.state.authStore.user;
 
@@ -45,12 +44,12 @@ ThunkAction<AppState> sendKeyRequest({
         requestingDeviceId: currentUser.deviceId,
       );
 
-      printDebug('[sendKeyRequest] completed');
+      printDebug('[sendKeyRequest] COMPLETED');
       printJson(data);
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
-        origin: 'fetchDeviceKeys',
+        origin: 'sendKeyRequest',
       ));
       return const {};
     }
