@@ -119,7 +119,7 @@ Future notificationSyncIsolate() async {
     final pluginInstance = await initNotifications();
 
     if (pluginInstance == null) {
-      throw 'COULD NOT INITIALIZE NOTIFICATION ISOLATE';
+      throw '[notificationSyncIsolate] failed to initialize plugin instance';
     }
 
     showBackgroundServiceNotification(
@@ -131,12 +131,10 @@ Future notificationSyncIsolate() async {
       Duration(seconds: BackgroundSync.serviceTimeout),
     );
 
-    print('[notificationSyncIsolate] enabled background sync');
-
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
 
-      // TODO: check for if one disabled notification services
+      // TODO: check for on the fly disabled notification services
 
       await backgroundSyncLoop(
         pluginInstance: pluginInstance,
@@ -195,10 +193,6 @@ Future backgroundSyncLoop({
     // Parse sync response
     final nextLastSince = data['next_batch'];
 
-    print(
-      '[backgroundSyncLoop] ___ sync complete $lastSince $currentLastSince ___',
-    );
-
     // Save new 'since' value for the next sync
     saveLastSince(lastSince: nextLastSince);
 
@@ -207,10 +201,6 @@ Future backgroundSyncLoop({
     final Map<String, dynamic> roomsInvited = data['rooms']['invite'];
 
     final rooms = roomsJoined..addAll(roomsInvited);
-
-    print(
-      '[backgroundSyncLoop] ___ room change amount ${rooms.length} ___',
-    );
 
     // Run all the rooms at once
     await Future.wait(rooms.entries.map((roomJson) async {

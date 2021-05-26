@@ -28,7 +28,7 @@ Future<String> parseMessageNotification({
     return '$formattedSender invited you to chat.';
   }
 
-  var roomName;
+  String roomName = INVALID;
 
   if (roomName.isEmpty) {
     roomName = roomNames[room.id] ?? INVALID;
@@ -64,7 +64,7 @@ Future<String> parseMessageTitle({
     return 'New Invite';
   }
 
-  var roomName;
+  String roomName = INVALID;
 
   if (roomName.isEmpty) {
     roomName = roomNames[room.id] ?? INVALID;
@@ -74,5 +74,5 @@ Future<String> parseMessageTitle({
     return 'New Message';
   }
 
-  return '$roomName';
+  return roomName;
 }
