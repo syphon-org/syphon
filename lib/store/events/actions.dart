@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -129,12 +130,12 @@ ThunkAction<AppState> setReceipts({
     };
 
 /// Load Message Events
-/// 
+///
 /// Pulls initial messages from storage or paginates through
 /// those existing in cold storage depending on requests from client
-/// 
+///
 /// Make sure these have been exhausted before calling fetchMessageEvents
-/// 
+///
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   int offset = 0,
@@ -162,10 +163,10 @@ ThunkAction<AppState> loadMessagesCached({
 }
 
 /// Fetch Message Events
-/// 
+///
 /// https://matrix.org/docs/spec/client_server/latest#syncing
 /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
-/// 
+///
 /// Pulls next message events remote from homeserver
 ThunkAction<AppState> fetchMessageEvents({
   Room? room,
@@ -219,7 +220,7 @@ ThunkAction<AppState> fetchMessageEvents({
 }
 
 /// Decrypt Events
-/// 
+///
 /// Reattribute decrypted events to the timeline
 ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
@@ -273,10 +274,10 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   };
 }
 
-///  
+///
 /// Fetch State Events
-/// 
-/// state events can only be 
+///
+/// state events can only be
 /// done from full state /sync data
 ThunkAction<AppState> fetchStateEvents({Room? room}) {
   return (Store<AppState> store) async {
@@ -287,6 +288,10 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         accessToken: store.state.authStore.user.accessToken,
         roomId: room!.id,
       );
+
+      printInfo("${stateEvents.runtimeType}");
+
+      printJson(stateEvents);
 
       if (stateEvents.runtimeType != List && stateEvents['errcode'] != null) {
         throw stateEvents['error'];
@@ -300,7 +305,7 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         },
       }));
     } catch (error) {
-      debugPrint('[fetchStateEvents] $error');
+      printError('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -390,10 +395,10 @@ ThunkAction<AppState> formatMessageReply(
   };
 }
 
-/// 
+///
 /// Read Message Marker
-/// 
-/// Send Fully Read or just Read receipts bundled into 
+///
+/// Send Fully Read or just Read receipts bundled into
 /// one http call
 ThunkAction<AppState> sendReadReceipts({
   Room? room,
@@ -427,10 +432,10 @@ ThunkAction<AppState> sendReadReceipts({
   };
 }
 
-/// 
+///
 /// Read Message Marker
-/// 
-/// Send Fully Read or just Read receipts bundled into 
+///
+/// Send Fully Read or just Read receipts bundled into
 /// one http call
 ThunkAction<AppState> sendTyping({
   String? roomId,

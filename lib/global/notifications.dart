@@ -89,22 +89,29 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
 Future<bool> promptNativeNotificationsRequest({
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final result = await pluginInstance
-      .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()!
-      .requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+  var result;
 
-  // TODO: extract ios only apns and reenable
-  // if (Platform.isIOS && connector != null) {
-  //   connector.requestNotificationPermissions();
-  // }
-  //
+  if (Platform.isAndroid) {
+    result = true;
+  }
 
-  // result means it's not needed, since it's iOS only
+  if (Platform.isIOS) {
+    // TODO: extract ios only apns and reenable
+    // if (connector != null) {
+    //   connector.requestNotificationPermissions();
+    // }
+    //
+
+    result = await pluginInstance
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+  }
+
   return Future.value(result);
 }
 
@@ -123,8 +130,6 @@ Future showBackgroundServiceNotification({
   String debugContent = '',
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
-
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id_background_service,
     Values.channel_name_background_service,
@@ -132,25 +137,22 @@ Future showBackgroundServiceNotification({
     ongoing: true,
     autoCancel: false,
     showWhen: false,
+    priority: Priority.defaultPriority,
+    importance: Importance.defaultImportance,
+    visibility: NotificationVisibility.private,
     // Timeout if not repeatedly set by the background service
     timeoutAfter: Values.serviceNotificationTimeoutDuration,
-    importance: Importance.none,
-    priority: Priority.min,
-    visibility: NotificationVisibility.private,
   );
 
   final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: iOSPlatformChannelSpecifics,
+    iOS: IOSNotificationDetails(),
   );
-
-  final backgroundNotificationContent =
-      Strings.contentNotificationBackgroundService;
 
   await pluginInstance.show(
     notificationId,
     Values.default_channel_title,
-    backgroundNotificationContent,
+    Strings.contentNotificationBackgroundService,
     platformChannelSpecifics,
   );
 }

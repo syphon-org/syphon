@@ -125,9 +125,9 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      showMessageNotificationTest(
-                        pluginInstance: globalNotificationPluginInstance!,
-                      );
+                      // showMessageNotificationTest(
+                      //   pluginInstance: globalNotificationPluginInstance!,
+                      // );
 
                       showBackgroundServiceNotification(
                         notificationId: BackgroundSync.service_id,

@@ -637,7 +637,7 @@ class _Props extends Equatable {
             ));
           },
           onSendMessage: ({required String body, String? type}) async {
-            if (body.isEmpty) return;
+            if (roomId == null || body.isEmpty) return;
 
             final room = store.state.roomStore.rooms[roomId]!;
 
@@ -648,7 +648,7 @@ class _Props extends Equatable {
 
             if (room.encryptionEnabled) {
               return store.dispatch(sendMessageEncrypted(
-                room: room,
+                roomId: roomId,
                 message: message,
               ));
             }

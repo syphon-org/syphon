@@ -1,14 +1,11 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
 // Package imports:
 
-import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -69,7 +66,7 @@ class SetSyncObserver {
 class ResetSync {}
 
 /// Default Room Sync Observer
-/// 
+///
 /// This will be run after the initial sync. Following login or signup, users
 /// will just have an observer that runs every second or so to sync with the server
 /// only while the app is _active_ otherwise, it will be up to a background service
@@ -126,9 +123,9 @@ ThunkAction<AppState> startSyncObserver() {
   };
 }
 
-/// Stop Sync Observer 
-/// 
-/// Will prevent the app from syncing with the homeserver 
+/// Stop Sync Observer
+///
+/// Will prevent the app from syncing with the homeserver
 /// every few seconds
 ThunkAction<AppState> stopSyncObserver() {
   return (Store<AppState> store) {
@@ -140,12 +137,12 @@ ThunkAction<AppState> stopSyncObserver() {
 }
 
 /// Initial Sync - Custom Solution for /sync
-/// 
+///
 /// This will only be run on log in because the matrix protocol handles
 /// initial syncing terribly. It's incredibly cumbersome to load thousands of events
 /// for multiple rooms all at once in order to show the user just some room names
 /// and timestamps. Lazy loading isn't always supported, so it's not a solid solution
-/// 
+///
 /// TODO: potentially re-enable the fetch rooms function if lazy_load fails
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
@@ -160,29 +157,29 @@ ThunkAction<AppState> initialSync() {
   };
 }
 
-/// 
+///
 /// Set Backgrounded
-/// 
+///
 /// Mark when the app has been backgrounded to visualize loading feedback
-///  
+///
 ThunkAction<AppState> setBackgrounded(bool backgrounded) {
   return (Store<AppState> store) async {
     store.dispatch(SetBackgrounded(backgrounded: backgrounded));
   };
 }
 
-/// 
+///
 /// Fetch Sync
-/// 
+///
 /// Responsible for updates based on differences from Matrix
-///  
+///
 ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
-      final isFullSync = since == null;
-      var filterId;
+      final isFullSync =
+          forceFull || since == null || store.state.roomStore.rooms.isEmpty;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');
@@ -193,9 +190,9 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
-        'fullState': forceFull || store.state.roomStore.rooms == null,
+        'fullState': isFullSync,
         'since': forceFull ? null : since ?? store.state.syncStore.lastSince,
-        'filter': filterId,
+        'filter': null,
         'timeout': 10000
       });
 

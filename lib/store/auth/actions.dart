@@ -223,13 +223,13 @@ ThunkAction<AppState> startAuthObserver() {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
+        // init encryption for E2EE
+        await store.dispatch(initKeyEncryption(user));
+
         // Run for new authed user without a proper sync
         if (store.state.syncStore.lastSince == null) {
           await store.dispatch(initialSync());
         }
-
-        // init encryption for E2EE
-        await store.dispatch(initKeyEncryption(user));
 
         // init notifications
         await initNotifications(
@@ -274,7 +274,7 @@ ThunkAction<AppState> stopAuthObserver() {
 }
 
 /// Generate Device Id
-/// 
+///
 /// Used in matrix to distinguish devices
 /// for encryption and verification
 ThunkAction<AppState> generateDeviceId({String? salt}) {
@@ -767,9 +767,9 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
   };
 }
 
-/// 
+///
 /// Create a user / Attempt creation
-/// 
+///
 /// process references are in assets/cheatsheet.md
 ThunkAction<AppState> createUser({enableErrors = false}) {
   return (Store<AppState> store) async {
@@ -965,7 +965,7 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
 }
 
 /// updateAvatarUri
-/// 
+///
 /// Helper action - no try catch as it's meant to be
 /// included in other update actions
 ThunkAction<AppState> updateAvatarUri({String? mxcUri}) {

@@ -149,7 +149,7 @@ ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
 }
 
 ThunkAction<AppState> setDeviceKeys(Map? deviceKeys) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
   };
 }
@@ -175,11 +175,11 @@ ThunkAction<AppState> deleteDeviceKeys() {
   };
 }
 
-/// 
+///
 /// Initing Olm Account
-/// 
+///
 /// https://gitlab.matrix.org/matrix-org/olm/-/blob/master/python/olm/account.py
-/// 
+///
 /// Uses deviceId to encrypt and serialize the account (pickle)
 /// needed to know about the python library to know what that was
 ThunkAction<AppState> initOlmEncryption(User user) {
@@ -245,7 +245,7 @@ ThunkAction<AppState> initKeyEncryption(User user) {
 }
 
 /// Save Olm Account
-/// 
+///
 /// serialize and save the olm account being used
 /// for identity and encryption
 ThunkAction<AppState> saveOlmAccount() {
@@ -359,7 +359,7 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
 }
 
 /// Generate One Time Keys
-/// 
+///
 /// Returns the keys as a map
 ThunkAction<AppState> generateOneTimeKeys({DeviceKey? deviceKey}) {
   return (Store<AppState> store) async {
@@ -489,6 +489,8 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       store.dispatch(updateOneTimeKeyCounts(
         Map<String, int>.from(data['one_time_key_counts']),
       ));
+
+      printInfo('[updateOneTimeKeys] successfully updated oneTimeKeys');
     } catch (error) {
       store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
     }
@@ -496,11 +498,11 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
 }
 
 /// Update Key Sharing Sessions
-/// 
+///
 /// Specifically for sending encrypted keys using olm
 /// for later use with encrypted messages using megolm
 /// sent directly to devices within the room
-/// 
+///
 /// https://matrix.org/docs/spec/client_server/latest#id454
 /// https://matrix.org/docs/spec/client_server/latest#id461
 ThunkAction<AppState> updateKeySessions({
@@ -508,6 +510,12 @@ ThunkAction<AppState> updateKeySessions({
 }) {
   return (Store<AppState> store) async {
     try {
+      final usersDeviceKeys = await store.dispatch(
+        fetchDeviceKeys(userIds: room.userIds),
+      );
+
+      store.dispatch(setDeviceKeys(usersDeviceKeys));
+
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
         exportMessageSession(roomId: room.id),
@@ -562,6 +570,10 @@ ThunkAction<AppState> updateKeySessions({
             };
 
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
+
+            printDebug('[sendSessionKeys] sending $randomNumber');
+            printJson(payload);
+
             final response = await MatrixApi.sendEventToDevice(
               trxId: randomNumber,
               protocol: store.state.authStore.protocol,
@@ -575,9 +587,9 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            debugPrint('[sendSessionKeys] success!');
+            debugPrint('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
-            debugPrint('[sendSessionKeys] $error');
+            printError('[sendSessionKeys] $error');
           }
         },
       );
@@ -860,7 +872,7 @@ ThunkAction<AppState> loadKeySessionInbound({
 }
 
 /// Inbound Message Session
-///  
+///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
 ThunkAction<AppState> createMessageSessionInbound({
   String? roomId,
@@ -900,9 +912,9 @@ ThunkAction<AppState> loadMessageSessionInbound({
   };
 }
 
-/// 
+///
 /// Save Message Session Inbound
-/// 
+///
 /// Saves the message session and index after encrypting and sending an event
 ThunkAction<AppState> saveMessageSessionInbound({
   String? roomId,
@@ -920,9 +932,9 @@ ThunkAction<AppState> saveMessageSessionInbound({
   };
 }
 
-/// 
+///
 /// Outbound Message Session Functionality
-/// 
+///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
 ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
   return (Store<AppState> store) async {
@@ -1010,18 +1022,18 @@ ThunkAction<AppState> exportMessageSession({String? roomId}) {
   };
 }
 
-/// 
+///
 /// Fetch Device Keys
-/// 
+///
 /// fetches the keys uploaded to the matrix homeserver
 /// by other users
 ThunkAction<AppState> fetchDeviceKeys({
-  List<String?>? userIds,
+  List<String?> userIds = const <String>[],
 }) {
   return (Store<AppState> store) async {
     try {
       final Map<String, dynamic> userIdMap = Map.fromIterable(
-        userIds!,
+        userIds,
         key: (userId) => userId,
         value: (userId) => const [],
       );

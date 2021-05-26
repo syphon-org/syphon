@@ -24,9 +24,9 @@ class Keys {
 
 abstract class Encryption {
   /// Fetch Encryption Keys
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id460
-  /// 
+  ///
   /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchKeys({
     String? protocol = 'https://',
@@ -59,9 +59,9 @@ abstract class Encryption {
   }
 
   /// Fetch Room Keys
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id460
-  /// 
+  ///
   /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
@@ -86,17 +86,17 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /// 
+  ///
   /// Fetch Key Changes
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
-  /// 
+  ///
   /// Gets a list of users who have updated their device identity keys since a previous sync token.
-  /// 
+  ///
   /// The server should include in the results any users who:
   ///   - currently share a room with the calling user (ie, both users have membership state join); and
   ///   - added new device identity keys or removed an existing device with identity keys, between from and to.
-  /// 
+  ///
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -119,11 +119,11 @@ abstract class Encryption {
   }
 
   /// Claim Keys
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
-  /// 
+  ///
   /// Claims one-time keys for use in pre-key messages.
-  /// 
+  ///
   static Future<Map<String, dynamic>> claimKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -193,27 +193,20 @@ abstract class Encryption {
     String? requestingUserId,
     String? requestingDeviceId,
   }) async {
-    final Map content = {
-      'content': {
-        'action': 'request',
-        // 'LWKAFEZEIV',
-        'requesting_device_id': requestingDeviceId,
-        'request_id': requestId,
-        'body': {
-          'room_id': roomId,
-          'algorithm': Algorithms.megolmv1,
-          'sender_key': senderKey,
-          'session_id': sessionId
-        }
-      },
-      'type': EventTypes.roomKeyRequest,
-      'sender': requestingUserId
-    };
-
     // format payload for toDevice events
     final payload = {
       userId: {
-        deviceId: content,
+        deviceId: {
+          'action': 'request',
+          'requesting_device_id': requestingDeviceId,
+          'request_id': requestId,
+          'body': {
+            'room_id': roomId,
+            'algorithm': Algorithms.megolmv1,
+            'sender_key': senderKey,
+            'session_id': sessionId
+          }
+        },
       },
     };
 

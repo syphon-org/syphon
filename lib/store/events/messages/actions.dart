@@ -205,14 +205,16 @@ ThunkAction<AppState> sendMessage({
 }
 
 /// Send Encrypted Messages
-/// 
+///
 /// Specifically for sending encrypted messages using megolm
 ThunkAction<AppState> sendMessageEncrypted({
-  required Room room,
+  required String roomId,
   required Message message, // body and type only for now
 }) {
   return (Store<AppState> store) async {
     try {
+      final room = store.state.roomStore.rooms[roomId]!;
+
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
       // send the key session - if one hasn't been sent
@@ -314,7 +316,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(id: roomId, sending: false, reply: Message()));
     }
   };
 }

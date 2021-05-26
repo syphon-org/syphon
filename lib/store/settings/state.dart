@@ -41,11 +41,11 @@ class SettingsStore extends Equatable {
 
   final List<Device> devices;
 
-  // Map<roomId, ChatSetting>
-  final Map<String, ChatSetting>? customChatSettings;
-  final List<String> sortGroups;
   final String? sortOrder;
+  final List<String> sortGroups;
 
+  //    Map<RoomId,
+  final Map<String, ChatSetting>? customChatSettings;
   final NotificationSettings? notificationSettings;
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
@@ -151,8 +151,7 @@ class SettingsStore extends Equatable {
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSend: enterSend ?? this.enterSend,
         readReceipts: readReceipts ?? this.readReceipts,
-        typingIndicators:
-            typingIndicators ?? this.typingIndicators,
+        typingIndicators: typingIndicators ?? this.typingIndicators,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:

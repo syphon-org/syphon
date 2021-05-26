@@ -8,9 +8,9 @@ import 'package:syphon/global/values.dart';
 
 abstract class Rooms {
   /// Sync (main functionality)
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id251
-  /// 
+  ///
   /// long polling will hang the http request until any new
   /// events are found, the hang will "timeout" using the respective
   /// param where you'll need to call the sync api again to wai
@@ -50,8 +50,8 @@ abstract class Rooms {
   }
 
   /// Sync (Background Isolate) (main functionality)
-  /// 
-  /// https://matrix.org/docs/spec/client_server/latest#id251 
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id251
   static Future<dynamic> syncBackground(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
@@ -61,7 +61,7 @@ abstract class Rooms {
     final int? timeout = params['timeout'];
     final String? filter = params['filter'];
 
-    return await sync(
+    return sync(
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
@@ -172,13 +172,13 @@ abstract class Rooms {
   }
 
   /// Create Room - POST
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id286
-  /// 
+  ///
   /// This API stops a user participating in a particular room.
   /// If the user was already in the room, they will no longer
-  /// be able to see new events in the room. If the room requires an invite to join, 
-  /// they will need to be re-invited before they can re-join. If the user was invited 
+  /// be able to see new events in the room. If the room requires an invite to join,
+  /// they will need to be re-invited before they can re-join. If the user was invited
   /// to the room, but had not joined, this call serves to reject the invite.
   static Future<dynamic> createRoom({
     String? protocol = 'https://',
@@ -228,15 +228,15 @@ abstract class Rooms {
   }
 
   /// Leave Room - POST
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id286
-  /// 
+  ///
   /// This API stops a user remembering about a particular room.
-  /// In general, history is a first class citizen in Matrix. 
-  /// After this API is called, however, a user will no longer be able 
-  /// to retrieve history for this room. If all users on a homeserver 
+  /// In general, history is a first class citizen in Matrix.
+  /// After this API is called, however, a user will no longer be able
+  /// to retrieve history for this room. If all users on a homeserver
   /// forget a room, the room is eligible for deletion from that homeserver.
-  /// If the user is currently joined to the room, they must leave the room 
+  /// If the user is currently joined to the room, they must leave the room
   /// before calling this API.
   static Future<dynamic> leaveRoom({
     String? protocol = 'https://',
@@ -244,7 +244,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -262,17 +263,17 @@ abstract class Rooms {
   }
 
   /// Forget Room - POST
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id286
-  /// 
+  ///
   /// This API stops a user remembering about a particular room.
-  /// In general, history is a first class citizen in Matrix. 
-  /// After this API is called, however, a user will no longer be able 
-  /// to retrieve history for this room. If all users on a homeserver 
+  /// In general, history is a first class citizen in Matrix.
+  /// After this API is called, however, a user will no longer be able
+  /// to retrieve history for this room. If all users on a homeserver
   /// forget a room, the room is eligible for deletion from that homeserver.
-  /// If the user is currently joined to the room, they must leave the room 
+  /// If the user is currently joined to the room, they must leave the room
   /// before calling this API.
-  /// 
+  ///
   /// Must leave room before you can forget (The Way)
   static Future<dynamic> forgetRoom({
     String? protocol = 'https://',
@@ -280,7 +281,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -296,17 +298,17 @@ abstract class Rooms {
   }
 
   /// Delete Room Alias - POST
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id286
-  /// 
-  /// 
+  ///
+  ///
   /// HAS NOTHING TO DO WITH DELETING ROOMS AS YOU WOULD EXPECT
-  /// 
-  /// Remove a mapping of room alias to room ID. Servers may choose 
+  ///
+  /// Remove a mapping of room alias to room ID. Servers may choose
   /// to implement additional access control checks here, for instance
-  /// that room aliases can only be deleted by their creator or a 
+  /// that room aliases can only be deleted by their creator or a
   /// server administrator.
-  ///  
+  ///
   static Future<dynamic> deleteRoomAlias({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -345,7 +347,8 @@ abstract class Rooms {
     bool lazyLoading = false,
     Map? filters,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -372,9 +375,9 @@ abstract class Rooms {
   }
 
   /// Create Room Filter (Lazy Loading) - POST
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter
-  /// 
+  ///
   /// Create a filter to use when fetching room state, messages, or /sync'ing
   static Future<dynamic> fetchFilter({
     String protocol = 'https://',
@@ -398,5 +401,35 @@ abstract class Rooms {
     );
 
     return await json.decode(reponse.body);
+  }
+
+  ///
+  /// Fetch Room Name
+  ///
+  /// Unauthenticated access to room info for the purpose
+  /// of fetching room names where needed in external to the
+  /// main thread
+  ///
+  ///
+  static Future<dynamic> fetchRoomName({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? roomId,
+  }) async {
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/aliases';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
   }
 }

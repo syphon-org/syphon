@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -13,23 +14,22 @@ import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 
-// Dart imports:
-import 'dart:math';
-
 // Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/background/parsers.dart';
+import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/selectors.dart';
 
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
 class BackgroundSync {
-  static const service_id = 254;
+  static const service_id = 255;
   static const serviceTimeout = 55; // seconds
 
   static Isolate? backgroundIsolate;
@@ -43,7 +43,7 @@ class BackgroundSync {
     }
   }
 
-  static void start({
+  static Future start({
     String? protocol,
     String? homeserver,
     String? accessToken,
@@ -57,43 +57,25 @@ class BackgroundSync {
     final secureStorage = FlutterSecureStorage();
 
     await Future.wait([
-      secureStorage.write(
-        key: Cache.protocolKey,
-        value: protocol,
-      ),
-      secureStorage.write(
-        key: Cache.homeserverKey,
-        value: homeserver,
-      ),
-      secureStorage.write(
-        key: Cache.accessTokenKey,
-        value: accessToken,
-      ),
-      secureStorage.write(
-        key: Cache.lastSinceKey,
-        value: lastSince,
-      ),
-      secureStorage.write(
-        key: Cache.userIdKey,
-        value: currentUser,
-      ),
-      secureStorage.write(
-        key: Cache.roomNamesKey,
-        value: jsonEncode(roomNames),
-      )
+      secureStorage.write(key: Cache.protocolKey, value: protocol),
+      secureStorage.write(key: Cache.homeserverKey, value: homeserver),
+      secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
+      secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
+      secureStorage.write(key: Cache.userIdKey, value: currentUser),
+      secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames))
     ]);
 
     await AndroidAlarmManager.periodic(
       Duration(seconds: serviceTimeout),
       service_id,
       notificationSyncIsolate,
-      rescheduleOnReboot: true,
       exact: true,
       wakeup: true,
+      rescheduleOnReboot: true,
     );
   }
 
-  static void stop() async {
+  static Future stop() async {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
@@ -102,13 +84,15 @@ class BackgroundSync {
   }
 }
 
+///
 /// Background Sync Job (Android Only)
-/// 
+///
 /// Fetches data from matrix in background and displays
 /// notifications without needing google play services
-/// 
+///
 /// NOTE: https://github.com/flutter/flutter/issues/32164
-void notificationSyncIsolate() async {
+///
+Future notificationSyncIsolate() async {
   try {
     String? protocol;
     String? homeserver;
@@ -149,7 +133,7 @@ void notificationSyncIsolate() async {
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
 
-      await syncLoop(
+      await backgroundSyncLoop(
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
@@ -167,34 +151,28 @@ void notificationSyncIsolate() async {
 }
 
 ///  Save Full Sync
-Future<dynamic> syncLoop({
+Future backgroundSyncLoop({
   required Map params,
   FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
   try {
+    print('[backgroundSyncLoop] starting sync loop');
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
     final lastSince = params['lastSince'];
-    final userId = params['userId'] ?? params['currentUser'];
-    final Map<String, dynamic>? roomNames = params['roomNames'];
+    final currentUserId = params['userId'] ?? params['currentUser'];
+
+    final roomNames = Map<String, String>.from(
+      params['roomNames'] ?? {},
+    );
 
     if (accessToken == null || lastSince == null) {
       return;
     }
 
-    var lastSinceNew;
-
     // Try to pull new lastSince if available
-    try {
-      final secureStorage = FlutterSecureStorage();
-
-      lastSinceNew = await secureStorage.read(
-        key: Cache.lastSinceKey,
-      );
-    } catch (error) {
-      print('[syncLoop] $error');
-    }
+    final currentLastSince = await loadLastSince(fallback: lastSince);
 
     /**
      * Check last since and see if any new messages arrived in the payload
@@ -205,63 +183,79 @@ Future<dynamic> syncLoop({
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
-      since: lastSinceNew ?? lastSince,
+      since: currentLastSince,
       timeout: 10000,
     );
 
     // Parse sync response
-    lastSinceNew = data['next_batch'];
-    final Map<String, dynamic> rawRooms = data['rooms']['join'];
+    final nextLastSince = data['next_batch'];
 
     // Save new 'since' value for the next sync
-    try {
-      final secureStorage = FlutterSecureStorage();
-
-      await secureStorage.write(key: Cache.lastSinceKey, value: lastSinceNew);
-    } catch (error) {
-      print('[syncLoop] $error');
-    }
+    saveLastSince(lastSince: nextLastSince);
 
     // Filter each room through the parser
-    rawRooms.forEach((roomId, json) {
-      final room =
-          Room(id: roomId).fromSync(json: json, lastSince: lastSinceNew);
-      final messagesNew = room.messagesNew;
+    final Map<String, dynamic> rooms = data['rooms']['join'];
 
-      if (messagesNew.length == 1) {
-        final String? messageSender = messagesNew[0].sender;
-        final String formattedSender = trimAlias(messageSender);
+    // Run all the rooms at once
+    await Future.wait(rooms.entries.map((roomJson) async {
+      final roomId = roomJson.key;
+      final roomData = roomJson.value;
 
-        if (!formattedSender.contains(userId)) {
-          if (room.direct) {
-            showMessageNotification(
-              messageHash: Random.secure().nextInt(20000),
-              body: '$formattedSender sent a new message.',
-              pluginInstance: pluginInstance!,
-            );
-            return;
-          }
+      final room = Room(id: roomId).fromSync(
+        json: roomData,
+        lastSince: nextLastSince,
+      );
 
-          if (room.invite) {
-            showMessageNotification(
-              messageHash: Random.secure().nextInt(20000),
-              body: '$formattedSender invited you to chat',
-              pluginInstance: pluginInstance!,
-            );
-            return;
-          }
+      if (room.messagesNew.isEmpty) {
+        return;
+      }
 
-          final roomName = roomNames![roomId];
-          showMessageNotification(
-            messageHash: Random.secure().nextInt(20000),
-            body: '$formattedSender sent a new message in $roomName',
-            pluginInstance: pluginInstance!,
+      // Make sure the room name exists in the cache
+      if (!roomNames.containsKey(room.id)) {
+        try {
+          final roomNameList = await MatrixApi.fetchRoomName(
+            protocol: protocol,
+            homeserver: homeserver,
+            accessToken: accessToken,
+            roomId: room.id.isEmpty ? roomId : room.id,
           );
-          return;
+
+          final roomAlias = roomNameList[roomNameList.length - 1];
+          final roomName =
+              roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
+
+          roomNames[room.id] = roomName;
+          saveRoomNames(roomNames: roomNames);
+        } catch (error) {
+          print(
+            '[backgroundSyncLoop] failed to fetch & parse room name ${room.id}',
+          );
         }
       }
-    });
+
+      // Run all the room messages at once once room name is conirmed
+      Future.wait(room.messagesNew.map((message) async {
+        final body = await parseMessageNotification(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+          protocol: protocol,
+          homeserver: homeserver,
+        );
+
+        if (body.isEmpty) return Future.value();
+
+        final int messageTrxId = Random.secure().nextInt(1 << 31);
+
+        showMessageNotification(
+          messageHash: messageTrxId,
+          body: body,
+          pluginInstance: pluginInstance!,
+        );
+      }));
+    }));
   } catch (error) {
-    print('[syncLoop] $error');
+    print('[backgroundSyncLoop] $error');
   }
 }
