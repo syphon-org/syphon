@@ -21,10 +21,11 @@ import 'package:syphon/global/algos.dart';
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/storage.dart';
-import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/store/user/model.dart';
 
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
@@ -99,7 +100,6 @@ Future notificationSyncIsolate() async {
     String? accessToken;
     String? lastSince;
     String? userId;
-    Map<String, dynamic>? roomNames;
 
     try {
       final secureStorage = FlutterSecureStorage();
@@ -109,15 +109,18 @@ Future notificationSyncIsolate() async {
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
-      final roomNamesData = await secureStorage.read(key: Cache.roomNamesKey);
-
-      roomNames = jsonDecode(roomNamesData!);
     } catch (error) {
       print('[notificationSyncIsolate] $error');
     }
 
+    final Map<String, String> roomNames = await loadRoomNames();
+
     // Init notifiations for background service and new messages/events
-    final pluginInstance = (await initNotifications())!;
+    final pluginInstance = await initNotifications();
+
+    if (pluginInstance == null) {
+      throw 'COULD NOT INITIALIZE NOTIFICATION ISOLATE';
+    }
 
     showBackgroundServiceNotification(
       notificationId: BackgroundSync.service_id,
@@ -132,6 +135,8 @@ Future notificationSyncIsolate() async {
 
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
+
+      // TODO: check for if one disabled notification services
 
       await backgroundSyncLoop(
         pluginInstance: pluginInstance,
@@ -153,10 +158,10 @@ Future notificationSyncIsolate() async {
 ///  Save Full Sync
 Future backgroundSyncLoop({
   required Map params,
-  FlutterLocalNotificationsPlugin? pluginInstance,
+  required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
-    print('[backgroundSyncLoop] starting sync loop');
+    print('[backgroundSyncLoop] ___ starting background sync ___ ');
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
@@ -190,28 +195,46 @@ Future backgroundSyncLoop({
     // Parse sync response
     final nextLastSince = data['next_batch'];
 
+    print(
+      '[backgroundSyncLoop] ___ sync complete $lastSince $currentLastSince ___',
+    );
+
     // Save new 'since' value for the next sync
     saveLastSince(lastSince: nextLastSince);
 
     // Filter each room through the parser
-    final Map<String, dynamic> rooms = data['rooms']['join'];
+    final Map<String, dynamic> roomsJoined = data['rooms']['join'];
+    final Map<String, dynamic> roomsInvited = data['rooms']['invite'];
+
+    final rooms = roomsJoined..addAll(roomsInvited);
+
+    print(
+      '[backgroundSyncLoop] ___ room change amount ${rooms.length} ___',
+    );
 
     // Run all the rooms at once
     await Future.wait(rooms.entries.map((roomJson) async {
       final roomId = roomJson.key;
       final roomData = roomJson.value;
 
+      print('[backgroundSyncLoop] ___ processing room $roomId ___');
+
       final room = Room(id: roomId).fromSync(
         json: roomData,
         lastSince: nextLastSince,
+        currentUser: User(userId: currentUserId),
       );
 
       if (room.messagesNew.isEmpty) {
         return;
       }
 
+      print('[backgroundSyncLoop] ___ checking room names $roomId ___');
+      printJson(roomNames);
+
       // Make sure the room name exists in the cache
-      if (!roomNames.containsKey(room.id)) {
+      if (!roomNames.containsKey(roomId) ||
+          roomNames[roomId] == Values.EMPTY_CHAT) {
         try {
           final roomNameList = await MatrixApi.fetchRoomName(
             protocol: protocol,
@@ -223,8 +246,11 @@ Future backgroundSyncLoop({
           final roomAlias = roomNameList[roomNameList.length - 1];
           final roomName =
               roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
+          print('[backgroundSyncLoop] ___ processing room name $roomName ___');
 
           roomNames[room.id] = roomName;
+
+          printJson(roomNames);
           saveRoomNames(roomNames: roomNames);
         } catch (error) {
           print(
@@ -234,8 +260,19 @@ Future backgroundSyncLoop({
       }
 
       // Run all the room messages at once once room name is conirmed
-      Future.wait(room.messagesNew.map((message) async {
+      await Future.wait(room.messagesNew.map((message) async {
+        print('[backgroundSyncLoop] ___ processing message ${message.id} ');
+
         final body = await parseMessageNotification(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+          protocol: protocol,
+          homeserver: homeserver,
+        );
+
+        final title = await parseMessageTitle(
           room: room,
           message: message,
           roomNames: roomNames,
@@ -249,9 +286,10 @@ Future backgroundSyncLoop({
         final int messageTrxId = Random.secure().nextInt(1 << 31);
 
         showMessageNotification(
-          messageHash: messageTrxId,
           body: body,
-          pluginInstance: pluginInstance!,
+          title: title,
+          messageHash: messageTrxId,
+          pluginInstance: pluginInstance,
         );
       }));
     }));

@@ -11,6 +11,8 @@ import 'package:syphon/cache/index.dart';
 Future saveRoomNames({required Map<String, String> roomNames}) async {
   // Try to pull new lastSince if available
   try {
+    if (roomNames.isEmpty) return;
+
     final secureStorage = FlutterSecureStorage();
     await secureStorage.write(
       key: Cache.roomNamesKey,
@@ -27,17 +29,23 @@ Future saveRoomNames({required Map<String, String> roomNames}) async {
 /// In storage, the crypto store is saved in it's entirety
 /// in a separate thread/isolate
 Future<Map<String, String>> loadRoomNames() async {
-  try {
-    final secureStorage = FlutterSecureStorage();
+  FlutterSecureStorage secureStorage;
 
-    return await jsonDecode(
+  try {
+    secureStorage = FlutterSecureStorage();
+
+    return Map<String, String>.from(await jsonDecode(
       await secureStorage.read(key: Cache.roomNamesKey) ?? '{}',
-    );
+    ));
   } catch (error) {
+    try {
+      secureStorage = FlutterSecureStorage();
+      secureStorage.delete(key: Cache.roomNamesKey);
+    } catch (error) {}
     print('[loadRoomNames] ${error.toString()}');
   }
 
-  return {};
+  return <String, String>{};
 }
 
 ///

@@ -37,9 +37,11 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -232,7 +234,7 @@ ThunkAction<AppState> startAuthObserver() {
         }
 
         // init notifications
-        await initNotifications(
+        globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String? payload) {
             debugPrint('[onSelectNotification] payload $payload');
             return Future.value(true);
@@ -241,6 +243,10 @@ ThunkAction<AppState> startAuthObserver() {
             store.dispatch(setPusherDeviceToken(token));
           },
         );
+
+        if (store.state.settingsStore.notificationsEnabled) {
+          store.dispatch(startNotifications());
+        }
 
         // start syncing for user
         await store.dispatch(startSyncObserver());

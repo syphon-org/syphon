@@ -28,7 +28,7 @@ Future<String> parseMessageNotification({
     return '$formattedSender invited you to chat.';
   }
 
-  var roomName = room.name ?? INVALID;
+  var roomName;
 
   if (roomName.isEmpty) {
     roomName = roomNames[room.id] ?? INVALID;
@@ -37,19 +37,42 @@ Future<String> parseMessageNotification({
   if (roomName.isEmpty) {
     return '$formattedSender sent a new message.';
   }
-  // try {
-  //   final roomNameList = await MatrixApi.fetchRoomName(
-  //     protocol: protocol,
-  //     homeserver: homeserver,
-  //     accessToken: accessToken,
-  //     roomId: message.roomId ?? room.id,
-  //   );
-
-  //   roomName = roomNameList[roomNameList.length - 1];
-  //   roomName = roomName..replaceAll('#', '').replaceAll(r'\:.*', '');
-  // } catch (error) {
-  //   print('[BackgroundSync] failed to fetch & parse room name ${room.id}');
-  // }
 
   return '$formattedSender sent a new message in $roomName';
+}
+
+Future<String> parseMessageTitle({
+  required Room room,
+  required Message message,
+  required String currentUserId,
+  required Map<String, String> roomNames,
+  required String protocol,
+  required String homeserver,
+}) async {
+  final String? messageSender = message.sender;
+  final String formattedSender = trimAlias(messageSender);
+
+  if (formattedSender.isEmpty || message.sender == currentUserId) {
+    return INVALID;
+  }
+
+  if (room.direct) {
+    return 'New Message';
+  }
+
+  if (room.invite) {
+    return 'New Invite';
+  }
+
+  var roomName;
+
+  if (roomName.isEmpty) {
+    roomName = roomNames[room.id] ?? INVALID;
+  }
+
+  if (roomName.isEmpty) {
+    return 'New Message';
+  }
+
+  return '$roomName';
 }

@@ -10,6 +10,7 @@ class Values {
   static const appDisplayName = 'Syphon';
 
   static const defaultLanguage = 'en-US';
+  static const EMPTY_CHAT = 'Empty Chat';
 
   // Notifications and Background service
   static const channel_id = '${appNameLabel}_notifications';

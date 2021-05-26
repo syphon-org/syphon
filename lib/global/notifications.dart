@@ -82,7 +82,6 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   }
 
   debugPrint('[initNotifications] successfully initialized $pluginInstance');
-  globalNotificationPluginInstance = pluginInstance;
   return pluginInstance;
 }
 
@@ -140,6 +139,7 @@ Future showBackgroundServiceNotification({
     priority: Priority.defaultPriority,
     importance: Importance.defaultImportance,
     visibility: NotificationVisibility.private,
+    channelShowBadge: false,
     // Timeout if not repeatedly set by the background service
     timeoutAfter: Values.serviceNotificationTimeoutDuration,
   );
@@ -159,7 +159,8 @@ Future showBackgroundServiceNotification({
 
 Future showMessageNotification({
   int messageHash = 0,
-  String? body,
+  String body = 'Tap to open Message',
+  String title = 'New Message',
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   final iOSPlatformChannelSpecifics = IOSNotificationDetails();
@@ -172,6 +173,7 @@ Future showMessageNotification({
     priority: Priority.high,
     importance: Importance.defaultImportance,
     visibility: NotificationVisibility.private,
+    channelShowBadge: true,
   );
 
   final platformChannelSpecifics = NotificationDetails(
@@ -181,8 +183,8 @@ Future showMessageNotification({
 
   await pluginInstance.show(
     messageHash,
-    'New Message',
-    body ?? 'Tap to open message',
+    title,
+    body,
     platformChannelSpecifics,
   );
 }

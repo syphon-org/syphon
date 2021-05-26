@@ -433,30 +433,38 @@ ThunkAction<AppState> toggleNotifications() {
     store.dispatch(ToggleNotifications());
 
     final enabled = store.state.settingsStore.notificationsEnabled;
-    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
-      (roomId, room) => MapEntry(roomId, room.name),
-    );
 
     if (enabled) {
-      await BackgroundSync.init();
-      await BackgroundSync.start(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        lastSince: store.state.syncStore.lastSince,
-        currentUser: store.state.authStore.user.userId,
-        roomNames: roomNames,
-      );
-
-      showBackgroundServiceNotification(
-        notificationId: BackgroundSync.service_id,
-        pluginInstance: globalNotificationPluginInstance!,
-      );
+      store.dispatch(startNotifications());
     } else {
       BackgroundSync.stop();
       dismissAllNotifications(
         pluginInstance: globalNotificationPluginInstance,
       );
     }
+  };
+}
+
+ThunkAction<AppState> startNotifications() {
+  return (Store<AppState> store) async {
+    await BackgroundSync.init();
+
+    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
+      (roomId, room) => MapEntry(roomId, room.name),
+    );
+
+    await BackgroundSync.start(
+      protocol: store.state.authStore.protocol,
+      homeserver: store.state.authStore.user.homeserver,
+      accessToken: store.state.authStore.user.accessToken,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.user.userId,
+      roomNames: roomNames,
+    );
+
+    showBackgroundServiceNotification(
+      notificationId: BackgroundSync.service_id,
+      pluginInstance: globalNotificationPluginInstance!,
+    );
   };
 }

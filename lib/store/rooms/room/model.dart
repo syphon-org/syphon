@@ -258,8 +258,8 @@ class Room {
   }
 
   Room fromSync({
-    User? currentUser,
-    String? lastSince,
+    required String lastSince,
+    required User currentUser,
     required Map<String, dynamic> json,
   }) {
     bool? invite;
@@ -343,13 +343,13 @@ class Room {
     }
 
     return fromAccountData(
-          accountEvents,
-        )
+      accountEvents,
+    )
         .fromStateEvents(
           invite: invite,
           limited: limited,
           events: stateEvents,
-          currentUser: currentUser!,
+          currentUser: currentUser,
           reactions: reactionEvents,
           redactions: redactionEvents,
         )
@@ -365,10 +365,10 @@ class Room {
         );
   }
 
-  /// 
+  ///
   /// fromAccountData
-  /// 
-  /// Mostly used to assign is_direct 
+  ///
+  /// Mostly used to assign is_direct
   Room fromAccountData(List<Event> accountDataEvents) {
     dynamic isDirect;
     try {
@@ -388,7 +388,7 @@ class Room {
     );
   }
 
-  /// 
+  ///
   /// Find details of room based on state events
   /// follows spec naming priority and thumbnail downloading
   Room fromStateEvents({
@@ -541,7 +541,7 @@ class Room {
   }
 
   /// fromMessageEvents
-  /// 
+  ///
   /// Update room based on messages events, many
   /// message events have side effects on room data
   /// outside displaying messages

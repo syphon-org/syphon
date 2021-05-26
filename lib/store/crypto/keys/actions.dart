@@ -44,8 +44,11 @@ ThunkAction<AppState> sendKeyRequest({
         requestingDeviceId: currentUser.deviceId,
       );
 
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
       printDebug('[sendKeyRequest] COMPLETED');
-      printJson(data);
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
