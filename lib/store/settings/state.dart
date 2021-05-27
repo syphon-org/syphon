@@ -23,10 +23,10 @@ class SettingsStore extends Equatable {
   final int? brightness;
   final ThemeType theme;
 
-  final bool enterSend; // TODO: rename *enabled
   final bool smsEnabled;
-  final bool readReceipts; // TODO: rename *enabled
-  final bool typingIndicators; // TODO: rename *enabled
+  final bool enterSendEnabled;
+  final bool readReceiptsEnabled;
+  final bool typingIndicatorsEnabled;
   final bool notificationsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
@@ -41,12 +41,12 @@ class SettingsStore extends Equatable {
 
   final List<Device> devices;
 
-  final String? sortOrder;
+  final String sortOrder;
   final List<String> sortGroups;
 
+  final NotificationSettings notificationSettings;
   //    Map<RoomId,
-  final Map<String, ChatSetting>? customChatSettings;
-  final NotificationSettings? notificationSettings;
+  final Map<String, ChatSetting> chatSettings; // roomId
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
@@ -66,19 +66,19 @@ class SettingsStore extends Equatable {
     this.avatarShape = 'Circle',
     this.sortGroups = const [SortOptions.PINNED],
     this.sortOrder = SortOrder.LATEST,
-    this.enterSend = false,
+    this.enterSendEnabled = false,
     this.smsEnabled = false,
-    this.readReceipts = false,
-    this.typingIndicators = false,
+    this.readReceiptsEnabled = false,
+    this.typingIndicatorsEnabled = false,
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
     this.dismissKeyboardEnabled = false,
-    this.customChatSettings,
+    this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
-    this.notificationSettings,
+    this.notificationSettings = const NotificationSettings(),
     this.alphaAgreement,
     this.pusherToken,
   });
@@ -96,14 +96,14 @@ class SettingsStore extends Equatable {
         language,
         avatarShape,
         smsEnabled,
-        enterSend,
-        readReceipts,
-        typingIndicators,
+        enterSendEnabled,
+        readReceiptsEnabled,
+        typingIndicatorsEnabled,
         notificationsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
         dismissKeyboardEnabled,
-        customChatSettings,
+        chatSettings,
         devices,
         loading,
         notificationSettings,
@@ -131,7 +131,7 @@ class SettingsStore extends Equatable {
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
-    Map<String, ChatSetting>? customChatSettings,
+    Map<String, ChatSetting>? chatSettings,
     NotificationSettings? notificationSettings,
     List<Device>? devices,
     bool? loading,
@@ -149,9 +149,10 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
-        enterSend: enterSend ?? this.enterSend,
-        readReceipts: readReceipts ?? this.readReceipts,
-        typingIndicators: typingIndicators ?? this.typingIndicators,
+        enterSendEnabled: enterSend ?? this.enterSendEnabled,
+        readReceiptsEnabled: readReceipts ?? this.readReceiptsEnabled,
+        typingIndicatorsEnabled:
+            typingIndicators ?? this.typingIndicatorsEnabled,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:
@@ -160,7 +161,7 @@ class SettingsStore extends Equatable {
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
-        customChatSettings: customChatSettings ?? this.customChatSettings,
+        chatSettings: chatSettings ?? this.chatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
         devices: devices ?? this.devices,
         loading: loading ?? this.loading,

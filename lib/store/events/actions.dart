@@ -408,7 +408,7 @@ ThunkAction<AppState> sendReadReceipts({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceiptsEnabled) {
         return debugPrint('[sendReadReceipts] read receipts disabled');
       }
 
@@ -444,7 +444,7 @@ ThunkAction<AppState> sendTyping({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.typingIndicators) {
+      if (!store.state.settingsStore.typingIndicatorsEnabled) {
         debugPrint('[sendTyping] typing indicators disabled');
         return;
       }

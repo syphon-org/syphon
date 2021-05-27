@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -398,7 +396,7 @@ ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(
       SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSend,
+        enterSend: !store.state.settingsStore.enterSendEnabled,
       ),
     );
   };

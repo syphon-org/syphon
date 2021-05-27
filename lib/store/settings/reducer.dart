@@ -51,8 +51,7 @@ SettingsStore settingsReducer(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );
     case SetRoomPrimaryColor:
-      final chatSettings =
-          Map<String, ChatSetting>.from(state.customChatSettings ?? {});
+      final chatSettings = Map<String, ChatSetting>.from(state.chatSettings);
 
       // Initialize chat settings if null
       if (chatSettings[action.roomId] == null) {
@@ -63,7 +62,7 @@ SettingsStore settingsReducer(
         primaryColor: action.color,
       );
       return state.copyWith(
-        customChatSettings: chatSettings,
+        chatSettings: chatSettings,
       );
     case SetLanguage:
       return state.copyWith(
@@ -75,11 +74,11 @@ SettingsStore settingsReducer(
       );
     case SetEnterSend:
       return state.copyWith(
-        enterSend: action.enterSend,
+        enterSend: action.enterSendEnabled,
       );
     case ToggleTypingIndicators:
       return state.copyWith(
-        typingIndicators: !state.typingIndicators,
+        typingIndicators: !state.typingIndicatorsEnabled,
       );
     case ToggleTimeFormat:
       return state.copyWith(
@@ -91,7 +90,7 @@ SettingsStore settingsReducer(
       );
     case ToggleReadReceipts:
       return state.copyWith(
-        readReceipts: !state.readReceipts,
+        readReceipts: !state.readReceiptsEnabled,
       );
     case ToggleMembershipEvents:
       return state.copyWith(

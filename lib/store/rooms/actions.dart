@@ -10,7 +10,6 @@ import 'package:flutter/foundation.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -509,7 +508,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceiptsEnabled) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -517,7 +516,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.readReceipts) {
+      if (store.state.settingsStore.readReceiptsEnabled) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );

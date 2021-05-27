@@ -1,6 +1,3 @@
-// Dart imports:
-import 'dart:async';
-
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +76,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
   }
 
   @protected
-  void onInviteUser(_Props props, Room room) async {
+  Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
     final RoomSearchArguments arguments =
@@ -379,7 +376,7 @@ class _Props extends Equatable {
   final Function onSearch;
   final Function onSendInvite;
 
-  _Props({
+  const _Props({
     required this.theme,
     required this.loading,
     required this.searchResults,
@@ -400,7 +397,7 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.searchStore.loading,
         searchResults: store.state.searchStore.searchResults,
-        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        chatSettings: store.state.settingsStore.chatSettings,
         onSearch: (text) {
           store.dispatch(searchRooms(searchText: text));
         },

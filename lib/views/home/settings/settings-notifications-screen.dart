@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
@@ -18,14 +19,15 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/remote/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({Key? key}) : super(key: key);
 
-  @protected
-  void onToggleNotifications(_Props props) async {
+  Future onToggleNotifications(_Props props) async {
     final enabledPreviously = props.localNotificationsEnabled;
     await props.onToggleLocalNotifications();
     if (enabledPreviously) {
@@ -39,6 +41,24 @@ class NotificationSettingsScreen extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
+
+          String styleTypeDescription;
+
+          switch (props.styleType) {
+            case StyleType.Inbox:
+              styleTypeDescription =
+                  'Notification content is grouped together within one notification';
+              break;
+            case StyleType.Grouped:
+              styleTypeDescription =
+                  'Notifications will stack overtop of each other until dismissed';
+              break;
+            case StyleType.Itemized:
+            default:
+              styleTypeDescription =
+                  'Each notification will appear as a separate notification';
+              break;
+          }
 
           return Scaffold(
             appBar: AppBar(
@@ -54,8 +74,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            body: Container(
-                child: Column(
+            body: Column(
               children: <Widget>[
                 CardSection(
                   child: Column(children: [
@@ -141,15 +160,13 @@ class NotificationSettingsScreen extends StatelessWidget {
                         'Notifications',
                         style: TextStyle(fontSize: 18.0),
                       ),
-                      trailing: Container(
-                        child: Switch(
-                          value: props.remoteNotificationsEnabled,
-                          onChanged: !Platform.isIOS
-                              ? null
-                              : (value) => props.onToggleRemoteNotifications(
-                                    context,
-                                  ),
-                        ),
+                      trailing: Switch(
+                        value: props.remoteNotificationsEnabled,
+                        onChanged: !Platform.isIOS
+                            ? null
+                            : (value) => props.onToggleRemoteNotifications(
+                                  context,
+                                ),
                       ),
                     ),
                     ListTile(
@@ -161,19 +178,52 @@ class NotificationSettingsScreen extends StatelessWidget {
                         'Fetch Notifications',
                         style: TextStyle(fontSize: 18.0),
                       ),
-                      trailing: Container(
-                        child: Switch(
-                          value: props.httpPusherEnabled,
-                          onChanged: !props.remoteNotificationsEnabled
-                              ? null
-                              : (value) => props.onTogglePusher(),
-                        ),
+                      trailing: Switch(
+                        value: props.httpPusherEnabled,
+                        onChanged: !props.remoteNotificationsEnabled
+                            ? null
+                            : (value) => props.onTogglePusher(),
                       ),
                     ),
                   ]),
                 ),
+                CardSection(
+                  child: Column(children: [
+                    Container(
+                      width: width,
+                      padding: Dimensions.listPadding,
+                      child: Text(
+                        'Options',
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.subtitle2,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () => props.onIncrementStyleType,
+                      contentPadding: Dimensions.listPadding,
+                      title: Text('Notification Type'),
+                      subtitle: Text(
+                        styleTypeDescription,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                      trailing: Text(enumToString(props.styleType)),
+                    ),
+                    ListTile(
+                      onTap: () => props.onIncrementToggleType,
+                      contentPadding: Dimensions.listPadding,
+                      title: Text('Options Default'),
+                      subtitle: Text(
+                        props.toggleType == ToggleType.All
+                            ? 'All chats will have notifications enabled by default'
+                            : 'No chats will have notifications unless explicity enabled',
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                      trailing: Text(enumToString(props.toggleType)),
+                    ),
+                  ]),
+                )
               ],
-            )),
+            ),
           );
         },
       );
@@ -184,17 +234,27 @@ class _Props extends Equatable {
   final bool localNotificationsEnabled;
   final bool remoteNotificationsEnabled;
 
+  final StyleType styleType;
+  final ToggleType toggleType;
+
+  final Function onIncrementStyleType;
+  final Function onIncrementToggleType;
+
   final Function onToggleLocalNotifications;
   final Function onToggleRemoteNotifications;
   final Function onTogglePusher;
 
-  _Props({
+  const _Props({
     required this.localNotificationsEnabled,
     required this.remoteNotificationsEnabled,
     required this.httpPusherEnabled,
     required this.onToggleLocalNotifications,
     required this.onToggleRemoteNotifications,
     required this.onTogglePusher,
+    required this.styleType,
+    required this.toggleType,
+    required this.onIncrementStyleType,
+    required this.onIncrementToggleType,
   });
 
   @override
@@ -212,10 +272,22 @@ class _Props extends Equatable {
             store.state.settingsStore.notificationsEnabled,
         remoteNotificationsEnabled:
             Platform.isIOS && store.state.settingsStore.notificationsEnabled,
+        styleType: store.state.settingsStore.notificationSettings.styleType,
+        toggleType: store.state.settingsStore.notificationSettings.toggleType,
         httpPusherEnabled:
-            store.state.settingsStore.notificationSettings != null,
+            store.state.settingsStore.notificationSettings.pushers.isNotEmpty,
+        onTogglePusher: () async {
+          // await store.dispatch(fetchNotificationPushers());
+          store.dispatch(fetchNotifications());
+        },
         onToggleLocalNotifications: () {
           return store.dispatch(toggleNotifications());
+        },
+        onIncrementStyleType: () {
+          return store.dispatch(incrementStyleType());
+        },
+        onIncrementToggleType: () {
+          return store.dispatch(incrementToggleType());
         },
         onToggleRemoteNotifications: (BuildContext context) {
           try {
@@ -226,24 +298,24 @@ class _Props extends Equatable {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text("Confirm Notifications"),
+                  title: Text('Confirm Notifications'),
                   content: Text(
                     Strings.confirmationNotifications,
                   ),
                   actions: <Widget>[
                     TextButton(
-                      child: Text('No'),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
+                      child: Text('No'),
                     ),
                     TextButton(
-                      child: Text('Sure'),
                       onPressed: () async {
                         await store.dispatch(toggleNotifications());
                         await store.dispatch(saveNotificationPusher());
                         Navigator.of(context).pop();
                       },
+                      child: Text('Sure'),
                     ),
                   ],
                 ),
@@ -257,10 +329,6 @@ class _Props extends Equatable {
           } catch (error) {
             debugPrint('[onToggleRemoteNotifications] $error');
           }
-        },
-        onTogglePusher: () async {
-          // await store.dispatch(fetchNotificationPushers());
-          store.dispatch(fetchNotifications());
         },
       );
 }

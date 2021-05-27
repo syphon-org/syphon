@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/sync/background/service.dart';
 
 ///
-/// Save Crypto Store
+/// Save Room Names (BackgroundSync)
 ///
 /// Save the crypto store to cold storage
 /// Idealy, run this after performance a pure action
@@ -24,7 +26,7 @@ Future saveRoomNames({required Map<String, String> roomNames}) async {
 }
 
 ///
-/// Load Crypto (Cold Storage)
+/// Load Room Names (BackgroundSync)
 ///
 /// In storage, the crypto store is saved in it's entirety
 /// in a separate thread/isolate
@@ -49,7 +51,7 @@ Future<Map<String, String>> loadRoomNames() async {
 }
 
 ///
-/// Save Last Since
+/// Load Last Since (BackgroundSync)
 ///
 /// Save the crypto store to cold storage
 /// Idealy, run this after performance a pure action
@@ -66,7 +68,7 @@ Future saveLastSince({required String lastSince}) async {
 }
 
 ///
-/// Load Crypto (Cold Storage)
+/// Load Crypto (BackgroundSync)
 ///
 /// In storage, the crypto store is saved in it's entirety
 /// in a separate thread/isolate
@@ -77,6 +79,48 @@ Future<String> loadLastSince({required String fallback}) async {
     return await secureStorage.read(key: Cache.lastSinceKey) ?? fallback;
   } catch (error) {
     print('[loadLastSince] ${error.toString()}');
+  }
+
+  return fallback;
+}
+
+///
+/// Save Notification Settings (BackgroundSync)
+///
+/// Used to update settings while the background
+/// sync thread is currently running
+///
+Future saveNotificationSettings({NotificationSettings? settings}) async {
+  // Try to pull new lastSince if available
+  try {
+    if (settings == null) return;
+
+    final secureStorage = FlutterSecureStorage();
+    await secureStorage.write(
+      key: BackgroundSync.notificationSettings,
+      value: jsonEncode(settings),
+    );
+  } catch (error) {
+    print('[saveNotificationSettings] ${error.toString()}');
+  }
+}
+
+///
+/// Load Notification Settings (BackgroundSync)
+///
+/// Used to load settings while the background
+/// sync thread is currently running
+///
+Future<NotificationSettings> loadNotificationSettings(
+    {NotificationSettings fallback = const NotificationSettings()}) async {
+  try {
+    final secureStorage = FlutterSecureStorage();
+
+    return jsonDecode(
+        await secureStorage.read(key: BackgroundSync.notificationSettings) ??
+            '{}');
+  } catch (error) {
+    print('[loadNotificationSettings] ${error.toString()}');
   }
 
   return fallback;

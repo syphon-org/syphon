@@ -1,7 +1,7 @@
 import 'package:syphon/store/index.dart';
 
 ///
-/// Theming Name
+/// Font Name
 ///
 String? fontName(AppState state) {
   return state.settingsStore.fontName;

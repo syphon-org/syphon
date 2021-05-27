@@ -23,6 +23,8 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/model.dart';
@@ -34,6 +36,8 @@ class BackgroundSync {
   static const serviceTimeout = 55; // seconds
 
   static Isolate? backgroundIsolate;
+
+  static const notificationSettings = 'notificationSettings';
 
   static Future<bool> init() async {
     try {
@@ -51,6 +55,7 @@ class BackgroundSync {
     String? lastSince,
     String? currentUser,
     Map<String, String?>? roomNames,
+    NotificationSettings settings = const NotificationSettings(),
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
@@ -63,7 +68,10 @@ class BackgroundSync {
       secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
       secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
       secureStorage.write(key: Cache.userIdKey, value: currentUser),
-      secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames))
+      secureStorage.write(
+          key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
+      secureStorage.write(
+          key: notificationSettings, value: jsonEncode(settings))
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -103,7 +111,6 @@ Future notificationSyncIsolate() async {
 
     try {
       final secureStorage = FlutterSecureStorage();
-
       userId = await secureStorage.read(key: Cache.userIdKey);
       protocol = await secureStorage.read(key: Cache.protocolKey);
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
@@ -113,6 +120,7 @@ Future notificationSyncIsolate() async {
       print('[notificationSyncIsolate] $error');
     }
 
+    final settings = await loadNotificationSettings();
     final Map<String, String> roomNames = await loadRoomNames();
 
     // Init notifiations for background service and new messages/events
@@ -137,6 +145,7 @@ Future notificationSyncIsolate() async {
       // TODO: check for on the fly disabled notification services
 
       await backgroundSyncLoop(
+        settings: settings,
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
@@ -157,6 +166,7 @@ Future notificationSyncIsolate() async {
 Future backgroundSyncLoop({
   required Map params,
   required FlutterLocalNotificationsPlugin pluginInstance,
+  required NotificationSettings settings,
 }) async {
   try {
     print('[backgroundSyncLoop] ___ starting background sync ___ ');
@@ -164,7 +174,7 @@ Future backgroundSyncLoop({
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
     final lastSince = params['lastSince'];
-    final currentUserId = params['userId'] ?? params['currentUser'];
+    final currentUserId = params['userId'];
 
     final roomNames = Map<String, String>.from(
       params['roomNames'] ?? {},
@@ -217,6 +227,19 @@ Future backgroundSyncLoop({
 
       if (room.messagesNew.isEmpty) {
         return;
+      }
+
+      final chatOptions = settings.chatOptions;
+      final hasOptions = chatOptions.containsKey(roomId);
+
+      if (settings.toggleType == ToggleType.None && !hasOptions) {
+        return;
+      }
+
+      if (settings.toggleType == ToggleType.All && hasOptions) {
+        if (!chatOptions[roomId]!.enabled) {
+          return;
+        }
       }
 
       print('[backgroundSyncLoop] ___ checking room names $roomId ___');

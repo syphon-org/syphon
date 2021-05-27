@@ -261,8 +261,8 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        typingIndicators: store.state.settingsStore.typingIndicators,
-        readReceipts: store.state.settingsStore.readReceipts,
+        typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
+        readReceipts: store.state.settingsStore.readReceiptsEnabled,
         onDisabled: () => store.dispatch(addInProgress()),
         onToggleTypingIndicators: () => store.dispatch(
           toggleTypingIndicators(),

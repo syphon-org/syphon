@@ -580,17 +580,15 @@ class _Props extends Equatable {
             ));
           },
           roomPrimaryColor: () {
-            final customChatSettings =
-                store.state.settingsStore.customChatSettings ??
-                    Map<String, ChatSetting>();
+            final chatSettings = store.state.settingsStore.chatSettings;
 
-            if (customChatSettings[roomId] != null) {
-              return customChatSettings[roomId]!.primaryColor != null
-                  ? Color(customChatSettings[roomId]!.primaryColor!)
-                  : Colors.grey;
+            if (chatSettings[roomId] == null) {
+              return Colours.hashedColor(roomId);
             }
 
-            return Colours.hashedColor(roomId);
+            return chatSettings[roomId]!.primaryColor != null
+                ? Color(chatSettings[roomId]!.primaryColor!)
+                : Colors.grey;
           }(),
           onSelectPrimaryColor: (color) {
             store.dispatch(

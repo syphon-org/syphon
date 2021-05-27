@@ -591,7 +591,7 @@ class _Props extends Equatable {
               store.state.settingsStore.roomTypeBadgesEnabled,
           dismissKeyboardEnabled:
               store.state.settingsStore.dismissKeyboardEnabled,
-          enterSendEnabled: store.state.settingsStore.enterSend,
+          enterSendEnabled: store.state.settingsStore.enterSendEnabled,
           loading: selectRoom(state: store.state, id: roomId).syncing,
           messagesLength: store.state.eventStore.messages.containsKey(roomId)
               ? store.state.eventStore.messages[roomId]?.length
@@ -600,14 +600,13 @@ class _Props extends Equatable {
             store.dispatch(selectReply(roomId: roomId, message: message));
           },
           roomPrimaryColor: () {
-            final customChatSettings =
-                store.state.settingsStore.customChatSettings ?? Map();
+            final chatSettings = store.state.settingsStore.chatSettings;
 
-            if (customChatSettings[roomId] != null) {
-              return Color(customChatSettings[roomId]!.primaryColor!);
+            if (chatSettings[roomId] == null) {
+              return Colours.hashedColor(roomId);
             }
 
-            return Colours.hashedColor(roomId);
+            return Color(chatSettings[roomId]!.primaryColor!);
           }(),
           onUpdateDeviceKeys: () async {
             final room = store.state.roomStore.rooms[roomId]!;
