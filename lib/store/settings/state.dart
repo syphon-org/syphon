@@ -3,11 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
-import "package:syphon/global/themes.dart";
-import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import './chat-settings/model.dart';
 
 part 'state.g.dart';
@@ -16,12 +15,6 @@ part 'state.g.dart';
 class SettingsStore extends Equatable {
   @JsonKey(ignore: true)
   final bool loading;
-
-  final int? primaryColor;
-  final int? accentColor;
-  final int? appBarColor;
-  final int? brightness;
-  final ThemeType theme;
 
   final bool enterSend; // TODO: rename *enabled
   final bool smsEnabled;
@@ -33,11 +26,7 @@ class SettingsStore extends Equatable {
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
 
-  final String fontName;
-  final String fontSize;
   final String language;
-  final String avatarShape;
-  final String messageSize;
 
   final List<Device> devices;
 
@@ -48,22 +37,15 @@ class SettingsStore extends Equatable {
 
   final NotificationSettings? notificationSettings;
 
+  final Theme appTheme;
+
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
   @JsonKey(ignore: true)
   final String? pusherToken; // NOTE: can be device token for APNS
 
   const SettingsStore({
-    this.primaryColor = Colours.cyanSyphon,
-    this.accentColor = Colours.cyanSyphon,
-    this.appBarColor,
-    this.brightness = 0,
-    this.theme = ThemeType.LIGHT,
-    this.fontName = 'Rubik',
-    this.fontSize = 'Default',
-    this.messageSize = 'Default',
     this.language = 'English',
-    this.avatarShape = 'Circle',
     this.sortGroups = const [SortOptions.PINNED],
     this.sortOrder = SortOrder.LATEST,
     this.enterSend = false,
@@ -79,22 +61,14 @@ class SettingsStore extends Equatable {
     this.devices = const [],
     this.loading = false,
     this.notificationSettings,
+    this.appTheme = const Theme(),
     this.alphaAgreement,
     this.pusherToken,
   });
 
   @override
   List<Object?> get props => [
-        primaryColor,
-        accentColor,
-        appBarColor,
-        brightness,
-        theme,
-        fontName,
-        fontSize,
-        messageSize,
         language,
-        avatarShape,
         smsEnabled,
         enterSend,
         readReceipts,
@@ -107,21 +81,13 @@ class SettingsStore extends Equatable {
         devices,
         loading,
         notificationSettings,
+        appTheme,
         alphaAgreement,
         pusherToken,
       ];
 
   SettingsStore copyWith({
-    int? primaryColor,
-    int? accentColor,
-    int? appBarColor,
-    int? brightness,
-    ThemeType? theme,
-    String? fontName,
-    String? fontSize,
     String? language,
-    String? messageSize,
-    String? avatarShape,
     bool? smsEnabled,
     bool? enterSend,
     bool? readReceipts,
@@ -133,21 +99,14 @@ class SettingsStore extends Equatable {
     bool? dismissKeyboardEnabled,
     Map<String, ChatSetting>? customChatSettings,
     NotificationSettings? notificationSettings,
+    Theme? appTheme,
     List<Device>? devices,
     bool? loading,
     String? alphaAgreement,
     String? pusherToken, // NOTE: device token for APNS
   }) =>
       SettingsStore(
-        primaryColor: primaryColor ?? this.primaryColor,
-        accentColor: accentColor ?? this.accentColor,
-        appBarColor: appBarColor ?? this.appBarColor,
-        brightness: brightness ?? this.brightness,
-        theme: theme ?? this.theme,
-        fontName: fontName ?? this.fontName,
-        fontSize: fontSize ?? this.fontSize,
         language: language ?? this.language,
-        avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSend: enterSend != null ? enterSend : this.enterSend,
         readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
@@ -163,11 +122,11 @@ class SettingsStore extends Equatable {
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         customChatSettings: customChatSettings ?? this.customChatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
+        appTheme: appTheme ?? this.appTheme,
         devices: devices ?? this.devices,
         loading: loading ?? this.loading,
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
-        messageSize: messageSize ?? this.messageSize,
       );
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
