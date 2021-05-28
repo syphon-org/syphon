@@ -144,13 +144,14 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
 }
 
 Message? latestMessage(List<Message> messages) {
-  // sort descending
   if (messages.isEmpty) {
     return null;
   }
 
-  return messages.fold(messages[0],
-      (newest, msg) => msg.timestamp! > newest!.timestamp! ? msg : newest);
+  return messages.fold(
+    messages[0],
+    (newest, msg) => msg.timestamp! > newest!.timestamp! ? msg : newest,
+  );
 }
 
 List<Message> latestMessages(List<Message> messages) {

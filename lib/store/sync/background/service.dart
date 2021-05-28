@@ -24,7 +24,6 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/model.dart';

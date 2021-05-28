@@ -56,7 +56,7 @@ class NotificationSettingsScreen extends StatelessWidget {
             case StyleType.Itemized:
             default:
               styleTypeDescription =
-                  'Each notification will appear as a separate notification';
+                  'A new notification will appear for every notification';
               break;
           }
 
@@ -132,95 +132,104 @@ class NotificationSettingsScreen extends StatelessWidget {
                   ]),
                 ),
                 CardSection(
-                  child: Column(children: [
-                    Container(
-                      width: width,
-                      padding: Dimensions.listPadding,
-                      child: Text(
-                        'Matrix (Remote)',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: width,
+                        padding: Dimensions.listPadding,
+                        child: Text(
+                          'Options',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
                       ),
-                    ),
-                    Container(
-                      width: width,
-                      padding: Dimensions.listPadding,
-                      child: Text(
-                        'Show notifications using Apple Push Notifications through Matrix',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ),
-                    ListTile(
-                      enabled: Platform.isIOS,
-                      dense: true,
-                      onTap: () => props.onToggleRemoteNotifications(context),
-                      contentPadding: Dimensions.listPadding,
-                      title: Text(
-                        'Notifications',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: Switch(
-                        value: props.remoteNotificationsEnabled,
-                        onChanged: !Platform.isIOS
+                      ListTile(
+                        onTap: !props.localNotificationsEnabled
                             ? null
-                            : (value) => props.onToggleRemoteNotifications(
-                                  context,
-                                ),
+                            : () => props.onIncrementStyleType,
+                        contentPadding: Dimensions.listPadding,
+                        title: Text('Notification Type'),
+                        subtitle: Text(
+                          styleTypeDescription,
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        trailing: Text(enumToString(props.styleType)),
                       ),
-                    ),
-                    ListTile(
-                      enabled: props.remoteNotificationsEnabled,
-                      dense: true,
-                      onTap: () => props.onTogglePusher(),
-                      contentPadding: Dimensions.listPadding,
-                      title: Text(
-                        'Fetch Notifications',
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                      trailing: Switch(
-                        value: props.httpPusherEnabled,
-                        onChanged: !props.remoteNotificationsEnabled
+                      ListTile(
+                        onTap: !props.localNotificationsEnabled
                             ? null
-                            : (value) => props.onTogglePusher(),
+                            : () => props.onIncrementToggleType,
+                        contentPadding: Dimensions.listPadding,
+                        title: Text('Options Default'),
+                        subtitle: Text(
+                          props.toggleType == ToggleType.All
+                              ? 'All chats will have notifications enabled by default'
+                              : 'No chats will have notifications unless explicity enabled',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        trailing: Text(enumToString(props.toggleType)),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
-                CardSection(
-                  child: Column(children: [
-                    Container(
-                      width: width,
-                      padding: Dimensions.listPadding,
-                      child: Text(
-                        'Options',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                Visibility(
+                  visible: Platform.isIOS,
+                  child: CardSection(
+                    child: Column(children: [
+                      Container(
+                        width: width,
+                        padding: Dimensions.listPadding,
+                        child: Text(
+                          'Matrix (Remote)',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
                       ),
-                    ),
-                    ListTile(
-                      onTap: () => props.onIncrementStyleType,
-                      contentPadding: Dimensions.listPadding,
-                      title: Text('Notification Type'),
-                      subtitle: Text(
-                        styleTypeDescription,
-                        style: Theme.of(context).textTheme.caption,
+                      Container(
+                        width: width,
+                        padding: Dimensions.listPadding,
+                        child: Text(
+                          'Show notifications using Apple Push Notifications through Matrix',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.caption,
+                        ),
                       ),
-                      trailing: Text(enumToString(props.styleType)),
-                    ),
-                    ListTile(
-                      onTap: () => props.onIncrementToggleType,
-                      contentPadding: Dimensions.listPadding,
-                      title: Text('Options Default'),
-                      subtitle: Text(
-                        props.toggleType == ToggleType.All
-                            ? 'All chats will have notifications enabled by default'
-                            : 'No chats will have notifications unless explicity enabled',
-                        style: Theme.of(context).textTheme.caption,
+                      ListTile(
+                        enabled: Platform.isIOS,
+                        dense: true,
+                        onTap: () => props.onToggleRemoteNotifications(context),
+                        contentPadding: Dimensions.listPadding,
+                        title: Text(
+                          'Notifications',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        trailing: Switch(
+                          value: props.remoteNotificationsEnabled,
+                          onChanged: !Platform.isIOS
+                              ? null
+                              : (value) => props.onToggleRemoteNotifications(
+                                    context,
+                                  ),
+                        ),
                       ),
-                      trailing: Text(enumToString(props.toggleType)),
-                    ),
-                  ]),
+                      ListTile(
+                        enabled: props.remoteNotificationsEnabled,
+                        dense: true,
+                        onTap: () => props.onTogglePusher(),
+                        contentPadding: Dimensions.listPadding,
+                        title: Text(
+                          'Fetch Notifications',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        trailing: Switch(
+                          value: props.httpPusherEnabled,
+                          onChanged: !props.remoteNotificationsEnabled
+                              ? null
+                              : (value) => props.onTogglePusher(),
+                        ),
+                      ),
+                    ]),
+                  ),
                 )
               ],
             ),

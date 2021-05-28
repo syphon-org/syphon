@@ -49,10 +49,10 @@ class Room {
   final String? prevHash; // most recent prev_batch (not the lastHash)
   final String? nextHash; // most recent next_batch
 
-  final int? lastRead;
-  final int? lastUpdate;
-  final int? totalJoinedUsers;
-  final int? namePriority;
+  final int lastRead;
+  final int lastUpdate;
+  final int totalJoinedUsers;
+  final int namePriority;
 
   // Event lists and handlers
   final Message? draft;

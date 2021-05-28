@@ -42,5 +42,5 @@ Future timeWrapper(
 }
 
 String enumToString(dynamic enumItem) {
-  return enumItem.toString().split('.')[1].toLowerCase();
+  return enumItem.toString().split('.')[1];
 }
