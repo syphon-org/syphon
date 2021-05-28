@@ -39,13 +39,14 @@ class SettingsStore extends Equatable {
   final String avatarShape;
   final String messageSize;
 
-  final List<Device> devices;
+  final int syncInterval;
+  final int syncPollTimeout;
 
   final String sortOrder;
   final List<String> sortGroups;
 
+  final List<Device> devices;
   final NotificationSettings notificationSettings;
-  //    Map<RoomId,
   final Map<String, ChatSetting> chatSettings; // roomId
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
@@ -64,6 +65,8 @@ class SettingsStore extends Equatable {
     this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
+    this.syncInterval = 2000, // millis
+    this.syncPollTimeout = 10000, // millis
     this.sortGroups = const [SortOptions.PINNED],
     this.sortOrder = SortOrder.LATEST,
     this.enterSendEnabled = false,
@@ -123,14 +126,15 @@ class SettingsStore extends Equatable {
     String? messageSize,
     String? avatarShape,
     bool? smsEnabled,
-    bool? enterSend,
-    bool? readReceipts,
-    bool? typingIndicators,
+    bool? enterSendEnabled,
+    bool? readReceiptsEnabled,
+    bool? typingIndicatorsEnabled,
     bool? notificationsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
+    int? syncInterval,
     Map<String, ChatSetting>? chatSettings,
     NotificationSettings? notificationSettings,
     List<Device>? devices,
@@ -149,10 +153,10 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
-        enterSendEnabled: enterSend ?? this.enterSendEnabled,
-        readReceiptsEnabled: readReceipts ?? this.readReceiptsEnabled,
+        enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
+        readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
         typingIndicatorsEnabled:
-            typingIndicators ?? this.typingIndicatorsEnabled,
+            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:
@@ -161,6 +165,7 @@ class SettingsStore extends Equatable {
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        syncInterval: syncInterval ?? this.syncInterval,
         chatSettings: chatSettings ?? this.chatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
         devices: devices ?? this.devices,

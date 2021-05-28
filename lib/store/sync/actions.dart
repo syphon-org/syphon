@@ -73,10 +73,10 @@ class ResetSync {}
 /// and a notification service to trigger syncs
 ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
-    final interval = store.state.syncStore.interval;
+    final interval = store.state.settingsStore.syncInterval;
 
     final Timer syncObserver = Timer.periodic(
-      Duration(seconds: interval),
+      Duration(milliseconds: interval),
       (timer) async {
         if (store.state.syncStore.lastSince == null) {
           debugPrint('[startSyncObserver] skipping sync, needs full sync');
@@ -98,15 +98,14 @@ ThunkAction<AppState> startSyncObserver() {
           debugPrint(
             '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
           );
-
-          if (backoffLimit == 1) {
-            debugPrint('[Sync Observer] forced retry timeout');
-            await store.dispatch(fetchSync(
-              since: store.state.syncStore.lastSince,
-            ));
+          if (backoffLimit != 1) {
+            return;
           }
 
-          return;
+          debugPrint('[Sync Observer] forced retry timeout');
+          return store.dispatch(fetchSync(
+            since: store.state.syncStore.lastSince,
+          ));
         }
 
         if (store.state.syncStore.syncing) {
@@ -193,7 +192,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         'fullState': isFullSync,
         'since': forceFull ? null : since ?? store.state.syncStore.lastSince,
         'filter': null,
-        'timeout': 10000
+        'timeout': store.state.settingsStore.syncPollTimeout
       });
 
       if (data['errcode'] != null) {

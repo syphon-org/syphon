@@ -23,7 +23,7 @@ class NotificationSettings extends Equatable {
   final bool enabled;
   final StyleType styleType;
   final ToggleType toggleType;
-  final Map<String, NotificationOptions> chatOptions; // RoomId
+  final Map<String, NotificationOptions> notificationOptions; // RoomId
 
   // Remote Only
   final List<Rule> rules;
@@ -35,7 +35,7 @@ class NotificationSettings extends Equatable {
     this.pushers = const <Pusher>[],
     this.toggleType = ToggleType.All,
     this.styleType = StyleType.Itemized,
-    this.chatOptions = const {},
+    this.notificationOptions = const {},
   });
 
   @override
@@ -43,7 +43,7 @@ class NotificationSettings extends Equatable {
         enabled,
         toggleType,
         styleType,
-        chatOptions,
+        notificationOptions,
         rules,
         pushers,
       ];
@@ -60,7 +60,7 @@ class NotificationSettings extends Equatable {
         enabled: enabled ?? this.enabled,
         toggleType: toggleType ?? this.toggleType,
         styleType: styleType ?? this.styleType,
-        chatOptions: chatOptions ?? this.chatOptions,
+        notificationOptions: chatOptions ?? this.notificationOptions,
         rules: rules ?? this.rules,
         pushers: pushers ?? this.pushers,
       );

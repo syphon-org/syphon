@@ -37,7 +37,8 @@ ThunkAction<AppState> muteChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options = Map<String, NotificationOptions>.from(settings.chatOptions);
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 
@@ -65,7 +66,8 @@ ThunkAction<AppState> toggleChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options = Map<String, NotificationOptions>.from(settings.chatOptions);
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 

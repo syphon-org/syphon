@@ -43,7 +43,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
   }
 
   @protected
-  void onMounted() async {
+  Future onMounted() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       version = packageInfo.version;
@@ -109,8 +109,8 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text("Fake Dialog"),
-                          content: Text("Testing dialog rendering"),
+                          title: Text('Fake Dialog'),
+                          content: Text('Testing dialog rendering'),
                         ),
                       );
                     },
@@ -162,6 +162,28 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   title: Text(
                     'Open Source Licenses',
                     style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+                ListTile(
+                  dense: true,
+                  onTap: props.onEditSyncInterval as void Function(),
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Sync Interval',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  subtitle: Text(
+                    'Amount of time in seconds when the app will check for updates',
+                    style: TextStyle(
+                      color: props.syncing ? Color(Colours.greyDisabled) : null,
+                    ),
+                  ),
+                  trailing: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      props.syncInterval.toString(),
+                      style: TextStyle(fontSize: 18.0),
+                    ),
                   ),
                 ),
                 ListTile(
@@ -268,24 +290,28 @@ class _Props extends Equatable {
   final String? language;
   final String? lastSince;
   final User currentUser;
+  final int syncInterval;
 
   final Function onToggleSyncing;
   final Function onManualSync;
   final Function onForceFullSync;
   final Function onForceFunction;
   final Function onStartBackgroundSync;
+  final Function onEditSyncInterval;
 
-  _Props({
+  const _Props({
     required this.syncing,
     required this.language,
     required this.syncObserverActive,
     required this.currentUser,
     required this.lastSince,
+    required this.syncInterval,
     required this.onManualSync,
     required this.onForceFullSync,
     required this.onToggleSyncing,
     required this.onForceFunction,
     required this.onStartBackgroundSync,
+    required this.onEditSyncInterval,
   });
 
   @override
@@ -304,8 +330,10 @@ class _Props extends Equatable {
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,
+        syncInterval: store.state.settingsStore.syncInterval,
         syncObserverActive: store.state.syncStore.syncObserver != null &&
             store.state.syncStore.syncObserver!.isActive,
+        onEditSyncInterval: () {},
         onToggleSyncing: () {
           final observer = store.state.syncStore.syncObserver;
           if (observer != null && observer.isActive) {

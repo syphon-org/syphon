@@ -228,7 +228,7 @@ Future backgroundSyncLoop({
         return;
       }
 
-      final chatOptions = settings.chatOptions;
+      final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
 
       if (settings.toggleType == ToggleType.None && !hasOptions) {
