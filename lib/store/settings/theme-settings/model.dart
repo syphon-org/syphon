@@ -9,27 +9,27 @@ import 'package:syphon/global/colours.dart';
 part 'model.g.dart';
 
 @JsonSerializable()
-class Theme extends Equatable {
+class AppTheme extends Equatable {
   final int primaryColor;
   final int accentColor;
   final int appBarColor;
   final int brightness;
   final ThemeType themeType;
-  final String fontName;
-  final String fontSize;
-  final String messageSize;
-  final String avatarShape;
+  final FontName fontName;
+  final FontSize fontSize;
+  final MessageSize messageSize;
+  final AvatarShape avatarShape;
 
-  const Theme({
+  const AppTheme({
     this.primaryColor = Colours.cyanSyphon,
     this.accentColor = Colours.cyanSyphon,
     this.appBarColor = Colours.cyanSyphon,
     this.brightness = 0,
     this.themeType = ThemeType.LIGHT,
-    this.fontName = 'Rubik',
-    this.fontSize = 'Default',
-    this.messageSize = 'Default',
-    this.avatarShape = 'Circle',
+    this.fontName = FontName.RUBIK,
+    this.fontSize = FontSize.DEFAULT,
+    this.messageSize = MessageSize.DEFAULT,
+    this.avatarShape = AvatarShape.CIRCLE,
   });
 
   @override
@@ -45,18 +45,18 @@ class Theme extends Equatable {
     avatarShape,
   ];
 
-  Theme copyWith({
+  AppTheme copyWith({
     int? primaryColor,
     int? accentColor,
     int? appBarColor,
     int? brightness,
     ThemeType? themeType,
-    String? fontName,
-    String? fontSize,
-    String? messageSize,
-    String? avatarShape,
+    FontName? fontName,
+    FontSize? fontSize,
+    MessageSize? messageSize,
+    AvatarShape? avatarShape,
   }) =>
-      Theme(
+      AppTheme(
         primaryColor: primaryColor ?? this.primaryColor,
         accentColor: accentColor ?? this.accentColor,
         appBarColor: appBarColor ?? this.appBarColor,
@@ -68,7 +68,7 @@ class Theme extends Equatable {
         avatarShape: avatarShape ?? this.avatarShape,
       );
 
-  Map<String, dynamic> toJson() => _$ThemeToJson(this);
+  Map<String, dynamic> toJson() => _$AppThemeToJson(this);
 
-  factory Theme.fromJson(Map<String, dynamic> json) => _$ThemeFromJson(json);
+  factory AppTheme.fromJson(Map<String, dynamic> json) => _$AppThemeFromJson(json);
 }

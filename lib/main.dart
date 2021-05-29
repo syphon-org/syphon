@@ -90,8 +90,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // set system status bar to match theme.
     // sadly the navbar doesn't play nicely with just being transparent
     // so will also be updated on theme change
-    final currentTheme = store.state.settingsStore.theme;
-    initSystemTheme(currentTheme, statusTransparent: false);
+    setupTheme(store.state.settingsStore.appTheme);
 
     store.dispatch(initDeepLinks());
     store.dispatch(initClientSecret());
@@ -118,8 +117,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
-        final currentTheme = store.state.settingsStore.theme;
-        initSystemTheme(currentTheme, statusTransparent: false);
+        setupTheme(store.state.settingsStore.appTheme);
         break;
       case AppLifecycleState.inactive:
         break;
@@ -235,7 +233,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           startLocale:
               Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
-          supportedLocales: [Locale('en'), Locale('ru')],
+          supportedLocales: const [Locale('en'), Locale('ru')],
           child: StoreConnector<AppState, SettingsStore>(
             distinct: true,
             converter: (store) => store.state.settingsStore,
@@ -243,20 +241,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
-              theme: Themes.generateCustomTheme(
-                primaryColorHex: settings.primaryColor,
-                accentColorHex: settings.accentColor,
-                appBarColorHex: settings.appBarColor,
-                fontName: settings.fontName,
-                fontSize: settings.fontSize,
-                themeType: settings.theme,
-              ),
+              theme: setupTheme(settings.appTheme, generateThemeData: true),
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
               builder: (context, child) => Scaffold(
                 body: child,
-                appBar: null,
                 key: globalScaffold,
               ),
             ),
