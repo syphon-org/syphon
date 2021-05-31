@@ -82,4 +82,4 @@ class Values {
 }
 
 // ignore: non_constant_identifier_names
-final bool DEBUG_MODE = !kReleaseMode;
+final bool DEBUG_MODE = false && !kReleaseMode;

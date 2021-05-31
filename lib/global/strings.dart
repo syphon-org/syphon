@@ -2,7 +2,7 @@
 import 'package:syphon/global/values.dart';
 
 /// Will be converted to
-/// i18n json soon, but a "String" 
+/// i18n json soon, but a "String"
 /// class below is just a stub for now
 class Strings {
   // View Titles
@@ -164,6 +164,9 @@ class Strings {
 
   static const confirmationGroupEncryption =
       'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this group chat?\n\nPlease be aware Group E2EE is still a work in progress. You may lose message data!';
+
+  static const confirmationModifySyncInterval =
+      'Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.';
 
   // Placeholders
   static const placeholderInputMatrixUnencrypted =

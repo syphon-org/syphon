@@ -72,6 +72,7 @@ dynamic storageMiddleware<State>(
     case ToggleTimeFormat:
     case ToggleReadReceipts:
     case LogAppAgreement:
+    case SetSyncInterval:
       saveSettings(store.state.settingsStore, storage: Storage.main!);
       break;
     case SetOlmAccountBackup:

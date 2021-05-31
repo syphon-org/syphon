@@ -258,9 +258,9 @@ class Room {
   }
 
   Room fromSync({
-    required String lastSince,
     required User currentUser,
     required Map<String, dynamic> json,
+    String? lastSince,
   }) {
     bool? invite;
     bool? limited;
@@ -562,7 +562,7 @@ class Room {
       );
 
       // See if the newest message has a greater timestamp
-      if (messages.isNotEmpty && lastUpdate! < messages[0].timestamp!) {
+      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp!) {
         lastUpdate = messages[0].timestamp;
       }
 

@@ -16,7 +16,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 
 class DialogConfirmPassword extends StatelessWidget {
-  DialogConfirmPassword({
+  const DialogConfirmPassword({
     Key? key,
     this.onConfirm,
     this.onCancel,
@@ -30,7 +30,7 @@ class DialogConfirmPassword extends StatelessWidget {
       distinct: true,
       converter: (Store<AppState> store) => Props.mapStateToProps(store),
       builder: (context, props) {
-        double width = MediaQuery.of(context).size.width;
+        final double width = MediaQuery.of(context).size.width;
 
         final double defaultWidgetScaling = width * 0.725;
         return SimpleDialog(
@@ -101,17 +101,25 @@ class DialogConfirmPassword extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
                   onPressed: !props.loading
                       ? () {
-                          if (this.onCancel != null) {
-                            this.onCancel!();
+                          if (onCancel != null) {
+                            onCancel!();
                           }
                           Navigator.of(context).pop();
                         }
                       : null,
+                  child: Text('Cancel'),
                 ),
                 TextButton(
+                  onPressed: !props.valid
+                      ? null
+                      : () {
+                          if (onConfirm != null) {
+                            onConfirm!();
+                          }
+                          Navigator.of(context).pop();
+                        },
                   child: !props.loading
                       ? Text('Confirm')
                       : Container(
@@ -127,14 +135,6 @@ class DialogConfirmPassword extends StatelessWidget {
                             ),
                           ),
                         ),
-                  onPressed: !props.valid
-                      ? null
-                      : () {
-                          if (this.onConfirm != null) {
-                            this.onConfirm!();
-                          }
-                          Navigator.of(context).pop();
-                        },
                 ),
               ],
             )

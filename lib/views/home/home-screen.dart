@@ -289,7 +289,8 @@ class HomeState extends State<HomeScreen> {
         final messageLatest = latestMessage(messages);
         final roomSettings = props.chatSettings[room.id];
         final preview = formatPreview(room: room, message: messageLatest);
-        final newMessage = room.lastRead < messageLatest!.timestamp! &&
+        final newMessage = messageLatest != null &&
+            room.lastRead < messageLatest.timestamp! &&
             messageLatest.userId != props.currentUser.userId;
 
         var backgroundColor;
@@ -324,7 +325,7 @@ class HomeState extends State<HomeScreen> {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
-        if (messages.isNotEmpty) {
+        if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
           if (messageLatest.type == EventTypes.encrypted &&
               messageLatest.body!.isEmpty) {

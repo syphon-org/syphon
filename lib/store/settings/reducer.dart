@@ -76,6 +76,14 @@ SettingsStore settingsReducer(
       return state.copyWith(
         enterSendEnabled: action.enterSendEnabled,
       );
+    case SetSyncInterval:
+      return state.copyWith(
+        syncInterval: action.syncInterval,
+      );
+    case SetPollTimeout:
+      return state.copyWith(
+        syncPollTimeout: action.syncPollTimeout,
+      );
     case ToggleTypingIndicators:
       return state.copyWith(
         typingIndicatorsEnabled: !state.typingIndicatorsEnabled,

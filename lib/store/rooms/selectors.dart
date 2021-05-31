@@ -40,10 +40,10 @@ List<Room> sortPrioritizedRooms(List<Room> rooms) {
       return 1;
     }
     // Otherwise, use timestamp
-    if ((a.lastUpdate ?? 0) > (b.lastUpdate ?? 0)) {
+    if (a.lastUpdate > b.lastUpdate) {
       return -1;
     }
-    if ((a.lastUpdate ?? 0) < (b.lastUpdate ?? 0)) {
+    if (a.lastUpdate < b.lastUpdate) {
       return 1;
     }
 

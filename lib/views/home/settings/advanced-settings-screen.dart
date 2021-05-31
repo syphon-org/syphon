@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
@@ -15,13 +16,14 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
-
-final bool debug = !kReleaseMode;
+import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
   const AdvancedSettingsScreen({Key? key}) : super(key: key);
@@ -31,7 +33,7 @@ class AdvancedSettingsScreen extends StatefulWidget {
 }
 
 class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
-  AdvancedSettingsScreenState({Key? key});
+  AdvancedSettingsScreenState();
 
   String? version;
   String? buildNumber;
@@ -44,7 +46,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
 
   @protected
   Future onMounted() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       version = packageInfo.version;
       buildNumber = packageInfo.buildNumber;
@@ -72,7 +74,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 child: Column(
               children: <Widget>[
                 Visibility(
-                  visible: debug,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     onTap: () => props.onStartBackgroundSync(),
@@ -84,7 +86,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: debug,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     onTap: () {
@@ -101,7 +103,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: debug,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -121,14 +123,10 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: debug,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      // showMessageNotificationTest(
-                      //   pluginInstance: globalNotificationPluginInstance!,
-                      // );
-
                       showBackgroundServiceNotification(
                         notificationId: BackgroundSync.service_id,
                         debugContent:
@@ -142,7 +140,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: debug,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -166,22 +164,21 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 ),
                 ListTile(
                   dense: true,
-                  onTap: props.onEditSyncInterval as void Function(),
+                  onTap: () => props.onEditSyncInterval(context),
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     'Sync Interval',
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   subtitle: Text(
-                    'Amount of time in seconds when the app will check for updates',
-                    style: TextStyle(
-                      color: props.syncing ? Color(Colours.greyDisabled) : null,
-                    ),
+                    'Amount of time in seconds the app wait\nbetween syncing',
                   ),
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      props.syncInterval.toString(),
+                      Duration(milliseconds: props.syncInterval)
+                          .inSeconds
+                          .toString(),
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -196,9 +193,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   ),
                   subtitle: Text(
                     'Toggle syncing with the matrix server',
-                    style: TextStyle(
-                      color: props.syncing ? Color(Colours.greyDisabled) : null,
-                    ),
                   ),
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
@@ -317,15 +311,13 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         syncing,
+        syncInterval,
         lastSince,
         currentUser,
         syncObserverActive,
       ];
 
-  static _Props mapStateToProps(
-    Store<AppState> store,
-  ) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         syncing: store.state.syncStore.syncing,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
@@ -333,7 +325,35 @@ class _Props extends Equatable {
         syncInterval: store.state.settingsStore.syncInterval,
         syncObserverActive: store.state.syncStore.syncObserver != null &&
             store.state.syncStore.syncObserver!.isActive,
-        onEditSyncInterval: () {},
+        onEditSyncInterval: (BuildContext context) {
+          return showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) => DialogTextInput(
+              title: 'Modify Sync Interval',
+              content: Strings.confirmationModifySyncInterval,
+              editingController: TextEditingController(
+                text: Duration(
+                  milliseconds: store.state.settingsStore.syncInterval,
+                ).inSeconds.toString(),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.singleLineFormatter
+              ],
+              onConfirm: (String interval) async {
+                store.dispatch(SetSyncInterval(
+                    syncInterval: Duration(
+                  seconds: int.parse(interval),
+                ).inMilliseconds));
+
+                await store.dispatch(stopSyncObserver());
+                await store.dispatch(startSyncObserver());
+              },
+            ),
+          );
+        },
         onToggleSyncing: () {
           final observer = store.state.syncStore.syncObserver;
           if (observer != null && observer.isActive) {

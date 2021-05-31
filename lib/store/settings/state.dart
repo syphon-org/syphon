@@ -135,6 +135,7 @@ class SettingsStore extends Equatable {
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
     int? syncInterval,
+    int? syncPollTimeout,
     Map<String, ChatSetting>? chatSettings,
     NotificationSettings? notificationSettings,
     List<Device>? devices,
@@ -166,6 +167,7 @@ class SettingsStore extends Equatable {
         roomTypeBadgesEnabled:
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
+        syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
         devices: devices ?? this.devices,

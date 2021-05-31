@@ -22,7 +22,7 @@ Room parseRoom(Map params) {
   final Map json = params['json'];
   final Room room = params['room'];
   final User currentUser = params['currentUser'];
-  final String lastSince = params['lastSince'];
+  final String? lastSince = params['lastSince'];
 
   // TODO: eventually remove the need for this with modular parsers
   return room.fromSync(
@@ -48,7 +48,7 @@ Map<String, dynamic> parseMessages({
   );
 
   // See if the newest message has a greater timestamp
-  if (messages.isNotEmpty && lastUpdate! < messages[0].timestamp!) {
+  if (messages.isNotEmpty && lastUpdate < messages[0].timestamp!) {
     lastUpdate = messages[0].timestamp;
   }
 

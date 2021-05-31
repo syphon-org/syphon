@@ -94,6 +94,20 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
+class SetSyncInterval {
+  final int syncInterval;
+  SetSyncInterval({
+    required this.syncInterval,
+  });
+}
+
+class SetPollTimeout {
+  final int pollTimeout;
+  SetPollTimeout({
+    required this.pollTimeout,
+  });
+}
+
 class ToggleDismissKeyboard {}
 
 class ToggleRoomTypeBadges {}
