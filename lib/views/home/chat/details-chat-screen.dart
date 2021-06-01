@@ -424,7 +424,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                               onTap: () => props.onToggleRoomNotifications(),
                               contentPadding: contentPadding,
                               title: Text(
-                                'Notifications Enabled',
+                                'Notifications',
                               ),
                               trailing: Switch(
                                 value: notificationsEnabled,

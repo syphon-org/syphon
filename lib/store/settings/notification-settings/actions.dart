@@ -31,7 +31,7 @@ class SetNotificationSettings {
 ///
 ThunkAction<AppState> muteChatNotifications({
   required String roomId,
-  required int duration, // time until mute is irrelevant
+  required int timestamp, // time until mute is irrelevant
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
@@ -41,8 +41,8 @@ ThunkAction<AppState> muteChatNotifications({
     options.putIfAbsent(roomId, () => NotificationOptions());
 
     options[roomId] = options[roomId]!.copyWith(
-      muted: !options[roomId]!.muted,
-      muteDuration: duration,
+      muteTimestamp: timestamp,
+      muted: true,
     );
 
     // notificationsSettings.chatOptions.update(roomId, (value) => );
@@ -61,6 +61,7 @@ ThunkAction<AppState> muteChatNotifications({
 ///
 ThunkAction<AppState> toggleChatNotifications({
   required String roomId,
+  bool? enabled,
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
@@ -70,7 +71,8 @@ ThunkAction<AppState> toggleChatNotifications({
     options.putIfAbsent(roomId, () => NotificationOptions());
 
     options[roomId] = options[roomId]!.copyWith(
-      enabled: !options[roomId]!.enabled,
+      enabled: enabled ?? !options[roomId]!.enabled,
+      muted: false,
     );
 
     store.dispatch(SetNotificationSettings(

@@ -120,7 +120,6 @@ Future notificationSyncIsolate() async {
       print('[notificationSyncIsolate] $error');
     }
 
-    final settings = await loadNotificationSettings();
     final Map<String, String> roomNames = await loadRoomNames();
 
     // Init notifiations for background service and new messages/events
@@ -152,7 +151,6 @@ Future notificationSyncIsolate() async {
       // TODO: check for on the fly disabled notification services
 
       await backgroundSyncLoop(
-        settings: settings,
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
@@ -173,12 +171,8 @@ Future notificationSyncIsolate() async {
 Future backgroundSyncLoop({
   required Map params,
   required FlutterLocalNotificationsPlugin pluginInstance,
-  required NotificationSettings settings,
 }) async {
   try {
-    print(
-      '[backgroundSyncLoop] ___ starting background sync ___ ${settings.styleType.toString()}',
-    );
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
@@ -195,6 +189,13 @@ Future backgroundSyncLoop({
 
     // Try to pull new lastSince if available
     final currentLastSince = await loadLastSince(fallback: lastSince);
+    final settings = await loadNotificationSettings();
+
+    // Prevents further updates within background service if
+    // disabled mid AlarmManager cycle
+    if (!settings.enabled) {
+      return;
+    }
 
     /**
      * Check last since and see if any new messages arrived in the payload
@@ -225,8 +226,6 @@ Future backgroundSyncLoop({
     await Future.forEach(rooms.keys, (String roomId) async {
       final roomData = rooms[roomId];
 
-      print('[backgroundSyncLoop] ___ processing room $roomId ___');
-
       final room = Room(id: roomId).fromSync(
         json: roomData,
         lastSince: nextLastSince,
@@ -244,13 +243,24 @@ Future backgroundSyncLoop({
         return;
       }
 
-      if (settings.toggleType == ToggleType.Enabled && hasOptions) {
-        if (!chatOptions[roomId]!.enabled) {
+      if (hasOptions) {
+        final options = chatOptions[roomId]!;
+        if (!options.enabled) {
           return;
+        }
+
+        if (options.muted) {
+          final mutedTimeout = DateTime.now().difference(
+            DateTime.fromMillisecondsSinceEpoch(options.muteTimestamp),
+          );
+
+          // future timeout still has not been met
+          if (mutedTimeout.isNegative) {
+            return;
+          }
         }
       }
 
-      print('[backgroundSyncLoop] ___ checking room names $roomId ___');
       printJson(roomNames);
 
       // Make sure the room name exists in the cache
@@ -267,7 +277,6 @@ Future backgroundSyncLoop({
           final roomAlias = roomNameList[roomNameList.length - 1];
           final roomName =
               roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
-          print('[backgroundSyncLoop] ___ processing room name $roomName ___');
 
           roomNames[room.id] = roomName;
 
@@ -320,8 +329,6 @@ Future backgroundSyncLoop({
 
       // Run all the room messages at once once room name is confirmed
       await Future.wait(room.messagesNew.map((message) async {
-        print('[backgroundSyncLoop] ___ processing message ${message.id} ');
-
         final title = parseMessageTitle(
           room: room,
           message: message,

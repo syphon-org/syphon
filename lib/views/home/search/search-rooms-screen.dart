@@ -84,7 +84,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
     final user = arguments.user!;
     final username = formatUsername(user);
 
-    return await showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,

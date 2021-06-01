@@ -8,30 +8,30 @@ part 'types.g.dart';
 class NotificationOptions extends Equatable {
   final bool muted;
   final bool enabled;
-  final int muteDuration;
+  final int muteTimestamp;
 
   const NotificationOptions({
     this.muted = false,
     this.enabled = false,
-    this.muteDuration = 0,
+    this.muteTimestamp = 0,
   });
 
   @override
   List<Object?> get props => [
         muted,
         enabled,
-        muteDuration,
+        muteTimestamp,
       ];
 
   NotificationOptions copyWith({
     bool? muted,
     bool? enabled,
-    int? muteDuration,
+    int? muteTimestamp,
   }) =>
       NotificationOptions(
         muted: muted ?? this.muted,
         enabled: enabled ?? this.enabled,
-        muteDuration: muteDuration ?? this.muteDuration,
+        muteTimestamp: muteTimestamp ?? this.muteTimestamp,
       );
 
   Map<String, dynamic> toJson() => _$NotificationOptionsToJson(this);

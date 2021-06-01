@@ -82,8 +82,8 @@ class MessageWidget extends StatelessWidget {
         final reactionCount = reactionCounts[index];
         return GestureDetector(
           onTap: () {
-            if (this.onToggleReaction != null) {
-              this.onToggleReaction!(reactionKey);
+            if (onToggleReaction != null) {
+              onToggleReaction!(reactionKey);
             }
           },
           child: Container(
@@ -206,12 +206,12 @@ class MessageWidget extends StatelessWidget {
     var zIndex = 1.0;
     var status = timeFormat == 'full'
         ? formatTimestampFull(
-            lastUpdateMillis: message.timestamp,
+            lastUpdateMillis: message.timestamp ?? 0,
             timeFormat: timeFormat,
             showTime: true,
           )
         : formatTimestamp(
-            lastUpdateMillis: message.timestamp,
+            lastUpdateMillis: message.timestamp ?? 0,
             timeFormat: timeFormat,
             showTime: true,
           );

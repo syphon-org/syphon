@@ -183,8 +183,6 @@ Future showMessageNotification({
   // For Inbox Style Only
   var payload;
 
-  print('[showMessageNotification] ${messageHash.toString()}');
-
   switch (style) {
     case StyleType.Latest:
       // TODO: allow for grouping / layered notifications here

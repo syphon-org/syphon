@@ -12,14 +12,17 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/details-chat-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-container.dart';
 
 final bool debug = !kReleaseMode;
 
@@ -33,7 +36,7 @@ enum ChatOptions {
 }
 
 class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
-  AppBarChat({
+  const AppBarChat({
     Key? key,
     this.title = 'title:',
     this.label = 'label:',
@@ -94,30 +97,28 @@ class AppBarChatState extends State<AppBarChat> {
     });
   }
 
-  @protected
-  void onBack() {
-    if (onBack != null) {
-      onBack();
+  onBack() {
+    if (widget.onBack != null) {
+      widget.onBack!();
     } else {
       Navigator.pop(context);
     }
   }
 
-  @protected
-  void onBlockUser(
-      {required BuildContext context, required _Props props}) async {
+  onBlockUser({required BuildContext context, required _Props props}) {
     final user = props.roomUsers.firstWhere(
       (user) => user!.userId != props.currentUser.userId,
     );
-    return await showDialog(
+
+    showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: "Block User",
+        title: 'Block User',
         content:
-            "If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
         onConfirm: () async {
-          await props.blockUser(user.userId);
+          await props.onBlockUser(user.userId);
           Navigator.popUntil(context, (route) => route.isFirst);
         },
         onDismiss: () => Navigator.pop(context),
@@ -125,12 +126,11 @@ class AppBarChatState extends State<AppBarChat> {
     );
   }
 
-  @protected
-  void onToggleSearch({BuildContext? context}) {
+  onToggleSearch({BuildContext? context}) {
     setState(() {
       searching = !searching;
     });
-    if (this.searching) {
+    if (searching) {
       Timer(
         Duration(milliseconds: 5), // hack to focus after visibility change
         () => FocusScope.of(
@@ -142,6 +142,82 @@ class AppBarChatState extends State<AppBarChat> {
     } else {
       FocusScope.of(context!).unfocus();
     }
+  }
+
+  onOpenMuteDialog(BuildContext context, _Props props) {
+    final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => DialogContainer(
+        title: 'Mute notifications',
+        children: [
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Mute for 1 hour',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onMuteNotifications(Duration(hours: 1));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Mute for 8 hours',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              props.onMuteNotifications(Duration(hours: 8));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Mute for 1 day',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              props.onMuteNotifications(Duration(days: 1));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Mute for 7 days',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              props.onMuteNotifications(Duration(days: 7));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Always',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              props.onToggleNotifications();
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -178,7 +254,7 @@ class AppBarChatState extends State<AppBarChat> {
                   child: Stack(
                     children: [
                       Hero(
-                        tag: "ChatAvatar",
+                        tag: 'ChatAvatar',
                         child: Avatar(
                           uri: widget.room!.avatarUri,
                           size: Dimensions.avatarSizeMin,
@@ -304,7 +380,11 @@ class AppBarChatState extends State<AppBarChat> {
                       );
                       break;
                     case ChatOptions.blockUser:
-                      return onBlockUser(context: context, props: props);
+                      onBlockUser(context: context, props: props);
+                      break;
+                    case ChatOptions.muteNotifications:
+                      onOpenMuteDialog(context, props);
+                      break;
                     default:
                       break;
                   }
@@ -331,7 +411,6 @@ class AppBarChatState extends State<AppBarChat> {
                       child: Text('Invite Friends'),
                     ),
                     const PopupMenuItem<ChatOptions>(
-                      enabled: false,
                       value: ChatOptions.muteNotifications,
                       child: Text('Mute Notifications'),
                     ),
@@ -354,12 +433,17 @@ class AppBarChatState extends State<AppBarChat> {
 class _Props extends Equatable {
   final User currentUser;
   final List<User?> roomUsers;
-  final Function blockUser;
 
-  _Props({
+  final Function onBlockUser;
+  final Function onMuteNotifications;
+  final Function onToggleNotifications;
+
+  const _Props({
     required this.roomUsers,
     required this.currentUser,
-    required this.blockUser,
+    required this.onBlockUser,
+    required this.onMuteNotifications,
+    required this.onToggleNotifications,
   });
 
   @override
@@ -371,9 +455,19 @@ class _Props extends Equatable {
         roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
             .map((id) => store.state.userStore.users[id])
             .toList(),
-        blockUser: (String userId) async {
+        onBlockUser: (String userId) async {
           final user = store.state.userStore.users[userId];
           return await store.dispatch(toggleBlockUser(user: user));
+        },
+        onMuteNotifications: (Duration duration) {
+          store.dispatch(muteChatNotifications(
+            roomId: roomId,
+            timestamp: DateTime.now().add(duration).millisecondsSinceEpoch,
+          ));
+        },
+        onToggleNotifications: () {
+          store.dispatch(
+              toggleChatNotifications(roomId: roomId, enabled: false));
         },
       );
 }
