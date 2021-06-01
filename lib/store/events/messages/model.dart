@@ -132,6 +132,7 @@ class Message extends Event {
         reactions: reactions ?? this.reactions,
       );
 
+  @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);

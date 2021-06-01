@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -96,6 +94,20 @@ class SetEnterSend {
   SetEnterSend({this.enterSend});
 }
 
+class SetSyncInterval {
+  final int syncInterval;
+  SetSyncInterval({
+    required this.syncInterval,
+  });
+}
+
+class SetPollTimeout {
+  final int pollTimeout;
+  SetPollTimeout({
+    required this.pollTimeout,
+  });
+}
+
 class ToggleDismissKeyboard {}
 
 class ToggleRoomTypeBadges {}
@@ -112,9 +124,7 @@ class ToggleReadReceipts {}
 
 class LogAppAgreement {}
 
-/**
- * Fetch Active Devices for account
- */
+/// Fetch Active Devices for account
 ThunkAction<AppState> fetchDevices() {
   return (Store<AppState> store) async {
     try {
@@ -144,9 +154,7 @@ ThunkAction<AppState> fetchDevices() {
   };
 }
 
-/**
- * Fetch Active Devices for account
- */
+/// Fetch Active Devices for account
 ThunkAction<AppState> updateDevice({String? deviceId}) {
   return (Store<AppState> store) async {
     try {
@@ -174,10 +182,8 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
   };
 }
 
-/**
- * Delete a single device
- * ** Fails after recent matix.org update **
- */
+/// Delete a single device
+/// ** Fails after recent matix.org update **
 ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
   return (Store<AppState> store) async {
     try {
@@ -221,9 +227,7 @@ ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
   };
 }
 
-/**
- * Delete multiple devices
- */
+/// Delete multiple devices
 ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   return (Store<AppState> store) async {
     try {
@@ -265,45 +269,35 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   };
 }
 
-/**
- * Send in a hex value to be used as the primary color
- */
+/// Send in a hex value to be used as the primary color
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
     store.dispatch(LogAppAgreement());
   };
 }
 
-/**
- * Send in a hex value to be used as the primary color
- */
+/// Send in a hex value to be used as the primary color
 ThunkAction<AppState> selectPrimaryColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetPrimaryColor(color: color));
   };
 }
 
-/**
- * Send in a hex value to be used as the secondary color
- */
+/// Send in a hex value to be used as the secondary color
 ThunkAction<AppState> selectAccentColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAccentColor(color: color));
   };
 }
 
-/**
- * Send in a hex value to be used as the app bar color
- */
+/// Send in a hex value to be used as the app bar color
 ThunkAction<AppState> updateAppBarColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAppBarColor(color: color));
   };
 }
 
-/**
- * Iterate over fontFamilies on action
- */
+/// Iterate over fontFamilies on action
 ThunkAction<AppState> incrementFontType() {
   return (Store<AppState> store) async {
     final currentFontType = store.state.settingsStore.fontName;
@@ -316,9 +310,7 @@ ThunkAction<AppState> incrementFontType() {
   };
 }
 
-/**
- * Iterate over fontFamilies on action
- */
+/// Iterate over fontFamilies on action
 ThunkAction<AppState> incrementFontSize() {
   return (Store<AppState> store) async {
     final currentFontSize = store.state.settingsStore.fontSize;
@@ -331,9 +323,7 @@ ThunkAction<AppState> incrementFontSize() {
   };
 }
 
-/**
- * Iterate over fontFamilies on action
- */
+/// Iterate over fontFamilies on action
 ThunkAction<AppState> incrementMessageSize() {
   return (Store<AppState> store) async {
     final currentMessageSize = store.state.settingsStore.messageSize;
@@ -346,9 +336,7 @@ ThunkAction<AppState> incrementMessageSize() {
   };
 }
 
-/**
- * Iterate over theme types on action
- */
+/// Iterate over theme types on action
 ThunkAction<AppState> incrementTheme() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.theme;
@@ -369,11 +357,11 @@ ThunkAction<AppState> incrementAvatarShape() {
     var newShape;
 
     switch (currentShape) {
-      case "Circle":
+      case 'Circle':
         newShape = 'Square';
         break;
       default:
-        newShape = "Circle";
+        newShape = 'Circle';
         break;
     }
 
@@ -381,7 +369,7 @@ ThunkAction<AppState> incrementAvatarShape() {
   };
 }
 
-final languages = ['English', "Russian"];
+final languages = ['English', 'Russian'];
 
 ThunkAction<AppState> incrementLanguage(context) {
   return (Store<AppState> store) async {
@@ -422,7 +410,7 @@ ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(
       SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSend,
+        enterSend: !store.state.settingsStore.enterSendEnabled,
       ),
     );
   };
@@ -442,35 +430,60 @@ ThunkAction<AppState> toggleMembershipEvents() {
 
 ThunkAction<AppState> toggleNotifications() {
   return (Store<AppState> store) async {
-    if (await promptNativeNotificationsRequest(
-      pluginInstance: globalNotificationPluginInstance!,
-    )) {
-      store.dispatch(ToggleNotifications());
-      final enabled = store.state.settingsStore.notificationsEnabled;
-      final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
-        (roomId, room) => MapEntry(roomId, room.name),
-      );
-      if (enabled) {
-        await BackgroundSync.init();
-        BackgroundSync.start(
-          protocol: store.state.authStore.protocol,
-          homeserver: store.state.authStore.user.homeserver,
-          accessToken: store.state.authStore.user.accessToken,
-          lastSince: store.state.syncStore.lastSince,
-          currentUser: store.state.authStore.user.userId,
-          roomNames: roomNames,
-        );
-
-        showBackgroundServiceNotification(
-          notificationId: BackgroundSync.service_id,
-          pluginInstance: globalNotificationPluginInstance!,
-        );
-      } else {
-        BackgroundSync.stop();
-        dismissAllNotifications(
-          pluginInstance: globalNotificationPluginInstance,
-        );
-      }
+    if (globalNotificationPluginInstance == null) {
+      return;
     }
+
+    final permitted = await promptNativeNotificationsRequest(
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+
+    if (!permitted) {
+      return;
+    }
+
+    store.dispatch(ToggleNotifications());
+
+    final enabled = store.state.settingsStore.notificationSettings.enabled;
+
+    if (enabled) {
+      store.dispatch(startNotifications());
+    } else {
+      store.dispatch(stopNotifications());
+    }
+  };
+}
+
+ThunkAction<AppState> startNotifications() {
+  return (Store<AppState> store) async {
+    await BackgroundSync.init();
+
+    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
+      (roomId, room) => MapEntry(roomId, room.name),
+    );
+
+    await BackgroundSync.start(
+      protocol: store.state.authStore.protocol,
+      homeserver: store.state.authStore.user.homeserver,
+      accessToken: store.state.authStore.user.accessToken,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.user.userId,
+      roomNames: roomNames,
+      settings: store.state.settingsStore.notificationSettings,
+    );
+
+    showBackgroundServiceNotification(
+      notificationId: BackgroundSync.service_id,
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+  };
+}
+
+ThunkAction<AppState> stopNotifications() {
+  return (Store<AppState> store) async {
+    BackgroundSync.stop();
+    dismissAllNotifications(
+      pluginInstance: globalNotificationPluginInstance,
+    );
   };
 }

@@ -204,17 +204,17 @@ ThunkAction<AppState> sendMessage({
   };
 }
 
-/**
- * Send Encrypted Messages
- * 
- * Specifically for sending encrypted messages using megolm
- */
+/// Send Encrypted Messages
+///
+/// Specifically for sending encrypted messages using megolm
 ThunkAction<AppState> sendMessageEncrypted({
-  required Room room,
+  required String roomId,
   required Message message, // body and type only for now
 }) {
   return (Store<AppState> store) async {
     try {
+      final room = store.state.roomStore.rooms[roomId]!;
+
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
       // send the key session - if one hasn't been sent
@@ -244,14 +244,14 @@ ThunkAction<AppState> sendMessageEncrypted({
         syncing: true,
       );
 
-      var unencryptedData = {};
+      final unencryptedData = {};
 
       if (reply != null && reply.body != null) {
         pending = await store.dispatch(
           formatMessageReply(room, pending, reply),
         );
-        unencryptedData["m.relates_to"] = {
-          "m.in_reply_to": {"event_id": "${reply.id}"}
+        unencryptedData['m.relates_to'] = {
+          'm.in_reply_to': {'event_id': '${reply.id}'}
         };
       }
 
@@ -264,8 +264,8 @@ ThunkAction<AppState> sendMessageEncrypted({
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
           roomId: room.id,
-          eventType: EventTypes.message,
           content: pending.content,
+          eventType: EventTypes.message,
         ),
       );
 
@@ -316,7 +316,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: room.id, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(id: roomId, sending: false, reply: Message()));
     }
   };
 }

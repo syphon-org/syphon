@@ -16,7 +16,6 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
@@ -78,7 +77,6 @@ class DeviceViewState extends State<DevicesScreen> {
     final store = StoreProvider.of<AppState>(context);
 
     store.dispatch(fetchDevices());
-    store.dispatch(fetchNotificationPushers());
   }
 
   @protected

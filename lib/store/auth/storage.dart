@@ -17,12 +17,10 @@ Future<void> saveAuth(
   });
 }
 
-/**
- * Load Messages (Cold Storage)
- * 
- * In storage, messages are indexed by eventId
- * In redux, they're indexed by RoomID and placed in a list
- */
+/// Load Messages (Cold Storage)
+/// 
+/// In storage, messages are indexed by eventId
+/// In redux, they're indexed by RoomID and placed in a list
 Future<AuthStore?> loadAuth({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.AUTH);

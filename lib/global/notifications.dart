@@ -1,6 +1,8 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -11,12 +13,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 
-/**
- * Notifications are handled by APNS when running in iOS
- * Only need to handle local notifications on desktop and android 
- *  https://matrix.org/docs/spec/client_server/latest#id470
- */
+/// Notifications are handled by APNS when running in iOS
+/// Only need to handle local notifications on desktop and android
+///  https://matrix.org/docs/spec/client_server/latest#id470
 
 // TODO: extract apns and re-enable
 // import 'package:flutter_apns/apns.dart';
@@ -41,23 +42,23 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   }
 
 // ic_launcher_foreground needs to be a added as a drawable resource to the root Android project
-  var initializationSettingsAndroid = AndroidInitializationSettings(
+  final initializationSettingsAndroid = AndroidInitializationSettings(
     'ic_launcher_foreground',
   );
 
-  var initializationSettingsIOS = IOSInitializationSettings(
+  final initializationSettingsIOS = IOSInitializationSettings(
     requestSoundPermission: false,
     requestBadgePermission: false,
     requestAlertPermission: false,
     onDidReceiveLocalNotification: onDidReceiveLocalNotification,
   );
 
-  var initializationSettings = InitializationSettings(
+  final initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
     iOS: initializationSettingsIOS,
   );
 
-  FlutterLocalNotificationsPlugin pluginInstance =
+  final FlutterLocalNotificationsPlugin pluginInstance =
       FlutterLocalNotificationsPlugin();
 
   await pluginInstance.initialize(
@@ -84,51 +85,53 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   }
 
   debugPrint('[initNotifications] successfully initialized $pluginInstance');
-  globalNotificationPluginInstance = pluginInstance;
   return pluginInstance;
 }
 
 Future<bool> promptNativeNotificationsRequest({
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final result = await pluginInstance
-      .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()!
-      .requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+  var result;
 
-  // TODO: extract ios only apns and reenable
-  // if (Platform.isIOS && connector != null) {
-  //   connector.requestNotificationPermissions();
-  // }
-  //
+  if (Platform.isAndroid) {
+    result = true;
+  }
 
-  // result means it's not needed, since it's iOS only
+  if (Platform.isIOS) {
+    // TODO: extract ios only apns and reenable
+    // if (connector != null) {
+    //   connector.requestNotificationPermissions();
+    // }
+    //
+
+    result = await pluginInstance
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+  }
+
   return Future.value(result);
 }
 
-/**
- * Background Service Notification
- * 
- * NOTE: background connection updates are only available on
- * android. iOS uses APNS to update through push notifications
- * 
- * This is used in android to circumvent google play services
- * 
- * If the notification is not reinvoked after 61 seconds the service is
- * likely no longer running and the notification should be automatically
- * dissmissed
- */
+/// Background Service Notification
+///
+/// NOTE: background connection updates are only available on
+/// android. iOS uses APNS to update through push notifications
+///
+/// This is used in android to circumvent google play services
+///
+/// If the notification is not reinvoked after 61 seconds the service is
+/// likely no longer running and the notification should be automatically
+/// dissmissed
 Future showBackgroundServiceNotification({
   int notificationId = 0,
   String debugContent = '',
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id_background_service,
     Values.channel_name_background_service,
@@ -136,59 +139,122 @@ Future showBackgroundServiceNotification({
     ongoing: true,
     autoCancel: false,
     showWhen: false,
+    priority: Priority.defaultPriority,
+    importance: Importance.defaultImportance,
+    visibility: NotificationVisibility.private,
+    channelShowBadge: false,
     // Timeout if not repeatedly set by the background service
     timeoutAfter: Values.serviceNotificationTimeoutDuration,
-    importance: Importance.none,
-    priority: Priority.min,
-    visibility: NotificationVisibility.private,
   );
 
-  final platformChannelSpecifics = new NotificationDetails(
+  final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: iOSPlatformChannelSpecifics,
+    iOS: IOSNotificationDetails(),
   );
-
-  var backgroundNotificationContent =
-      '${Strings.contentNotificationBackgroundService}';
 
   await pluginInstance.show(
     notificationId,
     Values.default_channel_title,
-    backgroundNotificationContent,
+    Strings.contentNotificationBackgroundService,
     platformChannelSpecifics,
   );
 }
 
 Future showMessageNotification({
-  int messageHash = 0,
-  String? body,
+  int? id,
+  String body = 'Tap to open Message',
+  String title = 'New Message',
+  StyleType style = StyleType.Itemized,
+  Map<String, String> uncheckedMessages = const {},
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
-
-  final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  var messageHash = id ?? Random.secure().nextInt(1 << 31);
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
     Values.channel_name_messages,
     Values.channel_description,
     groupKey: Values.channel_group_key,
-    priority: Priority.high,
+    priority: Priority.defaultPriority,
     importance: Importance.defaultImportance,
     visibility: NotificationVisibility.private,
+    channelShowBadge: true,
   );
+
+  // For Inbox Style Only
+  var payload;
+
+  switch (style) {
+    case StyleType.Latest:
+      // TODO: allow for grouping / layered notifications here
+      messageHash = 0;
+      androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        Values.channel_id,
+        Values.channel_name_messages,
+        Values.channel_description,
+        groupKey: Values.channel_group_key,
+        priority: Priority.defaultPriority,
+        importance: Importance.defaultImportance,
+        visibility: NotificationVisibility.private,
+        setAsGroupSummary: true,
+        channelShowBadge: true,
+      );
+      break;
+    case StyleType.Inbox:
+      // List<String> lines = <String>[
+      //   'ABC 123 Check this out',
+      //   'XYZ URI Launch Party'
+      // ];
+      messageHash = 0;
+      final List<String> lines = <String>[];
+
+      uncheckedMessages.values.forEach((notificationBody) {
+        lines.add(notificationBody);
+      });
+
+      final inboxStyleInformation = InboxStyleInformation(
+        lines,
+        contentTitle: title,
+        summaryText: body,
+      );
+
+      androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        Values.channel_id,
+        Values.channel_name_messages,
+        Values.channel_description,
+        groupKey: Values.channel_group_key,
+        priority: Priority.defaultPriority,
+        importance: Importance.defaultImportance,
+        visibility: NotificationVisibility.private,
+        setAsGroupSummary: true,
+        channelShowBadge: true,
+        styleInformation: inboxStyleInformation,
+      );
+
+      payload = jsonEncode({
+        'checked': true,
+      });
+      break;
+    default:
+      break;
+  }
 
   final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: iOSPlatformChannelSpecifics,
+    iOS: IOSNotificationDetails(),
   );
 
   await pluginInstance.show(
     messageHash,
-    'New Message',
-    body ?? 'Tap to open message',
+    title,
+    body,
     platformChannelSpecifics,
+    payload: payload,
   );
 }
 
+///
+/// example based on https://developer.android.com/training/notify-user/group.html
+///
 Future showMessageNotificationTest({
   int messageHash = 0,
   String? body,
@@ -198,34 +264,50 @@ Future showMessageNotificationTest({
   const String groupChannelId = 'grouped channel id';
   const String groupChannelName = 'grouped channel name';
   const String groupChannelDescription = 'grouped channel description';
-// example based on https://developer.android.com/training/notify-user/group.html
-  const AndroidNotificationDetails firstNotificationAndroidSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          setAsGroupSummary: true,
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          groupKey: groupKey);
-  const NotificationDetails firstNotificationPlatformSpecifics =
-      NotificationDetails(android: firstNotificationAndroidSpecifics);
-  await pluginInstance.show(1, 'XYZ URI', 'You will not believe...',
-      firstNotificationPlatformSpecifics);
-  const AndroidNotificationDetails secondNotificationAndroidSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          groupKey: groupKey);
-  const NotificationDetails secondNotificationPlatformSpecifics =
+  final firstNotificationAndroidSpecifics = AndroidNotificationDetails(
+    groupChannelId,
+    groupChannelName,
+    groupChannelDescription,
+    setAsGroupSummary: true,
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    groupKey: groupKey,
+  );
+
+  final firstNotificationPlatformSpecifics = NotificationDetails(
+    android: firstNotificationAndroidSpecifics,
+  );
+
+  await pluginInstance.show(
+    1,
+    'XYZ URI',
+    'You will not believe...',
+    firstNotificationPlatformSpecifics,
+  );
+
+  final secondNotificationAndroidSpecifics = AndroidNotificationDetails(
+    groupChannelId,
+    groupChannelName,
+    groupChannelDescription,
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    groupKey: groupKey,
+  );
+
+  final NotificationDetails secondNotificationPlatformSpecifics =
       NotificationDetails(android: secondNotificationAndroidSpecifics);
-  await pluginInstance.show(2, 'ABC 123', 'Please join us to celebrate the...',
-      secondNotificationPlatformSpecifics);
+  await pluginInstance.show(
+    2,
+    'ABC 123',
+    'Please join us to celebrate the...',
+    secondNotificationPlatformSpecifics,
+  );
 
   // Create the summary notification to support older devices that pre-date
-  /// Android 7.0 (API level 24).
-  ///
-  /// Recommended to create this regardless as the behaviour may vary as
-  /// mentioned in https://developer.android.com/training/notify-user/group
+  // / Android 7.0 (API level 24).
+  // /
+  // / Recommended to create this regardless as the behaviour may vary as
+  // / mentioned in https://developer.android.com/training/notify-user/group
   const List<String> lines = <String>[
     'ABC 123 Check this out',
     'XYZ URI    Launch Party'
@@ -251,7 +333,7 @@ Future showDebugNotification({
   String customMessage = 'Example Notification',
   FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
@@ -261,7 +343,7 @@ Future showDebugNotification({
     priority: Priority.high,
   );
 
-  final platformChannelSpecifics = new NotificationDetails(
+  final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
     iOS: iOSPlatformChannelSpecifics,
   );

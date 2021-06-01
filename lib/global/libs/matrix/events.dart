@@ -12,22 +12,20 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
 abstract class Events {
-  /**
-   * Fetch State Events
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id258
-   * 
-   * Get the state events for the current state of a room.
-   */
+  /// Fetch State Events
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#id258
+  /// 
+  /// Get the state events for the current state of a room.
   static Future<dynamic> fetchStateEvents({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
     String? roomId,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -40,10 +38,8 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Fetch Message Events
-   * https://matrix.org/docs/spec/client_server/latest#id261
-   */
+  /// Fetch Message Events
+  /// https://matrix.org/docs/spec/client_server/latest#id261
   static Future<dynamic> fetchMessageEvents({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -58,12 +54,12 @@ abstract class Events {
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
 
     url += '?limit=$limit';
-    url += from != null ? '&from=${from}' : '';
-    url += to != null ? '&to=${to}' : '';
+    url += from != null ? '&from=$from' : '';
+    url += to != null ? '&to=$to' : '';
     url += desc ? '&dir=b' : '&dir=f';
     url += '&filter={"not_types":["${EventTypes.member}"]}';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -76,11 +72,9 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Sync (Background Isolate) (main functionality)
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id251 
-   */
+  /// Sync (Background Isolate) (main functionality)
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#id251 
   static Future<dynamic> fetchMessageEventsMapped(Map params) async {
     return await fetchMessageEvents(
       protocol: params['protocol'],
@@ -94,17 +88,15 @@ abstract class Events {
     );
   }
 
-  /**
-   * Send Encrypted Message
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-   * 
-   * Notes on requestId (considered a transactionId in Matrix)
-   * 
-   * The transaction ID for this event. 
-   * Clients should generate an ID unique across requests with the same access token; 
-   * it will be used by the server to ensure idempotency of requests. <- really a requestId
-   */
+  /// Send Encrypted Message
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+  /// 
+  /// Notes on requestId (considered a transactionId in Matrix)
+  /// 
+  /// The transaction ID for this event. 
+  /// Clients should generate an ID unique across requests with the same access token; 
+  /// it will be used by the server to ensure idempotency of requests. <- really a requestId
 
   static Future<dynamic> sendMessageEncrypted({
     String? protocol = 'https://',
@@ -118,20 +110,20 @@ abstract class Events {
     String? sessionId,
     String? deviceId,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "algorithm": Algorithms.megolmv1, //  "m.megolm.v1.aes-sha2",
-      "sender_key": senderKey, // "<our curve25519 device key>",
-      "ciphertext": ciphertext, // "<encrypted payload>",
-      "session_id": sessionId, // "<outbound group session id>",
-      "device_id": deviceId, // "<our device ID>"
+    final Map body = {
+      'algorithm': Algorithms.megolmv1, //  'm.megolm.v1.aes-sha2',
+      'sender_key': senderKey, // '<our curve25519 device key>',
+      'ciphertext': ciphertext, // '<encrypted payload>',
+      'session_id': sessionId, // '<outbound group session id>',
+      'device_id': deviceId, // '<our device ID>'
     };
 
     if (unencryptedData != null) {
@@ -147,17 +139,15 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send Event (State Only)
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-   * 
-   * Notes on requestId (considered a transactionId in Matrix)
-   * 
-   * The transaction ID for this event. 
-   * Clients should generate an ID unique across requests with the same access token; 
-   * it will be used by the server to ensure idempotency of requests. <- really a requestId
-   */
+  /// Send Event (State Only)
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+  /// 
+  /// Notes on requestId (considered a transactionId in Matrix)
+  /// 
+  /// The transaction ID for this event. 
+  /// Clients should generate an ID unique across requests with the same access token; 
+  /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendEvent({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -172,7 +162,7 @@ abstract class Events {
 
     url += stateKey != null ? '/$stateKey' : '';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -186,17 +176,15 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send Message
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-   * 
-   * Notes on requestId (considered a transactionId in Matrix)
-   * 
-   * The transaction ID for this event. 
-   * Clients should generate an ID unique across requests with the same access token; 
-   * it will be used by the server to ensure idempotency of requests. <- really a requestId
-   */
+  /// Send Message
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+  /// 
+  /// Notes on requestId (considered a transactionId in Matrix)
+  /// 
+  /// The transaction ID for this event. 
+  /// Clients should generate an ID unique across requests with the same access token; 
+  /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendMessage({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -205,17 +193,17 @@ abstract class Events {
     String? trxId,
     Map? message,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "body": message!['body'],
-      "msgtype": message['msgtype'] ?? 'm.text',
+    final Map body = {
+      'body': message!['body'],
+      'msgtype': message['msgtype'] ?? 'm.text',
     };
 
     if (message['format'] != null) {
@@ -239,17 +227,15 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send Reaction
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-   * 
-   * Notes on requestId (considered a transactionId in Matrix)
-   * 
-   * The transaction ID for this event. 
-   * Clients should generate an ID unique across requests with the same access token; 
-   * it will be used by the server to ensure idempotency of requests. <- really a requestId
-   */
+  /// Send Reaction
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
+  /// 
+  /// Notes on requestId (considered a transactionId in Matrix)
+  /// 
+  /// The transaction ID for this event. 
+  /// Clients should generate an ID unique across requests with the same access token; 
+  /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendReaction({
     String protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -259,19 +245,19 @@ abstract class Events {
     String? messageId,
     String? trxId,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "m.relates_to": {
-        "rel_type": "m.annotation",
-        "event_id": "$messageId",
-        "key": "$reaction"
+    final Map body = {
+      'm.relates_to': {
+        'rel_type': 'm.annotation',
+        'event_id': messageId,
+        'key': reaction
       }
     };
 
@@ -297,15 +283,15 @@ abstract class Events {
     String? eventId,
     String? trxId,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {};
+    final Map body = {};
 
     final response = await http.put(
       Uri.parse(url),
@@ -316,17 +302,15 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send (Event) To Device
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-sendtodevice-eventtype-txnid
-   * 
-   * Not intended for messages per protocol requirements
-   * 
-   * This endpoint is used to send send-to-device events to a set of client devices.
-   * The messages to send. A map from user ID, to a map from device ID to message body. 
-   * The device ID may also be *, meaning all known devices for the user.
-   */
+  /// Send (Event) To Device
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-sendtodevice-eventtype-txnid
+  /// 
+  /// Not intended for messages per protocol requirements
+  /// 
+  /// This endpoint is used to send send-to-device events to a set of client devices.
+  /// The messages to send. A map from user ID, to a map from device ID to message body. 
+  /// The device ID may also be *, meaning all known devices for the user.
   static Future<dynamic> sendEventToDevice({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -337,17 +321,17 @@ abstract class Events {
     String? deviceId,
     Map? content,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/sendToDevice/$eventType/$trxId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
     // Use astrick to send to all known devices for user
-    Map body = {
-      "messages": content,
+    final Map body = {
+      'messages': content,
     };
 
     final response = await http.put(
@@ -359,9 +343,7 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send Typing Event 
-   */
+  /// Send Typing Event 
   static Future<dynamic> sendTyping({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -370,17 +352,17 @@ abstract class Events {
     String? userId,
     bool? typing,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/typing/$userId';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "typing": typing,
-      "timeout": 5000,
+    final Map body = {
+      'typing': typing,
+      'timeout': 5000,
     };
 
     final response = await http.put(
@@ -392,11 +374,9 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /**
-   * Send Read Receipts
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
-   */
+  /// Send Read Receipts
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
   static Future<dynamic> sendReadMarkers({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -406,15 +386,15 @@ abstract class Events {
     String? lastRead,
     bool readAll = true,
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
+    final Map body = {
       'm.fully_read': readAll ? messageId : lastRead,
       'm.read': messageId,
     };

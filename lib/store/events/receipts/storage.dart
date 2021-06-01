@@ -42,7 +42,7 @@ Future<Map<String, ReadReceipt>> loadReceipts(
   try {
     final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
 
-    final receiptsMap = Map<String, ReadReceipt>();
+    final receiptsMap = <String, ReadReceipt>{};
     final records = await store.records(messageIds).getSnapshots(storage);
 
     for (RecordSnapshot<String?, String>? record in records) {
@@ -54,6 +54,6 @@ Future<Map<String, ReadReceipt>> loadReceipts(
     return receiptsMap;
   } catch (error) {
     printError(error.toString());
-    return Map();
+    return {};
   }
 }

@@ -20,23 +20,27 @@ List<int> fibonacci(int n) {
 }
 
 void printJson(Map? jsonMap) {
-  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
-  String prettyEvent = encoder.convert(jsonMap);
+  final JsonEncoder encoder = JsonEncoder.withIndent('  ');
+  final String prettyEvent = encoder.convert(jsonMap);
   debugPrint(prettyEvent, wrapWidth: 2048);
 }
 
 // time functions by wrapping them here - needs testing
-Future<void> timeWrapper(
+Future timeWrapper(
   Future<dynamic> Function() function, {
   String name = 'Anonymous',
 }) async {
-  Stopwatch stopwatch = new Stopwatch()..start();
+  final Stopwatch stopwatch = Stopwatch()..start();
 
-  dynamic result = await function();
+  final dynamic result = await function();
 
   final stoptime = stopwatch.elapsed;
 
   printDebug('[$name TIMER] ${function.runtimeType} $stoptime');
 
   return result;
+}
+
+String enumToString(dynamic enumItem) {
+  return enumItem.toString().split('.')[1];
 }

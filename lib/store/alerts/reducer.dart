@@ -10,7 +10,7 @@ AlertsStore alertsReducer(
     case SetAlertsObserver:
       return state.copyWith(alertsObserver: action.alertsObserver);
     case AddAlert:
-      List<Alert> alerts = List<Alert>.from(state.alerts);
+      final List<Alert> alerts = List<Alert>.from(state.alerts);
       alerts.add(action.alert);
       return state.copyWith(alerts: alerts);
     case RemoveAlert:

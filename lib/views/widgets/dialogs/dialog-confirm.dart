@@ -9,7 +9,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogConfirm extends StatelessWidget {
-  DialogConfirm({
+  const DialogConfirm({
     Key? key,
     this.title = '',
     this.content = '',

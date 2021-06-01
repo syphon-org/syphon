@@ -1,5 +1,6 @@
 // Project imports:
 import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
@@ -38,10 +39,6 @@ SettingsStore settingsReducer(
       return state.copyWith(
         avatarShape: action.avatarShape,
       );
-    case SetAppBarColor:
-      return state.copyWith(
-        appBarColor: action.color,
-      );
     case SetDevices:
       return state.copyWith(
         devices: action.devices,
@@ -55,19 +52,21 @@ SettingsStore settingsReducer(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
       );
     case SetRoomPrimaryColor:
-      final chatSettings =
-          Map<String, ChatSetting>.from(state.customChatSettings ?? Map());
+      final chatSettings = Map<String, ChatSetting>.from(state.chatSettings);
 
       // Initialize chat settings if null
       if (chatSettings[action.roomId] == null) {
-        chatSettings[action.roomId] = ChatSetting();
+        chatSettings[action.roomId] = ChatSetting(
+          roomId: action.roomId,
+          language: state.language,
+        );
       }
 
       chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
         primaryColor: action.color,
       );
       return state.copyWith(
-        customChatSettings: chatSettings,
+        chatSettings: chatSettings,
       );
     case SetLanguage:
       return state.copyWith(
@@ -79,11 +78,19 @@ SettingsStore settingsReducer(
       );
     case SetEnterSend:
       return state.copyWith(
-        enterSend: action.enterSend,
+        enterSendEnabled: action.enterSendEnabled,
+      );
+    case SetSyncInterval:
+      return state.copyWith(
+        syncInterval: action.syncInterval,
+      );
+    case SetPollTimeout:
+      return state.copyWith(
+        syncPollTimeout: action.syncPollTimeout,
       );
     case ToggleTypingIndicators:
       return state.copyWith(
-        typingIndicators: !state.typingIndicators,
+        typingIndicatorsEnabled: !state.typingIndicatorsEnabled,
       );
     case ToggleTimeFormat:
       return state.copyWith(
@@ -95,7 +102,7 @@ SettingsStore settingsReducer(
       );
     case ToggleReadReceipts:
       return state.copyWith(
-        readReceipts: !state.readReceipts,
+        readReceiptsEnabled: !state.readReceiptsEnabled,
       );
     case ToggleMembershipEvents:
       return state.copyWith(
@@ -107,8 +114,11 @@ SettingsStore settingsReducer(
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationsEnabled: !state.notificationsEnabled,
+        notificationSettings: state.notificationSettings
+            .copyWith(enabled: !state.notificationSettings.enabled),
       );
+    case SetNotificationSettings:
+      return state.copyWith(notificationSettings: action.settings);
     default:
       return state;
   }

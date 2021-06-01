@@ -22,7 +22,7 @@
 - [ ] Encrypted Chat 
 - [ ] Group Chats
 - [ ] Profile Changes
-- [ ] Themeing Changes
+- [ ] Theming Changes
 - [ ] Force Kill and Restart
 
 ### Final Checklist

@@ -91,12 +91,10 @@ class ResetRooms {
   ResetRooms();
 }
 
-/**
- * Sync State Data
- * 
- * Helper action that will determine how to update a room
- * from data formatted like a sync request
- */
+/// Sync State Data
+///
+/// Helper action that will determine how to update a room
+/// from data formatted like a sync request
 ThunkAction<AppState> syncRooms(Map? roomData) {
   return (Store<AppState> store) async {
     // init new store containers
@@ -115,7 +113,10 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
       Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
       List<Message> messages = [];
 
+      if (json.isEmpty) return;
+
       // First past to decrypt encrypted events
+      // && json['timeline'] != null theres an issue here
       if (room.encryptionEnabled) {
         // reassign the mapped decrypted evets to the json timeline
         json['timeline']['events'] = await store.dispatch(
@@ -173,8 +174,8 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
         reactions: [],
         redactions: [],
         messagesNew: [],
-        users: Map<String, User>(),
-        readReceipts: Map<String, ReadReceipt>(),
+        users: <String, User>{},
+        readReceipts: <String, ReadReceipt>{},
       );
 
       // update room
@@ -202,13 +203,11 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
   };
 }
 
-/**
- *  
- * Fetch Rooms (w/o /sync)
- * 
- * Takes a negligible amount of time
- *  
- */
+///
+/// Fetch Rooms (w/o /sync)
+///
+/// Takes a negligible amount of time
+///
 ThunkAction<AppState> fetchRoom(
   String? roomId, {
   bool direct = false,
@@ -229,7 +228,7 @@ ThunkAction<AppState> fetchRoom(
           roomId: roomId,
         );
 
-        if (!(stateEvents is List) && stateEvents['errcode'] != null) {
+        if (stateEvents is! List && stateEvents['errcode'] != null) {
           throw stateEvents['error'];
         }
       }
@@ -238,11 +237,11 @@ ThunkAction<AppState> fetchRoom(
         messageEvents = await compute(
           MatrixApi.fetchMessageEventsMapped,
           {
-            "protocol": store.state.authStore.protocol,
-            "homeserver": store.state.authStore.user.homeserver,
-            "accessToken": store.state.authStore.user.accessToken,
-            "roomId": roomId,
-            "limit": 20,
+            'protocol': store.state.authStore.protocol,
+            'homeserver': store.state.authStore.user.homeserver,
+            'accessToken': store.state.authStore.user.accessToken,
+            'roomId': roomId,
+            'limit': 20,
           },
         );
 
@@ -252,7 +251,7 @@ ThunkAction<AppState> fetchRoom(
       }
 
       final payload = {
-        '$roomId': {
+        roomId: {
           'state': {
             'events': stateEvents ?? [],
           },
@@ -264,29 +263,27 @@ ThunkAction<AppState> fetchRoom(
       };
 
       if (direct) {
-        payload['$roomId']!['account_data'] = {
+        payload[roomId]!['account_data'] = {
           'events': [
-            {"type": 'm.direct'}
+            {'type': 'm.direct'}
           ]
         };
       }
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRoom] ${roomId} $error');
+      debugPrint('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
   };
 }
 
-/**
- *  
- * Fetch Rooms (w/o /sync)
- * 
- * Takes a negligible amount of time
- *  
- */
+///
+/// Fetch Rooms (w/o /sync)
+///
+/// Takes a negligible amount of time
+///
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
@@ -301,7 +298,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       }
 
       // Convert joined_rooms to Room objects
-      final joinedRooms = (data['joined_rooms'] as List<dynamic>);
+      final joinedRooms = data['joined_rooms'] as List<dynamic>;
       final joinedRoomsList = joinedRooms.map((id) => Room(id: id)).toList();
 
       await Future.wait(joinedRoomsList.map((room) async {
@@ -322,15 +319,13 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   };
 }
 
-/**
- * Fetch Direct Rooms
- * 
- * Fetches both state and message of direct rooms
- * found from account_data of current authed user
- * 
- * Have to account for multiple direct rooms with one user
- * @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org, !124:matrix.org]
- */
+/// Fetch Direct Rooms
+///
+/// Fetches both state and message of direct rooms
+/// found from account_data of current authed user
+///
+/// Have to account for multiple direct rooms with one user
+/// @riot-bot:matrix.org: [!ajJxpUAIJjYYTzvsHo:matrix.org, !124:matrix.org]
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
@@ -367,14 +362,12 @@ ThunkAction<AppState> fetchDirectRooms() {
   };
 }
 
-/**
- * Create Room 
- * 
- * stop / start the /sync session for this to run,
- * otherwise it will appear like the room does
- * not exist for the seconds between the response from
- * matrix and caching in the app
- */
+/// Create Room
+///
+/// stop / start the /sync session for this to run,
+/// otherwise it will appear like the room does
+/// not exist for the seconds between the response from
+/// matrix and caching in the app
 ThunkAction<AppState> createRoom({
   String? name,
   String? alias,
@@ -467,7 +460,7 @@ ThunkAction<AppState> createRoom({
           origin: 'createRoom|$preset',
         ),
       );
-      return room != null ? room.id : null;
+      return room?.id;
     } finally {
       await store.dispatch(startSyncObserver());
       store.dispatch(SetLoading(loading: false));
@@ -475,14 +468,12 @@ ThunkAction<AppState> createRoom({
   };
 }
 
-/**
- * Update Room
- * 
- * stop / start the /sync session for this to run,
- * otherwise it will appear like the room does
- * not exist for the seconds between the response from
- * matrix and caching in the app
- */
+/// Update Room
+///
+/// stop / start the /sync session for this to run,
+/// otherwise it will appear like the room does
+/// not exist for the seconds between the response from
+/// matrix and caching in the app
 ThunkAction<AppState> updateRoom({
   String? name,
   String? alias,
@@ -503,13 +494,11 @@ ThunkAction<AppState> updateRoom({
   };
 }
 
-/**
- * 
- * Mark Room Read (Locally Only)
- * 
- * Send Fully Read or just Read receipts bundled into 
- * one http call
- */
+///
+/// Mark Room Read (Locally Only)
+///
+/// Send Fully Read or just Read receipts bundled into
+/// one http call
 ThunkAction<AppState> markRoomRead({String? roomId}) {
   return (Store<AppState> store) async {
     try {
@@ -519,7 +508,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceiptsEnabled) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -527,7 +516,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.readReceipts) {
+      if (store.state.settingsStore.readReceiptsEnabled) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );
@@ -549,13 +538,11 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
   };
 }
 
-/**
- * 
- * Mark Room Read (Locally Only)
- * 
- * Send Fully Read or just Read receipts bundled into 
- * one http call
- */
+///
+/// Mark Room Read (Locally Only)
+///
+/// Send Fully Read or just Read receipts bundled into
+/// one http call
 ThunkAction<AppState> markRoomsReadAll() {
   return (Store<AppState> store) async {
     try {
@@ -578,14 +565,12 @@ ThunkAction<AppState> markRoomsReadAll() {
   };
 }
 
-/**
- * Toggle Direct Room
- * 
- * NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
- * 
- * Fetch the direct rooms list and recalculate it without the
- * given alias
- */
+/// Toggle Direct Room
+///
+/// NOTE: https://github.com/matrix-org/matrix-doc/issues/1519
+///
+/// Fetch the direct rooms list and recalculate it without the
+/// given alias
 ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
   return (Store<AppState> store) async {
     try {
@@ -625,7 +610,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
 
       // Toggle the direct room data based on user actions
       directRoomUsers = directRoomUsers.map((userId, rooms) {
-        List<dynamic> updatedRooms = List.from(rooms ?? []);
+        final List<dynamic> updatedRooms = List.from(rooms ?? []);
 
         if (userId != otherUserId) {
           return MapEntry(userId, updatedRooms);
@@ -676,9 +661,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
   };
 }
 
-/**
- * Update room avatar
- */
+/// Update room avatar
 ThunkAction<AppState> updateRoomAvatar({
   required String roomId,
   File? localFile,
@@ -718,9 +701,7 @@ ThunkAction<AppState> updateRoomAvatar({
   };
 }
 
-/**
- * Toggle Room Encryption On (Only)
- */
+/// Toggle Room Encryption On (Only)
 ThunkAction<AppState> toggleRoomEncryption({Room? room}) {
   return (Store<AppState> store) async {
     try {
@@ -752,12 +733,10 @@ ThunkAction<AppState> toggleRoomEncryption({Room? room}) {
   };
 }
 
-/**
- * Join Room (by id)
- * 
- * Not sure if this process is / will be any different
- * than accepting an invite
- */
+/// Join Room (by id)
+///
+/// Not sure if this process is / will be any different
+/// than accepting an invite
 ThunkAction<AppState> joinRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
@@ -774,7 +753,7 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      Room joinedRoom =
+      final Room joinedRoom =
           rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
@@ -790,10 +769,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
   };
 }
 
-/**
- * Invite User (by id)
- *  
- */
+/// Invite User (by id)
+///
 ThunkAction<AppState> inviteUser({
   Room? room,
   User? user,
@@ -825,12 +802,10 @@ ThunkAction<AppState> inviteUser({
   };
 }
 
-/**
- * Accept Room (by id, from invite
- * 
- * Not sure if this process is / will be any different
- * than joining a room
- */
+/// Accept Room (by id, from invite
+///
+/// Not sure if this process is / will be any different
+/// than joining a room
 ThunkAction<AppState> acceptRoom({required Room room}) {
   return (Store<AppState> store) async {
     try {
@@ -847,7 +822,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      Room joinedRoom =
+      final Room joinedRoom =
           rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
@@ -861,11 +836,9 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
   };
 }
 
-/**
- * Remove Room
- * 
- * Both leaves and forgets room
- */
+/// Remove Room
+///
+/// Both leaves and forgets room
 ThunkAction<AppState> removeRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
@@ -915,18 +888,16 @@ ThunkAction<AppState> removeRoom({Room? room}) {
   };
 }
 
-/**
- * Leave Room
- * 
- * NOTE: https://github.com/vector-im/riot-web/issues/722
- * NOTE: https://github.com/vector-im/riot-web/issues/6978
- * NOTE: https://github.com/matrix-org/matrix-doc/issues/948
- * 
- * Kick all (if owner), tries to delete alias, and leaves
- * TODO: make sure this is in accordance with matrix in that
- * the user can only delete if owning the room, or leave if
- * just a member
- */
+/// Leave Room
+///
+/// NOTE: https://github.com/vector-im/riot-web/issues/722
+/// NOTE: https://github.com/vector-im/riot-web/issues/6978
+/// NOTE: https://github.com/matrix-org/matrix-doc/issues/948
+///
+/// Kick all (if owner), tries to delete alias, and leaves
+/// TODO: make sure this is in accordance with matrix in that
+/// the user can only delete if owning the room, or leave if
+/// just a member
 ThunkAction<AppState> leaveRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {
@@ -951,17 +922,15 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
       }
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      debugPrint('[leaveRoom] $error');
+      printError('[leaveRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };
 }
 
-/**
- * 
- * Client side temporary hiding only
- */
+///
+/// Client side temporary hiding only
 ThunkAction<AppState> archiveRoom({Room? room}) {
   return (Store<AppState> store) async {
     try {

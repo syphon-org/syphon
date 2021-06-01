@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:syphon/global/dimensions.dart';
 
 class ButtonText extends StatelessWidget {
-  ButtonText({
+  const ButtonText({
     Key? key,
     this.text,
     this.textWidget,
@@ -33,8 +33,8 @@ class ButtonText extends StatelessWidget {
                     : null,
           ),
         ),
-        onPressed: disabled ? null : this.onPressed as void Function()?,
-        child: this.loading
+        onPressed: disabled ? null : onPressed as void Function()?,
+        child: loading
             ? Container(
                 constraints: BoxConstraints(
                   maxHeight: 24,
@@ -51,7 +51,7 @@ class ButtonText extends StatelessWidget {
             : (textWidget != null
                 ? textWidget!
                 : Text(
-                    this.text!,
+                    text!,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w100,

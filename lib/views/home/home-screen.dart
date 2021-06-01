@@ -1,4 +1,6 @@
 // Flutter imports:
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -287,18 +289,20 @@ class HomeState extends State<HomeScreen> {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
         final messageLatest = latestMessage(messages);
-        final roomSettings = props.chatSettings[room.id] ?? null;
+        final chatSettings = props.chatSettings[room.id];
         final preview = formatPreview(room: room, message: messageLatest);
+        final newMessage = messageLatest != null &&
+            room.lastRead < messageLatest.timestamp! &&
+            messageLatest.sender != props.currentUser.userId;
 
-        bool messagesNew = false;
         var backgroundColor;
         var textStyle = TextStyle();
         var primaryColor = Colors.grey[500];
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
-        if (roomSettings != null) {
-          primaryColor = Color(roomSettings.primaryColor!);
+        if (chatSettings != null) {
+          primaryColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
           primaryColor = roomColorDefaults[room.id];
         } else {
@@ -319,13 +323,13 @@ class HomeState extends State<HomeScreen> {
         }
 
         // show draft inidicator if it's an empty room
-        if (room.drafting || messages.length < 1) {
+        if (room.drafting || messages.isEmpty) {
           textStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
-        if (messages != null && messages.isNotEmpty) {
+        if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest!.type == EventTypes.encrypted &&
+          if (messageLatest.type == EventTypes.encrypted &&
               messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
@@ -335,8 +339,7 @@ class HomeState extends State<HomeScreen> {
           }
 
           // display message as being 'unread'
-          if (room.lastRead! < messageLatest.timestamp!) {
-            messagesNew = true;
+          if (newMessage) {
             textStyle = textStyle.copyWith(
               color: Theme.of(context).textTheme.bodyText1!.color,
               fontWeight: FontWeight.w500,
@@ -347,8 +350,8 @@ class HomeState extends State<HomeScreen> {
         // GestureDetector w/ animation
         return InkWell(
           onTap: () {
-            if (this.selectedRoom != null) {
-              this.onDismissMessageOptions();
+            if (selectedRoom != null) {
+              onDismissMessageOptions();
             } else {
               Navigator.pushNamed(
                 context,
@@ -426,7 +429,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: messagesNew,
+                        visible: newMessage,
                         child: Positioned(
                           top: 0,
                           right: 0,
@@ -513,15 +516,13 @@ class HomeState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        child: Text(
-                          preview,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.caption!.merge(
-                                textStyle,
-                              ),
-                        ),
+                      Text(
+                        preview,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.caption!.merge(
+                              textStyle,
+                            ),
                       ),
                     ],
                   ),
@@ -544,7 +545,7 @@ class HomeState extends State<HomeScreen> {
             context: context,
           );
 
-          if (this.selectedRoom != null) {
+          if (selectedRoom != null) {
             currentAppBar = buildAppBarRoomOptions(
               props: props,
               context: context,
@@ -567,7 +568,7 @@ class HomeState extends State<HomeScreen> {
                       child: Stack(
                         children: [
                           GestureDetector(
-                            onTap: this.onDismissMessageOptions,
+                            onTap: onDismissMessageOptions,
                             child: buildChatList(
                               props.rooms,
                               context,
@@ -595,7 +596,7 @@ class _Props extends Equatable {
   final User currentUser;
   final ThemeType theme;
   final Map<String, ChatSetting> chatSettings;
-  final Map<String, List<Message>?> messages;
+  final Map<String, List<Message>> messages;
 
   final Function onDebug;
   final Function onLeaveChat;
@@ -605,7 +606,7 @@ class _Props extends Equatable {
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
-  _Props({
+  const _Props({
     required this.rooms,
     required this.theme,
     required this.offline,
@@ -637,7 +638,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         theme: store.state.settingsStore.theme,
-        rooms: availableRooms(sortedPrioritizedRooms(filterBlockedRooms(
+        rooms: availableRooms(sortPrioritizedRooms(filterBlockedRooms(
           store.state.roomStore.rooms.values.toList(),
           store.state.userStore.blocked,
         ))),
@@ -683,7 +684,7 @@ class _Props extends Equatable {
         }(),
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
-        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        chatSettings: store.state.settingsStore.chatSettings,
         onDebug: () async {
           debugPrint('[onDebug] trigged debug function @ home');
         },

@@ -47,7 +47,7 @@ String trimAlias(String? alias) {
 }
 
 String formatAlias({String resource = '', String homeserver = ''}) {
-  return "@" + resource + ":" + homeserver;
+  return '@' + resource + ':' + homeserver;
 }
 
 String formatUsername(User user) {
@@ -72,7 +72,7 @@ String formatInitials(String? fullword) {
   // example words -> EX
   final word = fullword.replaceAll('@', '');
 
-  if (word.length == 0) {
+  if (word.isEmpty) {
     return 'NA';
   }
 
@@ -92,7 +92,7 @@ List<User?> searchUsersLocal(
   String? roomId,
   String? searchText = '',
 }) {
-  var users = roomUsers(state, roomId);
+  final users = roomUsers(state, roomId);
   if (searchText == null || searchText.isEmpty) {
     return users;
   }

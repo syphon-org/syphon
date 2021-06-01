@@ -35,9 +35,9 @@ List<Message> filterMessages(
 }
 
 List<Message> reviseMessagesBackground(Map params) {
-  List<Message> messages = params['messages'] ?? [];
-  Map<String, Redaction> redactions = params['redactions'];
-  Map<String, List<Reaction>> reactions = params['reactions'];
+  final List<Message> messages = params['messages'] ?? [];
+  final Map<String, Redaction> redactions = params['redactions'];
+  final Map<String, List<Reaction>> reactions = params['reactions'];
 
   return reviseMessagesFilter(messages, redactions, reactions);
 }
@@ -144,13 +144,14 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
 }
 
 Message? latestMessage(List<Message> messages) {
-  // sort descending
   if (messages.isEmpty) {
     return null;
   }
 
-  return messages.fold(messages[0],
-      (newest, msg) => msg.timestamp! > newest!.timestamp! ? msg : newest);
+  return messages.fold(
+    messages[0],
+    (latest, msg) => msg.timestamp! > latest!.timestamp! ? msg : latest,
+  );
 }
 
 List<Message> latestMessages(List<Message> messages) {
@@ -158,7 +159,7 @@ List<Message> latestMessages(List<Message> messages) {
 
   // sort descending
   sortedList.sort((a, b) {
-    if (a.pending! && !b.pending!) {
+    if (a.pending && !b.pending) {
       return -1;
     }
 

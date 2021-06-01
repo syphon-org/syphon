@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -13,45 +14,48 @@ import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 
-// Dart imports:
-import 'dart:math';
-
 // Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/sync/background/parsers.dart';
+import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/user/model.dart';
 
-/**
- * Background Sync Service (Android Only)
- * static class for managing service through app lifecycle
- */
+/// Background Sync Service (Android Only)
+/// static class for managing service through app lifecycle
 class BackgroundSync {
-  static const service_id = 254;
+  static const service_id = 255;
   static const serviceTimeout = 55; // seconds
 
   static Isolate? backgroundIsolate;
+
+  static const notificationSettings = 'notificationSettings';
+  static const notificationsUnchecked = 'notificationsUnchecked';
 
   static Future<bool> init() async {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      debugPrint('[BackgroundSync.init] ${error}');
+      debugPrint('[BackgroundSync.init] $error');
       return false;
     }
   }
 
-  static void start({
+  static Future start({
     String? protocol,
     String? homeserver,
     String? accessToken,
     String? lastSince,
     String? currentUser,
     Map<String, String?>? roomNames,
+    NotificationSettings? settings,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
@@ -59,43 +63,28 @@ class BackgroundSync {
     final secureStorage = FlutterSecureStorage();
 
     await Future.wait([
+      secureStorage.write(key: Cache.protocolKey, value: protocol),
+      secureStorage.write(key: Cache.homeserverKey, value: homeserver),
+      secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
+      secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
+      secureStorage.write(key: Cache.userIdKey, value: currentUser),
       secureStorage.write(
-        key: Cache.protocolKey,
-        value: protocol,
-      ),
+          key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
       secureStorage.write(
-        key: Cache.homeserverKey,
-        value: homeserver,
-      ),
-      secureStorage.write(
-        key: Cache.accessTokenKey,
-        value: accessToken,
-      ),
-      secureStorage.write(
-        key: Cache.lastSinceKey,
-        value: lastSince,
-      ),
-      secureStorage.write(
-        key: Cache.userIdKey,
-        value: currentUser,
-      ),
-      secureStorage.write(
-        key: Cache.roomNamesKey,
-        value: jsonEncode(roomNames),
-      )
+          key: notificationSettings, value: jsonEncode(settings))
     ]);
 
     await AndroidAlarmManager.periodic(
       Duration(seconds: serviceTimeout),
       service_id,
       notificationSyncIsolate,
-      rescheduleOnReboot: true,
       exact: true,
       wakeup: true,
+      rescheduleOnReboot: true,
     );
   }
 
-  static void stop() async {
+  static Future stop() async {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
@@ -104,40 +93,48 @@ class BackgroundSync {
   }
 }
 
-/**
- * Background Sync Job (Android Only)
- * 
- * Fetches data from matrix in background and displays
- * notifications without needing google play services
- * 
- * NOTE: https://github.com/flutter/flutter/issues/32164
- */
-void notificationSyncIsolate() async {
+///
+/// Background Sync Job (Android Only)
+///
+/// Fetches data from matrix in background and displays
+/// notifications without needing google play services
+///
+/// NOTE: https://github.com/flutter/flutter/issues/32164
+///
+Future notificationSyncIsolate() async {
   try {
     String? protocol;
     String? homeserver;
     String? accessToken;
     String? lastSince;
     String? userId;
-    Map<String, dynamic>? roomNames;
 
     try {
       final secureStorage = FlutterSecureStorage();
-
       userId = await secureStorage.read(key: Cache.userIdKey);
       protocol = await secureStorage.read(key: Cache.protocolKey);
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
-      final roomNamesData = await secureStorage.read(key: Cache.roomNamesKey);
-
-      roomNames = jsonDecode(roomNamesData!);
     } catch (error) {
       print('[notificationSyncIsolate] $error');
     }
 
+    final Map<String, String> roomNames = await loadRoomNames();
+
     // Init notifiations for background service and new messages/events
-    final pluginInstance = (await initNotifications())!;
+    final pluginInstance = await initNotifications(
+      onSelectNotification: (String? payload) {
+        debugPrint(
+          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
+        );
+        return Future.value(true);
+      },
+    );
+
+    if (pluginInstance == null) {
+      throw '[notificationSyncIsolate] failed to initialize plugin instance';
+    }
 
     showBackgroundServiceNotification(
       notificationId: BackgroundSync.service_id,
@@ -148,12 +145,12 @@ void notificationSyncIsolate() async {
       Duration(seconds: BackgroundSync.serviceTimeout),
     );
 
-    print('[notificationSyncIsolate] enabled background sync');
-
     while (DateTime.now().isBefore(cutoff)) {
       await Future.delayed(Duration(seconds: 2));
 
-      await syncLoop(
+      // TODO: check for on the fly disabled notification services
+
+      await backgroundSyncLoop(
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
@@ -170,36 +167,34 @@ void notificationSyncIsolate() async {
   }
 }
 
-/** 
- *  Save Full Sync
- */
-Future<dynamic> syncLoop({
+///  Save Full Sync
+Future backgroundSyncLoop({
   required Map params,
-  FlutterLocalNotificationsPlugin? pluginInstance,
+  required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
     final lastSince = params['lastSince'];
-    final userId = params['userId'] ?? params['currentUser'];
-    final Map<String, dynamic>? roomNames = params['roomNames'];
+    final currentUserId = params['userId'];
+
+    final roomNames = Map<String, String>.from(
+      params['roomNames'] ?? {},
+    );
 
     if (accessToken == null || lastSince == null) {
       return;
     }
 
-    var lastSinceNew;
-
     // Try to pull new lastSince if available
-    try {
-      final secureStorage = FlutterSecureStorage();
+    final currentLastSince = await loadLastSince(fallback: lastSince);
+    final settings = await loadNotificationSettings();
 
-      lastSinceNew = await secureStorage.read(
-        key: Cache.lastSinceKey,
-      );
-    } catch (error) {
-      print('[syncLoop] $error');
+    // Prevents further updates within background service if
+    // disabled mid AlarmManager cycle
+    if (!settings.enabled) {
+      return;
     }
 
     /**
@@ -211,63 +206,168 @@ Future<dynamic> syncLoop({
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
-      since: lastSinceNew ?? lastSince,
+      since: currentLastSince,
       timeout: 10000,
     );
 
     // Parse sync response
-    lastSinceNew = data['next_batch'];
-    final Map<String, dynamic> rawRooms = data['rooms']['join'];
+    final nextLastSince = data['next_batch'];
 
     // Save new 'since' value for the next sync
-    try {
-      final secureStorage = FlutterSecureStorage();
-
-      await secureStorage.write(key: Cache.lastSinceKey, value: lastSinceNew);
-    } catch (error) {
-      print('[syncLoop] $error');
-    }
+    saveLastSince(lastSince: nextLastSince);
 
     // Filter each room through the parser
-    rawRooms.forEach((roomId, json) {
-      final room =
-          Room(id: roomId).fromSync(json: json, lastSince: lastSinceNew);
-      final messagesNew = room.messagesNew;
+    final Map<String, dynamic> roomsJoined = data['rooms']['join'];
+    final Map<String, dynamic> roomsInvited = data['rooms']['invite'];
 
-      if (messagesNew.length == 1) {
-        final String? messageSender = messagesNew[0].sender;
-        final String formattedSender = trimAlias(messageSender);
+    final rooms = roomsJoined..addAll(roomsInvited);
 
-        if (!formattedSender.contains(userId)) {
-          if (room.direct) {
-            showMessageNotification(
-              messageHash: Random.secure().nextInt(20000),
-              body: '$formattedSender sent a new message.',
-              pluginInstance: pluginInstance!,
-            );
-            return;
-          }
+    // Run all the rooms at once
+    await Future.forEach(rooms.keys, (String roomId) async {
+      final roomData = rooms[roomId];
 
-          if (room.invite) {
-            showMessageNotification(
-              messageHash: Random.secure().nextInt(20000),
-              body: '$formattedSender invited you to chat',
-              pluginInstance: pluginInstance!,
-            );
-            return;
-          }
+      final room = Room(id: roomId).fromSync(
+        json: roomData,
+        lastSince: nextLastSince,
+        currentUser: User(userId: currentUserId),
+      );
 
-          final roomName = roomNames![roomId];
-          showMessageNotification(
-            messageHash: Random.secure().nextInt(20000),
-            body: '$formattedSender sent a new message in $roomName',
-            pluginInstance: pluginInstance!,
-          );
+      if (room.messagesNew.isEmpty) {
+        return;
+      }
+
+      final chatOptions = settings.notificationOptions;
+      final hasOptions = chatOptions.containsKey(roomId);
+
+      if (settings.toggleType == ToggleType.Disabled && !hasOptions) {
+        return;
+      }
+
+      if (hasOptions) {
+        final options = chatOptions[roomId]!;
+        if (!options.enabled) {
           return;
         }
+
+        if (options.muted) {
+          final mutedTimeout = DateTime.now().difference(
+            DateTime.fromMillisecondsSinceEpoch(options.muteTimestamp),
+          );
+
+          // future timeout still has not been met
+          if (mutedTimeout.isNegative) {
+            return;
+          }
+        }
       }
+
+      printJson(roomNames);
+
+      // Make sure the room name exists in the cache
+      if (!roomNames.containsKey(roomId) ||
+          roomNames[roomId] == Values.EMPTY_CHAT) {
+        try {
+          final roomNameList = await MatrixApi.fetchRoomName(
+            protocol: protocol,
+            homeserver: homeserver,
+            accessToken: accessToken,
+            roomId: room.id.isEmpty ? roomId : room.id,
+          );
+
+          final roomAlias = roomNameList[roomNameList.length - 1];
+          final roomName =
+              roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
+
+          roomNames[room.id] = roomName;
+
+          printJson(roomNames);
+          saveRoomNames(roomNames: roomNames);
+        } catch (error) {
+          print(
+            '[backgroundSyncLoop] failed to fetch & parse room name ${room.id}',
+          );
+        }
+      }
+
+      final uncheckedMessages = await loadNotificationsUnchecked();
+
+      ///
+      /// Inbox Style Notifications Only
+      ///
+      if (settings.styleType == StyleType.Inbox) {
+        room.messagesNew.forEach((message) {
+          final messageBody = parseMessageNotification(
+            room: room,
+            message: message,
+            roomNames: roomNames,
+            currentUserId: currentUserId,
+            protocol: protocol,
+            homeserver: homeserver,
+          );
+
+          uncheckedMessages.addAll(
+            {message.id ?? '0': messageBody},
+          );
+        });
+
+        await saveNotificationsUnchecked(uncheckedMessages);
+
+        var body = 'You have a new unread message';
+
+        if (uncheckedMessages.keys.length > 1) {
+          body = 'You have ${uncheckedMessages.keys.length} unread messages';
+        }
+
+        return showMessageNotification(
+          body: body,
+          title: 'New Messages',
+          style: settings.styleType,
+          pluginInstance: pluginInstance,
+          uncheckedMessages: uncheckedMessages,
+        );
+      }
+
+      // Run all the room messages at once once room name is confirmed
+      await Future.wait(room.messagesNew.map((message) async {
+        final title = parseMessageTitle(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+          protocol: protocol,
+          homeserver: homeserver,
+        );
+
+        final body = parseMessageNotification(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+          protocol: protocol,
+          homeserver: homeserver,
+        );
+
+        if (body.isEmpty) return Future.value();
+
+        print(message.id);
+        printJson(uncheckedMessages);
+
+        await showMessageNotification(
+          id: uncheckedMessages.isEmpty ? 0 : null,
+          body: body,
+          title: title,
+          style: settings.styleType,
+          pluginInstance: pluginInstance,
+        );
+
+        uncheckedMessages.addAll(
+          {message.id ?? '0': body},
+        );
+
+        await saveNotificationsUnchecked(uncheckedMessages);
+      }));
     });
   } catch (error) {
-    print('[syncLoop] $error');
+    print('[backgroundSyncLoop] $error');
   }
 }

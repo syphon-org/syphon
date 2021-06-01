@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
-import "package:syphon/global/themes.dart";
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
@@ -23,11 +23,10 @@ class SettingsStore extends Equatable {
   final int? brightness;
   final ThemeType theme;
 
-  final bool enterSend; // TODO: rename *enabled
   final bool smsEnabled;
-  final bool readReceipts; // TODO: rename *enabled
-  final bool typingIndicators; // TODO: rename *enabled
-  final bool notificationsEnabled;
+  final bool enterSendEnabled;
+  final bool readReceiptsEnabled;
+  final bool typingIndicatorsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
@@ -39,14 +38,15 @@ class SettingsStore extends Equatable {
   final String avatarShape;
   final String messageSize;
 
-  final List<Device> devices;
+  final int syncInterval;
+  final int syncPollTimeout;
 
-  // Map<roomId, ChatSetting>
-  final Map<String, ChatSetting>? customChatSettings;
+  final String sortOrder;
   final List<String> sortGroups;
-  final String? sortOrder;
 
-  final NotificationSettings? notificationSettings;
+  final List<Device> devices;
+  final Map<String, ChatSetting> chatSettings; // roomId
+  final NotificationSettings notificationSettings;
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
@@ -64,21 +64,22 @@ class SettingsStore extends Equatable {
     this.messageSize = 'Default',
     this.language = 'English',
     this.avatarShape = 'Circle',
+    this.syncInterval = 2000, // millis
+    this.syncPollTimeout = 10000, // millis
     this.sortGroups = const [SortOptions.PINNED],
     this.sortOrder = SortOrder.LATEST,
-    this.enterSend = false,
+    this.enterSendEnabled = false,
     this.smsEnabled = false,
-    this.readReceipts = false,
-    this.typingIndicators = false,
-    this.notificationsEnabled = false,
+    this.readReceiptsEnabled = false,
+    this.typingIndicatorsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
     this.dismissKeyboardEnabled = false,
-    this.customChatSettings,
+    this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
-    this.notificationSettings,
+    this.notificationSettings = const NotificationSettings(),
     this.alphaAgreement,
     this.pusherToken,
   });
@@ -96,14 +97,13 @@ class SettingsStore extends Equatable {
         language,
         avatarShape,
         smsEnabled,
-        enterSend,
-        readReceipts,
-        typingIndicators,
-        notificationsEnabled,
+        enterSendEnabled,
+        readReceiptsEnabled,
+        typingIndicatorsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
         dismissKeyboardEnabled,
-        customChatSettings,
+        chatSettings,
         devices,
         loading,
         notificationSettings,
@@ -123,15 +123,16 @@ class SettingsStore extends Equatable {
     String? messageSize,
     String? avatarShape,
     bool? smsEnabled,
-    bool? enterSend,
-    bool? readReceipts,
-    bool? typingIndicators,
-    bool? notificationsEnabled,
+    bool? enterSendEnabled,
+    bool? readReceiptsEnabled,
+    bool? typingIndicatorsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
-    Map<String, ChatSetting>? customChatSettings,
+    int? syncInterval,
+    int? syncPollTimeout,
+    Map<String, ChatSetting>? chatSettings,
     NotificationSettings? notificationSettings,
     List<Device>? devices,
     bool? loading,
@@ -149,11 +150,10 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         avatarShape: avatarShape ?? this.avatarShape,
         smsEnabled: smsEnabled ?? this.smsEnabled,
-        enterSend: enterSend != null ? enterSend : this.enterSend,
-        readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
-        typingIndicators:
-            typingIndicators != null ? typingIndicators : this.typingIndicators,
-        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+        enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
+        readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
+        typingIndicatorsEnabled:
+            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:
             dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
@@ -161,7 +161,9 @@ class SettingsStore extends Equatable {
             membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled:
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
-        customChatSettings: customChatSettings ?? this.customChatSettings,
+        syncInterval: syncInterval ?? this.syncInterval,
+        syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
+        chatSettings: chatSettings ?? this.chatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
         devices: devices ?? this.devices,
         loading: loading ?? this.loading,

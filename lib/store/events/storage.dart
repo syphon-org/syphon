@@ -65,7 +65,7 @@ Future<void> saveRedactions(
     });
   } catch (error) {
     printError('[saveRedactions] $error');
-    throw error;
+    rethrow;
   }
 }
 
@@ -81,7 +81,7 @@ Future<Map<String, Redaction>> loadRedactions({
 }) async {
   final store = StoreRef<String, String>(StorageKeys.REDACTIONS);
 
-  final redactions = Map<String, Redaction>();
+  final redactions = <String, Redaction>{};
 
   final redactionsData = await store.find(storage);
 
@@ -139,7 +139,7 @@ Future<void> saveReactions(
     });
   } catch (error) {
     printError('[saveReactions] $error');
-    throw error;
+    rethrow;
   }
 }
 
@@ -155,7 +155,7 @@ Future<Map<String, List<Reaction>>> loadReactions(
 }) async {
   try {
     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
-    final reactionsMap = Map<String, List<Reaction>>();
+    final reactionsMap = <String, List<Reaction>>{};
     final reactionsRecords =
         await store.records(messageIds).getSnapshots(storage);
 
@@ -171,7 +171,7 @@ Future<Map<String, List<Reaction>>> loadReactions(
     return reactionsMap;
   } catch (error) {
     printError(error.toString());
-    return Map();
+    return {};
   }
 }
 
@@ -197,12 +197,10 @@ Future<Message> loadMessage(String eventId, {required Database storage}) async {
   return Message.fromJson(json.decode(message!));
 }
 
-/**
- * Load Messages (Cold Storage)
- * 
- * In storage, messages are indexed by eventId
- * In redux, they're indexed by RoomID and placed in a list
- */
+/// Load Messages (Cold Storage)
+/// 
+/// In storage, messages are indexed by eventId
+/// In redux, they're indexed by RoomID and placed in a list
 Future<List<Message>> loadMessages(
   List<String> eventIds, {
   required Database storage,

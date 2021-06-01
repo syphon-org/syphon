@@ -77,7 +77,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   @protected
-  void onMounted(_Props props) async {
+  Future onMounted(_Props props) async {
     final draft = props.room.draft;
 
     // only marked if read receipts are enabled
@@ -393,8 +393,7 @@ class ChatScreenState extends State<ChatScreen> {
               props.onCheatCode();
             },
             onBack: () {
-              if (editorController.text != null &&
-                  0 < editorController.text.length) {
+              if (editorController.text.isNotEmpty) {
                 props.onSaveDraftMessage(
                   body: editorController.text,
                   type: MessageTypes.TEXT,
@@ -452,9 +451,6 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              maintainSize: false,
-                              maintainAnimation: false,
-                              maintainState: false,
                               visible: props.room.lastHash == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
@@ -595,7 +591,7 @@ class _Props extends Equatable {
               store.state.settingsStore.roomTypeBadgesEnabled,
           dismissKeyboardEnabled:
               store.state.settingsStore.dismissKeyboardEnabled,
-          enterSendEnabled: store.state.settingsStore.enterSend,
+          enterSendEnabled: store.state.settingsStore.enterSendEnabled,
           loading: selectRoom(state: store.state, id: roomId).syncing,
           messagesLength: store.state.eventStore.messages.containsKey(roomId)
               ? store.state.eventStore.messages[roomId]?.length
@@ -604,14 +600,13 @@ class _Props extends Equatable {
             store.dispatch(selectReply(roomId: roomId, message: message));
           },
           roomPrimaryColor: () {
-            final customChatSettings =
-                store.state.settingsStore.customChatSettings ?? Map();
+            final chatSettings = store.state.settingsStore.chatSettings;
 
-            if (customChatSettings[roomId] != null) {
-              return Color(customChatSettings[roomId]!.primaryColor!);
+            if (chatSettings[roomId] == null) {
+              return Colours.hashedColor(roomId);
             }
 
-            return Colours.hashedColor(roomId);
+            return Color(chatSettings[roomId]!.primaryColor);
           }(),
           onUpdateDeviceKeys: () async {
             final room = store.state.roomStore.rooms[roomId]!;
@@ -640,7 +635,9 @@ class _Props extends Equatable {
               room: store.state.roomStore.rooms[roomId],
             ));
           },
-          onSendMessage: ({String? body, String? type}) async {
+          onSendMessage: ({required String body, String? type}) async {
+            if (roomId == null || body.isEmpty) return;
+
             final room = store.state.roomStore.rooms[roomId]!;
 
             final message = Message(
@@ -650,7 +647,7 @@ class _Props extends Equatable {
 
             if (room.encryptionEnabled) {
               return store.dispatch(sendMessageEncrypted(
-                room: room,
+                roomId: roomId,
                 message: message,
               ));
             }

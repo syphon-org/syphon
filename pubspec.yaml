@@ -49,7 +49,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.8+180
+version: 0.1.8+181
 
 environment:
   sdk: ">=2.12.0 <3.0.0" # <- modified to solve build_runner
@@ -65,9 +65,14 @@ dependencies:
       url: https://github.com/ereio/swipeable.git
       ref: null-safety
 
+  canonical_json:
+    git:
+      url: https://github.com/ereio/flutter_canonical_json
+      ref: main
+
   # state
-  expandable: ^5.0.1
   equatable: ^2.0.0
+  expandable: ^5.0.1
   convert: ^3.0.0
   device_info: ^2.0.0
   redux: ^5.0.0
@@ -92,8 +97,8 @@ dependencies:
   sqlite3_flutter_libs: ^0.4.1
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
-  # checked_yaml: ^2.0.1
   flutter_secure_storage: ^4.1.0
+  # checked_yaml: ^2.0.1
   # sqflite_sqlcipher: 1.1.2
 
   # services
@@ -125,25 +130,20 @@ dependencies:
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
 
-  # json
+  # data
   json_annotation: 4.0.1
+  collection: ^1.15.0-nullsafety.4
 
   # UNSOUND NULL-SAFTEY
   # canonical_json: 1.0.0
   # flutter_material_color_picker: ^1.0.5
   # swipeable: 1.1.0
-  collection: ^1.15.0-nullsafety.4
 
 dev_dependencies:
   lint: ^1.5.3
-  # build_runner: ^1.12.2
   build_runner: ^2.0.2
-  # json_serializable: 4.1.0
   json_serializable: ^4.1.0
   flutter_launcher_icons: ^0.9.0
-
-# dependency_overrides:
-# intl: ^0.17.0-nullsafety.2 # <-- override for desktop builds on dev channel
 
 flutter_icons:
   android: true

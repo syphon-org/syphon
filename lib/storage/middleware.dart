@@ -9,7 +9,9 @@ import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
+import 'package:syphon/store/sync/background/storage.dart';
 
 ///
 /// Storage Middleware
@@ -46,7 +48,9 @@ dynamic storageMiddleware<State>(
         //   '[storageMiddleware] saving room ${action.runtimeType.toString()}',
         // );
         final room = store.state.roomStore.rooms[action.id];
-        saveRoom(room, storage: Storage.main);
+        if (room != null) {
+          saveRoom(room, storage: Storage.main);
+        }
       }
       break;
     case SetTheme:
@@ -68,6 +72,7 @@ dynamic storageMiddleware<State>(
     case ToggleTimeFormat:
     case ToggleReadReceipts:
     case LogAppAgreement:
+    case SetSyncInterval:
       saveSettings(store.state.settingsStore, storage: Storage.main!);
       break;
     case SetOlmAccountBackup:
@@ -83,6 +88,13 @@ dynamic storageMiddleware<State>(
     case UpdateMessageSessionOutbound:
     case ResetCrypto:
       saveCrypto(store.state.cryptoStore, storage: Storage.main!);
+      break;
+    case SetNotificationSettings:
+      // handles updating the background sync thread with new chat settings
+      saveNotificationSettings(
+        settings: store.state.settingsStore.notificationSettings,
+      );
+      saveSettings(store.state.settingsStore, storage: Storage.main!);
       break;
 
     default:

@@ -1,11 +1,9 @@
 // Project imports:
 import 'package:syphon/global/values.dart';
 
-/**
- * Will be converted to
- * i18n json soon, but a "String" 
- * class below is just a stub for now
- */
+/// Will be converted to
+/// i18n json soon, but a "String"
+/// class below is just a stub for now
 class Strings {
   // View Titles
   static const titleProfile = 'Set up Your Profile';
@@ -23,7 +21,7 @@ class Strings {
   static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
   static const titleDialogEncryption = 'Encrypt Chat?';
   static const titleDialogCaptcha = 'Complete Captcha';
-  static const titleDialogTerms = "Confirm Terms Of Service";
+  static const titleDialogTerms = 'Confirm Terms Of Service';
   static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
   static const titleDialogEmailRequirement = 'Email requirement';
   static const titleDialogEmailVerifiedRequirement = 'Email verification';
@@ -35,11 +33,12 @@ class Strings {
 
   // Labels
   static const labelSyncing = 'syncing chats...';
-  static const labelSearchForHomeservers = "Search for homeservers...";
+  static const labelSearchForHomeservers = 'Search for homeservers...';
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelUsersSection = 'Users';
   static const labelRecentUsers = 'Recent Users';
+  static const labelSearchResults = 'Search Results';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
   static const labelNoGroups = 'no groups found';
@@ -67,8 +66,6 @@ class Strings {
   static const buttonAgree = 'I Agree';
 
   // Text Buttons
-  static const buttonTextSignup = "button-text-signup";
-
   static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';
@@ -125,7 +122,7 @@ class Strings {
 
   // Confirmations
   static const confirmationDeleteKeys =
-      "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.";
+      'Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.';
 
   static const confirmationInvite =
       'Are you sure you want to invite the following user to the following room?';
@@ -168,6 +165,9 @@ class Strings {
   static const confirmationGroupEncryption =
       'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this group chat?\n\nPlease be aware Group E2EE is still a work in progress. You may lose message data!';
 
+  static const confirmationModifySyncInterval =
+      'Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.';
+
   // Placeholders
   static const placeholderInputMatrixUnencrypted =
       'Matrix message (unencrypted)';
@@ -176,8 +176,8 @@ class Strings {
   static String formatUsernameHint(
       {required String homeserver, String? username}) {
     final usernameFormatted =
-        username != null && username.length > 0 ? username : 'username';
-    final alias = homeserver.length != 0
+        username != null && username.isNotEmpty ? username : 'username';
+    final alias = homeserver.isNotEmpty
         ? '@$usernameFormatted:$homeserver'
         : '@$usernameFormatted:matrix.org';
 

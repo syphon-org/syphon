@@ -5,12 +5,11 @@ import 'dart:io';
 import 'dart:math';
 
 // Flutter imports:
+import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
-// import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
@@ -32,15 +31,14 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
-/**
- * 
- * E2EE
- * https://matrix.org/docs/spec/client_server/latest#id76
- * 
- * Outbound Key Session === Outbound Session (Algorithm.olmv1)
- * Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
- */
-
+///
+///
+/// E2EE
+/// https://matrix.org/docs/spec/client_server/latest#id76
+///
+/// Outbound Key Session === Outbound Session (Algorithm.olmv1)
+/// Outbound Message Session === Outbound Group Session (Algorithm.megolmv2)
+///
 class SetDeviceKeys {
   var deviceKeys;
   SetDeviceKeys({this.deviceKeys});
@@ -127,19 +125,12 @@ class AddInboundMessageSession {
   });
 }
 
-class DEBUGSetOutboundMessageSessionMap {
-  String? nothing;
-  DEBUGSetOutboundMessageSessionMap({this.nothing});
-}
-
 class ResetCrypto {}
 
-/**
- * Helper Actions
- */
+/// Helper Actions
 ThunkAction<AppState> setDeviceKeysOwned(Map deviceKeys) {
   return (Store<AppState> store) async {
-    Map<String, DeviceKey> currentKeys = Map.from(
+    final Map<String, DeviceKey> currentKeys = Map.from(
       store.state.cryptoStore.deviceKeysOwned,
     );
 
@@ -158,7 +149,7 @@ ThunkAction<AppState> toggleDeviceKeysExist(bool existence) {
 }
 
 ThunkAction<AppState> setDeviceKeys(Map? deviceKeys) {
-  return (Store<AppState> store) async {
+  return (Store<AppState> store) {
     store.dispatch(SetDeviceKeys(deviceKeys: deviceKeys));
   };
 }
@@ -184,15 +175,13 @@ ThunkAction<AppState> deleteDeviceKeys() {
   };
 }
 
-/**
- * 
- * Initing Olm Account
- * 
- * https://gitlab.matrix.org/matrix-org/olm/-/blob/master/python/olm/account.py
- * 
- * Uses deviceId to encrypt and serialize the account (pickle)
- * needed to know about the python library to know what that was
- */
+///
+/// Initing Olm Account
+///
+/// https://gitlab.matrix.org/matrix-org/olm/-/blob/master/python/olm/account.py
+///
+/// Uses deviceId to encrypt and serialize the account (pickle)
+/// needed to know about the python library to know what that was
 ThunkAction<AppState> initOlmEncryption(User user) {
   return (Store<AppState> store) async {
     try {
@@ -222,9 +211,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
   };
 }
 
-/**
- * Init Key Encryption
- */
+/// Init Key Encryption
 ThunkAction<AppState> initKeyEncryption(User user) {
   return (Store<AppState> store) async {
     // fetch device keys and pull out key based on device id
@@ -257,12 +244,10 @@ ThunkAction<AppState> initKeyEncryption(User user) {
   };
 }
 
-/**
- * Save Olm Account
- * 
- * serialize and save the olm account being used
- * for identity and encryption
- */
+/// Save Olm Account
+///
+/// serialize and save the olm account being used
+/// for identity and encryption
 ThunkAction<AppState> saveOlmAccount() {
   return (Store<AppState> store) async {
     try {
@@ -305,20 +290,22 @@ ThunkAction<AppState> generateIdentityKeys() {
         'user_id': authUser.userId,
       };
 
-      // figerprint signature key pair generation for upload
+      // fingerprint signature key pair generation for upload
       // warn: seems to work without canonical_json lib
       // utf8.decode(deviceKeysEncoded);
-      final deviceKeysEncoded = json.encode(deviceIdentityKeys);
-      final deviceKeysSerialized = deviceKeysEncoded;
+      final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
+      final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
 
-      var deviceKeysPayload = {'device_keys': deviceIdentityKeys};
+      final deviceKeysPayload = {'device_keys': deviceIdentityKeys};
 
-      deviceKeysPayload['device_keys']!['signatures'] = {
+      deviceKeysPayload['device_keys']?['signatures'] = {
         authUser.userId: {
           fingerprintKeyName: deviceKeysSigned,
         }
       };
+
+      printJson(deviceKeysPayload);
 
       // cache current device key for authed user
       final deviceKeysOwned = DeviceKey.fromMatrix(
@@ -345,6 +332,9 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
         'device_keys': deviceKey.toMatrix(),
       };
 
+      printDebug('[uploadIdentityKeys] start');
+      printJson(deviceKeyMap);
+
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: store.state.authStore.protocol,
@@ -356,6 +346,9 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
+
+      printDebug('[uploadIdentityKeys] finish');
+      printJson(data);
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
@@ -365,11 +358,9 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
   };
 }
 
-/**
- * Generate One Time Keys
- * 
- * Returns the keys as a map
- */
+/// Generate One Time Keys
+///
+/// Returns the keys as a map
 ThunkAction<AppState> generateOneTimeKeys({DeviceKey? deviceKey}) {
   return (Store<AppState> store) async {
     try {
@@ -397,10 +388,8 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
       final oneTimeKey = {'key': value};
 
       // sign one time keys
-      // TODO: CONFIRM WORKS WITHOUT CANONICAL JSON
-      final oneTimeKeyEncoded = json.encode(oneTimeKey);
-      //utf8.decode(oneTimeKeyEncoded);
-      final oneTimeKeySerialized = oneTimeKeyEncoded;
+      final oneTimeKeyEncoded = canonicalJson.encode(oneTimeKey);
+      final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
       final oneTimeKeySigned = olmAccount!.sign(oneTimeKeySerialized);
 
       // add one time key in new keys map only
@@ -500,27 +489,33 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       store.dispatch(updateOneTimeKeyCounts(
         Map<String, int>.from(data['one_time_key_counts']),
       ));
+
+      printInfo('[updateOneTimeKeys] successfully updated oneTimeKeys');
     } catch (error) {
       store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
     }
   };
 }
 
-/**
- * Update Key Sharing Sessions
- * 
- * Specifically for sending encrypted keys using olm
- * for later use with encrypted messages using megolm
- * sent directly to devices within the room
- * 
- * https://matrix.org/docs/spec/client_server/latest#id454
- * https://matrix.org/docs/spec/client_server/latest#id461
- */
+/// Update Key Sharing Sessions
+///
+/// Specifically for sending encrypted keys using olm
+/// for later use with encrypted messages using megolm
+/// sent directly to devices within the room
+///
+/// https://matrix.org/docs/spec/client_server/latest#id454
+/// https://matrix.org/docs/spec/client_server/latest#id461
 ThunkAction<AppState> updateKeySessions({
   required Room room,
 }) {
   return (Store<AppState> store) async {
     try {
+      final usersDeviceKeys = await store.dispatch(
+        fetchDeviceKeys(userIds: room.userIds),
+      );
+
+      store.dispatch(setDeviceKeys(usersDeviceKeys));
+
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
         exportMessageSession(roomId: room.id),
@@ -569,12 +564,16 @@ ThunkAction<AppState> updateKeySessions({
 
             // format payload for toDevice events
             final payload = {
-              '${deviceKey.userId}': {
-                '${deviceKey.deviceId}': roomKeyEventEncrypted,
+              deviceKey.userId: {
+                deviceKey.deviceId: roomKeyEventEncrypted,
               },
             };
 
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
+
+            printDebug('[sendSessionKeys] sending $randomNumber');
+            printJson(payload);
+
             final response = await MatrixApi.sendEventToDevice(
               trxId: randomNumber,
               protocol: store.state.authStore.protocol,
@@ -588,9 +587,9 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            debugPrint('[sendSessionKeys] success!');
+            debugPrint('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
-            debugPrint('[sendSessionKeys] $error');
+            printError('[sendSessionKeys] $error');
           }
         },
       );
@@ -600,7 +599,7 @@ ThunkAction<AppState> updateKeySessions({
       await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
       store.dispatch(addAlert(
-          origin: "updateKeySessions",
+          origin: 'updateKeySessions',
           message: error.toString(),
           error: error));
     }
@@ -672,7 +671,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       }
 
       // format oneTimeKey map from keys claimed in response
-      Map<String, OneTimeKey> oneTimekeys = {};
+      final Map<String, OneTimeKey> oneTimekeys = {};
       final oneTimeKeysClaimed = claimKeysResponse['one_time_keys'];
 
       // Must be without types for forEach
@@ -726,16 +725,16 @@ ThunkAction<AppState> claimOneTimeKeys({
   };
 }
 
-/**
- * 
- * Outbound Key Session Funcationality (synchronous)
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-an-olm-session
- * https://matrix.org/docs/spec/client_server/latest#m-room-key
- * https://matrix.org/docs/spec/client_server/latest#m-olm-v1-curve25519-aes-sha2
- * https://matrix.org/docs/spec/client_server/r0.4.0#m-olm-v1-curve25519-aes-sha2
- * 
- */
+///
+///
+/// Outbound Key Session Funcationality (synchronous)
+///
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-an-olm-session
+/// https://matrix.org/docs/spec/client_server/latest#m-room-key
+/// https://matrix.org/docs/spec/client_server/latest#m-olm-v1-curve25519-aes-sha2
+/// https://matrix.org/docs/spec/client_server/r0.4.0#m-olm-v1-curve25519-aes-sha2
+///
+///
 ThunkAction<AppState> createKeySessionOutbound({
   String? oneTimeKey,
   String? identityKey,
@@ -790,7 +789,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
 }) {
   return (Store<AppState> store) async {
     try {
-      var outboundKeySessionSerialized =
+      final outboundKeySessionSerialized =
           store.state.cryptoStore.outboundKeySessions[identityKey!];
 
       // Deserialize outbound key session with device identity key
@@ -824,7 +823,7 @@ ThunkAction<AppState> loadKeySessionInbound({
   return (Store<AppState> store) async {
     try {
       // type 1 - attempt to decrypt with an existing session
-      var inboundKeySessionSerialized =
+      final inboundKeySessionSerialized =
           store.state.cryptoStore.inboundKeySessions[identityKey!];
 
       if (inboundKeySessionSerialized != null) {
@@ -872,11 +871,9 @@ ThunkAction<AppState> loadKeySessionInbound({
   };
 }
 
-/**
- * Inbound Message Session
- *  
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
- */
+/// Inbound Message Session
+///
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
 ThunkAction<AppState> createMessageSessionInbound({
   String? roomId,
   String? identityKey,
@@ -915,12 +912,10 @@ ThunkAction<AppState> loadMessageSessionInbound({
   };
 }
 
-/**
- * 
- * Save Message Session Inbound
- * 
- * Saves the message session and index after encrypting and sending an event
- */
+///
+/// Save Message Session Inbound
+///
+/// Saves the message session and index after encrypting and sending an event
 ThunkAction<AppState> saveMessageSessionInbound({
   String? roomId,
   String? identityKey,
@@ -937,12 +932,10 @@ ThunkAction<AppState> saveMessageSessionInbound({
   };
 }
 
-/**
- * 
- * Outbound Message Session Functionality
- * 
- * https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
- */
+///
+/// Outbound Message Session Functionality
+///
+/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
 ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
@@ -980,11 +973,11 @@ ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
   };
 }
 
-/**
- * TODO:
- * one would likely need more based on identity + device, 
- * assuming you've imported keys but lets keep it simple for alpha
- */
+///
+/// Load Message Session Outbound
+///
+/// TODO: potentially convert to identity + device similar to inbound
+///
 ThunkAction<AppState> loadMessageSessionOutbound({String? roomId}) {
   return (Store<AppState> store) async {
     // Load session for identity
@@ -1008,12 +1001,10 @@ ThunkAction<AppState> saveMessageSessionOutbound({
   String? session,
 }) {
   return (Store<AppState> store) async {
-    store.dispatch(
-      AddOutboundMessageSession(
-        roomId: roomId,
-        session: session,
-      ),
-    );
+    store.dispatch(AddOutboundMessageSession(
+      roomId: roomId,
+      session: session,
+    ));
   };
 }
 
@@ -1031,20 +1022,18 @@ ThunkAction<AppState> exportMessageSession({String? roomId}) {
   };
 }
 
-/**
- * 
- * Fetch Device Keys
- * 
- * fetches the keys uploaded to the matrix homeserver
- * by other users
- */
+///
+/// Fetch Device Keys
+///
+/// fetches the keys uploaded to the matrix homeserver
+/// by other users
 ThunkAction<AppState> fetchDeviceKeys({
-  List<String?>? userIds,
+  List<String?> userIds = const <String>[],
 }) {
   return (Store<AppState> store) async {
     try {
       final Map<String, dynamic> userIdMap = Map.fromIterable(
-        userIds!,
+        userIds,
         key: (userId) => userId,
         value: (userId) => const [],
       );
@@ -1058,7 +1047,7 @@ ThunkAction<AppState> fetchDeviceKeys({
       );
 
       final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
-      Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
+      final Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
@@ -1110,7 +1099,7 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
       final deviceKey =
           store.state.cryptoStore.deviceKeysOwned[user.deviceId!]!;
 
-      var exportData = {
+      final exportData = {
         'account_key': store.state.cryptoStore.olmAccountKey,
         'device_keys': deviceKey.toMatrix(),
       };
@@ -1129,7 +1118,7 @@ ThunkAction<AppState> importDeviceKeysOwned() {
   return (Store<AppState> store) async {
     try {
       final authUser = store.state.authStore.user;
-      FilePickerResult file = await (FilePicker.platform.pickFiles(
+      final FilePickerResult file = await (FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['.json'],
       ) as Future<FilePickerResult>);

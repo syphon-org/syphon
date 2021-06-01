@@ -1,6 +1,3 @@
-// Dart imports:
-import 'dart:async';
-
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +76,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
   }
 
   @protected
-  void onInviteUser(_Props props, Room room) async {
+  Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
     final RoomSearchArguments arguments =
@@ -87,7 +84,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
     final user = arguments.user!;
     final username = formatUsername(user);
 
-    return await showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
         user: user,
@@ -149,21 +146,22 @@ class RoomSearchState extends State<RoomSearchScreen> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final roomSettings = props.chatSettings[room.id] ?? null;
+        final chatSettings = props.chatSettings[room.id];
 
         bool messagesNew = false;
         var previewStyle;
         var preview = room.topic;
         var backgroundColor = Colors.grey[500];
 
-        if (preview == null || preview.length == 0) {
+        if (preview == null || preview.isEmpty) {
           preview = 'No Description';
           previewStyle = TextStyle(fontStyle: FontStyle.italic);
         }
+
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
-        if (roomSettings != null) {
-          backgroundColor = Color(roomSettings.primaryColor!);
+        if (chatSettings != null) {
+          backgroundColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
           backgroundColor = roomColorDefaults[room.id];
         } else {
@@ -176,7 +174,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
 
         // GestureDetector w/ animation
         return InkWell(
-          onTap: () => this.onInviteUser(props, room),
+          onTap: () => onInviteUser(props, room),
           child: Container(
             padding: EdgeInsets.symmetric(
               vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
@@ -314,15 +312,13 @@ class RoomSearchState extends State<RoomSearchScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        child: Text(
-                          preview,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.caption!.merge(
-                                previewStyle,
-                              ),
-                        ),
+                      Text(
+                        preview,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.caption!.merge(
+                              previewStyle,
+                            ),
                       ),
                     ],
                   ),
@@ -379,7 +375,7 @@ class _Props extends Equatable {
   final Function onSearch;
   final Function onSendInvite;
 
-  _Props({
+  const _Props({
     required this.theme,
     required this.loading,
     required this.searchResults,
@@ -400,7 +396,7 @@ class _Props extends Equatable {
         theme: store.state.settingsStore.theme,
         loading: store.state.searchStore.loading,
         searchResults: store.state.searchStore.searchResults,
-        chatSettings: store.state.settingsStore.customChatSettings ?? Map(),
+        chatSettings: store.state.settingsStore.chatSettings,
         onSearch: (text) {
           store.dispatch(searchRooms(searchText: text));
         },

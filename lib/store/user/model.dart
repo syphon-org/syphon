@@ -42,7 +42,7 @@ class User extends Equatable {
         homeserver: homeserver ?? this.homeserver,
         accessToken: accessToken ?? this.accessToken,
         displayName: displayName ?? this.displayName,
-        homeserverName: homeserverName ?? this.homeserverName,
+        homeserverName: homeserverName ?? homeserverName,
         avatarUri: avatarUri ?? this.avatarUri,
       );
 

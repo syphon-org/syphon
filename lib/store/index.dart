@@ -54,7 +54,7 @@ class AppState extends Equatable {
   final SyncStore syncStore;
   final CryptoStore cryptoStore;
 
-  AppState({
+  const AppState({
     this.loading = true,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
@@ -98,10 +98,8 @@ AppState appReducer(AppState state, action) => AppState(
       cryptoStore: cryptoReducer(state.cryptoStore, action),
     );
 
-/**
- * Initialize Store
- * - Hot redux state cache for top level data 
- */
+/// Initialize Store
+/// - Hot redux state cache for top level data 
 Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
   var data;
 

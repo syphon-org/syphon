@@ -1,6 +1,4 @@
 // Project imports:
-import 'package:syphon/store/events/messages/model.dart';
-
 import './actions.dart';
 import './room/model.dart';
 import './state.dart';

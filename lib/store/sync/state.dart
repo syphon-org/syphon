@@ -18,9 +18,6 @@ class SyncStore extends Equatable {
   final String? lastSince; // Since we last checked for new info
 
   @JsonKey(ignore: true)
-  final int interval;
-
-  @JsonKey(ignore: true)
   final int backoff;
 
   @JsonKey(ignore: true)
@@ -41,7 +38,6 @@ class SyncStore extends Equatable {
     this.lastUpdate = 0,
     this.lastAttempt = 0,
     this.backoff = 0,
-    this.interval = 2, // default_interval
     this.lastSince,
     this.syncObserver,
   });

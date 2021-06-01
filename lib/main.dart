@@ -13,6 +13,7 @@ import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 
@@ -24,10 +25,12 @@ import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/views/home/home-screen.dart';
-import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
+// ignore: avoid_void_async
 void main() async {
   WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
@@ -115,14 +118,18 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   @override
+  // ignore: avoid_void_async
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
         final currentTheme = store.state.settingsStore.theme;
         initSystemTheme(currentTheme, statusTransparent: false);
+        dismissAllNotifications(
+          pluginInstance: globalNotificationPluginInstance,
+        );
+        saveNotificationsUnchecked(const {});
         break;
       case AppLifecycleState.inactive:
-        break;
         break;
       case AppLifecycleState.paused:
         store.dispatch(setBackgrounded(true));
@@ -214,16 +221,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.deactivate();
   }
 
-  Future onSelectNotification(String payload) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Testing Notifications'),
-        content: Text('Payload : $payload'),
-      ),
-    );
-  }
-
   // Store should not need to be passed to a widget to affect
   // lifecycle widget functions
   @override
@@ -235,7 +232,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           startLocale:
               Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
-          supportedLocales: [Locale('en'), Locale('ru')],
+          supportedLocales: const [Locale('en'), Locale('ru')],
           child: StoreConnector<AppState, SettingsStore>(
             distinct: true,
             converter: (store) => store.state.settingsStore,

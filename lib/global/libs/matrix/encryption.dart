@@ -4,6 +4,7 @@ import 'dart:convert';
 
 // Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
@@ -22,13 +23,11 @@ class Keys {
 }
 
 abstract class Encryption {
-  /**
-   * Fetch Encryption Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id460
-   * 
-   * Returns the current devices and identity keys for the given users.
-   */
+  /// Fetch Encryption Keys
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id460
+  ///
+  /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -37,7 +36,7 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/query';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -59,13 +58,11 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * Fetch Room Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#id460
-   * 
-   * Returns the current devices and identity keys for the given users.
-   */
+  /// Fetch Room Keys
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id460
+  ///
+  /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -74,10 +71,10 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    String url =
+    final String url =
         '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -89,19 +86,17 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * 
-   * Fetch Key Changes
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
-   * 
-   * Gets a list of users who have updated their device identity keys since a previous sync token.
-   * 
-   * The server should include in the results any users who:
-   *   - currently share a room with the calling user (ie, both users have membership state join); and
-   *   - added new device identity keys or removed an existing device with identity keys, between from and to.
-   * 
-   */
+  ///
+  /// Fetch Key Changes
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-keys-changes
+  ///
+  /// Gets a list of users who have updated their device identity keys since a previous sync token.
+  ///
+  /// The server should include in the results any users who:
+  ///   - currently share a room with the calling user (ie, both users have membership state join); and
+  ///   - added new device identity keys or removed an existing device with identity keys, between from and to.
+  ///
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
     String homeserver = 'matrix.org',
@@ -109,9 +104,9 @@ abstract class Encryption {
     String? from,
     String? to,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/changes';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -123,28 +118,26 @@ abstract class Encryption {
     return await json.decode(response.body);
   }
 
-  /**
-   * Claim Keys
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
-   * 
-   * Claims one-time keys for use in pre-key messages.
-   * 
-   */
+  /// Claim Keys
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-keys-claim
+  ///
+  /// Claims one-time keys for use in pre-key messages.
+  ///
   static Future<Map<String, dynamic>> claimKeys({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
     Map? oneTimeKeys,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/claim';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
+    final Map body = {
       'timeout': 10000,
       'one_time_keys': oneTimeKeys,
     };
@@ -164,9 +157,9 @@ abstract class Encryption {
     String? accessToken,
     Map? data,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
+    final String url = '$protocol$homeserver/_matrix/client/r0/keys/upload';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
@@ -197,33 +190,27 @@ abstract class Encryption {
     String? deviceId,
     String? senderKey,
     String? sessionId,
+    String? requestingUserId,
+    String? requestingDeviceId,
   }) async {
-    Map content = {
-      'content': {
-        'action': 'request',
-        // 'LWKAFEZEIV',
-        'requesting_device_id': deviceId,
-        'request_id': requestId,
-        'body': {
-          // '!UhmfsSdxgBXFBiXnKG:matrix.org',
-          'room_id': roomId,
-          'algorithm': Algorithms.megolmv1,
-          // '5XivQ5GjANSUvZv2m9HYrtVOxKUkL2lDHWiNMmH11hQ',
-          'sender_key': senderKey,
-          // '6EtPICxnz4yq4/93qTVULhtiHE0R99qnABI8oN5o4wY'
-          'session_id': sessionId
-        }
-      },
-      'type': EventTypes.roomKeyRequest,
-      'sender': userId //'@ereio:matrix.org'
-    };
-
     // format payload for toDevice events
     final payload = {
       userId: {
-        deviceId: content,
+        deviceId: {
+          'action': 'request',
+          'requesting_device_id': requestingDeviceId,
+          'request_id': requestId,
+          'body': {
+            'room_id': roomId,
+            'algorithm': Algorithms.megolmv1,
+            'sender_key': senderKey,
+            'session_id': sessionId
+          }
+        },
       },
     };
+
+    printJson(payload);
 
     return MatrixApi.sendEventToDevice(
       protocol: protocol,

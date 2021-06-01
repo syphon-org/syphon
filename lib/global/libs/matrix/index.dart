@@ -34,6 +34,7 @@ abstract class MatrixApi {
   static const syncRoom = Rooms.syncRoom;
   static const syncBackground = Rooms.syncBackground;
   static const fetchRoomIds = Rooms.fetchRoomIds;
+  static const fetchRoomName = Rooms.fetchRoomName;
   static const fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
   static const createRoom = Rooms.createRoom;
   static const joinRoom = Rooms.joinRoom;

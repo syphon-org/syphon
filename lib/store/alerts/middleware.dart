@@ -32,7 +32,7 @@ dynamic alertMiddleware<State>(
         if (await canLaunch(termsUrlFormatted)) {
           return await launch(termsUrlFormatted, forceSafariVC: false);
         } else {
-          throw 'Could not launch ${termsUrl}';
+          throw 'Could not launch $termsUrl';
         }
       }
 

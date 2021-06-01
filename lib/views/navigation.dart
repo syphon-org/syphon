@@ -26,14 +26,14 @@ import 'package:syphon/views/home/settings/password/password-update-screen.dart'
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-storage-screen.dart';
 import 'package:syphon/views/home/settings/settings-theming-screen.dart';
-import 'package:syphon/views/login/forgot/password-forgot-screen.dart';
-import 'package:syphon/views/login/forgot/password-reset-screen.dart';
-import 'package:syphon/views/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/IntroScreen.dart';
-import 'package:syphon/views/login/login-screen.dart';
-import 'package:syphon/views/signup/signup-screen.dart';
-import 'package:syphon/views/signup/loading-screen.dart';
-import 'package:syphon/views/signup/verification-screen.dart';
+import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
+import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
+import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
+import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/intro/login/login-screen.dart';
+import 'package:syphon/views/intro/signup/signup-screen.dart';
+import 'package:syphon/views/intro/signup/loading-screen.dart';
+import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =

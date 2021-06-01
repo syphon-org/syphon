@@ -21,7 +21,7 @@ void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
   var themeNavbarIconBrightness;
 
   switch (themeType) {
-    case (ThemeType.LIGHT):
+    case ThemeType.LIGHT:
       // TODO: transparent setting
       // themeNavbarColour = Colors.transparent.value;
       // themeNavbarIconBrightness = Brightness.light;
@@ -29,7 +29,7 @@ void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
       themeNavbarColour = Colours.whiteDefault;
       themeNavbarIconBrightness = Brightness.dark;
       break;
-    case (ThemeType.NIGHT):
+    case ThemeType.NIGHT:
       themeNavbarColour = Colours.blackFull;
       themeNavbarIconBrightness = Brightness.light;
       break;
@@ -78,8 +78,8 @@ class Themes {
     int? appBarColor = appBarColorHex;
     int? scaffoldBackgroundColor = Colours.whiteDefault;
 
-    var appBarElevation;
     var modalColor;
+    var appBarElevation;
     var brightness = Brightness.light;
     var iconColor = Colors.grey[500];
 

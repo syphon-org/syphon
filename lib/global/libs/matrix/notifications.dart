@@ -7,13 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
 
 abstract class Notifications {
-  /**
-   * Fetch Notification Pushers
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-   * 
-   * Gets all currently active pushers for the authenticated user.
-   */
+  /// Fetch Notification Pushers
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
+  /// 
+  /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotifications({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -29,7 +27,7 @@ abstract class Notifications {
     url += from != null ? '&from=$from' : '';
     url += only != null ? '&only=$only' : '';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -41,21 +39,19 @@ abstract class Notifications {
     return await json.decode(response.body);
   }
 
-  /**
-   * Fetch Notification Pushers
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-   * 
-   * Gets all currently active pushers for the authenticated user.
-   */
+  /// Fetch Notification Pushers
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
+  /// 
+  /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotificationPushers({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
     String? accessToken,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/pushers';
+    final String url = '$protocol$homeserver/_matrix/client/r0/pushers';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
@@ -84,15 +80,13 @@ abstract class Notifications {
         "append": false
       }
     */
-  /**
-   * Save Notification Pusher
-   * 
-   * https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-   * 
-   * This endpoint allows the creation, modification and deletion of pushers for 
-   * this user ID. The behaviour of this endpoint varies depending on the values 
-   * in the JSON body.
-   */
+  /// Save Notification Pusher
+  /// 
+  /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
+  /// 
+  /// This endpoint allows the creation, modification and deletion of pushers for 
+  /// this user ID. The behaviour of this endpoint varies depending on the values 
+  /// in the JSON body.
   static Future<dynamic> saveNotificationPusher({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -107,26 +101,26 @@ abstract class Notifications {
     String? dataUrl, // required
     String? append,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/pushers/set';
-    String pushGateway = '$protocol$homeserver/_matrix/push/v1/notify';
+    final String url = '$protocol$homeserver/_matrix/client/r0/pushers/set';
+    final String pushGateway = '$protocol$homeserver/_matrix/push/v1/notify';
 
-    Map<String, String> headers = {
+    final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    Map body = {
-      "lang": 'en',
-      "kind": kind,
-      "app_display_name": appDisplayName,
-      "device_display_name": deviceDisplayName,
-      "app_id": appId,
-      "pushkey": pushKey,
-      "data": {
-        "url": pushGateway,
-        "format": "event_id_only",
+    final Map body = {
+      'lang': 'en',
+      'kind': kind,
+      'app_display_name': appDisplayName,
+      'device_display_name': deviceDisplayName,
+      'app_id': appId,
+      'pushkey': pushKey,
+      'data': {
+        'url': pushGateway,
+        'format': 'event_id_only',
       },
-      "append": false
+      'append': false
     };
 
     if (profileTag != null) {

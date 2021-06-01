@@ -1,148 +1,131 @@
-// Flutter imports:
-import 'package:flutter/material.dart';
-
-// Package imports:
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/options/types.dart';
 
-/**
- * Fetch Remote Push Notification Service Rules
- */
-ThunkAction<AppState> fetchNotifications() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
+class MuteChatNotifications {
+  final String roomId;
+  final Duration duration;
 
-      final data = await MatrixApi.fetchNotifications(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      debugPrint('[fetchNotificationPushers] $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
+  MuteChatNotifications({
+    required this.roomId,
+    required this.duration,
+  });
 }
 
-/**
- * Fetch Remote Push Notification Services
- */
-ThunkAction<AppState> fetchNotificationPushers() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final data = await MatrixApi.fetchNotificationPushers(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      debugPrint('[fetchNotificationPushers] $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
+// Eventually exist as its own store
+class SetNotificationSettings {
+  final NotificationSettings settings;
+  SetNotificationSettings({required this.settings});
 }
 
-/**
- * Fetch Remote Push Notification Service Rules
- */
-ThunkAction<AppState> fetchNotificationPusherRules() {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final data = {'errcode': 'Not Implemented'};
-
-      if (data['errcode'] != null) {
-        throw data['error']!;
-      }
-    } catch (error) {
-      printError('[fetchNotificationPusherRules] $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/**
- * Set Pusher Device Token
- * 
- * NOTE: used to set iOS APNS token
- * 
- * Either the Apple Push Notification Service token for
- * this device or an email address for "email" notifications
- */
-ThunkAction<AppState> setPusherDeviceToken(String token) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-      store.dispatch(SetPusherToken(token: token));
-    } catch (error) {
-      debugPrint('[setPusherDeviceToken] $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/**
- * Fetch Remote Push Notification Service
- */
-ThunkAction<AppState> saveNotificationPusher({
-  String kind = 'http', // can be 'email' with token as email
-  bool erase = false,
+///
+/// Mute Chat Notifications
+///
+/// Disable notifications for a certain period of time
+/// for a specific chat
+///
+ThunkAction<AppState> muteChatNotifications({
+  required String roomId,
+  required int timestamp, // time until mute is irrelevant
 }) {
   return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
+    final settings = store.state.settingsStore.notificationSettings;
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
 
-      final deviceId = store.state.authStore.user.deviceId;
-      final devices = store.state.settingsStore.devices;
-      final pusherKey = store.state.settingsStore.pusherToken;
+    options.putIfAbsent(roomId, () => NotificationOptions());
 
-      final currentDevice = devices.firstWhere(
-        (device) => device.deviceId == deviceId,
-      );
+    options[roomId] = options[roomId]!.copyWith(
+      muteTimestamp: timestamp,
+      muted: true,
+    );
 
-      final data = await MatrixApi.saveNotificationPusher(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        kind: erase ? null : kind,
-        pushKey: pusherKey,
-        appDisplayName: Values.appNameLong,
-        appId: Values.appId,
-        lang: Values.defaultLanguage,
-        deviceDisplayName: currentDevice.displayName,
-      );
+    // notificationsSettings.chatOptions.update(roomId, (value) => );
+    store.dispatch(SetNotificationSettings(
+      settings: settings.copyWith(notificationOptions: options),
+    ));
+  };
+}
 
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      debugPrint('[saveNotificationPusher] $error');
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
+///
+/// Toggle Chat Notifications
+///
+/// Depending on the state of the allow list / block list
+/// handling of notifications, this will either begin or end
+/// notifications for a chat
+///
+ThunkAction<AppState> toggleChatNotifications({
+  required String roomId,
+  bool? enabled,
+}) {
+  return (Store<AppState> store) async {
+    final settings = store.state.settingsStore.notificationSettings;
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
+
+    options.putIfAbsent(roomId, () => NotificationOptions());
+
+    options[roomId] = options[roomId]!.copyWith(
+      enabled: enabled ?? !options[roomId]!.enabled,
+      muted: false,
+    );
+
+    store.dispatch(SetNotificationSettings(
+      settings: settings.copyWith(notificationOptions: options),
+    ));
+  };
+}
+
+///
+/// Update Toggle Type
+///
+/// Change the state of the allow list / block list
+/// handling of notifications
+///
+ThunkAction<AppState> incrementToggleType() {
+  return (Store<AppState> store) async {
+    final settings = store.state.settingsStore.notificationSettings;
+
+    final index = ToggleType.values.indexOf(settings.toggleType);
+    final toggleType =
+        ToggleType.values[(index + 1) % ToggleType.values.length];
+
+    store.dispatch(SetNotificationSettings(
+      settings: settings.copyWith(toggleType: toggleType),
+    ));
+
+    // Reset notification background thread
+    await store.dispatch(stopNotifications());
+    store.dispatch(startNotifications());
+  };
+}
+
+///
+/// Update Style Type
+///
+/// Change the style of notifications
+/// ITEMIZED - One notification per message
+/// INBOX - Grouped Together within one notification
+/// GROUPED - Layered as the come in under one notification slot
+///
+ThunkAction<AppState> incrementStyleType() {
+  return (Store<AppState> store) async {
+    final settings = store.state.settingsStore.notificationSettings;
+
+    final index = StyleType.values.indexOf(settings.styleType);
+    final styleType = StyleType.values[(index + 1) % StyleType.values.length];
+
+    store.dispatch(SetNotificationSettings(
+      settings: settings.copyWith(styleType: styleType),
+    ));
+
+    // Reset notification background thread
+    await store.dispatch(stopNotifications());
+    store.dispatch(startNotifications());
   };
 }

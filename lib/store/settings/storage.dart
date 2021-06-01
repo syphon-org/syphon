@@ -5,12 +5,10 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/settings/state.dart';
 
-/**
- * Save Settings (Cold Storage)
- * 
- * Save the Settings store to cold storage
- * Idealy, run this after performance a pure action
- */
+/// Save Settings (Cold Storage)
+/// 
+/// Save the Settings store to cold storage
+/// Idealy, run this after performance a pure action
 Future<void> saveSettings(
   SettingsStore settingsStore, {
   required Database storage,
@@ -23,12 +21,10 @@ Future<void> saveSettings(
   });
 }
 
-/**
- * Load Settings (Cold Storage)
- * 
- * In storage, the Settings store is saved in it's entirety 
- * in a separate thread/isolate 
- */
+/// Load Settings (Cold Storage)
+/// 
+/// In storage, the Settings store is saved in it's entirety 
+/// in a separate thread/isolate 
 Future<SettingsStore?> loadSettings({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.SETTINGS);
