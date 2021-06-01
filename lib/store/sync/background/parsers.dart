@@ -5,14 +5,14 @@ import 'package:syphon/store/user/selectors.dart';
 
 const String INVALID = '';
 
-Future<String> parseMessageNotification({
+String parseMessageNotification({
   required Room room,
   required Message message,
   required String currentUserId,
   required Map<String, String> roomNames,
   required String protocol,
   required String homeserver,
-}) async {
+}) {
   final String? messageSender = message.sender;
   final String formattedSender = trimAlias(messageSender);
 
@@ -21,11 +21,11 @@ Future<String> parseMessageNotification({
   }
 
   if (room.direct) {
-    return '$formattedSender sent a new message.';
+    return '$formattedSender sent a new message';
   }
 
   if (room.invite) {
-    return '$formattedSender invited you to chat.';
+    return '$formattedSender invited you to chat';
   }
 
   String roomName = INVALID;
@@ -35,20 +35,20 @@ Future<String> parseMessageNotification({
   }
 
   if (roomName.isEmpty) {
-    return '$formattedSender sent a new message.';
+    return '$formattedSender sent a new message';
   }
 
   return '$formattedSender sent a new message in $roomName';
 }
 
-Future<String> parseMessageTitle({
+String parseMessageTitle({
   required Room room,
   required Message message,
   required String currentUserId,
   required Map<String, String> roomNames,
   required String protocol,
   required String homeserver,
-}) async {
+}) {
   final String? messageSender = message.sender;
   final String formattedSender = trimAlias(messageSender);
 

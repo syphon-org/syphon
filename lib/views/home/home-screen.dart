@@ -1,4 +1,6 @@
 // Flutter imports:
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -287,11 +289,11 @@ class HomeState extends State<HomeScreen> {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
         final messageLatest = latestMessage(messages);
-        final roomSettings = props.chatSettings[room.id];
+        final chatSettings = props.chatSettings[room.id];
         final preview = formatPreview(room: room, message: messageLatest);
         final newMessage = messageLatest != null &&
             room.lastRead < messageLatest.timestamp! &&
-            messageLatest.userId != props.currentUser.userId;
+            messageLatest.sender != props.currentUser.userId;
 
         var backgroundColor;
         var textStyle = TextStyle();
@@ -299,8 +301,8 @@ class HomeState extends State<HomeScreen> {
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
-        if (roomSettings != null) {
-          primaryColor = Color(roomSettings.primaryColor!);
+        if (chatSettings != null) {
+          primaryColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
           primaryColor = roomColorDefaults[room.id];
         } else {

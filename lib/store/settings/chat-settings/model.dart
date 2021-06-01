@@ -4,23 +4,25 @@ import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/settings/notification-settings/options/types.dart';
 
 part 'model.g.dart';
 
 @JsonSerializable()
 class ChatSetting extends Equatable {
-  final String? roomId;
-  final int? primaryColor;
-  final bool? smsEnabled;
-  final bool? notificationsEnabled;
-  final String? language;
+  final String roomId;
+  final int primaryColor;
+  final bool smsEnabled;
+  final String language;
+
+  final NotificationOptions? notificationOptions;
 
   const ChatSetting({
-    this.roomId,
+    required this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
     this.primaryColor = Colours.greyDefault,
-    this.notificationsEnabled = false,
+    this.notificationOptions,
   });
 
   @override
@@ -28,8 +30,8 @@ class ChatSetting extends Equatable {
         roomId,
         primaryColor,
         smsEnabled,
-        notificationsEnabled,
         language,
+        notificationOptions,
       ];
 
   ChatSetting copyWith({
@@ -37,14 +39,14 @@ class ChatSetting extends Equatable {
     String? language,
     bool? smsEnabled,
     int? primaryColor,
-    bool? notificationsEnabled,
+    NotificationOptions? notificationOptions,
   }) =>
       ChatSetting(
         roomId: roomId ?? this.roomId,
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         primaryColor: primaryColor ?? this.primaryColor,
-        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+        notificationOptions: notificationOptions ?? this.notificationOptions,
       );
   Map<String, dynamic> toJson() => _$ChatSettingToJson(this);
 

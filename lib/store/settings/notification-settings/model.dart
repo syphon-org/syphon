@@ -8,22 +8,22 @@ import 'package:syphon/store/settings/notification-settings/remote/rules/model.d
 part 'model.g.dart';
 
 enum ToggleType {
-  All,
-  None,
+  Enabled,
+  Disabled,
 }
 
 enum StyleType {
   Itemized,
-  Grouped,
+  Latest,
   Inbox,
 }
 
 @JsonSerializable()
 class NotificationSettings extends Equatable {
-  final bool enabled;
+  final bool enabled; // notifications enabled
   final StyleType styleType;
   final ToggleType toggleType;
-  final Map<String, NotificationOptions> notificationOptions; // RoomId
+  final Map<String, NotificationOptions> notificationOptions; // Map<RoomId,
 
   // Remote Only
   final List<Rule> rules;
@@ -33,7 +33,7 @@ class NotificationSettings extends Equatable {
     this.enabled = false,
     this.rules = const <Rule>[],
     this.pushers = const <Pusher>[],
-    this.toggleType = ToggleType.All,
+    this.toggleType = ToggleType.Enabled,
     this.styleType = StyleType.Itemized,
     this.notificationOptions = const {},
   });
@@ -52,7 +52,7 @@ class NotificationSettings extends Equatable {
     enabled,
     toggleType,
     styleType,
-    chatOptions,
+    notificationOptions,
     pushers,
     rules,
   }) =>
@@ -60,7 +60,7 @@ class NotificationSettings extends Equatable {
         enabled: enabled ?? this.enabled,
         toggleType: toggleType ?? this.toggleType,
         styleType: styleType ?? this.styleType,
-        notificationOptions: chatOptions ?? this.notificationOptions,
+        notificationOptions: notificationOptions ?? this.notificationOptions,
         rules: rules ?? this.rules,
         pushers: pushers ?? this.pushers,
       );

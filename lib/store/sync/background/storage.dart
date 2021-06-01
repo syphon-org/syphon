@@ -116,12 +116,59 @@ Future<NotificationSettings> loadNotificationSettings(
   try {
     final secureStorage = FlutterSecureStorage();
 
-    return jsonDecode(
-        await secureStorage.read(key: BackgroundSync.notificationSettings) ??
-            '{}');
+    final settingsEncoded = await secureStorage.read(
+      key: BackgroundSync.notificationSettings,
+    );
+
+    final settingsJson = await jsonDecode(settingsEncoded!);
+
+    return NotificationSettings.fromJson(settingsJson);
   } catch (error) {
     print('[loadNotificationSettings] ${error.toString()}');
   }
 
   return fallback;
+}
+
+///
+/// Save Notification Data Unchecked (BackgroundSync)
+///
+/// Used to save unchecked notification data when
+/// the notification style is Inbox. Aggregates all unchecked
+/// notifications into one.
+///
+Future saveNotificationsUnchecked(Map<String, String> uncheckedMessages) async {
+  try {
+    final secureStorage = FlutterSecureStorage();
+    await secureStorage.write(
+      key: BackgroundSync.notificationsUnchecked,
+      value: jsonEncode(uncheckedMessages),
+    );
+  } catch (error) {
+    print('[saveNotificationsUnchecked] ${error.toString()}');
+  }
+}
+
+///
+/// Load Notification Data Unchecked (BackgroundSync)
+///
+/// Used to load settings while the background
+/// sync thread is currently running
+///
+Future<Map<String, String>> loadNotificationsUnchecked() async {
+  try {
+    final secureStorage = FlutterSecureStorage();
+
+    final uncheckedData = await secureStorage.read(
+          key: BackgroundSync.notificationsUnchecked,
+        ) ??
+        '{}';
+    final uncheckedJson = jsonDecode(uncheckedData);
+
+    return Map<String, String>.from(uncheckedJson ?? {});
+  } catch (error) {
+    print('[loadNotificationsUnchecked] ${error.toString()}');
+  }
+
+  return <String, String>{};
 }

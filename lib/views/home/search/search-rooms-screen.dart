@@ -146,21 +146,22 @@ class RoomSearchState extends State<RoomSearchScreen> {
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final roomSettings = props.chatSettings[room.id] ?? null;
+        final chatSettings = props.chatSettings[room.id];
 
         bool messagesNew = false;
         var previewStyle;
         var preview = room.topic;
         var backgroundColor = Colors.grey[500];
 
-        if (preview == null || preview.length == 0) {
+        if (preview == null || preview.isEmpty) {
           preview = 'No Description';
           previewStyle = TextStyle(fontStyle: FontStyle.italic);
         }
+
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
-        if (roomSettings != null) {
-          backgroundColor = Color(roomSettings.primaryColor!);
+        if (chatSettings != null) {
+          backgroundColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
           backgroundColor = roomColorDefaults[room.id];
         } else {
@@ -173,7 +174,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
 
         // GestureDetector w/ animation
         return InkWell(
-          onTap: () => this.onInviteUser(props, room),
+          onTap: () => onInviteUser(props, room),
           child: Container(
             padding: EdgeInsets.symmetric(
               vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
@@ -311,15 +312,13 @@ class RoomSearchState extends State<RoomSearchScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        child: Text(
-                          preview,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.caption!.merge(
-                                previewStyle,
-                              ),
-                        ),
+                      Text(
+                        preview,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.caption!.merge(
+                              previewStyle,
+                            ),
                       ),
                     ],
                   ),

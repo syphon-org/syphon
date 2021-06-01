@@ -47,11 +47,13 @@ class NotificationSettingsScreen extends StatelessWidget {
           switch (props.styleType) {
             case StyleType.Inbox:
               styleTypeDescription =
-                  'Notification content is grouped together within one notification';
+                  'Notification content is formatted together within one notification';
               break;
-            case StyleType.Grouped:
+            case StyleType.Latest:
               styleTypeDescription =
-                  'Notifications will stack overtop of each other until dismissed';
+                  'Notifications will only show one for the most recent notification';
+              // styleTypeDescription =
+              //     'Notifications will stack overtop of each other until all are dismissed';
               break;
             case StyleType.Itemized:
             default:
@@ -76,100 +78,62 @@ class NotificationSettingsScreen extends StatelessWidget {
             ),
             body: Column(
               children: <Widget>[
-                CardSection(
-                  child: Column(children: [
-                    Container(
-                      width: width,
-                      padding: Dimensions.listPadding,
-                      child: Text(
-                        'On-Device',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
-                      ),
-                    ),
-                    Container(
-                      width: width,
-                      padding: Dimensions.listPadding,
-                      child: RichText(
-                        textAlign: TextAlign.left,
-                        text: TextSpan(
-                          text: 'Show notifications using a background service',
-                          style: Theme.of(context).textTheme.caption,
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: ' without ',
-                              style:
-                                  Theme.of(context).textTheme.caption!.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                            ),
-                            TextSpan(
-                              text: 'Google Play Services',
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      enabled: Platform.isAndroid,
-                      dense: true,
-                      onTap: () => props.onToggleLocalNotifications(),
-                      contentPadding: Dimensions.listPadding,
-                      title: Text(
-                        'Notifications',
-                        style: Theme.of(context).textTheme.bodyText2,
-                      ),
-                      trailing: Container(
-                        child: Switch(
-                          value: props.localNotificationsEnabled,
-                          onChanged: !Platform.isAndroid
-                              ? null
-                              : (value) => onToggleNotifications(props),
-                        ),
-                      ),
-                    ),
-                  ]),
-                ),
-                CardSection(
-                  child: Column(
-                    children: [
+                Visibility(
+                  visible: Platform.isAndroid ||
+                      Platform.isMacOS ||
+                      Platform.isLinux,
+                  child: CardSection(
+                    child: Column(children: [
                       Container(
                         width: width,
                         padding: Dimensions.listPadding,
                         child: Text(
-                          'Options',
+                          'On-Device',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.subtitle2,
                         ),
                       ),
-                      ListTile(
-                        onTap: !props.localNotificationsEnabled
-                            ? null
-                            : () => props.onIncrementStyleType,
-                        contentPadding: Dimensions.listPadding,
-                        title: Text('Notification Type'),
-                        subtitle: Text(
-                          styleTypeDescription,
-                          style: Theme.of(context).textTheme.caption,
+                      Container(
+                        width: width,
+                        padding: Dimensions.listPadding,
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          text: TextSpan(
+                            text:
+                                'Show notifications using a background service',
+                            style: Theme.of(context).textTheme.caption,
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: ' without ',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                              TextSpan(
+                                text: 'Google Play Services',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ],
+                          ),
                         ),
-                        trailing: Text(enumToString(props.styleType)),
                       ),
                       ListTile(
-                        onTap: !props.localNotificationsEnabled
-                            ? null
-                            : () => props.onIncrementToggleType,
+                        dense: true,
+                        onTap: () => props.onToggleLocalNotifications(),
                         contentPadding: Dimensions.listPadding,
-                        title: Text('Options Default'),
-                        subtitle: Text(
-                          props.toggleType == ToggleType.All
-                              ? 'All chats will have notifications enabled by default'
-                              : 'No chats will have notifications unless explicity enabled',
-                          style: Theme.of(context).textTheme.caption,
+                        title: Text(
+                          'Notifications',
+                          style: Theme.of(context).textTheme.bodyText2,
                         ),
-                        trailing: Text(enumToString(props.toggleType)),
+                        trailing: Switch(
+                          value: props.localNotificationsEnabled,
+                          onChanged: (value) => onToggleNotifications(props),
+                        ),
                       ),
-                    ],
+                    ]),
                   ),
                 ),
                 Visibility(
@@ -230,7 +194,48 @@ class NotificationSettingsScreen extends StatelessWidget {
                       ),
                     ]),
                   ),
-                )
+                ),
+                CardSection(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: width,
+                        padding: Dimensions.listPadding,
+                        child: Text(
+                          'Options',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ),
+                      ListTile(
+                        onTap: !props.localNotificationsEnabled
+                            ? null
+                            : () => props.onIncrementStyleType(),
+                        contentPadding: Dimensions.listPadding,
+                        title: Text('Notification Type'),
+                        subtitle: Text(
+                          styleTypeDescription,
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        trailing: Text(enumToString(props.styleType)),
+                      ),
+                      ListTile(
+                        onTap: !props.localNotificationsEnabled
+                            ? null
+                            : () => props.onIncrementToggleType(),
+                        contentPadding: Dimensions.listPadding,
+                        title: Text('Notification Default'),
+                        subtitle: Text(
+                          props.toggleType == ToggleType.Enabled
+                              ? 'All chats have notifications enabled by default'
+                              : 'All chats have notifications disabled by default',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        trailing: Text(enumToString(props.toggleType)),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
@@ -271,16 +276,19 @@ class _Props extends Equatable {
         localNotificationsEnabled,
         remoteNotificationsEnabled,
         httpPusherEnabled,
+        styleType,
+        toggleType,
       ];
 
   static _Props mapStateToProps(
     Store<AppState> store,
   ) =>
       _Props(
+        // will not always be platform dependent
         localNotificationsEnabled: Platform.isAndroid &&
-            store.state.settingsStore.notificationsEnabled,
-        remoteNotificationsEnabled:
-            Platform.isIOS && store.state.settingsStore.notificationsEnabled,
+            store.state.settingsStore.notificationSettings.enabled,
+        remoteNotificationsEnabled: Platform.isIOS &&
+            store.state.settingsStore.notificationSettings.enabled,
         styleType: store.state.settingsStore.notificationSettings.styleType,
         toggleType: store.state.settingsStore.notificationSettings.toggleType,
         httpPusherEnabled:
@@ -303,7 +311,7 @@ class _Props extends Equatable {
             // If the platform is iOS, we'll want to confirm they understand
             // the native notification prompt
             if (Platform.isIOS &&
-                !store.state.settingsStore.notificationsEnabled) {
+                !store.state.settingsStore.notificationSettings.enabled) {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(

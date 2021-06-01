@@ -1,5 +1,6 @@
 // Project imports:
 import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
@@ -55,7 +56,10 @@ SettingsStore settingsReducer(
 
       // Initialize chat settings if null
       if (chatSettings[action.roomId] == null) {
-        chatSettings[action.roomId] = ChatSetting();
+        chatSettings[action.roomId] = ChatSetting(
+          roomId: action.roomId,
+          language: state.language,
+        );
       }
 
       chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
@@ -110,8 +114,11 @@ SettingsStore settingsReducer(
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationsEnabled: !state.notificationsEnabled,
+        notificationSettings: state.notificationSettings
+            .copyWith(enabled: !state.notificationSettings.enabled),
       );
+    case SetNotificationSettings:
+      return state.copyWith(notificationSettings: action.settings);
     default:
       return state;
   }

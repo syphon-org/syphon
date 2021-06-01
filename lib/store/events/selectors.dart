@@ -150,7 +150,7 @@ Message? latestMessage(List<Message> messages) {
 
   return messages.fold(
     messages[0],
-    (newest, msg) => msg.timestamp! > newest!.timestamp! ? msg : newest,
+    (latest, msg) => msg.timestamp! > latest!.timestamp! ? msg : latest,
   );
 }
 

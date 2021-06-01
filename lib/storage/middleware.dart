@@ -94,6 +94,7 @@ dynamic storageMiddleware<State>(
       saveNotificationSettings(
         settings: store.state.settingsStore.notificationSettings,
       );
+      saveSettings(store.state.settingsStore, storage: Storage.main!);
       break;
 
     default:

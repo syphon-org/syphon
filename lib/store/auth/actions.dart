@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
@@ -40,9 +41,11 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/remote/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -237,7 +240,12 @@ ThunkAction<AppState> startAuthObserver() {
         // init notifications
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String? payload) {
-            debugPrint('[onSelectNotification] payload $payload');
+            dismissAllNotifications(
+              pluginInstance: globalNotificationPluginInstance,
+            );
+
+            saveNotificationsUnchecked({});
+
             return Future.value(true);
           },
           onSaveToken: (token) {
@@ -245,7 +253,7 @@ ThunkAction<AppState> startAuthObserver() {
           },
         );
 
-        if (store.state.settingsStore.notificationsEnabled) {
+        if (store.state.settingsStore.notificationSettings.enabled) {
           store.dispatch(startNotifications());
         }
 

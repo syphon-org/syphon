@@ -3,6 +3,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 // Project imports:
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
 
@@ -19,10 +20,7 @@ class MuteChatNotifications {
 // Eventually exist as its own store
 class SetNotificationSettings {
   final NotificationSettings settings;
-
-  SetNotificationSettings({
-    required this.settings,
-  });
+  SetNotificationSettings({required this.settings});
 }
 
 ///
@@ -49,7 +47,7 @@ ThunkAction<AppState> muteChatNotifications({
 
     // notificationsSettings.chatOptions.update(roomId, (value) => );
     store.dispatch(SetNotificationSettings(
-      settings: settings.copyWith(),
+      settings: settings.copyWith(notificationOptions: options),
     ));
   };
 }
@@ -76,7 +74,8 @@ ThunkAction<AppState> toggleChatNotifications({
     );
 
     store.dispatch(SetNotificationSettings(
-        settings: settings.copyWith(chatOptions: options)));
+      settings: settings.copyWith(notificationOptions: options),
+    ));
   };
 }
 
@@ -97,6 +96,10 @@ ThunkAction<AppState> incrementToggleType() {
     store.dispatch(SetNotificationSettings(
       settings: settings.copyWith(toggleType: toggleType),
     ));
+
+    // Reset notification background thread
+    await store.dispatch(stopNotifications());
+    store.dispatch(startNotifications());
   };
 }
 
@@ -118,5 +121,9 @@ ThunkAction<AppState> incrementStyleType() {
     store.dispatch(SetNotificationSettings(
       settings: settings.copyWith(styleType: styleType),
     ));
+
+    // Reset notification background thread
+    await store.dispatch(stopNotifications());
+    store.dispatch(startNotifications());
   };
 }

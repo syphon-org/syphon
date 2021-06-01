@@ -37,6 +37,7 @@ class BackgroundSync {
   static Isolate? backgroundIsolate;
 
   static const notificationSettings = 'notificationSettings';
+  static const notificationsUnchecked = 'notificationsUnchecked';
 
   static Future<bool> init() async {
     try {
@@ -54,7 +55,7 @@ class BackgroundSync {
     String? lastSince,
     String? currentUser,
     Map<String, String?>? roomNames,
-    NotificationSettings settings = const NotificationSettings(),
+    NotificationSettings? settings,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
@@ -123,7 +124,14 @@ Future notificationSyncIsolate() async {
     final Map<String, String> roomNames = await loadRoomNames();
 
     // Init notifiations for background service and new messages/events
-    final pluginInstance = await initNotifications();
+    final pluginInstance = await initNotifications(
+      onSelectNotification: (String? payload) {
+        debugPrint(
+          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
+        );
+        return Future.value(true);
+      },
+    );
 
     if (pluginInstance == null) {
       throw '[notificationSyncIsolate] failed to initialize plugin instance';
@@ -168,7 +176,9 @@ Future backgroundSyncLoop({
   required NotificationSettings settings,
 }) async {
   try {
-    print('[backgroundSyncLoop] ___ starting background sync ___ ');
+    print(
+      '[backgroundSyncLoop] ___ starting background sync ___ ${settings.styleType.toString()}',
+    );
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
@@ -212,9 +222,8 @@ Future backgroundSyncLoop({
     final rooms = roomsJoined..addAll(roomsInvited);
 
     // Run all the rooms at once
-    await Future.wait(rooms.entries.map((roomJson) async {
-      final roomId = roomJson.key;
-      final roomData = roomJson.value;
+    await Future.forEach(rooms.keys, (String roomId) async {
+      final roomData = rooms[roomId];
 
       print('[backgroundSyncLoop] ___ processing room $roomId ___');
 
@@ -231,11 +240,11 @@ Future backgroundSyncLoop({
       final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
 
-      if (settings.toggleType == ToggleType.None && !hasOptions) {
+      if (settings.toggleType == ToggleType.Disabled && !hasOptions) {
         return;
       }
 
-      if (settings.toggleType == ToggleType.All && hasOptions) {
+      if (settings.toggleType == ToggleType.Enabled && hasOptions) {
         if (!chatOptions[roomId]!.enabled) {
           return;
         }
@@ -271,11 +280,49 @@ Future backgroundSyncLoop({
         }
       }
 
-      // Run all the room messages at once once room name is conirmed
+      final uncheckedMessages = await loadNotificationsUnchecked();
+
+      ///
+      /// Inbox Style Notifications Only
+      ///
+      if (settings.styleType == StyleType.Inbox) {
+        room.messagesNew.forEach((message) {
+          final messageBody = parseMessageNotification(
+            room: room,
+            message: message,
+            roomNames: roomNames,
+            currentUserId: currentUserId,
+            protocol: protocol,
+            homeserver: homeserver,
+          );
+
+          uncheckedMessages.addAll(
+            {message.id ?? '0': messageBody},
+          );
+        });
+
+        await saveNotificationsUnchecked(uncheckedMessages);
+
+        var body = 'You have a new unread message';
+
+        if (uncheckedMessages.keys.length > 1) {
+          body = 'You have ${uncheckedMessages.keys.length} unread messages';
+        }
+
+        return showMessageNotification(
+          body: body,
+          title: 'New Messages',
+          style: settings.styleType,
+          pluginInstance: pluginInstance,
+          uncheckedMessages: uncheckedMessages,
+        );
+      }
+
+      // Run all the room messages at once once room name is confirmed
       await Future.wait(room.messagesNew.map((message) async {
         print('[backgroundSyncLoop] ___ processing message ${message.id} ');
 
-        final body = await parseMessageNotification(
+        final title = parseMessageTitle(
           room: room,
           message: message,
           roomNames: roomNames,
@@ -284,7 +331,7 @@ Future backgroundSyncLoop({
           homeserver: homeserver,
         );
 
-        final title = await parseMessageTitle(
+        final body = parseMessageNotification(
           room: room,
           message: message,
           roomNames: roomNames,
@@ -295,16 +342,24 @@ Future backgroundSyncLoop({
 
         if (body.isEmpty) return Future.value();
 
-        final int messageTrxId = Random.secure().nextInt(1 << 31);
+        print(message.id);
+        printJson(uncheckedMessages);
 
-        showMessageNotification(
+        await showMessageNotification(
+          id: uncheckedMessages.isEmpty ? 0 : null,
           body: body,
           title: title,
-          messageHash: messageTrxId,
+          style: settings.styleType,
           pluginInstance: pluginInstance,
         );
+
+        uncheckedMessages.addAll(
+          {message.id ?? '0': body},
+        );
+
+        await saveNotificationsUnchecked(uncheckedMessages);
       }));
-    }));
+    });
   } catch (error) {
     print('[backgroundSyncLoop] $error');
   }

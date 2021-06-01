@@ -285,7 +285,8 @@ class _Props extends Equatable {
         theme: themeTypeName(store.state),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
-        notificationsEnabled: store.state.settingsStore.notificationsEnabled,
+        notificationsEnabled:
+            store.state.settingsStore.notificationSettings.enabled,
         onDisabled: () => store.dispatch(addInProgress()),
         onLogoutUser: () => store.dispatch(logoutUser()),
       );

@@ -606,7 +606,7 @@ class _Props extends Equatable {
               return Colours.hashedColor(roomId);
             }
 
-            return Color(chatSettings[roomId]!.primaryColor!);
+            return Color(chatSettings[roomId]!.primaryColor);
           }(),
           onUpdateDeviceKeys: () async {
             final room = store.state.roomStore.rooms[roomId]!;

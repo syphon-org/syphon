@@ -7,6 +7,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/details-all-users-screen.dart';
@@ -162,335 +165,360 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
         store,
         arguments?.roomId,
       ),
-      builder: (context, props) => Scaffold(
-        backgroundColor: scaffordBackgroundColor,
-        body: CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              expandedHeight: height * 0.3,
-              brightness: Theme.of(context).appBarTheme.brightness,
-              automaticallyImplyLeading: false,
-              titleSpacing: 0.0,
-              title: Row(
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(left: 8),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context, false),
+      builder: (context, props) {
+        var notificationsEnabled =
+            props.notificationSettings.toggleType == ToggleType.Enabled;
+
+        if (props.notificationOptions != null) {
+          notificationsEnabled = props.notificationOptions?.enabled ?? false;
+        }
+
+        return Scaffold(
+          backgroundColor: scaffordBackgroundColor,
+          body: CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: height * 0.3,
+                brightness: Theme.of(context).appBarTheme.brightness,
+                automaticallyImplyLeading: false,
+                titleSpacing: 0.0,
+                title: Row(
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => Navigator.pop(context, false),
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      arguments!.title!,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(color: Colors.white),
+                    Flexible(
+                      child: Text(
+                        arguments!.title!,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(color: Colors.white),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              flexibleSpace: Hero(
-                tag: 'ChatAvatar',
-                child: Container(
-                  padding: EdgeInsets.only(top: height * 0.075),
-                  color: props.roomPrimaryColor,
-                  width: width,
-                  child: OverflowBox(
-                    minHeight: 64,
-                    maxHeight: height * 0.3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Opacity(
-                          opacity: headerOpacity,
-                          child: Avatar(
-                            size: height * 0.15,
-                            uri: props.room.avatarUri,
-                            alt: props.room.name,
-                            background: Colours.hashedColor(props.room.id),
+                  ],
+                ),
+                flexibleSpace: Hero(
+                  tag: 'ChatAvatar',
+                  child: Container(
+                    padding: EdgeInsets.only(top: height * 0.075),
+                    color: props.roomPrimaryColor,
+                    width: width,
+                    child: OverflowBox(
+                      minHeight: 64,
+                      maxHeight: height * 0.3,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Opacity(
+                            opacity: headerOpacity,
+                            child: Avatar(
+                              size: height * 0.15,
+                              uri: props.room.avatarUri,
+                              alt: props.room.name,
+                              background: Colours.hashedColor(props.room.id),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SliverList(
-                delegate: SliverChildListDelegate([
-              Container(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Column(
-                  children: <Widget>[
-                    CardSection(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      margin: EdgeInsets.only(bottom: 4),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: width,
-                            padding: titlePadding,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        Strings.labelUsersSection,
-                                        textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .subtitle2,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                TouchableOpacity(
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/home/chat/users',
-                                      arguments: ChatUsersDetailArguments(
-                                        roomId: props.room.id,
-                                      ),
-                                    );
-                                  },
-                                  activeOpacity: 0.4,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        Strings.buttonTextSeeAllUsers,
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      Text(
-                                        ' (${props.room.userIds.length})',
-                                        textAlign: TextAlign.start,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            constraints: BoxConstraints(
-                              maxWidth: width,
-                              maxHeight: Dimensions.avatarSizeLarge,
-                            ),
-                            child: ListUserBubbles(
-                              users: props.users,
-                              roomId: props.room.id,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    CardSection(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: width,
-                            padding: titlePadding,
-                            child: Text(
-                              'About',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
-                            ),
-                          ),
-                          Container(
-                            padding: contentPadding,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  props.room.name!,
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.headline6,
-                                ),
-                                Text(
-                                  props.room.id,
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.caption,
-                                ),
-                                Text(
-                                  props.room.type,
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.caption,
-                                ),
-                                Visibility(
-                                  visible: props.room.topic != null &&
-                                      props.room.topic!.isNotEmpty,
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 12),
-                                    child: Text(
-                                      props.room.topic!,
-                                      style: TextStyle(fontSize: 16),
+              SliverList(
+                  delegate: SliverChildListDelegate([
+                Container(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    children: <Widget>[
+                      CardSection(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        margin: EdgeInsets.only(bottom: 4),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width,
+                              padding: titlePadding,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          Strings.labelUsersSection,
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle2,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    CardSection(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: width,
-                            padding: contentPadding,
-                            child: Text(
-                              'Chat Settings',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
-                            ),
-                          ),
-                          ListTile(
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Color',
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.only(right: 8),
-                              child: CircleAvatar(
-                                radius: 16,
-                                backgroundColor: props.roomPrimaryColor,
+                                  TouchableOpacity(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/home/chat/users',
+                                        arguments: ChatUsersDetailArguments(
+                                          roomId: props.room.id,
+                                        ),
+                                      );
+                                    },
+                                    activeOpacity: 0.4,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          Strings.buttonTextSeeAllUsers,
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        Text(
+                                          ' (${props.room.userIds.length})',
+                                          textAlign: TextAlign.start,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                            onTap: () => onShowColorPicker(
-                              context: context,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              originalColor: props.roomPrimaryColor.value,
+                            Container(
+                              constraints: BoxConstraints(
+                                maxWidth: width,
+                                maxHeight: Dimensions.avatarSizeLarge,
+                              ),
+                              child: ListUserBubbles(
+                                users: props.users,
+                                roomId: props.room.id,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: width,
+                              padding: titlePadding,
+                              child: Text(
+                                'About',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
                             ),
-                          ),
-                          ListTile(
-                            enabled: !props.loading,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Toggle Direct Room',
-                              style: Theme.of(context).textTheme.subtitle1,
+                            Container(
+                              padding: contentPadding,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    props.room.name!,
+                                    textAlign: TextAlign.start,
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
+                                  Text(
+                                    props.room.id,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                  Text(
+                                    props.room.type,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                  Visibility(
+                                    visible: props.room.topic != null &&
+                                        props.room.topic!.isNotEmpty,
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 12),
+                                      child: Text(
+                                        props.room.topic!,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            trailing: Switch(
-                              value: props.room.direct,
-                              onChanged: (value) {
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width,
+                              padding: contentPadding,
+                              child: Text(
+                                'Chat Settings',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Color',
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.only(right: 8),
+                                child: CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: props.roomPrimaryColor,
+                                ),
+                              ),
+                              onTap: () => onShowColorPicker(
+                                context: context,
+                                onSelectColor: props.onSelectPrimaryColor,
+                                originalColor: props.roomPrimaryColor.value,
+                              ),
+                            ),
+                            ListTile(
+                              enabled: !props.loading,
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Toggle Direct Room',
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                              trailing: Switch(
+                                value: props.room.direct,
+                                onChanged: (value) {
+                                  props.onToggleDirectRoom();
+                                },
+                              ),
+                              onTap: () {
                                 props.onToggleDirectRoom();
                               },
                             ),
-                            onTap: () {
-                              props.onToggleDirectRoom();
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    CardSection(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: width,
-                            padding: contentPadding,
-                            child: Text(
-                              'Notifications Settings',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
-                            ),
-                          ),
-                          ListTile(
-                            enabled: false,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Mute Notifications',
-                            ),
-                            trailing: Switch(
-                              value: false,
-                              onChanged: null,
-                            ),
-                          ),
-                          ListTile(
-                            enabled: false,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Vibrate',
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                'Default',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .copyWith(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          ListTile(
-                            enabled: false,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'Notification Sound',
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                'Default (Argon)',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .copyWith(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    CardSection(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: width,
-                            padding: contentPadding,
-                            child: Text(
-                              'Privacy and Status',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
-                            ),
-                          ),
-                          ListTile(
-                            enabled: false,
-                            contentPadding: contentPadding,
-                            title: Text(
-                              'View Encryption Key',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    CardSection(
-                      child: Container(
+                      CardSection(
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         child: Column(
                           children: [
-                            Visibility(
-                              visible: props.room.direct,
-                              child: ListTile(
-                                onTap: () => onBlockUser(
-                                  context: context,
-                                  props: props,
+                            Container(
+                              width: width,
+                              padding: contentPadding,
+                              child: Text(
+                                'Notification Settings',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onToggleRoomNotifications(),
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Notifications Enabled',
+                              ),
+                              trailing: Switch(
+                                value: notificationsEnabled,
+                                onChanged: (_) =>
+                                    props.onToggleRoomNotifications(),
+                              ),
+                            ),
+                            ListTile(
+                              enabled: false,
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Vibrate',
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
                                 ),
+                              ),
+                            ),
+                            ListTile(
+                              enabled: false,
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'Notification Sound',
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Default (Argon)',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: width,
+                              padding: contentPadding,
+                              child: Text(
+                                'Privacy and Status',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ),
+                            ListTile(
+                              enabled: false,
+                              contentPadding: contentPadding,
+                              title: Text(
+                                'View Encryption Key',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      CardSection(
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Visibility(
+                                visible: props.room.direct,
+                                child: ListTile(
+                                  onTap: () => onBlockUser(
+                                    context: context,
+                                    props: props,
+                                  ),
+                                  contentPadding: contentPadding,
+                                  title: Text(
+                                    'Block User',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .copyWith(
+                                          color: Colors.redAccent,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                              ListTile(
+                                onTap: () => onLeaveChat(props),
                                 contentPadding: contentPadding,
                                 title: Text(
-                                  'Block User',
+                                  'Leave Chat',
                                   style: Theme.of(context)
                                       .textTheme
                                       .subtitle1!
@@ -499,31 +527,18 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                       ),
                                 ),
                               ),
-                            ),
-                            ListTile(
-                              onTap: () => this.onLeaveChat(props),
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Leave Chat',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1!
-                                    .copyWith(
-                                      color: Colors.redAccent,
-                                    ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ])),
-          ],
-        ),
-      ),
+              ])),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -535,11 +550,14 @@ class _Props extends Equatable {
   final List<User?> users;
   final Color roomPrimaryColor;
   final List<Message> messages;
+  final NotificationOptions? notificationOptions;
+  final NotificationSettings notificationSettings;
 
   final Function onLeaveChat;
   final Function onBlockUser;
   final Function onSelectPrimaryColor;
   final Function onToggleDirectRoom;
+  final Function onToggleRoomNotifications;
   // final Function onViewEncryptionKeys;
 
   _Props({
@@ -553,6 +571,9 @@ class _Props extends Equatable {
     required this.roomPrimaryColor,
     required this.onSelectPrimaryColor,
     required this.onToggleDirectRoom,
+    required this.notificationOptions,
+    required this.notificationSettings,
+    required this.onToggleRoomNotifications,
     // @required this.onViewEncryptionKeys,
   });
 
@@ -567,10 +588,18 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
       _Props(
           loading: store.state.roomStore.loading,
+          notificationSettings: store.state.settingsStore.notificationSettings,
+          notificationOptions: store.state.settingsStore.notificationSettings
+              .notificationOptions[roomId],
           room: selectRoom(id: roomId, state: store.state),
           users: roomUsers(store.state, roomId),
           currentUser: store.state.authStore.user,
           messages: roomMessages(store.state, roomId),
+          onToggleRoomNotifications: () async {
+            if (roomId != null) {
+              await store.dispatch(toggleChatNotifications(roomId: roomId));
+            }
+          },
           onBlockUser: (User user) async {
             await store.dispatch(toggleBlockUser(user: user));
           },
@@ -586,14 +615,13 @@ class _Props extends Equatable {
               return Colours.hashedColor(roomId);
             }
 
-            return chatSettings[roomId]!.primaryColor != null
-                ? Color(chatSettings[roomId]!.primaryColor!)
-                : Colors.grey;
+            return Color(chatSettings[roomId]!.primaryColor);
           }(),
           onSelectPrimaryColor: (color) {
-            store.dispatch(
-              updateRoomPrimaryColor(roomId: roomId, color: color),
-            );
+            store.dispatch(updateRoomPrimaryColor(
+              roomId: roomId,
+              color: color,
+            ));
           },
           onToggleDirectRoom: () {
             final room = selectRoom(id: roomId, state: store.state);

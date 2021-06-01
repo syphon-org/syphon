@@ -127,15 +127,12 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   child: ListTile(
                     dense: true,
                     onTap: () {
-                      showBackgroundServiceNotification(
-                        notificationId: BackgroundSync.service_id,
-                        debugContent:
-                            DateFormat('E h:mm ss a').format(DateTime.now()),
+                      showMessageNotificationTest(
                         pluginInstance: globalNotificationPluginInstance!,
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text('Test Notifcations',
+                    title: Text('Test Notifications',
                         style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
@@ -363,12 +360,7 @@ class _Props extends Equatable {
           }
         },
         onStartBackgroundSync: () async {
-          return BackgroundSync.start(
-            protocol: store.state.authStore.protocol,
-            homeserver: store.state.authStore.user.homeserver,
-            accessToken: store.state.authStore.user.accessToken,
-            lastSince: store.state.syncStore.lastSince,
-          );
+          store.dispatch(startNotifications());
         },
         onManualSync: () {
           store.dispatch(fetchSync(since: store.state.syncStore.lastSince));

@@ -444,15 +444,12 @@ ThunkAction<AppState> toggleNotifications() {
 
     store.dispatch(ToggleNotifications());
 
-    final enabled = store.state.settingsStore.notificationsEnabled;
+    final enabled = store.state.settingsStore.notificationSettings.enabled;
 
     if (enabled) {
       store.dispatch(startNotifications());
     } else {
-      BackgroundSync.stop();
-      dismissAllNotifications(
-        pluginInstance: globalNotificationPluginInstance,
-      );
+      store.dispatch(stopNotifications());
     }
   };
 }
@@ -472,11 +469,21 @@ ThunkAction<AppState> startNotifications() {
       lastSince: store.state.syncStore.lastSince,
       currentUser: store.state.authStore.user.userId,
       roomNames: roomNames,
+      settings: store.state.settingsStore.notificationSettings,
     );
 
     showBackgroundServiceNotification(
       notificationId: BackgroundSync.service_id,
       pluginInstance: globalNotificationPluginInstance!,
+    );
+  };
+}
+
+ThunkAction<AppState> stopNotifications() {
+  return (Store<AppState> store) async {
+    BackgroundSync.stop();
+    dismissAllNotifications(
+      pluginInstance: globalNotificationPluginInstance,
     );
   };
 }

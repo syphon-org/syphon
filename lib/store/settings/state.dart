@@ -27,7 +27,6 @@ class SettingsStore extends Equatable {
   final bool enterSendEnabled;
   final bool readReceiptsEnabled;
   final bool typingIndicatorsEnabled;
-  final bool notificationsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
@@ -46,8 +45,8 @@ class SettingsStore extends Equatable {
   final List<String> sortGroups;
 
   final List<Device> devices;
-  final NotificationSettings notificationSettings;
   final Map<String, ChatSetting> chatSettings; // roomId
+  final NotificationSettings notificationSettings;
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
@@ -73,7 +72,6 @@ class SettingsStore extends Equatable {
     this.smsEnabled = false,
     this.readReceiptsEnabled = false,
     this.typingIndicatorsEnabled = false,
-    this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
@@ -102,7 +100,6 @@ class SettingsStore extends Equatable {
         enterSendEnabled,
         readReceiptsEnabled,
         typingIndicatorsEnabled,
-        notificationsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
         dismissKeyboardEnabled,
@@ -129,7 +126,6 @@ class SettingsStore extends Equatable {
     bool? enterSendEnabled,
     bool? readReceiptsEnabled,
     bool? typingIndicatorsEnabled,
-    bool? notificationsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
@@ -158,7 +154,6 @@ class SettingsStore extends Equatable {
         readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
         typingIndicatorsEnabled:
             typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
-        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:
             dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,

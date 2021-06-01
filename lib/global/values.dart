@@ -58,7 +58,7 @@ class Values {
   // Animations
   static const animationDurationDefault = 350; // millis
   static const animationDurationDefaultFast = 275;
-  static const serviceNotificationTimeoutDuration = 65000; // millis
+  static const serviceNotificationTimeoutDuration = 75000; // millis
 
   static const defaultHeaders = {'Content-type': 'application/json'};
   static const fontFamilies = [
@@ -82,4 +82,4 @@ class Values {
 }
 
 // ignore: non_constant_identifier_names
-final bool DEBUG_MODE = false && !kReleaseMode;
+final bool DEBUG_MODE = !kReleaseMode;

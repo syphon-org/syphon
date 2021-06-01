@@ -1,6 +1,8 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/notification-settings/model.dart';
 
 /// Notifications are handled by APNS when running in iOS
 /// Only need to handle local notifications on desktop and android
@@ -158,27 +161,88 @@ Future showBackgroundServiceNotification({
 }
 
 Future showMessageNotification({
-  int messageHash = 0,
+  int? id,
   String body = 'Tap to open Message',
   String title = 'New Message',
+  StyleType style = StyleType.Itemized,
+  Map<String, String> uncheckedMessages = const {},
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
-
-  final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  var messageHash = id ?? Random.secure().nextInt(1 << 31);
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
     Values.channel_name_messages,
     Values.channel_description,
     groupKey: Values.channel_group_key,
-    priority: Priority.high,
+    priority: Priority.defaultPriority,
     importance: Importance.defaultImportance,
     visibility: NotificationVisibility.private,
     channelShowBadge: true,
   );
 
+  // For Inbox Style Only
+  var payload;
+
+  print('[showMessageNotification] ${messageHash.toString()}');
+
+  switch (style) {
+    case StyleType.Latest:
+      // TODO: allow for grouping / layered notifications here
+      messageHash = 0;
+      androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        Values.channel_id,
+        Values.channel_name_messages,
+        Values.channel_description,
+        groupKey: Values.channel_group_key,
+        priority: Priority.defaultPriority,
+        importance: Importance.defaultImportance,
+        visibility: NotificationVisibility.private,
+        setAsGroupSummary: true,
+        channelShowBadge: true,
+      );
+      break;
+    case StyleType.Inbox:
+      // List<String> lines = <String>[
+      //   'ABC 123 Check this out',
+      //   'XYZ URI Launch Party'
+      // ];
+      messageHash = 0;
+      final List<String> lines = <String>[];
+
+      uncheckedMessages.values.forEach((notificationBody) {
+        lines.add(notificationBody);
+      });
+
+      final inboxStyleInformation = InboxStyleInformation(
+        lines,
+        contentTitle: title,
+        summaryText: body,
+      );
+
+      androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        Values.channel_id,
+        Values.channel_name_messages,
+        Values.channel_description,
+        groupKey: Values.channel_group_key,
+        priority: Priority.defaultPriority,
+        importance: Importance.defaultImportance,
+        visibility: NotificationVisibility.private,
+        setAsGroupSummary: true,
+        channelShowBadge: true,
+        styleInformation: inboxStyleInformation,
+      );
+
+      payload = jsonEncode({
+        'checked': true,
+      });
+      break;
+    default:
+      break;
+  }
+
   final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: iOSPlatformChannelSpecifics,
+    iOS: IOSNotificationDetails(),
   );
 
   await pluginInstance.show(
@@ -186,6 +250,7 @@ Future showMessageNotification({
     title,
     body,
     platformChannelSpecifics,
+    payload: payload,
   );
 }
 
@@ -201,33 +266,50 @@ Future showMessageNotificationTest({
   const String groupChannelId = 'grouped channel id';
   const String groupChannelName = 'grouped channel name';
   const String groupChannelDescription = 'grouped channel description';
-  const AndroidNotificationDetails firstNotificationAndroidSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          setAsGroupSummary: true,
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          groupKey: groupKey);
-  const NotificationDetails firstNotificationPlatformSpecifics =
-      NotificationDetails(android: firstNotificationAndroidSpecifics);
-  await pluginInstance.show(1, 'XYZ URI', 'You will not believe...',
-      firstNotificationPlatformSpecifics);
-  const AndroidNotificationDetails secondNotificationAndroidSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          groupKey: groupKey);
-  const NotificationDetails secondNotificationPlatformSpecifics =
+  final firstNotificationAndroidSpecifics = AndroidNotificationDetails(
+    groupChannelId,
+    groupChannelName,
+    groupChannelDescription,
+    setAsGroupSummary: true,
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    groupKey: groupKey,
+  );
+
+  final firstNotificationPlatformSpecifics = NotificationDetails(
+    android: firstNotificationAndroidSpecifics,
+  );
+
+  await pluginInstance.show(
+    1,
+    'XYZ URI',
+    'You will not believe...',
+    firstNotificationPlatformSpecifics,
+  );
+
+  final secondNotificationAndroidSpecifics = AndroidNotificationDetails(
+    groupChannelId,
+    groupChannelName,
+    groupChannelDescription,
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    groupKey: groupKey,
+  );
+
+  final NotificationDetails secondNotificationPlatformSpecifics =
       NotificationDetails(android: secondNotificationAndroidSpecifics);
-  await pluginInstance.show(2, 'ABC 123', 'Please join us to celebrate the...',
-      secondNotificationPlatformSpecifics);
+  await pluginInstance.show(
+    2,
+    'ABC 123',
+    'Please join us to celebrate the...',
+    secondNotificationPlatformSpecifics,
+  );
 
   // Create the summary notification to support older devices that pre-date
-  /// Android 7.0 (API level 24).
-  ///
-  /// Recommended to create this regardless as the behaviour may vary as
-  /// mentioned in https://developer.android.com/training/notify-user/group
+  // / Android 7.0 (API level 24).
+  // /
+  // / Recommended to create this regardless as the behaviour may vary as
+  // / mentioned in https://developer.android.com/training/notify-user/group
   const List<String> lines = <String>[
     'ABC 123 Check this out',
     'XYZ URI    Launch Party'
