@@ -40,7 +40,7 @@ extension ThemeTypeValues on ThemeType {
     }
   }
   // The color of the app background
-  Color get backgroundColor {
+  Color get backgroundBrightness {
     // A non-null assertion is made because the values are hardcoded
     switch (this) {
       case ThemeType.LIGHT: return Colors.grey[200]!;
@@ -49,7 +49,7 @@ extension ThemeTypeValues on ThemeType {
     }
   }
   // The brightness of the theme
-  Brightness get brightness {
+  Brightness get themeBrightness {
     switch (this) {
       case ThemeType.LIGHT: return Brightness.light;
       default: return Brightness.dark;
@@ -89,10 +89,10 @@ extension ThemeTypeValues on ThemeType {
 }
 
 enum FontName {
-  INTER,
   RUBIK,
   ROBOTO,
   POPPINS,
+  INTER,
 }
 extension FontNameValues on FontName {
   String get name {
@@ -124,8 +124,8 @@ extension FontNameValues on FontName {
 }
 
 enum FontSize {
-  DEFAULT,
   SMALL,
+  DEFAULT,
   LARGE,
 }
 extension FontSizeValues on FontSize {
@@ -168,18 +168,36 @@ extension FontSizeValues on FontSize {
 }
 
 enum MessageSize {
-  DEFAULT,
   SMALL,
+  DEFAULT,
   LARGE,
+}
+extension MessageSizeValues on MessageSize {
+  String get name {
+    switch (this) {
+      case MessageSize.SMALL: return 'Small';
+      case MessageSize.DEFAULT: return 'Default';
+      case MessageSize.LARGE: return 'Large';
+      default: return 'Unknown';
+    }
+  }
 }
 
 enum AvatarShape {
   CIRCLE,
   SQUARE,
 }
+extension AvatarShapeValues on AvatarShape {
+  String get name {
+    switch (this) {
+      case AvatarShape.CIRCLE: return 'Circle';
+      case AvatarShape.SQUARE: return 'Square';
+      default: return 'Unknown';
+    }
+  }
+}
 
 // Set the theme for the system UI
-// This should only really be used by refreshTheme()
 void setSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -202,7 +220,7 @@ ThemeData? setupTheme(AppTheme appTheme, {bool generateThemeData = false}) {
     final primaryColor = Color(appTheme.primaryColor);
     final accentColor = Color(appTheme.accentColor);
     final scaffoldBackgroundColor = appTheme.themeType.scaffoldBackgroundColor;
-    final brightness = appTheme.brightness as Brightness;
+    final brightness = appTheme.themeType.themeBrightness;
     final invertedPrimaryColor =
     brightness == Brightness.light ? primaryColor : accentColor;
 

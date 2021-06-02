@@ -87,11 +87,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    // set system status bar to match theme.
-    // sadly the navbar doesn't play nicely with just being transparent
-    // so will also be updated on theme change
-    setupTheme(store.state.settingsStore.appTheme);
-
     store.dispatch(initDeepLinks());
     store.dispatch(initClientSecret());
     store.dispatch(startAuthObserver());
@@ -173,7 +168,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       }
 
       final alertMessage =
-          alert.message ?? alert.error ?? 'Unknown Error Occured';
+          alert.message ?? alert.error ?? 'Unknown Error Occurred';
 
       globalScaffold.currentState?.showSnackBar(SnackBar(
         backgroundColor: color,
