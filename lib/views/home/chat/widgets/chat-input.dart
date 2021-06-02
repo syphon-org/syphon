@@ -397,7 +397,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
-        enterSendEnabled: store.state.settingsStore.enterSend,
+        enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

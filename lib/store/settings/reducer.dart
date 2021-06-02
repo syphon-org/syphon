@@ -75,11 +75,11 @@ SettingsStore settingsReducer(
       );
     case ToggleEnterSend:
       return state.copyWith(
-        enterSend: !state.enterSend,
+        enterSend: !state.enterSendEnabled,
       );
     case ToggleTypingIndicators:
       return state.copyWith(
-        typingIndicators: !state.typingIndicators,
+        typingIndicators: !state.typingIndicatorsEnabled,
       );
     case ToggleTimeFormat:
       return state.copyWith(
@@ -91,7 +91,7 @@ SettingsStore settingsReducer(
       );
     case ToggleReadReceipts:
       return state.copyWith(
-        readReceipts: !state.readReceipts,
+        readReceipts: !state.readReceiptsEnabled,
       );
     case ToggleMembershipEvents:
       return state.copyWith(

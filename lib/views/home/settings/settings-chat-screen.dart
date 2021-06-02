@@ -318,7 +318,7 @@ class Props extends Equatable {
       Props(
         chatFontSize: 'Default',
         language: store.state.settingsStore.language,
-        enterSend: store.state.settingsStore.enterSend,
+        enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {

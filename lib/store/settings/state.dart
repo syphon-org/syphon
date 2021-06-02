@@ -16,10 +16,10 @@ class SettingsStore extends Equatable {
   @JsonKey(ignore: true)
   final bool loading;
 
-  final bool enterSend; // TODO: rename *enabled
+  final bool enterSendEnabled;
   final bool smsEnabled;
-  final bool readReceipts; // TODO: rename *enabled
-  final bool typingIndicators; // TODO: rename *enabled
+  final bool readReceiptsEnabled;
+  final bool typingIndicatorsEnabled;
   final bool notificationsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
@@ -48,10 +48,10 @@ class SettingsStore extends Equatable {
     this.language = 'English',
     this.sortGroups = const [SortOptions.PINNED],
     this.sortOrder = SortOrder.LATEST,
-    this.enterSend = false,
+    this.enterSendEnabled = false,
     this.smsEnabled = false,
-    this.readReceipts = false,
-    this.typingIndicators = false,
+    this.readReceiptsEnabled = false,
+    this.typingIndicatorsEnabled = false,
     this.notificationsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
@@ -70,9 +70,9 @@ class SettingsStore extends Equatable {
   List<Object?> get props => [
         language,
         smsEnabled,
-        enterSend,
-        readReceipts,
-        typingIndicators,
+        enterSendEnabled,
+        readReceiptsEnabled,
+        typingIndicatorsEnabled,
         notificationsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
@@ -108,10 +108,10 @@ class SettingsStore extends Equatable {
       SettingsStore(
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
-        enterSend: enterSend != null ? enterSend : this.enterSend,
-        readReceipts: readReceipts != null ? readReceipts : this.readReceipts,
-        typingIndicators:
-            typingIndicators != null ? typingIndicators : this.typingIndicators,
+        enterSendEnabled: enterSend != null ? enterSend : this.enterSendEnabled,
+        readReceiptsEnabled: readReceipts != null ? readReceipts : this.readReceiptsEnabled,
+        typingIndicatorsEnabled:
+            typingIndicators != null ? typingIndicators : this.typingIndicatorsEnabled,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled:

@@ -232,8 +232,6 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
 
-      var sentRequest = false;
-
       // map through each event and decrypt if possible
       final decryptTimelineActions = timelineEvents.map((event) async {
         final eventType = event['type'];
@@ -397,7 +395,7 @@ ThunkAction<AppState> sendReadReceipts({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.readReceipts) {
+      if (!store.state.settingsStore.readReceiptsEnabled) {
         return debugPrint('[sendReadReceipts] read receipts disabled');
       }
 
@@ -435,7 +433,7 @@ ThunkAction<AppState> sendTyping({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.typingIndicators) {
+      if (!store.state.settingsStore.typingIndicatorsEnabled) {
         debugPrint('[sendTyping] typing indicators disabled');
         return;
       }
