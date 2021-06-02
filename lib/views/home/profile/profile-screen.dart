@@ -116,7 +116,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final backgroundColor = Themes.backgroundBrightness(props.theme);
+        final backgroundColor = props.themeType.backgroundBrightness;
 
         return Scaffold(
           appBar: AppBar(
@@ -303,19 +303,19 @@ class ProfileScreenState extends State<ProfileScreen> {
 class _Props extends Equatable {
   final User user;
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final Function onSaveProfile;
 
   _Props({
     required this.user,
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.onSaveProfile,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
           File? avatarFileNew,

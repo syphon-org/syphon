@@ -9,12 +9,12 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/selectors.dart';
 import 'widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -281,8 +281,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        font: fontName(store.state),
-        theme: themeTypeName(store.state),
+        font: store.state.settingsStore.appTheme.fontName.name,
+        theme: store.state.settingsStore.appTheme.themeType.name,
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,

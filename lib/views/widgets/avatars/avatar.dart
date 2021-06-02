@@ -7,6 +7,7 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -45,7 +46,7 @@ class Avatar extends StatelessWidget {
 
           var borderRadius = BorderRadius.circular(size);
 
-          if (props.avatarShape == 'Square') {
+          if (props.avatarShape == AvatarShape.SQUARE) {
             borderRadius = BorderRadius.circular(size / 3);
           }
 
@@ -139,7 +140,7 @@ class Avatar extends StatelessWidget {
 }
 
 class _Props extends Equatable {
-  final String? avatarShape;
+  final AvatarShape? avatarShape;
 
   const _Props({
     required this.avatarShape,
@@ -149,5 +150,5 @@ class _Props extends Equatable {
   List<Object?> get props => [avatarShape];
 
   _Props.mapStateToProps(Store<AppState> store)
-      : avatarShape = store.state.settingsStore.avatarShape;
+      : avatarShape = store.state.settingsStore.appTheme.avatarShape;
 }

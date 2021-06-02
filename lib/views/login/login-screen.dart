@@ -494,7 +494,7 @@ class _Props extends Equatable {
           store.dispatch(setLoginPassword(password: text));
         },
         onIncrementTheme: () {
-          store.dispatch(incrementTheme());
+          store.dispatch(incrementThemeType());
         },
         onDebug: () async {
           store.dispatch(initClientSecret());

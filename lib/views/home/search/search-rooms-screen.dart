@@ -372,7 +372,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final List<dynamic> searchResults;
   final Map<String, ChatSetting> chatSettings;
 
@@ -380,7 +380,7 @@ class _Props extends Equatable {
   final Function onSendInvite;
 
   _Props({
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.searchResults,
     required this.chatSettings,
@@ -390,14 +390,14 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        theme,
+        themeType,
         loading,
         searchResults,
         chatSettings,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         loading: store.state.searchStore.loading,
         searchResults: store.state.searchStore.searchResults,
         chatSettings: store.state.settingsStore.customChatSettings ?? Map(),

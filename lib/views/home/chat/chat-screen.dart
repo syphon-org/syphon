@@ -533,7 +533,7 @@ class _Props extends Equatable {
   final bool loading;
   final int? messagesLength;
   final bool enterSendEnabled;
-  final ThemeType theme;
+  final ThemeType themeType;
   final Color roomPrimaryColor;
   final bool roomTypeBadgesEnabled;
   final bool dismissKeyboardEnabled;
@@ -554,7 +554,7 @@ class _Props extends Equatable {
 
   _Props({
     required this.room,
-    required this.theme,
+    required this.themeType,
     required this.userId,
     required this.loading,
     required this.messagesLength,
@@ -589,7 +589,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
       _Props(
           room: selectRoom(id: roomId, state: store.state),
-          theme: store.state.settingsStore.theme,
+          themeType: store.state.settingsStore.appTheme.themeType,
           userId: store.state.authStore.user.userId,
           roomTypeBadgesEnabled:
               store.state.settingsStore.roomTypeBadgesEnabled,

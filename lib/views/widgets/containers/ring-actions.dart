@@ -118,18 +118,18 @@ class ActionRing extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final ThemeType type;
+  final ThemeType themeType;
 
   Props({
-    required this.type,
+    required this.themeType,
   });
 
   @override
   List<Object> get props => [
-        type,
+        themeType,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        type: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
       );
 }

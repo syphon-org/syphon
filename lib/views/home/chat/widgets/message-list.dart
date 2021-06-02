@@ -161,7 +161,7 @@ class MessageListState extends State<MessageList> {
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
-                      theme: props.theme,
+                      theme: props.themeType,
                       fontSize: 14,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
                       onSwipe: props.onSelectReply,
@@ -188,7 +188,7 @@ class MessageListState extends State<MessageList> {
 
 class _Props extends Equatable {
   final Room room;
-  final ThemeType theme;
+  final ThemeType themeType;
   final User currentUser;
   final Map<String, User> users;
   final List<Message> messages;
@@ -199,7 +199,7 @@ class _Props extends Equatable {
 
   _Props({
     required this.room,
-    required this.theme,
+    required this.themeType,
     required this.users,
     required this.messages,
     required this.currentUser,
@@ -218,7 +218,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
       _Props(
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         currentUser: store.state.authStore.user,
         room: selectRoom(id: roomId, state: store.state),
         users: messageUsers(roomId: roomId, state: store.state),

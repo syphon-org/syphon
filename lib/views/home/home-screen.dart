@@ -173,7 +173,7 @@ class HomeState extends State<HomeScreen> {
         title: Row(
           children: <Widget>[
             AvatarAppBar(
-              theme: props.theme,
+              themeType: props.themeType,
               user: props.currentUser,
               offline: props.offline,
               syncing: props.syncing,
@@ -593,7 +593,7 @@ class _Props extends Equatable {
   final bool unauthed;
   final bool roomTypeBadgesEnabled;
   final User currentUser;
-  final ThemeType theme;
+  final ThemeType themeType;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>?> messages;
 
@@ -607,7 +607,7 @@ class _Props extends Equatable {
 
   _Props({
     required this.rooms,
-    required this.theme,
+    required this.themeType,
     required this.offline,
     required this.syncing,
     required this.unauthed,
@@ -627,7 +627,7 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         rooms,
-        theme,
+        themeType,
         syncing,
         offline,
         unauthed,
@@ -636,7 +636,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         rooms: availableRooms(sortedPrioritizedRooms(filterBlockedRooms(
           store.state.roomStore.rooms.values.toList(),
           store.state.userStore.blocked,

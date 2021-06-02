@@ -104,7 +104,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          final backgroundColor = Themes.backgroundBrightness(props.theme);
+          final backgroundColor = props.themeType.backgroundBrightness;
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
@@ -505,7 +505,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final String? homeserver;
   final List<User> users;
 
@@ -514,7 +514,7 @@ class _Props extends Equatable {
 
   _Props({
     required this.users,
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.homeserver,
     required this.onCreateRoomPublic,
@@ -524,14 +524,14 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         users,
-        theme,
+        themeType,
         loading,
         homeserver,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         homeserver: store.state.authStore.user.homeserverName,
         loading: store.state.authStore.loading,
         onClearUserInvites: () => store.dispatch(

@@ -12,7 +12,7 @@ class AvatarAppBar extends StatelessWidget {
   AvatarAppBar({
     Key? key,
     this.user,
-    this.theme = ThemeType.LIGHT,
+    this.themeType = ThemeType.LIGHT,
     this.syncing = false,
     this.offline = false,
     this.unauthed = false,
@@ -25,7 +25,7 @@ class AvatarAppBar extends StatelessWidget {
   final bool? offline;
   final bool unauthed;
   final String? tooltip;
-  final ThemeType theme;
+  final ThemeType themeType;
 
   final Function? onPressed;
 
@@ -56,7 +56,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: Themes.backgroundBrightness(theme),
+                    color: themeType.backgroundBrightness,
                     child: Icon(
                       Icons.offline_bolt,
                       color: Colors.white,
@@ -78,7 +78,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: Themes.backgroundBrightness(theme),
+                    color: themeType.backgroundBrightness,
                     child: Icon(
                       Icons.block,
                       color: Colors.white,
@@ -101,7 +101,7 @@ class AvatarAppBar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     padding: EdgeInsets.all(2),
-                    color: Themes.backgroundBrightness(theme),
+                    color: themeType.backgroundBrightness,
                     child: CircularProgressIndicator(
                       strokeWidth: Dimensions.defaultStrokeWidthLite,
                     ),

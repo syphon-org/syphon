@@ -30,14 +30,14 @@ class LoadingScreen extends StatelessWidget {
             height: height,
             width: width,
             child: StoreConnector<AppState, dynamic>(
-              converter: (store) => () => store.dispatch(incrementTheme()),
-              builder: (context, onIncrementTheme) => Flex(
+              converter: (store) => () => store.dispatch(incrementThemeType()),
+              builder: (context, onIncrementThemeType) => Flex(
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   TouchableOpacity(
                     onTap: () {
-                      onIncrementTheme();
+                      onIncrementThemeType();
                     },
                     child: const Image(
                       width: 100,

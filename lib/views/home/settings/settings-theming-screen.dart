@@ -9,12 +9,12 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
+import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
@@ -121,7 +121,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () => props.onIncrementTheme(),
+                          onTap: () => props.onIncrementThemeType(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Theme',
@@ -153,7 +153,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.fontName,
+                            props.fontName.name,
                           ),
                           onTap: () => props.onIncrementFontType(),
                         ),
@@ -164,7 +164,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.fontSize,
+                            props.fontSize.name,
                           ),
                           onTap: () => props.onIncrementFontSize(),
                         ),
@@ -175,7 +175,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.messageSize,
+                            props.messageSize.name,
                           ),
                           onTap: () => props.onIncrementMessageSize(),
                         ),
@@ -217,7 +217,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.avatarShape,
+                            props.avatarShape.name,
                           ),
                         ),
                       ],
@@ -237,10 +237,10 @@ class Props extends Equatable {
   final int appBarColor;
   final String themeType;
   final String language;
-  final String fontName;
-  final String fontSize;
-  final String messageSize;
-  final String avatarShape;
+  final FontName fontName;
+  final FontSize fontSize;
+  final MessageSize messageSize;
+  final AvatarShape avatarShape;
 
   final bool roomTypeBadgesEnabled;
 
@@ -250,7 +250,7 @@ class Props extends Equatable {
   final Function onIncrementFontType;
   final Function onIncrementFontSize;
   final Function onIncrementMessageSize;
-  final Function onIncrementTheme;
+  final Function onIncrementThemeType;
   final Function onToggleRoomTypeBadges;
   final Function onIncrementAvatarShape;
 
@@ -270,7 +270,7 @@ class Props extends Equatable {
     required this.onSelectAppBarColor,
     required this.onIncrementFontType,
     required this.onIncrementFontSize,
-    required this.onIncrementTheme,
+    required this.onIncrementThemeType,
     required this.onToggleRoomTypeBadges,
     required this.onIncrementAvatarShape,
     required this.onIncrementMessageSize,
@@ -291,17 +291,17 @@ class Props extends Equatable {
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         primaryColor:
-            store.state.settingsStore.primaryColor ?? Colours.cyanSyphon,
+            store.state.settingsStore.appTheme.primaryColor ?? Colours.cyanSyphon,
         accentColor:
-            store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
+            store.state.settingsStore.appTheme.accentColor ?? Colours.cyanSyphon,
         appBarColor:
-            store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
-        themeType: themeTypeName(store.state),
+            store.state.settingsStore.appTheme.appBarColor ?? Colours.cyanSyphon,
+        themeType: store.state.settingsStore.appTheme.themeType.name,
         language: store.state.settingsStore.language,
-        fontName: store.state.settingsStore.fontName,
-        fontSize: store.state.settingsStore.fontSize,
-        messageSize: store.state.settingsStore.messageSize,
-        avatarShape: store.state.settingsStore.avatarShape,
+        fontName: store.state.settingsStore.appTheme.fontName,
+        fontSize: store.state.settingsStore.appTheme.fontSize,
+        messageSize: store.state.settingsStore.appTheme.messageSize,
+        avatarShape: store.state.settingsStore.appTheme.avatarShape,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
@@ -327,8 +327,8 @@ class Props extends Equatable {
         onIncrementMessageSize: () => store.dispatch(
           incrementMessageSize(),
         ),
-        onIncrementTheme: () => store.dispatch(
-          incrementTheme(),
+        onIncrementThemeType: () => store.dispatch(
+          incrementThemeType(),
         ),
         onIncrementAvatarShape: () => store.dispatch(
           incrementAvatarShape(),
