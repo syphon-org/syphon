@@ -71,7 +71,7 @@ SettingsStore settingsReducer(
       );
     case SetThemeType:
       return state.copyWith(
-        appTheme: state.appTheme.copyWith(themeType: action.theme),
+        appTheme: state.appTheme.copyWith(themeType: action.themeType),
       );
     case ToggleEnterSend:
       return state.copyWith(
