@@ -88,10 +88,7 @@ class SetLanguage {
   SetLanguage({this.language});
 }
 
-class SetEnterSend {
-  final bool? enterSend;
-  SetEnterSend({this.enterSend});
-}
+class ToggleEnterSend {}
 
 class ToggleDismissKeyboard {}
 
@@ -416,11 +413,7 @@ ThunkAction<AppState> toggleTimeFormat() {
 
 ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
-    store.dispatch(
-      SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSend,
-      ),
-    );
+    store.dispatch(ToggleEnterSend());
   };
 }
 
