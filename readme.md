@@ -103,24 +103,19 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 2. generate json conversion for models
    - ```flutter run```
 
-### macos
-0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
-1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
-2. ```flutter config --enable-macos-desktop```
-3. ```brew install libolm``` to install native olm dependencies
-4. follow instructions for linking the dylib generated from brew to the Syphon project
+### macos  
+1. ```flutter config --enable-macos-desktop```
+2. ```brew install libolm``` to install native olm dependencies
+3. follow instructions for linking the dylib generated from brew to the Syphon project
   - refer to [macos dylib linking guide](https://flutter.dev/docs/development/platform-integration/c-interop#compiled-dynamic-library-macos)
-2. ```flutter build macos``` to build the .app bundle
+4. ```flutter build macos``` to build the .app bundle
 
 ### linux
-
-0. add ```intl: ^0.17.0-nullsafety.2``` under ```dependency_overrides``` (temporary step)
-1. ```flutter channel dev``` since desktop support is still considered alpha in flutter
-2. ```flutter config --enable-linux-desktop```
-3. ```apt install libolm3 libsqlite3-dev``` or ```pacman -S libolm``` or platform equivalent for libolm
-4. ```flutter build linux && flutter build bundle```
-5. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
-6. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+1. ```flutter config --enable-linux-desktop```
+2. ```apt install libolm3 libsqlite3-dev``` or ```pacman -S libolm``` or platform equivalent for libolm
+3. ```flutter build linux && flutter build bundle```
+4. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
+5. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
 
 ### windows
 - not currently supported, feel free to reach out if you can support making builds!
