@@ -40,12 +40,9 @@ Future<Database?> initStorage() async {
   try {
     DatabaseFactory? storageFactory;
 
-    final isDesktop =
-        Platform.isLinux || Platform.isWindows || Platform.isMacOS;
-    final isMobile = Platform.isAndroid || Platform.isIOS;
     var version;
 
-    if (isMobile) {
+    if (Platform.isAndroid || Platform.isIOS) {
       version = 1;
       // always open cold storage as sqflite
       storageFactory = getDatabaseFactorySqflite(
@@ -54,7 +51,7 @@ Future<Database?> initStorage() async {
     }
 
     /// Supports Windows/Linux/MacOS for now.
-    if (isDesktop) {
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       version = 2;
       storageFactory = getDatabaseFactorySqflite(
         sqflite_ffi.databaseFactoryFfi,
@@ -73,9 +70,6 @@ Future<Database?> initStorage() async {
       Storage.mainLocation,
       codec: codec,
       version: version,
-      onVersionChanged: (path, version, mode) async {
-        return Future.value(true);
-      },
     );
 
     return Storage.main;
