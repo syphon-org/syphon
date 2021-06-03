@@ -289,10 +289,6 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         roomId: room!.id,
       );
 
-      printInfo("${stateEvents.runtimeType}");
-
-      printJson(stateEvents);
-
       if (stateEvents.runtimeType != List && stateEvents['errcode'] != null) {
         throw stateEvents['error'];
       }

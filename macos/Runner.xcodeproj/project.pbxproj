@@ -27,7 +27,12 @@
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
-		D2743EC32651BBF5006FDB28 /* libolm.3.2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; };
+		D23E4F2126694FFA0064E72D /* libolm.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D23E4F2026694FFA0064E72D /* libolm.3.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		D23E4F22266950D20064E72D /* libolm.3.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = D23E4F2026694FFA0064E72D /* libolm.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D23E4F24266950D30064E72D /* libolm.3.2.2.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D23E4F252669521D0064E72D /* libolm.3.dylib in Resources */ = {isa = PBXBuildFile; fileRef = D23E4F2026694FFA0064E72D /* libolm.3.dylib */; };
+		D23E4F262669521F0064E72D /* libolm.3.2.2.dylib in Resources */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; };
+		D2743EC32651BBF5006FDB28 /* libolm.3.2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,14 +46,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		33CC110E2044A8840003C045 /* Bundle Framework */ = {
+		D23E4F23266950D20064E72D /* Embed Libraries */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				D23E4F24266950D30064E72D /* libolm.3.2.2.dylib in Embed Libraries */,
+				D23E4F22266950D20064E72D /* libolm.3.dylib in Embed Libraries */,
 			);
-			name = "Bundle Framework";
+			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -73,6 +80,7 @@
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		B9D833B3E037FA761D00EF30 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C1CD66FF4A25F1396737BF9C /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D23E4F2026694FFA0064E72D /* libolm.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libolm.3.dylib; sourceTree = "<group>"; };
 		D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libolm.3.2.2.dylib; sourceTree = "<group>"; };
 		FE87411DC33C73CF1781CD2F /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D23E4F2126694FFA0064E72D /* libolm.3.dylib in Frameworks */,
 				D2743EC32651BBF5006FDB28 /* libolm.3.2.2.dylib in Frameworks */,
 				26725682E95C9D306B1B4506 /* Pods_Runner.framework in Frameworks */,
 			);
@@ -168,6 +177,7 @@
 		D73912EC22F37F3D000D13A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D23E4F2026694FFA0064E72D /* libolm.3.dylib */,
 				D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */,
 				C1CD66FF4A25F1396737BF9C /* Pods_Runner.framework */,
 			);
@@ -185,9 +195,9 @@
 				33CC10E92044A3C60003C045 /* Sources */,
 				33CC10EA2044A3C60003C045 /* Frameworks */,
 				33CC10EB2044A3C60003C045 /* Resources */,
-				33CC110E2044A8840003C045 /* Bundle Framework */,
 				3399D490228B24CF009A79C7 /* ShellScript */,
 				1099EB9383B9AF0DE0476B42 /* [CP] Embed Pods Frameworks */,
+				D23E4F23266950D20064E72D /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -212,7 +222,6 @@
 					33CC10EC2044A3C60003C045 = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 0920;
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -251,6 +260,8 @@
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+				D23E4F252669521D0064E72D /* libolm.3.dylib in Resources */,
+				D23E4F262669521F0064E72D /* libolm.3.2.2.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,8 +446,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/DebugProfile.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = W98LUTKH5G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",
@@ -571,8 +584,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/DebugProfile.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = W98LUTKH5G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",
@@ -601,8 +616,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Release.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = W98LUTKH5G;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",

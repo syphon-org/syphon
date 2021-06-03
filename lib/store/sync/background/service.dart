@@ -261,8 +261,6 @@ Future backgroundSyncLoop({
         }
       }
 
-      printJson(roomNames);
-
       // Make sure the room name exists in the cache
       if (!roomNames.containsKey(roomId) ||
           roomNames[roomId] == Values.EMPTY_CHAT) {
@@ -280,7 +278,6 @@ Future backgroundSyncLoop({
 
           roomNames[room.id] = roomName;
 
-          printJson(roomNames);
           saveRoomNames(roomNames: roomNames);
         } catch (error) {
           print(
@@ -348,9 +345,6 @@ Future backgroundSyncLoop({
         );
 
         if (body.isEmpty) return Future.value();
-
-        print(message.id);
-        printJson(uncheckedMessages);
 
         await showMessageNotification(
           id: uncheckedMessages.isEmpty ? 0 : null,

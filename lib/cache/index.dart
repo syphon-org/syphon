@@ -14,8 +14,6 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class Cache {
   // encryption references (in memory only)
-  static String? ivKey;
-  static String? ivKeyNext;
   static String? cryptKey;
 
   // hot cache refrences
