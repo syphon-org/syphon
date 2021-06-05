@@ -19,12 +19,6 @@ List<int> fibonacci(int n) {
   return series;
 }
 
-void printJson(Map? jsonMap) {
-  final JsonEncoder encoder = JsonEncoder.withIndent('  ');
-  final String prettyEvent = encoder.convert(jsonMap);
-  debugPrint(prettyEvent, wrapWidth: 2048);
-}
-
 // time functions by wrapping them here - needs testing
 Future timeWrapper(
   Future<dynamic> Function() function, {

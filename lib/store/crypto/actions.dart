@@ -305,8 +305,6 @@ ThunkAction<AppState> generateIdentityKeys() {
         }
       };
 
-      printJson(deviceKeysPayload);
-
       // cache current device key for authed user
       final deviceKeysOwned = DeviceKey.fromMatrix(
         deviceKeysPayload['device_keys'],
@@ -332,9 +330,6 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
         'device_keys': deviceKey.toMatrix(),
       };
 
-      printDebug('[uploadIdentityKeys] start');
-      printJson(deviceKeyMap);
-
       // upload the public device keys
       final data = await MatrixApi.uploadKeys(
         protocol: store.state.authStore.protocol,
@@ -346,9 +341,6 @@ ThunkAction<AppState> uploadIdentityKeys({required DeviceKey deviceKey}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      printDebug('[uploadIdentityKeys] finish');
-      printJson(data);
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
@@ -570,9 +562,6 @@ ThunkAction<AppState> updateKeySessions({
             };
 
             final randomNumber = Random.secure().nextInt(1 << 31).toString();
-
-            printDebug('[sendSessionKeys] sending $randomNumber');
-            printJson(payload);
 
             final response = await MatrixApi.sendEventToDevice(
               trxId: randomNumber,

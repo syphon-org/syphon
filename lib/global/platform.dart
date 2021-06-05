@@ -25,6 +25,7 @@ Future<void> initPlatformDependencies() async {
     printDebug = (String message, {String? title}) {};
     printInfo = (String message, {String? title}) {};
     printError = (String message, {String? title}) {};
+    printJson = (Map? json) {};
   }
 
   // init platform overrides for compatability with dart libs
@@ -60,7 +61,11 @@ Future<void> initPlatformDependencies() async {
   if (Platform.isMacOS) {
     final directory = await getApplicationSupportDirectory();
     printInfo('[macos] ${directory.path}');
-    // DynamicLibrary.open('libolm.dylib');
+    try {
+      DynamicLibrary.open('libolm.3.dylib');
+    } catch (error) {
+      print('[macos] ${error.toString()}');
+    }
   }
 
   // init background sync for Android only

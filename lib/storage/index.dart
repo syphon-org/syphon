@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
@@ -31,14 +32,18 @@ class Storage {
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const mainLocation = '${Values.appNameLabel}-main-storage.db';
+  static const mainLocation =
+      '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
 }
 
 Future<Database?> initStorage() async {
   try {
     DatabaseFactory? storageFactory;
 
+    var version;
+
     if (Platform.isAndroid || Platform.isIOS) {
+      version = 1;
       // always open cold storage as sqflite
       storageFactory = getDatabaseFactorySqflite(
         sqflite.databaseFactory,
@@ -47,6 +52,7 @@ Future<Database?> initStorage() async {
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      version = 2;
       storageFactory = getDatabaseFactorySqflite(
         sqflite_ffi.databaseFactoryFfi,
       );
@@ -63,6 +69,7 @@ Future<Database?> initStorage() async {
     Storage.main = await storageFactory.openDatabase(
       Storage.mainLocation,
       codec: codec,
+      version: version,
     );
 
     return Storage.main;

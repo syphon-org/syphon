@@ -210,8 +210,6 @@ abstract class Encryption {
       },
     };
 
-    printJson(payload);
-
     return MatrixApi.sendEventToDevice(
       protocol: protocol,
       homeserver: homeserver,
