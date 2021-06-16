@@ -291,8 +291,6 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // fingerprint signature key pair generation for upload
-      // warn: seems to work without canonical_json lib
-      // utf8.decode(deviceKeysEncoded);
       final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
       final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
@@ -414,6 +412,11 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
     // Confirm user has generated an olm account
     final olmAccount = store.state.cryptoStore.olmAccount;
     if (olmAccount == null) {
+      return;
+    }
+
+    final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned.isEmpty;
+    if (deviceKeysOwned) {
       return;
     }
 

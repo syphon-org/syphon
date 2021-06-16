@@ -18,6 +18,10 @@ class CryptoStore extends Equatable {
   // Serialized olm account
   final String? olmAccountKey;
 
+  final bool? deviceKeysExist;
+
+  final bool deviceKeyVerified;
+
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
   final Map<String, Map<String, int>> messageSessionIndex;
 
@@ -39,8 +43,6 @@ class CryptoStore extends Equatable {
   // Map<DeviceId, DeviceKey> deviceKeysOwned
   final Map<String, DeviceKey> deviceKeysOwned; // key is deviceId
 
-  final bool? deviceKeysExist;
-
   // Track last known uploaded key amounts
   final Map<String, int> oneTimeKeysCounts;
 
@@ -49,6 +51,8 @@ class CryptoStore extends Equatable {
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
+    this.deviceKeysExist = false,
+    this.deviceKeyVerified = false,
     this.inboundMessageSessions = const {}, // messages
     this.outboundMessageSessions = const {}, // messages //
     this.inboundKeySessions = const {}, // one-time device keys
@@ -57,7 +61,6 @@ class CryptoStore extends Equatable {
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
     this.oneTimeKeysClaimed = const {},
-    this.deviceKeysExist = false,
     this.oneTimeKeysCounts = const {},
   });
 
@@ -65,6 +68,8 @@ class CryptoStore extends Equatable {
   List<Object?> get props => [
         olmAccount,
         olmAccountKey,
+        deviceKeysExist,
+        deviceKeyVerified,
         messageSessionIndex,
         inboundMessageSessions,
         outboundMessageSessions,
@@ -72,7 +77,6 @@ class CryptoStore extends Equatable {
         outboundKeySessions,
         deviceKeys,
         deviceKeysOwned,
-        deviceKeysExist,
         oneTimeKeysClaimed,
         oneTimeKeysCounts
       ];
@@ -80,12 +84,13 @@ class CryptoStore extends Equatable {
   CryptoStore copyWith({
     Account? olmAccount,
     String? olmAccountKey,
+    bool? deviceKeysExist,
+    bool? deviceKeyVerified,
     Map<String, Map<String, int>>? messageSessionIndex,
     Map<String, Map<String, String>>? inboundMessageSessions,
     Map<String, String>? outboundMessageSessions,
     Map<String, String>? inboundKeySessions,
     Map<String, String>? outboundKeySessions,
-    bool? deviceKeysExist,
     Map<String, DeviceKey>? deviceKeysOwned,
     Map<String, Map<String, DeviceKey>>? deviceKeys,
     Map<String, OneTimeKey>? oneTimeKeysClaimed,
@@ -105,6 +110,7 @@ class CryptoStore extends Equatable {
         deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
         oneTimeKeysClaimed: oneTimeKeysClaimed ?? this.oneTimeKeysClaimed,
         deviceKeysExist: deviceKeysExist ?? this.deviceKeysExist,
+        deviceKeyVerified: deviceKeyVerified ?? this.deviceKeyVerified,
         oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
       );
 

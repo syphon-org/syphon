@@ -65,11 +65,6 @@ dependencies:
       url: https://github.com/ereio/swipeable.git
       ref: null-safety
 
-  canonical_json:
-    git:
-      url: https://github.com/ereio/flutter_canonical_json
-      ref: main
-
   # state
   equatable: ^2.0.0
   expandable: ^5.0.1
@@ -89,6 +84,7 @@ dependencies:
   crypt: ^4.0.1
   crypto: ^3.0.1
   encrypt: ^5.0.0
+  canonical_json: 1.1.0
 
   # cache/storage
   sembast: ^3.0.1
@@ -135,7 +131,6 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
 
   # UNSOUND NULL-SAFTEY
-  # canonical_json: 1.0.0
   # flutter_material_color_picker: ^1.0.5
   # swipeable: 1.1.0
 

@@ -44,9 +44,7 @@ class MessageList extends StatefulWidget {
 }
 
 class MessageListState extends State<MessageList> {
-  MessageListState({
-    Key? key,
-  }) : super();
+  MessageListState() : super();
   final TextEditingController controller = TextEditingController();
 
   @protected

@@ -225,6 +225,8 @@ ThunkAction<AppState> fetchMessageEvents({
 ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     try {
+      final verified = store.state.cryptoStore.deviceKeyVerified;
+
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
 
@@ -242,7 +244,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
             } catch (error) {
               debugPrint('[decryptMessageEvent] $error');
 
-              if (!sentKeyRequest) {
+              if (!sentKeyRequest && verified) {
                 sentKeyRequest = true;
                 debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
                 store.dispatch(sendKeyRequest(

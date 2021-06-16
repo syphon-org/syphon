@@ -36,8 +36,8 @@ import './auth/state.dart';
 import './media/state.dart';
 import './rooms/reducer.dart';
 import './rooms/state.dart';
-import './search/state.dart';
 import './search/reducer.dart';
+import './search/state.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
 
@@ -99,7 +99,7 @@ AppState appReducer(AppState state, action) => AppState(
     );
 
 /// Initialize Store
-/// - Hot redux state cache for top level data 
+/// - Hot redux state cache for top level data
 Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
   var data;
 

@@ -116,12 +116,10 @@ packages:
   canonical_json:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: dab7d28ded523a4e0532c3f7c653587de6997b8a
-      url: "https://github.com/ereio/flutter_canonical_json"
-    source: git
-    version: "2.0.0"
+      name: canonical_json
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   characters:
     dependency: transitive
     description:
