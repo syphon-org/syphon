@@ -571,7 +571,7 @@ ThunkAction<AppState> markRoomsReadAll() {
 ///
 /// Fetch the direct rooms list and recalculate it without the
 /// given alias
-ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
+ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -596,7 +596,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
         (userId) => userId != currentUser.userId,
       );
 
-      if (otherUserId == null) {
+      if (otherUserId == null && enabled) {
         throw 'Cannot toggle room to direct without other users';
       }
 
@@ -604,7 +604,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
       Map directRoomUsers = data as Map<String, dynamic>;
       final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
-      if (usersDirectRooms.isEmpty && enabled!) {
+      if (usersDirectRooms.isEmpty && enabled) {
         directRoomUsers[otherUserId] = [room.id];
       }
 
@@ -616,7 +616,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
           return MapEntry(userId, updatedRooms);
         }
 
-        if (enabled!) {
+        if (enabled) {
           updatedRooms.add(room.id);
         } else {
           updatedRooms.removeWhere((roomId) => roomId == room.id);
