@@ -12,7 +12,7 @@ class Event {
   final String? type;
   final String? sender;
   final String? stateKey;
-  final int? timestamp;
+  final int timestamp;
 
   @JsonKey(ignore: true)
   final dynamic content;
@@ -28,7 +28,7 @@ class Event {
     this.sender,
     this.stateKey,
     this.content,
-    this.timestamp,
+    this.timestamp = 0,
     this.data,
   });
 
@@ -67,7 +67,7 @@ class Event {
       type: json['type'] as String?,
       sender: json['sender'] as String?,
       stateKey: json['state_key'] as String?,
-      timestamp: json['origin_server_ts'] as int?,
+      timestamp: json['origin_server_ts'] as int,
       content: json['content'] as dynamic,
       data: data,
     );

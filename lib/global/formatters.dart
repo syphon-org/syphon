@@ -21,12 +21,13 @@ String formatLanguageCode(String? language) {
   }
 }
 
-// @again_guy:matrix.org -> ER
-String formatSenderInitials(String sender) {
-  final formattedSender = formatSender(sender).toUpperCase();
-  return formattedSender.length < 2
-      ? formattedSender
-      : formattedSender.substring(0, 2);
+// @again_guy:matrix.org -> AG
+// a -> A
+String formatInitials(String? word) {
+  final wordUppercase = (word ?? '').toUpperCase();
+  return wordUppercase.length > 1
+      ? wordUppercase.substring(0, 2)
+      : wordUppercase;
 }
 
 String formatTimestampFull({

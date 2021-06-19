@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
@@ -10,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 // Package imports:
-import 'package:crypt/crypt.dart';
 import 'package:device_info/device_info.dart';
 
 import 'package:redux/redux.dart';
@@ -40,11 +40,8 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/remote/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
@@ -294,25 +291,12 @@ ThunkAction<AppState> stopAuthObserver() {
 /// for encryption and verification
 ThunkAction<AppState> generateDeviceId({String? salt}) {
   return (Store<AppState> store) async {
-    // Wait at least 2 seconds until you can attempt to login again
-    // includes processing time by authenticating matrix server
-    store.dispatch(SetStopgap(stopgap: true));
-
-    // prevents people spamming the login if it were to fail repeatedly
-    Timer(Duration(seconds: 2), () {
-      store.dispatch(SetStopgap(stopgap: false));
-    });
-
     final defaultId = Random.secure().nextInt(1 << 31).toString();
-    var device = Device(
-      deviceId: defaultId,
-      displayName: Values.appDisplayName,
-    );
-
-    var deviceId;
 
     try {
       final deviceInfoPlugin = DeviceInfoPlugin();
+
+      var deviceId;
 
       // Find a unique value for the type of device
       if (Platform.isAndroid) {
@@ -326,24 +310,24 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
       }
 
       // hash it
-      final cryptHash = Crypt.sha256(deviceId, rounds: 1000, salt: salt).hash;
+      final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
-      // make it easier to read
-      final deviceIdHash = cryptHash
+      final deviceIdHash = base64
+          .encode(deviceIdDigest.bytes)
           .toUpperCase()
           .replaceAll(RegExp(r'[^\w]'), '')
           .substring(0, 10);
 
-      device = Device(
+      return Device(
         deviceId: deviceIdHash,
-        deviceIdPrivate: deviceId,
         displayName: Values.appDisplayName,
       );
-
-      return device;
     } catch (error) {
       debugPrint('[generateDeviceId] $error');
-      return device;
+      return Device(
+        deviceId: defaultId,
+        displayName: Values.appDisplayName,
+      );
     }
   };
 }
@@ -353,6 +337,15 @@ ThunkAction<AppState> loginUser() {
     store.dispatch(SetLoading(loading: true));
 
     try {
+      // Wait at least 2 seconds until you can attempt to login again
+      // includes processing time by authenticating matrix server
+      store.dispatch(SetStopgap(stopgap: true));
+
+      // prevents people spamming the login if it were to fail repeatedly
+      Timer(Duration(seconds: 2), () {
+        store.dispatch(SetStopgap(stopgap: false));
+      });
+
       var homeserver = store.state.authStore.homeserver;
       final username = store.state.authStore.username.replaceAll('@', '');
       final password = store.state.authStore.password;
@@ -425,7 +418,15 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       }
 
       final username = store.state.authStore.username;
-      final protocol = store.state.authStore.protocol;
+
+      // Wait at least 2 seconds until you can attempt to login again
+      // includes processing time by authenticating matrix server
+      store.dispatch(SetStopgap(stopgap: true));
+
+      // prevents people spamming the login if it were to fail repeatedly
+      Timer(Duration(seconds: 2), () {
+        store.dispatch(SetStopgap(stopgap: false));
+      });
 
       final Device device = await store.dispatch(
         generateDeviceId(salt: username),

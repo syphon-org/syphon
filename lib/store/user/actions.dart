@@ -6,7 +6,6 @@ import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -97,7 +96,7 @@ ThunkAction<AppState> fetchUser({User user = const User()}) {
 }
 
 /// Toggle Block User
-/// 
+///
 /// Fetch the blocked user list and recalculate
 /// events without the given user id
 ThunkAction<AppState> toggleBlockUser({User? user = const User()}) {

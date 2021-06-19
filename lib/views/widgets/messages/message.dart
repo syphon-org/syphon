@@ -38,7 +38,7 @@ class MessageWidget extends StatelessWidget {
 
   final Message message;
   final ThemeType theme;
-  final int? lastRead;
+  final int lastRead;
   final double fontSize;
   final bool isLastSender;
   final bool isNextSender;
@@ -189,7 +189,7 @@ class MessageWidget extends StatelessWidget {
 
     // emoji input button needs space
     final hasReactions = message.reactions.isNotEmpty || selected;
-    final isRead = message.timestamp! < lastRead!;
+    final isRead = message.timestamp < lastRead;
 
     var textColor = Colors.white;
     var showSender = true;
@@ -206,12 +206,12 @@ class MessageWidget extends StatelessWidget {
     var zIndex = 1.0;
     var status = timeFormat == 'full'
         ? formatTimestampFull(
-            lastUpdateMillis: message.timestamp ?? 0,
+            lastUpdateMillis: message.timestamp,
             timeFormat: timeFormat,
             showTime: true,
           )
         : formatTimestamp(
-            lastUpdateMillis: message.timestamp ?? 0,
+            lastUpdateMillis: message.timestamp,
             timeFormat: timeFormat,
             showTime: true,
           );

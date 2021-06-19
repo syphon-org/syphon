@@ -562,7 +562,7 @@ class Room {
       );
 
       // See if the newest message has a greater timestamp
-      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp!) {
+      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
         lastUpdate = messages[0].timestamp;
       }
 

@@ -1,4 +1,5 @@
 // Project imports:
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -14,8 +15,8 @@ String formatPreviewTopic(String? fullTopic) {
   return topicTruncated.replaceAll('\n', ' ');
 }
 
-String formatPreviewMessage(String body) {
-  return body.replaceAll('\n', ' ');
+String formatPreviewMessage(String? body) {
+  return (body ?? '').replaceAll('\n', ' ');
 }
 
 String formatTotalUsers(int totalUsers) {
@@ -25,7 +26,7 @@ String formatTotalUsers(int totalUsers) {
 String formatPreview({required Room room, Message? message}) {
   // Prioritize drafts for any room, regardless of state
   if (room.draft != null && room.draft!.body != null) {
-    return 'Draft: ${formatPreviewMessage(room.draft!.body!)}';
+    return 'Draft: ${formatPreviewMessage(room.draft!.body)}';
   }
 
   // Show topic if the user has joined a group but not sent
@@ -37,7 +38,7 @@ String formatPreview({required Room room, Message? message}) {
 
     // room was created, but no messages or topic
     if (room.topic == null || room.topic!.isEmpty) {
-      return 'No messages yet';
+      return 'No messages';
     }
 
     // show the topic as the preview message
@@ -46,16 +47,17 @@ String formatPreview({required Room room, Message? message}) {
 
   // message was deleted
   if (message.type != EventTypes.encrypted &&
-      (message.body == '' || message.body == null)) {
+      (message.body == null || message.body!.isEmpty)) {
     return 'This message was deleted';
   }
 
   // message hasn't been decrypted
-  if (message.type == EventTypes.encrypted && message.body!.isEmpty) {
+  if (message.type == EventTypes.encrypted &&
+      (message.body == null || message.body!.isEmpty)) {
     return Strings.contentEncryptedMessage;
   }
 
-  return formatPreviewMessage(message.body!);
+  return formatPreviewMessage(message.body);
 }
 
 String formatRoomName({required Room room}) {
@@ -64,5 +66,8 @@ String formatRoomName({required Room room}) {
 }
 
 String formatRoomInitials({required Room room}) {
-  return room.name!.substring(0, 2).toUpperCase();
+  if (room.name == null || room.name!.isEmpty) {
+    return '';
+  }
+  return formatInitials(room.name);
 }

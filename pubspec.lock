@@ -183,13 +183,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  crypt:
-    dependency: "direct main"
-    description:
-      name: crypt
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.1"
   crypto:
     dependency: "direct main"
     description:
@@ -927,7 +920,7 @@ packages:
     source: hosted
     version: "1.2.0"
   test:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: test
       url: "https://pub.dartlang.org"

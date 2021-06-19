@@ -1,4 +1,6 @@
-import 'package:crypt/crypt.dart';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -25,7 +27,7 @@ ThunkAction<AppState> sendKeyRequest({
       final String sessionId = event.content['session_id'];
 
       // Just needs to be unique, but different
-      final requestId = Crypt.sha256(sessionId, rounds: 1000, salt: '').hash;
+      final requestId = sha1.convert(utf8.encode(sessionId)).toString();
 
       final currentUser = store.state.authStore.user;
 

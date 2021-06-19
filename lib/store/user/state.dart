@@ -33,6 +33,7 @@ class UserStore extends Equatable {
         users,
         invites,
         loading,
+        blocked,
       ];
 
   UserStore copyWith({

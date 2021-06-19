@@ -1,11 +1,7 @@
-// Flutter imports:
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -16,7 +12,6 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
@@ -49,19 +44,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeState extends State<HomeScreen> {
-  HomeState({Key? key}) : super();
+  HomeState() : super();
 
-  final GlobalKey<FabCircularMenuState> fabKey =
-      GlobalKey<FabCircularMenuState>();
+  final fabKey = GlobalKey<FabCircularMenuState>();
 
   Room? selectedRoom;
-  late Map<String, Color?> roomColorDefaults;
-
-  @override
-  void initState() {
-    super.initState();
-    roomColorDefaults = Map();
-  }
+  Map<String, Color> roomColorDefaults = {};
 
   @protected
   onToggleRoomOptions({Room? room}) {
@@ -120,7 +108,7 @@ class HomeState extends State<HomeScreen> {
             tooltip: 'Archive Room',
             color: Colors.white,
             onPressed: () async {
-              await props!.onArchiveRoom(room: this.selectedRoom);
+              await props!.onArchiveRoom(room: selectedRoom);
               setState(() {
                 selectedRoom = null;
               });
@@ -134,7 +122,7 @@ class HomeState extends State<HomeScreen> {
               tooltip: 'Leave Chat',
               color: Colors.white,
               onPressed: () async {
-                await props!.onLeaveChat(room: this.selectedRoom);
+                await props!.onLeaveChat(room: selectedRoom);
                 setState(() {
                   selectedRoom = null;
                 });
@@ -142,14 +130,14 @@ class HomeState extends State<HomeScreen> {
             ),
           ),
           Visibility(
-            visible: this.selectedRoom!.direct,
+            visible: selectedRoom!.direct,
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
               tooltip: 'Delete Chat',
               color: Colors.white,
               onPressed: () async {
-                await props!.onDeleteChat(room: this.selectedRoom);
+                await props!.onDeleteChat(room: selectedRoom);
                 setState(() {
                   selectedRoom = null;
                 });
@@ -251,7 +239,9 @@ class HomeState extends State<HomeScreen> {
       );
 
   @protected
-  Widget buildChatList(List<Room> rooms, BuildContext context, _Props props) {
+  Widget buildChatList(BuildContext context, _Props props) {
+    final rooms = props.rooms;
+
     if (rooms.isEmpty) {
       return Center(
           child: Column(
@@ -288,23 +278,25 @@ class HomeState extends State<HomeScreen> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
-        final messageLatest = latestMessage(messages);
         final chatSettings = props.chatSettings[room.id];
+
+        final messageLatest = latestMessage(messages);
         final preview = formatPreview(room: room, message: messageLatest);
+        final roomName = room.name ?? '';
         final newMessage = messageLatest != null &&
-            room.lastRead < messageLatest.timestamp! &&
+            room.lastRead < messageLatest.timestamp &&
             messageLatest.sender != props.currentUser.userId;
 
         var backgroundColor;
         var textStyle = TextStyle();
-        var primaryColor = Colors.grey[500];
+        Color primaryColor = Colors.grey;
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
         if (chatSettings != null) {
           primaryColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
-          primaryColor = roomColorDefaults[room.id];
+          primaryColor = roomColorDefaults[room.id] ?? primaryColor;
         } else {
           primaryColor = Colours.hashedColor(room.id);
           roomColorDefaults.putIfAbsent(
@@ -358,7 +350,7 @@ class HomeState extends State<HomeScreen> {
                 '/home/chat',
                 arguments: ChatViewArguements(
                   roomId: room.id,
-                  title: room.name,
+                  title: roomName,
                 ),
               );
             }
@@ -504,7 +496,7 @@ class HomeState extends State<HomeScreen> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              room.name!,
+                              roomName,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
@@ -570,7 +562,6 @@ class HomeState extends State<HomeScreen> {
                           GestureDetector(
                             onTap: onDismissMessageOptions,
                             child: buildChatList(
-                              props.rooms,
                               context,
                               props,
                             ),
@@ -628,12 +619,14 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         rooms,
+        messages,
         theme,
         syncing,
         offline,
         unauthed,
         currentUser,
         chatSettings,
+        roomTypeBadgesEnabled,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(

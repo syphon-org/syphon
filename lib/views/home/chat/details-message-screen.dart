@@ -60,9 +60,9 @@ class MessageDetailsScreen extends StatelessWidget {
           final Message message = props.message!;
 
           final timestamp =
-              DateTime.fromMillisecondsSinceEpoch(message.timestamp!);
+              DateTime.fromMillisecondsSinceEpoch(message.timestamp);
           final received = DateTime.fromMillisecondsSinceEpoch(
-              message.received ?? message.timestamp!);
+              message.received ?? message.timestamp);
 
           final isUserSent = props.userId == message.sender;
 
