@@ -23,7 +23,6 @@ Room parseRoom(Map params) {
   final Room room = params['room'];
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
-  print('WHAT ${lastSince}');
 
   // TODO: eventually remove the need for this with modular parsers
   return room.fromSync(

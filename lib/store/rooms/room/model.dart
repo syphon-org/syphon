@@ -274,8 +274,6 @@ class Room {
     final List<Message> messageEvents = [];
     final List<Redaction> redactionEvents = [];
 
-    print('FROM SYNC ${lastSince}');
-
     // Find state only updates
     if (json['state'] != null) {
       final List<dynamic> stateEventsRaw = json['state']['events'];

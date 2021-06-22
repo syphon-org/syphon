@@ -112,8 +112,6 @@ class ChatInputState extends State<ChatInput> {
       sendable = text.trim().isNotEmpty;
     });
 
-    print('text ${text} ${text.trim().isNotEmpty}');
-
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
       props!.onSendTyping(typing: true, roomId: props.room.id);
