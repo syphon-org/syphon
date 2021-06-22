@@ -30,7 +30,6 @@ class ChatInput extends StatefulWidget {
   final TextEditingController controller;
 
   final Function? onSubmitMessage;
-  final Function? onSubmittedMessage;
   final Function? onChangeMethod;
   final Function? onUpdateMessage;
   final Function? onCancelReply;
@@ -47,7 +46,6 @@ class ChatInput extends StatefulWidget {
     this.onUpdateMessage,
     this.onChangeMethod,
     this.onSubmitMessage,
-    this.onSubmittedMessage,
     this.onCancelReply,
   }) : super(key: key);
 
@@ -97,11 +95,24 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
-  @protected
+  @override
+  void dispose() {
+    super.dispose();
+    if (typingNotifier != null) {
+      typingNotifier!.cancel();
+    }
+
+    if (typingNotifierTimeout != null) {
+      typingNotifierTimeout!.cancel();
+    }
+  }
+
   onUpdate(String text, {_Props? props}) {
     setState(() {
       sendable = text.trim().isNotEmpty;
     });
+
+    print('text ${text} ${text.trim().isNotEmpty}');
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
@@ -139,15 +150,13 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    if (typingNotifier != null) {
-      typingNotifier!.cancel();
-    }
+  onSubmit() {
+    setState(() {
+      sendable = false;
+    });
 
-    if (typingNotifierTimeout != null) {
-      typingNotifierTimeout!.cancel();
+    if (widget.onSubmitMessage != null) {
+      widget.onSubmitMessage!();
     }
   }
 
@@ -168,14 +177,16 @@ class ChatInputState extends State<ChatInput> {
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
           final isSendable = sendable && !widget.sending;
+
+          if (!isSendable) {
+            sendButtonColor = Color(Colours.greyDisabled);
+          }
+
           if (widget.mediumType == MediumType.plaintext) {
+            hintText = Strings.placeholderInputMatrixUnencrypted;
+
             if (isSendable) {
-              if (Theme.of(context).accentColor !=
-                  Theme.of(context).primaryColor) {
-                sendButtonColor = Theme.of(context).accentColor;
-              } else {
-                sendButtonColor = Colors.grey[700];
-              }
+              sendButtonColor = Theme.of(context).accentColor;
             }
           }
 
@@ -190,8 +201,7 @@ class ChatInputState extends State<ChatInput> {
           var sendButton = InkWell(
             borderRadius: BorderRadius.circular(48),
             onLongPress: widget.onChangeMethod as void Function()?,
-            onTap:
-                !isSendable ? null : widget.onSubmitMessage as void Function()?,
+            onTap: !isSendable ? null : onSubmit,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Container(
@@ -209,9 +219,7 @@ class ChatInputState extends State<ChatInput> {
             sendButton = InkWell(
               borderRadius: BorderRadius.circular(48),
               onLongPress: widget.onChangeMethod as void Function()?,
-              onTap: !isSendable
-                  ? null
-                  : widget.onSubmitMessage as void Function()?,
+              onTap: !isSendable ? null : onSubmit,
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
                 child: Container(
@@ -331,9 +339,7 @@ class ChatInputState extends State<ChatInput> {
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !isSendable
-                          ? null
-                          : widget.onSubmittedMessage as void Function(String)?,
+                      onSubmitted: !isSendable ? null : (text) => onSubmit(),
                       style: TextStyle(
                         height: 1.5,
                         color: inputTextColor,

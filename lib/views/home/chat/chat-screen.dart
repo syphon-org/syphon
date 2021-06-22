@@ -511,7 +511,6 @@ class ChatScreenState extends State<ChatScreen> {
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSubmitMessage(props),
-                        onSubmittedMessage: (text) => onSubmitMessage(props),
                       ),
                     ),
                   ),

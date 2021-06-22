@@ -171,10 +171,10 @@ class Room {
     bool? hidden,
     bool? archived,
     joinRule,
-    lastRead,
-    lastUpdate,
-    namePriority,
-    totalJoinedUsers,
+    int? lastRead,
+    int? lastUpdate,
+    int? namePriority,
+    int? totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
     userTyping,
@@ -274,6 +274,8 @@ class Room {
     final List<Message> messageEvents = [];
     final List<Redaction> redactionEvents = [];
 
+    print('FROM SYNC ${lastSince}');
+
     // Find state only updates
     if (json['state'] != null) {
       final List<dynamic> stateEventsRaw = json['state']['events'];
@@ -342,9 +344,7 @@ class Room {
       }
     }
 
-    return fromAccountData(
-      accountEvents,
-    )
+    return fromAccountData(accountEvents)
         .fromStateEvents(
           invite: invite,
           limited: limited,
@@ -414,7 +414,7 @@ class Room {
 
     events.forEach((event) {
       try {
-        final timestamp = event.timestamp ?? 0;
+        final timestamp = event.timestamp;
         lastUpdate = timestamp > lastUpdate! ? event.timestamp : lastUpdate;
 
         switch (event.type) {
@@ -608,7 +608,7 @@ class Room {
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
-        lastUpdate: lastUpdate ?? this.lastUpdate,
+        lastUpdate: lastUpdate,
         // oldest hash in the timeline
         lastHash: lastHash ?? this.lastHash ?? prevHash,
         // most recent prev_batch from the last /sync
