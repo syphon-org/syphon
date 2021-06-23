@@ -14,11 +14,10 @@ class Colours {
   static const greyDark = 0xff4D5767;
   static const greyBubble = 0xffEEEEEE;
 
-  static const blackDefault = 0xff121212;
   static const blackFull = 0xff000000;
+  static const blackDefault = 0xff121212;
   static const greyDefault = 0xFF9E9E9E;
   static const whiteDefault = 0xffFEFEFE;
-  static const textDefault = 0xFF42A5F5;
 
   // Material colors at shades of 700
   static const chatRed = 0xFFC62828;

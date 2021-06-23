@@ -8,6 +8,11 @@ import 'package:syphon/store/settings/notification-settings/options/types.dart';
 
 part 'model.g.dart';
 
+enum LastUpdateType {
+  Message,
+  State,
+}
+
 @JsonSerializable()
 class ChatSetting extends Equatable {
   final String roomId;

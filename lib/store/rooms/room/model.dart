@@ -15,6 +15,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -396,6 +397,7 @@ class Room {
     required List<Event> events,
     List<Reaction>? reactions,
     List<Redaction>? redactions,
+    LastUpdateType lastUpdateType = LastUpdateType.Message,
   }) {
     String? name;
     String? avatarUri;
@@ -403,7 +405,7 @@ class Room {
     String? joinRule;
     bool? encryptionEnabled;
     bool direct = this.direct;
-    int? lastUpdate = this.lastUpdate;
+    int? lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
     final Map<String, User> usersAdd = Map.from(usersNew);
@@ -413,7 +415,9 @@ class Room {
     events.forEach((event) {
       try {
         final timestamp = event.timestamp;
-        lastUpdate = timestamp > lastUpdate! ? event.timestamp : lastUpdate;
+        if (lastUpdateType == LastUpdateType.State) {
+          lastUpdate = timestamp > lastUpdate! ? timestamp : lastUpdate;
+        }
 
         switch (event.type) {
           case 'm.room.name':
@@ -530,7 +534,7 @@ class Room {
       userIds: userIds.toList(),
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
-      lastUpdate: lastUpdate! > 0 ? lastUpdate : this.lastUpdate,
+      lastUpdate: lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,

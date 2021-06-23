@@ -189,14 +189,14 @@ class VerificationScreenState extends State<VerificationScreen>
                                 ),
                                 child: ButtonSolid(
                                   text: 'resend email',
-                                  loading: this.sending || props.loading,
-                                  disabled: this.sending || props.loading,
+                                  loading: sending || props.loading,
+                                  disabled: sending || props.loading,
                                   onPressed: () {
                                     props.onResendVerification(
-                                      sendAttempt: this.sendAttempt + 1,
+                                      sendAttempt: sendAttempt + 1,
                                     );
                                     setState(() {
-                                      sendAttempt = this.sendAttempt + 1;
+                                      sendAttempt = sendAttempt + 1;
                                     });
                                   },
                                 ),
