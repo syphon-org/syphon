@@ -211,7 +211,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                 ),
                                 child: ButtonText(
                                   text: 'check verification',
-                                  disabled: this.sending || props.loading,
+                                  disabled: sending || props.loading,
                                   onPressed: () async {
                                     final result = await props.onCreateUser(
                                         enableErrors: true);

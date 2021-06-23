@@ -17,7 +17,7 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/captcha.dart';
 
 class DialogCaptcha extends StatelessWidget {
-  DialogCaptcha({
+  const DialogCaptcha({
     Key? key,
     this.onConfirm,
     this.onCancel,
@@ -31,8 +31,8 @@ class DialogCaptcha extends StatelessWidget {
       distinct: true,
       converter: (Store<AppState> store) => Props.mapStateToProps(store),
       builder: (context, props) {
-        double width = MediaQuery.of(context).size.width;
-        double height = MediaQuery.of(context).size.height;
+        final double width = MediaQuery.of(context).size.width;
+        final double height = MediaQuery.of(context).size.height;
 
         return SimpleDialog(
           shape: RoundedRectangleBorder(
@@ -77,8 +77,8 @@ class DialogCaptcha extends StatelessWidget {
                 ButtonText(
                   text: 'Cancel',
                   onPressed: () {
-                    if (this.onCancel != null) {
-                      this.onCancel!();
+                    if (onCancel != null) {
+                      onCancel!();
                     }
                     Navigator.of(context).pop();
                   },
@@ -96,11 +96,17 @@ class Props extends Equatable {
 
   final Function onCompleteCaptcha;
 
-  Props({
+  const Props({
     required this.completed,
     required this.publicKey,
     required this.onCompleteCaptcha,
   });
+
+  @override
+  List<Object?> get props => [
+        completed,
+        publicKey,
+      ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
@@ -108,7 +114,8 @@ class Props extends Equatable {
           return store.state.authStore.interactiveAuths['params']
               [MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token, {required BuildContext context}) async {
+        onCompleteCaptcha: (String token,
+            {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),
@@ -117,10 +124,4 @@ class Props extends Equatable {
           Navigator.of(context).pop();
         },
       );
-
-  @override
-  List<Object?> get props => [
-        completed,
-        publicKey,
-      ];
 }

@@ -18,6 +18,7 @@ class Colours {
   static const blackFull = 0xff000000;
   static const greyDefault = 0xFF9E9E9E;
   static const whiteDefault = 0xffFEFEFE;
+  static const textDefault = 0xFF42A5F5;
 
   // Material colors at shades of 700
   static const chatRed = 0xFFC62828;
