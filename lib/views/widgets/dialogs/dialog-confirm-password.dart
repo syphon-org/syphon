@@ -11,7 +11,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
-import 'package:syphon/views/widgets/loader/loader-indicator.dart';
+import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogConfirmPassword extends StatelessWidget {
   const DialogConfirmPassword({

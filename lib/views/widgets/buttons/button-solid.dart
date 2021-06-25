@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/views/widgets/loader/loader-indicator.dart';
+import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class ButtonSolid extends StatelessWidget {
   const ButtonSolid({
