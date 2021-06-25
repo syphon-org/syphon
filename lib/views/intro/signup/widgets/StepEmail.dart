@@ -113,51 +113,49 @@ class EmailStepState extends State<EmailStep> {
                         style: Theme.of(context).textTheme.caption,
                       ),
                     ),
-                    Container(
-                      child: Stack(
-                        overflow: Overflow.visible,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 24,
-                            ),
-                            child: Text(
-                              'Enter an email address',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 24,
                           ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      DialogExplaination(
-                                    title: Strings.titleDialogEmailRequirement,
-                                    content: Strings.contentEmailRequirement,
-                                    onConfirm: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 20,
-                                width: 20,
-                                child: Icon(
-                                  Icons.info_outline,
-                                  color: Theme.of(context).accentColor,
-                                  size: 20,
+                          child: Text(
+                            'Enter an email address',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    DialogExplaination(
+                                  title: Strings.titleDialogEmailRequirement,
+                                  content: Strings.contentEmailRequirement,
+                                  onConfirm: () {
+                                    Navigator.pop(context);
+                                  },
                                 ),
+                              );
+                            },
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              child: Icon(
+                                Icons.info_outline,
+                                color: Theme.of(context).accentColor,
+                                size: 20,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     Visibility(
                       visible: !props.isEmailAvailable,

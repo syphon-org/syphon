@@ -69,41 +69,39 @@ class CaptchaStepState extends State<CaptchaStep> {
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ),
-                  Container(
-                    child: Stack(
-                      overflow: Overflow.visible,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 24,
-                          ),
-                          child: Text(
-                            'Confirm you\'re alive',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 24,
                         ),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () {
-                              // TODO: show captcha explaination dialog
-                            },
-                            child: Container(
-                              height: 20,
-                              width: 20,
-                              child: Icon(
-                                Icons.info_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                        child: Text(
+                          'Confirm you\'re alive',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            // TODO: show captcha explaination dialog
+                          },
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                              size: 20,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -150,9 +148,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
-        onShowCaptcha: (
-          BuildContext context,
-        ) async {
+        onShowCaptcha: (BuildContext context) async {
           final authSession = store.state.authStore.session;
           await showDialog(
             context: context,

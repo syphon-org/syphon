@@ -269,7 +269,7 @@ ThunkAction<AppState> startAuthObserver() {
 
     // set auth state listener
     store.state.authStore.onAuthStateChanged!.listen(
-      onAuthStateChanged as Function(User?),
+      onAuthStateChanged,
     );
   };
 }
@@ -499,6 +499,8 @@ ThunkAction<AppState> logoutUser() {
         }
       }
 
+      store.state.authStore.authObserver!.add(null);
+
       // wipe cache
       await deleteCache();
       await initCache();
@@ -672,7 +674,7 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String? password}) {
       final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
-        protocol: store.state.authStore.protocol,
+        protocol: protocol,
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
@@ -857,10 +859,11 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       return true;
     } catch (error) {
       printError('[createUser] error $error');
+
       if (enableErrors) {
         store.dispatch(addAlert(
           origin: 'createUser',
-          message: 'Failed to signup',
+          message: error.toString(),
           error: error,
         ));
       }
@@ -1079,7 +1082,18 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
           return store.dispatch(setInteractiveAuths(auths: data));
         }
 
-        store.dispatch(logoutUser());
+        store.state.authStore.authObserver!.add(null);
+
+        // wipe cache
+        await deleteCache();
+        await initCache();
+
+        // wipe cold storage
+        await deleteStorage();
+        await initStorage();
+
+        // reset client secret
+        await store.dispatch(initClientSecret());
       } catch (error) {
         store.dispatch(addAlert(
           error: error,
@@ -1095,8 +1109,7 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
-    final List<dynamic> homeserversJson =
-        await (JackApi.fetchPublicServers() as Future<List<dynamic>>);
+    final homeserversJson = await JackApi.fetchPublicServers();
 
     // parse homeserver data
     final List<Homeserver> homserverData = homeserversJson.map((data) {
@@ -1130,8 +1143,8 @@ ThunkAction<AppState> fetchHomeservers() {
     final homeservers = await Future.wait(
       homserverData.map((homeserver) async {
         final url = await fetchFavicon(url: homeserver.hostname);
-        final uri = Uri.parse(url!);
         try {
+          final uri = Uri.parse(url!);
           final response = await http.get(uri);
 
           if (response.statusCode == 200) {
@@ -1268,14 +1281,13 @@ ThunkAction<AppState> resolveUsername({String? username}) {
 ThunkAction<AppState> setLoginPassword({String? password}) =>
     (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
-
       store.dispatch(SetPasswordValid(
         valid: password != null && password.isNotEmpty,
       ));
     };
 
 ThunkAction<AppState> setPassword({
-  String? password,
+  required String password,
   bool ignoreConfirm = false,
 }) {
   return (Store<AppState> store) {
@@ -1285,10 +1297,8 @@ ThunkAction<AppState> setPassword({
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
-      valid: password != null &&
-          currentConfirm != null &&
-          password.length > 6 &&
-          (currentPassword == currentConfirm || ignoreConfirm),
+      valid: (currentPassword == currentConfirm || ignoreConfirm) &&
+          password.length > 8,
     ));
   };
 }

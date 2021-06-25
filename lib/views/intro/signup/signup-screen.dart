@@ -25,7 +25,6 @@ import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
 import 'widgets/StepUsername.dart';
 
-// Styling Widgets
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
@@ -33,6 +32,7 @@ final Duration nextAnimationDuration = Duration(
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
 
+  @override
   SignupScreenState createState() => SignupScreenState();
 }
 
@@ -49,7 +49,7 @@ class SignupScreenState extends State<SignupScreen> {
     PasswordStep(),
   ];
 
-  SignupScreenState({Key? key});
+  SignupScreenState();
 
   @override
   void initState() {
@@ -67,8 +67,13 @@ class SignupScreenState extends State<SignupScreen> {
     onMounted();
   }
 
-  @protected
-  void onMounted() async {
+  @override
+  void deactivate() {
+    subscription.cancel();
+    super.deactivate();
+  }
+
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
 
     final props = _Props.mapStateToProps(store);
@@ -82,11 +87,11 @@ class SignupScreenState extends State<SignupScreen> {
 
     // Init change listener
     subscription = store.onChange.listen((state) async {
-      if (state.authStore.interactiveAuths.isNotEmpty &&
-          this.sections.length < 4) {
+      if (state.authStore.interactiveAuths.isNotEmpty && sections.length < 4) {
         final newSections = List<Widget>.from(sections);
 
         List<dynamic>? newStages = [];
+
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
         } catch (error) {
@@ -117,8 +122,7 @@ class SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  @protected
-  void onDidChange(_Props? oldProps, _Props props) {
+  onDidChange(_Props? oldProps, _Props props) {
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
         sections = sections
@@ -136,14 +140,7 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  @override
-  void deactivate() {
-    subscription.cancel();
-    super.deactivate();
-  }
-
-  @protected
-  void onBackStep(BuildContext context) {
+  onBackStep(BuildContext context) {
     if (currentStep < 1) {
       Navigator.pop(context, false);
     } else {
@@ -217,7 +214,7 @@ class SignupScreenState extends State<SignupScreen> {
       case PasswordStep:
         return () async {
           if (sections.length < 4) {
-            final result = await props.onCreateUser();
+            final result = await props.onCreateUser(enableErrors: lastStep);
 
             // If signup is completed here, just wait for auth redirect
             if (result) {
@@ -338,10 +335,8 @@ class SignupScreenState extends State<SignupScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width,
+                  height: height,
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -415,8 +410,7 @@ class SignupScreenState extends State<SignupScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SmoothPageIndicator(
-                                    controller:
-                                        pageController!, // PageController
+                                    controller: pageController!,
                                     count: sections.length,
                                     effect: WormEffect(
                                       spacing: 16,
@@ -424,7 +418,7 @@ class SignupScreenState extends State<SignupScreen> {
                                       dotWidth: 12,
                                       activeDotColor:
                                           Theme.of(context).primaryColor,
-                                    ), // your preferred effect
+                                    ),
                                   ),
                                 ],
                               ),

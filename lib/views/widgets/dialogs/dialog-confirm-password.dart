@@ -123,7 +123,9 @@ class DialogConfirmPassword extends StatelessWidget {
                   child: !props.loading
                       ? Text(Strings.buttonConfirmOfficial,
                           style: TextStyle(
-                            color: Theme.of(context).primaryColor,
+                            color: props.valid
+                                ? Theme.of(context).primaryColor
+                                : Color(Colours.greyDisabled),
                           ))
                       : LoadingIndicator(),
                 ),

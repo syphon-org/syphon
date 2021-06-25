@@ -24,7 +24,7 @@ class HomeserverStep extends StatefulWidget {
 }
 
 class HomeserverStepState extends State<HomeserverStep> {
-  HomeserverStepState({Key? key});
+  HomeserverStepState();
 
   final homeserverController = TextEditingController();
 

@@ -29,11 +29,11 @@ class SearchHomeserverScreen extends StatefulWidget {
 }
 
 class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
-  final Store<AppState>? store;
   final searchInputFocusNode = FocusNode();
 
   bool searching = false;
-  SearchHomeserverScreenState({Key? key, this.store});
+  ExpandableController controller = ExpandableController();
+  SearchHomeserverScreenState();
 
   @override
   void didChangeDependencies() {
@@ -45,7 +45,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
-    if (!this.searching) {
+    if (!searching) {
       setState(() {
         searching = true;
       });
@@ -97,8 +97,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                     scrollDirection: Axis.vertical,
                     itemCount: props.homeservers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Homeserver homeserver =
-                          props.homeservers[index] ?? Map() as Homeserver;
+                      final homeserver =
+                          props.homeservers[index] ?? {} as Homeserver;
 
                       return GestureDetector(
                         onTap: () {
@@ -111,7 +111,10 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                             theme: ExpandableThemeData(
                               hasIcon: false,
                               tapBodyToCollapse: true,
-                              tapHeaderToExpand: true,
+                              tapHeaderToExpand: false,
+                              expandIcon: IconData(
+                                Icons.arrow_drop_down.codePoint,
+                              ),
                             ),
                             header: ListTile(
                               leading: Avatar(
@@ -216,7 +219,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver.responseTime! + 'ms',
+                                        '${homeserver.responseTime ?? '0'}ms',
                                         softWrap: true,
                                       ),
                                     ],
@@ -236,7 +239,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                   ),
                   Visibility(
                     visible: props.searchText.isNotEmpty &&
-                        props.searchText.length > 0 &&
+                        props.searchText.isNotEmpty &&
                         props.homeservers.isEmpty,
                     child: Container(
                       padding: EdgeInsets.only(top: 8, bottom: 8),
@@ -252,7 +255,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                             url: props.homeserver.photoUrl != null
                                 ? props.homeserver.photoUrl
                                 : null,
-                            background: props.searchText.length > 0
+                            background: props.searchText.isNotEmpty
                                 ? Colours.hashedColor(props.searchText)
                                 : Colors.grey,
                           ),
@@ -288,7 +291,7 @@ class _Props extends Equatable {
   final Function onSelect;
   final Function onFetchHomeserverPreview;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.homeservers,
     required this.searchText,
@@ -321,7 +324,7 @@ class _Props extends Equatable {
           store.dispatch(searchHomeservers(searchText: text));
         },
         onFetchHomeserverPreview: (String hostname) async {
-          var urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
+          final urlRegex = RegExp(Values.urlRegex, caseSensitive: false);
 
           if (urlRegex.hasMatch('https://$hostname')) {
             final preview = await store.dispatch(

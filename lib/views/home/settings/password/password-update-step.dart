@@ -8,22 +8,19 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
-// Store
+class PasswordUpdateStep extends StatefulWidget {
+  const PasswordUpdateStep({Key? key}) : super(key: key);
 
-// Styling
-
-class PasswordStep extends StatefulWidget {
-  const PasswordStep({Key? key}) : super(key: key);
-
-  PasswordStepState createState() => PasswordStepState();
+  PasswordUpdateStepState createState() => PasswordUpdateStepState();
 }
 
-class PasswordStepState extends State<PasswordStep> {
-  PasswordStepState({Key? key});
+class PasswordUpdateStepState extends State<PasswordUpdateStep> {
+  PasswordUpdateStepState({Key? key});
 
   bool visibility = false;
   FocusNode currentFocusNode = FocusNode();
@@ -76,7 +73,7 @@ class PasswordStepState extends State<PasswordStep> {
                       Container(
                         padding: EdgeInsets.only(bottom: 8, top: 8),
                         child: Text(
-                          'Come up with 4 random words\nyou\'ll easily remember',
+                          Strings.passwordRecommendationDefault,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.caption,
                         ),
@@ -239,7 +236,7 @@ class _Props extends Equatable {
   final Function onChangePasswordConfirm;
   final Function onChangeCurrentPassword;
 
-  _Props({
+  const _Props({
     required this.password,
     required this.passwordCurrent,
     required this.passwordConfirm,

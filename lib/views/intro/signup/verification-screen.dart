@@ -239,7 +239,7 @@ class _Props extends Equatable {
   final Function onCreateUser;
   final Function onResendVerification;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.verification,
     required this.onCreateUser,

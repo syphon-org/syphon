@@ -7,7 +7,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogExplaination extends StatelessWidget {
-  DialogExplaination({
+  const DialogExplaination({
     Key? key,
     this.user,
     this.title = '',

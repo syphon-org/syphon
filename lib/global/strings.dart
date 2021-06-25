@@ -81,6 +81,10 @@ class Strings {
   static const buttonLoginCreateAction = 'Create One';
   static const buttonTextLogin = 'Login';
 
+  // Prompts
+  static const passwordRecommendationDefault =
+      'Try thinking up 3 or more random\nwords you\'ll easily remember';
+
   // Errors
   static const alertInviteUnknownUser =
       'This user doesn\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
@@ -130,7 +134,10 @@ class Strings {
       'A verification email will be sent to your inbox before resetting your password. After verification, you\'ll be able to set and confirm a new password.';
 
   static const contentConfirmPasswordReset =
-      'Click on the link sent to your email. After clicking the link, press the continue button below to change your passwoord.';
+      'Click on the link sent to your email. After clicking the link, press the continue button below to change your password.';
+
+  static const contentPasswordRequirements =
+      'Each homeserver may have different requirements for passwords.\n\nIf you\'re having trouble, try creating a password including a lower-case letter, an upper-case letter, a number and a symbol and with at least 8 characters';
 
   static const contentEmailVerifiedRequirement =
       'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';

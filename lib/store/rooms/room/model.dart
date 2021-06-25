@@ -508,7 +508,7 @@ class Room {
 
           // set name and avi to first non user or that + total others
           name = hasMultipleUsers
-              ? '${shownUser.displayName} and ${usersAdd.values.length - 1}'
+              ? '${shownUser.displayName} and ${usersAdd.values.length - 1} others'
               : shownUser.displayName;
 
           // set avatar if one has not been assigned
