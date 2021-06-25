@@ -1,8 +1,6 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
@@ -14,7 +12,6 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 
-// Project imports:
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/reducer.dart';

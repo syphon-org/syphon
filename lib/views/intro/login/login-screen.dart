@@ -1,12 +1,9 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:math';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 
@@ -18,7 +15,6 @@ import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -431,7 +427,7 @@ class _Props extends Equatable {
   final Function onChangeHomeserver;
   final Function onResetSession;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.username,
     required this.password,
@@ -474,7 +470,7 @@ class _Props extends Equatable {
           homeserver: store.state.authStore.hostname,
         ),
         onResetSession: () async {
-          await store.dispatch(resetSession());
+          await store.dispatch(resetInteractiveAuth());
         },
         onChangeUsername: (String text) async {
           await store.dispatch(resolveUsername(username: text));

@@ -1,4 +1,3 @@
-// Flutter imports:
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';

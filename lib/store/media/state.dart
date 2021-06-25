@@ -1,7 +1,5 @@
-// Dart imports:
 import 'dart:typed_data';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 
 // @JsonSerializable(nullable: true, includeIfNull: true)

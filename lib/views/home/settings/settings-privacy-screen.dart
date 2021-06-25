@@ -1,33 +1,108 @@
-// Flutter imports:
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
+import 'package:syphon/views/widgets/loader/loader-indicator.dart';
 
 class PrivacySettingsScreen extends StatelessWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
 
+  onConfirmDeactivateAccount({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Confirm Deactivate Account'),
+        content: Text(Strings.contentDeactivateAccount),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            child: Text(
+              Strings.buttonCancel,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              props.onResetConfirmAuth();
+              onConfirmDeactivateAccountFinal(props: props, context: context);
+            },
+            child: Text(
+              Strings.buttonConfirm,
+              style: TextStyle(
+                color: Colors.redAccent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  onConfirmDeactivateAccountFinal({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Confirm Deactivate Account'),
+        content: Text(Strings.contentDeactivateAccountFinal),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            child: Text(
+              Strings.buttonCancel,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await props.onDeactivateAccount(context);
+            },
+            child: props.loading
+                ? LoadingIndicator()
+                : Text(
+                    Strings.buttonDeactivate,
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  onConfirmAuth() {}
+
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
+          final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
             appBar: AppBar(
@@ -225,6 +300,35 @@ class PrivacySettingsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    CardSection(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: Dimensions.listPadding,
+                            child: Text(
+                              'Account Management',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onConfirmDeactivateAccount(
+                              props: props,
+                              context: context,
+                            ),
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Deactivate Account',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 )),
           );
@@ -232,9 +336,10 @@ class PrivacySettingsScreen extends StatelessWidget {
       );
 }
 
-class Props extends Equatable {
-  final bool? typingIndicators;
+class _Props extends Equatable {
+  final bool loading;
   final bool? readReceipts;
+  final bool? typingIndicators;
 
   final Function onToggleTypingIndicators;
   final Function onToggleReadReceipts;
@@ -242,93 +347,125 @@ class Props extends Equatable {
   final Function onImportDeviceKey;
   final Function onDeleteDeviceKey;
   final Function onDisabled;
+  final Function onDeactivateAccount;
+  final Function onResetConfirmAuth;
 
-  Props({
-    required this.onDisabled,
-    required this.typingIndicators,
+  const _Props({
+    required this.loading,
     required this.readReceipts,
+    required this.typingIndicators,
+    required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onToggleReadReceipts,
     required this.onExportDeviceKey,
     required this.onImportDeviceKey,
     required this.onDeleteDeviceKey,
+    required this.onDeactivateAccount,
+    required this.onResetConfirmAuth,
   });
 
   @override
   List<Object?> get props => [
+        loading,
         typingIndicators,
         readReceipts,
       ];
 
-  static Props mapStateToProps(Store<AppState> store) => Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
+        loading: store.state.authStore.loading,
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
         readReceipts: store.state.settingsStore.readReceiptsEnabled,
         onDisabled: () => store.dispatch(addInProgress()),
+        onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
+        onDeactivateAccount: (BuildContext context) async {
+          // Attempt to deactivate account
+          await store.dispatch(deactivateAccount());
+
+          // Prompt for password if an Interactive Auth sessions was started
+          final authSession = store.state.authStore.session;
+          if (authSession != null) {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => DialogConfirmPassword(
+                key: Key(authSession),
+                title: tr(StringIds.titleConfirmPassword),
+                content: tr(StringIds.promptConfirmDeactivation),
+                onConfirm: () async {
+                  await store.dispatch(deactivateAccount());
+                  Navigator.of(dialogContext).pop();
+                },
+                onCancel: () async {
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+            );
+          }
+        },
         onToggleTypingIndicators: () => store.dispatch(
           toggleTypingIndicators(),
         ),
         onToggleReadReceipts: () => store.dispatch(
           toggleReadReceipts(),
         ),
+        onImportDeviceKey: () {
+          store.dispatch(importDeviceKeysOwned());
+        },
         onExportDeviceKey: (BuildContext context) async {
           await showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: Text("Confirm Exporting Keys"),
+            builder: (dialogContext) => AlertDialog(
+              title: Text('Confirm Exporting Keys'),
               content: Text(Strings.contentDeleteDeviceKeyWarning),
               actions: <Widget>[
                 TextButton(
-                  child: Text(Strings.buttonCancel),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
+                  child: Text(Strings.buttonCancel),
                 ),
                 TextButton(
+                  onPressed: () async {
+                    store.dispatch(exportDeviceKeysOwned());
+                    Navigator.of(dialogContext).pop();
+                  },
                   child: Text(
                     'Export Keys',
                     style: TextStyle(
                       color: Colors.redAccent,
                     ),
                   ),
-                  onPressed: () async {
-                    store.dispatch(exportDeviceKeysOwned());
-                    Navigator.of(context).pop();
-                  },
                 ),
               ],
             ),
           );
         },
-        onImportDeviceKey: () {
-          store.dispatch(importDeviceKeysOwned());
-        },
         onDeleteDeviceKey: (BuildContext context) async {
           await showDialog(
             context: context,
-            builder: (context) => AlertDialog(
+            builder: (dialogContext) => AlertDialog(
               title: Text(Strings.titleDialogDeleteKeys),
               content: Text(Strings.confirmationDeleteKeys),
               actions: <Widget>[
                 TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
                   child: Text(
                     Strings.buttonCancel,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
                 ),
                 TextButton(
+                  onPressed: () async {
+                    await store.dispatch(deleteDeviceKeys());
+                    Navigator.of(dialogContext).pop();
+                  },
                   child: Text(
                     Strings.buttonDeleteKeys,
                     style: Theme.of(context).textTheme.subtitle1!.copyWith(
                           color: Colors.redAccent,
                         ),
                   ),
-                  onPressed: () async {
-                    await store.dispatch(deleteDeviceKeys());
-                    Navigator.of(context).pop();
-                  },
                 ),
               ],
             ),

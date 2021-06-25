@@ -1,13 +1,10 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Package imports:
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
@@ -17,7 +14,6 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 
-// Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';

@@ -1,12 +1,9 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -18,7 +15,6 @@ import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';

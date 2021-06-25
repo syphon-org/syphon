@@ -1,4 +1,3 @@
-// Flutter imports:
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 
-// Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -385,7 +383,7 @@ class _Props extends Equatable {
 
   final Function onSendTyping;
 
-  _Props({
+  const _Props({
     required this.room,
     required this.enterSendEnabled,
     required this.onSendTyping,

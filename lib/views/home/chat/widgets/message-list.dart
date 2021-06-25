@@ -1,4 +1,3 @@
-// Flutter imports:
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';

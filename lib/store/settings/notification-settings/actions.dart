@@ -1,7 +1,6 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';

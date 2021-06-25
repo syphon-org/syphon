@@ -1,10 +1,6 @@
-// Dart imports:
-
-// Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';

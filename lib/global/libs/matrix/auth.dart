@@ -1,16 +1,15 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-// Package imports:
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id183
-/// 
+///
 /// Authentication Types
-/// 
+///
 /// Can be used during actual login or interactive auth for confirmation
 class MatrixAuthTypes {
   static const PASSWORD = 'm.login.password';
@@ -72,7 +71,7 @@ abstract class Auth {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -116,7 +115,7 @@ abstract class Auth {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -124,8 +123,8 @@ abstract class Auth {
   }
 
   /// Register New User
-  /// 
-  /// inhibit_login automatically logs in the user after creation 
+  ///
+  /// inhibit_login automatically logs in the user after creation
   static Future<dynamic> registerEmail({
     String? protocol,
     String? homeserver,
@@ -142,9 +141,11 @@ abstract class Auth {
       'send_attempt': sendAttempt,
     };
 
+    printJson(body);
+
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -152,8 +153,8 @@ abstract class Auth {
   }
 
   /// Register New User
-  /// 
-  /// inhibit_login automatically logs in the user after creation 
+  ///
+  /// inhibit_login automatically logs in the user after creation
   static Future<dynamic> registerUser({
     String? protocol,
     String? homeserver,
@@ -225,7 +226,7 @@ abstract class Auth {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -273,10 +274,10 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  ///  https://matrix.org/docs/spec/client_server/latest#id211 
-  /// 
+  ///  https://matrix.org/docs/spec/client_server/latest#id211
+  ///
   ///  Check Username Availability
-  /// 
+  ///
   ///  Used to check what types of logins are available on the server
   static Future<dynamic> checkUsernameAvailability({
     String? protocol = 'https://',
@@ -292,10 +293,10 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-  ///  https://matrix.org/docs/spec/client_server/latest#id211 
-  /// 
+  ///  https://matrix.org/docs/spec/client_server/latest#id211
+  ///
   ///  Check Username Availability
-  /// 
+  ///
   ///  Used to check what types of logins are available on the server
   static Future<dynamic> checkHomeserver({
     String protocol = 'https://',
@@ -320,9 +321,9 @@ abstract class Auth {
   }
 
   /// Update User Password
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id198
-  /// 
+  ///
   static Future<dynamic> updatePassword({
     String? protocol,
     String? homeserver,
@@ -333,7 +334,8 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -377,7 +379,8 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map body = {
       'auth': {
@@ -396,7 +399,7 @@ abstract class Auth {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 
@@ -426,7 +429,7 @@ abstract class Auth {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: {'Content-type': 'application/json'},
+      headers: {...Values.defaultHeaders},
       body: json.encode(body),
     );
 

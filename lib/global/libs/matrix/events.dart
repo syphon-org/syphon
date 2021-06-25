@@ -1,11 +1,8 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';

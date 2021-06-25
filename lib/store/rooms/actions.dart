@@ -1,12 +1,8 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
-// Flutter imports:
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
-
-// Package imports:
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -20,7 +16,6 @@ import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';

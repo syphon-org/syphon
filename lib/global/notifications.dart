@@ -1,16 +1,12 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-// Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';

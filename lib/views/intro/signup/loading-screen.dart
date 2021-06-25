@@ -1,12 +1,9 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/store/index.dart';

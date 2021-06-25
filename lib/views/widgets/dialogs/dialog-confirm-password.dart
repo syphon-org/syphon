@@ -1,27 +1,29 @@
-// Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/colours.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/views/widgets/loader/loader-indicator.dart';
 
 class DialogConfirmPassword extends StatelessWidget {
   const DialogConfirmPassword({
     Key? key,
+    this.title = 'Confirm Password (Default)',
+    this.content = 'Please confirm your password (Default)',
     this.onConfirm,
     this.onCancel,
   }) : super(key: key);
 
+  final String title;
+  final String content;
   final Function? onConfirm;
   final Function? onCancel;
 
@@ -48,9 +50,7 @@ class DialogConfirmPassword extends StatelessWidget {
             right: 16,
             bottom: 16,
           ),
-          title: Text(
-            tr('title-delete-devices'),
-          ),
+          title: Text(title),
           children: <Widget>[
             Column(
               children: <Widget>[
@@ -62,7 +62,7 @@ class DialogConfirmPassword extends StatelessWidget {
                     left: 8,
                   ),
                   child: Text(
-                    Strings.contentDeleteDevices,
+                    content,
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.caption,
                   ),
@@ -106,10 +106,11 @@ class DialogConfirmPassword extends StatelessWidget {
                           if (onCancel != null) {
                             onCancel!();
                           }
-                          Navigator.of(context).pop();
                         }
                       : null,
-                  child: Text('Cancel'),
+                  child: Text(
+                    Strings.buttonCancel,
+                  ),
                 ),
                 TextButton(
                   onPressed: !props.valid
@@ -118,23 +119,13 @@ class DialogConfirmPassword extends StatelessWidget {
                           if (onConfirm != null) {
                             onConfirm!();
                           }
-                          Navigator.of(context).pop();
                         },
                   child: !props.loading
-                      ? Text('Confirm')
-                      : Container(
-                          constraints: BoxConstraints(
-                            maxHeight: 16,
-                            maxWidth: 16,
-                          ),
-                          child: CircularProgressIndicator(
-                            strokeWidth: Dimensions.defaultStrokeWidth,
-                            backgroundColor: Colors.white,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.grey,
-                            ),
-                          ),
-                        ),
+                      ? Text(Strings.buttonConfirmOfficial,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                          ))
+                      : LoadingIndicator(),
                 ),
               ],
             )
@@ -150,7 +141,7 @@ class Props extends Equatable {
 
   final Function onChangePassword;
 
-  Props({
+  const Props({
     required this.valid,
     required this.loading,
     required this.devices,
@@ -168,8 +159,9 @@ class Props extends Equatable {
     Store<AppState> store,
   ) =>
       Props(
-        valid: store.state.authStore.credential!.value != null &&
-            store.state.authStore.credential!.value!.length > 0,
+        valid: store.state.authStore.credential != null &&
+            store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.isNotEmpty,
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices,
         onChangePassword: (password) {

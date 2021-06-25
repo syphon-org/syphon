@@ -1,12 +1,11 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/loader/loader-indicator.dart';
 
 class ButtonOutline extends StatelessWidget {
-  ButtonOutline({
+  const ButtonOutline({
     Key? key,
     this.text,
     this.loading = false,
@@ -51,25 +50,13 @@ class ButtonOutline extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: disabled ? null : this.onPressed as void Function()?,
-          child: this.loading
-              ? Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 28,
-                    maxWidth: 28,
-                  ),
-                  child: CircularProgressIndicator(
-                    strokeWidth: Dimensions.defaultStrokeWidth,
-                    backgroundColor: Colors.white,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.grey,
-                    ),
-                  ),
-                )
+          onPressed: disabled ? null : onPressed as void Function()?,
+          child: loading
+              ? LoadingIndicator()
               : (child != null
                   ? child!
                   : Text(
-                      this.text!,
+                      text!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w100,

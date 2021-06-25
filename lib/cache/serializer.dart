@@ -1,18 +1,14 @@
-// Dart imports:
 import 'dart:convert';
 import 'dart:typed_data';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 
-// Package imports:
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 
-// Project imports:
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';

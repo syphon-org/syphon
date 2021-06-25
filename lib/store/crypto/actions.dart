@@ -1,14 +1,11 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-// Flutter imports:
 import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:file_picker/file_picker.dart';
 
 import 'package:intl/intl.dart';
@@ -18,7 +15,6 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';

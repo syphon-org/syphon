@@ -1,15 +1,11 @@
-// Dart imports:
 import 'dart:math';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';

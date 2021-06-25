@@ -1,11 +1,10 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/views/widgets/loader/loader-indicator.dart';
 
 class DialogTextInput extends StatefulWidget {
   const DialogTextInput({
@@ -147,19 +146,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
                     },
               child: !widget.loading
                   ? Text(Strings.buttonSaveGeneric)
-                  : Container(
-                      constraints: BoxConstraints(
-                        maxHeight: 16,
-                        maxWidth: 16,
-                      ),
-                      child: CircularProgressIndicator(
-                        strokeWidth: Dimensions.defaultStrokeWidth,
-                        backgroundColor: Colors.white,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.grey,
-                        ),
-                      ),
-                    ),
+                  : LoadingIndicator(size: 16),
             ),
           ],
         )

@@ -1,4 +1,3 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -7,10 +6,8 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-// Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:device_info/device_info.dart';
 
 import 'package:redux/redux.dart';
@@ -18,7 +15,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -64,8 +60,8 @@ class SetUser {
 }
 
 class SetClientSecret {
-  final String? clientSecret;
-  SetClientSecret({this.clientSecret});
+  final String clientSecret;
+  SetClientSecret({required this.clientSecret});
 }
 
 class SetHostname {
@@ -179,6 +175,8 @@ class ResetOnboarding {}
 
 class ResetAuthStore {}
 
+class ResetSession {}
+
 late StreamSubscription _sub;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
@@ -222,7 +220,7 @@ ThunkAction<AppState> startAuthObserver() {
       authObserver: StreamController<User?>.broadcast(),
     ));
 
-    final Function onAuthStateChanged = (User? user) async {
+    final onAuthStateChanged = (User? user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -482,6 +480,8 @@ ThunkAction<AppState> logoutUser() {
       if (store.state.authStore.user.homeserver == null) {
         throw Exception('Unavailable user data');
       }
+
+      // tell authObserver to wipe store user and other data
       final temp = store.state.authStore.user.accessToken;
       store.state.authStore.authObserver!.add(null);
 
@@ -498,6 +498,7 @@ ThunkAction<AppState> logoutUser() {
           throw Exception(data['error']);
         }
       }
+
       // wipe cache
       await deleteCache();
       await initCache();
@@ -506,8 +507,8 @@ ThunkAction<AppState> logoutUser() {
       await deleteStorage();
       await initStorage();
 
-      // // tell authObserver to wipe store user and other data
-      // store.state.authStore.authObserver!.add(null);
+      // reset client secret
+      await store.dispatch(initClientSecret());
     } catch (error) {
       store.dispatch(addAlert(
         origin: 'logoutUser',
@@ -630,7 +631,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
       final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
-        protocol: store.state.authStore.protocol,
+        protocol: protocol,
         homeserver: homeserver,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
@@ -751,12 +752,14 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
       }
 
       final data = await MatrixApi.registerEmail(
-        protocol: store.state.authStore.protocol,
+        protocol: protocol,
         homeserver: homeserver,
         email: store.state.authStore.email,
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
       );
+
+      printJson(data);
 
       if (data['errcode'] != null) {
         throw data['error'];
@@ -827,6 +830,8 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         throw data['error'];
       }
 
+      printJson(data);
+
       if (data['flows'] != null) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
@@ -873,8 +878,6 @@ ThunkAction<AppState> updatePassword(String password) {
       store.dispatch(SetLoading(loading: true));
 
       var data;
-
-      final protocol = store.state.authStore.protocol;
 
       // Call just to get interactive auths
       data = await MatrixApi.updatePassword(
@@ -1028,16 +1031,9 @@ ThunkAction<AppState> updateCredential({
   };
 }
 
-ThunkAction<AppState> resetCredentials() {
+ThunkAction<AppState> resetInteractiveAuth() {
   return (Store<AppState> store) async {
-    store.dispatch(SetSession(session: null));
-    store.dispatch(SetCredential(credential: null));
-  };
-}
-
-ThunkAction<AppState> resetSession() {
-  return (Store<AppState> store) async {
-    store.dispatch(SetSession(session: ''));
+    store.dispatch(ResetSession());
   };
 }
 
@@ -1054,6 +1050,47 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
   };
 }
 
+ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
+      try {
+        store.dispatch(SetLoading(loading: true));
+
+        final currentCredential =
+            store.state.authStore.credential ?? Credential();
+
+        final idServer = store.state.authStore.user.idserver;
+        final homeserver = store.state.authStore.user.homeserver;
+
+        final data = await MatrixApi.deactivateUser(
+          protocol: store.state.authStore.protocol,
+          homeserver: homeserver,
+          accessToken: store.state.authStore.user.accessToken,
+          identityServer: idServer ?? homeserver,
+          session: store.state.authStore.session,
+          userId: store.state.authStore.user.userId,
+          authType: MatrixAuthTypes.PASSWORD,
+          authValue: currentCredential.value,
+        );
+
+        if (data['errcode'] != null) {
+          throw data['error'];
+        }
+
+        if (data['flows'] != null) {
+          return store.dispatch(setInteractiveAuths(auths: data));
+        }
+
+        store.dispatch(logoutUser());
+      } catch (error) {
+        store.dispatch(addAlert(
+          error: error,
+          message: error.toString(),
+          origin: 'deactivateAccount',
+        ));
+      } finally {
+        store.dispatch(SetLoading(loading: false));
+      }
+    };
+
 ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
@@ -1065,7 +1102,7 @@ ThunkAction<AppState> fetchHomeservers() {
     final List<Homeserver> homserverData = homeserversJson.map((data) {
       final hostname = data['hostname'].toString().split('.');
       final hostnameBase = hostname.length > 1
-          ? hostname[hostname.length - 2] + '.' + hostname[hostname.length - 1]
+          ? '${hostname[hostname.length - 2]}.${hostname[hostname.length - 1]}'
           : hostname[0];
 
       return Homeserver(

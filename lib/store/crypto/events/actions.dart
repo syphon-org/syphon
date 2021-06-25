@@ -1,18 +1,14 @@
-// Dart imports:
 import 'dart:convert';
 
-// Flutter imports:
 import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 // import 'package:canonical_json/canonical_json.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';

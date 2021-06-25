@@ -1,7 +1,5 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
 
-// Project imports:
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/details-all-users-screen.dart';
 import 'package:syphon/views/home/chat/details-chat-screen.dart';

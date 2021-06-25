@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';

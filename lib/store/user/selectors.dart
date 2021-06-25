@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import './model.dart';

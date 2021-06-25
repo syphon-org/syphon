@@ -1,12 +1,10 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 
 /// Media queries for matrix
-/// 
+///
 /// Testing out using a "params map"
 /// as the default to allow calling from
 /// a non-ui thread
@@ -42,7 +40,8 @@ class Media {
 
     // Parce the mxc uri for the server location and id
     final String mediaId = mediaUriParts[mediaUriParts.length - 1];
-    final String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
+    final String mediaServer =
+        serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
     String url =
         '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
@@ -130,7 +129,7 @@ dynamic buildMediaDownloadRequest({
 }
 
 /// https://matrix.org/docs/spec/client_server/latest#id392
-/// 
+///
 /// Upload some content to the content repository.
 dynamic buildMediaUploadRequest({
   String protocol = 'https://',

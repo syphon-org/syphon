@@ -48,8 +48,6 @@ ThunkAction<AppState> sendKeyRequest({
       if (data['errcode'] != null) {
         throw data['error'];
       }
-
-      printDebug('[sendKeyRequest] COMPLETED');
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

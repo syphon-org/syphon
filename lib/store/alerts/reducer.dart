@@ -1,4 +1,3 @@
-// Project imports:
 import './actions.dart';
 import './model.dart';
 

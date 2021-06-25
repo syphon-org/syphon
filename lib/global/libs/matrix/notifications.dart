@@ -1,16 +1,14 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
 
 abstract class Notifications {
   /// Fetch Notification Pushers
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-  /// 
+  ///
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotifications({
     String? protocol = 'https://',
@@ -40,9 +38,9 @@ abstract class Notifications {
   }
 
   /// Fetch Notification Pushers
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-  /// 
+  ///
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotificationPushers({
     String? protocol = 'https://',
@@ -81,11 +79,11 @@ abstract class Notifications {
       }
     */
   /// Save Notification Pusher
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-pushers
-  /// 
-  /// This endpoint allows the creation, modification and deletion of pushers for 
-  /// this user ID. The behaviour of this endpoint varies depending on the values 
+  ///
+  /// This endpoint allows the creation, modification and deletion of pushers for
+  /// this user ID. The behaviour of this endpoint varies depending on the values
   /// in the JSON body.
   static Future<dynamic> saveNotificationPusher({
     String? protocol = 'https://',

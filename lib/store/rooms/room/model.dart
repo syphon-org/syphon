@@ -1,13 +1,10 @@
-// Dart imports:
 import 'dart:collection';
 
-// Package imports:
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/print.dart';
 
-// Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -405,7 +402,7 @@ class Room {
     String? joinRule;
     bool? encryptionEnabled;
     bool direct = this.direct;
-    int? lastUpdate;
+    int? lastUpdate = this.lastUpdate;
     int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
 
     final Map<String, User> usersAdd = Map.from(usersNew);
@@ -555,7 +552,7 @@ class Room {
   }) {
     try {
       bool? limited;
-      int? lastUpdate = this.lastUpdate;
+      int lastUpdate = this.lastUpdate;
       final messageIds = this.messageIds;
 
       // Converting only message events
@@ -564,8 +561,12 @@ class Room {
       );
 
       // See if the newest message has a greater timestamp
-      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
-        lastUpdate = messages[0].timestamp;
+      final latestMessage = messages.firstWhereOrNull(
+        (msg) => lastUpdate < msg.timestamp,
+      );
+
+      if (latestMessage != null) {
+        lastUpdate = latestMessage.timestamp;
       }
 
       // limited indicates need to fetch additional data for room timelines
@@ -601,8 +602,7 @@ class Room {
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
-      final messageIdsAll = Set<String>.from(this.messageIds)
-        ..addAll(messageIdsNew);
+      final messageIdsAll = Set<String>.from(messageIds)..addAll(messageIdsNew);
 
       // Save values to room
       return copyWith(

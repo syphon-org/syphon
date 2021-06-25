@@ -1,5 +1,11 @@
-// Project imports:
 import 'package:syphon/global/values.dart';
+
+// Use this to reference JSON defined
+// string IDs for i18n library reference
+class StringIds {
+  static const titleConfirmPassword = 'title-confirm-password';
+  static const promptConfirmDeactivation = 'prompt-confirm-deactivate';
+}
 
 /// Will be converted to
 /// i18n json soon, but a "String"
@@ -57,8 +63,10 @@ class Strings {
   static const buttonLetsChat = 'let\'s chat';
   static const buttonCreate = 'create';
   static const buttonCancel = 'cancel';
+  static const buttonDeactivate = 'deactivate';
   static const buttonQuit = 'quit';
   static const buttonConfirm = 'got it';
+  static const buttonConfirmOfficial = 'confirm';
   static const buttonConfirmAlt = 'ok';
   static const buttonBlocKUser = 'block user';
   static const buttonDeleteKeys = 'delete keys';
@@ -75,7 +83,7 @@ class Strings {
 
   // Errors
   static const alertInviteUnknownUser =
-      'This user doens\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
+      'This user doesn\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
   static const errorMessageSendingFailed = 'Message Failed To Send';
   static const errorCheckHomeserver =
       'This server failed the \'well-known\' check, make sure the server is configured correctly';
@@ -105,6 +113,13 @@ class Strings {
 
   static const contentDeleteDeviceKeyWarning =
       "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
+
+  static const contentDeactivateAccount =
+      'THIS WILL PERMANENTLY DELETE YOUR ACCOUNT\n\nYou will be unable to recover any data or access for this account after deactivation.\nPlease take careful consideration before doing this!';
+
+  static const contentDeactivateAccountFinal =
+      'There is no way to recover this account after it\'s deleted. You will immediately be logged out of your account and it will become unavailable.\n\nThis is your final warning regarding deactivation. If you are sure you\'re sure, press deactivate below.';
+
   static const contentEncryptedMessage = 'Encrypted Message';
   static const contentDeletedMessage = 'This message was deleted';
 

@@ -61,6 +61,7 @@ abstract class MatrixApi {
   static const saveAccountData = Users.saveAccountData;
   static const updateDisplayName = Users.updateDisplayName;
   static const updateAvatarUri = Users.updateAvatarUri;
+  static const deactivateUser = Users.deactivateUser;
 
   // Users
   static const inviteUser = Users.inviteUser;

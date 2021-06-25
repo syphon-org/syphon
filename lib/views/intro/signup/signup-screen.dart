@@ -1,17 +1,13 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -148,14 +144,14 @@ class SignupScreenState extends State<SignupScreen> {
 
   @protected
   void onBackStep(BuildContext context) {
-    if (this.currentStep < 1) {
+    if (currentStep < 1) {
       Navigator.pop(context, false);
     } else {
       setState(() {
-        currentStep = this.currentStep - 1;
+        currentStep = currentStep - 1;
       });
       pageController!.animateToPage(
-        this.currentStep,
+        currentStep,
         duration: Duration(milliseconds: 275),
         curve: Curves.easeInOut,
       );
@@ -164,7 +160,7 @@ class SignupScreenState extends State<SignupScreen> {
 
   @protected
   bool? onCheckStepValid(_Props props, PageController? controller) {
-    final currentSection = this.sections[this.currentStep];
+    final currentSection = sections[currentStep];
 
     switch (currentSection.runtimeType) {
       case HomeserverStep:
@@ -188,8 +184,8 @@ class SignupScreenState extends State<SignupScreen> {
 
   @protected
   Function? onCompleteStep(_Props props, PageController? controller) {
-    final currentSection = this.sections[this.currentStep];
-    final lastStep = (this.sections.length - 1) == this.currentStep;
+    final currentSection = sections[currentStep];
+    final lastStep = (sections.length - 1) == currentStep;
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () async {
@@ -229,7 +225,7 @@ class SignupScreenState extends State<SignupScreen> {
             }
           }
 
-          return await controller!.nextPage(
+          return controller!.nextPage(
             duration: nextAnimationDuration,
             curve: Curves.ease,
           );
@@ -306,7 +302,7 @@ class SignupScreenState extends State<SignupScreen> {
       return Strings.buttonLoginSSO;
     }
 
-    if (this.currentStep == sections.length - 1) {
+    if (currentStep == sections.length - 1) {
       return Strings.buttonSignupFinish;
     }
 
@@ -319,8 +315,8 @@ class SignupScreenState extends State<SignupScreen> {
         onDidChange: onDidChange,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             extendBodyBehindAppBar: true,
@@ -369,7 +365,6 @@ class SignupScreenState extends State<SignupScreen> {
                                 allowImplicitScrolling: false,
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
-                                children: sections,
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
@@ -377,6 +372,7 @@ class SignupScreenState extends State<SignupScreen> {
                                         index != sections.length - 1;
                                   });
                                 },
+                                children: sections,
                               ),
                             ),
                           ],
@@ -388,19 +384,17 @@ class SignupScreenState extends State<SignupScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           direction: Axis.vertical,
                           children: <Widget>[
-                            Container(
-                              child: ButtonSolid(
-                                text: buildButtonString(props),
-                                loading: props.creating || props.loading,
-                                disabled: props.creating ||
-                                    !onCheckStepValid(
-                                      props,
-                                      this.pageController,
-                                    )!,
-                                onPressed: onCompleteStep(
-                                  props,
-                                  this.pageController,
-                                ),
+                            ButtonSolid(
+                              text: buildButtonString(props),
+                              loading: props.creating || props.loading,
+                              disabled: props.creating ||
+                                  !onCheckStepValid(
+                                    props,
+                                    pageController,
+                                  )!,
+                              onPressed: onCompleteStep(
+                                props,
+                                pageController,
                               ),
                             ),
                           ],
@@ -481,7 +475,7 @@ class _Props extends Equatable {
   final Function onResetCredential;
   final Function onSelectHomeserver;
 
-  _Props({
+  const _Props({
     required this.user,
     required this.hostname,
     required this.homeserver,
