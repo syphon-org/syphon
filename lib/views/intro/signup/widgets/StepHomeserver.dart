@@ -181,7 +181,7 @@ class _Props extends Equatable {
   final Function onSetHostname;
   final Function onChangeHomeserver;
 
-  _Props({
+  const _Props({
     required this.hostname,
     required this.homeserver,
     required this.onSetHostname,

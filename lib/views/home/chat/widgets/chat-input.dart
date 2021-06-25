@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -325,8 +326,8 @@ class ChatInputState extends State<ChatInput> {
                     ),
                     child: TextField(
                       maxLines: null,
-                      autocorrect: false,
-                      enableSuggestions: false,
+                      autocorrect: props.autocorrectEnabled,
+                      enableSuggestions: props.suggestionsEnabled,
                       keyboardType: TextInputType.multiline,
                       textInputAction: widget.enterSend
                           ? TextInputAction.send
@@ -380,12 +381,16 @@ class ChatInputState extends State<ChatInput> {
 class _Props extends Equatable {
   final Room room;
   final bool enterSendEnabled;
+  final bool autocorrectEnabled;
+  final bool suggestionsEnabled;
 
   final Function onSendTyping;
 
   const _Props({
     required this.room,
     required this.enterSendEnabled,
+    required this.autocorrectEnabled,
+    required this.suggestionsEnabled,
     required this.onSendTyping,
   });
 
@@ -398,6 +403,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
+        autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
+        suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),
