@@ -10,12 +10,15 @@ class Colours {
 
   static const greyEnabled = 0xffFAFAFA;
   static const greyDisabled = 0xffD8D8D8;
-  static const greyDark = 0xff4D5767;
-  static const greyBubble = 0xffEEEEEE;
+
+  static const greyDefault = 0xFF9E9E9E; // Colors.grey[500]
+  static const greyLight = 0xFFE0E0E0; // Colors.grey[300]
+  static const greyLightest = 0xFFEEEEEE; // Colors.grey[200]
+  static const greyDark = 0xFF616161; // Colors.grey[700]
+  static const greyDarkest = 0xFF303030; // Colors.grey[850]
 
   static const blackFull = 0xff000000;
   static const blackDefault = 0xff121212;
-  static const greyDefault = 0xFF9E9E9E;
   static const whiteDefault = 0xffFEFEFE;
 
   // Material colors at shades of 700
@@ -29,8 +32,7 @@ class Colours {
 
   static Color hashedColor(String? string) {
     final hashable = string ?? '123';
-    final int hash =
-        hashable.codeUnits.reduce((value, element) => value + element);
+    final int hash = hashable.codeUnits.reduce((value, element) => value + element);
     return Colours.chatColors[hash % Colours.chatColors.length];
   }
 

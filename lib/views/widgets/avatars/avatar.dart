@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -38,8 +39,8 @@ class Avatar extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final Color backgroundColor =
-              uri != null || url != null ? Colors.transparent : Colors.grey;
+          final bool emptyAvi = uri == null && url == null;
+          final Color backgroundColor = !emptyAvi ? Colors.transparent : Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 
@@ -50,7 +51,7 @@ class Avatar extends StatelessWidget {
           Widget avatarWidget = ClipRRect(
             borderRadius: borderRadius,
             child: Text(
-              formatInitials(alt ?? ''),
+              formatInitialsLong(alt ?? ''),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: Dimensions.avatarFontSize(size: size),
@@ -96,10 +97,9 @@ class Avatar extends StatelessWidget {
                   width: size,
                   height: size,
                   decoration: BoxDecoration(
-                      borderRadius: borderRadius,
-                      color: uri == null && url == null && !force
-                          ? background ?? backgroundColor
-                          : Colors.transparent),
+                    borderRadius: borderRadius,
+                    color: emptyAvi && !force ? background ?? backgroundColor : Colors.transparent,
+                  ),
                   child: Center(child: avatarWidget),
                 ),
                 Visibility(
@@ -114,8 +114,7 @@ class Avatar extends StatelessWidget {
                           border: Border.all(
                             color: Colors.white,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(Dimensions.badgeAvatarSize),
+                          borderRadius: BorderRadius.circular(Dimensions.badgeAvatarSize),
                         ),
                         width: Dimensions.badgeAvatarSize,
                         height: Dimensions.badgeAvatarSize,
@@ -146,6 +145,5 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [avatarShape];
 
-  _Props.mapStateToProps(Store<AppState> store)
-      : avatarShape = store.state.settingsStore.avatarShape;
+  _Props.mapStateToProps(Store<AppState> store) : avatarShape = store.state.settingsStore.avatarShape;
 }

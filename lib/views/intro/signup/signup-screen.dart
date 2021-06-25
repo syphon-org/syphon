@@ -68,9 +68,9 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   @override
-  void deactivate() {
+  void dispose() {
     subscription.cancel();
-    super.deactivate();
+    super.dispose();
   }
 
   onMounted() async {
@@ -80,8 +80,7 @@ class SignupScreenState extends State<SignupScreen> {
 
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
-        sections = sections
-          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
     }
 
@@ -125,8 +124,7 @@ class SignupScreenState extends State<SignupScreen> {
   onDidChange(_Props? oldProps, _Props props) {
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
-        sections = sections
-          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
     }
     if (props.homeserver.loginType == MatrixAuthTypes.PASSWORD) {
@@ -163,9 +161,7 @@ class SignupScreenState extends State<SignupScreen> {
       case HomeserverStep:
         return props.isHomeserverValid;
       case UsernameStep:
-        return props.isUsernameValid &&
-            props.isUsernameAvailable &&
-            !props.loading;
+        return props.isUsernameValid && props.isUsernameAvailable && !props.loading;
       case PasswordStep:
         return props.isPasswordValid;
       case EmailStep:
@@ -363,8 +359,7 @@ class SignupScreenState extends State<SignupScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -416,8 +411,7 @@ class SignupScreenState extends State<SignupScreen> {
                                       spacing: 16,
                                       dotHeight: 12,
                                       dotWidth: 12,
-                                      activeDotColor:
-                                          Theme.of(context).primaryColor,
+                                      activeDotColor: Theme.of(context).primaryColor,
                                     ),
                                   ),
                                 ],
@@ -500,8 +494,7 @@ class _Props extends Equatable {
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver,
-        isHomeserverValid: store.state.authStore.homeserver.valid &&
-            !store.state.authStore.loading,
+        isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,

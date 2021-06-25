@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
@@ -35,14 +36,12 @@ class ButtonOutline extends StatelessWidget {
         child: TextButton(
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) =>
-                  states.contains(MaterialState.disabled)
-                      ? Colors.grey[300]
-                      : Theme.of(context).primaryColor,
+              (Set<MaterialState> states) => states.contains(MaterialState.disabled)
+                  ? Color(Colours.greyLight)
+                  : Theme.of(context).primaryColor,
             ),
             backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) =>
-                  states.contains(MaterialState.disabled) ? Colors.grey : null,
+              (Set<MaterialState> states) => states.contains(MaterialState.disabled) ? Colors.grey : null,
             ),
             shape: MaterialStateProperty.resolveWith<OutlinedBorder>(
               (Set<MaterialState> states) => RoundedRectangleBorder(
@@ -61,7 +60,7 @@ class ButtonOutline extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
-                        color: disabled ? Colors.grey[300] : Colors.white,
+                        color: disabled ? Color(Colours.greyLight) : Colors.white,
                       ),
                     )),
         ),

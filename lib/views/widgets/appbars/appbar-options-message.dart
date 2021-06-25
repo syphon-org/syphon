@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/views/home/chat/details-message-screen.dart';
+import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 
-class AppBarMessageOptions extends StatefulWidget
-    implements PreferredSizeWidget {
-  AppBarMessageOptions({
+class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
+  const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',
     this.label = 'label:',
@@ -60,7 +60,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   @override
   Widget build(BuildContext context) => AppBar(
         brightness: Brightness.dark, // TOOD: this should inherit from theme
-        backgroundColor: Colors.grey[500],
+        backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
         title: Row(

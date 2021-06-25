@@ -14,8 +14,8 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
-class ChatSettingsScreen extends StatelessWidget {
-  const ChatSettingsScreen({Key? key}) : super(key: key);
+class ChatsSettingsScreen extends StatelessWidget {
+  const ChatsSettingsScreen({Key? key}) : super(key: key);
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
@@ -24,10 +24,9 @@ class ChatSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            Props.mapStateToProps(store, context),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store, context),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
+          final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
             appBar: AppBar(
@@ -85,8 +84,7 @@ class ChatSettingsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor:
-                                      Color(Colours.greyDisabled),
+                                  inactiveThumbColor: Color(Colours.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),
@@ -103,8 +101,7 @@ class ChatSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.enterSend!,
-                                onChanged: (enterSend) =>
-                                    props.onToggleEnterSend(),
+                                onChanged: (enterSend) => props.onToggleEnterSend(),
                               ),
                             ),
                             ListTile(
@@ -119,8 +116,7 @@ class ChatSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.timeFormat24!,
-                                onChanged: (value) =>
-                                    props.onToggleTimeFormat(),
+                                onChanged: (value) => props.onToggleTimeFormat(),
                               ),
                             ),
                             ListTile(
@@ -135,8 +131,7 @@ class ChatSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.dismissKeyboard!,
-                                onChanged: (value) =>
-                                    props.onToggleDismissKeyboard(),
+                                onChanged: (value) => props.onToggleDismissKeyboard(),
                               ),
                             ),
                           ],
@@ -290,7 +285,7 @@ class Props extends Equatable {
   final Function onToggleTimeFormat;
   final Function onToggleDismissKeyboard;
 
-  Props({
+  const Props({
     required this.language,
     required this.enterSend,
     required this.chatFontSize,
@@ -311,8 +306,7 @@ class Props extends Equatable {
         timeFormat24,
       ];
 
-  static Props mapStateToProps(Store<AppState> store, BuildContext context) =>
-      Props(
+  static Props mapStateToProps(Store<AppState> store, BuildContext context) => Props(
         chatFontSize: 'Default',
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSendEnabled,

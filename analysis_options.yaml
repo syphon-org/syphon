@@ -16,6 +16,7 @@ linter:
     avoid_escaping_inner_quotes: false
     prefer_for_elements_to_map_fromIterable: false # that syntax is challenging, will change if becomes standard
     prefer_conditional_assignment: false
+    sized_box_for_whitespace: false
 
     # Enabled
     prefer_single_quotes: true

@@ -89,7 +89,7 @@ class DeviceViewState extends State<DevicesScreen> {
 
     return AppBar(
       brightness: Brightness.dark, // TOOD: this should inherit from theme
-      backgroundColor: Colors.grey[500],
+      backgroundColor: Color(Colours.greyDefault),
       automaticallyImplyLeading: false,
       titleSpacing: 0.0,
       title: Row(
@@ -159,10 +159,9 @@ class DeviceViewState extends State<DevicesScreen> {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          final sectionBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(Colours.blackDefault)
-                  : const Color(Colours.whiteDefault);
+          final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
+              ? const Color(Colours.blackDefault)
+              : const Color(Colours.whiteDefault);
 
           var currentAppBar = buildAppBar(
             props: props,
@@ -195,32 +194,24 @@ class DeviceViewState extends State<DevicesScreen> {
                       Color? iconColor;
                       Color? backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
-                      TextStyle textStyle = Theme.of(context)
-                          .textTheme
-                          .caption!
-                          .copyWith(fontSize: 12);
-                      final bool isCurrentDevice =
-                          props.currentDeviceId == device.deviceId;
+                      TextStyle textStyle = Theme.of(context).textTheme.caption!.copyWith(fontSize: 12);
+                      final bool isCurrentDevice = props.currentDeviceId == device.deviceId;
 
-                      if (device.displayName!.contains('Firefox') ||
-                          device.displayName!.contains('Mac')) {
+                      if (device.displayName!.contains('Firefox') || device.displayName!.contains('Mac')) {
                         deviceTypeIcon = Icons.laptop;
                       } else if (device.displayName!.contains('iOS')) {
                         deviceTypeIcon = Icons.phone_iphone;
                       }
 
-                      if (selectedDevices != null &&
-                          selectedDevices!.contains(device)) {
+                      if (selectedDevices != null && selectedDevices!.contains(device)) {
                         backgroundColor = Colours.hashedColor(device.deviceId);
-                        backgroundColor = Colors.grey[500];
+                        backgroundColor = Color(Colours.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;
                       }
 
                       return InkWell(
-                        onTap: selectedDevices == null
-                            ? null
-                            : () => onToggleModifyDevice(device: device),
+                        onTap: selectedDevices == null ? null : () => onToggleModifyDevice(device: device),
                         onLongPress: () => onToggleModifyDevice(device: device),
                         child: Card(
                           elevation: 0,
@@ -316,8 +307,7 @@ class Props extends Equatable {
         onDeleteDevices: (BuildContext context, List<Device> devices) async {
           if (devices.isEmpty) return;
 
-          final List<String?> deviceIds =
-              devices.map((device) => device.deviceId).toList();
+          final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
           if (devices.length == 1) {
             await store.dispatch(deleteDevice(deviceId: deviceIds[0]));
@@ -334,8 +324,7 @@ class Props extends Equatable {
                 title: tr(StringIds.titleConfirmPassword),
                 content: Strings.contentDeleteDevices,
                 onConfirm: () async {
-                  final List<String?> deviceIds =
-                      devices.map((device) => device.deviceId).toList();
+                  final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
                   if (devices.length == 1) {
                     await store.dispatch(deleteDevice(deviceId: deviceIds[0]));

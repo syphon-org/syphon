@@ -26,6 +26,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
@@ -267,10 +268,9 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  @protected
   onShowMediumMenu(context, _Props props) async {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
 
     showMenu(
       elevation: 4.0,
@@ -291,7 +291,7 @@ class ChatScreenState extends State<ChatScreen> {
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
-              this.onChangeMediumType(
+              onChangeMediumType(
                 newMediumType: MediumType.plaintext,
                 props: props,
               );
@@ -324,7 +324,7 @@ class ChatScreenState extends State<ChatScreen> {
                 ? null
                 : () {
                     Navigator.pop(context);
-                    this.onChangeMediumType(
+                    onChangeMediumType(
                       newMediumType: MediumType.encryption,
                       props: props,
                     );
@@ -365,7 +365,7 @@ class ChatScreenState extends State<ChatScreen> {
               .roomId,
         ),
         builder: (context, props) {
-          double height = MediaQuery.of(context).size.height;
+          final double height = MediaQuery.of(context).size.height;
 
           final closedInputPadding = !inputFieldNode.hasFocus &&
               Platform.isIOS &&
@@ -382,7 +382,7 @@ class ChatScreenState extends State<ChatScreen> {
 
           Widget appBar = AppBarChat(
             room: props.room,
-            color: props.roomPrimaryColor,
+            color: props.chatColorPrimary,
             badgesEnabled: props.roomTypeBadgesEnabled,
             onDebug: () {
               props.onCheatCode();
@@ -401,13 +401,13 @@ class ChatScreenState extends State<ChatScreen> {
             },
           );
 
-          if (this.selectedMessage != null) {
+          if (selectedMessage != null) {
             appBar = AppBarMessageOptions(
               room: props.room,
               message: selectedMessage,
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
-                message: this.selectedMessage,
+                message: selectedMessage,
               ),
             );
           }
@@ -524,7 +524,7 @@ class _Props extends Equatable {
   final int? messagesLength;
   final bool enterSendEnabled;
   final ThemeType theme;
-  final Color roomPrimaryColor;
+  final Color chatColorPrimary;
   final bool roomTypeBadgesEnabled;
   final bool dismissKeyboardEnabled;
 
@@ -549,7 +549,7 @@ class _Props extends Equatable {
     required this.loading,
     required this.messagesLength,
     required this.enterSendEnabled,
-    required this.roomPrimaryColor,
+    required this.chatColorPrimary,
     required this.roomTypeBadgesEnabled,
     required this.dismissKeyboardEnabled,
     required this.onUpdateDeviceKeys,
@@ -573,7 +573,7 @@ class _Props extends Equatable {
         userId,
         loading,
         enterSendEnabled,
-        roomPrimaryColor,
+        chatColorPrimary,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
@@ -593,15 +593,7 @@ class _Props extends Equatable {
           onSelectReply: (Message message) {
             store.dispatch(selectReply(roomId: roomId, message: message));
           },
-          roomPrimaryColor: () {
-            final chatSettings = store.state.settingsStore.chatSettings;
-
-            if (chatSettings[roomId] == null) {
-              return Colours.hashedColor(roomId);
-            }
-
-            return Color(chatSettings[roomId]!.primaryColor);
-          }(),
+          chatColorPrimary: selectChatColor(store, roomId),
           onUpdateDeviceKeys: () async {
             final room = store.state.roomStore.rooms[roomId]!;
 

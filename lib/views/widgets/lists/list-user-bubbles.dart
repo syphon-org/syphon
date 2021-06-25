@@ -5,19 +5,18 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/home/chat/details-all-users-screen.dart';
+import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
-/**
- * List of Users (Avi Bubbles)
- * 
- * Still uses userId because users
- * are still indexed by room
- */
+///
+/// List of Users (Avi Bubbles)
+///
+/// Still uses userId because users
+/// are still indexed by room
 class ListUserBubbles extends StatelessWidget {
-  ListUserBubbles({
+  const ListUserBubbles({
     Key? key,
     this.users = const [],
     this.roomId = '',
@@ -32,7 +31,6 @@ class ListUserBubbles extends StatelessWidget {
   final String? roomId;
   final List<User?> users;
 
-  @protected
   onShowUserDetails({
     required BuildContext context,
     User? user,
@@ -77,7 +75,7 @@ class ListUserBubbles extends StatelessWidget {
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSize,
-                      background: Colours.hashedColor(formatUsername(user)),
+                      background: Colours.hashedColor(user.userId),
                     ),
                   ),
                 ),
@@ -91,8 +89,7 @@ class ListUserBubbles extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 14),
               child: ClipOval(
                 child: Material(
-                  color:
-                      Theme.of(context).scaffoldBackgroundColor, // button color
+                  color: Theme.of(context).scaffoldBackgroundColor, // button color
                   child: InkWell(
                     onTap: () {
                       if (invite) {
@@ -127,9 +124,7 @@ class ListUserBubbles extends StatelessWidget {
                         ),
                         child: Icon(
                           invite ? Icons.edit : Icons.arrow_forward_ios,
-                          size: invite
-                              ? Dimensions.iconSize
-                              : Dimensions.iconSizeLarge,
+                          size: invite ? Dimensions.iconSize : Dimensions.iconSizeLarge,
                           color: Theme.of(context).textTheme.caption!.color,
                         ),
                       ),

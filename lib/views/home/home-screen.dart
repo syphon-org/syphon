@@ -27,7 +27,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/details-chat-screen.dart';
+import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -66,9 +66,8 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) =>
-      AppBar(
-        backgroundColor: Colors.grey[500],
+  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+        backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
         title: Row(
@@ -95,7 +94,7 @@ class HomeState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context!,
                 '/home/chat/settings',
-                arguments: ChatSettingsArguments(
+                arguments: ChatDetailArguments(
                   roomId: selectedRoom!.id,
                   title: selectedRoom!.name,
                 ),
@@ -155,8 +154,7 @@ class HomeState extends State<HomeScreen> {
       );
 
   @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) =>
-      AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -321,8 +319,7 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted &&
-              messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -436,9 +433,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'group' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -458,9 +453,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'public' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -503,8 +496,7 @@ class HomeState extends State<HomeScreen> {
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),
@@ -645,13 +637,10 @@ class _Props extends Equatable {
           final backgrounded = store.state.syncStore.backgrounded;
           final loadingRooms = store.state.roomStore.loading;
 
-          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-              store.state.syncStore.lastAttempt ?? 0);
+          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(store.state.syncStore.lastAttempt ?? 0);
 
           // See if the last attempted sy nc is older than 60 seconds
-          final isLastAttemptOld = DateTime.now()
-              .difference(lastAttempt)
-              .compareTo(Duration(seconds: 90));
+          final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
 
           // syncing for the first time
           if (syncing && !synced) {

@@ -113,15 +113,13 @@ class UserProfileState extends State<UserProfileScreen> {
     final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
-    final UserDetailsArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as UserDetailsArguments;
+    final UserDetailsArguments arguments = ModalRoute.of(context)!.settings.arguments as UserDetailsArguments;
 
     final user = arguments.user!;
     final userColor = Colours.hashedColor(user.userId);
-    final scaffordBackgroundColor =
-        Theme.of(context).brightness == Brightness.light
-            ? Colors.grey[200]
-            : Theme.of(context).scaffoldBackgroundColor;
+    final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
+        ? Color(Colours.greyLightest)
+        : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,

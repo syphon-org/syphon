@@ -24,9 +24,37 @@ String formatLanguageCode(String? language) {
 // a -> A
 String formatInitials(String? word) {
   final wordUppercase = (word ?? '').toUpperCase();
-  return wordUppercase.length > 1
-      ? wordUppercase.substring(0, 2)
-      : wordUppercase;
+  return wordUppercase.length > 1 ? wordUppercase.substring(0, 2) : wordUppercase;
+}
+
+String formatInitialsLong(String? fullword) {
+  //  -> ?
+  if (fullword == null || fullword.isEmpty) {
+    return '?';
+  }
+
+  final word = fullword.replaceAll('@', '');
+
+  if (word.isEmpty) {
+    return '?';
+  }
+
+  // example words -> EW
+  if (word.length > 2 && word.contains(' ') && word.split(' ')[1].isNotEmpty) {
+    final words = word.split(' ');
+    final wordOne = words.elementAt(0);
+    final wordTwo = words.elementAt(1);
+
+    var initials = '';
+    initials = wordOne.isEmpty ? initials : initials + wordOne.substring(0, 1);
+    initials = wordTwo.isEmpty ? initials : initials + wordTwo.substring(0, 1);
+
+    return initials.toUpperCase();
+  }
+
+  final initials = word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
+
+  return initials.toUpperCase();
 }
 
 String formatTimestampFull({

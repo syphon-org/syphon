@@ -8,6 +8,18 @@ List<Room> availableRooms(List<Room> rooms) {
   return List.from(rooms.where((room) => !room.hidden));
 }
 
+String formatRoomName({required Room room}) {
+  final name = room.name!;
+  return name.length > 22 ? '${name.substring(0, 22)}...' : name;
+}
+
+String formatRoomInitials({required Room room}) {
+  if (room.name == null || room.name!.isEmpty) {
+    return '';
+  }
+  return formatInitialsLong(room.name);
+}
+
 String formatPreviewTopic(String? fullTopic) {
   final topic = fullTopic ?? Strings.contentTopicEmpty;
   final topicTruncated = topic.length > 100 ? topic.substring(0, 100) : topic;
@@ -45,28 +57,14 @@ String formatPreview({required Room room, Message? message}) {
   }
 
   // message was deleted
-  if (message.type != EventTypes.encrypted &&
-      (message.body == null || message.body!.isEmpty)) {
+  if (message.type != EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
     return 'This message was deleted';
   }
 
   // message hasn't been decrypted
-  if (message.type == EventTypes.encrypted &&
-      (message.body == null || message.body!.isEmpty)) {
+  if (message.type == EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
     return Strings.contentEncryptedMessage;
   }
 
   return formatPreviewMessage(message.body);
-}
-
-String formatRoomName({required Room room}) {
-  final name = room.name!;
-  return name.length > 22 ? '${name.substring(0, 22)}...' : name;
-}
-
-String formatRoomInitials({required Room room}) {
-  if (room.name == null || room.name!.isEmpty) {
-    return '';
-  }
-  return formatInitials(room.name);
 }

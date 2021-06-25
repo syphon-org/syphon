@@ -13,6 +13,7 @@ import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/messages/message-typing.dart';
@@ -158,7 +159,7 @@ class MessageListState extends State<MessageList> {
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
                       theme: props.theme,
-                      fontSize: 14,
+                      color: props.chatColorPrimary,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
                       onSwipe: props.onSelectReply,
                       onPressAvatar: widget.onViewUserDetails,
@@ -189,17 +190,19 @@ class _Props extends Equatable {
   final Map<String, User> users;
   final List<Message> messages;
   final bool? timeFormat24Enabled;
+  final Color? chatColorPrimary;
 
   final Function onToggleReaction;
   final Function onSelectReply;
 
-  _Props({
+  const _Props({
     required this.room,
     required this.theme,
     required this.users,
     required this.messages,
     required this.currentUser,
     required this.timeFormat24Enabled,
+    required this.chatColorPrimary,
     required this.onToggleReaction,
     required this.onSelectReply,
   });
@@ -216,6 +219,7 @@ class _Props extends Equatable {
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
         theme: store.state.settingsStore.theme,
         currentUser: store.state.authStore.user,
+        chatColorPrimary: selectBubbleColor(store, roomId),
         room: selectRoom(id: roomId, state: store.state),
         users: messageUsers(roomId: roomId, state: store.state),
         messages: latestMessages(

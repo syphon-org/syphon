@@ -32,9 +32,7 @@ class ModalUserDetails extends StatelessWidget {
   final String? userId;
   final bool? nested; // pop context twice when double nested in a view
 
-  @protected
-  void onNavigateToProfile(
-      {required BuildContext context, required _Props props}) async {
+  onNavigateToProfile({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/user/details',
@@ -44,9 +42,7 @@ class ModalUserDetails extends StatelessWidget {
     );
   }
 
-  @protected
-  void onNavigateToInvite(
-      {required BuildContext context, required _Props props}) async {
+  onNavigateToInvite({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       '/home/rooms/search',
@@ -56,9 +52,7 @@ class ModalUserDetails extends StatelessWidget {
     );
   }
 
-  @protected
-  void onMessageUser(
-      {required BuildContext context, required _Props props}) async {
+  onMessageUser({required BuildContext context, required _Props props}) async {
     final user = props.user;
     return await showDialog(
       context: context,
@@ -135,9 +129,8 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
-                            background: props.user.avatarUri == null
-                                ? Colours.hashedColor(props.user.userId)
-                                : null,
+                            background:
+                                props.user.avatarUri == null ? Colours.hashedColor(props.user.userId) : null,
                           ),
                         ),
                       ],
@@ -150,10 +143,9 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style:
-                                Theme.of(context).textTheme.subtitle1!.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                         )
                       ],
