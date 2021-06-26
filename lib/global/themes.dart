@@ -161,6 +161,11 @@ class Themes {
       primaryColorDark: Color(primaryColor),
       primaryColorLight: Color(primaryColor),
       accentColor: Color(accentColor),
+      accentIconTheme: IconThemeData(color: Color(accentColor)),
+      colorScheme: ThemeData().colorScheme.copyWith(
+            primary: Color(primaryColor),
+            secondary: Color(accentColor),
+          ),
       brightness: brightness,
 
       // Core UI\
@@ -182,6 +187,7 @@ class Themes {
         helperStyle: TextStyle(
           color: Color(invertedPrimaryColor),
         ),
+        focusColor: Color(invertedPrimaryColor),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(

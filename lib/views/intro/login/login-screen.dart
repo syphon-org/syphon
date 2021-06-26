@@ -167,7 +167,7 @@ class LoginScreenState extends State<LoginScreen> {
 
                 // Do your stuff
                 setState(() {
-                  visibility = !this.visibility;
+                  visibility = !visibility;
                 });
 
                 if (!passwordFocus.hasFocus) {
@@ -309,9 +309,8 @@ class LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Visibility(
-                            visible:
-                                props.loginType == MatrixAuthTypes.PASSWORD ||
-                                    props.loginType == MatrixAuthTypes.DUMMY,
+                            visible: props.loginType == MatrixAuthTypes.PASSWORD ||
+                                props.loginType == MatrixAuthTypes.DUMMY,
                             child: buildPasswordLogin(props),
                           ),
                           Visibility(
@@ -333,8 +332,7 @@ class LoginScreenState extends State<LoginScreen> {
                             child: Stack(
                               children: [
                                 Visibility(
-                                  visible: props.loginType ==
-                                          MatrixAuthTypes.PASSWORD ||
+                                  visible: props.loginType == MatrixAuthTypes.PASSWORD ||
                                       props.loginType == MatrixAuthTypes.DUMMY,
                                   child: ButtonSolid(
                                     text: Strings.buttonLogin,
@@ -344,8 +342,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible:
-                                      props.loginType == MatrixAuthTypes.SSO,
+                                  visible: props.loginType == MatrixAuthTypes.SSO,
                                   child: ButtonSolid(
                                     text: Strings.buttonLoginSSO,
                                     loading: props.loading,
@@ -386,10 +383,7 @@ class LoginScreenState extends State<LoginScreen> {
                               child: Text(
                                 Strings.buttonLoginCreateAction,
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2!
-                                    .copyWith(
+                                style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                       color: Theme.of(context).primaryColor,
                                       decoration: TextDecoration.underline,
                                     ),
@@ -459,12 +453,11 @@ class _Props extends Equatable {
         password: store.state.authStore.password,
         homeserver: store.state.authStore.homeserver,
         loginType: store.state.authStore.homeserver.loginType,
-        isLoginAttemptable:
-            store.state.authStore.homeserver.loginType == MatrixAuthTypes.SSO ||
-                (store.state.authStore.isPasswordValid &&
-                    store.state.authStore.isUsernameValid &&
-                    !store.state.authStore.loading &&
-                    !store.state.authStore.stopgap),
+        isLoginAttemptable: store.state.authStore.homeserver.loginType == MatrixAuthTypes.SSO ||
+            (store.state.authStore.isPasswordValid &&
+                store.state.authStore.isUsernameValid &&
+                !store.state.authStore.loading &&
+                !store.state.authStore.stopgap),
         usernameHint: Strings.formatUsernameHint(
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
