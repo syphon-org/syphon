@@ -491,7 +491,7 @@ class Room {
       if ((namePriority > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
         // Filter out number of non current users to show preview of total
         final otherUsers = usersAdd.values.where(
-          (user) => user.userId != currentUser.userId && user.displayName != currentUser.displayName,
+          (user) => user.userId != currentUser.userId,
         );
 
         if (otherUsers.isNotEmpty) {
@@ -500,9 +500,15 @@ class Room {
           final hasMultipleUsers = otherUsers.length > 1;
 
           // set name and avi to first non user or that + total others
-          name = hasMultipleUsers
-              ? '${shownUser.displayName} and ${usersAdd.values.length - 1} others'
-              : shownUser.displayName;
+          name = shownUser.displayName;
+
+          if (name == currentUser.displayName) {
+            name = '${shownUser.displayName} (${shownUser.userId})';
+          }
+
+          if (hasMultipleUsers) {
+            name = '${shownUser.displayName} and ${usersAdd.values.length - 1} others';
+          }
 
           // set avatar if one has not been assigned
           if (avatarUri == null && this.avatarUri == null && otherUsers.length == 1) {
@@ -513,8 +519,6 @@ class Room {
     } catch (error) {
       printError('[directRoomName] ${error.toString()}');
     }
-
-    printDebug('[Room.fromStateEvents] $name ${this.name} $namePriority');
 
     return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,

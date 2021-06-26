@@ -196,8 +196,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       } on PlatformException {
         addAlert(
           origin: 'initDeepLinks',
-          message:
-              'Failed to SSO Login, please try again later or contact support',
+          message: 'Failed to SSO Login, please try again later or contact support',
         );
         // Handle exception by warning the user their action did not succeed
         // return?
@@ -310,11 +309,8 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
       // hash it
       final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
-      final deviceIdHash = base64
-          .encode(deviceIdDigest.bytes)
-          .toUpperCase()
-          .replaceAll(RegExp(r'[^\w]'), '')
-          .substring(0, 10);
+      final deviceIdHash =
+          base64.encode(deviceIdDigest.bytes).toUpperCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 
       return Device(
         deviceId: deviceIdHash,
@@ -583,8 +579,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
 ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
   return (Store<AppState> store) async {
     try {
-      final List<String> completed =
-          List<String>.from(auths!['completed'] ?? []);
+      final List<String> completed = List<String>.from(auths!['completed'] ?? []);
 
       await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));
@@ -641,8 +636,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
         session: session,
       );
 
-      if (data['errcode'] != null &&
-          data['errcode'] == MatrixErrors.not_authorized) {
+      if (data['errcode'] != null && data['errcode'] == MatrixErrors.not_authorized) {
         throw data['error'];
       }
 
@@ -748,8 +742,7 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
       final currentCredential = store.state.authStore.credential!;
       final protocol = store.state.authStore.protocol;
 
-      if (currentCredential.params!.containsValue(emailSubmitted) &&
-          sendAttempt! < 2) {
+      if (currentCredential.params!.containsValue(emailSubmitted) && sendAttempt! < 2) {
         return true;
       }
 
@@ -760,8 +753,6 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
         clientSecret: clientSecret,
         sendAttempt: sendAttempt,
       );
-
-      printJson(data);
 
       if (data['errcode'] != null) {
         throw data['error'];
@@ -824,21 +815,17 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       );
 
       if (data['errcode'] != null) {
-        if (data['errcode'] == MatrixErrors.not_authorized &&
-            credential!.type == MatrixAuthTypes.EMAIL) {
+        if (data['errcode'] == MatrixErrors.not_authorized && credential!.type == MatrixAuthTypes.EMAIL) {
           store.dispatch(SetVerificationNeeded(needed: true));
           return false;
         }
         throw data['error'];
       }
 
-      printJson(data);
-
       if (data['flows'] != null) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
-        final List<dynamic> stages =
-            store.state.authStore.interactiveAuths['flows'][0]['stages'];
+        final List<dynamic> stages = store.state.authStore.interactiveAuths['flows'][0]['stages'];
         final completed = store.state.authStore.completed;
 
         // Compare the completed stages to the flow stages provided
@@ -1057,8 +1044,7 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
       try {
         store.dispatch(SetLoading(loading: true));
 
-        final currentCredential =
-            store.state.authStore.credential ?? Credential();
+        final currentCredential = store.state.authStore.credential ?? Credential();
 
         final idServer = store.state.authStore.user.idserver;
         final homeserver = store.state.authStore.user.homeserver;
@@ -1122,17 +1108,10 @@ ThunkAction<AppState> fetchHomeservers() {
         hostname: hostnameBase,
         location: data['location'] ?? '',
         description: data['description'] ?? '',
-        usersActive: data['users_active'] != null
-            ? data['users_active'].toString()
-            : null,
-        roomsTotal: data['public_room_count'] != null
-            ? data['public_room_count'].toString()
-            : null,
-        founded:
-            data['online_since'] != null ? data['online_since'].toString() : '',
-        responseTime: data['last_response_time'] != null
-            ? data['last_response_time'].toString()
-            : '',
+        usersActive: data['users_active'] != null ? data['users_active'].toString() : null,
+        roomsTotal: data['public_room_count'] != null ? data['public_room_count'].toString() : null,
+        founded: data['online_since'] != null ? data['online_since'].toString() : '',
+        responseTime: data['last_response_time'] != null ? data['last_response_time'].toString() : '',
       );
     }).toList();
 
@@ -1215,20 +1194,17 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
   };
 }
 
-ThunkAction<AppState> initClientSecret({String? hostname}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> initClientSecret({String? hostname}) => (Store<AppState> store) {
       store.dispatch(SetClientSecret(
         clientSecret: generateClientSecret(length: 24),
       ));
     };
 
-ThunkAction<AppState> setHostname({String? hostname}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setHostname({String? hostname}) => (Store<AppState> store) {
       store.dispatch(SetHostname(hostname: hostname!.trim()));
     };
 
-ThunkAction<AppState> setHomeserver({Homeserver? homeserver}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setHomeserver({Homeserver? homeserver}) => (Store<AppState> store) {
       store.dispatch(SetHomeserver(homeserver: homeserver));
     };
 
@@ -1246,8 +1222,7 @@ ThunkAction<AppState> setEmail({String? email}) {
 
 ThunkAction<AppState> setUsername({String? username}) {
   return (Store<AppState> store) {
-    store.dispatch(
-        SetUsernameValid(valid: username != null && username.isNotEmpty));
+    store.dispatch(SetUsernameValid(valid: username != null && username.isNotEmpty));
     store.dispatch(SetUsername(username: username!.trim()));
   };
 }
@@ -1278,8 +1253,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
   };
 }
 
-ThunkAction<AppState> setLoginPassword({String? password}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setLoginPassword({String? password}) => (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
       store.dispatch(SetPasswordValid(
         valid: password != null && password.isNotEmpty,
@@ -1297,8 +1271,7 @@ ThunkAction<AppState> setPassword({
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
-      valid: (currentPassword == currentConfirm || ignoreConfirm) &&
-          password.length > 8,
+      valid: (currentPassword == currentConfirm || ignoreConfirm) && password.length > 8,
     ));
   };
 }
@@ -1317,9 +1290,7 @@ ThunkAction<AppState> setPasswordConfirm({String? password}) {
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
-      valid: password != null &&
-          password.length > 6 &&
-          currentPassword == currentConfirm,
+      valid: password != null && password.length > 6 && currentPassword == currentConfirm,
     ));
   };
 }

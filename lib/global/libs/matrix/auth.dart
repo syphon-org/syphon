@@ -132,16 +132,13 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
 
     final Map body = {
       'email': email,
       'client_secret': clientSecret,
       'send_attempt': sendAttempt,
     };
-
-    printJson(body);
 
     final response = await http.post(
       Uri.parse(url),
@@ -334,8 +331,7 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -379,8 +375,7 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map body = {
       'auth': {
@@ -418,8 +413,7 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
 
     final Map body = {
       'email': email,

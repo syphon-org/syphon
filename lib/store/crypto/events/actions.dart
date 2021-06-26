@@ -28,8 +28,7 @@ ThunkAction<AppState> encryptMessageContent({
 }) {
   return (Store<AppState> store) async {
     // Load and deserialize session
-    final olm.OutboundGroupSession outboundMessageSession =
-        await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -131,8 +130,7 @@ ThunkAction<AppState> encryptKeyContent({
     final userFingerprintKey = userIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
-    final fingerprintKeyId =
-        Keys.fingerprint(deviceId: recipientKeys!.deviceId);
+    final fingerprintKeyId = Keys.fingerprint(deviceId: recipientKeys!.deviceId);
     final identityKeyId = Keys.identity(deviceId: recipientKeys.deviceId);
     final fingerprintKey = recipientKeys.keys![fingerprintKeyId]; // recipient
     final identityKey = recipientKeys.keys![identityKeyId]!; // recipient
@@ -288,18 +286,18 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
         switch (eventType) {
           case EventTypes.encrypted:
             try {
+              // printJson(toDeviceRaw); // TODO: test olm recovery
+
               final eventDecrypted = await store.dispatch(
                 decryptKeyEvent(event: event),
               );
 
               if (EventTypes.roomKey == eventDecrypted['type']) {
                 // save decrepted user session key under roomId
-                await store.dispatch(
-                  saveSessionKey(
-                    event: eventDecrypted,
-                    identityKey: identityKeySender,
-                  ),
-                );
+                await store.dispatch(saveSessionKey(
+                  event: eventDecrypted,
+                  identityKey: identityKeySender,
+                ));
 
                 try {
                   // redecrypt events in the room with new key

@@ -421,10 +421,7 @@ ThunkAction<AppState> createRoom({
             directUser.userId!,
             currentUser.userId!,
           ] as List<String>,
-          users: {
-            directUser.userId!: directUser,
-            currentUser.userId!: currentUser
-          } as Map<String, User>,
+          users: {directUser.userId!: directUser, currentUser.userId!: currentUser} as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));
@@ -748,8 +745,7 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -817,9 +813,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
-
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
@@ -831,6 +825,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
   };
 }
 
+///
 /// Remove Room
 ///
 /// Both leaves and forgets room
@@ -839,12 +834,16 @@ ThunkAction<AppState> removeRoom({Room? room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      if (room!.direct) {
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+      }
+
       // submit a leave room request
       final leaveData = await MatrixApi.leaveRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
+        roomId: room.id,
       );
 
       // remove the room locally if it's already been removed remotely
@@ -869,15 +868,10 @@ ThunkAction<AppState> removeRoom({Room? room}) {
         }
       }
 
-      await deleteRooms({room.id: room});
+      store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {
-      if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-      }
-
-      await store.dispatch(RemoveRoom(roomId: room.id));
       store.dispatch(SetLoading(loading: false));
     }
   };
@@ -915,6 +909,7 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
         }
         throw deleteData['error'];
       }
+
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       printError('[leaveRoom] $error');

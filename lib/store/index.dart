@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:sembast/sembast.dart';
+import 'package:syphon/cache/middleware.dart';
 import 'package:syphon/cache/storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -109,21 +110,7 @@ Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
   final persistor = Persistor<AppState>(
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: data),
-    shouldSave: (Store<AppState> store, dynamic action) {
-      switch (action.runtimeType) {
-        case SetRoom:
-        case SetOlmAccount:
-        case SetOlmAccountBackup:
-        case SetDeviceKeysOwned:
-        case SetUser:
-        case ResetCrypto:
-        case ResetUser:
-          printInfo('[initStore] persistor saving from ${action.runtimeType}');
-          return true;
-        default:
-          return false;
-      }
-    },
+    shouldSave: cacheMiddleware,
   );
 
   // Finally load persisted store

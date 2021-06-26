@@ -85,6 +85,10 @@ class ChatScreenState extends State<ChatScreen> {
         barrierDismissible: false,
         builder: (context) => DialogInvite(
           onAccept: props.onAcceptInvite,
+          onReject: () {
+            props.onRejectInvite();
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
           onCancel: () {
             Navigator.popUntil(context, (route) => route.isFirst);
           },
@@ -525,6 +529,7 @@ class _Props extends Equatable {
   final Function onLoadMoreMessages;
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
+  final Function onRejectInvite;
   final Function onToggleEncryption;
   final Function onToggleReaction;
   final Function onCheatCode;
@@ -549,6 +554,7 @@ class _Props extends Equatable {
     required this.onLoadMoreMessages,
     required this.onLoadFirstBatch,
     required this.onAcceptInvite,
+    required this.onRejectInvite,
     required this.onToggleEncryption,
     required this.onToggleReaction,
     required this.onCheatCode,
@@ -638,6 +644,11 @@ class _Props extends Equatable {
       },
       onAcceptInvite: () {
         store.dispatch(acceptRoom(
+          room: selectRoom(state: store.state, id: roomId),
+        ));
+      },
+      onRejectInvite: () {
+        store.dispatch(leaveRoom(
           room: selectRoom(state: store.state, id: roomId),
         ));
       },

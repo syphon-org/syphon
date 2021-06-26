@@ -71,9 +71,7 @@ class IntroScreenState extends State<IntroScreen> {
     double width = MediaQuery.of(context).size.width;
 
     if (alphaAgreement == null || true) {
-      final termsTitle = Platform.isIOS
-          ? Strings.titleDialogTerms
-          : Strings.titleDialogTermsAlpha;
+      final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,
@@ -140,16 +138,16 @@ class IntroScreenState extends State<IntroScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     child: TextButton(
-                      child: Text(
-                        Strings.buttonAgree,
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () async {
                         await store.dispatch(acceptAgreement());
                         Navigator.of(context).pop();
                       },
+                      child: Text(
+                        Strings.buttonAgree,
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
                     ),
                   ),
                 ],
@@ -273,8 +271,7 @@ class IntroScreenState extends State<IntroScreen> {
                                     dotWidth: 12,
                                     paintStyle: PaintingStyle.fill,
                                     strokeWidth: 12,
-                                    activeDotColor:
-                                        Theme.of(context).primaryColor,
+                                    activeDotColor: Theme.of(context).primaryColor,
                                   ), // your preferred effect
                                 ),
                               ],
@@ -301,14 +298,9 @@ class IntroScreenState extends State<IntroScreen> {
                                     child: Text(
                                       Strings.buttonIntroExistAction,
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .copyWith(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            decoration:
-                                                TextDecoration.underline,
+                                      style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                                            color: Theme.of(context).primaryColor,
+                                            decoration: TextDecoration.underline,
                                           ),
                                     ),
                                   ),
