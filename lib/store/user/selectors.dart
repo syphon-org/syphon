@@ -1,4 +1,4 @@
-// Project imports:
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import './model.dart';
@@ -47,6 +47,7 @@ String trimAlias(String? alias) {
 }
 
 String formatAlias({String resource = '', String homeserver = ''}) {
+  // ignore: prefer_interpolation_to_compose_strings
   return '@' + resource + ':' + homeserver;
 }
 
@@ -54,32 +55,12 @@ String formatUsername(User user) {
   return user.displayName ?? trimAlias(user.userId ?? '');
 }
 
-String formatInitials(String? fullword) {
-  //  -> ?
-  if (fullword == null || fullword.isEmpty) {
-    return '?';
+String formatUserInitials(User? user) {
+  if (user == null || (user.displayName == null && user.userId == null)) {
+    return '';
   }
 
-  // example words -> EW
-  if (fullword.contains(' ') && fullword.split(' ')[1].isNotEmpty) {
-    final words = fullword.split(' ');
-    final initialOne = words.elementAt(0).substring(0, 1);
-    final initialTwo = words.elementAt(1).substring(0, 1);
-
-    return (initialOne + initialTwo).toUpperCase();
-  }
-
-  // example words -> EX
-  final word = fullword.replaceAll('@', '');
-
-  if (word.isEmpty) {
-    return 'NA';
-  }
-
-  final initials =
-      word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
-
-  return initials.toUpperCase();
+  return formatInitialsLong(user.displayName ?? user.userId);
 }
 
 List<User?> roomUsers(AppState state, String? roomId) {
@@ -98,8 +79,6 @@ List<User?> searchUsersLocal(
   }
 
   return List.from(users.where(
-    (user) =>
-        (user!.displayName ?? '').contains(searchText) ||
-        (user.userId ?? '').contains(searchText),
+    (user) => (user!.displayName ?? '').contains(searchText) || (user.userId ?? '').contains(searchText),
   ));
 }

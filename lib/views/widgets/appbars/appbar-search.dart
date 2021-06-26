@@ -1,11 +1,9 @@
-// Flutter imports:
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Project imports:
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {

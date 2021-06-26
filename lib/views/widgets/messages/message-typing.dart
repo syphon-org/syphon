@@ -1,11 +1,9 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/print.dart';
 
-// Project imports:
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';

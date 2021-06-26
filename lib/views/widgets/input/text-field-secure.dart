@@ -1,22 +1,20 @@
-// Flutter imports:
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 
-/**
- * Secured Text Field Input
- * 
- * Remove all auto completions by default
- * Other functionality that could indicate
- * text content
- */
+///
+/// Secured Text Field Input
+///
+/// Remove all auto completions by default
+/// Other functionality that could indicate
+/// text content
+///
 class TextFieldSecure extends StatelessWidget {
-  TextFieldSecure({
+  const TextFieldSecure({
     Key? key,
     this.label,
     this.hint,
@@ -28,6 +26,8 @@ class TextFieldSecure extends StatelessWidget {
     this.disabled = false,
     this.obscureText = false,
     this.disableSpacing = false,
+    this.autocorrect = false,
+    this.enabledSuggestions = false,
     this.textAlign = TextAlign.left,
     this.formatters = const [],
     this.onChanged,
@@ -41,6 +41,9 @@ class TextFieldSecure extends StatelessWidget {
   final bool disabled;
   final bool obscureText;
   final bool disableSpacing;
+  final bool autocorrect;
+  final bool enabledSuggestions;
+
   final int maxLines;
   final Widget? suffix; // include actions
   final String? hint;
@@ -73,19 +76,19 @@ class TextFieldSecure extends StatelessWidget {
           onSubmitted: onSubmitted as void Function(String)?,
           textInputAction: textInputAction,
           onEditingComplete: onEditingComplete as void Function()?,
-          autocorrect: false,
-          enableSuggestions: false,
+          autocorrect: autocorrect,
+          enableSuggestions: enabledSuggestions,
           autofillHints: autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
               ? [
-                  FilteringTextInputFormatter.deny(RegExp(r"\t")),
+                  FilteringTextInputFormatter.deny(RegExp(r'\t')),
                   ...formatters,
                 ]
               : [
-                  FilteringTextInputFormatter.deny(RegExp(r"\s")),
-                  FilteringTextInputFormatter.deny(RegExp(r"\t")),
-                  FilteringTextInputFormatter.deny(RegExp(r"\n")),
+                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                  FilteringTextInputFormatter.deny(RegExp(r'\t')),
+                  FilteringTextInputFormatter.deny(RegExp(r'\n')),
                   ...formatters,
                 ],
           smartQuotesType: SmartQuotesType.disabled,

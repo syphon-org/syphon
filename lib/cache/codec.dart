@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 
 const IV_LENGTH = 16;
-const IV_LENGTH_BASE_64 = (IV_LENGTH + (IV_LENGTH / 2));
+const IV_LENGTH_BASE_64 = IV_LENGTH + (IV_LENGTH / 2);
 
 /// Random bytes generator
 Uint8List _generateIV(int length) {

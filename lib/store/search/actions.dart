@@ -1,18 +1,13 @@
-// Dart imports:
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-// Flutter imports:
 import 'package:flutter/material.dart';
-
-// Package imports:
 
 import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';

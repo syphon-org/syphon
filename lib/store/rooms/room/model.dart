@@ -1,13 +1,10 @@
-// Dart imports:
 import 'dart:collection';
 
-// Package imports:
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/print.dart';
 
-// Project imports:
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -15,6 +12,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -171,10 +169,10 @@ class Room {
     bool? hidden,
     bool? archived,
     joinRule,
-    lastRead,
-    lastUpdate,
-    namePriority,
-    totalJoinedUsers,
+    int? lastRead,
+    int? lastUpdate,
+    int? namePriority,
+    int? totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
     userTyping,
@@ -221,7 +219,7 @@ class Room {
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
-        reply: reply ?? this.reply,
+        reply: reply == Null ? null : reply ?? this.reply,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
@@ -278,30 +276,26 @@ class Room {
     if (json['state'] != null) {
       final List<dynamic> stateEventsRaw = json['state']['events'];
 
-      stateEvents =
-          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['invite_state'] != null) {
       final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-      stateEvents =
-          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
     }
 
     if (json['ephemeral'] != null) {
       final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-      ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['account_data'] != null) {
       final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-      accountEvents =
-          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     // Find state and message updates from timeline
@@ -342,9 +336,7 @@ class Room {
       }
     }
 
-    return fromAccountData(
-      accountEvents,
-    )
+    return fromAccountData(accountEvents)
         .fromStateEvents(
           invite: invite,
           limited: limited,
@@ -398,6 +390,7 @@ class Room {
     required List<Event> events,
     List<Reaction>? reactions,
     List<Redaction>? redactions,
+    LastUpdateType lastUpdateType = LastUpdateType.Message,
   }) {
     String? name;
     String? avatarUri;
@@ -406,7 +399,7 @@ class Room {
     bool? encryptionEnabled;
     bool direct = this.direct;
     int? lastUpdate = this.lastUpdate;
-    int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
+    int namePriority = this.namePriority;
 
     final Map<String, User> usersAdd = Map.from(usersNew);
     Set<String> userIds = Set<String>.from(this.userIds);
@@ -414,12 +407,14 @@ class Room {
 
     events.forEach((event) {
       try {
-        final timestamp = event.timestamp ?? 0;
-        lastUpdate = timestamp > lastUpdate! ? event.timestamp : lastUpdate;
+        final timestamp = event.timestamp;
+        if (lastUpdateType == LastUpdateType.State) {
+          lastUpdate = timestamp > lastUpdate! ? timestamp : lastUpdate;
+        }
 
         switch (event.type) {
           case 'm.room.name':
-            if (namePriority! > 0) {
+            if (namePriority > 0) {
               namePriority = 1;
               name = event.content['name'];
             }
@@ -433,13 +428,13 @@ class Room {
             break;
 
           case 'm.room.canonical_alias':
-            if (namePriority! > 2) {
+            if (namePriority > 2) {
               namePriority = 2;
               name = event.content['alias'];
             }
             break;
           case 'm.room.aliases':
-            if (namePriority! > 3) {
+            if (namePriority > 3) {
               namePriority = 3;
               name = event.content['aliases'][0];
             }
@@ -490,16 +485,13 @@ class Room {
 
     try {
       // checks to make sure someone didn't name the room after the authed user
-      final badRoomName =
-          name == currentUser.displayName || name == currentUser.userId;
+      final badRoomName = name == currentUser.displayName || name == currentUser.userId;
 
       // no name room check
-      if ((namePriority! > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
+      if ((namePriority > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
         // Filter out number of non current users to show preview of total
         final otherUsers = usersAdd.values.where(
-          (user) =>
-              user.userId != currentUser.userId &&
-              user.displayName != currentUser.displayName,
+          (user) => user.userId != currentUser.userId,
         );
 
         if (otherUsers.isNotEmpty) {
@@ -508,19 +500,25 @@ class Room {
           final hasMultipleUsers = otherUsers.length > 1;
 
           // set name and avi to first non user or that + total others
-          name = hasMultipleUsers
-              ? '${shownUser.displayName} and ${usersAdd.values.length - 1}'
-              : shownUser.displayName;
+          name = shownUser.displayName;
+
+          if (name == currentUser.displayName) {
+            name = '${shownUser.displayName} (${shownUser.userId})';
+          }
+
+          if (hasMultipleUsers) {
+            name = '${shownUser.displayName} and ${usersAdd.values.length - 1} others';
+          }
 
           // set avatar if one has not been assigned
-          if (avatarUri == null &&
-              this.avatarUri == null &&
-              otherUsers.length == 1) {
+          if (avatarUri == null && this.avatarUri == null && otherUsers.length == 1) {
             avatarUri = shownUser.avatarUri;
           }
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      printError('[directRoomName] ${error.toString()}');
+    }
 
     return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
@@ -532,7 +530,7 @@ class Room {
       userIds: userIds.toList(),
       avatarUri: avatarUri ?? this.avatarUri,
       joinRule: joinRule ?? this.joinRule,
-      lastUpdate: lastUpdate! > 0 ? lastUpdate : this.lastUpdate,
+      lastUpdate: lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
       reactions: reactions,
@@ -553,7 +551,7 @@ class Room {
   }) {
     try {
       bool? limited;
-      int? lastUpdate = this.lastUpdate;
+      int lastUpdate = this.lastUpdate;
       final messageIds = this.messageIds;
 
       // Converting only message events
@@ -562,8 +560,12 @@ class Room {
       );
 
       // See if the newest message has a greater timestamp
-      if (messages.isNotEmpty && lastUpdate < messages[0].timestamp!) {
-        lastUpdate = messages[0].timestamp;
+      final latestMessage = messages.firstWhereOrNull(
+        (msg) => lastUpdate < msg.timestamp,
+      );
+
+      if (latestMessage != null) {
+        lastUpdate = latestMessage.timestamp;
       }
 
       // limited indicates need to fetch additional data for room timelines
@@ -582,9 +584,7 @@ class Room {
         // - the oldest hash (lastHash) is non-existant
         // - the previous hash (most recent) is non-existant
         // - the oldest hash equals the previously fetched hash
-        if (this.lastHash == null ||
-            this.prevHash == null ||
-            this.lastHash == this.prevHash) {
+        if (this.lastHash == null || this.prevHash == null || this.lastHash == this.prevHash) {
           limited = false;
         }
       }
@@ -599,8 +599,7 @@ class Room {
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
       final messagesNew = List<Message>.from(messagesMap.values);
-      final messageIdsAll = Set<String>.from(this.messageIds)
-        ..addAll(messageIdsNew);
+      final messageIdsAll = Set<String>.from(messageIds)..addAll(messageIdsNew);
 
       // Save values to room
       return copyWith(
@@ -608,7 +607,7 @@ class Room {
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
-        lastUpdate: lastUpdate ?? this.lastUpdate,
+        lastUpdate: lastUpdate,
         // oldest hash in the timeline
         lastHash: lastHash ?? this.lastHash ?? prevHash,
         // most recent prev_batch from the last /sync
@@ -662,9 +661,7 @@ class Room {
                 readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceipts[key]!
-                    .userReads!
-                    .addAll(readReceiptsNew.userReads!);
+                readReceipts[key]!.userReads!.addAll(readReceiptsNew.userReads!);
               }
             });
             break;

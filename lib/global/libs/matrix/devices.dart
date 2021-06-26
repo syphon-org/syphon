@@ -1,14 +1,12 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
 
 abstract class Devices {
   /// https://matrix.org/docs/spec/client_server/latest#id472
-  /// 
+  ///
   /// HTTP:GET
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchDevices({
@@ -28,7 +26,7 @@ abstract class Devices {
   }
 
   /// https://matrix.org/docs/spec/client_server/latest#id412
-  ///  
+  ///
   /// HTTP:PUT
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> updateDevice({
@@ -73,7 +71,8 @@ abstract class Devices {
     String? authType,
     String? authValue,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

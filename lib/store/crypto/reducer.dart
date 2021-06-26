@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/global/print.dart';
 
 import './actions.dart';

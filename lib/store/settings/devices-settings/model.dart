@@ -1,4 +1,3 @@
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -7,14 +6,12 @@ part 'model.g.dart';
 @JsonSerializable()
 class Device extends Equatable {
   final String? deviceId;
-  final String? deviceIdPrivate;
   final String? displayName;
   final String? lastSeenIp;
   final int? lastSeenTs;
 
   const Device({
     this.deviceId,
-    this.deviceIdPrivate,
     this.displayName,
     this.lastSeenIp,
     this.lastSeenTs,
@@ -23,7 +20,6 @@ class Device extends Equatable {
   @override
   List<Object?> get props => [
         deviceId,
-        deviceIdPrivate,
         displayName,
         lastSeenIp,
         lastSeenTs,
@@ -31,14 +27,12 @@ class Device extends Equatable {
 
   Device copyWith({
     String? deviceId,
-    String? deviceIdPrivate,
     String? displayName,
     String? lastSeenIp,
     int? lastSeenTs,
   }) =>
       Device(
         deviceId: deviceId ?? this.deviceId,
-        deviceIdPrivate: deviceIdPrivate ?? this.deviceIdPrivate,
         displayName: displayName ?? this.displayName,
         lastSeenIp: lastSeenIp ?? this.lastSeenIp,
         lastSeenTs: lastSeenTs ?? this.lastSeenTs,

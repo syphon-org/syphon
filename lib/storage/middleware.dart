@@ -44,13 +44,17 @@ dynamic storageMiddleware<State>(
     case UpdateRoom:
       // TODO: create a mutation like SetSyncing to distinguish small but important room mutations
       if (action.syncing == null) {
-        // printInfo(
-        //   '[storageMiddleware] saving room ${action.runtimeType.toString()}',
-        // );
         final room = store.state.roomStore.rooms[action.id];
         if (room != null) {
           saveRoom(room, storage: Storage.main);
         }
+      }
+      break;
+    case RemoveRoom:
+      final _action = action as RemoveRoom;
+      final room = store.state.roomStore.rooms[_action.roomId];
+      if (room != null) {
+        deleteRooms({room.id: room}, storage: Storage.main);
       }
       break;
     case SetTheme:

@@ -1,4 +1,3 @@
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 

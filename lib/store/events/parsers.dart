@@ -38,7 +38,7 @@ Map<String, dynamic> parseMessages({
   List<Message> existing = const [],
 }) {
   bool? limited;
-  int? lastUpdate = room.lastUpdate;
+  int lastUpdate = room.lastUpdate;
   final outbox = List<Message>.from(room.outbox);
   final messagesAll = List<Message>.from(existing);
 
@@ -48,7 +48,7 @@ Map<String, dynamic> parseMessages({
   );
 
   // See if the newest message has a greater timestamp
-  if (messages.isNotEmpty && lastUpdate < messages[0].timestamp!) {
+  if (messages.isNotEmpty && lastUpdate < messages[0].timestamp) {
     lastUpdate = messages[0].timestamp;
   }
 
@@ -99,7 +99,7 @@ Map<String, dynamic> parseMessages({
       outbox: outbox,
       messageIds: messageIdsAll.toList(),
       limited: limited ?? room.limited,
-      lastUpdate: lastUpdate ?? room.lastUpdate,
+      lastUpdate: lastUpdate,
       encryptionEnabled: room.encryptionEnabled || hasEncrypted != null,
     ),
   };

@@ -1,11 +1,8 @@
-// Dart imports:
 import 'dart:io';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -15,7 +12,6 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';

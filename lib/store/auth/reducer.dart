@@ -1,4 +1,3 @@
-// Project imports:
 import '../user/model.dart';
 import './actions.dart';
 import './state.dart';
@@ -67,9 +66,18 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
         captcha: false,
         interactiveAuths: null,
       );
+    case ResetSession:
+      return AuthStore(
+        loading: false,
+        user: state.user,
+        clientSecret: state.clientSecret,
+      );
     case ResetAuthStore:
       // retain the app sessions auth observer only
-      return AuthStore(authObserver: state.authObserver);
+      return AuthStore(
+        authObserver: state.authObserver,
+        clientSecret: state.clientSecret,
+      );
     default:
       return state;
   }

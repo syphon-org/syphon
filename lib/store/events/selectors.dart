@@ -1,4 +1,3 @@
-// Project imports:
 import 'dart:async';
 
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -117,7 +116,7 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)
-  replacements.sort((b, a) => a.timestamp!.compareTo(b.timestamp!));
+  replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
   for (Message messageEdited in replacements) {
     final messageIdOriginal = messageEdited.relatedEventId!;
@@ -150,7 +149,7 @@ Message? latestMessage(List<Message> messages) {
 
   return messages.fold(
     messages[0],
-    (latest, msg) => msg.timestamp! > latest!.timestamp! ? msg : latest,
+    (latest, msg) => msg.timestamp > latest!.timestamp ? msg : latest,
   );
 }
 
@@ -163,10 +162,10 @@ List<Message> latestMessages(List<Message> messages) {
       return -1;
     }
 
-    if (a.timestamp! > b.timestamp!) {
+    if (a.timestamp > b.timestamp) {
       return -1;
     }
-    if (a.timestamp! < b.timestamp!) {
+    if (a.timestamp < b.timestamp) {
       return 1;
     }
 

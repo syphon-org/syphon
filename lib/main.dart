@@ -1,13 +1,10 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Package imports:
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
@@ -17,7 +14,6 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 
-// Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -153,9 +149,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       if (user == null && defaultHome.runtimeType == HomeScreen) {
         defaultHome = IntroScreen();
         NavigationService.clearTo('/intro', context);
-      } else if (user != null &&
-          user.accessToken != null &&
-          defaultHome.runtimeType == IntroScreen) {
+      } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
         // Default Authenticated App Home
         defaultHome = HomeScreen();
         NavigationService.clearTo('/home', context);
@@ -181,17 +175,13 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           color = Colors.grey;
       }
 
-      final alertMessage =
-          alert.message ?? alert.error ?? 'Unknown Error Occured';
+      final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occured';
 
       globalScaffold.currentState?.showSnackBar(SnackBar(
         backgroundColor: color,
         content: Text(
           alertMessage,
-          style: Theme.of(context)
-              .textTheme
-              .subtitle1
-              ?.copyWith(color: Colors.white),
+          style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
         ),
         duration: alert.duration,
         action: SnackBarAction(
@@ -207,18 +197,13 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    alertsListener?.cancel();
-    store.dispatch(disposeDeepLinks());
-    super.dispose();
-  }
-
-  @override
-  void deactivate() {
-    closeCache(cache);
-    WidgetsBinding.instance?.removeObserver(this);
     store.dispatch(stopAuthObserver());
     store.dispatch(stopAlertsObserver());
-    super.deactivate();
+    store.dispatch(disposeDeepLinks());
+    closeCache(cache);
+    WidgetsBinding.instance?.removeObserver(this);
+    alertsListener?.cancel();
+    super.dispose();
   }
 
   // Store should not need to be passed to a widget to affect
@@ -229,8 +214,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          startLocale:
-              Locale(formatLanguageCode(store.state.settingsStore.language)),
+          startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
           supportedLocales: const [Locale('en'), Locale('ru')],
           child: StoreConnector<AppState, SettingsStore>(

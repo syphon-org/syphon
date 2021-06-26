@@ -1,6 +1,5 @@
-// Dart imports:
-import 'dart:math';
 import 'dart:convert';
+import 'dart:math';
 
 String generateClientSecret({required int length}) {
   final random = Random.secure();

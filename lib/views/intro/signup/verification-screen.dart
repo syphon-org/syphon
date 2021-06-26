@@ -1,14 +1,11 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -51,7 +48,7 @@ class VerificationScreenState extends State<VerificationScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
+  didChangeAppLifecycleState(AppLifecycleState state) async {
     final store = StoreProvider.of<AppState>(context);
     final props = _Props.mapStateToProps(store);
 
@@ -74,8 +71,8 @@ class VerificationScreenState extends State<VerificationScreen>
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             body: ScrollConfiguration(
@@ -189,14 +186,14 @@ class VerificationScreenState extends State<VerificationScreen>
                                 ),
                                 child: ButtonSolid(
                                   text: 'resend email',
-                                  loading: this.sending || props.loading,
-                                  disabled: this.sending || props.loading,
+                                  loading: sending || props.loading,
+                                  disabled: sending || props.loading,
                                   onPressed: () {
                                     props.onResendVerification(
-                                      sendAttempt: this.sendAttempt + 1,
+                                      sendAttempt: sendAttempt + 1,
                                     );
                                     setState(() {
-                                      sendAttempt = this.sendAttempt + 1;
+                                      sendAttempt = sendAttempt + 1;
                                     });
                                   },
                                 ),
@@ -211,7 +208,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                 ),
                                 child: ButtonText(
                                   text: 'check verification',
-                                  disabled: this.sending || props.loading,
+                                  disabled: sending || props.loading,
                                   onPressed: () async {
                                     final result = await props.onCreateUser(
                                         enableErrors: true);
@@ -242,7 +239,7 @@ class _Props extends Equatable {
   final Function onCreateUser;
   final Function onResendVerification;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.verification,
     required this.onCreateUser,

@@ -1,11 +1,8 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogConfirm extends StatelessWidget {

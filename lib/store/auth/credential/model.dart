@@ -1,8 +1,6 @@
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 
 part 'model.g.dart';

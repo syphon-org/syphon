@@ -1,11 +1,7 @@
-// Flutter imports:
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -16,7 +12,6 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
@@ -32,7 +27,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/details-chat-screen.dart';
+import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -49,19 +44,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeState extends State<HomeScreen> {
-  HomeState({Key? key}) : super();
+  HomeState() : super();
 
-  final GlobalKey<FabCircularMenuState> fabKey =
-      GlobalKey<FabCircularMenuState>();
+  final fabKey = GlobalKey<FabCircularMenuState>();
 
   Room? selectedRoom;
-  late Map<String, Color?> roomColorDefaults;
-
-  @override
-  void initState() {
-    super.initState();
-    roomColorDefaults = Map();
-  }
+  Map<String, Color> roomColorDefaults = {};
 
   @protected
   onToggleRoomOptions({Room? room}) {
@@ -78,9 +66,8 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) =>
-      AppBar(
-        backgroundColor: Colors.grey[500],
+  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+        backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
         title: Row(
@@ -107,7 +94,7 @@ class HomeState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context!,
                 '/home/chat/settings',
-                arguments: ChatSettingsArguments(
+                arguments: ChatDetailArguments(
                   roomId: selectedRoom!.id,
                   title: selectedRoom!.name,
                 ),
@@ -120,7 +107,7 @@ class HomeState extends State<HomeScreen> {
             tooltip: 'Archive Room',
             color: Colors.white,
             onPressed: () async {
-              await props!.onArchiveRoom(room: this.selectedRoom);
+              await props!.onArchiveRoom(room: selectedRoom);
               setState(() {
                 selectedRoom = null;
               });
@@ -134,7 +121,7 @@ class HomeState extends State<HomeScreen> {
               tooltip: 'Leave Chat',
               color: Colors.white,
               onPressed: () async {
-                await props!.onLeaveChat(room: this.selectedRoom);
+                await props!.onLeaveChat(room: selectedRoom);
                 setState(() {
                   selectedRoom = null;
                 });
@@ -142,14 +129,14 @@ class HomeState extends State<HomeScreen> {
             ),
           ),
           Visibility(
-            visible: this.selectedRoom!.direct,
+            visible: selectedRoom!.direct,
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
               tooltip: 'Delete Chat',
               color: Colors.white,
               onPressed: () async {
-                await props!.onDeleteChat(room: this.selectedRoom);
+                await props!.onDeleteChat(room: selectedRoom);
                 setState(() {
                   selectedRoom = null;
                 });
@@ -167,8 +154,7 @@ class HomeState extends State<HomeScreen> {
       );
 
   @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) =>
-      AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -251,7 +237,9 @@ class HomeState extends State<HomeScreen> {
       );
 
   @protected
-  Widget buildChatList(List<Room> rooms, BuildContext context, _Props props) {
+  Widget buildChatList(BuildContext context, _Props props) {
+    final rooms = props.rooms;
+
     if (rooms.isEmpty) {
       return Center(
           child: Column(
@@ -288,23 +276,25 @@ class HomeState extends State<HomeScreen> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
-        final messageLatest = latestMessage(messages);
         final chatSettings = props.chatSettings[room.id];
+
+        final messageLatest = latestMessage(messages);
         final preview = formatPreview(room: room, message: messageLatest);
+        final roomName = room.name ?? '';
         final newMessage = messageLatest != null &&
-            room.lastRead < messageLatest.timestamp! &&
+            room.lastRead < messageLatest.timestamp &&
             messageLatest.sender != props.currentUser.userId;
 
         var backgroundColor;
         var textStyle = TextStyle();
-        var primaryColor = Colors.grey[500];
+        Color primaryColor = Colors.grey;
 
         // Check settings for custom color, then check temp cache,
         // or generate new temp color
         if (chatSettings != null) {
           primaryColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
-          primaryColor = roomColorDefaults[room.id];
+          primaryColor = roomColorDefaults[room.id] ?? primaryColor;
         } else {
           primaryColor = Colours.hashedColor(room.id);
           roomColorDefaults.putIfAbsent(
@@ -329,8 +319,7 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted &&
-              messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -358,7 +347,7 @@ class HomeState extends State<HomeScreen> {
                 '/home/chat',
                 arguments: ChatViewArguements(
                   roomId: room.id,
-                  title: room.name,
+                  title: roomName,
                 ),
               );
             }
@@ -444,9 +433,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'group' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -466,9 +453,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'public' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -504,15 +489,14 @@ class HomeState extends State<HomeScreen> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              room.name!,
+                              roomName,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),
@@ -570,7 +554,6 @@ class HomeState extends State<HomeScreen> {
                           GestureDetector(
                             onTap: onDismissMessageOptions,
                             child: buildChatList(
-                              props.rooms,
                               context,
                               props,
                             ),
@@ -628,12 +611,14 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         rooms,
+        messages,
         theme,
         syncing,
         offline,
         unauthed,
         currentUser,
         chatSettings,
+        roomTypeBadgesEnabled,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -652,13 +637,10 @@ class _Props extends Equatable {
           final backgrounded = store.state.syncStore.backgrounded;
           final loadingRooms = store.state.roomStore.loading;
 
-          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-              store.state.syncStore.lastAttempt ?? 0);
+          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(store.state.syncStore.lastAttempt ?? 0);
 
           // See if the last attempted sy nc is older than 60 seconds
-          final isLastAttemptOld = DateTime.now()
-              .difference(lastAttempt)
-              .compareTo(Duration(seconds: 90));
+          final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
 
           // syncing for the first time
           if (syncing && !synced) {

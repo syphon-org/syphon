@@ -1,15 +1,10 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
-
-// Package imports:
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';

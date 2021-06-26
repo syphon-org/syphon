@@ -1,10 +1,8 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:swipeable/swipeable.dart';
 
-// Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
@@ -16,10 +14,10 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 
 class MessageWidget extends StatelessWidget {
-  MessageWidget({
+  const MessageWidget({
     Key? key,
     required this.message,
-    this.isUserSent,
+    this.isUserSent = false,
     this.messageOnly = false,
     this.isLastSender = false,
     this.isNextSender = false,
@@ -29,6 +27,7 @@ class MessageWidget extends StatelessWidget {
     this.theme = ThemeType.LIGHT,
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
+    this.color,
     this.onLongPress,
     this.onPressAvatar,
     this.onInputReaction,
@@ -38,15 +37,17 @@ class MessageWidget extends StatelessWidget {
 
   final Message message;
   final ThemeType theme;
-  final int? lastRead;
+  final int lastRead;
   final double fontSize;
   final bool isLastSender;
   final bool isNextSender;
-  final bool? isUserSent;
+  final bool isUserSent;
   final bool messageOnly;
   final String timeFormat;
   final String? avatarUri;
   final String? selectedMessageId;
+  final Color? color;
+
   final Function? onSwipe;
   final Function? onPressAvatar;
   final Function? onInputReaction;
@@ -90,7 +91,7 @@ class MessageWidget extends StatelessWidget {
             width: reactionCount > 1 ? 48 : 32,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.grey[500],
+              color: Color(Colours.greyDefault),
               borderRadius: BorderRadius.circular(Dimensions.iconSize),
               border: Border.all(
                 color: Colors.white,
@@ -149,7 +150,7 @@ class MessageWidget extends StatelessWidget {
           width: 36,
           height: Dimensions.iconSizeLarge,
           decoration: BoxDecoration(
-            color: Colors.grey[500],
+            color: Color(Colours.greyDefault),
             borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
             border: Border.all(
               color: Colors.white,
@@ -181,21 +182,26 @@ class MessageWidget extends StatelessWidget {
     );
   }
 
+  onSwipeMessage(Message message) {
+    if (onSwipe != null) {
+      onSwipe!(message);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final message = this.message;
-    final selected =
-        selectedMessageId != null && selectedMessageId == message.id;
+    final selected = selectedMessageId != null && selectedMessageId == message.id;
 
     // emoji input button needs space
     final hasReactions = message.reactions.isNotEmpty || selected;
-    final isRead = message.timestamp! < lastRead!;
+    final isRead = message.timestamp < lastRead;
 
     var textColor = Colors.white;
     var showSender = true;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
-    Color? bubbleColor = Colours.hashedColor(message.sender);
+    Color? bubbleColor = color ?? Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
@@ -206,18 +212,18 @@ class MessageWidget extends StatelessWidget {
     var zIndex = 1.0;
     var status = timeFormat == 'full'
         ? formatTimestampFull(
-            lastUpdateMillis: message.timestamp ?? 0,
+            lastUpdateMillis: message.timestamp,
             timeFormat: timeFormat,
             showTime: true,
           )
         : formatTimestamp(
-            lastUpdateMillis: message.timestamp ?? 0,
+            lastUpdateMillis: message.timestamp,
             timeFormat: timeFormat,
             showTime: true,
           );
 
     // Current User Bubble Styling
-    if (isUserSent!) {
+    if (isUserSent) {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
@@ -257,14 +263,14 @@ class MessageWidget extends StatelessWidget {
       }
     }
 
-    if (isUserSent!) {
+    if (isUserSent) {
       if (theme == ThemeType.DARK) {
-        bubbleColor = Colors.grey[700];
+        bubbleColor = Color(Colours.greyDark);
       } else if (theme != ThemeType.LIGHT) {
-        bubbleColor = Colors.grey[850];
+        bubbleColor = Color(Colours.greyDarkest);
       } else {
         textColor = const Color(Colours.blackFull);
-        bubbleColor = const Color(Colours.greyBubble);
+        bubbleColor = const Color(Colours.greyLightest);
       }
 
       indicatorColor = isRead ? textColor : bubbleColor;
@@ -305,19 +311,19 @@ class MessageWidget extends StatelessWidget {
     }
 
     return Swipeable(
-      onSwipeLeft: isUserSent! ? () => onSwipe!(message) : null,
-      onSwipeRight: !isUserSent! ? () => onSwipe!(message) : null,
+      onSwipeLeft: isUserSent ? () => onSwipeMessage(message) : () => {},
+      onSwipeRight: !isUserSent ? () => onSwipeMessage(message) : () => {},
       background: Positioned(
         top: 0,
         bottom: 0,
-        left: !isUserSent! ? 0 : null,
-        right: isUserSent! ? 0 : null,
+        left: !isUserSent ? 0 : null,
+        right: isUserSent ? 0 : null,
         child: Opacity(
           // HACK: hide the reply icon under the message
           opacity: opacity == 0.5 ? 0 : 1,
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: isUserSent! ? 24 : 50,
+              horizontal: isUserSent ? 24 : 50,
             ),
             child: Flex(
               direction: Axis.horizontal,
@@ -348,8 +354,7 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin:
-                      bubbleSpacing, // spacing between different user bubbles
+                  margin: bubbleSpacing, // spacing between different user bubbles
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
                     direction: Axis.horizontal,
@@ -357,7 +362,7 @@ class MessageWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Visibility(
-                        visible: !isLastSender && !isUserSent! && !messageOnly,
+                        visible: !isLastSender && !isUserSent && !messageOnly,
                         maintainState: !messageOnly,
                         maintainAnimation: !messageOnly,
                         maintainSize: !messageOnly,
@@ -369,8 +374,7 @@ class MessageWidget extends StatelessWidget {
                             }
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8)
-                                .copyWith(bottom: hasReactions ? 16 : 0),
+                            margin: const EdgeInsets.only(right: 8).copyWith(bottom: hasReactions ? 16 : 0),
                             child: Avatar(
                               margin: EdgeInsets.zero,
                               padding: EdgeInsets.zero,
@@ -406,7 +410,7 @@ class MessageWidget extends StatelessWidget {
                                 crossAxisAlignment: alignmentMessageText,
                                 children: <Widget>[
                                   Visibility(
-                                    visible: !isUserSent! && showSender,
+                                    visible: !isUserSent && showSender,
                                     child: Container(
                                       margin: EdgeInsets.only(bottom: 4),
                                       child: Text(
@@ -427,10 +431,7 @@ class MessageWidget extends StatelessWidget {
                                         color: textColor,
                                         fontStyle: fontStyle,
                                         fontWeight: FontWeight.w300,
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .subtitle2!
-                                            .fontSize,
+                                        fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
                                       ),
                                     ),
                                   ),
@@ -442,9 +443,7 @@ class MessageWidget extends StatelessWidget {
                                     crossAxisAlignment: alignmentMessageText,
                                     children: [
                                       Visibility(
-                                        visible: !isUserSent! &&
-                                            message.type ==
-                                                EventTypes.encrypted,
+                                        visible: !isUserSent && message.type == EventTypes.encrypted,
                                         child: Container(
                                           width: Dimensions.indicatorSize,
                                           height: Dimensions.indicatorSize,
@@ -469,9 +468,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent! &&
-                                            message.type ==
-                                                EventTypes.encrypted,
+                                        visible: isUserSent && message.type == EventTypes.encrypted,
                                         child: Container(
                                           width: Dimensions.indicatorSize,
                                           height: Dimensions.indicatorSize,
@@ -484,7 +481,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent! && message.failed,
+                                        visible: isUserSent && message.failed,
                                         child: Container(
                                           width: Dimensions.indicatorSize,
                                           height: Dimensions.indicatorSize,
@@ -497,7 +494,7 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: isUserSent! && !message.failed,
+                                        visible: isUserSent && !message.failed,
                                         child: Stack(children: [
                                           Visibility(
                                             visible: message.pending,
@@ -506,8 +503,7 @@ class MessageWidget extends StatelessWidget {
                                               height: Dimensions.indicatorSize,
                                               margin: EdgeInsets.only(left: 4),
                                               child: CircularProgressIndicator(
-                                                strokeWidth: Dimensions
-                                                    .defaultStrokeWidthLite,
+                                                strokeWidth: Dimensions.defaultStrokeWidthLite,
                                               ),
                                             ),
                                           ),
@@ -565,17 +561,16 @@ class MessageWidget extends StatelessWidget {
                             Visibility(
                               visible: selected,
                               child: Positioned(
-                                left: isUserSent! ? 0 : null,
-                                right: !isUserSent! ? 0 : null,
+                                left: isUserSent ? 0 : null,
+                                right: !isUserSent ? 0 : null,
                                 bottom: 0,
                                 child: Container(
                                   height: Dimensions.iconSize,
-                                  transform:
-                                      Matrix4.translationValues(0.0, 4.0, 0.0),
+                                  transform: Matrix4.translationValues(0.0, 4.0, 0.0),
                                   child: buildReactionsInput(
                                     context,
                                     alignmentReaction,
-                                    isUserSent!,
+                                    isUserSent,
                                   ),
                                 ),
                               ),
@@ -583,13 +578,12 @@ class MessageWidget extends StatelessWidget {
                             Visibility(
                               visible: hasReactions && !selected,
                               child: Positioned(
-                                left: isUserSent! ? 0 : null,
-                                right: !isUserSent! ? 0 : null,
+                                left: isUserSent ? 0 : null,
+                                right: !isUserSent ? 0 : null,
                                 bottom: 0,
                                 child: Container(
                                   height: Dimensions.iconSize,
-                                  transform:
-                                      Matrix4.translationValues(0.0, 4.0, 0.0),
+                                  transform: Matrix4.translationValues(0.0, 4.0, 0.0),
                                   child: buildReactions(
                                     context,
                                     alignmentReaction,

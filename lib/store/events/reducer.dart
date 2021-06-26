@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';

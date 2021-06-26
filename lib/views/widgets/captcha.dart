@@ -1,15 +1,11 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Package imports:
 import 'package:webview_flutter/webview_flutter.dart';
 
-// Project imports:
 import 'package:syphon/global/values.dart';
 
 /*
@@ -65,7 +61,6 @@ class CaptchaState extends State<Captcha> {
   }
 
   CaptchaState({
-    Key? key,
     this.publickey,
     this.onVerified,
   });
@@ -73,30 +68,28 @@ class CaptchaState extends State<Captcha> {
   // Matrix Public Key
   @override
   Widget build(BuildContext context) {
-    final captchaUrl = '${Values.captchaUrl}${this.publickey}';
+    final captchaUrl = '${Values.captchaUrl}$publickey';
 
-    return Container(
-      child: WebView(
-        initialUrl: captchaUrl,
-        javascriptMode: JavascriptMode.unrestricted,
-        javascriptChannels: <JavascriptChannel>[
-          JavascriptChannel(
-            name: 'RecaptchaFlutterChannel',
-            onMessageReceived: (JavascriptMessage receiver) {
-              String token = receiver.message;
-              if (token.contains("verify")) {
-                token = token.substring(7);
-              }
-              if (this.onVerified != null) {
-                this.onVerified!(token);
-              }
-            },
-          ),
-        ].toSet(),
-        onWebViewCreated: (WebViewController webViewController) {
-          controller.complete(webViewController);
-        },
-      ),
+    return WebView(
+      initialUrl: captchaUrl,
+      javascriptMode: JavascriptMode.unrestricted,
+      javascriptChannels: {
+        JavascriptChannel(
+          name: 'RecaptchaFlutterChannel',
+          onMessageReceived: (JavascriptMessage receiver) {
+            String token = receiver.message;
+            if (token.contains('verify')) {
+              token = token.substring(7);
+            }
+            if (onVerified != null) {
+              onVerified!(token);
+            }
+          },
+        ),
+      },
+      onWebViewCreated: (WebViewController webViewController) {
+        controller.complete(webViewController);
+      },
     );
   }
 }

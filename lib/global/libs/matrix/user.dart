@@ -1,21 +1,19 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 
 abstract class Users {
   /// Fetch Account Data
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-account-data-type
-  ///  
+  ///
   /// Set some account_data for the client. This config is only visible
-  /// to the user that set the account_data. The config will be synced 
+  /// to the user that set the account_data. The config will be synced
   /// to clients in the top-level account_data.
   static Future<dynamic> fetchAccountData({
     String? protocol = 'https://',
@@ -42,11 +40,11 @@ abstract class Users {
   }
 
   /// Save Account Data
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
-  /// 
+  ///
   /// Set some account_data for the client. This config is only visible
-  /// to the user that set the account_data. The config will be synced 
+  /// to the user that set the account_data. The config will be synced
   /// to clients in the top-level account_data.
   static Future<dynamic> saveAccountData({
     String? protocol = 'https://',
@@ -75,11 +73,11 @@ abstract class Users {
   }
 
   /// Ignore User (a.k.a. Block User)
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#m-ignored-user-list
-  ///  
+  ///
   /// Set some account_data for the client. This config is only visible
-  /// to the user that set the account_data. The config will be synced 
+  /// to the user that set the account_data. The config will be synced
   /// to clients in the top-level account_data.
   static Future<dynamic> updateBlockedUsers({
     String? protocol = 'https://',
@@ -111,11 +109,11 @@ abstract class Users {
   }
 
   /// Ignore User (a.k.a. Block User)
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#m-ignored-user-list
-  ///  
+  ///
   /// Set some account_data for the client. This config is only visible
-  /// to the user that set the account_data. The config will be synced 
+  /// to the user that set the account_data. The config will be synced
   /// to clients in the top-level account_data.
   static Future<dynamic> inviteUser({
     String? protocol = 'https://',
@@ -124,7 +122,8 @@ abstract class Users {
     String? roomId,
     String? userId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -145,11 +144,11 @@ abstract class Users {
   }
 
   /// Update Display Name
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id260
-  ///  
+  ///
   /// This API sets the given user's display name.
-  ///  You must have permission to set this user's display name, 
+  ///  You must have permission to set this user's display name,
   /// e.g. you need to have their access_token.
   static Future<dynamic> fetchUserProfile({
     String? protocol = 'https://',
@@ -174,11 +173,11 @@ abstract class Users {
   }
 
   /// Update Display Name
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id260
-  ///  
+  ///
   /// This API sets the given user's display name.
-  ///  You must have permission to set this user's display name, 
+  ///  You must have permission to set this user's display name,
   /// e.g. you need to have their access_token.
   static Future<dynamic> updateDisplayName({
     String? protocol = 'https://',
@@ -211,11 +210,11 @@ abstract class Users {
   }
 
   /// Update Avatar Uri
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id303
-  ///  
-  /// This API sets the given user's avatar URL. 
-  /// You must have permission to set this user's avatar URL, e.g. 
+  ///
+  /// This API sets the given user's avatar URL.
+  /// You must have permission to set this user's avatar URL, e.g.
   /// you need to have their access_token.
   static Future<dynamic> updateAvatarUri({
     String? protocol = 'https://',
@@ -245,12 +244,59 @@ abstract class Users {
       saveResponse.body,
     );
   }
+
+  /// Update Avatar Uri
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id303
+  ///
+  /// This API sets the given user's avatar URL.
+  /// You must have permission to set this user's avatar URL, e.g.
+  /// you need to have their access_token.
+  static Future<dynamic> deactivateUser({
+    String? protocol = 'https://',
+    String? homeserver = 'matrix.org',
+    String? accessToken,
+    String? userId,
+    String? identityServer,
+    String? session,
+    String? authType,
+    String? authValue,
+  }) async {
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/deactivate';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final Map body = {'id_server': identityServer};
+
+    if (session != null) {
+      body['auth'] = {
+        'session': session,
+        'type': authType,
+        'user': userId,
+        'password': authValue, // WARNING: this may not always be password?
+      };
+    }
+
+    final saveResponse = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(
+      saveResponse.body,
+    );
+  }
 }
 
 /// https://matrix.org/docs/spec/client_server/latest#id259
-/// 
-/// A list of members of the room. 
-/// If you are joined to the room then this will be the current members of the room. 
+///
+/// A list of members of the room.
+/// If you are joined to the room then this will be the current members of the room.
 /// If you have left the room then this will be the members of the room when you left.
 dynamic buildRoomMembersRequest({
   String protocol = 'https://',
@@ -258,7 +304,8 @@ dynamic buildRoomMembersRequest({
   String? accessToken,
   String? roomId,
 }) {
-  final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
+  final String url =
+      '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
 
   final Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

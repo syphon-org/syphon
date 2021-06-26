@@ -1,5 +1,5 @@
-// Flutter imports:
 import 'dart:async';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 
-// Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -30,7 +29,6 @@ class ChatInput extends StatefulWidget {
   final TextEditingController controller;
 
   final Function? onSubmitMessage;
-  final Function? onSubmittedMessage;
   final Function? onChangeMethod;
   final Function? onUpdateMessage;
   final Function? onCancelReply;
@@ -47,7 +45,6 @@ class ChatInput extends StatefulWidget {
     this.onUpdateMessage,
     this.onChangeMethod,
     this.onSubmitMessage,
-    this.onSubmittedMessage,
     this.onCancelReply,
   }) : super(key: key);
 
@@ -97,7 +94,18 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
-  @protected
+  @override
+  void dispose() {
+    super.dispose();
+    if (typingNotifier != null) {
+      typingNotifier!.cancel();
+    }
+
+    if (typingNotifierTimeout != null) {
+      typingNotifierTimeout!.cancel();
+    }
+  }
+
   onUpdate(String text, {_Props? props}) {
     setState(() {
       sendable = text.trim().isNotEmpty;
@@ -139,23 +147,26 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    if (typingNotifier != null) {
-      typingNotifier!.cancel();
-    }
+  onSubmit() {
+    setState(() {
+      sendable = false;
+    });
 
-    if (typingNotifierTimeout != null) {
-      typingNotifierTimeout!.cancel();
+    if (widget.onSubmitMessage != null) {
+      widget.onSubmitMessage!();
+    }
+  }
+
+  onCancelReply() {
+    if (widget.onCancelReply != null) {
+      widget.onCancelReply!();
     }
   }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
         onInitialBuild: onMounted,
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -163,19 +174,20 @@ class ChatInputState extends State<ChatInput> {
 
           // dynamic dimensions
           final double messageInputWidth = width - 72;
-          final bool replying =
-              widget.quotable != null && widget.quotable!.sender != null;
+          final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
           final isSendable = sendable && !widget.sending;
+
+          if (!isSendable) {
+            sendButtonColor = Color(Colours.greyDisabled);
+          }
+
           if (widget.mediumType == MediumType.plaintext) {
+            hintText = Strings.placeholderInputMatrixUnencrypted;
+
             if (isSendable) {
-              if (Theme.of(context).accentColor !=
-                  Theme.of(context).primaryColor) {
-                sendButtonColor = Theme.of(context).accentColor;
-              } else {
-                sendButtonColor = Colors.grey[700];
-              }
+              sendButtonColor = Theme.of(context).accentColor;
             }
           }
 
@@ -190,8 +202,7 @@ class ChatInputState extends State<ChatInput> {
           var sendButton = InkWell(
             borderRadius: BorderRadius.circular(48),
             onLongPress: widget.onChangeMethod as void Function()?,
-            onTap:
-                !isSendable ? null : widget.onSubmitMessage as void Function()?,
+            onTap: !isSendable ? null : onSubmit,
             child: CircleAvatar(
               backgroundColor: sendButtonColor,
               child: Container(
@@ -209,9 +220,7 @@ class ChatInputState extends State<ChatInput> {
             sendButton = InkWell(
               borderRadius: BorderRadius.circular(48),
               onLongPress: widget.onChangeMethod as void Function()?,
-              onTap: !isSendable
-                  ? null
-                  : widget.onSubmitMessage as void Function()?,
+              onTap: !isSendable ? null : onSubmit,
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
                 child: Container(
@@ -255,12 +264,9 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText:
-                                  replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(
-                                  color: Theme.of(context).accentColor),
-                              contentPadding: Dimensions.inputContentPadding
-                                  .copyWith(right: 36),
+                              labelText: replying ? widget.quotable!.sender : '',
+                              labelStyle: TextStyle(color: Theme.of(context).accentColor),
+                              contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Theme.of(context).accentColor,
@@ -269,10 +275,8 @@ class ChatInputState extends State<ChatInput> {
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                               border: OutlineInputBorder(
@@ -283,10 +287,8 @@ class ChatInputState extends State<ChatInput> {
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                             ),
@@ -297,7 +299,7 @@ class ChatInputState extends State<ChatInput> {
                           right: 0,
                           bottom: 0,
                           child: IconButton(
-                            onPressed: () => widget.onCancelReply!(),
+                            onPressed: () => onCancelReply(),
                             icon: Icon(
                               Icons.close,
                               size: Dimensions.iconSize,
@@ -321,19 +323,15 @@ class ChatInputState extends State<ChatInput> {
                     ),
                     child: TextField(
                       maxLines: null,
-                      autocorrect: false,
-                      enableSuggestions: false,
+                      autocorrect: props.autocorrectEnabled,
+                      enableSuggestions: props.suggestionsEnabled,
                       keyboardType: TextInputType.multiline,
-                      textInputAction: widget.enterSend
-                          ? TextInputAction.send
-                          : TextInputAction.newline,
+                      textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
                       cursorColor: inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !isSendable
-                          ? null
-                          : widget.onSubmittedMessage as void Function(String)?,
+                      onSubmitted: !isSendable ? null : (text) => onSubmit(),
                       style: TextStyle(
                         height: 1.5,
                         color: inputTextColor,
@@ -344,8 +342,7 @@ class ChatInputState extends State<ChatInput> {
                         fillColor: inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor, width: 1),
+                            borderSide: BorderSide(color: Theme.of(context).accentColor, width: 1),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(!replying ? 24 : 0),
                               topRight: Radius.circular(!replying ? 24 : 0),
@@ -378,12 +375,16 @@ class ChatInputState extends State<ChatInput> {
 class _Props extends Equatable {
   final Room room;
   final bool enterSendEnabled;
+  final bool autocorrectEnabled;
+  final bool suggestionsEnabled;
 
   final Function onSendTyping;
 
-  _Props({
+  const _Props({
     required this.room,
     required this.enterSendEnabled,
+    required this.autocorrectEnabled,
+    required this.suggestionsEnabled,
     required this.onSendTyping,
   });
 
@@ -396,6 +397,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
+        autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
+        suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

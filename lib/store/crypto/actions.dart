@@ -1,14 +1,11 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-// Flutter imports:
 import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:file_picker/file_picker.dart';
 
 import 'package:intl/intl.dart';
@@ -16,10 +13,8 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
@@ -291,8 +286,6 @@ ThunkAction<AppState> generateIdentityKeys() {
       };
 
       // fingerprint signature key pair generation for upload
-      // warn: seems to work without canonical_json lib
-      // utf8.decode(deviceKeysEncoded);
       final deviceKeysEncoded = canonicalJson.encode(deviceIdentityKeys);
       final deviceKeysSerialized = utf8.decode(deviceKeysEncoded);
       final deviceKeysSigned = olmAccount.sign(deviceKeysSerialized);
@@ -417,11 +410,15 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
       return;
     }
 
+    final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned.isEmpty;
+    if (deviceKeysOwned) {
+      return;
+    }
+
     // if the key count hasn't changed, don't update it
     final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts;
 
-    if (currentKeyCount[Algorithms.signedcurve25519] ==
-            oneTimeKeysCounts[Algorithms.signedcurve25519] &&
+    if (currentKeyCount[Algorithms.signedcurve25519] == oneTimeKeysCounts[Algorithms.signedcurve25519] &&
         currentKeyCount.isNotEmpty) {
       return;
     }
@@ -432,8 +429,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
 
     // register new key counts
     final int maxKeyCount = olmAccount.max_number_of_one_time_keys();
-    final int signedCurveCount =
-        oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
+    final int signedCurveCount = oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
 
     // the last check is because im scared
     if ((signedCurveCount < maxKeyCount / 3) && signedCurveCount < 100) {
@@ -537,8 +533,7 @@ ThunkAction<AppState> updateKeySessions({
         (oneTimeKey) async {
           try {
             // find the identityKey for the device
-            final deviceKey = store.state.cryptoStore
-                .deviceKeys[oneTimeKey.userId!]![oneTimeKey.deviceId!]!;
+            final deviceKey = store.state.cryptoStore.deviceKeys[oneTimeKey.userId!]![oneTimeKey.deviceId!]!;
 
             // Poorly decided to save key sessions by deviceId at first but then
             // realised that you may have the same identityKey for diff
@@ -587,10 +582,7 @@ ThunkAction<AppState> updateKeySessions({
       await Future.wait(requestsSendToDevicee);
       await store.dispatch(setOneTimeKeysClaimed({}));
     } catch (error) {
-      store.dispatch(addAlert(
-          origin: 'updateKeySessions',
-          message: error.toString(),
-          error: error));
+      store.dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
     }
   };
 }
@@ -609,9 +601,8 @@ ThunkAction<AppState> claimOneTimeKeys({
       final currentUser = store.state.authStore.user;
 
       // get deviceKeys for every user present in the chat
-      final List<DeviceKey> roomDeviceKeys = List.from(roomUserIds
-          .map((userId) => (deviceKeys[userId] ?? {}).values)
-          .expand((x) => x));
+      final List<DeviceKey> roomDeviceKeys =
+          List.from(roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x));
 
       // Create a map of all the oneTimeKeys to claim
       final claimKeysPayload = roomDeviceKeys.fold(
@@ -631,8 +622,7 @@ ThunkAction<AppState> claimOneTimeKeys({
             claims[deviceKey.userId] = {};
           }
 
-          claims[deviceKey.userId][deviceKey.deviceId] =
-              Algorithms.signedcurve25519;
+          claims[deviceKey.userId][deviceKey.deviceId] = Algorithms.signedcurve25519;
 
           return claims;
         },
@@ -654,8 +644,7 @@ ThunkAction<AppState> claimOneTimeKeys({
         oneTimeKeys: claimKeysPayload,
       );
 
-      if (claimKeysResponse['errcode'] != null ||
-          claimKeysResponse['failures'].isNotEmpty) {
+      if (claimKeysResponse['errcode'] != null || claimKeysResponse['failures'].isNotEmpty) {
         throw claimKeysResponse['error'];
       }
 
@@ -693,8 +682,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       // create sessions from new one time keys per device id
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
-        final deviceKey =
-            store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
+        final deviceKey = store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
         final keyId = Keys.identity(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys![keyId];
 
@@ -778,8 +766,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
 }) {
   return (Store<AppState> store) async {
     try {
-      final outboundKeySessionSerialized =
-          store.state.cryptoStore.outboundKeySessions[identityKey!];
+      final outboundKeySessionSerialized = store.state.cryptoStore.outboundKeySessions[identityKey!];
 
       // Deserialize outbound key session with device identity key
       if (outboundKeySessionSerialized != null) {
@@ -812,16 +799,13 @@ ThunkAction<AppState> loadKeySessionInbound({
   return (Store<AppState> store) async {
     try {
       // type 1 - attempt to decrypt with an existing session
-      final inboundKeySessionSerialized =
-          store.state.cryptoStore.inboundKeySessions[identityKey!];
+      final inboundKeySessionSerialized = store.state.cryptoStore.inboundKeySessions[identityKey!];
 
       if (inboundKeySessionSerialized != null) {
-        final inboundKeySession = olm.Session()
-          ..unpickle(identityKey, inboundKeySessionSerialized);
+        final inboundKeySession = olm.Session()..unpickle(identityKey, inboundKeySessionSerialized);
 
         // This returns a flag indicating whether the message was encrypted using that session.
-        final inboundkeySessionMatch =
-            inboundKeySession.matches_inbound_from(identityKey, body!);
+        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body!);
 
         if (inboundkeySessionMatch) {
           return inboundKeySession;
@@ -888,8 +872,7 @@ ThunkAction<AppState> loadMessageSessionInbound({
   String? identityKey,
 }) {
   return (Store<AppState> store) async {
-    final messageSessions =
-        store.state.cryptoStore.inboundMessageSessions[roomId!];
+    final messageSessions = store.state.cryptoStore.inboundMessageSessions[roomId!];
 
     if (messageSessions == null || !messageSessions.containsKey(identityKey)) {
       throw 'Unable to find inbound message session for decryption';
@@ -970,8 +953,7 @@ ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
 ThunkAction<AppState> loadMessageSessionOutbound({String? roomId}) {
   return (Store<AppState> store) async {
     // Load session for identity
-    var outboundMessageSessionSerialized =
-        store.state.cryptoStore.outboundMessageSessions[roomId!];
+    var outboundMessageSessionSerialized = store.state.cryptoStore.outboundMessageSessions[roomId!];
 
     if (outboundMessageSessionSerialized == null) {
       outboundMessageSessionSerialized = await store.dispatch(
@@ -999,8 +981,7 @@ ThunkAction<AppState> saveMessageSessionOutbound({
 
 ThunkAction<AppState> exportMessageSession({String? roomId}) {
   return (Store<AppState> store) async {
-    final olm.OutboundGroupSession outboundMessageSession =
-        await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -1077,16 +1058,14 @@ ThunkAction<AppState> exportDeviceKeysOwned() {
 
       final currentTime = DateTime.now();
 
-      final formattedTime =
-          DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
+      final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
 
       final fileName = '${directory.path}/app_key_export_$formattedTime.json';
 
       var file = File(fileName);
 
       final user = store.state.authStore.user;
-      final deviceKey =
-          store.state.cryptoStore.deviceKeysOwned[user.deviceId!]!;
+      final deviceKey = store.state.cryptoStore.deviceKeysOwned[user.deviceId!]!;
 
       final exportData = {
         'account_key': store.state.cryptoStore.olmAccountKey,

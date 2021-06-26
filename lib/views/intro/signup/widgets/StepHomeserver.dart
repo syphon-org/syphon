@@ -1,14 +1,11 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -27,7 +24,7 @@ class HomeserverStep extends StatefulWidget {
 }
 
 class HomeserverStepState extends State<HomeserverStep> {
-  HomeserverStepState({Key? key});
+  HomeserverStepState();
 
   final homeserverController = TextEditingController();
 
@@ -184,7 +181,7 @@ class _Props extends Equatable {
   final Function onSetHostname;
   final Function onChangeHomeserver;
 
-  _Props({
+  const _Props({
     required this.hostname,
     required this.homeserver,
     required this.onSetHostname,

@@ -1,21 +1,16 @@
-// Dart imports:
 import 'dart:io';
 
-// Flutter imports: ;
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
 
-// Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
@@ -31,6 +26,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
@@ -89,6 +85,10 @@ class ChatScreenState extends State<ChatScreen> {
         barrierDismissible: false,
         builder: (context) => DialogInvite(
           onAccept: props.onAcceptInvite,
+          onReject: () {
+            props.onRejectInvite();
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
           onCancel: () {
             Navigator.popUntil(context, (route) => route.isFirst);
           },
@@ -272,10 +272,9 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  @protected
   onShowMediumMenu(context, _Props props) async {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
 
     showMenu(
       elevation: 4.0,
@@ -296,7 +295,7 @@ class ChatScreenState extends State<ChatScreen> {
           child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
-              this.onChangeMediumType(
+              onChangeMediumType(
                 newMediumType: MediumType.plaintext,
                 props: props,
               );
@@ -329,7 +328,7 @@ class ChatScreenState extends State<ChatScreen> {
                 ? null
                 : () {
                     Navigator.pop(context);
-                    this.onChangeMediumType(
+                    onChangeMediumType(
                       newMediumType: MediumType.encryption,
                       props: props,
                     );
@@ -366,18 +365,15 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatViewArguements)
-              .roomId,
+          (ModalRoute.of(context)!.settings.arguments as ChatViewArguements).roomId,
         ),
         builder: (context, props) {
-          double height = MediaQuery.of(context).size.height;
+          final double height = MediaQuery.of(context).size.height;
 
-          final closedInputPadding = !inputFieldNode.hasFocus &&
-              Platform.isIOS &&
-              Dimensions.buttonlessHeightiOS < height;
+          final closedInputPadding =
+              !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
 
-          final isScrolling =
-              messagesController.hasClients && messagesController.offset != 0;
+          final isScrolling = messagesController.hasClients && messagesController.offset != 0;
 
           Color inputContainerColor = Colors.white;
 
@@ -387,7 +383,7 @@ class ChatScreenState extends State<ChatScreen> {
 
           Widget appBar = AppBarChat(
             room: props.room,
-            color: props.roomPrimaryColor,
+            color: props.chatColorPrimary,
             badgesEnabled: props.roomTypeBadgesEnabled,
             onDebug: () {
               props.onCheatCode();
@@ -406,13 +402,13 @@ class ChatScreenState extends State<ChatScreen> {
             },
           );
 
-          if (this.selectedMessage != null) {
+          if (selectedMessage != null) {
             appBar = AppBarMessageOptions(
               room: props.room,
               message: selectedMessage,
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
-                message: this.selectedMessage,
+                message: selectedMessage,
               ),
             );
           }
@@ -462,9 +458,7 @@ class ChatScreenState extends State<ChatScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Load more messages',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2,
+                                        style: Theme.of(context).textTheme.bodyText2,
                                       )
                                     ],
                                   ),
@@ -486,17 +480,11 @@ class ChatScreenState extends State<ChatScreen> {
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling
-                          ? [
-                              BoxShadow(
-                                  blurRadius: 6,
-                                  offset: Offset(0, -4),
-                                  color: Colors.black12)
-                            ]
+                          ? [BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
                           : [],
                     ),
                     child: AnimatedPadding(
-                      duration: Duration(
-                          milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                      duration: Duration(milliseconds: inputFieldNode.hasFocus ? 225 : 0),
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
@@ -511,7 +499,6 @@ class ChatScreenState extends State<ChatScreen> {
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSubmitMessage(props),
-                        onSubmittedMessage: (text) => onSubmitMessage(props),
                       ),
                     ),
                   ),
@@ -530,7 +517,7 @@ class _Props extends Equatable {
   final int? messagesLength;
   final bool enterSendEnabled;
   final ThemeType theme;
-  final Color roomPrimaryColor;
+  final Color chatColorPrimary;
   final bool roomTypeBadgesEnabled;
   final bool dismissKeyboardEnabled;
 
@@ -542,20 +529,21 @@ class _Props extends Equatable {
   final Function onLoadMoreMessages;
   final Function onLoadFirstBatch;
   final Function onAcceptInvite;
+  final Function onRejectInvite;
   final Function onToggleEncryption;
   final Function onToggleReaction;
   final Function onCheatCode;
   final Function onMarkRead;
   final Function onSelectReply;
 
-  _Props({
+  const _Props({
     required this.room,
     required this.theme,
     required this.userId,
     required this.loading,
     required this.messagesLength,
     required this.enterSendEnabled,
-    required this.roomPrimaryColor,
+    required this.chatColorPrimary,
     required this.roomTypeBadgesEnabled,
     required this.dismissKeyboardEnabled,
     required this.onUpdateDeviceKeys,
@@ -566,6 +554,7 @@ class _Props extends Equatable {
     required this.onLoadMoreMessages,
     required this.onLoadFirstBatch,
     required this.onAcceptInvite,
+    required this.onRejectInvite,
     required this.onToggleEncryption,
     required this.onToggleReaction,
     required this.onCheatCode,
@@ -579,158 +568,152 @@ class _Props extends Equatable {
         userId,
         loading,
         enterSendEnabled,
-        roomPrimaryColor,
+        chatColorPrimary,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
-      _Props(
-          room: selectRoom(id: roomId, state: store.state),
-          theme: store.state.settingsStore.theme,
-          userId: store.state.authStore.user.userId,
-          roomTypeBadgesEnabled:
-              store.state.settingsStore.roomTypeBadgesEnabled,
-          dismissKeyboardEnabled:
-              store.state.settingsStore.dismissKeyboardEnabled,
-          enterSendEnabled: store.state.settingsStore.enterSendEnabled,
-          loading: selectRoom(state: store.state, id: roomId).syncing,
-          messagesLength: store.state.eventStore.messages.containsKey(roomId)
-              ? store.state.eventStore.messages[roomId]?.length
-              : 0,
-          onSelectReply: (Message message) {
-            store.dispatch(selectReply(roomId: roomId, message: message));
-          },
-          roomPrimaryColor: () {
-            final chatSettings = store.state.settingsStore.chatSettings;
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+      room: selectRoom(id: roomId, state: store.state),
+      theme: store.state.settingsStore.theme,
+      userId: store.state.authStore.user.userId,
+      roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
+      dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
+      enterSendEnabled: store.state.settingsStore.enterSendEnabled,
+      loading: selectRoom(state: store.state, id: roomId).syncing,
+      messagesLength: store.state.eventStore.messages.containsKey(roomId)
+          ? store.state.eventStore.messages[roomId]?.length
+          : 0,
+      onSelectReply: (Message? message) {
+        store.dispatch(selectReply(roomId: roomId, message: message));
+      },
+      chatColorPrimary: selectChatColor(store, roomId),
+      onUpdateDeviceKeys: () async {
+        final room = store.state.roomStore.rooms[roomId]!;
 
-            if (chatSettings[roomId] == null) {
-              return Colours.hashedColor(roomId);
-            }
+        final usersDeviceKeys = await store.dispatch(
+          fetchDeviceKeys(userIds: room.userIds),
+        );
 
-            return Color(chatSettings[roomId]!.primaryColor);
-          }(),
-          onUpdateDeviceKeys: () async {
-            final room = store.state.roomStore.rooms[roomId]!;
+        store.dispatch(setDeviceKeys(usersDeviceKeys));
+      },
+      onSaveDraftMessage: ({
+        String? body,
+        String? type,
+      }) {
+        store.dispatch(saveDraft(
+          body: body,
+          type: type,
+          room: store.state.roomStore.rooms[roomId],
+        ));
+      },
+      onClearDraftMessage: ({
+        String? body,
+        String? type,
+      }) {
+        store.dispatch(clearDraft(
+          room: store.state.roomStore.rooms[roomId],
+        ));
+      },
+      onSendMessage: ({required String body, String? type}) async {
+        if (roomId == null || body.isEmpty) return;
 
-            final usersDeviceKeys = await store.dispatch(
-              fetchDeviceKeys(userIds: room.userIds),
-            );
+        final room = store.state.roomStore.rooms[roomId]!;
 
-            store.dispatch(setDeviceKeys(usersDeviceKeys));
-          },
-          onSaveDraftMessage: ({
-            String? body,
-            String? type,
-          }) {
-            store.dispatch(saveDraft(
-              body: body,
-              type: type,
-              room: store.state.roomStore.rooms[roomId],
-            ));
-          },
-          onClearDraftMessage: ({
-            String? body,
-            String? type,
-          }) {
-            store.dispatch(clearDraft(
-              room: store.state.roomStore.rooms[roomId],
-            ));
-          },
-          onSendMessage: ({required String body, String? type}) async {
-            if (roomId == null || body.isEmpty) return;
+        final message = Message(
+          body: body,
+          type: type,
+        );
 
-            final room = store.state.roomStore.rooms[roomId]!;
+        if (room.encryptionEnabled) {
+          return store.dispatch(sendMessageEncrypted(
+            roomId: roomId,
+            message: message,
+          ));
+        }
 
-            final message = Message(
-              body: body,
-              type: type,
-            );
+        return store.dispatch(sendMessage(
+          room: room,
+          message: message,
+        ));
+      },
+      onDeleteMessage: ({
+        Message? message,
+      }) {
+        if (message != null) {
+          store.dispatch(deleteMessage(message: message));
+        }
+      },
+      onAcceptInvite: () {
+        store.dispatch(acceptRoom(
+          room: selectRoom(state: store.state, id: roomId),
+        ));
+      },
+      onRejectInvite: () {
+        store.dispatch(leaveRoom(
+          room: selectRoom(state: store.state, id: roomId),
+        ));
+      },
+      onMarkRead: () {
+        store.dispatch(markRoomRead(roomId: roomId));
+      },
+      onLoadFirstBatch: () {
+        final room = selectRoom(id: roomId, state: store.state);
 
-            if (room.encryptionEnabled) {
-              return store.dispatch(sendMessageEncrypted(
-                roomId: roomId,
-                message: message,
-              ));
-            }
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.nextHash,
+          limit: 25,
+        ));
+      },
+      onToggleReaction: ({Message? message, String? emoji}) {
+        final room = selectRoom(id: roomId, state: store.state);
 
-            return store.dispatch(sendMessage(
-              room: room,
-              message: message,
-            ));
-          },
-          onDeleteMessage: ({
-            Message? message,
-          }) {
-            if (message != null) {
-              store.dispatch(deleteMessage(message: message));
-            }
-          },
-          onAcceptInvite: () {
-            store.dispatch(acceptRoom(
-              room: selectRoom(state: store.state, id: roomId),
-            ));
-          },
-          onMarkRead: () {
-            store.dispatch(markRoomRead(roomId: roomId));
-          },
-          onLoadFirstBatch: () {
-            final room = selectRoom(id: roomId, state: store.state);
+        store.dispatch(
+          toggleReaction(room: room, message: message, emoji: emoji),
+        );
+      },
+      onToggleEncryption: () {
+        final room = selectRoom(id: roomId, state: store.state);
+        store.dispatch(
+          toggleRoomEncryption(room: room),
+        );
+      },
+      onLoadMoreMessages: () {
+        final room = selectRoom(state: store.state, id: roomId);
 
-            store.dispatch(fetchMessageEvents(
-              room: room,
-              from: room.nextHash,
-              limit: 25,
-            ));
-          },
-          onToggleReaction: ({Message? message, String? emoji}) {
-            final room = selectRoom(id: roomId, state: store.state);
+        // load message from cold storage
+        // TODO: paginate cold storage messages
+        // final messages = roomMessages(store.state, roomId);
+        // if (messages.length < room.messageIds.length) {
+        //   printDebug(
+        //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
+        //   return store.dispatch(
+        //     loadMessageEvents(
+        //       room: room,
+        //       offset: messages.length,
+        //     ),
+        //   );
+        // }
 
-            store.dispatch(
-              toggleReaction(room: room, message: message, emoji: emoji),
-            );
-          },
-          onToggleEncryption: () {
-            final room = selectRoom(id: roomId, state: store.state);
-            store.dispatch(
-              toggleRoomEncryption(room: room),
-            );
-          },
-          onLoadMoreMessages: () {
-            final room = selectRoom(state: store.state, id: roomId);
+        // fetch messages beyond the oldest known message - lastHash
+        return store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.lastHash,
+          oldest: true,
+        ));
+      },
+      onCheatCode: () async {
+        // await store.dispatch(store.dispatch(generateDeviceId(
+        //   salt: store.state.authStore.username,
+        // )));
 
-            // load message from cold storage
-            // TODO: paginate cold storage messages
-            // final messages = roomMessages(store.state, roomId);
-            // if (messages.length < room.messageIds.length) {
-            //   printDebug(
-            //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-            //   return store.dispatch(
-            //     loadMessageEvents(
-            //       room: room,
-            //       offset: messages.length,
-            //     ),
-            //   );
-            // }
+        final room = selectRoom(state: store.state, id: roomId);
 
-            // fetch messages beyond the oldest known message - lastHash
-            return store.dispatch(fetchMessageEvents(
-              room: room,
-              from: room.lastHash,
-              oldest: true,
-            ));
-          },
-          onCheatCode: () async {
-            // await store.dispatch(store.dispatch(generateDeviceId(
-            //   salt: store.state.authStore.username,
-            // )));
+        store.dispatch(updateKeySessions(room: room));
 
-            final room = selectRoom(state: store.state, id: roomId);
+        final usersDeviceKeys = await store.dispatch(
+          fetchDeviceKeys(userIds: room.userIds),
+        );
 
-            store.dispatch(updateKeySessions(room: room));
-
-            final usersDeviceKeys = await store.dispatch(
-              fetchDeviceKeys(userIds: room.userIds),
-            );
-
-            printJson(usersDeviceKeys);
-          });
+        printJson(usersDeviceKeys);
+      });
 }

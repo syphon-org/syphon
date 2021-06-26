@@ -1,17 +1,10 @@
-// Dart imports:
-import 'dart:async';
-
-// Flutter imports:
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -19,7 +12,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'step-password.dart';
+import 'password-update-step.dart';
 
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
@@ -39,7 +32,7 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
   PageController? pageController;
 
   var sections = [
-    PasswordStep(),
+    PasswordUpdateStep(),
   ];
 
   PasswordUpdateState({Key? key});
