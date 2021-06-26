@@ -162,11 +162,12 @@ class Themes {
       primaryColorLight: Color(primaryColor),
       accentColor: Color(accentColor),
       accentIconTheme: IconThemeData(color: Color(accentColor)),
+      brightness: brightness,
       colorScheme: ThemeData().colorScheme.copyWith(
             primary: Color(primaryColor),
             secondary: Color(accentColor),
+            brightness: brightness,
           ),
-      brightness: brightness,
 
       // Core UI\
       dialogBackgroundColor: modalColor,
