@@ -571,7 +571,7 @@ class _Props extends Equatable {
         await store.dispatch(toggleBlockUser(user: user));
       },
       onLeaveChat: () async {
-        await store.dispatch(removeRoom(
+        await store.dispatch(leaveRoom(
           room: selectRoom(state: store.state, id: roomId),
         ));
       },

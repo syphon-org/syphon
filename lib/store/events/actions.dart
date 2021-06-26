@@ -342,8 +342,7 @@ ThunkAction<AppState> selectReply({
 }) {
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId!]!;
-    final reply = message ?? Message();
-    store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
+    store.dispatch(SetRoom(room: room.copyWith(reply: message ?? Null)));
   };
 }
 

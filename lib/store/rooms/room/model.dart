@@ -219,7 +219,7 @@ class Room {
         userTyping: userTyping ?? this.userTyping,
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
-        reply: reply ?? this.reply,
+        reply: reply == Null ? null : reply ?? this.reply,
         outbox: outbox ?? this.outbox,
         messageIds: messageIds ?? this.messageIds,
         messagesNew: messagesNew ?? this.messagesNew,
@@ -276,30 +276,26 @@ class Room {
     if (json['state'] != null) {
       final List<dynamic> stateEventsRaw = json['state']['events'];
 
-      stateEvents =
-          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['invite_state'] != null) {
       final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-      stateEvents =
-          stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
       invite = true;
     }
 
     if (json['ephemeral'] != null) {
       final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-      ephemeralEvents =
-          ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     if (json['account_data'] != null) {
       final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-      accountEvents =
-          accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+      accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
     }
 
     // Find state and message updates from timeline
@@ -403,7 +399,7 @@ class Room {
     bool? encryptionEnabled;
     bool direct = this.direct;
     int? lastUpdate = this.lastUpdate;
-    int? namePriority = this.namePriority != 4 ? this.namePriority : 4;
+    int namePriority = this.namePriority;
 
     final Map<String, User> usersAdd = Map.from(usersNew);
     Set<String> userIds = Set<String>.from(this.userIds);
@@ -418,7 +414,7 @@ class Room {
 
         switch (event.type) {
           case 'm.room.name':
-            if (namePriority! > 0) {
+            if (namePriority > 0) {
               namePriority = 1;
               name = event.content['name'];
             }
@@ -432,13 +428,13 @@ class Room {
             break;
 
           case 'm.room.canonical_alias':
-            if (namePriority! > 2) {
+            if (namePriority > 2) {
               namePriority = 2;
               name = event.content['alias'];
             }
             break;
           case 'm.room.aliases':
-            if (namePriority! > 3) {
+            if (namePriority > 3) {
               namePriority = 3;
               name = event.content['aliases'][0];
             }
@@ -489,16 +485,13 @@ class Room {
 
     try {
       // checks to make sure someone didn't name the room after the authed user
-      final badRoomName =
-          name == currentUser.displayName || name == currentUser.userId;
+      final badRoomName = name == currentUser.displayName || name == currentUser.userId;
 
       // no name room check
-      if ((namePriority! > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
+      if ((namePriority > 3 && usersAdd.isNotEmpty && direct) || badRoomName) {
         // Filter out number of non current users to show preview of total
         final otherUsers = usersAdd.values.where(
-          (user) =>
-              user.userId != currentUser.userId &&
-              user.displayName != currentUser.displayName,
+          (user) => user.userId != currentUser.userId && user.displayName != currentUser.displayName,
         );
 
         if (otherUsers.isNotEmpty) {
@@ -512,14 +505,16 @@ class Room {
               : shownUser.displayName;
 
           // set avatar if one has not been assigned
-          if (avatarUri == null &&
-              this.avatarUri == null &&
-              otherUsers.length == 1) {
+          if (avatarUri == null && this.avatarUri == null && otherUsers.length == 1) {
             avatarUri = shownUser.avatarUri;
           }
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      printError('[directRoomName] ${error.toString()}');
+    }
+
+    printDebug('[Room.fromStateEvents] $name ${this.name} $namePriority');
 
     return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
@@ -585,9 +580,7 @@ class Room {
         // - the oldest hash (lastHash) is non-existant
         // - the previous hash (most recent) is non-existant
         // - the oldest hash equals the previously fetched hash
-        if (this.lastHash == null ||
-            this.prevHash == null ||
-            this.lastHash == this.prevHash) {
+        if (this.lastHash == null || this.prevHash == null || this.lastHash == this.prevHash) {
           limited = false;
         }
       }
@@ -664,9 +657,7 @@ class Room {
                 readReceipts[key] = readReceiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceipts[key]!
-                    .userReads!
-                    .addAll(readReceiptsNew.userReads!);
+                readReceipts[key]!.userReads!.addAll(readReceiptsNew.userReads!);
               }
             });
             break;

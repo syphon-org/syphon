@@ -63,7 +63,7 @@ dependencies:
   swipeable:
     git:
       url: https://github.com/ereio/swipeable.git
-      ref: null-safety
+      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
 
   # state
   equatable: ^2.0.0

@@ -900,8 +900,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: null-safety
-      resolved-ref: "46a6372a463db5dda757e608d9a7939e5e92f50e"
+      ref: "867b117f15f51404e31597d8ab9d5325f6b52938"
+      resolved-ref: "867b117f15f51404e31597d8ab9d5325f6b52938"
       url: "https://github.com/ereio/swipeable.git"
     source: git
     version: "2.0.0"

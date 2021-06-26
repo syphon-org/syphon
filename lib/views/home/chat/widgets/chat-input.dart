@@ -157,11 +157,16 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
+  onCancelReply() {
+    if (widget.onCancelReply != null) {
+      widget.onCancelReply!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
         onInitialBuild: onMounted,
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -169,8 +174,7 @@ class ChatInputState extends State<ChatInput> {
 
           // dynamic dimensions
           final double messageInputWidth = width - 72;
-          final bool replying =
-              widget.quotable != null && widget.quotable!.sender != null;
+          final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
           final isSendable = sendable && !widget.sending;
@@ -260,12 +264,9 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText:
-                                  replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(
-                                  color: Theme.of(context).accentColor),
-                              contentPadding: Dimensions.inputContentPadding
-                                  .copyWith(right: 36),
+                              labelText: replying ? widget.quotable!.sender : '',
+                              labelStyle: TextStyle(color: Theme.of(context).accentColor),
+                              contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Theme.of(context).accentColor,
@@ -274,10 +275,8 @@ class ChatInputState extends State<ChatInput> {
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                               border: OutlineInputBorder(
@@ -288,10 +287,8 @@ class ChatInputState extends State<ChatInput> {
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                             ),
@@ -302,7 +299,7 @@ class ChatInputState extends State<ChatInput> {
                           right: 0,
                           bottom: 0,
                           child: IconButton(
-                            onPressed: () => widget.onCancelReply!(),
+                            onPressed: () => onCancelReply(),
                             icon: Icon(
                               Icons.close,
                               size: Dimensions.iconSize,
@@ -329,9 +326,7 @@ class ChatInputState extends State<ChatInput> {
                       autocorrect: props.autocorrectEnabled,
                       enableSuggestions: props.suggestionsEnabled,
                       keyboardType: TextInputType.multiline,
-                      textInputAction: widget.enterSend
-                          ? TextInputAction.send
-                          : TextInputAction.newline,
+                      textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
                       cursorColor: inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
@@ -347,8 +342,7 @@ class ChatInputState extends State<ChatInput> {
                         fillColor: inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).accentColor, width: 1),
+                            borderSide: BorderSide(color: Theme.of(context).accentColor, width: 1),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(!replying ? 24 : 0),
                               topRight: Radius.circular(!replying ? 24 : 0),
