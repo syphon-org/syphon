@@ -3,10 +3,37 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // Project imports:
-import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/colours.dart';
 
 part 'model.g.dart';
+
+// Theme-related types
+enum ThemeType {
+  Light,
+  Dark,
+  Darker,
+  Night,
+}
+enum FontName {
+  Rubik,
+  Roboto,
+  Poppins,
+  Inter,
+}
+enum MessageSize {
+  Small,
+  Default,
+  Large,
+}
+enum FontSize {
+  Small,
+  Default,
+  Large,
+}
+enum AvatarShape {
+  Circle,
+  Square,
+}
 
 @JsonSerializable()
 class AppTheme extends Equatable {
@@ -25,11 +52,11 @@ class AppTheme extends Equatable {
     this.accentColor = Colours.cyanSyphon,
     this.appBarColor = Colours.cyanSyphon,
     this.brightness = 0,
-    this.themeType = ThemeType.LIGHT,
-    this.fontName = FontName.RUBIK,
-    this.fontSize = FontSize.DEFAULT,
-    this.messageSize = MessageSize.DEFAULT,
-    this.avatarShape = AvatarShape.CIRCLE,
+    this.themeType = ThemeType.Light,
+    this.fontName = FontName.Rubik,
+    this.fontSize = FontSize.Default,
+    this.messageSize = MessageSize.Default,
+    this.avatarShape = AvatarShape.Circle,
   });
 
   @override

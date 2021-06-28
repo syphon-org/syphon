@@ -10,7 +10,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -116,7 +117,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final backgroundColor = props.themeType.backgroundBrightness;
+        final backgroundColor = selectBackgroundBrightness(props.themeType);
 
         return Scaffold(
           appBar: AppBar(

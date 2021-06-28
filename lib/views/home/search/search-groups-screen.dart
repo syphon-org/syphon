@@ -17,7 +17,7 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';

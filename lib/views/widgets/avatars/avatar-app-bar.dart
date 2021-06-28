@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
@@ -12,7 +13,7 @@ class AvatarAppBar extends StatelessWidget {
   AvatarAppBar({
     Key? key,
     this.user,
-    this.themeType = ThemeType.LIGHT,
+    this.themeType = ThemeType.Light,
     this.syncing = false,
     this.offline = false,
     this.unauthed = false,
@@ -56,7 +57,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: themeType.backgroundBrightness,
+                    color: selectBackgroundBrightness(themeType),
                     child: Icon(
                       Icons.offline_bolt,
                       color: Colors.white,
@@ -78,7 +79,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: themeType.backgroundBrightness,
+                    color: selectBackgroundBrightness(themeType),
                     child: Icon(
                       Icons.block,
                       color: Colors.white,
@@ -101,7 +102,7 @@ class AvatarAppBar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     padding: EdgeInsets.all(2),
-                    color: themeType.backgroundBrightness,
+                    color: selectBackgroundBrightness(themeType),
                     child: CircularProgressIndicator(
                       strokeWidth: Dimensions.defaultStrokeWidthLite,
                     ),

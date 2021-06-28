@@ -7,7 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';

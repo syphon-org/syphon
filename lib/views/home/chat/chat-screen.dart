@@ -18,9 +18,8 @@ import 'package:syphon/global/assets.dart';
 // Project imports:
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/reactions/actions.dart';

@@ -12,7 +12,7 @@ import 'package:redux/redux.dart';
 // Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 
 class ActionRing extends StatelessWidget {

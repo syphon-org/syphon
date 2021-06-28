@@ -7,7 +7,7 @@ import 'package:redux/redux.dart';
 
 // Project imports:
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -46,7 +46,7 @@ class Avatar extends StatelessWidget {
 
           var borderRadius = BorderRadius.circular(size);
 
-          if (props.avatarShape == AvatarShape.SQUARE) {
+          if (props.avatarShape == AvatarShape.Square) {
             borderRadius = BorderRadius.circular(size / 3);
           }
 

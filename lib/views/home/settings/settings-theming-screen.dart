@@ -9,7 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
@@ -153,7 +153,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.fontName.name,
+                            props.fontName.toString(),
                           ),
                           onTap: () => props.onIncrementFontType(),
                         ),
@@ -164,7 +164,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.fontSize.name,
+                            props.fontSize.toString(),
                           ),
                           onTap: () => props.onIncrementFontSize(),
                         ),
@@ -175,7 +175,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.messageSize.name,
+                            props.messageSize.toString(),
                           ),
                           onTap: () => props.onIncrementMessageSize(),
                         ),
@@ -217,7 +217,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
-                            props.avatarShape.name,
+                            props.avatarShape.toString(),
                           ),
                         ),
                       ],
@@ -296,7 +296,7 @@ class Props extends Equatable {
             store.state.settingsStore.appTheme.accentColor ?? Colours.cyanSyphon,
         appBarColor:
             store.state.settingsStore.appTheme.appBarColor ?? Colours.cyanSyphon,
-        themeType: store.state.settingsStore.appTheme.themeType.name,
+        themeType: store.state.settingsStore.appTheme.themeType.toString(),
         language: store.state.settingsStore.language,
         fontName: store.state.settingsStore.appTheme.fontName,
         fontSize: store.state.settingsStore.appTheme.fontSize,

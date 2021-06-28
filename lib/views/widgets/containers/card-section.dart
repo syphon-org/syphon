@@ -8,10 +8,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
 class CardSection extends StatelessWidget {
   CardSection({
@@ -37,7 +36,7 @@ class CardSection extends StatelessWidget {
             margin: margin ?? EdgeInsets.symmetric(vertical: 4),
             elevation: elevation ?? 0.5,
             // Re-use the System UI color because they are exactly the same
-            color: Color(props.themeType.systemUiColor),
+            color: Color(selectSystemUiColor(props.themeType)),
             child: Container(
               padding: padding ?? EdgeInsets.only(top: 12),
               child: child,

@@ -9,7 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 // Project imports:
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -281,8 +281,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        font: store.state.settingsStore.appTheme.fontName.name,
-        theme: store.state.settingsStore.appTheme.themeType.name,
+        font: store.state.settingsStore.appTheme.fontName.toString(),
+        theme: store.state.settingsStore.appTheme.themeType.toString(),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled: store.state.settingsStore.notificationsEnabled,
