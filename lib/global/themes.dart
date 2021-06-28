@@ -153,11 +153,13 @@ class Themes {
         break;
     }
 
-    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : accentColor;
+    final invertedPrimaryColor =
+        brightness == Brightness.light ? primaryColor : accentColor;
 
     return ThemeData(
       // Main Colors
       primaryColor: Color(primaryColor),
+      primaryColorBrightness: brightness,
       primaryColorDark: Color(primaryColor),
       primaryColorLight: Color(primaryColor),
       accentColor: Color(accentColor),
@@ -178,7 +180,9 @@ class Themes {
         selectionHandleColor: Color(primaryColor),
       ),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null
+          ? Color(scaffoldBackgroundColor)
+          : null,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,
