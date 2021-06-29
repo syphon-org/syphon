@@ -1,214 +1,92 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:syphon/global/algos.dart';
 
-import 'colours.dart';
+// Project imports:
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
-enum ThemeType {
-  LIGHT,
-  DARK,
-  DARKER,
-  NIGHT,
-}
-
-///
-/// Init System Theme
-///
-/// Written by TR_SLimey
-///
-void initSystemTheme(ThemeType themeType, {bool statusTransparent = false}) {
-  var themeNavbarColour;
-  var themeNavbarIconBrightness;
-
-  switch (themeType) {
-    case ThemeType.LIGHT:
-      // TODO: transparent setting
-      // themeNavbarColour = Colors.transparent.value;
-      // themeNavbarIconBrightness = Brightness.light;
-
-      themeNavbarColour = Colours.whiteDefault;
-      themeNavbarIconBrightness = Brightness.dark;
-      break;
-    case ThemeType.NIGHT:
-      themeNavbarColour = Colours.blackFull;
-      themeNavbarIconBrightness = Brightness.light;
-      break;
-    default:
-      themeNavbarColour = Colours.blackDefault;
-      themeNavbarIconBrightness = Brightness.light;
-  }
-
+// Set the theme for the system UI only
+void setSystemTheme(ThemeType themeType) {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: statusTransparent ? Colors.transparent : null,
-      systemNavigationBarColor: Color(themeNavbarColour),
-      systemNavigationBarIconBrightness: themeNavbarIconBrightness,
+      statusBarColor: Colors.transparent, // Transparent means same as app bar
+      systemNavigationBarColor: Color(selectSystemUiColor(themeType)),
+      systemNavigationBarIconBrightness: selectSystemUiIconColor(themeType),
     ),
   );
 }
 
-class Themes {
-  static Color? backgroundBrightness(ThemeType type) {
-    switch (type) {
-      case ThemeType.LIGHT:
-        return Color(Colours.greyLightest);
-      case ThemeType.NIGHT:
-        return Color(Colours.greyDefault);
-      default:
-        return Color(Colours.greyDark);
-    }
-  }
+// Set the theme
+// Applies a system theme and returns a ThemeData instance which should be
+// applied immediately to match the system UI
+ThemeData? setupTheme(AppTheme appTheme, {bool generateThemeData = false}) {
+  // Set system UI theme
+  setSystemTheme(appTheme.themeType);
 
-  static Color invertedPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? Theme.of(context).primaryColor
-        : Theme.of(context).accentColor;
-  }
-
-  static ThemeData generateCustomTheme({
-    int? primaryColorHex,
-    int? accentColorHex,
-    int? appBarColorHex,
-    String? fontName,
-    String? fontSize,
-    ThemeType? themeType,
-  }) {
-    int primaryColor = primaryColorHex ?? Colours.cyanSyphon;
-    int accentColor = accentColorHex ?? Colours.cyanSyphon;
-    int? appBarColor = appBarColorHex;
-    int? scaffoldBackgroundColor = Colours.whiteDefault;
-
-    var modalColor;
-    var appBarElevation;
-    var brightness = Brightness.light;
-    var iconColor = Color(Colours.greyDefault);
-
-    switch (themeType) {
-      case ThemeType.DARK:
-        brightness = Brightness.dark;
-        iconColor = Colors.white;
-        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
-        accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = appBarColor ?? Colours.blackDefault;
-        scaffoldBackgroundColor = null;
-        break;
-      case ThemeType.DARKER:
-        brightness = Brightness.dark;
-        appBarElevation = 0.0;
-        iconColor = Colors.white;
-        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
-        accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = appBarColor ?? Colours.blackDefault;
-        scaffoldBackgroundColor = Colours.blackDefault;
-        break;
-      case ThemeType.NIGHT:
-        brightness = Brightness.dark;
-        appBarElevation = 0.0;
-        iconColor = Colors.white;
-        modalColor = Colors.grey[900];
-        primaryColor = primaryColorHex ?? Colours.cyanSyphon;
-        accentColor = accentColorHex ?? Colours.cyanSyphon;
-        appBarColor = appBarColor ?? Colours.blackFull;
-        scaffoldBackgroundColor = Colours.blackFull;
-        break;
-      case ThemeType.LIGHT:
-      default:
-        break;
-    }
-
-    var titleWeight = FontWeight.w400;
-    var bodyWeight = FontWeight.w400;
-
-    double? letterSpacing;
-    switch (fontName) {
-      case 'Rubik':
-        titleWeight = FontWeight.w100;
-        bodyWeight = FontWeight.w400;
-        letterSpacing = 0.5;
-        break;
-      default:
-        break;
-    }
-    double subtitleSize;
-    double subtitleSizeLarge;
-    double bodySize;
-    double bodySizeLarge;
-    switch (fontSize) {
-      case 'Small':
-        subtitleSize = 12;
-        subtitleSizeLarge = 14;
-        bodySize = 16;
-        bodySizeLarge = 18;
-        break;
-      case 'Large':
-        subtitleSize = 16;
-        subtitleSizeLarge = 18;
-        bodySize = 20;
-        bodySizeLarge = 22;
-        break;
-      default:
-        subtitleSize = 14;
-        subtitleSizeLarge = 16;
-        bodySize = 18;
-        bodySizeLarge = 20;
-        break;
-    }
-
+  // Generate the ThemeData to return if requested
+  if (generateThemeData) {
+    final primaryColor = Color(appTheme.primaryColor);
+    final accentColor = Color(appTheme.accentColor);
+    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
+    final brightness = selectThemeBrightness(appTheme.themeType);
     final invertedPrimaryColor =
-        brightness == Brightness.light ? primaryColor : accentColor;
+    brightness == Brightness.light ? primaryColor : accentColor;
+
+    final titleWeight = selectFontTitleWeight(appTheme.fontName);
+    final bodyWeight = selectFontBodyWeight(appTheme.fontName);
+    final letterSpacing = selectFontLetterSpacing(appTheme.fontName);
+    final subtitleSize = selectFontSubtitleSize(appTheme.fontSize);
+    final subtitleSizeLarge = selectFontSubtitleSizeLarge(appTheme.fontSize);
+    final bodySize = selectFontBodySize(appTheme.fontSize);
+    final bodySizeLarge = selectFontBodySizeLarge(appTheme.fontSize);
 
     return ThemeData(
       // Main Colors
-      primaryColor: Color(primaryColor),
-      primaryColorBrightness: brightness,
-      primaryColorDark: Color(primaryColor),
-      primaryColorLight: Color(primaryColor),
-      accentColor: Color(accentColor),
-      accentIconTheme: IconThemeData(color: Color(accentColor)),
+      primaryColor: primaryColor,
+      primaryColorDark: primaryColor,
+      primaryColorLight: primaryColor,
+      accentColor: accentColor,
       brightness: brightness,
-      colorScheme: ThemeData().colorScheme.copyWith(
-            primary: Color(primaryColor),
-            secondary: Color(accentColor),
-            brightness: brightness,
-          ),
 
-      // Core UI\
-      dialogBackgroundColor: modalColor,
-      focusColor: Color(primaryColor),
+      // Core UI
+      dialogBackgroundColor: selectModalColor(appTheme.themeType),
+      focusColor: primaryColor,
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: Color(primaryColor),
-        selectionColor: Color(primaryColor).withAlpha(100),
-        selectionHandleColor: Color(primaryColor),
+        cursorColor: primaryColor,
+        selectionColor: primaryColor.withAlpha(100),
+        selectionHandleColor: primaryColor,
       ),
-      iconTheme: IconThemeData(color: iconColor),
+      iconTheme: IconThemeData(color: selectIconColor(appTheme.themeType)),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
           ? Color(scaffoldBackgroundColor)
           : null,
       appBarTheme: AppBarTheme(
-        elevation: appBarElevation,
+        elevation: selectAppBarElevation(appTheme.themeType),
         brightness: Brightness.dark,
-        color: Color(appBarColor ?? primaryColorHex!),
+        color: Color(appTheme.appBarColor),
       ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
-          color: Color(invertedPrimaryColor),
+          color: invertedPrimaryColor,
         ),
-        focusColor: Color(invertedPrimaryColor),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(
-            color: Color(invertedPrimaryColor),
+            color: invertedPrimaryColor,
           ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(
-            color: Color(invertedPrimaryColor),
+            color: invertedPrimaryColor,
           ),
         ),
       ),
 
       // Fonts
-      fontFamily: fontName ?? 'Rubik',
+      fontFamily: enumToString(appTheme.fontName),
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
@@ -232,7 +110,7 @@ class Themes {
           fontSize: subtitleSize,
           fontWeight: bodyWeight,
           letterSpacing: letterSpacing,
-          color: Color(accentColor),
+          color: accentColor,
         ),
         caption: TextStyle(
           fontSize: subtitleSize,
