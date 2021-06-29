@@ -7,7 +7,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -112,7 +113,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final backgroundColor = Themes.backgroundBrightness(props.theme);
+        final backgroundColor = selectBackgroundBrightness(props.themeType);
 
         return Scaffold(
           appBar: AppBar(
@@ -299,19 +300,19 @@ class ProfileScreenState extends State<ProfileScreen> {
 class _Props extends Equatable {
   final User user;
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final Function onSaveProfile;
 
   _Props({
     required this.user,
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.onSaveProfile,
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
           File? avatarFileNew,

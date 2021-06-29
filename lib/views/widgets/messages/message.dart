@@ -7,7 +7,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -24,7 +24,7 @@ class MessageWidget extends StatelessWidget {
     this.lastRead = 0,
     this.selectedMessageId,
     this.avatarUri,
-    this.theme = ThemeType.LIGHT,
+    this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
     this.color,
@@ -36,7 +36,7 @@ class MessageWidget extends StatelessWidget {
   }) : super(key: key);
 
   final Message message;
-  final ThemeType theme;
+  final ThemeType themeType;
   final int lastRead;
   final double fontSize;
   final bool isLastSender;
@@ -264,9 +264,9 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (isUserSent) {
-      if (theme == ThemeType.DARK) {
+      if (themeType == ThemeType.Dark) {
         bubbleColor = Color(Colours.greyDark);
-      } else if (theme != ThemeType.LIGHT) {
+      } else if (themeType != ThemeType.Light) {
         bubbleColor = Color(Colours.greyDarkest);
       } else {
         textColor = const Color(Colours.blackFull);

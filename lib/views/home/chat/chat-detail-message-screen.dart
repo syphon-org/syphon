@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -101,7 +101,7 @@ class MessageDetailsScreen extends StatelessWidget {
                         message: current,
                         isUserSent: isUserSent,
                         messageOnly: true,
-                        theme: props.theme,
+                        themeType: props.themeType,
                         timeFormat: 'full',
                       );
                     },
@@ -207,14 +207,14 @@ class MessageDetailsScreen extends StatelessWidget {
 class _Props extends Equatable {
   final String? userId;
   final String? roomId;
-  final ThemeType theme;
+  final ThemeType themeType;
   final Message? message;
   final Map<String, User> users;
   final Map<String, ReadReceipt> readReceipts;
 
   _Props({
     required this.users,
-    required this.theme,
+    required this.themeType,
     required this.roomId,
     required this.userId,
     required this.message,
@@ -232,12 +232,12 @@ class _Props extends Equatable {
         readReceipts: store.state.eventStore.receipts[args.roomId!] ??
             <String, ReadReceipt>{},
         userId: store.state.authStore.user.userId,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
       );
 
   @override
   List<Object?> get props => [
-        theme,
+        themeType,
         userId,
         readReceipts,
       ];

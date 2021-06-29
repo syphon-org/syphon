@@ -19,7 +19,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
@@ -510,7 +510,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final bool creatingRoom;
   final List<User> usersRecent;
   final List<dynamic> searchResults;
@@ -520,7 +520,7 @@ class _Props extends Equatable {
   final Function onSendInvite;
 
   _Props({
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.usersRecent,
     required this.creatingRoom,
@@ -532,7 +532,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         usersRecent: friendlyUsers(store.state),
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.appTheme.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
         searchResults: store.state.searchStore.searchResults,
@@ -552,7 +552,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         loading,
-        theme,
+        themeType,
         creatingRoom,
         searchResults,
       ];
