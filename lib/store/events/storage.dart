@@ -9,7 +9,7 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 
 Future<void> saveEvents(
   List<Event> events, {
@@ -156,14 +156,12 @@ Future<Map<String, List<Reaction>>> loadReactions(
   try {
     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
     final reactionsMap = <String, List<Reaction>>{};
-    final reactionsRecords =
-        await store.records(messageIds).getSnapshots(storage);
+    final reactionsRecords = await store.records(messageIds).getSnapshots(storage);
 
     for (RecordSnapshot<String?, String>? reactionList in reactionsRecords) {
       if (reactionList != null) {
-        final reactions = List.from(await json.decode(reactionList.value))
-            .map((json) => Reaction.fromJson(json))
-            .toList();
+        final reactions =
+            List.from(await json.decode(reactionList.value)).map((json) => Reaction.fromJson(json)).toList();
         reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
       }
     }
@@ -198,7 +196,7 @@ Future<Message> loadMessage(String eventId, {required Database storage}) async {
 }
 
 /// Load Messages (Cold Storage)
-/// 
+///
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 Future<List<Message>> loadMessages(

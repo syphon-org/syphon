@@ -1,11 +1,11 @@
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 
 import './actions.dart';
-import '../events/model.dart';
 import './state.dart';
-import 'package:syphon/store/events/messages/model.dart';
+import '../events/model.dart';
 
 EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
@@ -20,7 +20,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
         state.reactions,
       );
 
-      for (Reaction reaction in action.reactions ?? []) {
+      for (final Reaction reaction in action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
         final exists = reactionsUpdated.containsKey(reactionEventId);
 

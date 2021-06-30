@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 import 'package:syphon/store/index.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
@@ -15,8 +15,7 @@ List<Message> roomOutbox(AppState state, String? roomId) {
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
-  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? [])
-      as Map<String, List<Reaction>>;
+  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? []) as Map<String, List<Reaction>>;
 }
 
 // remove messages from blocked users
@@ -78,8 +77,7 @@ Map<String, Message?> appendReactions(
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionedMessageIds =
-      reactions.keys.where((k) => messages.containsKey(k)).toList();
+  final List<String> reactionedMessageIds = reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
   for (String messageId in reactionedMessageIds) {

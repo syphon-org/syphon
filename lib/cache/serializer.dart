@@ -11,10 +11,6 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/state.dart';

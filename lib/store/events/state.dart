@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
+import 'package:syphon/store/events/redactions/model.dart';
 
 import 'model.dart';
 
@@ -55,6 +55,5 @@ class EventStore extends Equatable {
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);
-  factory EventStore.fromJson(Map<String, dynamic> json) =>
-      _$EventStoreFromJson(json);
+  factory EventStore.fromJson(Map<String, dynamic> json) => _$EventStoreFromJson(json);
 }
