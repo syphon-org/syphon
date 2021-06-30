@@ -1,0 +1,50 @@
+kind: pipeline
+type: docker
+name: dev build
+steps:
+- name: build android
+  image: cirrusci/flutter:2.0.6
+  commands:
+    # Keep track of the time when build was started
+    - echo $(date -Iseconds) > BUILD_START_TIME
+    # Environment variables
+    - export DEBIAN_FRONTEND=noninteractive
+    - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
+    # Install dependencies (git should be pre-installed)
+    - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
+    - git submodule update --init --recursive
+    - sdkmanager "ndk-bundle"
+    # Set up flutter
+    - flutter config --no-analytics
+    - flutter pub get
+    - flutter pub run build_runner build --delete-conflicting-outputs
+    # Modify gradle build script (remove/change parts which don't work in this environment)
+    - sed -i '/keystoreProperties\[/d' android/app/build.gradle
+    - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
+    - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
+    # Modify package and app name to allow for installing alongside normal Syphon
+    - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly (0x1a)"/g' android/app/src/main/AndroidManifest.xml
+    - sed -i 's/applicationId "org.tether.tether"/applicationId "space.oxlabslofs.syphon.nightly"/g' android/app/build.gradle
+    # Build the APK
+    - flutter build apk --split-per-abi
+- name: publish artifacts
+  image: alpine:latest
+  environment:
+    PUBLISH_HOST:
+      from_secret: PUBLISH_HOST
+    PUBLISH_USER:
+      from_secret: PUBLISH_USER
+    PUBLISH_PASS:
+      from_secret: PUBLISH_PASS
+    PUBLISH_PORT:
+      from_secret: PUBLISH_PORT
+  commands:
+    # Deps
+    - apk update && apk add --no-cache openssh lftp
+    # Push
+    - |
+      (
+      echo mkdir -p -f /build/syphon/$(echo $DRONE_BRANCH)/$(cat BUILD_START_TIME)/
+      echo mirror -i "\.(apk)$" -R build/app/outputs/apk/release /build/syphon/$(echo $DRONE_BRANCH)/$(cat BUILD_START_TIME)/
+      echo bye
+      ) | lftp -u $(echo $PUBLISH_USER),$(echo $PUBLISH_PASS) sftp://$(echo $PUBLISH_HOST):$(echo $PUBLISH_PORT) -e 'set sftp:connect-program "ssh -a -x -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"'
