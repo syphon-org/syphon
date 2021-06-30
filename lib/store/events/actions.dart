@@ -21,8 +21,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-class ResetEvents {}
-
 class SetEvents {
   final String? roomId;
   final List<Event>? events;
@@ -57,6 +55,28 @@ class SetRedactions {
   final List<Redaction>? redactions;
   SetRedactions({this.redactions});
 }
+
+class LoadMessages {
+  final Map<String, List<Message>> messagesMap;
+  LoadMessages({required this.messagesMap});
+}
+
+class LoadReactions {
+  final Map<String, List<Reaction>> reactionsMap;
+  LoadReactions({required this.reactionsMap});
+}
+
+class LoadReceipts {
+  final Map<String, Map<String, ReadReceipt>> receiptsMap;
+  LoadReceipts({required this.receiptsMap});
+}
+
+class LoadRedactions {
+  final Map<String, Redaction> redactionsMap;
+  LoadRedactions({required this.redactionsMap});
+}
+
+class ResetEvents {}
 
 ///
 /// Save Outbox Message

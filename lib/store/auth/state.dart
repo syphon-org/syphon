@@ -29,8 +29,7 @@ class AuthStore extends Equatable {
 
   final StreamController<User?>? authObserver;
 
-  Stream<User?>? get onAuthStateChanged =>
-      authObserver != null ? authObserver!.stream : null;
+  Stream<User?>? get onAuthStateChanged => authObserver != null ? authObserver!.stream : null;
 
   // Interactive Auth Data
   final Credential? credential;
@@ -185,6 +184,5 @@ class AuthStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$AuthStoreToJson(this);
 
-  factory AuthStore.fromJson(Map<String, dynamic> json) =>
-      _$AuthStoreFromJson(json);
+  factory AuthStore.fromJson(Map<String, dynamic> json) => _$AuthStoreFromJson(json);
 }

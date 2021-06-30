@@ -40,6 +40,12 @@ class UpdateMediaCache {
   });
 }
 
+class LoadMedia {
+  final Map<String, Uint8List> media;
+
+  LoadMedia({required this.media});
+}
+
 ThunkAction<AppState> uploadMedia({
   File? localFile,
   String? mediaName = 'photo',
@@ -82,8 +88,7 @@ ThunkAction<AppState> uploadMedia({
   };
 }
 
-ThunkAction<AppState> fetchThumbnail(
-    {String? mxcUri, double? size, bool force = false}) {
+ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
@@ -96,8 +101,7 @@ ThunkAction<AppState> fetchThumbnail(
 
       // Noop if currently checking or failed
       if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING ||
-              mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
+          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {
         return;
       }

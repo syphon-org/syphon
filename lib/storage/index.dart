@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/cache/index.dart';
@@ -11,17 +12,23 @@ import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/storage.dart';
+import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/storage.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {
@@ -32,8 +39,7 @@ class Storage {
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const mainLocation =
-      '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
+  static const mainLocation = '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
 }
 
 Future<Database?> initStorage() async {
@@ -131,9 +137,68 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = {};
-    Map<String, List<Reaction>> reactions = {};
-    Map<String, Map<String, ReadReceipt>> receipts = {};
+    final messages = <String, List<Message>>{};
+    final reactions = <String, List<Reaction>>{};
+    final receipts = <String, Map<String, ReadReceipt>>{};
+
+    for (final Room room in rooms.values) {
+      messages[room.id] = await loadMessages(
+        room.messageIds,
+        storage: storage,
+      );
+
+      reactions.addAll(await loadReactions(
+        room.messageIds,
+        storage: storage,
+      ));
+
+      receipts[room.id] = await loadReceipts(
+        room.messageIds,
+        storage: storage,
+      );
+    }
+
+    return {
+      StorageKeys.AUTH: auth,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.SETTINGS: settings,
+      'users': users.isNotEmpty ? users : null,
+      'media': media,
+      'messages': messages.isNotEmpty ? messages : null,
+      'reactions': reactions,
+      'redactions': redactions,
+      'receipts': receipts,
+    };
+  } catch (error) {
+    printError('[loadStorage]  ${error.toString()}');
+    return {};
+  }
+}
+
+//
+// Load Storage (Async)
+//
+// finishes loading cold storage objects to RAM, this can
+// be much more specific and performant
+//
+// for example, only load users that are known to be
+// involved in stored messages/events
+//
+// TODO: need pagination for pretty much all of these
+//
+loadStorageAsync(Database? storage, Store<AppState> store) async {
+  try {
+    if (storage == null) return;
+
+    final rooms = await loadRooms(storage: storage);
+    final users = await loadUsers(storage: storage);
+    final media = await loadMediaAll(storage: storage);
+    final redactions = await loadRedactions(storage: storage);
+
+    Map<String, List<Message>> messages = Map();
+    Map<String, List<Reaction>> reactions = Map();
+    Map<String, Map<String, ReadReceipt>> receipts = Map();
 
     for (Room room in rooms.values) {
       messages[room.id] = await loadMessages(
@@ -152,20 +217,48 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
       );
     }
 
-    return {
-      'auth': auth,
-      'users': users.isNotEmpty ? users : null,
-      'rooms': rooms,
-      'media': media,
-      'crypto': crypto,
-      'messages': messages.isNotEmpty ? messages : null,
-      'reactions': reactions,
-      'redactions': redactions,
-      'receipts': receipts,
-      'settings': settings,
+    final loaded = {
+      StorageKeys.USERS: users,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.MEDIA: media,
+      StorageKeys.MESSAGES: messages.isNotEmpty ? messages : null,
+      StorageKeys.REACTIONS: reactions,
+      StorageKeys.REDACTIONS: redactions,
+      StorageKeys.RECEIPTS: receipts,
     };
+
+    for (MapEntry data in loaded.entries) {
+      if (data.value != null) {
+        switch (data.key) {
+          case StorageKeys.USERS:
+            store.dispatch(SetUsers(users: data.value));
+            break;
+          case StorageKeys.ROOMS:
+            store.dispatch(SetRooms(
+              rooms: List.from((data.value as Map).values),
+            ));
+            break;
+          case StorageKeys.MEDIA:
+            store.dispatch(LoadMedia(media: data.value));
+            break;
+          case StorageKeys.MESSAGES:
+            store.dispatch(LoadMessages(messagesMap: data.value));
+            break;
+          case StorageKeys.REACTIONS:
+            store.dispatch(LoadReactions(reactionsMap: data.value));
+            break;
+          case StorageKeys.RECEIPTS:
+            store.dispatch(LoadReceipts(receiptsMap: data.value));
+            break;
+          case StorageKeys.REDACTIONS:
+            store.dispatch(LoadRedactions(redactionsMap: data.value));
+            break;
+          default:
+            break;
+        }
+      }
+    }
   } catch (error) {
-    printError('[loadStorage]  ${error.toString()}');
-    return {};
+    printError('[loadStorageAsync]  ${error.toString()}');
   }
 }
