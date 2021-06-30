@@ -1,11 +1,6 @@
 kind: pipeline
 type: docker
 name: android build dev
-trigger:
-  branch:
-    - dev
-  event:
-    - push
 steps:
   - name: build android
     image: cirrusci/flutter:2.2.2
@@ -37,10 +32,6 @@ kind: pipeline
 type: docker
 name: linux build dev
 trigger:
-  branch:
-    - dev
-    - main
-    - chore/pipeline
   event:
     - push
 steps:
