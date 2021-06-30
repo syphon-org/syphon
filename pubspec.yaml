@@ -49,7 +49,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.8+181
+version: 0.1.9+190
 
 environment:
   sdk: ">=2.12.0 <3.0.0" # <- modified to solve build_runner
@@ -63,12 +63,7 @@ dependencies:
   swipeable:
     git:
       url: https://github.com/ereio/swipeable.git
-      ref: null-safety
-
-  canonical_json:
-    git:
-      url: https://github.com/ereio/flutter_canonical_json
-      ref: main
+      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
 
   # state
   equatable: ^2.0.0
@@ -86,9 +81,9 @@ dependencies:
 
   # encryption
   olm: ^2.0.0
-  crypt: ^4.0.1
   crypto: ^3.0.1
   encrypt: ^5.0.0
+  canonical_json: 1.1.0
 
   # cache/storage
   sembast: ^3.0.1
@@ -135,7 +130,6 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
 
   # UNSOUND NULL-SAFTEY
-  # canonical_json: 1.0.0
   # flutter_material_color_picker: ^1.0.5
   # swipeable: 1.1.0
 
@@ -144,6 +138,7 @@ dev_dependencies:
   build_runner: ^2.0.2
   json_serializable: ^4.1.0
   flutter_launcher_icons: ^0.9.0
+  test: any
 
 flutter_icons:
   android: true

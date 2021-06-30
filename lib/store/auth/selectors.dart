@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';

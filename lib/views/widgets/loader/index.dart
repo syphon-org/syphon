@@ -1,12 +1,10 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 
 class Loader extends StatelessWidget {
-  Loader({
+  const Loader({
     Key? key,
     this.loading = false,
   }) : super(key: key);
@@ -15,7 +13,7 @@ class Loader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Visibility(
-        visible: this.loading,
+        visible: loading,
         child: Container(
           margin: EdgeInsets.only(top: 8),
           child: Row(

@@ -1,12 +1,8 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
-// Flutter imports:
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
-
-// Package imports:
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -20,7 +16,6 @@ import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -426,10 +421,7 @@ ThunkAction<AppState> createRoom({
             directUser.userId!,
             currentUser.userId!,
           ] as List<String>,
-          users: {
-            directUser.userId!: directUser,
-            currentUser.userId!: currentUser
-          } as Map<String, User>,
+          users: {directUser.userId!: directUser, currentUser.userId!: currentUser} as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));
@@ -571,7 +563,7 @@ ThunkAction<AppState> markRoomsReadAll() {
 ///
 /// Fetch the direct rooms list and recalculate it without the
 /// given alias
-ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
+ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -596,7 +588,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
         (userId) => userId != currentUser.userId,
       );
 
-      if (otherUserId == null) {
+      if (otherUserId == null && enabled) {
         throw 'Cannot toggle room to direct without other users';
       }
 
@@ -604,7 +596,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
       Map directRoomUsers = data as Map<String, dynamic>;
       final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
-      if (usersDirectRooms.isEmpty && enabled!) {
+      if (usersDirectRooms.isEmpty && enabled) {
         directRoomUsers[otherUserId] = [room.id];
       }
 
@@ -616,7 +608,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool? enabled}) {
           return MapEntry(userId, updatedRooms);
         }
 
-        if (enabled!) {
+        if (enabled) {
           updatedRooms.add(room.id);
         } else {
           updatedRooms.removeWhere((roomId) => roomId == room.id);
@@ -753,8 +745,7 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -822,9 +813,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
-
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
@@ -836,6 +825,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
   };
 }
 
+///
 /// Remove Room
 ///
 /// Both leaves and forgets room
@@ -844,12 +834,16 @@ ThunkAction<AppState> removeRoom({Room? room}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
+      if (room!.direct) {
+        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+      }
+
       // submit a leave room request
       final leaveData = await MatrixApi.leaveRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
+        roomId: room.id,
       );
 
       // remove the room locally if it's already been removed remotely
@@ -874,15 +868,10 @@ ThunkAction<AppState> removeRoom({Room? room}) {
         }
       }
 
-      await deleteRooms({room.id: room});
+      store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       debugPrint('[removeRoom] $error');
     } finally {
-      if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
-      }
-
-      await store.dispatch(RemoveRoom(roomId: room.id));
       store.dispatch(SetLoading(loading: false));
     }
   };
@@ -920,6 +909,7 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
         }
         throw deleteData['error'];
       }
+
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
       printError('[leaveRoom] $error');

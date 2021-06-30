@@ -1,12 +1,12 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colours.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class ButtonSolid extends StatelessWidget {
-  ButtonSolid({
+  const ButtonSolid({
     Key? key,
     this.text,
     this.textWidget,
@@ -36,16 +36,13 @@ class ButtonSolid extends StatelessWidget {
         child: TextButton(
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) =>
-                  states.contains(MaterialState.disabled)
-                      ? Colors.grey[300]
-                      : Theme.of(context).primaryColor,
+              (Set<MaterialState> states) => states.contains(MaterialState.disabled)
+                  ? Color(Colours.greyLight)
+                  : Theme.of(context).primaryColor,
             ),
             backgroundColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) =>
-                  states.contains(MaterialState.disabled)
-                      ? Colors.grey
-                      : Theme.of(context).primaryColor,
+                  states.contains(MaterialState.disabled) ? Colors.grey : Theme.of(context).primaryColor,
             ),
             shape: MaterialStateProperty.resolveWith<OutlinedBorder>(
               (Set<MaterialState> states) => RoundedRectangleBorder(
@@ -53,30 +50,18 @@ class ButtonSolid extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: disabled ? null : this.onPressed as void Function()?,
-          child: this.loading
-              ? Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 28,
-                    maxWidth: 28,
-                  ),
-                  child: CircularProgressIndicator(
-                    strokeWidth: Dimensions.defaultStrokeWidth,
-                    backgroundColor: Colors.white,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.grey,
-                    ),
-                  ),
-                )
+          onPressed: disabled ? null : onPressed as void Function()?,
+          child: loading
+              ? LoadingIndicator()
               : (textWidget != null
                   ? textWidget!
                   : Text(
-                      this.text!,
+                      text!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
-                        color: disabled ? Colors.grey[300] : Colors.white,
+                        color: disabled ? Color(Colours.greyLight) : Colors.white,
                       ),
                     )),
         ),

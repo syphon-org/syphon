@@ -1,24 +1,19 @@
-// Dart imports:
 import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
-// Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 
-// Package imports:
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:syphon/global/algos.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/values.dart';

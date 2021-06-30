@@ -1,17 +1,13 @@
-// Dart imports:
 import 'dart:typed_data';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -83,13 +79,12 @@ class MatrixImageState extends State<MatrixImage> {
 
     // Created in attempts to reduce framerate drop in chat details
     // not sure this actually works as it still drops on scroll
-    if (this.disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
+    if (disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
       finalUriData = mediaCache[widget.mxcUri!];
     }
   }
 
   MatrixImageState({
-    Key? key,
     this.forceLoading = false,
     this.disableRebuild = false,
   });
@@ -122,7 +117,7 @@ class MatrixImageState extends State<MatrixImage> {
               height: widget.size ?? widget.height,
               child: CircularProgressIndicator(
                 strokeWidth: widget.strokeWidth * 1.5,
-                valueColor: new AlwaysStoppedAnimation<Color>(
+                valueColor: AlwaysStoppedAnimation<Color>(
                   Theme.of(context).accentColor,
                 ),
                 value: null,

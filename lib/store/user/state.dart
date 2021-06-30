@@ -1,8 +1,6 @@
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-// Project imports:
 import 'package:syphon/store/user/model.dart';
 
 part 'state.g.dart';
@@ -33,6 +31,7 @@ class UserStore extends Equatable {
         users,
         invites,
         loading,
+        blocked,
       ];
 
   UserStore copyWith({

@@ -1,8 +1,6 @@
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-// Project imports:
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';

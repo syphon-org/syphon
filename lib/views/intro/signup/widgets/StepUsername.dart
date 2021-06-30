@@ -1,18 +1,14 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -53,7 +49,7 @@ class UsernameStepState extends State<UsernameStep> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        double height = MediaQuery.of(context).size.height;
+        final double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidget = CircularProgressIndicator(

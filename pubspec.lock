@@ -116,12 +116,10 @@ packages:
   canonical_json:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: dab7d28ded523a4e0532c3f7c653587de6997b8a
-      url: "https://github.com/ereio/flutter_canonical_json"
-    source: git
-    version: "2.0.0"
+      name: canonical_json
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   characters:
     dependency: transitive
     description:
@@ -185,13 +183,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  crypt:
-    dependency: "direct main"
-    description:
-      name: crypt
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.1"
   crypto:
     dependency: "direct main"
     description:
@@ -909,8 +900,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: null-safety
-      resolved-ref: "46a6372a463db5dda757e608d9a7939e5e92f50e"
+      ref: "867b117f15f51404e31597d8ab9d5325f6b52938"
+      resolved-ref: "867b117f15f51404e31597d8ab9d5325f6b52938"
       url: "https://github.com/ereio/swipeable.git"
     source: git
     version: "2.0.0"
@@ -929,7 +920,7 @@ packages:
     source: hosted
     version: "1.2.0"
   test:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: test
       url: "https://pub.dartlang.org"

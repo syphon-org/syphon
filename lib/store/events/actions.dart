@@ -1,14 +1,10 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-// Package imports:
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/algos.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
@@ -225,6 +221,8 @@ ThunkAction<AppState> fetchMessageEvents({
 ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     try {
+      final verified = store.state.cryptoStore.deviceKeyVerified;
+
       // First past to decrypt encrypted events
       final List<dynamic> timelineEvents = json['timeline']['events'];
 
@@ -242,7 +240,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
             } catch (error) {
               debugPrint('[decryptMessageEvent] $error');
 
-              if (!sentKeyRequest) {
+              if (!sentKeyRequest && verified) {
                 sentKeyRequest = true;
                 debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
                 store.dispatch(sendKeyRequest(
@@ -344,8 +342,7 @@ ThunkAction<AppState> selectReply({
 }) {
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId!]!;
-    final reply = message ?? Message();
-    store.dispatch(SetRoom(room: room.copyWith(reply: reply)));
+    store.dispatch(SetRoom(room: room.copyWith(reply: message ?? Null)));
   };
 }
 

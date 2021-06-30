@@ -1,7 +1,5 @@
-// Dart imports:
 import 'dart:typed_data';
 
-// Project imports:
 import './actions.dart';
 import './state.dart';
 

@@ -1,12 +1,8 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
-
-// Package imports:
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';

@@ -1,11 +1,8 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:flutter_svg/flutter_svg.dart';
 
-// Project imports:
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 

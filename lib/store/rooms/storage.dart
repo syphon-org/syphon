@@ -45,7 +45,7 @@ Future deleteRooms(
   storage = storage ?? Storage.main;
 
   return storage!.transaction((txn) async {
-    for (Room? room in rooms.values) {
+    for (final Room? room in rooms.values) {
       final record = store.record(room?.id);
       await record.delete(txn);
     }

@@ -1,10 +1,7 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';

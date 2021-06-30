@@ -5,6 +5,7 @@ class MatrixErrors {
   static const String user_in_use = 'M_USER_IN_USE';
   static const String unknown_token = 'M_UNKNOWN_TOKEN';
   static const String email_in_use = 'M_THREEPID_IN_USE';
+  static const String weak_password = 'M_WEAK_PASSWORD';
 }
 
 class MatrixErrorsSoft {

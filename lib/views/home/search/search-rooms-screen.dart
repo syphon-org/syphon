@@ -1,8 +1,6 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,7 +12,6 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
@@ -42,14 +39,14 @@ class RoomSearchScreen extends StatefulWidget {
 class RoomSearchState extends State<RoomSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
-  RoomSearchState({Key? key});
+  RoomSearchState();
 
-  late Map<String, Color?> roomColorDefaults;
+  late Map<String, Color> roomColorDefaults;
 
   @override
   void initState() {
     super.initState();
-    roomColorDefaults = Map();
+    roomColorDefaults = {};
   }
 
   // componentDidMount(){}
@@ -79,8 +76,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final RoomSearchArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
+    final RoomSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
     final user = arguments.user!;
     final username = formatUsername(user);
 
@@ -89,8 +85,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Invite $username',
-        content: Strings.confirmationInvite +
-            '\n\nUser: $username\nRoom: ${room.name}',
+        content: '${Strings.confirmationInvite}\n\nUser: $username\nRoom: ${room.name}',
         action: 'send invite',
         onStartChat: () async {
           props.onSendInvite(room: room, user: user);
@@ -148,28 +143,24 @@ class RoomSearchState extends State<RoomSearchScreen> {
         final room = rooms[index];
         final chatSettings = props.chatSettings[room.id];
 
-        bool messagesNew = false;
         var previewStyle;
         var preview = room.topic;
-        var backgroundColor = Colors.grey[500];
+        var backgroundColor = Color(Colours.greyDefault);
 
         if (preview == null || preview.isEmpty) {
           preview = 'No Description';
           previewStyle = TextStyle(fontStyle: FontStyle.italic);
         }
 
-        // Check settings for custom color, then check temp cache,
-        // or generate new temp color
+        // Check settings for custom color,
+        // then check temp cache, or generate new temp color
         if (chatSettings != null) {
           backgroundColor = Color(chatSettings.primaryColor);
         } else if (roomColorDefaults.containsKey(room.id)) {
-          backgroundColor = roomColorDefaults[room.id];
+          backgroundColor = roomColorDefaults[room.id]!;
         } else {
           backgroundColor = Colours.hashedColor(room.id);
-          roomColorDefaults.putIfAbsent(
-            room.id,
-            () => backgroundColor,
-          );
+          roomColorDefaults.putIfAbsent(room.id, () => backgroundColor);
         }
 
         // GestureDetector w/ animation
@@ -229,21 +220,6 @@ class RoomSearchState extends State<RoomSearchScreen> {
                                 color: Colors.white,
                                 size: Dimensions.iconSizeMini,
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: messagesNew,
-                        child: Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSizeSmall,
-                              height: Dimensions.badgeAvatarSizeSmall,
-                              color: Theme.of(context).accentColor,
                             ),
                           ),
                         ),

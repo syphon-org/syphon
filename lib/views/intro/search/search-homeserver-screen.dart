@@ -1,12 +1,9 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -18,7 +15,6 @@ import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -33,11 +29,11 @@ class SearchHomeserverScreen extends StatefulWidget {
 }
 
 class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
-  final Store<AppState>? store;
   final searchInputFocusNode = FocusNode();
 
   bool searching = false;
-  SearchHomeserverScreenState({Key? key, this.store});
+  ExpandableController controller = ExpandableController();
+  SearchHomeserverScreenState();
 
   @override
   void didChangeDependencies() {
@@ -49,7 +45,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
-    if (!this.searching) {
+    if (!searching) {
       setState(() {
         searching = true;
       });
@@ -101,8 +97,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                     scrollDirection: Axis.vertical,
                     itemCount: props.homeservers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Homeserver homeserver =
-                          props.homeservers[index] ?? Map() as Homeserver;
+                      final homeserver = props.homeservers[index] ?? {} as Homeserver;
 
                       return GestureDetector(
                         onTap: () {
@@ -115,15 +110,14 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                             theme: ExpandableThemeData(
                               hasIcon: false,
                               tapBodyToCollapse: true,
-                              tapHeaderToExpand: true,
+                              tapHeaderToExpand: false,
                             ),
                             header: ListTile(
                               leading: Avatar(
                                 size: Dimensions.avatarSizeMin,
                                 url: homeserver.photoUrl,
                                 alt: homeserver.hostname,
-                                background:
-                                    Colours.hashedColor(homeserver.hostname),
+                                background: Colours.hashedColor(homeserver.hostname),
                               ),
                               title: Text(
                                 homeserver.hostname!,
@@ -142,8 +136,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Location',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
@@ -160,9 +153,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                       children: <Widget>[
                                         Text(
                                           'Users',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption,
+                                          style: Theme.of(context).textTheme.caption,
                                           softWrap: true,
                                         ),
                                         Text(
@@ -174,16 +165,13 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: homeserver.roomsTotal != null &&
-                                      homeserver.usersActive == null,
+                                  visible: homeserver.roomsTotal != null && homeserver.usersActive == null,
                                   child: Expanded(
                                     child: Column(
                                       children: <Widget>[
                                         Text(
                                           'Rooms',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption,
+                                          style: Theme.of(context).textTheme.caption,
                                           softWrap: true,
                                         ),
                                         Text(
@@ -199,8 +187,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Founded',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
@@ -215,12 +202,11 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Avg Speed',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver.responseTime! + 'ms',
+                                        '${homeserver.responseTime ?? '0'}ms',
                                         softWrap: true,
                                       ),
                                     ],
@@ -240,7 +226,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                   ),
                   Visibility(
                     visible: props.searchText.isNotEmpty &&
-                        props.searchText.length > 0 &&
+                        props.searchText.isNotEmpty &&
                         props.homeservers.isEmpty,
                     child: Container(
                       padding: EdgeInsets.only(top: 8, bottom: 8),
@@ -253,10 +239,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                           leading: Avatar(
                             alt: props.searchText,
                             size: Dimensions.avatarSizeMin,
-                            url: props.homeserver.photoUrl != null
-                                ? props.homeserver.photoUrl
-                                : null,
-                            background: props.searchText.length > 0
+                            url: props.homeserver.photoUrl != null ? props.homeserver.photoUrl : null,
+                            background: props.searchText.isNotEmpty
                                 ? Colours.hashedColor(props.searchText)
                                 : Colors.grey,
                           ),
@@ -292,7 +276,7 @@ class _Props extends Equatable {
   final Function onSelect;
   final Function onFetchHomeserverPreview;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.homeservers,
     required this.searchText,
@@ -311,8 +295,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading:
-            store.state.searchStore.loading || store.state.authStore.loading,
+        loading: store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults
@@ -325,7 +308,7 @@ class _Props extends Equatable {
           store.dispatch(searchHomeservers(searchText: text));
         },
         onFetchHomeserverPreview: (String hostname) async {
-          var urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
+          final urlRegex = RegExp(Values.urlRegex, caseSensitive: false);
 
           if (urlRegex.hasMatch('https://$hostname')) {
             final preview = await store.dispatch(

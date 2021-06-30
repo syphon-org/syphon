@@ -60,7 +60,7 @@ class Values {
   static const animationDurationDefaultFast = 275;
   static const serviceNotificationTimeoutDuration = 75000; // millis
 
-  static const defaultHeaders = {'Content-type': 'application/json'};
+  static const defaultHeaders = {'Content-Type': 'application/json'};
   static const fontFamilies = [
     'Rubik',
     'Roboto',

@@ -1,16 +1,12 @@
-// Dart imports:
 import 'dart:math';
 
-// Flutter imports:
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/model.dart';

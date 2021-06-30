@@ -1,13 +1,10 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -25,6 +22,7 @@ final Duration nextAnimationDuration = Duration(
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
 
+  @override
   ForgotPasswordState createState() => ForgotPasswordState();
 }
 
@@ -38,9 +36,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
     EmailVerifyStep(),
   ];
 
-  ForgotPasswordState({
-    Key? key,
-  });
+  ForgotPasswordState();
 
   @override
   void initState() {

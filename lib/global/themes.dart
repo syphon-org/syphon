@@ -1,4 +1,3 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -51,11 +50,11 @@ class Themes {
   static Color? backgroundBrightness(ThemeType type) {
     switch (type) {
       case ThemeType.LIGHT:
-        return Colors.grey[200];
+        return Color(Colours.greyLightest);
       case ThemeType.NIGHT:
-        return Colors.grey[500];
+        return Color(Colours.greyDefault);
       default:
-        return Colors.grey[700];
+        return Color(Colours.greyDark);
     }
   }
 
@@ -81,7 +80,7 @@ class Themes {
     var modalColor;
     var appBarElevation;
     var brightness = Brightness.light;
-    var iconColor = Colors.grey[500];
+    var iconColor = Color(Colours.greyDefault);
 
     switch (themeType) {
       case ThemeType.DARK:
@@ -160,10 +159,17 @@ class Themes {
     return ThemeData(
       // Main Colors
       primaryColor: Color(primaryColor),
+      primaryColorBrightness: brightness,
       primaryColorDark: Color(primaryColor),
       primaryColorLight: Color(primaryColor),
       accentColor: Color(accentColor),
+      accentIconTheme: IconThemeData(color: Color(accentColor)),
       brightness: brightness,
+      colorScheme: ThemeData().colorScheme.copyWith(
+            primary: Color(primaryColor),
+            secondary: Color(accentColor),
+            brightness: brightness,
+          ),
 
       // Core UI\
       dialogBackgroundColor: modalColor,
@@ -186,6 +192,7 @@ class Themes {
         helperStyle: TextStyle(
           color: Color(invertedPrimaryColor),
         ),
+        focusColor: Color(invertedPrimaryColor),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28.0),
           borderSide: BorderSide(

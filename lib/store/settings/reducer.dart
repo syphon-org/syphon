@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import './actions.dart';

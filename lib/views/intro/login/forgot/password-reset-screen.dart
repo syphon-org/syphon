@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -23,6 +21,7 @@ final Duration nextAnimationDuration = Duration(
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({Key? key}) : super(key: key);
 
+  @override
   PasswordResetState createState() => PasswordResetState();
 }
 
@@ -37,9 +36,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
     PasswordResetStep(),
   ];
 
-  PasswordResetState({
-    Key? key,
-  });
+  PasswordResetState();
 
   @override
   void initState() {
@@ -106,7 +103,6 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                 allowImplicitScrolling: false,
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
-                                children: sections,
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
@@ -114,6 +110,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                         index != sections.length - 1;
                                   });
                                 },
+                                children: sections,
                               ),
                             ),
                           ],
@@ -168,12 +165,19 @@ class _Props extends Equatable {
   final Map interactiveAuths;
   final Function onResetPassword;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.isPasswordValid,
     required this.interactiveAuths,
     required this.onResetPassword,
   });
+
+  @override
+  List<Object> get props => [
+        loading,
+        isPasswordValid,
+        interactiveAuths,
+      ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
@@ -185,11 +189,4 @@ class _Props extends Equatable {
           );
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        isPasswordValid,
-        interactiveAuths,
-      ];
 }

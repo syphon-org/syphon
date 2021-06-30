@@ -1,12 +1,9 @@
-// Dart imports:
 import 'dart:async';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 
-// Project imports:
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -40,6 +37,7 @@ class AuthStore extends Equatable {
   final List<String> completed;
   final Map<String, dynamic> interactiveAuths;
 
+  // TODO: extract / cache in case user force closes app during signup
   // temp state values for signup
   final String email;
   final String username;
@@ -128,8 +126,8 @@ class AuthStore extends Equatable {
 
   AuthStore copyWith({
     user,
-    session,
-    clientSecret,
+    String? session,
+    String? clientSecret,
     protocol,
     email,
     loading,

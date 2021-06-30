@@ -1,17 +1,13 @@
-// Dart imports:
 import 'dart:async';
 
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// Project imports:
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -29,7 +25,6 @@ import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
 import 'widgets/StepUsername.dart';
 
-// Styling Widgets
 final Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
@@ -37,6 +32,7 @@ final Duration nextAnimationDuration = Duration(
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
 
+  @override
   SignupScreenState createState() => SignupScreenState();
 }
 
@@ -53,7 +49,7 @@ class SignupScreenState extends State<SignupScreen> {
     PasswordStep(),
   ];
 
-  SignupScreenState({Key? key});
+  SignupScreenState();
 
   @override
   void initState() {
@@ -71,26 +67,30 @@ class SignupScreenState extends State<SignupScreen> {
     onMounted();
   }
 
-  @protected
-  void onMounted() async {
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
+
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
 
     final props = _Props.mapStateToProps(store);
 
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
-        sections = sections
-          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
     }
 
     // Init change listener
     subscription = store.onChange.listen((state) async {
-      if (state.authStore.interactiveAuths.isNotEmpty &&
-          this.sections.length < 4) {
+      if (state.authStore.interactiveAuths.isNotEmpty && sections.length < 4) {
         final newSections = List<Widget>.from(sections);
 
         List<dynamic>? newStages = [];
+
         try {
           newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
         } catch (error) {
@@ -121,12 +121,10 @@ class SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  @protected
-  void onDidChange(_Props? oldProps, _Props props) {
+  onDidChange(_Props? oldProps, _Props props) {
     if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
       setState(() {
-        sections = sections
-          ..removeWhere((step) => step.runtimeType != HomeserverStep);
+        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
     }
     if (props.homeserver.loginType == MatrixAuthTypes.PASSWORD) {
@@ -140,22 +138,15 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  @override
-  void deactivate() {
-    subscription.cancel();
-    super.deactivate();
-  }
-
-  @protected
-  void onBackStep(BuildContext context) {
-    if (this.currentStep < 1) {
+  onBackStep(BuildContext context) {
+    if (currentStep < 1) {
       Navigator.pop(context, false);
     } else {
       setState(() {
-        currentStep = this.currentStep - 1;
+        currentStep = currentStep - 1;
       });
       pageController!.animateToPage(
-        this.currentStep,
+        currentStep,
         duration: Duration(milliseconds: 275),
         curve: Curves.easeInOut,
       );
@@ -164,15 +155,13 @@ class SignupScreenState extends State<SignupScreen> {
 
   @protected
   bool? onCheckStepValid(_Props props, PageController? controller) {
-    final currentSection = this.sections[this.currentStep];
+    final currentSection = sections[currentStep];
 
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return props.isHomeserverValid;
       case UsernameStep:
-        return props.isUsernameValid &&
-            props.isUsernameAvailable &&
-            !props.loading;
+        return props.isUsernameValid && props.isUsernameAvailable && !props.loading;
       case PasswordStep:
         return props.isPasswordValid;
       case EmailStep:
@@ -188,8 +177,8 @@ class SignupScreenState extends State<SignupScreen> {
 
   @protected
   Function? onCompleteStep(_Props props, PageController? controller) {
-    final currentSection = this.sections[this.currentStep];
-    final lastStep = (this.sections.length - 1) == this.currentStep;
+    final currentSection = sections[currentStep];
+    final lastStep = (sections.length - 1) == currentStep;
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () async {
@@ -221,7 +210,7 @@ class SignupScreenState extends State<SignupScreen> {
       case PasswordStep:
         return () async {
           if (sections.length < 4) {
-            final result = await props.onCreateUser();
+            final result = await props.onCreateUser(enableErrors: lastStep);
 
             // If signup is completed here, just wait for auth redirect
             if (result) {
@@ -229,7 +218,7 @@ class SignupScreenState extends State<SignupScreen> {
             }
           }
 
-          return await controller!.nextPage(
+          return controller!.nextPage(
             duration: nextAnimationDuration,
             curve: Curves.ease,
           );
@@ -306,7 +295,7 @@ class SignupScreenState extends State<SignupScreen> {
       return Strings.buttonLoginSSO;
     }
 
-    if (this.currentStep == sections.length - 1) {
+    if (currentStep == sections.length - 1) {
       return Strings.buttonSignupFinish;
     }
 
@@ -319,8 +308,8 @@ class SignupScreenState extends State<SignupScreen> {
         onDidChange: onDidChange,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             extendBodyBehindAppBar: true,
@@ -342,10 +331,8 @@ class SignupScreenState extends State<SignupScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width,
+                  height: height,
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -369,14 +356,13 @@ class SignupScreenState extends State<SignupScreen> {
                                 allowImplicitScrolling: false,
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
-                                children: sections,
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
+                                children: sections,
                               ),
                             ),
                           ],
@@ -388,19 +374,17 @@ class SignupScreenState extends State<SignupScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           direction: Axis.vertical,
                           children: <Widget>[
-                            Container(
-                              child: ButtonSolid(
-                                text: buildButtonString(props),
-                                loading: props.creating || props.loading,
-                                disabled: props.creating ||
-                                    !onCheckStepValid(
-                                      props,
-                                      this.pageController,
-                                    )!,
-                                onPressed: onCompleteStep(
-                                  props,
-                                  this.pageController,
-                                ),
+                            ButtonSolid(
+                              text: buildButtonString(props),
+                              loading: props.creating || props.loading,
+                              disabled: props.creating ||
+                                  !onCheckStepValid(
+                                    props,
+                                    pageController,
+                                  )!,
+                              onPressed: onCompleteStep(
+                                props,
+                                pageController,
                               ),
                             ),
                           ],
@@ -421,16 +405,14 @@ class SignupScreenState extends State<SignupScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SmoothPageIndicator(
-                                    controller:
-                                        pageController!, // PageController
+                                    controller: pageController!,
                                     count: sections.length,
                                     effect: WormEffect(
                                       spacing: 16,
                                       dotHeight: 12,
                                       dotWidth: 12,
-                                      activeDotColor:
-                                          Theme.of(context).primaryColor,
-                                    ), // your preferred effect
+                                      activeDotColor: Theme.of(context).primaryColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -481,7 +463,7 @@ class _Props extends Equatable {
   final Function onResetCredential;
   final Function onSelectHomeserver;
 
-  _Props({
+  const _Props({
     required this.user,
     required this.hostname,
     required this.homeserver,
@@ -512,8 +494,7 @@ class _Props extends Equatable {
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver,
-        isHomeserverValid: store.state.authStore.homeserver.valid &&
-            !store.state.authStore.loading,
+        isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,

@@ -1,8 +1,7 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colours.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 
 class ButtonTextOpacity extends StatefulWidget {
@@ -64,26 +63,25 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                     ),
                   ),
                 )
-              : (widget.textWidget != null
-                  ? widget.textWidget
-                  : Text(
-                      widget.text!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w100,
-                        letterSpacing: 0.8,
-                        color: () {
-                          if (widget.disabled) {
-                            return Colors.grey[300];
-                          }
-                          if (widget.color != null) {
-                            return widget.color;
-                          }
-                          return Theme.of(context).textTheme.button!.color;
-                        }(),
-                      ),
-                    )),
+              : (widget.textWidget ??
+                  Text(
+                    widget.text!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w100,
+                      letterSpacing: 0.8,
+                      color: () {
+                        if (widget.disabled) {
+                          return Color(Colours.greyLight);
+                        }
+                        if (widget.color != null) {
+                          return widget.color;
+                        }
+                        return Theme.of(context).textTheme.button!.color;
+                      }(),
+                    ),
+                  )),
         ),
       );
 }

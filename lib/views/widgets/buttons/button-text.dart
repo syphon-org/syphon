@@ -1,8 +1,7 @@
-// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colours.dart';
 
-// Project imports:
 import 'package:syphon/global/dimensions.dart';
 
 class ButtonText extends StatelessWidget {
@@ -29,7 +28,7 @@ class ButtonText extends StatelessWidget {
           foregroundColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) =>
                 states.contains(MaterialState.disabled)
-                    ? Colors.grey[300]
+                    ? Color(Colours.greyDisabled)
                     : null,
           ),
         ),
@@ -53,17 +52,17 @@ class ButtonText extends StatelessWidget {
                 : Text(
                     text!,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: Theme.of(context).textTheme.bodyText1?.fontSize,
                       fontWeight: FontWeight.w100,
                       letterSpacing: 0.8,
                       color: () {
                         if (disabled) {
-                          return Colors.grey[300];
+                          return Color(Colours.greyDisabled);
                         }
                         if (color != null) {
                           return color;
                         }
-                        return Theme.of(context).buttonColor;
+                        return Theme.of(context).textTheme.bodyText1?.color;
                       }(),
                     ),
                   )),

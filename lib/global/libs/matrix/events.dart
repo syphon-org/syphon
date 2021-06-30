@@ -1,21 +1,17 @@
-// Dart imports:
 import 'dart:async';
 import 'dart:convert';
 
-// Package imports:
 import 'package:http/http.dart' as http;
 
-// Project imports:
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 
 abstract class Events {
   /// Fetch State Events
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#id258
-  /// 
+  ///
   /// Get the state events for the current state of a room.
   static Future<dynamic> fetchStateEvents({
     String? protocol = 'https://',
@@ -23,7 +19,8 @@ abstract class Events {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -73,8 +70,8 @@ abstract class Events {
   }
 
   /// Sync (Background Isolate) (main functionality)
-  /// 
-  /// https://matrix.org/docs/spec/client_server/latest#id251 
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id251
   static Future<dynamic> fetchMessageEventsMapped(Map params) async {
     return await fetchMessageEvents(
       protocol: params['protocol'],
@@ -89,13 +86,13 @@ abstract class Events {
   }
 
   /// Send Encrypted Message
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-  /// 
+  ///
   /// Notes on requestId (considered a transactionId in Matrix)
-  /// 
-  /// The transaction ID for this event. 
-  /// Clients should generate an ID unique across requests with the same access token; 
+  ///
+  /// The transaction ID for this event.
+  /// Clients should generate an ID unique across requests with the same access token;
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
 
   static Future<dynamic> sendMessageEncrypted({
@@ -140,13 +137,13 @@ abstract class Events {
   }
 
   /// Send Event (State Only)
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-  /// 
+  ///
   /// Notes on requestId (considered a transactionId in Matrix)
-  /// 
-  /// The transaction ID for this event. 
-  /// Clients should generate an ID unique across requests with the same access token; 
+  ///
+  /// The transaction ID for this event.
+  /// Clients should generate an ID unique across requests with the same access token;
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendEvent({
     String? protocol = 'https://',
@@ -177,13 +174,13 @@ abstract class Events {
   }
 
   /// Send Message
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-  /// 
+  ///
   /// Notes on requestId (considered a transactionId in Matrix)
-  /// 
-  /// The transaction ID for this event. 
-  /// Clients should generate an ID unique across requests with the same access token; 
+  ///
+  /// The transaction ID for this event.
+  /// Clients should generate an ID unique across requests with the same access token;
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendMessage({
     String? protocol = 'https://',
@@ -228,13 +225,13 @@ abstract class Events {
   }
 
   /// Send Reaction
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-rooms-roomid-send-eventtype-txnid
-  /// 
+  ///
   /// Notes on requestId (considered a transactionId in Matrix)
-  /// 
-  /// The transaction ID for this event. 
-  /// Clients should generate an ID unique across requests with the same access token; 
+  ///
+  /// The transaction ID for this event.
+  /// Clients should generate an ID unique across requests with the same access token;
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendReaction({
     String protocol = 'https://',
@@ -303,13 +300,13 @@ abstract class Events {
   }
 
   /// Send (Event) To Device
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-sendtodevice-eventtype-txnid
-  /// 
+  ///
   /// Not intended for messages per protocol requirements
-  /// 
+  ///
   /// This endpoint is used to send send-to-device events to a set of client devices.
-  /// The messages to send. A map from user ID, to a map from device ID to message body. 
+  /// The messages to send. A map from user ID, to a map from device ID to message body.
   /// The device ID may also be *, meaning all known devices for the user.
   static Future<dynamic> sendEventToDevice({
     String? protocol = 'https://',
@@ -343,7 +340,7 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /// Send Typing Event 
+  /// Send Typing Event
   static Future<dynamic> sendTyping({
     String? protocol = 'https://',
     String? homeserver = 'matrix.org',
@@ -375,7 +372,7 @@ abstract class Events {
   }
 
   /// Send Read Receipts
-  /// 
+  ///
   /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
   static Future<dynamic> sendReadMarkers({
     String? protocol = 'https://',
