@@ -97,8 +97,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                     scrollDirection: Axis.vertical,
                     itemCount: props.homeservers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final homeserver =
-                          props.homeservers[index] ?? {} as Homeserver;
+                      final homeserver = props.homeservers[index] ?? {} as Homeserver;
 
                       return GestureDetector(
                         onTap: () {
@@ -112,17 +111,13 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                               hasIcon: false,
                               tapBodyToCollapse: true,
                               tapHeaderToExpand: false,
-                              expandIcon: IconData(
-                                Icons.arrow_drop_down.codePoint,
-                              ),
                             ),
                             header: ListTile(
                               leading: Avatar(
                                 size: Dimensions.avatarSizeMin,
                                 url: homeserver.photoUrl,
                                 alt: homeserver.hostname,
-                                background:
-                                    Colours.hashedColor(homeserver.hostname),
+                                background: Colours.hashedColor(homeserver.hostname),
                               ),
                               title: Text(
                                 homeserver.hostname!,
@@ -141,8 +136,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Location',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
@@ -159,9 +153,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                       children: <Widget>[
                                         Text(
                                           'Users',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption,
+                                          style: Theme.of(context).textTheme.caption,
                                           softWrap: true,
                                         ),
                                         Text(
@@ -173,16 +165,13 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: homeserver.roomsTotal != null &&
-                                      homeserver.usersActive == null,
+                                  visible: homeserver.roomsTotal != null && homeserver.usersActive == null,
                                   child: Expanded(
                                     child: Column(
                                       children: <Widget>[
                                         Text(
                                           'Rooms',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption,
+                                          style: Theme.of(context).textTheme.caption,
                                           softWrap: true,
                                         ),
                                         Text(
@@ -198,8 +187,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Founded',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
@@ -214,8 +202,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Avg Speed',
-                                        style:
-                                            Theme.of(context).textTheme.caption,
+                                        style: Theme.of(context).textTheme.caption,
                                         softWrap: true,
                                       ),
                                       Text(
@@ -252,9 +239,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                           leading: Avatar(
                             alt: props.searchText,
                             size: Dimensions.avatarSizeMin,
-                            url: props.homeserver.photoUrl != null
-                                ? props.homeserver.photoUrl
-                                : null,
+                            url: props.homeserver.photoUrl != null ? props.homeserver.photoUrl : null,
                             background: props.searchText.isNotEmpty
                                 ? Colours.hashedColor(props.searchText)
                                 : Colors.grey,
@@ -310,8 +295,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading:
-            store.state.searchStore.loading || store.state.authStore.loading,
+        loading: store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults
