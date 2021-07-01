@@ -145,5 +145,5 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [avatarShape];
 
-  _Props.mapStateToProps(Store<AppState> store) : avatarShape = store.state.settingsStore.appTheme.avatarShape;
+  _Props.mapStateToProps(Store<AppState> store) : avatarShape = store.state.settingsStore.themeSettings.avatarShape;
 }

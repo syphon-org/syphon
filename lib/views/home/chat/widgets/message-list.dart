@@ -204,7 +204,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         currentUser: store.state.authStore.user,
         chatColorPrimary: selectBubbleColor(store, roomId),
         room: selectRoom(id: roomId, state: store.state),

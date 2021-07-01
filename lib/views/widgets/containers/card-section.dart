@@ -57,6 +57,6 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
       );
 }

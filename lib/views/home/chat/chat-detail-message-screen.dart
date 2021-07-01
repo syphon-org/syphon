@@ -232,7 +232,7 @@ class _Props extends Equatable {
         readReceipts: store.state.eventStore.receipts[args.roomId!] ??
             <String, ReadReceipt>{},
         userId: store.state.authStore.user.userId,
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
       );
 
   @override

@@ -460,7 +460,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         homeserver: store.state.authStore.user.homeserverName,
         loading: store.state.authStore.loading,
         onClearUserInvites: () => store.dispatch(

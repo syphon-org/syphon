@@ -312,7 +312,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.authStore.loading,
         onSaveProfile: ({
           File? avatarFileNew,

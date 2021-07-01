@@ -399,7 +399,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.searchStore.loading,
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         searchResults: store.state.searchStore.searchResults,
         onJoin: ({Room? room}) {
           store.dispatch(joinRoom(room: room));

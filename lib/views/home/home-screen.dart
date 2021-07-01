@@ -622,7 +622,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         rooms: availableRooms(sortPrioritizedRooms(filterBlockedRooms(
           store.state.roomStore.rooms.values.toList(),
           store.state.userStore.blocked,

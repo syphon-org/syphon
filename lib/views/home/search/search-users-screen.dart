@@ -404,7 +404,7 @@ class _Props extends Equatable {
   });
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        themeType: store.state.settingsStore.appTheme.themeType,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
         usersRecent: friendlyUsers(store.state),

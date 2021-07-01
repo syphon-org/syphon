@@ -289,17 +289,17 @@ class Props extends Equatable {
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         primaryColor:
-            store.state.settingsStore.appTheme.primaryColor,
+            store.state.settingsStore.themeSettings.primaryColor,
         accentColor:
-            store.state.settingsStore.appTheme.accentColor,
+            store.state.settingsStore.themeSettings.accentColor,
         appBarColor:
-            store.state.settingsStore.appTheme.appBarColor,
-        themeType: enumToString(store.state.settingsStore.appTheme.themeType),
+            store.state.settingsStore.themeSettings.appBarColor,
+        themeType: enumToString(store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: enumToString(store.state.settingsStore.appTheme.fontName),
-        fontSize: enumToString(store.state.settingsStore.appTheme.fontSize),
-        messageSize: enumToString(store.state.settingsStore.appTheme.messageSize),
-        avatarShape: enumToString(store.state.settingsStore.appTheme.avatarShape),
+        fontName: enumToString(store.state.settingsStore.themeSettings.fontName),
+        fontSize: enumToString(store.state.settingsStore.themeSettings.fontSize),
+        messageSize: enumToString(store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: enumToString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),

@@ -278,8 +278,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        fontName: enumToString(store.state.settingsStore.appTheme.fontName),
-        themeTypeName: enumToString(store.state.settingsStore.appTheme.themeType),
+        fontName: enumToString(store.state.settingsStore.themeSettings.fontName),
+        themeTypeName: enumToString(store.state.settingsStore.themeSettings.themeType),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled:

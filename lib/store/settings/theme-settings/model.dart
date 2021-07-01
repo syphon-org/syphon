@@ -34,7 +34,7 @@ enum AvatarShape {
 }
 
 @JsonSerializable()
-class AppTheme extends Equatable {
+class ThemeSettings extends Equatable {
   final int primaryColor;
   final int accentColor;
   final int appBarColor;
@@ -45,7 +45,7 @@ class AppTheme extends Equatable {
   final MessageSize messageSize;
   final AvatarShape avatarShape;
 
-  const AppTheme({
+  const ThemeSettings({
     this.primaryColor = Colours.cyanSyphon,
     this.accentColor = Colours.cyanSyphon,
     this.appBarColor = Colours.cyanSyphon,
@@ -70,7 +70,7 @@ class AppTheme extends Equatable {
     avatarShape,
   ];
 
-  AppTheme copyWith({
+  ThemeSettings copyWith({
     int? primaryColor,
     int? accentColor,
     int? appBarColor,
@@ -81,7 +81,7 @@ class AppTheme extends Equatable {
     MessageSize? messageSize,
     AvatarShape? avatarShape,
   }) =>
-      AppTheme(
+      ThemeSettings(
         primaryColor: primaryColor ?? this.primaryColor,
         accentColor: accentColor ?? this.accentColor,
         appBarColor: appBarColor ?? this.appBarColor,
@@ -93,7 +93,7 @@ class AppTheme extends Equatable {
         avatarShape: avatarShape ?? this.avatarShape,
       );
 
-  Map<String, dynamic> toJson() => _$AppThemeToJson(this);
+  Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);
 
-  factory AppTheme.fromJson(Map<String, dynamic> json) => _$AppThemeFromJson(json);
+  factory ThemeSettings.fromJson(Map<String, dynamic> json) => _$ThemeSettingsFromJson(json);
 }

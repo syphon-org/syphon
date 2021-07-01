@@ -21,7 +21,7 @@ void setSystemTheme(ThemeType themeType) {
 // Set the theme
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI
-ThemeData? setupTheme(AppTheme appTheme, {bool generateThemeData = false}) {
+ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) {
   // Set system UI theme
   setSystemTheme(appTheme.themeType);
 
@@ -32,7 +32,7 @@ ThemeData? setupTheme(AppTheme appTheme, {bool generateThemeData = false}) {
     final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
     final brightness = selectThemeBrightness(appTheme.themeType);
     final invertedPrimaryColor =
-    brightness == Brightness.light ? primaryColor : accentColor;
+      brightness == Brightness.light ? primaryColor : accentColor;
 
     final titleWeight = selectFontTitleWeight(appTheme.fontName);
     final bodyWeight = selectFontBodyWeight(appTheme.fontName);

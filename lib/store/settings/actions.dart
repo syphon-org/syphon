@@ -293,7 +293,7 @@ ThunkAction<AppState> updateAppBarColor(int color) {
 /// Iterate over FontNames on action
 ThunkAction<AppState> incrementFontType() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.appTheme;
+    final currentTheme = store.state.settingsStore.themeSettings;
     final fontNameIndex = FontName.values.indexOf(currentTheme.fontName);
 
     store.dispatch(SetFontName(
@@ -306,7 +306,7 @@ ThunkAction<AppState> incrementFontType() {
 /// Iterate over FontSizes on action
 ThunkAction<AppState> incrementFontSize() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.appTheme;
+    final currentTheme = store.state.settingsStore.themeSettings;
     final fontSizeIndex = FontSize.values.indexOf(currentTheme.fontSize);
 
     store.dispatch(SetFontSize(
@@ -318,7 +318,7 @@ ThunkAction<AppState> incrementFontSize() {
 /// Iterate over MessageSizes on action
 ThunkAction<AppState> incrementMessageSize() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.appTheme;
+    final currentTheme = store.state.settingsStore.themeSettings;
     final messageSizeIndex = MessageSize.values.indexOf(currentTheme.messageSize);
 
     store.dispatch(SetMessageSize(
@@ -330,7 +330,7 @@ ThunkAction<AppState> incrementMessageSize() {
 /// Iterate over ThemeTypes on action
 ThunkAction<AppState> incrementThemeType() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.appTheme;
+    final currentTheme = store.state.settingsStore.themeSettings;
     final themeTypeIndex = ThemeType.values.indexOf(currentTheme.themeType);
     final nextThemeType = ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
 
@@ -344,7 +344,7 @@ ThunkAction<AppState> incrementThemeType() {
 /// Iterate over AvatarShapes on action
 ThunkAction<AppState> incrementAvatarShape() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.appTheme;
+    final currentTheme = store.state.settingsStore.themeSettings;
     final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
 
     store.dispatch(SetAvatarShape(

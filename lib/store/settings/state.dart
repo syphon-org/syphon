@@ -35,7 +35,7 @@ class SettingsStore extends Equatable {
   final Map<String, ChatSetting> chatSettings; // roomId
   final NotificationSettings notificationSettings;
 
-  final AppTheme appTheme;
+  final ThemeSettings themeSettings;
 
   final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
@@ -60,7 +60,7 @@ class SettingsStore extends Equatable {
     this.devices = const [],
     this.loading = false,
     this.notificationSettings = const NotificationSettings(),
-    this.appTheme = const AppTheme(),
+    this.themeSettings = const ThemeSettings(),
     this.alphaAgreement,
     this.pusherToken,
   });
@@ -79,7 +79,7 @@ class SettingsStore extends Equatable {
         devices,
         loading,
         notificationSettings,
-        appTheme,
+        themeSettings,
         alphaAgreement,
         pusherToken,
       ];
@@ -98,7 +98,7 @@ class SettingsStore extends Equatable {
     int? syncPollTimeout,
     Map<String, ChatSetting>? chatSettings,
     NotificationSettings? notificationSettings,
-    AppTheme? appTheme,
+    ThemeSettings? themeSettings,
     List<Device>? devices,
     bool? loading,
     String? alphaAgreement,
@@ -122,7 +122,7 @@ class SettingsStore extends Equatable {
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
         notificationSettings: notificationSettings ?? this.notificationSettings,
-        appTheme: appTheme ?? this.appTheme,
+        themeSettings: themeSettings ?? this.themeSettings,
         devices: devices ?? this.devices,
         loading: loading ?? this.loading,
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,

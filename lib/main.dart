@@ -112,7 +112,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
-        setupTheme(store.state.settingsStore.appTheme);
+        setupTheme(store.state.settingsStore.themeSettings);
 
         dismissAllNotifications(
           pluginInstance: globalNotificationPluginInstance,
@@ -218,7 +218,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
-              theme: setupTheme(settings.appTheme, generateThemeData: true),
+              theme: setupTheme(settings.themeSettings, generateThemeData: true),
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
