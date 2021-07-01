@@ -172,8 +172,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
-      final isFullSync =
-          forceFull || since == null || store.state.roomStore.rooms.isEmpty;
+      final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');
@@ -199,21 +198,29 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         throw data['error'];
       }
 
-      // TODO: Unfiltered
-      // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       // final Map presence = data['presence'];
-      final nextBatch = data['next_batch'];
+
+      final String nextBatch = data['next_batch'];
+
+      final Map<String, dynamic> roomJson = data['rooms'] ?? {};
+      final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
+
+      if (roomJson.isNotEmpty) {
+        final Map<String, dynamic>? joinedJson = roomJson['join'];
+        final Map<String, dynamic>? invitesJson = roomJson['invite'];
+        // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
+
+        // Updates for rooms
+        await store.dispatch(syncRooms(joinedJson));
+        await store.dispatch(syncRooms(invitesJson));
+      }
+
+      if (toDeviceJson.isNotEmpty) {
+        // Updates for device specific data (mostly room encryption)
+        await store.dispatch(syncDevice(toDeviceJson));
+      }
+
       final Map oneTimeKeyCount = data['device_one_time_keys_count'];
-      final Map<String, dynamic>? rawJoined = data['rooms']['join'];
-      final Map<String, dynamic>? rawInvites = data['rooms']['invite'];
-      final Map<String, dynamic>? rawToDevice = data['to_device'];
-
-      // Updates for rooms
-      await store.dispatch(syncRooms(rawJoined));
-      await store.dispatch(syncRooms(rawInvites));
-
-      // Updates for device specific data (mostly room encryption)
-      await store.dispatch(syncDevice(rawToDevice ?? {}));
 
       // Update encryption one time key count
       store.dispatch(updateOneTimeKeyCounts(

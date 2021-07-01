@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id183

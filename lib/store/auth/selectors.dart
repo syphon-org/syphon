@@ -1,6 +1,5 @@
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/model.dart';
 
 // Preauth
 
@@ -13,9 +12,7 @@ bool isLoginAttemptable(AppState state) {
     return true;
   }
 
-  return state.authStore.isPasswordValid &&
-      state.authStore.isUsernameValid &&
-      !state.authStore.loading;
+  return state.authStore.isPasswordValid && state.authStore.isUsernameValid && !state.authStore.loading;
 }
 
 bool isAuthLoading(AppState state) {

@@ -415,6 +415,7 @@ class _Props extends Equatable {
 
   final Function onDebug;
   final Function onLoginUser;
+  final Function onLoginUserSSO;
   final Function onIncrementTheme;
   final Function onChangeUsername;
   final Function onChangePassword;
@@ -431,6 +432,7 @@ class _Props extends Equatable {
     required this.usernameHint,
     required this.onDebug,
     required this.onLoginUser,
+    required this.onLoginUserSSO,
     required this.onIncrementTheme,
     required this.onChangeUsername,
     required this.onChangePassword,
@@ -485,7 +487,7 @@ class _Props extends Equatable {
         onDebug: () async {
           store.dispatch(initClientSecret());
         },
-        onLoginUser: () async {
+        onLoginUserSSO: () async {
           final hostname = store.state.authStore.hostname;
           final homeserver = store.state.authStore.homeserver;
 
@@ -493,10 +495,15 @@ class _Props extends Equatable {
             return store.dispatch(selectHomeserver(hostname: hostname));
           }
 
-          if (homeserver.loginType == MatrixAuthTypes.SSO) {
-            return await store.dispatch(loginUserSSO());
-          }
+          return await store.dispatch(loginUserSSO());
+        },
+        onLoginUser: () async {
+          final hostname = store.state.authStore.hostname;
+          final homeserver = store.state.authStore.homeserver;
 
+          if (hostname != homeserver.hostname) {
+            return store.dispatch(selectHomeserver(hostname: hostname));
+          }
           return await store.dispatch(loginUser());
         },
       );
