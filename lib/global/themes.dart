@@ -45,6 +45,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
     return ThemeData(
       // Main Colors
       primaryColor: primaryColor,
+      primaryColorBrightness: brightness,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
       accentColor: accentColor,
