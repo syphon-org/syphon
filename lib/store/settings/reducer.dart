@@ -12,31 +12,31 @@ SettingsStore settingsReducer(
       );
     case SetPrimaryColor:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(primaryColor: action.color),
+        themeSettings: state.themeSettings.copyWith(primaryColor: action.color),
       );
     case SetAccentColor:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(accentColor: action.color),
+        themeSettings: state.themeSettings.copyWith(accentColor: action.color),
       );
     case SetAppBarColor:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(appBarColor: action.color),
+        themeSettings: state.themeSettings.copyWith(appBarColor: action.color),
       );
     case SetFontName:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(fontName: action.fontName),
+        themeSettings: state.themeSettings.copyWith(fontName: action.fontName),
       );
     case SetFontSize:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(fontSize: action.fontSize),
+        themeSettings: state.themeSettings.copyWith(fontSize: action.fontSize),
       );
     case SetMessageSize:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(messageSize: action.messageSize),
+        themeSettings: state.themeSettings.copyWith(messageSize: action.messageSize),
       );
     case SetAvatarShape:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(avatarShape: action.avatarShape),
+        themeSettings: state.themeSettings.copyWith(avatarShape: action.avatarShape),
       );
     case SetDevices:
       return state.copyWith(
@@ -73,7 +73,7 @@ SettingsStore settingsReducer(
       );
     case SetThemeType:
       return state.copyWith(
-        appTheme: state.themeSettings.copyWith(themeType: action.themeType),
+        themeSettings: state.themeSettings.copyWith(themeType: action.themeType),
       );
     case ToggleEnterSend:
       return state.copyWith(
