@@ -1183,10 +1183,12 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
           ) ??
           {};
 
-      // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
-      final loginType = (response['flows'] as List).elementAt(0)['type'];
+      printJson(response);
 
-      homeserver = homeserver.copyWith(loginType: loginType);
+      // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
+      final loginTypes = (response['flows'] as List).map((flow) => flow['type'] as String).toList();
+
+      homeserver = homeserver.copyWith(loginTypes: loginTypes);
     } catch (error) {}
 
     store.dispatch(SetLoading(loading: false));

@@ -8,6 +8,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
@@ -20,8 +21,6 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-container.dart';
-
-final bool debug = !kReleaseMode;
 
 enum ChatOptions {
   search,
@@ -336,7 +335,7 @@ class AppBarChatState extends State<AppBarChat> {
           ),
           actions: <Widget>[
             Visibility(
-              visible: debug,
+              visible: DEBUG_MODE,
               child: IconButton(
                 icon: Icon(Icons.gamepad),
                 iconSize: Dimensions.buttonAppBarSize,

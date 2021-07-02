@@ -32,8 +32,7 @@ class Storage {
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const mainLocation =
-      '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
+  static const mainLocation = '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
 }
 
 Future<Database?> initStorage() async {

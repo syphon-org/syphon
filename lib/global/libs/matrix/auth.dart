@@ -20,6 +20,11 @@ class MatrixAuthTypes {
   static const EMAIL = 'm.login.email.identity';
 }
 
+enum AuthTypes {
+  Password,
+  SSO,
+}
+
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
