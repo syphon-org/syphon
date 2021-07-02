@@ -28,11 +28,16 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
   if (generateThemeData) {
     final primaryColor = Color(appTheme.primaryColor);
     final accentColor = Color(appTheme.accentColor);
-    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
     final brightness = selectThemeBrightness(appTheme.themeType);
     final invertedPrimaryColor =
       brightness == Brightness.light ? primaryColor : accentColor;
 
+    final appBarElevation = selectAppBarElevation(appTheme.themeType);
+    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
+    final dialogBackgroundColor = selectModalColor(appTheme.themeType);
+    final iconColor = selectIconColor(appTheme.themeType);
+
+    final fontFamily = selectFontNameString(appTheme.fontName);
     final titleWeight = selectFontTitleWeight(appTheme.fontName);
     final bodyWeight = selectFontBodyWeight(appTheme.fontName);
     final letterSpacing = selectFontLetterSpacing(appTheme.fontName);
@@ -51,19 +56,19 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       brightness: brightness,
 
       // Core UI
-      dialogBackgroundColor: selectModalColor(appTheme.themeType),
+      dialogBackgroundColor: dialogBackgroundColor,
       focusColor: primaryColor,
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: primaryColor,
         selectionColor: primaryColor.withAlpha(100),
         selectionHandleColor: primaryColor,
       ),
-      iconTheme: IconThemeData(color: selectIconColor(appTheme.themeType)),
+      iconTheme: IconThemeData(color: iconColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null
           ? Color(scaffoldBackgroundColor)
           : null,
       appBarTheme: AppBarTheme(
-        elevation: selectAppBarElevation(appTheme.themeType),
+        elevation: appBarElevation,
         brightness: Brightness.dark,
         color: Color(appTheme.appBarColor),
       ),
@@ -86,7 +91,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       ),
 
       // Fonts
-      fontFamily: selectFontNameString(appTheme.fontName),
+      fontFamily: fontFamily,
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
