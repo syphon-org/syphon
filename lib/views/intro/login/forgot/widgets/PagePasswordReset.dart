@@ -75,8 +75,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupPassword,
-                    semanticsLabel:
-                        'User thinking up a password in a swirl of wind',
+                    semanticsLabel: 'User thinking up a password in a swirl of wind',
                   ),
                 ),
               ),
@@ -180,7 +179,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all((6)),
+                        padding: EdgeInsets.all(6),
                         child: Icon(
                           Icons.check,
                           color: Colors.white,
