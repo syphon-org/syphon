@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'model.dart';
 
 // ThemeType
+
+String selectThemeTypeString(ThemeType themeType) {
+  return enumToString(themeType);
+}
 
 int selectSystemUiColor(ThemeType themeType) {
   switch (themeType) {
@@ -45,7 +50,7 @@ Color selectIconColor(ThemeType themeType) {
 
 Color? selectModalColor(ThemeType themeType) {
   switch (themeType) {
-    case ThemeType.Night: return Colors.grey[900]!;
+    case ThemeType.Night: return Colors.grey[900];
     default: return null;
   }
 }
@@ -69,6 +74,10 @@ double? selectAppBarElevation(ThemeType themeType) {
 
 // FontName
 
+String selectFontNameString(FontName fontName) {
+  return enumToString(fontName);
+}
+
 double? selectFontLetterSpacing(FontName fontName) {
   switch (fontName) {
     case FontName.Rubik: return 0.5;
@@ -90,6 +99,10 @@ FontWeight selectFontBodyWeight(FontName fontName) {
 }
 
 // FontSize
+
+String selectFontSizeString(FontSize fontSize) {
+  return enumToString(fontSize);
+}
 
 double selectFontSubtitleSize(FontSize fontSize) {
   switch (fontSize) {
@@ -121,4 +134,16 @@ double selectFontBodySizeLarge(FontSize fontSize) {
     case FontSize.Large: return 22;
     default: return 20;
   }
+}
+
+// MessageSize
+
+String selectMessageSizeString(MessageSize messageSize) {
+  return enumToString(messageSize);
+}
+
+// AvatarShape
+
+String selectAvatarShapeString(AvatarShape avatarShape) {
+  return enumToString(avatarShape);
 }

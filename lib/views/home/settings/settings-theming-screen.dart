@@ -7,12 +7,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
@@ -294,12 +293,12 @@ class Props extends Equatable {
             store.state.settingsStore.themeSettings.accentColor,
         appBarColor:
             store.state.settingsStore.themeSettings.appBarColor,
-        themeType: enumToString(store.state.settingsStore.themeSettings.themeType),
+        themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: enumToString(store.state.settingsStore.themeSettings.fontName),
-        fontSize: enumToString(store.state.settingsStore.themeSettings.fontSize),
-        messageSize: enumToString(store.state.settingsStore.themeSettings.messageSize),
-        avatarShape: enumToString(store.state.settingsStore.themeSettings.avatarShape),
+        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
+        fontSize: selectFontSizeString(store.state.settingsStore.themeSettings.fontSize),
+        messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),

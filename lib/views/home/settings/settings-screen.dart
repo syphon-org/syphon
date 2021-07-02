@@ -8,10 +8,10 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -278,8 +278,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        fontName: enumToString(store.state.settingsStore.themeSettings.fontName),
-        themeTypeName: enumToString(store.state.settingsStore.themeSettings.themeType),
+        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
+        themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled:

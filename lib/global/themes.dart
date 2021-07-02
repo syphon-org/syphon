@@ -1,7 +1,6 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/global/algos.dart';
 
 // Project imports:
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -87,7 +86,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       ),
 
       // Fonts
-      fontFamily: enumToString(appTheme.fontName),
+      fontFamily: selectFontNameString(appTheme.fontName),
       primaryTextTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
