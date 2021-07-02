@@ -107,8 +107,7 @@ class Dimensions {
         bottom: 8,
       );
 
-  static EdgeInsets listTitlePaddingDynamic({double width = 500}) =>
-      EdgeInsets.only(
+  static EdgeInsets listTitlePaddingDynamic({double width = 500}) => EdgeInsets.only(
         left: width * 0.04,
         right: width * 0.04,
         top: 6,

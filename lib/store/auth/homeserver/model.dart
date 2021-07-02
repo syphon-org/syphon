@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 
 part 'model.g.dart';
 
@@ -27,7 +28,7 @@ class Homeserver extends Equatable {
     this.photoUrl,
     this.identityUrl,
     this.loginType,
-    this.loginTypes = const [],
+    this.loginTypes = const [MatrixAuthTypes.PASSWORD],
     this.location,
     this.description,
     this.usersActive,

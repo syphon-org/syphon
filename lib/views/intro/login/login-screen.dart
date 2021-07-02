@@ -323,11 +323,11 @@ class LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Visibility(
-                            visible: props.isPasswordEnabled,
+                            visible: props.isPasswordLoginAvailable,
                             child: buildPasswordLogin(props),
                           ),
                           Visibility(
-                            visible: props.isSSOEnabled && !props.isPasswordEnabled,
+                            visible: props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
                             child: buildSSOLogin(props),
                           ),
                         ],
@@ -345,7 +345,7 @@ class LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               children: [
                                 Visibility(
-                                  visible: props.isPasswordEnabled,
+                                  visible: props.isPasswordLoginAvailable,
                                   child: ButtonSolid(
                                     text: Strings.buttonLogin,
                                     loading: props.loading && currentAuthType == AuthTypes.Password,
@@ -354,7 +354,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: props.isSSOEnabled && !props.isPasswordEnabled,
+                                  visible: props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonSolid(
@@ -366,7 +366,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: props.isSSOEnabled && props.isPasswordEnabled,
+                                  visible: props.isSSOLoginAvailable && props.isPasswordLoginAvailable,
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonOutline(
@@ -441,8 +441,8 @@ class _Props extends Equatable {
   final List<String> loginTypes;
   final Homeserver homeserver;
 
-  final bool isPasswordEnabled;
-  final bool isSSOEnabled;
+  final bool isPasswordLoginAvailable;
+  final bool isSSOLoginAvailable;
 
   final Function onDebug;
   final Function onLoginUser;
@@ -458,8 +458,8 @@ class _Props extends Equatable {
     required this.username,
     required this.password,
     required this.loginTypes,
-    required this.isPasswordEnabled,
-    required this.isSSOEnabled,
+    required this.isPasswordLoginAvailable,
+    required this.isSSOLoginAvailable,
     required this.homeserver,
     required this.isPasswordLoginAttemptable,
     required this.isSSOLoginAttemptable,
@@ -491,10 +491,10 @@ class _Props extends Equatable {
         password: store.state.authStore.password,
         homeserver: store.state.authStore.homeserver,
         loginTypes: store.state.authStore.homeserver.loginTypes,
-        isSSOEnabled: selectSSOEnabled(store.state),
-        isPasswordEnabled: selectPasswordEnabled(store.state),
-        isPasswordLoginAttemptable: selectPasswordLoginAttemptable(store.state),
+        isSSOLoginAvailable: selectSSOEnabled(store.state),
+        isPasswordLoginAvailable: selectPasswordEnabled(store.state),
         isSSOLoginAttemptable: selectSSOLoginAttemptable(store.state),
+        isPasswordLoginAttemptable: selectPasswordLoginAttemptable(store.state),
         usernameHint: Strings.formatUsernameHint(
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
