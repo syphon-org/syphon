@@ -12,6 +12,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -22,7 +23,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
@@ -294,7 +294,7 @@ class LoginScreenState extends State<LoginScreen> {
                       children: <Widget>[
                         TouchableOpacity(
                           onTap: () {
-                            props.onIncrementTheme();
+                            props.onIncrementThemeType();
                           },
                           child: Container(
                             constraints: BoxConstraints(
@@ -447,7 +447,7 @@ class _Props extends Equatable {
   final Function onDebug;
   final Function onLoginUser;
   final Function onLoginUserSSO;
-  final Function onIncrementTheme;
+  final Function onIncrementThemeType;
   final Function onChangeUsername;
   final Function onChangePassword;
   final Function onChangeHomeserver;
@@ -467,7 +467,7 @@ class _Props extends Equatable {
     required this.onDebug,
     required this.onLoginUser,
     required this.onLoginUserSSO,
-    required this.onIncrementTheme,
+    required this.onIncrementThemeType,
     required this.onChangeUsername,
     required this.onChangePassword,
     required this.onChangeHomeserver,
@@ -480,6 +480,7 @@ class _Props extends Equatable {
         username,
         password,
         usernameHint,
+        onIncrementThemeType,
         isPasswordLoginAttemptable,
         isSSOLoginAttemptable,
         loginTypes,
@@ -516,8 +517,8 @@ class _Props extends Equatable {
         onChangePassword: (String text) {
           store.dispatch(setLoginPassword(password: text));
         },
-        onIncrementTheme: () {
-          store.dispatch(incrementTheme());
+        onIncrementThemeType: () {
+          store.dispatch(incrementThemeType());
         },
         onDebug: () async {
           store.dispatch(initClientSecret());

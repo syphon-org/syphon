@@ -14,7 +14,7 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -377,14 +377,14 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final List<dynamic> searchResults;
 
   final Function onJoin;
   final Function onSearch;
 
   _Props({
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.searchResults,
     required this.onJoin,
@@ -393,13 +393,13 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
-        theme,
+        themeType,
         loading,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.searchStore.loading,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         searchResults: store.state.searchStore.searchResults,
         onJoin: ({Room? room}) {
           store.dispatch(joinRoom(room: room));
