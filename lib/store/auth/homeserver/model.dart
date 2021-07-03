@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
 
 part 'model.g.dart';
 
@@ -10,6 +11,7 @@ class Homeserver extends Equatable {
   final String? photoUrl;
   final String? identityUrl;
   final String? loginType;
+  final List<String> loginTypes;
 
   final String? location;
   final String? description;
@@ -26,6 +28,7 @@ class Homeserver extends Equatable {
     this.photoUrl,
     this.identityUrl,
     this.loginType,
+    this.loginTypes = const [MatrixAuthTypes.PASSWORD, MatrixAuthTypes.SSO],
     this.location,
     this.description,
     this.usersActive,
@@ -57,6 +60,7 @@ class Homeserver extends Equatable {
     String? photoUrl,
     String? identityUrl,
     String? loginType,
+    List<String>? loginTypes,
     String? location,
     String? description,
     String? founded,
@@ -71,6 +75,7 @@ class Homeserver extends Equatable {
         photoUrl: photoUrl ?? this.photoUrl,
         identityUrl: identityUrl ?? this.identityUrl,
         loginType: loginType ?? this.loginType,
+        loginTypes: loginTypes ?? this.loginTypes,
         location: loginType ?? this.location,
         description: description ?? this.description,
         usersActive: usersActive ?? this.usersActive,
@@ -82,6 +87,5 @@ class Homeserver extends Equatable {
 
   Map<String, dynamic> toJson() => _$HomeserverToJson(this);
 
-  factory Homeserver.fromJson(Map<String, dynamic> json) =>
-      _$HomeserverFromJson(json);
+  factory Homeserver.fromJson(Map<String, dynamic> json) => _$HomeserverFromJson(json);
 }

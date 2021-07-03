@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
@@ -29,13 +30,16 @@ class HomeserverStepState extends State<HomeserverStep> {
   final homeserverController = TextEditingController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+  void initState() {
+    super.initState();
+
+    // NOTE: SchedulerBinding still needed in screen child views
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      onMounted();
+    });
   }
 
-  @protected
-  void onMounted() {
+  onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
@@ -115,13 +119,8 @@ class HomeserverStepState extends State<HomeserverStep> {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-      onWillChange: (oldProps, newProps) {
-        if (oldProps!.homeserver.hostname != newProps.homeserver.hostname) {
-          homeserverController.text = newProps.homeserver.hostname!;
-        }
-      },
       builder: (context, props) {
-        double height = MediaQuery.of(context).size.height;
+        final double height = MediaQuery.of(context).size.height;
 
         return Container(
           margin: EdgeInsets.symmetric(
@@ -142,8 +141,7 @@ class HomeserverStepState extends State<HomeserverStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupHomeserver,
-                    semanticsLabel:
-                        'User resting their leg on an at symbol stool box',
+                    semanticsLabel: 'User resting their leg on an at symbol stool box',
                   ),
                 ),
               ),
@@ -188,6 +186,12 @@ class _Props extends Equatable {
     required this.onChangeHomeserver,
   });
 
+  @override
+  List<Object> get props => [
+        hostname,
+        homeserver,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver,
@@ -198,9 +202,4 @@ class _Props extends Equatable {
           store.dispatch(selectHomeserver(hostname: hostname));
         },
       );
-
-  @override
-  List<Object> get props => [
-        homeserver,
-      ];
 }

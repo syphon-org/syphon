@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/store/auth/selectors.dart';
 
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -20,6 +21,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';
 import 'package:syphon/views/intro/signup/widgets/StepTerms.dart';
+import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
@@ -70,6 +72,7 @@ class SignupScreenState extends State<SignupScreen> {
   @override
   void dispose() {
     subscription.cancel();
+    pageController?.dispose();
     super.dispose();
   }
 
@@ -77,8 +80,9 @@ class SignupScreenState extends State<SignupScreen> {
     final store = StoreProvider.of<AppState>(context);
 
     final props = _Props.mapStateToProps(store);
+    final loginTypes = props.homeserver.loginTypes;
 
-    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+    if (loginTypes.contains(MatrixAuthTypes.SSO) && !loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
       setState(() {
         sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
@@ -122,12 +126,18 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   onDidChange(_Props? oldProps, _Props props) {
-    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+    final loginTypes = props.homeserver.loginTypes;
+    final loginTypesOld = oldProps?.homeserver.loginTypes;
+
+    if (loginTypes == loginTypesOld) return;
+
+    if (loginTypes.contains(MatrixAuthTypes.SSO) && !loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
       setState(() {
         sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
       });
     }
-    if (props.homeserver.loginType == MatrixAuthTypes.PASSWORD) {
+
+    if (loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
       setState(() {
         sections = [
           HomeserverStep(),
@@ -153,7 +163,6 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  @protected
   bool? onCheckStepValid(_Props props, PageController? controller) {
     final currentSection = sections[currentStep];
 
@@ -175,8 +184,7 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  @protected
-  Function? onCompleteStep(_Props props, PageController? controller) {
+  onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
     switch (currentSection.runtimeType) {
@@ -188,7 +196,7 @@ class SignupScreenState extends State<SignupScreen> {
             valid = await props.onSelectHomeserver(props.hostname);
           }
 
-          if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+          if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) && usingSSO) {
             valid = false; // don't do anything else
             await props.onLoginSSO();
           }
@@ -291,10 +299,6 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   String buildButtonString(_Props props) {
-    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
-      return Strings.buttonLoginSSO;
-    }
-
     if (currentStep == sections.length - 1) {
       return Strings.buttonSignupFinish;
     }
@@ -338,7 +342,7 @@ class SignupScreenState extends State<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Flexible(
-                        flex: 8,
+                        flex: 6,
                         fit: FlexFit.tight,
                         child: Flex(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -369,34 +373,53 @@ class SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       Flexible(
-                        flex: 1,
+                        flex: 0,
                         child: Flex(
                           mainAxisAlignment: MainAxisAlignment.end,
                           direction: Axis.vertical,
                           children: <Widget>[
-                            ButtonSolid(
-                              text: buildButtonString(props),
-                              loading: props.creating || props.loading,
-                              disabled: props.creating ||
-                                  !onCheckStepValid(
+                            Container(
+                              padding: const EdgeInsets.only(top: 12, bottom: 12),
+                              child: ButtonSolid(
+                                text: buildButtonString(props),
+                                loading: props.creating || props.loading,
+                                disabled: props.creating ||
+                                    !onCheckStepValid(
+                                      props,
+                                      pageController,
+                                    )!,
+                                onPressed: onCompleteStep(
+                                  props,
+                                  pageController,
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: props.isSSOLoginAvailable && currentStep == 0,
+                              child: Container(
+                                padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                child: ButtonOutline(
+                                  text: Strings.buttonLoginSSO,
+                                  disabled: props.loading,
+                                  onPressed: onCompleteStep(
                                     props,
                                     pageController,
-                                  )!,
-                              onPressed: onCompleteStep(
-                                props,
-                                pageController,
+                                    usingSSO: true,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                       Flexible(
-                        flex: 1,
+                        flex: 0,
                         child: Flex(
                           mainAxisAlignment: MainAxisAlignment.center,
                           direction: Axis.vertical,
                           children: <Widget>[
                             Container(
+                              margin: EdgeInsets.symmetric(vertical: 12),
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.buttonHeightMin,
                               ),
@@ -436,6 +459,8 @@ class _Props extends Equatable {
   final String hostname;
   final Homeserver homeserver;
   final bool isHomeserverValid;
+  final bool isSSOLoginAvailable;
+  final bool isPasswordLoginAvailable;
 
   final String username;
   final bool isUsernameValid;
@@ -468,6 +493,8 @@ class _Props extends Equatable {
     required this.hostname,
     required this.homeserver,
     required this.isHomeserverValid,
+    required this.isPasswordLoginAvailable,
+    required this.isSSOLoginAvailable,
     required this.username,
     required this.isUsernameValid,
     required this.isUsernameAvailable,
@@ -489,12 +516,35 @@ class _Props extends Equatable {
     required this.onSelectHomeserver,
   });
 
+  @override
+  List<Object> get props => [
+        user,
+        hostname,
+        homeserver,
+        isHomeserverValid,
+        username,
+        isUsernameValid,
+        isUsernameAvailable,
+        password,
+        isPasswordValid,
+        email,
+        isEmailValid,
+        creating,
+        captcha,
+        agreement,
+        loading,
+        interactiveAuths,
+        verificationNeeded,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
         completed: store.state.authStore.completed,
         hostname: store.state.authStore.hostname,
         homeserver: store.state.authStore.homeserver,
         isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
+        isSSOLoginAvailable: selectSSOEnabled(store.state),
+        isPasswordLoginAvailable: selectPasswordEnabled(store.state),
         username: store.state.authStore.username,
         isUsernameValid: store.state.authStore.isUsernameValid,
         isUsernameAvailable: store.state.authStore.isUsernameAvailable,
@@ -526,24 +576,4 @@ class _Props extends Equatable {
           return await store.dispatch(selectHomeserver(hostname: hostname));
         },
       );
-
-  @override
-  List<Object> get props => [
-        user,
-        homeserver,
-        isHomeserverValid,
-        username,
-        isUsernameValid,
-        isUsernameAvailable,
-        password,
-        isPasswordValid,
-        email,
-        isEmailValid,
-        creating,
-        captcha,
-        agreement,
-        loading,
-        interactiveAuths,
-        verificationNeeded,
-      ];
 }

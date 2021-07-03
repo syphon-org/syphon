@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +28,10 @@ class SearchHomeserverScreen extends StatefulWidget {
 
 class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
   final searchInputFocusNode = FocusNode();
+  final ExpandableController controller = ExpandableController();
 
   bool searching = false;
-  ExpandableController controller = ExpandableController();
+
   SearchHomeserverScreenState();
 
   @override
@@ -58,6 +57,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
 
   @override
   void dispose() {
+    controller.dispose();
     searchInputFocusNode.dispose();
     super.dispose();
   }

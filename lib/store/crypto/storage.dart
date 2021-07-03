@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/crypto/state.dart';
 
 /// Save Crypto Store
-/// 
+///
 /// Save the crypto store to cold storage
 /// Idealy, run this after performance a pure action
 Future<void> saveCrypto(
@@ -23,9 +22,9 @@ Future<void> saveCrypto(
 }
 
 /// Load Crypto (Cold Storage)
-/// 
-/// In storage, the crypto store is saved in it's entirety 
-/// in a separate thread/isolate 
+///
+/// In storage, the crypto store is saved in it's entirety
+/// in a separate thread/isolate
 Future<CryptoStore?> loadCrypto({required Database storage}) async {
   try {
     final store = StoreRef<String, String>(StorageKeys.CRYPTO);

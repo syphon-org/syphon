@@ -144,9 +144,14 @@ ThunkAction<AppState> initialSync() {
     await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchSync());
 
+    final lastSince = store.state.syncStore.lastSince;
+
     // Fetch All Room Ids - continue showing a sync
-    await store.dispatch(fetchDirectRooms());
-    await store.dispatch(fetchRooms());
+    if (lastSince != null) {
+      await store.dispatch(fetchDirectRooms());
+      await store.dispatch(fetchRooms());
+    }
+
     await store.dispatch(SetSyncing(syncing: false));
   };
 }
@@ -172,8 +177,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
-      final isFullSync =
-          forceFull || since == null || store.state.roomStore.rooms.isEmpty;
+      final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');
@@ -199,26 +203,38 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         throw data['error'];
       }
 
-      // TODO: Unfiltered
-      // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
       // final Map presence = data['presence'];
-      final nextBatch = data['next_batch'];
-      final Map oneTimeKeyCount = data['device_one_time_keys_count'];
-      final Map<String, dynamic>? rawJoined = data['rooms']['join'];
-      final Map<String, dynamic>? rawInvites = data['rooms']['invite'];
-      final Map<String, dynamic>? rawToDevice = data['to_device'];
 
-      // Updates for rooms
-      await store.dispatch(syncRooms(rawJoined));
-      await store.dispatch(syncRooms(rawInvites));
+      final String nextBatch = data['next_batch'];
+      final Map<String, dynamic> roomJson = data['rooms'] ?? {};
+      final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
+      final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
 
-      // Updates for device specific data (mostly room encryption)
-      await store.dispatch(syncDevice(rawToDevice ?? {}));
+      if (roomJson.isNotEmpty) {
+        final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
+        final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
+        // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
 
-      // Update encryption one time key count
-      store.dispatch(updateOneTimeKeyCounts(
-        Map<String, int>.from(oneTimeKeyCount),
-      ));
+        // Updates for rooms
+        if (joinedJson.isNotEmpty) {
+          await store.dispatch(syncRooms(joinedJson));
+        }
+        if (invitesJson.isNotEmpty) {
+          await store.dispatch(syncRooms(invitesJson));
+        }
+      }
+
+      if (toDeviceJson.isNotEmpty) {
+        // Updates for device specific data (mostly room encryption)
+        await store.dispatch(syncDevice(toDeviceJson));
+      }
+
+      if (oneTimeKeyCount.isEmpty) {
+        // Update encryption one time key count
+        store.dispatch(updateOneTimeKeyCounts(
+          Map<String, int>.from(oneTimeKeyCount),
+        ));
+      }
 
       // WARN: may finish a sync poll after logging out
       // TODO: cancel in progress sync polls?
