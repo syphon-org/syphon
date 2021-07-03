@@ -144,9 +144,14 @@ ThunkAction<AppState> initialSync() {
     await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchSync());
 
+    final lastSince = store.state.syncStore.lastSince;
+
     // Fetch All Room Ids - continue showing a sync
-    await store.dispatch(fetchDirectRooms());
-    await store.dispatch(fetchRooms());
+    if (lastSince != null) {
+      await store.dispatch(fetchDirectRooms());
+      await store.dispatch(fetchRooms());
+    }
+
     await store.dispatch(SetSyncing(syncing: false));
   };
 }
@@ -201,18 +206,22 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       // final Map presence = data['presence'];
 
       final String nextBatch = data['next_batch'];
-
       final Map<String, dynamic> roomJson = data['rooms'] ?? {};
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
+      final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
 
       if (roomJson.isNotEmpty) {
-        final Map<String, dynamic>? joinedJson = roomJson['join'];
-        final Map<String, dynamic>? invitesJson = roomJson['invite'];
+        final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
+        final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
         // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
 
         // Updates for rooms
-        await store.dispatch(syncRooms(joinedJson));
-        await store.dispatch(syncRooms(invitesJson));
+        if (joinedJson.isNotEmpty) {
+          await store.dispatch(syncRooms(joinedJson));
+        }
+        if (invitesJson.isNotEmpty) {
+          await store.dispatch(syncRooms(invitesJson));
+        }
       }
 
       if (toDeviceJson.isNotEmpty) {
@@ -220,12 +229,12 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         await store.dispatch(syncDevice(toDeviceJson));
       }
 
-      final Map oneTimeKeyCount = data['device_one_time_keys_count'];
-
-      // Update encryption one time key count
-      store.dispatch(updateOneTimeKeyCounts(
-        Map<String, int>.from(oneTimeKeyCount),
-      ));
+      if (oneTimeKeyCount.isEmpty) {
+        // Update encryption one time key count
+        store.dispatch(updateOneTimeKeyCounts(
+          Map<String, int>.from(oneTimeKeyCount),
+        ));
+      }
 
       // WARN: may finish a sync poll after logging out
       // TODO: cancel in progress sync polls?

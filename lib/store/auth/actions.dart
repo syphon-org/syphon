@@ -1183,8 +1183,6 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
           ) ??
           {};
 
-      printJson(response);
-
       // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
       final loginTypes = (response['flows'] as List).map((flow) => flow['type'] as String).toList();
 

@@ -28,8 +28,7 @@ class StorageSettingsScreen extends StatelessWidget {
               ),
               title: Text(
                 'Storage',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
             ),
             body: Column(
@@ -44,7 +43,7 @@ class StorageSettingsScreen extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: !DEBUG_MODE,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,
@@ -58,7 +57,7 @@ class StorageSettingsScreen extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: !DEBUG_MODE,
+                  visible: DEBUG_MODE,
                   child: ListTile(
                     dense: true,
                     contentPadding: Dimensions.listPadding,

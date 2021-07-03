@@ -90,7 +90,7 @@ class ResetRooms {
 ///
 /// Helper action that will determine how to update a room
 /// from data formatted like a sync request
-ThunkAction<AppState> syncRooms(Map? roomData) {
+ThunkAction<AppState> syncRooms(Map roomData) {
   return (Store<AppState> store) async {
     // init new store containers
     final rooms = store.state.roomStore.rooms;
@@ -98,101 +98,101 @@ ThunkAction<AppState> syncRooms(Map? roomData) {
     final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
-    // syncing null data happens sometimes?
-    if (roomData == null) {
-      return;
-    }
-
     await Future.wait(roomData.keys.map((id) async {
-      final Map json = roomData[id] ?? {};
-      Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
-      List<Message> messages = [];
+      try {
+        final Map json = roomData[id] ?? {};
+        Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        List<Message> messages = [];
 
-      if (json.isEmpty) return;
+        if (json.isEmpty) return;
 
-      // First past to decrypt encrypted events
-      // && json['timeline'] != null theres an issue here
-      if (room.encryptionEnabled) {
-        // reassign the mapped decrypted evets to the json timeline
-        json['timeline']['events'] = await store.dispatch(
-          decryptEvents(room, Map<String, dynamic>.from(json)),
+        // First past to decrypt encrypted events
+        // && json['timeline'] != null theres an issue here
+        if (room.encryptionEnabled) {
+          // reassign the mapped decrypted evets to the json timeline
+          json['timeline']['events'] = await store.dispatch(
+            decryptEvents(room, Map<String, dynamic>.from(json)),
+          );
+        }
+
+        // parse room and events
+        room = await compute(parseRoom, {
+          'json': json,
+          'room': room,
+          'currentUser': user,
+          'lastSince': lastSince,
+        });
+
+        printInfo(
+          '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
         );
-      }
 
-      // parse room and events
-      room = await compute(parseRoom, {
-        'json': json,
-        'room': room,
-        'currentUser': user,
-        'lastSince': lastSince,
-      });
+        // update cold storage
+        await Future.wait([
+          saveUsers(room.usersNew, storage: Storage.main!),
+          saveRooms({room.id: room}, storage: Storage.main),
+          saveReactions(room.reactions, storage: Storage.main!),
+          saveMessages(room.messagesNew, storage: Storage.main!),
+          saveRedactions(room.redactions, storage: Storage.main!),
+          saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
+        ]);
 
-      printInfo(
-        '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
-      );
-
-      // update cold storage
-      await Future.wait([
-        saveUsers(room.usersNew, storage: Storage.main!),
-        saveRooms({room.id: room}, storage: Storage.main),
-        saveReactions(room.reactions, storage: Storage.main!),
-        saveMessages(room.messagesNew, storage: Storage.main!),
-        saveRedactions(room.redactions, storage: Storage.main!),
-        saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
-      ]);
-
-      // mutation filters - handles previously fetched messages
-      messages = await store.dispatch(mutateMessages(
-        messages: room.messagesNew,
-      ));
-
-      // update store
-      await store.dispatch(setUsers(room.usersNew));
-      await store.dispatch(setReactions(reactions: room.reactions));
-      await store.dispatch(setRedactions(redactions: room.redactions));
-      await store.dispatch(setReceipts(
-        room: room,
-        receipts: room.readReceipts,
-      ));
-      await store.dispatch(setMessages(
-        room: room,
-        messages: messages,
-        outbox: room.outbox,
-      ));
-
-      // mutation filters - handles backfilling mutations
-      await store.dispatch(mutateMessagesRoom(room: room));
-
-      // TODO: remove with parsers - clear users from parsed room objects
-      room = room.copyWith(
-        outbox: [],
-        reactions: [],
-        redactions: [],
-        messagesNew: [],
-        users: <String, User>{},
-        readReceipts: <String, ReadReceipt>{},
-      );
-
-      // update room
-      store.dispatch(SetRoom(room: room));
-
-      // fetch avatar if a uri was found
-      if (room.avatarUri != null) {
-        store.dispatch(fetchThumbnail(
-          mxcUri: room.avatarUri,
+        // mutation filters - handles previously fetched messages
+        messages = await store.dispatch(mutateMessages(
+          messages: room.messagesNew,
         ));
-      }
 
-      // and is not already at the end of the last known batch
-      // the end would be room.prevHash == room.lastHash
-      // fetch previous messages since last /sync (a gap)
-      // determined by the fromSync function of room
-      final roomUpdated = store.state.roomStore.rooms[room.id];
-      if (roomUpdated != null && room.limited) {
-        store.dispatch(fetchMessageEvents(
+        // update store
+        await store.dispatch(setUsers(room.usersNew));
+        await store.dispatch(setReactions(reactions: room.reactions));
+        await store.dispatch(setRedactions(redactions: room.redactions));
+        await store.dispatch(setReceipts(
           room: room,
-          from: room.prevHash,
+          receipts: room.readReceipts,
         ));
+        await store.dispatch(setMessages(
+          room: room,
+          messages: messages,
+          outbox: room.outbox,
+        ));
+
+        // mutation filters - handles backfilling mutations
+        await store.dispatch(mutateMessagesRoom(room: room));
+
+        // TODO: remove with parsers - clear users from parsed room objects
+        room = room.copyWith(
+          outbox: [],
+          reactions: [],
+          redactions: [],
+          messagesNew: [],
+          users: <String, User>{},
+          readReceipts: <String, ReadReceipt>{},
+        );
+
+        // update room
+        store.dispatch(SetRoom(room: room));
+
+        // fetch avatar if a uri was found
+        if (room.avatarUri != null) {
+          store.dispatch(fetchThumbnail(
+            mxcUri: room.avatarUri,
+          ));
+        }
+
+        // and is not already at the end of the last known batch
+        // the end would be room.prevHash == room.lastHash
+        // fetch previous messages since last /sync (a gap)
+        // determined by the fromSync function of room
+        final roomUpdated = store.state.roomStore.rooms[room.id];
+        if (roomUpdated != null && room.limited) {
+          printWarning('[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
+          store.dispatch(fetchMessageEvents(
+            room: room,
+            from: room.prevHash,
+          ));
+        }
+      } catch (error) {
+        printError('[syncRoom] error $id ${error.toString()}');
       }
     }));
   };
@@ -282,6 +282,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
+      debugPrint('[fetchSync] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -298,7 +299,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 
       await Future.wait(joinedRoomsList.map((room) async {
         try {
-          store.dispatch(fetchRoom(room.id, fetchState: syncState));
+          await store.dispatch(fetchRoom(room.id, fetchState: syncState));
         } catch (error) {
           debugPrint('[fetchRoom(s)] ${room.id} $error');
         } finally {
@@ -324,6 +325,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
+      debugPrint('[fetchSync] *** starting fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -344,7 +346,7 @@ ThunkAction<AppState> fetchDirectRooms() {
       // Fetch room state and messages by userId/roomId
       await Future.wait(directRoomList.map((roomId) async {
         try {
-          store.dispatch(fetchRoom(roomId, direct: true));
+          await store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
           debugPrint('[fetchDirectRooms] $error');
         }
@@ -417,11 +419,16 @@ ThunkAction<AppState> createRoom({
         room = room.copyWith(
           direct: true,
           name: directUser.displayName ?? directUser.userId,
+          // ignore: unnecessary_cast
           userIds: [
             directUser.userId!,
             currentUser.userId!,
           ] as List<String>,
-          users: {directUser.userId!: directUser, currentUser.userId!: currentUser} as Map<String, User>,
+          // ignore: unnecessary_cast
+          users: {
+            directUser.userId!: directUser,
+            currentUser.userId!: currentUser,
+          } as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));
