@@ -15,6 +15,7 @@ import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
+import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -369,7 +370,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   visible: props.isSSOLoginAvailable && props.isPasswordLoginAvailable,
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
-                                    child: ButtonOutline(
+                                    child: ButtonText(
                                       text: Strings.buttonLoginSSO,
                                       loading: props.loading && currentAuthType == AuthTypes.SSO,
                                       disabled: !props.isSSOLoginAttemptable || currentAuthType != null,

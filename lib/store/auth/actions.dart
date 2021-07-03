@@ -790,10 +790,9 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(SetCreating(creating: true));
 
       final homeserver = store.state.authStore.homeserver.baseUrl;
-      final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
-      final authType = session != null ? credential!.type : loginType;
+      final authType = session != null ? credential!.type : MatrixAuthTypes.DUMMY;
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
 
