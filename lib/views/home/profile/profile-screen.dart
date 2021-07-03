@@ -30,17 +30,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
-  ProfileScreenState({Key? key}) : super();
-
-  File? avatarFileNew;
-
-  String? userIdNew;
-  String? displayNameNew;
+  ProfileScreenState() : super();
 
   final userIdController = TextEditingController();
   final displayNameController = TextEditingController();
 
   final String title = Strings.titleProfile;
+
+  String? userIdNew;
+  String? displayNameNew;
+  File? avatarFileNew;
 
   onMounted(_Props props) {
     displayNameController.value = TextEditingValue(
@@ -60,10 +59,13 @@ class ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
 
-    setState(() {
-      displayNameNew = props.user.displayName;
-    });
+  @override
+  void dispose() {
+    userIdController.dispose();
+    displayNameController.dispose();
+    super.dispose();
   }
 
   onShowImageOptions(context) async {
@@ -100,11 +102,11 @@ class ProfileScreenState extends State<ProfileScreen> {
           background: Colours.hashedColor(formatUsername(props.user)),
         );
 
-        if (this.avatarFileNew != null) {
+        if (avatarFileNew != null) {
           avatarWidget = ClipRRect(
             borderRadius: BorderRadius.circular(imageSize),
             child: Image.file(
-              this.avatarFileNew ?? props.user.avatarUri as File,
+              avatarFileNew!,
               width: imageSize,
               height: imageSize,
               fit: BoxFit.cover,
@@ -114,6 +116,9 @@ class ProfileScreenState extends State<ProfileScreen> {
 
         final backgroundColor = Themes.backgroundBrightness(props.theme);
 
+        final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
+
+        print("$avatarFileNew, $displayNameNew, $userIdNew");
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -171,10 +176,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       Dimensions.iconSizeLarge,
                                     ),
                                     boxShadow: [
-                                      BoxShadow(
-                                          blurRadius: 6,
-                                          offset: Offset(0, 0),
-                                          color: Colors.black54)
+                                      BoxShadow(blurRadius: 6, offset: Offset(0, 0), color: Colors.black54)
                                     ],
                                   ),
                                   child: Icon(
@@ -241,15 +243,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   child: ButtonSolid(
                                     text: Strings.buttonSaveGeneric,
                                     loading: props.loading,
-                                    disabled: props.loading ||
-                                        displayNameNew ==
-                                            props.user.displayName,
+                                    disabled: props.loading || !hasNewInfo,
                                     onPressed: () async {
-                                      final bool successful =
-                                          await props.onSaveProfile(
+                                      final bool successful = await props.onSaveProfile(
                                         userIdNew: null,
-                                        avatarFileNew: this.avatarFileNew,
-                                        displayNameNew: this.displayNameNew,
+                                        avatarFileNew: avatarFileNew,
+                                        displayNameNew: displayNameNew,
                                       );
                                       if (successful) {
                                         Navigator.pop(context);
@@ -302,7 +301,7 @@ class _Props extends Equatable {
   final ThemeType theme;
   final Function onSaveProfile;
 
-  _Props({
+  const _Props({
     required this.user,
     required this.theme,
     required this.loading,
@@ -320,8 +319,7 @@ class _Props extends Equatable {
         }) async {
           final currentUser = store.state.authStore.user;
 
-          if (displayNameNew != null &&
-              currentUser.displayName != displayNameNew) {
+          if (displayNameNew != null && currentUser.displayName != displayNameNew) {
             final bool successful = await store.dispatch(
               updateDisplayName(displayNameNew),
             );

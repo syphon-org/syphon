@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -9,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:syphon/global/dimensions.dart';
 
 class ModalImageOptions extends StatelessWidget {
-  ModalImageOptions({
+  const ModalImageOptions({
     Key? key,
     this.onSetNewAvatar,
   }) : super(key: key);
@@ -56,15 +55,17 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final PickedFile image = await (ImagePicker().getImage(
+                final PickedFile? image = await ImagePicker().getImage(
                   source: ImageSource.camera,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                ) as Future<PickedFile>);
+                );
+
+                if (image == null) return;
 
                 final File imageFile = File(image.path);
-                if (this.onSetNewAvatar != null) {
-                  this.onSetNewAvatar!(image: imageFile);
+                if (onSetNewAvatar != null) {
+                  onSetNewAvatar!(image: imageFile);
                 }
 
                 Navigator.pop(context);
@@ -83,11 +84,13 @@ class ModalImageOptions extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
-                final PickedFile image = await (ImagePicker().getImage(
+                final PickedFile? image = await ImagePicker().getImage(
                   source: ImageSource.gallery,
                   maxWidth: Dimensions.avatarSizeMax,
                   maxHeight: Dimensions.avatarSizeMax,
-                ) as Future<PickedFile>);
+                );
+
+                if (image == null) return;
 
                 final File imageFile = File(image.path);
 
