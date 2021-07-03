@@ -216,7 +216,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           useOnlyLangCode: true,
           startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
-          supportedLocales: const [Locale('en'), Locale('ru')],
+          supportedLocales: const [Locale('en'), Locale('ru'), Locale('pl')],
           child: StoreConnector<AppState, SettingsStore>(
             distinct: true,
             converter: (store) => store.state.settingsStore,

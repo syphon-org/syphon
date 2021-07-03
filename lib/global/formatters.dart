@@ -15,6 +15,8 @@ String formatLanguageCode(String? language) {
       return 'en';
     case 'russian':
       return 'ru';
+    case 'polish':
+      return 'pl';
     default:
       return 'en';
   }
