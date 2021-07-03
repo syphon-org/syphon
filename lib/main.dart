@@ -86,12 +86,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    // set system status bar to match theme.
-    // sadly the navbar doesn't play nicely with just being transparent
-    // so will also be updated on theme change
-    final currentTheme = store.state.settingsStore.theme;
-    initSystemTheme(currentTheme, statusTransparent: false);
-
     store.dispatch(initDeepLinks());
     store.dispatch(initClientSecret());
     store.dispatch(startAuthObserver());
@@ -118,8 +112,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
-        final currentTheme = store.state.settingsStore.theme;
-        initSystemTheme(currentTheme, statusTransparent: false);
+        setupTheme(store.state.settingsStore.themeSettings);
+
         dismissAllNotifications(
           pluginInstance: globalNotificationPluginInstance,
         );
@@ -175,7 +169,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           color = Colors.grey;
       }
 
-      final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occured';
+      final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
 
       globalScaffold.currentState?.showSnackBar(SnackBar(
         backgroundColor: color,
@@ -224,14 +218,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
-              theme: Themes.generateCustomTheme(
-                primaryColorHex: settings.primaryColor,
-                accentColorHex: settings.accentColor,
-                appBarColorHex: settings.appBarColor,
-                fontName: settings.fontName,
-                fontSize: settings.fontSize,
-                themeType: settings.theme,
-              ),
+              theme: setupTheme(settings.themeSettings, generateThemeData: true),
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,

@@ -11,7 +11,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
@@ -118,7 +118,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () => props.onIncrementTheme(),
+                          onTap: () => props.onIncrementThemeType(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
                             'Theme',
@@ -247,7 +247,7 @@ class Props extends Equatable {
   final Function onIncrementFontType;
   final Function onIncrementFontSize;
   final Function onIncrementMessageSize;
-  final Function onIncrementTheme;
+  final Function onIncrementThemeType;
   final Function onToggleRoomTypeBadges;
   final Function onIncrementAvatarShape;
 
@@ -267,7 +267,7 @@ class Props extends Equatable {
     required this.onSelectAppBarColor,
     required this.onIncrementFontType,
     required this.onIncrementFontSize,
-    required this.onIncrementTheme,
+    required this.onIncrementThemeType,
     required this.onToggleRoomTypeBadges,
     required this.onIncrementAvatarShape,
     required this.onIncrementMessageSize,
@@ -288,17 +288,17 @@ class Props extends Equatable {
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         primaryColor:
-            store.state.settingsStore.primaryColor ?? Colours.cyanSyphon,
+            store.state.settingsStore.themeSettings.primaryColor,
         accentColor:
-            store.state.settingsStore.accentColor ?? Colours.cyanSyphon,
+            store.state.settingsStore.themeSettings.accentColor,
         appBarColor:
-            store.state.settingsStore.appBarColor ?? Colours.cyanSyphon,
-        themeType: themeTypeName(store.state),
+            store.state.settingsStore.themeSettings.appBarColor,
+        themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: store.state.settingsStore.fontName,
-        fontSize: store.state.settingsStore.fontSize,
-        messageSize: store.state.settingsStore.messageSize,
-        avatarShape: store.state.settingsStore.avatarShape,
+        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
+        fontSize: selectFontSizeString(store.state.settingsStore.themeSettings.fontSize),
+        messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
@@ -324,8 +324,8 @@ class Props extends Equatable {
         onIncrementMessageSize: () => store.dispatch(
           incrementMessageSize(),
         ),
-        onIncrementTheme: () => store.dispatch(
-          incrementTheme(),
+        onIncrementThemeType: () => store.dispatch(
+          incrementThemeType(),
         ),
         onIncrementAvatarShape: () => store.dispatch(
           incrementAvatarShape(),
