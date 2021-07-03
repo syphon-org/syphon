@@ -28,7 +28,7 @@ class Homeserver extends Equatable {
     this.photoUrl,
     this.identityUrl,
     this.loginType,
-    this.loginTypes = const [MatrixAuthTypes.PASSWORD],
+    this.loginTypes = const [MatrixAuthTypes.PASSWORD, MatrixAuthTypes.SSO],
     this.location,
     this.description,
     this.usersActive,
