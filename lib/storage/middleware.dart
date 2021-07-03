@@ -57,7 +57,7 @@ dynamic storageMiddleware<State>(
         deleteRooms({room.id: room}, storage: Storage.main);
       }
       break;
-    case SetTheme:
+    case SetThemeType:
     case SetPrimaryColor:
     case SetAvatarShape:
     case SetAccentColor:
@@ -68,7 +68,7 @@ dynamic storageMiddleware<State>(
     case SetRoomPrimaryColor:
     case SetDevices:
     case SetLanguage:
-    case SetEnterSend:
+    case ToggleEnterSend:
     case ToggleRoomTypeBadges:
     case ToggleMembershipEvents:
     case ToggleNotifications:

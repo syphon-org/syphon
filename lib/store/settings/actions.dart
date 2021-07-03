@@ -7,7 +7,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
-import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
@@ -15,9 +15,9 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
-class SetTheme {
-  final ThemeType theme;
-  SetTheme(this.theme);
+class SetThemeType {
+  final ThemeType themeType;
+  SetThemeType(this.themeType);
 }
 
 class SetPrimaryColor {
@@ -26,7 +26,7 @@ class SetPrimaryColor {
 }
 
 class SetAvatarShape {
-  final String? avatarShape;
+  final AvatarShape? avatarShape;
   SetAvatarShape({this.avatarShape});
 }
 
@@ -41,17 +41,17 @@ class SetAppBarColor {
 }
 
 class SetFontName {
-  final String? fontName;
+  final FontName? fontName;
   SetFontName({this.fontName});
 }
 
 class SetFontSize {
-  final String? fontSize;
+  final FontSize? fontSize;
   SetFontSize({this.fontSize});
 }
 
 class SetMessageSize {
-  final String? messageSize;
+  final MessageSize? messageSize;
   SetMessageSize({this.messageSize});
 }
 
@@ -85,11 +85,6 @@ class SetLanguage {
   SetLanguage({this.language});
 }
 
-class SetEnterSend {
-  final bool? enterSend;
-  SetEnterSend({this.enterSend});
-}
-
 class SetSyncInterval {
   final int syncInterval;
   SetSyncInterval({
@@ -103,6 +98,8 @@ class SetPollTimeout {
     required this.pollTimeout,
   });
 }
+
+class ToggleEnterSend {}
 
 class ToggleDismissKeyboard {}
 
@@ -293,81 +290,73 @@ ThunkAction<AppState> updateAppBarColor(int color) {
   };
 }
 
-/// Iterate over fontFamilies on action
+/// Iterate over FontNames on action
 ThunkAction<AppState> incrementFontType() {
   return (Store<AppState> store) async {
-    final currentFontType = store.state.settingsStore.fontName;
-    final currentIndex = Values.fontFamilies.indexOf(currentFontType);
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final fontNameIndex = FontName.values.indexOf(currentTheme.fontName);
 
     store.dispatch(SetFontName(
       fontName:
-          Values.fontFamilies[(currentIndex + 1) % Values.fontFamilies.length],
+        FontName.values[(fontNameIndex + 1) % FontName.values.length],
     ));
   };
 }
 
-/// Iterate over fontFamilies on action
+/// Iterate over FontSizes on action
 ThunkAction<AppState> incrementFontSize() {
   return (Store<AppState> store) async {
-    final currentFontSize = store.state.settingsStore.fontSize;
-    final fontSizes = Values.fontSizes;
-    final currentIndex = fontSizes.indexOf(currentFontSize);
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final fontSizeIndex = FontSize.values.indexOf(currentTheme.fontSize);
 
     store.dispatch(SetFontSize(
-      fontSize: fontSizes[(currentIndex + 1) % fontSizes.length],
+      fontSize: FontSize.values[(fontSizeIndex + 1) % FontSize.values.length],
     ));
   };
 }
 
-/// Iterate over fontFamilies on action
+/// Iterate over MessageSizes on action
 ThunkAction<AppState> incrementMessageSize() {
   return (Store<AppState> store) async {
-    final currentMessageSize = store.state.settingsStore.messageSize;
-    final messageSizes = Values.messageSizes;
-    final currentIndex = messageSizes.indexOf(currentMessageSize);
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final messageSizeIndex = MessageSize.values.indexOf(currentTheme.messageSize);
 
     store.dispatch(SetMessageSize(
-      messageSize: messageSizes[(currentIndex + 1) % messageSizes.length],
+      messageSize: MessageSize.values[(messageSizeIndex + 1) % MessageSize.values.length],
     ));
   };
 }
 
-/// Iterate over theme types on action
-ThunkAction<AppState> incrementTheme() {
+/// Iterate over ThemeTypes on action
+ThunkAction<AppState> incrementThemeType() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.theme;
-    final themeIndex = ThemeType.values.indexOf(currentTheme);
-    final nextTheme =
-        ThemeType.values[(themeIndex + 1) % ThemeType.values.length];
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final themeTypeIndex = ThemeType.values.indexOf(currentTheme.themeType);
+    final nextThemeType = ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
-    initSystemTheme(nextTheme, statusTransparent: false);
+    setSystemTheme(nextThemeType);
 
-    store.dispatch(SetTheme(nextTheme));
+    store.dispatch(SetThemeType(nextThemeType));
   };
 }
 
+/// Iterate over AvatarShapes on action
 ThunkAction<AppState> incrementAvatarShape() {
   return (Store<AppState> store) async {
-    final currentShape = store.state.settingsStore.avatarShape;
-    var newShape;
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
 
-    switch (currentShape) {
-      case 'Circle':
-        newShape = 'Square';
-        break;
-      default:
-        newShape = 'Circle';
-        break;
-    }
-
-    store.dispatch(SetAvatarShape(avatarShape: newShape));
+    store.dispatch(SetAvatarShape(
+      avatarShape:
+      AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
+    ));
   };
 }
 
-final languages = ['English', 'Russian', 'Polish'];
-
 ThunkAction<AppState> incrementLanguage(context) {
+  final languages = ['English', 'Russian', 'Polish'];
+
   return (Store<AppState> store) async {
     final languageIndex = languages.indexWhere(
       (name) => name == store.state.settingsStore.language,
@@ -404,11 +393,7 @@ ThunkAction<AppState> toggleTimeFormat() {
 
 ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
-    store.dispatch(
-      SetEnterSend(
-        enterSend: !store.state.settingsStore.enterSendEnabled,
-      ),
-    );
+    store.dispatch(ToggleEnterSend());
   };
 }
 

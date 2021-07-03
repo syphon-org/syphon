@@ -8,7 +8,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -92,7 +93,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          final backgroundColor = Themes.backgroundBrightness(props.theme);
+          final backgroundColor = selectBackgroundBrightness(props.themeType);
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
@@ -433,7 +434,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final ThemeType theme;
+  final ThemeType themeType;
   final String? homeserver;
   final List<User> users;
 
@@ -442,7 +443,7 @@ class _Props extends Equatable {
 
   _Props({
     required this.users,
-    required this.theme,
+    required this.themeType,
     required this.loading,
     required this.homeserver,
     required this.onCreateRoomPublic,
@@ -452,14 +453,14 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [
         users,
-        theme,
+        themeType,
         loading,
         homeserver,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         users: store.state.userStore.invites,
-        theme: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         homeserver: store.state.authStore.user.homeserverName,
         loading: store.state.authStore.loading,
         onClearUserInvites: () => store.dispatch(

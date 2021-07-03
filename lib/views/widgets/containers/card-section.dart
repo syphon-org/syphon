@@ -6,7 +6,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/themes.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/index.dart';
 
 class CardSection extends StatelessWidget {
@@ -28,29 +29,12 @@ class CardSection extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          var backgroundColor = Color(Colours.whiteDefault);
-
-          switch (props.type) {
-            case ThemeType.DARK:
-              backgroundColor = Color(Colours.blackDefault);
-              break;
-            case ThemeType.DARKER:
-              backgroundColor = Color(Colours.blackDefault);
-              break;
-            case ThemeType.NIGHT:
-              backgroundColor = Color(Colours.blackFull);
-              break;
-            case ThemeType.LIGHT:
-              backgroundColor = Color(Colours.whiteDefault);
-              break;
-            default:
-              break;
-          }
 
           return Card(
             margin: margin ?? EdgeInsets.symmetric(vertical: 4),
             elevation: elevation ?? 0.5,
-            color: backgroundColor,
+            // Re-use the System UI color because they are exactly the same
+            color: Color(selectSystemUiColor(props.themeType)),
             child: Container(
               padding: padding ?? EdgeInsets.only(top: 12),
               child: child,
@@ -61,18 +45,18 @@ class CardSection extends StatelessWidget {
 }
 
 class Props extends Equatable {
-  final ThemeType type;
+  final ThemeType themeType;
 
   Props({
-    required this.type,
+    required this.themeType,
   });
 
   @override
   List<Object> get props => [
-        type,
+        themeType,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        type: store.state.settingsStore.theme,
+        themeType: store.state.settingsStore.themeSettings.themeType,
       );
 }
