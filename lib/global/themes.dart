@@ -54,6 +54,11 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       primaryColorLight: primaryColor,
       accentColor: accentColor,
       brightness: brightness,
+      colorScheme: ThemeData().colorScheme.copyWith(
+        primary: primaryColor,
+        secondary: accentColor,
+        brightness: brightness,
+      ),
 
       // Core UI
       dialogBackgroundColor: dialogBackgroundColor,
