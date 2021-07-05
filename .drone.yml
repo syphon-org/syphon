@@ -52,8 +52,8 @@ steps:
       - flutter config --enable-linux-desktop
       # Build the linux app exec
       - flutter build linux -v --release
-      - cd build/linux/x64/release/bundle
-      - tar -cvzf syphon.linux.x64.tar.gz .
+      - cd build/linux/x64/release && mv bundle syphon
+      - tar -cvzf syphon.linux.x64.tar.gz syphon/
 
   - name: release linux
     image: golang:1.13
@@ -67,13 +67,15 @@ steps:
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release delete -y --delete-tag --repo syphon-org/syphon ${DRONE_BRANCH}
-      - tea release create --tag ${DRONE_BRANCH} --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
 
 ---
 kind: pipeline
 type: docker
 name: linux deploy prod
 trigger:
+  branch:
+    - main
   event:
     - tag
 steps:
