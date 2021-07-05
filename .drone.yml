@@ -65,7 +65,6 @@ steps:
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release delete -y --delete-tag --repo syphon-org/syphon ${DRONE_BRANCH}
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
 
 ---
