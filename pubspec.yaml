@@ -17,6 +17,10 @@ description: a privacy focused matrix client
 # $ pub cache repair
 # $ flutter pub cache repair
 
+# release commands
+# flutter build android --release
+# flutter build macos --release
+
 # mobile development commands
 # $ xcrun simctl delete unavailable
 # $ xcrun simctl list devices

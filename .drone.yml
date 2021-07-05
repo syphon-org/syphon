@@ -52,7 +52,8 @@ steps:
       - flutter config --enable-linux-desktop
       # Build the linux app exec
       - flutter build linux -v --release
-      - tar -cvzf syphon.linux.x64.tar.gz build/linux/x64/release/bundle
+      - cd build/linux/x64/release/bundle
+      - tar -cvzf syphon.linux.x64.tar.gz .
 
   - name: release linux
     image: golang:1.13

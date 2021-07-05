@@ -15,4 +15,4 @@
 - iOS now has auto-correct and autocomplete on by default for chat input
 
 📐 Refactoring
-- Lots! 
+- Theme refactoring w/ native android transparency improvements (Thanks @0x1a8510f2)
