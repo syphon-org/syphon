@@ -72,7 +72,7 @@ Future<Database?> initStorage() async {
 
     return Storage.main;
   } catch (error) {
-    print('[initStorage] $error');
+    printDebug('[initStorage] $error');
     return null;
   }
 }
