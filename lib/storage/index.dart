@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/cache/index.dart';
@@ -73,19 +72,19 @@ Future<Database?> initStorage() async {
 
     return Storage.main;
   } catch (error) {
-    debugPrint('[initStorage] $error');
+    print('[initStorage] $error');
     return null;
   }
 }
 
 // // Closes and saves storage
-void closeStorage() async {
+closeStorage() async {
   if (Storage.main != null) {
     Storage.main!.close();
   }
 }
 
-Future<void> deleteStorage() async {
+Future deleteStorage() async {
   try {
     late DatabaseFactory storageFactory;
 
@@ -109,17 +108,16 @@ Future<void> deleteStorage() async {
   }
 }
 
-/**
- * Load Storage
- * 
- * bulk loads cold storage objects to RAM, this can
- * be much more specific and performant
- * 
- * for example, only load users that are known to be
- * involved in stored messages/events
- * 
- * TODO: need pagination for pretty much all of these
- */
+///
+/// Load Storage
+///
+/// bulk loads cold storage objects to RAM, this can
+/// be much more specific and performant
+///
+/// for example, only load users that are known to be
+/// involved in stored messages/events
+///
+/// TODO: need pagination for pretty much all of these
 Future<Map<String, dynamic>> loadStorage(Database storage) async {
   try {
     final auth = await loadAuth(storage: storage);
