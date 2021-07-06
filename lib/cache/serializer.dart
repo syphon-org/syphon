@@ -123,8 +123,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             mediaStore = MediaStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SettingsStore':
-            settingsStore =
-                SettingsStore.fromJson(store as Map<String, dynamic>);
+            settingsStore = SettingsStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'UserStore':
             userStore = UserStore.fromJson(store as Map<String, dynamic>);
@@ -164,8 +163,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             messages: preloaded['messages'] ?? Map<String, List<Message>>(),
             reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
             redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded['receipts'] ??
-                Map<String, Map<String, ReadReceipt>>(),
+            receipts: preloaded['receipts'] ?? Map<String, Map<String, ReadReceipt>>(),
           ),
       syncStore: syncStore ?? SyncStore(),
       settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),
