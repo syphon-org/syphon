@@ -791,6 +791,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
 /// Manage and load Olm sessions for pre-key messages or indications
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
+///
 ThunkAction<AppState> loadKeySessionInbound({
   int? type,
   String? body,

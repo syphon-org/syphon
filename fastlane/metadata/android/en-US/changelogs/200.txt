@@ -1,0 +1,18 @@
+# 0.1.10
+
+🔮 New Features:
+- Deactivate Account
+- Chat Bubble Color Customization
+
+🐛 Bug Fixes
+- SSO + User/Pass Login issues
+- Profile update issues
+- Issue removing chats from chat history
+- Issues regarding chat previews on home appearing grey
+- Issues surrounding signup flow user experience
+- Color contrast and theming issues throughout the app
+- Timeline will only show chat updates based on messages
+- iOS now has auto-correct and autocomplete on by default for chat input
+
+📐 Refactoring
+- Theme refactoring w/ native android transparency improvements (Thanks @0x1a8510f2)

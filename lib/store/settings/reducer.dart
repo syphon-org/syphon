@@ -12,31 +12,31 @@ SettingsStore settingsReducer(
       );
     case SetPrimaryColor:
       return state.copyWith(
-        primaryColor: action.color,
+        themeSettings: state.themeSettings.copyWith(primaryColor: action.color),
       );
     case SetAccentColor:
       return state.copyWith(
-        accentColor: action.color,
+        themeSettings: state.themeSettings.copyWith(accentColor: action.color),
       );
     case SetAppBarColor:
       return state.copyWith(
-        appBarColor: action.color,
+        themeSettings: state.themeSettings.copyWith(appBarColor: action.color),
       );
     case SetFontName:
       return state.copyWith(
-        fontName: action.fontName,
+        themeSettings: state.themeSettings.copyWith(fontName: action.fontName),
       );
     case SetFontSize:
       return state.copyWith(
-        fontSize: action.fontSize,
+        themeSettings: state.themeSettings.copyWith(fontSize: action.fontSize),
       );
     case SetMessageSize:
       return state.copyWith(
-        messageSize: action.messageSize,
+        themeSettings: state.themeSettings.copyWith(messageSize: action.messageSize),
       );
     case SetAvatarShape:
       return state.copyWith(
-        avatarShape: action.avatarShape,
+        themeSettings: state.themeSettings.copyWith(avatarShape: action.avatarShape),
       );
     case SetDevices:
       return state.copyWith(
@@ -71,13 +71,13 @@ SettingsStore settingsReducer(
       return state.copyWith(
         language: action.language,
       );
-    case SetTheme:
+    case SetThemeType:
       return state.copyWith(
-        theme: action.theme,
+        themeSettings: state.themeSettings.copyWith(themeType: action.themeType),
       );
-    case SetEnterSend:
+    case ToggleEnterSend:
       return state.copyWith(
-        enterSendEnabled: action.enterSendEnabled,
+        enterSendEnabled: !state.enterSendEnabled,
       );
     case SetSyncInterval:
       return state.copyWith(

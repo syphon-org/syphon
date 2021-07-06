@@ -790,10 +790,9 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(SetCreating(creating: true));
 
       final homeserver = store.state.authStore.homeserver.baseUrl;
-      final loginType = store.state.authStore.homeserver.loginType;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.session;
-      final authType = session != null ? credential!.type : loginType;
+      final authType = session != null ? credential!.type : MatrixAuthTypes.DUMMY;
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
 
@@ -1184,9 +1183,9 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
           {};
 
       // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
-      final loginType = (response['flows'] as List).elementAt(0)['type'];
+      final loginTypes = (response['flows'] as List).map((flow) => flow['type'] as String).toList();
 
-      homeserver = homeserver.copyWith(loginType: loginType);
+      homeserver = homeserver.copyWith(loginTypes: loginTypes);
     } catch (error) {}
 
     store.dispatch(SetLoading(loading: false));

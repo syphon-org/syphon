@@ -10,6 +10,7 @@ import 'package:sqlite3/open.dart';
 import 'package:syphon/global/print.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider_linux/path_provider_linux.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
 ///
@@ -20,7 +21,8 @@ import 'package:syphon/store/sync/background/service.dart';
 ///
 Future<void> initPlatformDependencies() async {
   // disable debugPrint when in release mode
-  if (kReleaseMode) {
+
+  if (!DEBUG_MODE) {
     debugPrint = (String? message, {int? wrapWidth}) {};
     printDebug = (String message, {String? title}) {};
     printInfo = (String message, {String? title}) {};

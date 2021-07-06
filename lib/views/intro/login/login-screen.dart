@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +9,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
+import 'package:syphon/store/auth/selectors.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/buttons/button-outline.dart';
+import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -21,11 +24,8 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
-
-final bool debug = !kReleaseMode;
 
 class LoginScreen extends StatefulWidget {
   final Store<AppState>? store;
@@ -40,18 +40,9 @@ class LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   bool visibility = false;
+  AuthTypes? currentAuthType;
 
-  LoginScreenState({Key? key});
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  LoginScreenState();
 
   @override
   void dispose() {
@@ -59,6 +50,30 @@ class LoginScreenState extends State<LoginScreen> {
     passwordController.dispose();
     passwordFocus.dispose();
     super.dispose();
+  }
+
+  onLoginPassword(_Props props) async {
+    setState(() {
+      currentAuthType = AuthTypes.Password;
+    });
+
+    await props.onLoginUser();
+
+    setState(() {
+      currentAuthType = null;
+    });
+  }
+
+  onLoginSSO(_Props props) async {
+    setState(() {
+      currentAuthType = AuthTypes.SSO;
+    });
+
+    await props.onLoginUserSSO();
+
+    setState(() {
+      currentAuthType = null;
+    });
   }
 
   buildSSOLogin(_Props props) {
@@ -114,7 +129,7 @@ class LoginScreenState extends State<LoginScreen> {
               label: props.usernameHint,
               disableSpacing: true,
               controller: usernameController,
-              autofillHints: [AutofillHints.username],
+              autofillHints: const [AutofillHints.username],
               formatters: [FilteringTextInputFormatter.deny(RegExp(r'@@'))],
               onSubmitted: (text) {
                 FocusScope.of(context).requestFocus(passwordFocus);
@@ -151,7 +166,7 @@ class LoginScreenState extends State<LoginScreen> {
             focusNode: passwordFocus,
             obscureText: !visibility,
             textAlign: TextAlign.left,
-            autofillHints: [AutofillHints.password],
+            autofillHints: const [AutofillHints.password],
             onChanged: (password) {
               props.onChangePassword(password);
             },
@@ -201,7 +216,7 @@ class LoginScreenState extends State<LoginScreen> {
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
+                  children: const <Widget>[
                     Text(
                       'Forgot Password?',
                       textAlign: TextAlign.center,
@@ -222,8 +237,8 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -235,7 +250,7 @@ class LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           actions: <Widget>[
             Visibility(
-              visible: debug,
+              visible: DEBUG_MODE,
               child: IconButton(
                 icon: Icon(Icons.settings),
                 iconSize: Dimensions.iconSizeLarge,
@@ -280,7 +295,7 @@ class LoginScreenState extends State<LoginScreen> {
                       children: <Widget>[
                         TouchableOpacity(
                           onTap: () {
-                            props.onIncrementTheme();
+                            props.onIncrementThemeType();
                           },
                           child: Container(
                             constraints: BoxConstraints(
@@ -309,12 +324,11 @@ class LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Visibility(
-                            visible: props.loginType == MatrixAuthTypes.PASSWORD ||
-                                props.loginType == MatrixAuthTypes.DUMMY,
+                            visible: props.isPasswordLoginAvailable,
                             child: buildPasswordLogin(props),
                           ),
                           Visibility(
-                            visible: props.loginType == MatrixAuthTypes.SSO,
+                            visible: props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
                             child: buildSSOLogin(props),
                           ),
                         ],
@@ -329,25 +343,39 @@ class LoginScreenState extends State<LoginScreen> {
                       children: <Widget>[
                         Container(
                             padding: const EdgeInsets.only(top: 26, bottom: 12),
-                            child: Stack(
+                            child: Column(
                               children: [
                                 Visibility(
-                                  visible: props.loginType == MatrixAuthTypes.PASSWORD ||
-                                      props.loginType == MatrixAuthTypes.DUMMY,
+                                  visible: props.isPasswordLoginAvailable,
                                   child: ButtonSolid(
                                     text: Strings.buttonLogin,
-                                    loading: props.loading,
-                                    disabled: !props.isLoginAttemptable,
-                                    onPressed: () => props.onLoginUser(),
+                                    loading: props.loading && currentAuthType == AuthTypes.Password,
+                                    disabled: !props.isPasswordLoginAttemptable || currentAuthType != null,
+                                    onPressed: () => onLoginPassword(props),
                                   ),
                                 ),
                                 Visibility(
-                                  visible: props.loginType == MatrixAuthTypes.SSO,
-                                  child: ButtonSolid(
-                                    text: Strings.buttonLoginSSO,
-                                    loading: props.loading,
-                                    disabled: !props.isLoginAttemptable,
-                                    onPressed: () => props.onLoginUser(),
+                                  visible: props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
+                                  child: Container(
+                                    padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                    child: ButtonSolid(
+                                      text: Strings.buttonLoginSSO,
+                                      loading: props.loading && currentAuthType == AuthTypes.SSO,
+                                      disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
+                                      onPressed: () => onLoginSSO(props),
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: props.isSSOLoginAvailable && props.isPasswordLoginAvailable,
+                                  child: Container(
+                                    padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                    child: ButtonText(
+                                      text: Strings.buttonLoginSSO,
+                                      loading: props.loading && currentAuthType == AuthTypes.SSO,
+                                      disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
+                                      onPressed: () => onLoginSSO(props),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -408,14 +436,19 @@ class _Props extends Equatable {
   final bool loading;
   final String username;
   final String password;
-  final bool isLoginAttemptable;
+  final bool isPasswordLoginAttemptable;
+  final bool isSSOLoginAttemptable;
   final String usernameHint;
-  final String? loginType;
+  final List<String> loginTypes;
   final Homeserver homeserver;
+
+  final bool isPasswordLoginAvailable;
+  final bool isSSOLoginAvailable;
 
   final Function onDebug;
   final Function onLoginUser;
-  final Function onIncrementTheme;
+  final Function onLoginUserSSO;
+  final Function onIncrementThemeType;
   final Function onChangeUsername;
   final Function onChangePassword;
   final Function onChangeHomeserver;
@@ -425,13 +458,17 @@ class _Props extends Equatable {
     required this.loading,
     required this.username,
     required this.password,
-    required this.loginType,
+    required this.loginTypes,
+    required this.isPasswordLoginAvailable,
+    required this.isSSOLoginAvailable,
     required this.homeserver,
-    required this.isLoginAttemptable,
+    required this.isPasswordLoginAttemptable,
+    required this.isSSOLoginAttemptable,
     required this.usernameHint,
     required this.onDebug,
     required this.onLoginUser,
-    required this.onIncrementTheme,
+    required this.onLoginUserSSO,
+    required this.onIncrementThemeType,
     required this.onChangeUsername,
     required this.onChangePassword,
     required this.onChangeHomeserver,
@@ -444,7 +481,10 @@ class _Props extends Equatable {
         username,
         password,
         usernameHint,
-        isLoginAttemptable,
+        onIncrementThemeType,
+        isPasswordLoginAttemptable,
+        isSSOLoginAttemptable,
+        loginTypes,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -452,12 +492,11 @@ class _Props extends Equatable {
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         homeserver: store.state.authStore.homeserver,
-        loginType: store.state.authStore.homeserver.loginType,
-        isLoginAttemptable: store.state.authStore.homeserver.loginType == MatrixAuthTypes.SSO ||
-            (store.state.authStore.isPasswordValid &&
-                store.state.authStore.isUsernameValid &&
-                !store.state.authStore.loading &&
-                !store.state.authStore.stopgap),
+        loginTypes: store.state.authStore.homeserver.loginTypes,
+        isSSOLoginAvailable: selectSSOEnabled(store.state),
+        isPasswordLoginAvailable: selectPasswordEnabled(store.state),
+        isSSOLoginAttemptable: selectSSOLoginAttemptable(store.state),
+        isPasswordLoginAttemptable: selectPasswordLoginAttemptable(store.state),
         usernameHint: Strings.formatUsernameHint(
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
@@ -479,11 +518,21 @@ class _Props extends Equatable {
         onChangePassword: (String text) {
           store.dispatch(setLoginPassword(password: text));
         },
-        onIncrementTheme: () {
-          store.dispatch(incrementTheme());
+        onIncrementThemeType: () {
+          store.dispatch(incrementThemeType());
         },
         onDebug: () async {
           store.dispatch(initClientSecret());
+        },
+        onLoginUserSSO: () async {
+          final hostname = store.state.authStore.hostname;
+          final homeserver = store.state.authStore.homeserver;
+
+          if (hostname != homeserver.hostname) {
+            return store.dispatch(selectHomeserver(hostname: hostname));
+          }
+
+          return await store.dispatch(loginUserSSO());
         },
         onLoginUser: () async {
           final hostname = store.state.authStore.hostname;
@@ -492,11 +541,6 @@ class _Props extends Equatable {
           if (hostname != homeserver.hostname) {
             return store.dispatch(selectHomeserver(hostname: hostname));
           }
-
-          if (homeserver.loginType == MatrixAuthTypes.SSO) {
-            return await store.dispatch(loginUserSSO());
-          }
-
           return await store.dispatch(loginUser());
         },
       );

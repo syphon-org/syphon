@@ -27,9 +27,7 @@ class ButtonText extends StatelessWidget {
         style: ButtonStyle(
           foregroundColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) =>
-                states.contains(MaterialState.disabled)
-                    ? Color(Colours.greyDisabled)
-                    : null,
+                states.contains(MaterialState.disabled) ? Color(Colours.greyDisabled) : null,
           ),
         ),
         onPressed: disabled ? null : onPressed as void Function()?,
@@ -62,7 +60,7 @@ class ButtonText extends StatelessWidget {
                         if (color != null) {
                           return color;
                         }
-                        return Theme.of(context).textTheme.bodyText1?.color;
+                        return Theme.of(context).primaryColor;
                       }(),
                     ),
                   )),

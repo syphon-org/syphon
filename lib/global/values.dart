@@ -61,24 +61,7 @@ class Values {
   static const serviceNotificationTimeoutDuration = 75000; // millis
 
   static const defaultHeaders = {'Content-Type': 'application/json'};
-  static const fontFamilies = [
-    'Rubik',
-    'Roboto',
-    'Poppins',
-    'Inter',
-  ];
 
-  static const fontSizes = [
-    'Small',
-    'Default',
-    'Large',
-  ];
-
-  static const messageSizes = [
-    'Small',
-    'Default',
-    'Large',
-  ];
 }
 
 // ignore: non_constant_identifier_names

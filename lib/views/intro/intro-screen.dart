@@ -56,7 +56,8 @@ class IntroScreenState extends State<IntroScreen> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-    // NOTE: SchedulerBinding still needed to have navigator context in dialogs
+
+    // NOTE: SchedulerBinding still needed in screen child views
     SchedulerBinding.instance!.addPostFrameCallback((_) {
       onMounted();
     });

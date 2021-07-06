@@ -36,14 +36,13 @@ class CaptchaState extends State<Captcha> {
   final String? publickey;
   final Function? onVerified;
 
-  final Completer<WebViewController> controller =
-      Completer<WebViewController>();
+  final Completer<WebViewController> controller = Completer<WebViewController>();
 
   @override
   void initState() {
     super.initState();
 
-    // NOTE: SchedulerBinding still needed to have navigator context in dialogs
+    // NOTE: SchedulerBinding still needed in screen child views
     SchedulerBinding.instance!.addPostFrameCallback((_) {
       onMounted();
     });

@@ -11,7 +11,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -145,7 +145,7 @@ class SettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
-                              'Theme ${props.theme}, Font ${props.font}',
+                              'Theme ${props.themeTypeName}, Font ${props.fontName}',
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
@@ -250,15 +250,15 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool? notificationsEnabled;
-  final String? font;
-  final String theme;
+  final String? fontName;
+  final String themeTypeName;
 
   final Function onDisabled;
   final Function onLogoutUser;
 
   _Props({
-    required this.font,
-    required this.theme,
+    required this.fontName,
+    required this.themeTypeName,
     required this.loading,
     required this.authLoading,
     required this.notificationsEnabled,
@@ -268,7 +268,7 @@ class _Props extends Equatable {
 
   @override
   List<Object?> get props => [
-        theme,
+        themeTypeName,
         loading,
         authLoading,
         notificationsEnabled,
@@ -278,8 +278,8 @@ class _Props extends Equatable {
     Store<AppState> store,
   ) =>
       _Props(
-        font: fontName(store.state),
-        theme: themeTypeName(store.state),
+        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
+        themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
         notificationsEnabled:
