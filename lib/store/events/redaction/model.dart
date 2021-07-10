@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/events/model.dart';
 
 part 'model.g.dart';
@@ -56,8 +55,7 @@ class Redaction extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$RedactionToJson(this);
-  factory Redaction.fromJson(Map<String, dynamic> json) =>
-      _$RedactionFromJson(json);
+  factory Redaction.fromJson(Map<String, dynamic> json) => _$RedactionFromJson(json);
 
   factory Redaction.fromEvent(Event event) {
     return Redaction(

@@ -37,7 +37,6 @@ Brightness selectSystemUiIconColor(ThemeType themeType) {
 }
 
 Color selectBackgroundBrightness(ThemeType themeType) {
-  // A non-null assertion is made because the values are hardcoded
   switch (themeType) {
     case ThemeType.Light:
       return Color(Colours.greyLightest);
@@ -88,25 +87,32 @@ int? selectScaffoldBackgroundColor(ThemeType themeType) {
   }
 }
 
-Color selectChatInputTextColor(ThemeType themeType) {
+Color selectInputTextColor(ThemeType themeType) {
   switch (themeType) {
-    case ThemeType.Light: return Color(Colours.blackDefault);
-    default: return Colors.white;
+    case ThemeType.Light:
+      return Color(Colours.blackDefault);
+    default:
+      return Colors.white;
   }
 }
 
-Color selectChatInputCursorColor(ThemeType themeType) {
+Color selectCursorColor(ThemeType themeType) {
   switch (themeType) {
-    case ThemeType.Light: return Colors.blueGrey;
-    default: return Colors.white;
+    case ThemeType.Light:
+      return Colors.blueGrey;
+    default:
+      return Colors.white;
   }
 }
 
-Color selectChatInputBackgroundColor(ThemeType themeType) {
+Color selectInputBackgroundColor(ThemeType themeType) {
   switch (themeType) {
-    case ThemeType.Light: return Color(Colours.greyEnabled);
-    case ThemeType.Dark: return Colors.grey[800]!;
-    default: return Colors.grey[850]!;
+    case ThemeType.Light:
+      return Color(Colours.greyEnabled);
+    case ThemeType.Dark:
+      return Colors.grey[800]!;
+    default:
+      return Colors.grey[850]!;
   }
 }
 
@@ -120,8 +126,6 @@ double? selectAppBarElevation(ThemeType themeType) {
       return null;
   }
 }
-
-// FontName
 
 String selectFontNameString(FontName fontName) {
   return enumToString(fontName);
@@ -151,8 +155,6 @@ FontWeight selectFontBodyWeight(FontName fontName) {
       return FontWeight.w400;
   }
 }
-
-// FontSize
 
 String selectFontSizeString(FontSize fontSize) {
   return enumToString(fontSize);
@@ -202,13 +204,9 @@ double selectFontBodySizeLarge(FontSize fontSize) {
   }
 }
 
-// MessageSize
-
 String selectMessageSizeString(MessageSize messageSize) {
   return enumToString(messageSize);
 }
-
-// AvatarShape
 
 String selectAvatarShapeString(AvatarShape avatarShape) {
   return enumToString(avatarShape);

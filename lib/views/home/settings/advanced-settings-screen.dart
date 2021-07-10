@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 
@@ -16,7 +15,6 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
