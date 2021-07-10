@@ -18,6 +18,8 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 
 class ChatInput extends StatefulWidget {
   final String roomId;
@@ -60,10 +62,6 @@ class ChatInputState extends State<ChatInput> {
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
 
-  Color inputTextColor = const Color(Colours.blackDefault);
-  Color inputColorBackground = const Color(Colours.greyEnabled);
-  Color inputCursorColor = Colors.blueGrey;
-  Color? sendButtonColor = const Color(Colours.greyDisabled);
   String hintText = Strings.placeholderInputMatrixUnencrypted;
 
   @protected
@@ -84,14 +82,7 @@ class ChatInputState extends State<ChatInput> {
         });
       }
     });
-
-    if (Theme.of(context).brightness == Brightness.dark) {
-      setState(() {
-        inputTextColor = Colors.white;
-        inputCursorColor = Colors.white;
-        inputColorBackground = Colors.blueGrey;
-      });
-    }
+    
   }
 
   @override
@@ -179,24 +170,26 @@ class ChatInputState extends State<ChatInput> {
 
           final isSendable = sendable && !widget.sending;
 
-          if (!isSendable) {
-            sendButtonColor = Color(Colours.greyDisabled);
-          }
+          Color sendButtonColor = const Color(Colours.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderInputMatrixUnencrypted;
-
-            if (isSendable) {
-              sendButtonColor = Theme.of(context).accentColor;
-            }
+            sendButtonColor = Theme.of(context).accentColor;
           }
 
           if (widget.mediumType == MediumType.encryption) {
             hintText = Strings.placeholderInputMatrixEncrypted;
+            sendButtonColor = Theme.of(context).primaryColor;
+          }
 
-            if (isSendable) {
-              sendButtonColor = Theme.of(context).primaryColor;
-            }
+          // if the button is disabled, make it more transparent to indicate that
+          if (!isSendable) {
+            sendButtonColor = Color.fromRGBO(
+              sendButtonColor.red,
+              sendButtonColor.green,
+              sendButtonColor.blue,
+              130,
+            );
           }
 
           var sendButton = InkWell(
@@ -260,7 +253,7 @@ class ChatInputState extends State<ChatInput> {
                               text: replying ? widget.quotable!.body : '',
                             ),
                             style: TextStyle(
-                              color: inputTextColor,
+                              color: props.inputTextColor,
                             ),
                             decoration: InputDecoration(
                               filled: true,
@@ -327,34 +320,41 @@ class ChatInputState extends State<ChatInput> {
                       enableSuggestions: props.suggestionsEnabled,
                       keyboardType: TextInputType.multiline,
                       textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                      cursorColor: inputCursorColor,
+                      cursorColor: props.inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
                       onSubmitted: !isSendable ? null : (text) => onSubmit(),
                       style: TextStyle(
                         height: 1.5,
-                        color: inputTextColor,
+                        color: props.inputTextColor,
                       ),
                       decoration: InputDecoration(
                         filled: true,
                         hintText: hintText,
-                        fillColor: inputColorBackground,
+                        fillColor: props.inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Theme.of(context).accentColor, width: 1),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
-                            )),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).accentColor,
+                              width: 1,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(!replying ? 24 : 0),
+                            topRight: Radius.circular(!replying ? 24 : 0),
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
+                          )),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(!replying ? 24 : 0),
-                          topRight: Radius.circular(!replying ? 24 : 0),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).accentColor,
+                              width: 1,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(!replying ? 24 : 0),
+                            topRight: Radius.circular(!replying ? 24 : 0),
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
                         )),
                       ),
                     ),
@@ -374,6 +374,9 @@ class ChatInputState extends State<ChatInput> {
 
 class _Props extends Equatable {
   final Room room;
+  final Color inputTextColor;
+  final Color inputCursorColor;
+  final Color inputColorBackground;
   final bool enterSendEnabled;
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
@@ -382,6 +385,9 @@ class _Props extends Equatable {
 
   const _Props({
     required this.room,
+    required this.inputTextColor,
+    required this.inputCursorColor,
+    required this.inputColorBackground,
     required this.enterSendEnabled,
     required this.autocorrectEnabled,
     required this.suggestionsEnabled,
@@ -396,6 +402,9 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
+        inputTextColor: selectChatInputTextColor(store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectChatInputCursorColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectChatInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
