@@ -41,10 +41,7 @@ class ChatViewArguements {
   final String? title;
 
   // Improve loading times
-  ChatViewArguements({
-    this.roomId,
-    this.title,
-  });
+  ChatViewArguements({this.roomId, this.title});
 }
 
 class ChatScreen extends StatefulWidget {
@@ -164,7 +161,7 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  onSubmitMessage(_Props props) async {
+  onSendMessage(_Props props) async {
     setState(() {
       sending = true;
     });
@@ -493,7 +490,7 @@ class ChatScreenState extends State<ChatScreen> {
                         sending: sending,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
-                        onSubmitMessage: () => onSubmitMessage(props),
+                        onSubmitMessage: () => onSendMessage(props),
                       ),
                     ),
                   ),

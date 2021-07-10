@@ -15,10 +15,10 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
-class UserDetailsArguments {
+class UserProfileArguments {
   final User? user;
 
-  UserDetailsArguments({this.user});
+  UserProfileArguments({this.user});
 }
 
 class UserProfileScreen extends StatefulWidget {
@@ -29,7 +29,7 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class UserProfileState extends State<UserProfileScreen> {
-  UserProfileState({Key? key}) : super();
+  UserProfileState() : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
@@ -44,7 +44,7 @@ class UserProfileState extends State<UserProfileScreen> {
     super.initState();
     scrollController.addListener(() {
       final height = MediaQuery.of(context).size.height;
-      final minOffset = 0;
+      const minOffset = 0;
       final maxOffset = height * 0.2;
       final offsetRatio = scrollController.offset / maxOffset;
 
@@ -70,15 +70,14 @@ class UserProfileState extends State<UserProfileScreen> {
     });
   }
 
-  @protected
-  void onBlockUser({required BuildContext context, _Props? props}) async {
+  onBlockUser({required BuildContext context, _Props? props}) async {
     return await showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: "Block User",
+        title: 'Block User',
         content:
-            "If you block ${props!.user.displayName}, you will not be able to see their messages and you will immediately leave this chat.",
+            'If you block ${props!.user.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
         onConfirm: () async {
           await props.blockUser(props.user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -88,10 +87,9 @@ class UserProfileState extends State<UserProfileScreen> {
     );
   }
 
-  @protected
   onShowColorPicker({
     required context,
-    int? originalColor,
+    required int originalColor,
     Function? onSelectColor,
   }) async {
     await showDialog(
@@ -113,7 +111,7 @@ class UserProfileState extends State<UserProfileScreen> {
     final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
-    final UserDetailsArguments arguments = ModalRoute.of(context)!.settings.arguments as UserDetailsArguments;
+    final UserProfileArguments arguments = ModalRoute.of(context)!.settings.arguments as UserProfileArguments;
 
     final user = arguments.user!;
     final userColor = Colours.hashedColor(user.userId);
@@ -158,7 +156,7 @@ class UserProfileState extends State<UserProfileScreen> {
                 ],
               ),
               flexibleSpace: Hero(
-                tag: "UserAvatar",
+                tag: 'UserAvatar',
                 child: Container(
                   padding: EdgeInsets.only(top: height * 0.075),
                   color: userColor,
@@ -232,39 +230,32 @@ class UserProfileState extends State<UserProfileScreen> {
                     ),
                     CardSection(
                       padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Container(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: width,
-                              padding: contentPadding,
-                              child: Text(
-                                'Chat Settings',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: contentPadding,
+                            child: Text(
+                              'Chat Settings',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: contentPadding,
+                            title: Text(
+                              'Color',
+                            ),
+                            trailing: Container(
+                              padding: EdgeInsets.only(right: 16),
+                              child: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: userColor,
                               ),
                             ),
-                            ListTile(
-                              enabled: false,
-                              // onTap: () => onShowColorPicker(
-                              //   context: context,
-                              //   onSelectColor: props.onSelectPrimaryColor,
-                              //   originalColor: props.roomPrimaryColor.value,
-                              // ),
-                              contentPadding: contentPadding,
-                              title: Text(
-                                'Color',
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.only(right: 16),
-                                child: CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: userColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     CardSection(
@@ -313,7 +304,7 @@ class _Props extends Equatable {
   final Function blockUser;
   final Function sendMessage;
 
-  _Props({
+  const _Props({
     required this.user,
     required this.loading,
     required this.blockUser,
