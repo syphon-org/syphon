@@ -61,8 +61,7 @@ class ChatInputState extends State<ChatInput> {
 
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
-  
-  Color? sendButtonColor = const Color(Colours.greyDisabled);
+
   String hintText = Strings.placeholderInputMatrixUnencrypted;
 
   @protected
@@ -175,24 +174,26 @@ class ChatInputState extends State<ChatInput> {
 
           final isSendable = sendable && !widget.sending;
 
-          if (!isSendable) {
-            sendButtonColor = Color(Colours.greyDisabled);
-          }
+          Color sendButtonColor = const Color(Colours.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderInputMatrixUnencrypted;
-
-            if (isSendable) {
-              sendButtonColor = Theme.of(context).accentColor;
-            }
+            sendButtonColor = Theme.of(context).accentColor;
           }
 
           if (widget.mediumType == MediumType.encryption) {
             hintText = Strings.placeholderInputMatrixEncrypted;
+            sendButtonColor = Theme.of(context).primaryColor;
+          }
 
-            if (isSendable) {
-              sendButtonColor = Theme.of(context).primaryColor;
-            }
+          // if the button is disabled, make it more transparent to indicate that
+          if (!isSendable) {
+            sendButtonColor = Color.fromRGBO(
+              sendButtonColor.red,
+              sendButtonColor.green,
+              sendButtonColor.blue,
+              130,
+            );
           }
 
           var sendButton = InkWell(
