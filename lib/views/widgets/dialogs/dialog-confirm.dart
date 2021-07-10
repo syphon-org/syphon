@@ -10,12 +10,14 @@ class DialogConfirm extends StatelessWidget {
     Key? key,
     this.title = '',
     this.content = '',
+    this.confirm = Strings.buttonConfirm,
     this.onConfirm,
     this.onDismiss,
   }) : super(key: key);
 
   final String title;
   final String content;
+  final String confirm;
   final Function? onConfirm;
   final Function? onDismiss;
 
@@ -44,7 +46,7 @@ class DialogConfirm extends StatelessWidget {
                 ButtonText(
                   onPressed: () => onConfirm!(),
                   textWidget: Text(
-                    Strings.buttonConfirm,
+                    confirm,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),

@@ -102,6 +102,9 @@ class Strings {
   static const contentIntroSecondPartBold = 'privacy and control ';
   static const contentIntroSecondPartTwo = 'where the\nmessages are stored';
 
+  static const contentAdvancedColorDialog =
+      'Are you sure you want to enable advanced color selection? Selecting colors like white or black may prevent you from seeing most of the apps buttons or inputs! Select the color type again once enabled.';
+
   static const contentIntroThird =
       'Both Matrix and ${Values.appName} are developed\nopenly by organizations and people,\nnot corporations';
 

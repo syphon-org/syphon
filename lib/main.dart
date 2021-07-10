@@ -20,6 +20,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/state.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/views/home/home-screen.dart';
@@ -211,14 +212,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale('en'),
           supportedLocales: const [Locale('en'), Locale('ru'), Locale('pl')],
-          child: StoreConnector<AppState, SettingsStore>(
+          child: StoreConnector<AppState, ThemeSettings>(
             distinct: true,
-            converter: (store) => store.state.settingsStore,
-            builder: (context, settings) => MaterialApp(
+            converter: (store) => store.state.settingsStore.themeSettings,
+            builder: (context, themeSettings) => MaterialApp(
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
-              theme: setupTheme(settings.themeSettings, generateThemeData: true),
+              theme: setupTheme(themeSettings, generateThemeData: true),
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,

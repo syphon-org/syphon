@@ -9,6 +9,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
@@ -26,8 +27,6 @@ class ThemingSettingsScreen extends StatefulWidget {
 class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
   bool advancedColors = false;
 
-  onShowColorDialog() {}
-
   onToggleAdvancedColors(
     BuildContext context,
   ) async {
@@ -36,8 +35,8 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
       barrierDismissible: true,
       builder: (dialogContext) => DialogConfirm(
         title: 'Confirm Advanced Colors',
-        content:
-            'Are you sure you want to enable advanced color selection? Selecting colors like white or black may prevent you from seeing most of the apps buttons or inputs!',
+        content: Strings.contentAdvancedColorDialog,
+        confirm: 'enable',
         onConfirm: () async {
           setState(() {
             advancedColors = true;
@@ -230,11 +229,10 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                             'Room Type Badges',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
-                          trailing: Container(
-                            child: Switch(
-                              value: props.roomTypeBadgesEnabled,
-                              onChanged: (value) => props.onToggleRoomTypeBadges(),
-                            ),
+                          trailing: Switch(
+                            value: props.roomTypeBadgesEnabled,
+                            onChanged: (value) => props.onToggleRoomTypeBadges(),
+                            activeColor: Color(props.primaryColor),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
                         ),
