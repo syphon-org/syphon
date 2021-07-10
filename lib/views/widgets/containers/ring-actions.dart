@@ -10,8 +10,8 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
 class ActionRing extends StatelessWidget {
   const ActionRing({
@@ -77,7 +77,7 @@ class ActionRing extends StatelessWidget {
             FloatingActionButton(
               heroTag: 'fab1',
               tooltip: 'Create Public Room',
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: props.primaryColor,
               onPressed: () => onNavigateToCreateGroupPublic(context),
               child: SvgPicture.asset(
                 Assets.iconPublicAddBeing,
@@ -87,7 +87,7 @@ class ActionRing extends StatelessWidget {
             FloatingActionButton(
               heroTag: 'fab2',
               tooltip: 'Create Group',
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: props.primaryColor,
               onPressed: () => onNavigateToCreateGroup(context),
               child: SvgPicture.asset(
                 Assets.iconGroupAddBeing,
@@ -97,7 +97,7 @@ class ActionRing extends StatelessWidget {
             FloatingActionButton(
               heroTag: 'fab3',
               tooltip: 'Direct Message',
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: props.primaryColor,
               onPressed: () => onNavigateToDraft(context),
               child: SvgPicture.asset(
                 Assets.iconPersonAddBeing,
@@ -107,7 +107,7 @@ class ActionRing extends StatelessWidget {
             FloatingActionButton(
               heroTag: 'fab4',
               tooltip: 'Search Public Groups',
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: props.primaryColor,
               onPressed: () => onNavigateToPublicSearch(context),
               child: SvgPicture.asset(
                 Assets.iconSearchPublicCondensedBeing,
@@ -120,22 +120,18 @@ class ActionRing extends StatelessWidget {
 }
 
 class _Props extends Equatable {
-  final ThemeType themeType;
   final Color primaryColor;
 
   const _Props({
-    required this.themeType,
     required this.primaryColor,
   });
 
   @override
   List<Object> get props => [
-        themeType,
         primaryColor,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        themeType: store.state.settingsStore.themeSettings.themeType,
-        primaryColor: Color(store.state.settingsStore.themeSettings.primaryColor),
+        primaryColor: selectPrimaryColor(store.state.settingsStore.themeSettings),
       );
 }

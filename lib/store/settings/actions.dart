@@ -134,9 +134,7 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices = jsonDevices
-          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
-          .toList();
+      final List<Device> devices = jsonDevices.map((jsonDevice) => Device.fromMatrix(jsonDevice)).toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
@@ -182,8 +180,7 @@ ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final currentCredential =
-          store.state.authStore.credential ?? Credential();
+      final currentCredential = store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,
@@ -226,8 +223,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final currentCredential =
-          store.state.authStore.credential ?? Credential();
+      final currentCredential = store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,
@@ -270,14 +266,14 @@ ThunkAction<AppState> acceptAgreement() {
 }
 
 /// Send in a hex value to be used as the primary color
-ThunkAction<AppState> selectPrimaryColor(int color) {
+ThunkAction<AppState> setPrimaryColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetPrimaryColor(color: color));
   };
 }
 
 /// Send in a hex value to be used as the secondary color
-ThunkAction<AppState> selectAccentColor(int color) {
+ThunkAction<AppState> setAccentColor(int color) {
   return (Store<AppState> store) async {
     store.dispatch(SetAccentColor(color: color));
   };
@@ -297,8 +293,7 @@ ThunkAction<AppState> incrementFontType() {
     final fontNameIndex = FontName.values.indexOf(currentTheme.fontName);
 
     store.dispatch(SetFontName(
-      fontName:
-        FontName.values[(fontNameIndex + 1) % FontName.values.length],
+      fontName: FontName.values[(fontNameIndex + 1) % FontName.values.length],
     ));
   };
 }
@@ -348,8 +343,7 @@ ThunkAction<AppState> incrementAvatarShape() {
     final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
 
     store.dispatch(SetAvatarShape(
-      avatarShape:
-      AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
+      avatarShape: AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
     ));
   };
 }
