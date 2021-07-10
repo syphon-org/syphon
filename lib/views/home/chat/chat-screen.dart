@@ -311,7 +311,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                        semanticsLabel: Strings.semanticsSendArrow,
                       ),
                     ),
                   ),
@@ -344,7 +344,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                        semanticsLabel: Strings.semanticsSendArrow,
                       ),
                     ),
                   ),
@@ -471,12 +471,7 @@ class ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      top: 12,
-                      bottom: 12,
-                    ),
+                    padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling

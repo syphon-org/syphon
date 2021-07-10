@@ -441,7 +441,7 @@ class _Props extends Equatable {
   final Function onCreateRoomPublic;
   final Function onClearUserInvites;
 
-  _Props({
+  const _Props({
     required this.users,
     required this.themeType,
     required this.loading,

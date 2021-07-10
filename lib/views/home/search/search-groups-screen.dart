@@ -33,7 +33,7 @@ class GroupSearchScreen extends StatefulWidget {
 class GroupSearchState extends State<GroupSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
-  GroupSearchState({Key? key});
+  GroupSearchState();
 
   // componentDidMount(){}
   @override
@@ -43,12 +43,12 @@ class GroupSearchState extends State<GroupSearchScreen> {
   }
 
   @protected
-  void onMounted() async {
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
-    if (searchResults.isNotEmpty && !(searchResults[0] is Room)) {
+    if (searchResults.isNotEmpty && searchResults[0] is! Room) {
       store.dispatch(clearSearchResults());
     }
     // Initial search to show rooms by most popular
@@ -86,7 +86,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                Strings.labelNoGroups,
+                props.loading ? Strings.labelSearching : Strings.labelNoGroups,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
@@ -99,7 +99,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
       scrollDirection: Axis.vertical,
       itemCount: props.searchResults.length,
       itemBuilder: (BuildContext context, int index) {
-        final room = (props.searchResults[index] as Room);
+        final room = props.searchResults[index] as Room;
         final formattedUserTotal = NumberFormat.compact();
         final localUserTotal = NumberFormat();
         final hashedColor = Colours.hashedColor(room.id);
@@ -383,7 +383,7 @@ class _Props extends Equatable {
   final Function onJoin;
   final Function onSearch;
 
-  _Props({
+  const _Props({
     required this.themeType,
     required this.loading,
     required this.searchResults,

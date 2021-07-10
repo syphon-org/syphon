@@ -39,11 +39,13 @@ class Strings {
 
   // Labels
   static const labelSyncing = 'syncing chats...';
+  static const labelSearching = 'Searching...';
   static const labelSearchForHomeservers = 'Search for homeservers...';
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
   static const labelUsersSection = 'Users';
   static const labelRecentUsers = 'Recent Users';
+  static const labelKnownUsers = 'Known Users';
   static const labelSearchResults = 'Search Results';
   static const labelRoomNameDefault = 'New Chat';
   static const labelNoMessages = 'no messages found';
@@ -96,8 +98,7 @@ class Strings {
   static const contentIntroFirstPartOne =
       '${Values.appName} works by using an encrypted \nand decentralized protocol \ncalled ';
 
-  static const contentIntroSecondPartOne =
-      'Matrix enables you to message others \nwith';
+  static const contentIntroSecondPartOne = 'Matrix enables you to message others \nwith';
   static const contentIntroSecondPartBold = 'privacy and control ';
   static const contentIntroSecondPartTwo = 'where the\nmessages are stored';
 
@@ -107,13 +108,11 @@ class Strings {
   static const contentIntroFinal =
       'By using ${Values.appName} and other Matrix clients\nwe can make private messaging \naccessible to everyone';
 
-  static const contentNotificationBackgroundService =
-      'Background connection enabled';
+  static const contentNotificationBackgroundService = 'Background connection enabled';
 
   // Content
   static const contentTopicEmpty = 'No Topic Description';
-  static const contentDeleteDevices =
-      'You will have to sign in again on these devices if you remove them.';
+  static const contentDeleteDevices = 'You will have to sign in again on these devices if you remove them.';
 
   static const contentDeleteDeviceKeyWarning =
       "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
@@ -152,8 +151,8 @@ class Strings {
   static const confirmationInvites =
       'Are you sure you want to invite the selected users to the following room?';
 
-  static const confirmationStartChat = 'Even if you don\'t send a message, ' +
-      'the user will still see your invite to chat.';
+  static const confirmationStartChat =
+      'Even if you don\'t send a message, ' + 'the user will still see your invite to chat.';
   static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +
       'the user will still see your invite to chat if they exist.\n\nDo you want to try chatting with this username?';
   static const confirmationAppTermsOfService =
@@ -163,11 +162,9 @@ class Strings {
   static const confirmationInteractiveAuth =
       'In order to perform this action, you\'ll need to enter your password again';
 
-  static const confirmationThanks =
-      'Thanks for trying out ${Values.appName}!\n\n';
+  static const confirmationThanks = 'Thanks for trying out ${Values.appName}!\n\n';
 
-  static const confirmationAlphaVersion =
-      'Please be aware this app is still very much in Alpha.\n';
+  static const confirmationAlphaVersion = 'Please be aware this app is still very much in Alpha.\n';
 
   static const confirmationAlphaWarning =
       'Do not use, nor do I recommend using, Syphon where proven and independently verified security is required.\n';
@@ -191,17 +188,13 @@ class Strings {
       'Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.';
 
   // Placeholders
-  static const placeholderInputMatrixUnencrypted =
-      'Matrix message (unencrypted)';
+  static const placeholderInputMatrixUnencrypted = 'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
-  static String formatUsernameHint(
-      {required String homeserver, String? username}) {
-    final usernameFormatted =
-        username != null && username.isNotEmpty ? username : 'username';
-    final alias = homeserver.isNotEmpty
-        ? '@$usernameFormatted:$homeserver'
-        : '@$usernameFormatted:matrix.org';
+  static String formatUsernameHint({required String homeserver, String? username}) {
+    final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
+    final alias =
+        homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
 
     return alias.replaceFirst('@', '', 1);
   }
@@ -210,13 +203,10 @@ class Strings {
   static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 
   // Accessibility
-  static const semanticsPrivateMessage =
-      'A person holding up a private message';
-  static const semanticsSendUnencrypted = 'Send unencrypted message';
-  static const semanticsIntroFinal =
-      'Two different people feeling confident and lookin\' good';
+  static const semanticsPrivateMessage = 'A person holding up a private message';
+  static const semanticsSendArrow = 'Right arrow prompt to send a message';
+  static const semanticsIntroFinal = 'Two different people feeling confident and lookin\' good';
   static const semanticsIntroThird = 'People lounging around and messaging';
   static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
-  static const semanticsLabelHomeEmpty =
-      'Tiny cute monsters hidding behind foliage';
+  static const semanticsLabelHomeEmpty = 'Tiny cute monsters hidding behind foliage';
 }

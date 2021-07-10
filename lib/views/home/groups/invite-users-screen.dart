@@ -13,7 +13,6 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/containers/card-section.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -27,6 +26,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -49,7 +49,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
   final searchInputFocusNode = FocusNode();
   final avatarScrollController = ScrollController();
 
-  String? searchable;
+  String searchable = '';
   List<User?> invites = [];
   String? creatingRoomDisplayName;
 
@@ -72,7 +72,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
-    if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
+    if (searchResults.isNotEmpty && searchResults[0] is! User) {
       store.dispatch(clearSearchResults());
     }
   }
@@ -83,17 +83,26 @@ class InviteUsersState extends State<InviteUsersScreen> {
     super.dispose();
   }
 
-  /**
-   * 
-   * Toggle User Invite
-   * 
-   * add/remove user to invite list
-   */
-  @protected
-  void onToggleInvite({User? user}) async {
+  onShowUserDetails({required BuildContext context, User? user}) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ModalUserDetails(
+        user: user,
+        nested: true,
+      ),
+    );
+  }
+
+  ///
+  /// Toggle User Invite
+  ///
+  /// add/remove user to invite list
+  ///
+  onToggleInvite({User? user}) async {
     final List<User?> invitesUpdated = List.from(invites);
-    final userIndex =
-        invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
+    final userIndex = invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
 
     if (userIndex == -1) {
       invitesUpdated.add(user);
@@ -116,16 +125,12 @@ class InviteUsersState extends State<InviteUsersScreen> {
     }
   }
 
-  /**
-   * 
-   * Attempt User Invite
-   * 
-   * attempt chating with a user 
-   * by the name searched
-   */
-  @protected
-  Future onAttemptInvite(
-      {required BuildContext context, _Props? props, User? user}) async {
+  ///
+  /// Attempt User Invite
+  ///
+  /// attempt chating with a user by the name searched
+  ///
+  onAttemptInvite({required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -141,39 +146,35 @@ class InviteUsersState extends State<InviteUsersScreen> {
     );
   }
 
-  /**
-   * 
-   * Confirm and save invite list
-   * 
-   * also attempts to invite users directly if a room id already exists
-   */
-  @protected
-  Future onConfirmInvites(_Props props) async {
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+  ///
+  /// Confirm and save invite list
+  ///
+  /// also attempts to invite users directly if a room id already exists
+  ///
+  onConfirmInvites(_Props props) async {
+    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final roomId = arguments.roomId;
 
-    if (roomId != null && this.invites.length > 0) {
-      await this.onSendInvites(props);
+    if (roomId != null && invites.isNotEmpty) {
+      await onSendInvites(props);
     } else {
-      await props.onAddInvites(users: this.invites);
+      await props.onAddInvites(users: invites);
       Navigator.pop(context);
     }
   }
 
-  /**
-   * Actually send invites to all listed users
-   */
-  Future onSendInvites(_Props props) async {
+  ///
+  /// Actually send invites to all listed users
+  ///
+  onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments.roomId;
     final room = store.state.roomStore.rooms[roomId!];
 
-    final multiple = this.invites.length > 1;
+    final multiple = invites.length > 1;
     final invitePlurialized = multiple ? 'Invites' : 'Invite';
 
     // Confirm sending the invites with a dialog
@@ -197,54 +198,81 @@ class InviteUsersState extends State<InviteUsersScreen> {
     );
   }
 
-  Future onShowUserDetails({
-    required BuildContext context,
-    User? user,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ModalUserDetails(
-        user: user,
-      ),
+  @protected
+  Widget buildUserChipList(BuildContext context, _Props props) {
+    return ListView.builder(
+      shrinkWrap: true,
+      controller: avatarScrollController,
+      itemCount: invites.length,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (BuildContext context, int index) {
+        final user = invites[index]!;
+
+        return Align(
+          child: GestureDetector(
+            onTap: () => onShowUserDetails(
+              context: context,
+              user: user,
+            ),
+            child: Container(
+              padding: EdgeInsets.only(
+                left: index == 0 ? 12 : 4,
+                right: index == invites.length - 1 ? 12 : 4,
+              ),
+              child: Chip(
+                labelPadding: EdgeInsets.only(left: 8),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.comfortable,
+                avatar: Avatar(
+                  margin: EdgeInsets.zero,
+                  padding: EdgeInsets.zero,
+                  uri: user.avatarUri,
+                  alt: user.displayName ?? user.userId,
+                  size: Dimensions.avatarSizeMessage,
+                  background: Colours.hashedColor(
+                    formatUsername(user),
+                  ),
+                ),
+                label: Text(
+                  formatUsername(user),
+                  style: Theme.of(context).textTheme.caption!.copyWith(
+                        color: Theme.of(context).textTheme.bodyText1!.color,
+                      ),
+                ),
+                deleteIcon: Icon(
+                  Icons.close,
+                  size: Dimensions.avatarSizeMessage / 1.5,
+                  color: Theme.of(context).textTheme.bodyText1!.color,
+                ),
+                onDeleted: () => onToggleInvite(user: user),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    final storeConnector = StoreConnector<AppState, _Props>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final width = MediaQuery.of(context).size.height;
         final showInvites = invites.isNotEmpty;
 
-        final searchText = searchable ?? '';
-
         final attemptableUser = User(
-          displayName: searchText,
-          userId: searchable != null && searchable!.contains(':')
-              ? searchable
-              : formatUserId(searchText),
+          displayName: searchable,
+          userId: searchable.contains(':') ? searchable : formatUserId(searchable),
         );
 
         final foundResult = props.searchResults.indexWhere(
-          (result) => result.userId.contains(searchText),
+          (result) => result.userId.contains(searchable),
         );
 
-        final showManualUser = searchable != null &&
-            searchable!.isNotEmpty &&
-            foundResult < 0 &&
-            !props.loading;
-
-        final usersList = searchable == null || searchable!.isEmpty
-            ? props.usersRecent
-            : props.searchResults;
-
-        final usersListLabel = searchable == null || searchable!.isEmpty
-            ? Strings.labelRecentUsers
-            : Strings.labelSearchedUsers;
+        final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
+        final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
+        final usersListLabel = searchable.isEmpty ? Strings.labelRecentUsers : Strings.labelSearchedUsers;
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -280,7 +308,6 @@ class InviteUsersState extends State<InviteUsersScreen> {
           body: Align(
             alignment: Alignment.topRight,
             child: Column(
-              // ignore: avoid_redundant_argument_values
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Visibility(
@@ -293,66 +320,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
                       maxWidth: width,
                       maxHeight: Dimensions.listAvatarHeighttMax,
                     ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      controller: avatarScrollController,
-                      itemCount: invites.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        final user = invites[index]!;
-
-                        return Align(
-                          child: GestureDetector(
-                            onTap: () => onShowUserDetails(
-                              context: context,
-                              user: user,
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                left: index == 0 ? 12 : 4,
-                                right: index == invites.length - 1 ? 12 : 4,
-                              ),
-                              child: Chip(
-                                labelPadding: EdgeInsets.only(left: 8),
-                                padding: EdgeInsets.zero,
-                                visualDensity: VisualDensity.comfortable,
-                                avatar: Avatar(
-                                  margin: EdgeInsets.zero,
-                                  padding: EdgeInsets.zero,
-                                  uri: user.avatarUri,
-                                  alt: user.displayName ?? user.userId,
-                                  size: Dimensions.avatarSizeMessage,
-                                  background: Colours.hashedColor(
-                                    formatUsername(user),
-                                  ),
-                                ),
-                                label: Text(
-                                  formatUsername(user),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .caption!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1!
-                                            .color,
-                                      ),
-                                ),
-                                deleteIcon: Icon(
-                                  Icons.close,
-                                  size: Dimensions.avatarSizeMessage / 1.5,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1!
-                                      .color,
-                                ),
-                                onDeleted: () => onToggleInvite(user: user),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    child: buildUserChipList(context, props),
                   ),
                 ),
                 Expanded(
@@ -362,11 +330,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
                         shrinkWrap: true,
                         children: [
                           Container(
-                            padding: EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                              top: 16,
-                            ),
+                            padding: EdgeInsets.only(left: 20, right: 20, top: 16),
                             child: Row(
                               children: [
                                 Text(
@@ -378,113 +342,33 @@ class InviteUsersState extends State<InviteUsersScreen> {
                             ),
                           ),
                           Visibility(
-                              visible: showManualUser,
-                              child: GestureDetector(
-                                  onTap: () => onAttemptInvite(
-                                        props: props,
-                                        context: context,
-                                        user: attemptableUser,
-                                      ),
-                                  child: CardSection(
-                                    margin: EdgeInsets.zero,
-                                    padding: EdgeInsets.symmetric(vertical: 4),
-                                    elevation: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: ListTile(
-                                        enabled: creatingRoomDisplayName !=
-                                            searchable,
-                                        leading: Avatar(
-                                          uri: attemptableUser.avatarUri,
-                                          alt: attemptableUser.displayName ??
-                                              attemptableUser.userId,
-                                          background: Colours.hashedColor(
-                                            attemptableUser.userId,
-                                          ),
-                                        ),
-                                        title: Text(
-                                          formatUsername(attemptableUser),
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText1,
-                                        ),
-                                        subtitle: Text(
-                                          attemptableUser.userId!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption!
-                                              .merge(
-                                                TextStyle(
-                                                  color: props.loading
-                                                      ? Color(
-                                                          Colours.greyDisabled)
-                                                      : null,
-                                                ),
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  ))),
+                            visible: showManualUser,
+                            child: ListItemUser(
+                              onPress: () =>
+                                  onAttemptInvite(props: props, context: context, user: attemptableUser),
+                              type: ListItemUserType.Selectable,
+                              user: attemptableUser,
+                              enabled: creatingRoomDisplayName != searchable,
+                              loading: props.loading,
+                              real: false,
+                            ),
+                          ),
                           ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
                             itemCount: usersList.length,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
-                              final user = (usersList[index] as User);
+                              final user = usersList[index] as User;
 
-                              return CardSection(
-                                margin: EdgeInsets.zero,
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                                elevation: 0,
-                                child: InkWell(
-                                  onTap: () => onToggleInvite(user: user),
-                                  child: ListTile(
-                                    enabled: creatingRoomDisplayName !=
-                                        user.displayName,
-                                    leading: GestureDetector(
-                                      onTap: () => this.onShowUserDetails(
-                                        context: context,
-                                        user: user,
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Avatar(
-                                            uri: user.avatarUri,
-                                            alt:
-                                                user.displayName ?? user.userId,
-                                            selected: invites.contains(
-                                              user,
-                                            ),
-                                            background: Colours.hashedColor(
-                                              formatUsername(user),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    title: Text(
-                                      formatUsername(user),
-                                      overflow: TextOverflow.ellipsis,
-                                      style:
-                                          Theme.of(context).textTheme.bodyText1,
-                                    ),
-                                    subtitle: Text(
-                                      user.userId!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .caption!
-                                          .merge(
-                                            TextStyle(
-                                              color: props.loading
-                                                  ? Color(Colours.greyDisabled)
-                                                  : null,
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                ),
+                              return ListItemUser(
+                                type: ListItemUserType.Selectable,
+                                user: user,
+                                enabled: creatingRoomDisplayName != user.displayName,
+                                selected: invites.contains(user),
+                                loading: props.loading,
+                                onPress: () => onToggleInvite(user: user),
+                                onPressAvatar: () => onShowUserDetails(context: context, user: user),
                               );
                             },
                           )
@@ -502,10 +386,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
             ),
           ),
         );
-      },
-    );
-    return storeConnector;
-  }
+      });
 }
 
 class _Props extends Equatable {
@@ -519,7 +400,7 @@ class _Props extends Equatable {
   final Function onAddInvites;
   final Function onSendInvite;
 
-  _Props({
+  const _Props({
     required this.themeType,
     required this.loading,
     required this.usersRecent,
@@ -529,14 +410,28 @@ class _Props extends Equatable {
     required this.onAddInvites,
     required this.onSendInvite,
   });
+  @override
+  List<Object> get props => [
+        loading,
+        themeType,
+        creatingRoom,
+        searchResults,
+      ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        usersRecent: friendlyUsers(store.state),
+        usersRecent: selectFriendlyUsers(store.state),
         themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
         searchResults: store.state.searchStore.searchResults,
         onSearch: (text) {
+          if (text.contains('@') && text.length == 1) {
+            return;
+          }
+
+          if (text.isEmpty) {
+            return;
+          }
           store.dispatch(searchUsers(searchText: text));
         },
         onAddInvites: ({List<User>? users}) async {
@@ -548,12 +443,4 @@ class _Props extends Equatable {
           );
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        themeType,
-        creatingRoom,
-        searchResults,
-      ];
 }

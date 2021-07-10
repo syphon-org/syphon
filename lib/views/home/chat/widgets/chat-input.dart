@@ -172,7 +172,7 @@ class ChatInputState extends State<ChatInput> {
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderInputMatrixUnencrypted;
-            sendButtonColor = Theme.of(context).accentColor;
+            sendButtonColor = Color(Colours.greyDark);
           }
 
           if (widget.mediumType == MediumType.encryption) {
@@ -182,7 +182,7 @@ class ChatInputState extends State<ChatInput> {
 
           // if the button is disabled, make it more transparent to indicate that
           if (!isSendable) {
-            sendButtonColor = sendButtonColor.withOpacity(130);
+            sendButtonColor = Color(Colours.greyDisabled);
           }
 
           var sendButton = InkWell(
@@ -196,7 +196,7 @@ class ChatInputState extends State<ChatInput> {
                 child: SvgPicture.asset(
                   Assets.iconSendUnlockBeing,
                   color: Colors.white,
-                  semanticsLabel: Strings.semanticsSendUnencrypted,
+                  semanticsLabel: Strings.semanticsSendArrow,
                 ),
               ),
             ),
@@ -214,7 +214,7 @@ class ChatInputState extends State<ChatInput> {
                   child: SvgPicture.asset(
                     Assets.iconSendLockSolidBeing,
                     color: Colors.white,
-                    semanticsLabel: Strings.semanticsSendUnencrypted,
+                    semanticsLabel: Strings.semanticsSendArrow,
                   ),
                 ),
               ),
@@ -397,8 +397,7 @@ class _Props extends Equatable {
         room: selectRoom(id: roomId, state: store.state),
         inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
         inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground:
-            selectChatInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
