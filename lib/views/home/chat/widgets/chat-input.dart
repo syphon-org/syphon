@@ -168,10 +168,6 @@ class ChatInputState extends State<ChatInput> {
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
 
-          final inputTextColor = selectChatInputTextColor(props.themeType);
-          final inputCursorColor = selectChatInputCursorColor(props.themeType);
-          final inputColorBackground = selectChatInputBackgroundColor(props.themeType);
-
           final isSendable = sendable && !widget.sending;
 
           Color sendButtonColor = const Color(Colours.blueBubbly);
@@ -324,19 +320,19 @@ class ChatInputState extends State<ChatInput> {
                       enableSuggestions: props.suggestionsEnabled,
                       keyboardType: TextInputType.multiline,
                       textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                      cursorColor: inputCursorColor,
+                      cursorColor: props.inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
                       onChanged: (text) => onUpdate(text, props: props),
                       onSubmitted: !isSendable ? null : (text) => onSubmit(),
                       style: TextStyle(
                         height: 1.5,
-                        color: inputTextColor,
+                        color: props.inputTextColor,
                       ),
                       decoration: InputDecoration(
                         filled: true,
                         hintText: hintText,
-                        fillColor: inputColorBackground,
+                        fillColor: props.inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -378,7 +374,9 @@ class ChatInputState extends State<ChatInput> {
 
 class _Props extends Equatable {
   final Room room;
-  final ThemeType themeType;
+  final Color inputTextColor;
+  final Color inputCursorColor;
+  final Color inputColorBackground;
   final bool enterSendEnabled;
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
@@ -387,7 +385,9 @@ class _Props extends Equatable {
 
   const _Props({
     required this.room,
-    required this.themeType,
+    required this.inputTextColor,
+    required this.inputCursorColor,
+    required this.inputColorBackground,
     required this.enterSendEnabled,
     required this.autocorrectEnabled,
     required this.suggestionsEnabled,
@@ -402,7 +402,9 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
-        themeType: store.state.settingsStore.themeSettings.themeType,
+        inputTextColor: selectChatInputTextColor(store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectChatInputCursorColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectChatInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
