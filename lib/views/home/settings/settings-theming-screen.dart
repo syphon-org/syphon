@@ -23,7 +23,7 @@ class ThemingSettingsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
+          final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
             appBar: AppBar(
@@ -39,8 +39,7 @@ class ThemingSettingsScreen extends StatelessWidget {
               ),
             ),
             body: SingleChildScrollView(
-              child: Container(
-                  child: Column(
+              child: Column(
                 children: <Widget>[
                   CardSection(
                     child: Column(
@@ -57,8 +56,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                         ListTile(
                           onTap: () => showDialog(
                             context: context,
-                            builder: (BuildContext context) =>
-                                DialogColorPicker(
+                            builder: (BuildContext context) => DialogColorPicker(
                               title: 'Select Primary Color',
                               resetColor: Colours.cyanSyphon,
                               currentColor: props.primaryColor,
@@ -78,8 +76,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                         ListTile(
                           onTap: () => showDialog(
                             context: context,
-                            builder: (BuildContext context) =>
-                                DialogColorPicker(
+                            builder: (BuildContext context) => DialogColorPicker(
                               title: 'Select Accent Color',
                               resetColor: Colours.cyanSyphon,
                               currentColor: props.accentColor,
@@ -99,8 +96,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                         ListTile(
                           onTap: () => showDialog(
                             context: context,
-                            builder: (BuildContext context) =>
-                                DialogColorPicker(
+                            builder: (BuildContext context) => DialogColorPicker(
                               title: 'Select App Bar Color',
                               resetColor: Colours.cyanSyphon,
                               currentColor: props.appBarColor,
@@ -200,8 +196,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                           trailing: Container(
                             child: Switch(
                               value: props.roomTypeBadgesEnabled,
-                              onChanged: (value) =>
-                                  props.onToggleRoomTypeBadges(),
+                              onChanged: (value) => props.onToggleRoomTypeBadges(),
                             ),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
@@ -221,7 +216,7 @@ class ThemingSettingsScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              )),
+              ),
             ),
           );
         },
@@ -287,12 +282,9 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        primaryColor:
-            store.state.settingsStore.themeSettings.primaryColor,
-        accentColor:
-            store.state.settingsStore.themeSettings.accentColor,
-        appBarColor:
-            store.state.settingsStore.themeSettings.appBarColor,
+        primaryColor: store.state.settingsStore.themeSettings.primaryColor,
+        accentColor: store.state.settingsStore.themeSettings.accentColor,
+        appBarColor: store.state.settingsStore.themeSettings.appBarColor,
         themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
         fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
@@ -305,11 +297,11 @@ class Props extends Equatable {
         ),
         onSelectPrimaryColor: (int color) => store.dispatch(
           // convert to int hex color code
-          selectPrimaryColor(color),
+          setPrimaryColor(color),
         ),
         onSelectAccentColor: (int color) => store.dispatch(
           // convert to int hex color code
-          selectAccentColor(color),
+          setAccentColor(color),
         ),
         onSelectAppBarColor: (int color) => store.dispatch(
           // convert to int hex color code

@@ -13,8 +13,8 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
-import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -254,9 +254,13 @@ class LoginScreenState extends State<LoginScreen> {
               child: IconButton(
                 icon: Icon(Icons.settings),
                 iconSize: Dimensions.iconSizeLarge,
-                tooltip: 'Debug (Future Tools)',
+                tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    NavigationPaths.theming,
+                  );
                   props.onDebug();
                 },
               ),

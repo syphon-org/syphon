@@ -45,9 +45,14 @@ class NavigationService {
   }
 }
 
+class NavigationPaths {
+  static const intro = '/intro';
+  static const theming = '/theming';
+}
+
 class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
-        '/intro': (BuildContext context) => const IntroScreen(),
+        NavigationPaths.intro: (BuildContext context) => const IntroScreen(),
         '/login': (BuildContext context) => const LoginScreen(),
         '/signup': (BuildContext context) => const SignupScreen(),
         '/forgot': (BuildContext context) => ForgotPasswordScreen(),
@@ -74,7 +79,7 @@ class NavigationProvider {
         '/licenses': (BuildContext context) => LicensePage(applicationName: Values.appName),
         '/privacy': (BuildContext context) => PrivacySettingsScreen(),
         '/chat-preferences': (BuildContext context) => ChatsSettingsScreen(),
-        '/theming': (BuildContext context) => ThemingSettingsScreen(),
+        NavigationPaths.theming: (BuildContext context) => ThemingSettingsScreen(),
         '/devices': (BuildContext context) => DevicesScreen(),
         '/settings': (BuildContext context) => SettingsScreen(),
         '/blocked': (BuildContext context) => BlockedScreen(),

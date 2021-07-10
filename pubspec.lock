@@ -270,9 +270,11 @@ packages:
   fab_circular_menu:
     dependency: "direct main"
     description:
-      name: fab_circular_menu
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "78f2836a7bbd58ad43461552612e75743e565c8e"
+      url: "https://github.com/ereio/fab-circular-menu.git"
+    source: git
     version: "1.0.2"
   ffi:
     dependency: transitive
