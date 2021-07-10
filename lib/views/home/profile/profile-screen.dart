@@ -119,7 +119,6 @@ class ProfileScreenState extends State<ProfileScreen> {
 
         final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
 
-        print("$avatarFileNew, $displayNameNew, $userIdNew");
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
