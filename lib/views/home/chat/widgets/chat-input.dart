@@ -253,7 +253,7 @@ class ChatInputState extends State<ChatInput> {
                               text: replying ? widget.quotable!.body : '',
                             ),
                             style: TextStyle(
-                              color: inputTextColor,
+                              color: props.inputTextColor,
                             ),
                             decoration: InputDecoration(
                               filled: true,
