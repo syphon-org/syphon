@@ -64,6 +64,28 @@ int? selectScaffoldBackgroundColor(ThemeType themeType) {
   }
 }
 
+Color selectChatInputTextColor(ThemeType themeType) {
+  switch (themeType) {
+    case ThemeType.Light: return Color(Colours.blackDefault);
+    default: return Colors.white;
+  }
+}
+
+Color selectChatInputCursorColor(ThemeType themeType) {
+  switch (themeType) {
+    case ThemeType.Light: return Colors.blueGrey;
+    default: return Colors.white;
+  }
+}
+
+Color selectChatInputBackgroundColor(ThemeType themeType) {
+  switch (themeType) {
+    case ThemeType.Light: return Color(Colours.greyEnabled);
+    case ThemeType.Dark: return Colors.grey[800]!;
+    default: return Colors.grey[850]!;
+  }
+}
+
 double? selectAppBarElevation(ThemeType themeType) {
   switch (themeType) {
     case ThemeType.Darker: return 0.0;

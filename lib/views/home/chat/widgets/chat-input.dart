@@ -18,6 +18,8 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 
 class ChatInput extends StatefulWidget {
   final String roomId;
@@ -59,10 +61,7 @@ class ChatInputState extends State<ChatInput> {
 
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
-
-  Color inputTextColor = const Color(Colours.blackDefault);
-  Color inputColorBackground = const Color(Colours.greyEnabled);
-  Color inputCursorColor = Colors.blueGrey;
+  
   Color? sendButtonColor = const Color(Colours.greyDisabled);
   String hintText = Strings.placeholderInputMatrixUnencrypted;
 
@@ -84,14 +83,7 @@ class ChatInputState extends State<ChatInput> {
         });
       }
     });
-
-    if (Theme.of(context).brightness == Brightness.dark) {
-      setState(() {
-        inputTextColor = Colors.white;
-        inputCursorColor = Colors.white;
-        inputColorBackground = Colors.blueGrey;
-      });
-    }
+    
   }
 
   @override
@@ -176,6 +168,10 @@ class ChatInputState extends State<ChatInput> {
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxHeight = replying ? height * 0.45 : height * 0.5;
+
+          final inputTextColor = selectChatInputTextColor(props.themeType);
+          final inputCursorColor = selectChatInputCursorColor(props.themeType);
+          final inputColorBackground = selectChatInputBackgroundColor(props.themeType);
 
           final isSendable = sendable && !widget.sending;
 
@@ -342,19 +338,26 @@ class ChatInputState extends State<ChatInput> {
                         fillColor: inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Theme.of(context).accentColor, width: 1),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
-                            )),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).accentColor,
+                              width: 1,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(!replying ? 24 : 0),
+                            topRight: Radius.circular(!replying ? 24 : 0),
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
+                          )),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(!replying ? 24 : 0),
-                          topRight: Radius.circular(!replying ? 24 : 0),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).accentColor,
+                              width: 1,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(!replying ? 24 : 0),
+                            topRight: Radius.circular(!replying ? 24 : 0),
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
                         )),
                       ),
                     ),
@@ -374,6 +377,7 @@ class ChatInputState extends State<ChatInput> {
 
 class _Props extends Equatable {
   final Room room;
+  final ThemeType themeType;
   final bool enterSendEnabled;
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
@@ -382,6 +386,7 @@ class _Props extends Equatable {
 
   const _Props({
     required this.room,
+    required this.themeType,
     required this.enterSendEnabled,
     required this.autocorrectEnabled,
     required this.suggestionsEnabled,
@@ -396,6 +401,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
+        themeType: store.state.settingsStore.themeSettings.themeType,
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
