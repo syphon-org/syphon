@@ -77,14 +77,14 @@ Future<Database?> initStorage() async {
   }
 }
 
-// // Closes and saves storage
+// Closes and saves storage
 closeStorage() async {
   if (Storage.main != null) {
     Storage.main!.close();
   }
 }
 
-Future deleteStorage() async {
+deleteStorage() async {
   try {
     late DatabaseFactory storageFactory;
 

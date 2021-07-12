@@ -69,8 +69,9 @@ class IntroScreenState extends State<IntroScreen> {
 
     final store = StoreProvider.of<AppState>(context);
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
 
+    // TODO: decide on alway showing alpha aggrement on intro
     if (alphaAgreement == null || true) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
@@ -160,7 +161,7 @@ class IntroScreenState extends State<IntroScreen> {
     }
   }
 
-  String buildButtonString() {
+  buildButtonString() {
     switch (currentStep) {
       case 0:
         return 'let\'s go';
@@ -211,38 +212,36 @@ class IntroScreenState extends State<IntroScreen> {
                   direction: Axis.vertical,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Container(
-                      child: ButtonSolid(
-                        text: buildButtonString(),
-                        onPressed: () {
-                          if (currentStep == 0) {
-                            setState(() {
-                              onboarding = true;
-                            });
-                          }
+                    ButtonSolid(
+                      text: buildButtonString(),
+                      onPressed: () {
+                        if (currentStep == 0) {
+                          setState(() {
+                            onboarding = true;
+                          });
+                        }
 
-                          if (currentStep == sections.length - 2) {
-                            setState(() {
-                              loginText = Strings.buttonIntroExistQuestion;
-                              onboarding = false;
-                            });
-                          }
+                        if (currentStep == sections.length - 2) {
+                          setState(() {
+                            loginText = Strings.buttonIntroExistQuestion;
+                            onboarding = false;
+                          });
+                        }
 
-                          if (currentStep == sections.length - 1) {
-                            Navigator.pushNamed(
-                              context,
-                              '/signup',
-                            );
-                          }
-
-                          pageController!.nextPage(
-                            duration: Duration(
-                              milliseconds: Values.animationDurationDefault,
-                            ),
-                            curve: Curves.ease,
+                        if (currentStep == sections.length - 1) {
+                          Navigator.pushNamed(
+                            context,
+                            '/signup',
                           );
-                        },
-                      ),
+                        }
+
+                        pageController!.nextPage(
+                          duration: Duration(
+                            milliseconds: Values.animationDurationDefault,
+                          ),
+                          curve: Curves.ease,
+                        );
+                      },
                     ),
                   ],
                 ),
