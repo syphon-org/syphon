@@ -24,6 +24,7 @@ class MessageWidget extends StatelessWidget {
     this.lastRead = 0,
     this.selectedMessageId,
     this.avatarUri,
+    this.displayName,
     this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
@@ -46,6 +47,7 @@ class MessageWidget extends StatelessWidget {
   final String timeFormat;
   final String? avatarUri;
   final String? selectedMessageId;
+  final String? displayName;
   final Color? color;
 
   final Function? onSwipe;
@@ -414,7 +416,7 @@ class MessageWidget extends StatelessWidget {
                                     child: Container(
                                       margin: EdgeInsets.only(bottom: 4),
                                       child: Text(
-                                        formatSender(message.sender!),
+                                        displayName ?? formatSender(message.sender!),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: textColor,

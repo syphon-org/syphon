@@ -252,7 +252,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       }
     } catch (error) {
       store.dispatch(SetOffline(offline: true));
-      printError('[fetchSync] ${error.toString()}');
+      printError('[fetchSync] error ${error.toString()}');
 
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;

@@ -365,14 +365,12 @@ class ChatScreenState extends State<ChatScreen> {
           (ModalRoute.of(context)!.settings.arguments as ChatViewArguements).roomId,
         ),
         builder: (context, props) {
-          final double height = MediaQuery.of(context).size.height;
-
+          final height = MediaQuery.of(context).size.height;
           final closedInputPadding =
               !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
-
           final isScrolling = messagesController.hasClients && messagesController.offset != 0;
 
-          Color inputContainerColor = Colors.white;
+          var inputContainerColor = Colors.white;
 
           if (Theme.of(context).brightness == Brightness.dark) {
             inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
