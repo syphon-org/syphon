@@ -19,7 +19,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
 
 class ChatInput extends StatefulWidget {
   final String roomId;
@@ -82,7 +81,6 @@ class ChatInputState extends State<ChatInput> {
         });
       }
     });
-    
   }
 
   @override
@@ -174,7 +172,7 @@ class ChatInputState extends State<ChatInput> {
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderInputMatrixUnencrypted;
-            sendButtonColor = Theme.of(context).accentColor;
+            sendButtonColor = Color(Colours.greyDark);
           }
 
           if (widget.mediumType == MediumType.encryption) {
@@ -184,12 +182,7 @@ class ChatInputState extends State<ChatInput> {
 
           // if the button is disabled, make it more transparent to indicate that
           if (!isSendable) {
-            sendButtonColor = Color.fromRGBO(
-              sendButtonColor.red,
-              sendButtonColor.green,
-              sendButtonColor.blue,
-              130,
-            );
+            sendButtonColor = Color(Colours.greyDisabled);
           }
 
           var sendButton = InkWell(
@@ -203,7 +196,7 @@ class ChatInputState extends State<ChatInput> {
                 child: SvgPicture.asset(
                   Assets.iconSendUnlockBeing,
                   color: Colors.white,
-                  semanticsLabel: Strings.semanticsSendUnencrypted,
+                  semanticsLabel: Strings.semanticsSendArrow,
                 ),
               ),
             ),
@@ -221,7 +214,7 @@ class ChatInputState extends State<ChatInput> {
                   child: SvgPicture.asset(
                     Assets.iconSendLockSolidBeing,
                     color: Colors.white,
-                    semanticsLabel: Strings.semanticsSendUnencrypted,
+                    semanticsLabel: Strings.semanticsSendArrow,
                   ),
                 ),
               ),
@@ -318,6 +311,7 @@ class ChatInputState extends State<ChatInput> {
                       maxLines: null,
                       autocorrect: props.autocorrectEnabled,
                       enableSuggestions: props.suggestionsEnabled,
+                      textCapitalization: props.textCapitalization,
                       keyboardType: TextInputType.multiline,
                       textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
                       cursorColor: props.inputCursorColor,
@@ -335,27 +329,27 @@ class ChatInputState extends State<ChatInput> {
                         fillColor: props.inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                            borderSide: BorderSide(
                               color: Theme.of(context).accentColor,
                               width: 1,
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(!replying ? 24 : 0),
-                            topRight: Radius.circular(!replying ? 24 : 0),
-                            bottomLeft: Radius.circular(24),
-                            bottomRight: Radius.circular(24),
-                          )),
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(!replying ? 24 : 0),
+                              topRight: Radius.circular(!replying ? 24 : 0),
+                              bottomLeft: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            )),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(
+                            borderSide: BorderSide(
                               color: Theme.of(context).accentColor,
                               width: 1,
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(!replying ? 24 : 0),
-                            topRight: Radius.circular(!replying ? 24 : 0),
-                            bottomLeft: Radius.circular(24),
-                            bottomRight: Radius.circular(24),
-                        )),
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(!replying ? 24 : 0),
+                              topRight: Radius.circular(!replying ? 24 : 0),
+                              bottomLeft: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            )),
                       ),
                     ),
                   ),
@@ -380,6 +374,7 @@ class _Props extends Equatable {
   final bool enterSendEnabled;
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
+  final TextCapitalization textCapitalization;
 
   final Function onSendTyping;
 
@@ -391,6 +386,7 @@ class _Props extends Equatable {
     required this.enterSendEnabled,
     required this.autocorrectEnabled,
     required this.suggestionsEnabled,
+    required this.textCapitalization,
     required this.onSendTyping,
   });
 
@@ -402,12 +398,13 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
-        inputTextColor: selectChatInputTextColor(store.state.settingsStore.themeSettings.themeType),
-        inputCursorColor: selectChatInputCursorColor(store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground: selectChatInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
+        inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
+        textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

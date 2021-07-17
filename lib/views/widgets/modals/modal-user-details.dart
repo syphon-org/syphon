@@ -36,7 +36,7 @@ class ModalUserDetails extends StatelessWidget {
     Navigator.pushNamed(
       context,
       '/home/user/details',
-      arguments: UserDetailsArguments(
+      arguments: UserProfileArguments(
         user: props.user,
       ),
     );

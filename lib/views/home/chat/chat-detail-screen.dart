@@ -96,7 +96,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
   }
 
   @protected
-  Future onBlockUser({required BuildContext context, required _Props props}) async {
+  onBlockUser({required BuildContext context, required _Props props}) async {
     final user = props.users.firstWhere(
       (user) => user!.userId != props.currentUser.userId,
     );
@@ -117,10 +117,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
   }
 
   @protected
-  Future onShowColorPicker({
-    int? originalColor,
-    Function? onSelectColor,
+  onShowColorPicker({
     required BuildContext context,
+    required int originalColor,
+    required Function onSelectColor,
   }) async =>
       showDialog(
         context: context,

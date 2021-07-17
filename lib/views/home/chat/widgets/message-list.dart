@@ -138,6 +138,7 @@ class MessageListState extends State<MessageList> {
                         widget.selectedMessage != null ? widget.selectedMessage!.id : null;
 
                     final avatarUri = props.users[message.sender]?.avatarUri;
+                    final displayName = props.users[message.sender]?.displayName;
 
                     return MessageWidget(
                       message: message,
@@ -147,6 +148,7 @@ class MessageListState extends State<MessageList> {
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
+                      displayName: displayName,
                       themeType: props.themeType,
                       color: props.chatColorPrimary,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',

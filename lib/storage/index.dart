@@ -77,14 +77,14 @@ Future<Database?> initStorage() async {
   }
 }
 
-// // Closes and saves storage
+// Closes and saves storage
 closeStorage() async {
   if (Storage.main != null) {
     Storage.main!.close();
   }
 }
 
-Future deleteStorage() async {
+deleteStorage() async {
   try {
     late DatabaseFactory storageFactory;
 
@@ -128,11 +128,11 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final settings = await loadSettings(storage: storage);
     final redactions = await loadRedactions(storage: storage);
 
-    Map<String, List<Message>> messages = {};
-    Map<String, List<Reaction>> reactions = {};
-    Map<String, Map<String, ReadReceipt>> receipts = {};
+    final messages = <String, List<Message>>{};
+    final reactions = <String, List<Reaction>>{};
+    final receipts = <String, Map<String, ReadReceipt>>{};
 
-    for (Room room in rooms.values) {
+    for (final Room room in rooms.values) {
       messages[room.id] = await loadMessages(
         room.messageIds,
         storage: storage,

@@ -20,7 +20,7 @@ class Cache {
   static Database? cacheMain;
 
 // Global hot cache storage reference to prevent redundent storage loading
-  static FlutterSecureStorage? storage;
+  static FlutterSecureStorage? keyStorage;
 
   // inital store caches for reload
   static Map<String, Map?> cacheStores = {};
@@ -41,27 +41,25 @@ class Cache {
   static const accessTokenKey = 'accessToken';
 }
 
-/**
- * Init Cache
- * 
- * (needs cold storage extracted as it's own entity)
- */
+///
+/// Init Hot Cache
+///
 Future<Database?> initCache() async {
   try {
     var cachePath = Cache.cachePath;
     var cacheFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
-      Cache.storage = FlutterSecureStorage();
+      Cache.keyStorage = FlutterSecureStorage();
 
-      var directory = await getApplicationSupportDirectory();
+      final directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, Cache.cachePath);
       cacheFactory = databaseFactoryIo;
     }
 
     // Configure cache encryption/decryption instance
-    Cache.cryptKey = await loadKey();
+    Cache.cryptKey = await loadCacheKey();
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -83,25 +81,25 @@ Future<Database?> initCache() async {
 
     return Cache.cacheMain;
   } catch (error) {
-    printError('[initCache] ${error}');
+    printError('[initCache] $error');
     return null;
   }
 }
 
-// // Closes and saves storage
-void closeCache(Database? cache) async {
+// Closes and saves storage
+closeCache(Database? cache) async {
   if (cache != null) {
     cache.close();
   }
 }
 
-Future<void> deleteCache({Database? cache}) async {
+deleteCache({Database? cache}) async {
   try {
     late var cacheFactory;
     var cachePath = Cache.cachePath;
 
     if (Platform.isAndroid || Platform.isIOS) {
-      var directory = await getApplicationSupportDirectory();
+      final directory = await getApplicationSupportDirectory();
       await directory.create();
       cachePath = join(directory.path, cachePath);
       cacheFactory = databaseFactoryIo;
@@ -115,8 +113,7 @@ Future<void> deleteCache({Database? cache}) async {
 
     Cache.cacheMain = await cacheFactory.deleteDatabase(cachePath);
   } catch (error) {
-    printError('[initCache] ${error}');
-    return null;
+    printError('[initCache] $error');
   }
 }
 
@@ -124,25 +121,28 @@ String generateKey() {
   return Key.fromSecureRandom(32).base64;
 }
 
-Future<String?> loadKey() async {
-  final location = Cache.keyLocation;
+Future<String?> loadCacheId() async {}
+
+Future<String?> loadCacheKey() async {
+  const location = Cache.keyLocation;
+
   var key;
 
   // mobile
   if (Platform.isAndroid || Platform.isIOS) {
-    final storage = Cache.storage!;
+    final keyStorage = Cache.keyStorage!;
 
     // try to read key
     try {
-      key = await storage.read(key: location);
+      key = await keyStorage.read(key: location);
     } catch (error) {
-      printError('[loadKey] ${error}');
+      printError('[loadKey] $error');
     }
 
     // generate a new one on failure
     if (key == null) {
       key = generateKey();
-      await storage.write(key: Cache.keyLocation, value: key);
+      await keyStorage.write(key: Cache.keyLocation, value: key);
     }
   }
 
@@ -161,8 +161,7 @@ Future<String?> loadKey() async {
       if (key == null) {
         final directory = await getApplicationSupportDirectory();
         key = generateKey();
-        await File(join(directory.path, location))
-            .writeAsString(key, flush: true);
+        await File(join(directory.path, location)).writeAsString(key, flush: true);
       }
     } catch (error) {
       printError('[loadKey] $error');

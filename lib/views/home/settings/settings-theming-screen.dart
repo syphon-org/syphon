@@ -9,19 +9,69 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
-class ThemingSettingsScreen extends StatelessWidget {
+class ThemingSettingsScreen extends StatefulWidget {
   const ThemingSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
+  _ThemingSettingsScreenState createState() => _ThemingSettingsScreenState();
+}
+
+class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
+  onToggleAdvancedColors(BuildContext context, Function onAdvanced) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogConfirm(
+        title: 'Confirm Advanced Colors',
+        content: Strings.contentAdvancedColorDialog,
+        confirm: 'enable',
+        onConfirm: () async {
+          Navigator.pop(dialogContext);
+          onAdvanced();
+        },
+        onDismiss: () => Navigator.pop(dialogContext),
+      ),
+    );
+  }
+
+  onToggleColorType({
+    required String title,
+    required int currentColor,
+    required Function onSelectColor,
+    bool? advanced,
+  }) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => DialogColorPicker(
+        title: title,
+        resetColor: Colours.cyanSyphon,
+        currentColor: currentColor,
+        onSelectColor: onSelectColor,
+        advanced: advanced ?? false,
+        onToggleAdvanced: () => onToggleAdvancedColors(
+            dialogContext,
+            () => onToggleColorType(
+                  title: title,
+                  currentColor: currentColor,
+                  onSelectColor: onSelectColor,
+                  advanced: true,
+                )),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
@@ -54,14 +104,10 @@ class ThemingSettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext context) => DialogColorPicker(
-                              title: 'Select Primary Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.primaryColor,
-                              onSelectColor: props.onSelectPrimaryColor,
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select Primary Color',
+                            currentColor: props.primaryColor,
+                            onSelectColor: props.onSelectPrimaryColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
@@ -74,14 +120,10 @@ class ThemingSettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext context) => DialogColorPicker(
-                              title: 'Select Accent Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.accentColor,
-                              onSelectColor: props.onSelectAccentColor,
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select Accent Color',
+                            currentColor: props.accentColor,
+                            onSelectColor: props.onSelectAccentColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
@@ -94,14 +136,10 @@ class ThemingSettingsScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext context) => DialogColorPicker(
-                              title: 'Select App Bar Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.appBarColor,
-                              onSelectColor: props.onSelectAppBarColor,
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select App Bar Color',
+                            currentColor: props.appBarColor,
+                            onSelectColor: props.onSelectAppBarColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
@@ -193,11 +231,10 @@ class ThemingSettingsScreen extends StatelessWidget {
                             'Room Type Badges',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
-                          trailing: Container(
-                            child: Switch(
-                              value: props.roomTypeBadgesEnabled,
-                              onChanged: (value) => props.onToggleRoomTypeBadges(),
-                            ),
+                          trailing: Switch(
+                            value: props.roomTypeBadgesEnabled,
+                            onChanged: (value) => props.onToggleRoomTypeBadges(),
+                            activeColor: Color(props.primaryColor),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
                         ),
@@ -223,7 +260,7 @@ class ThemingSettingsScreen extends StatelessWidget {
       );
 }
 
-class Props extends Equatable {
+class _Props extends Equatable {
   final int primaryColor;
   final int accentColor;
   final int appBarColor;
@@ -246,7 +283,7 @@ class Props extends Equatable {
   final Function onToggleRoomTypeBadges;
   final Function onIncrementAvatarShape;
 
-  Props({
+  const _Props({
     required this.primaryColor,
     required this.accentColor,
     required this.appBarColor,
@@ -281,7 +318,7 @@ class Props extends Equatable {
         roomTypeBadgesEnabled,
       ];
 
-  static Props mapStateToProps(Store<AppState> store) => Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         primaryColor: store.state.settingsStore.themeSettings.primaryColor,
         accentColor: store.state.settingsStore.themeSettings.accentColor,
         appBarColor: store.state.settingsStore.themeSettings.appBarColor,

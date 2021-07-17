@@ -104,14 +104,11 @@ class ProfileScreenState extends State<ProfileScreen> {
         );
 
         if (avatarFileNew != null) {
-          avatarWidget = ClipRRect(
-            borderRadius: BorderRadius.circular(imageSize),
-            child: Image.file(
-              avatarFileNew!,
-              width: imageSize,
-              height: imageSize,
-              fit: BoxFit.cover,
-            ),
+          avatarWidget = Avatar(
+            alt: formatUsername(props.user),
+            size: imageSize,
+            file: avatarFileNew,
+            background: Colours.hashedColor(formatUsername(props.user)),
           );
         }
 

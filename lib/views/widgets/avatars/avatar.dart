@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class Avatar extends StatelessWidget {
     Key? key,
     this.uri,
     this.url,
+    this.file,
     this.alt,
     this.size = Dimensions.avatarSizeMin,
     this.force = false,
@@ -29,6 +32,7 @@ class Avatar extends StatelessWidget {
   final String? uri;
   final String? url;
   final String? alt;
+  final File? file;
   final double size;
   final Color? background;
   final EdgeInsets? margin;
@@ -81,6 +85,18 @@ class Avatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fallbackColor: Colors.transparent,
+              ),
+            );
+          }
+
+          if (file != null) {
+            avatarWidget = ClipRRect(
+              borderRadius: borderRadius,
+              child: Image.file(
+                file!,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
               ),
             );
           }
@@ -145,5 +161,6 @@ class _Props extends Equatable {
   @override
   List<Object?> get props => [avatarShape];
 
-  _Props.mapStateToProps(Store<AppState> store) : avatarShape = store.state.settingsStore.themeSettings.avatarShape;
+  _Props.mapStateToProps(Store<AppState> store)
+      : avatarShape = store.state.settingsStore.themeSettings.avatarShape;
 }

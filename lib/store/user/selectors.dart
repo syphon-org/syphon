@@ -11,7 +11,7 @@ dynamic homeserver(AppState state) {
 }
 
 // Users the authed user has dm'ed
-List<User> friendlyUsers(AppState state) {
+List<User> selectFriendlyUsers(AppState state) {
   final rooms = state.roomStore.rooms.values;
   final users = state.userStore.users;
   final userCurrent = state.authStore.user;
@@ -25,6 +25,13 @@ List<User> friendlyUsers(AppState state) {
   final roomsDirectUsers = roomDirectUserIds.map((userId) => users[userId]);
 
   return List.from(roomsDirectUsers);
+}
+
+// Users the authed user has dm'ed
+List<User> selectKnownUsers(AppState state) {
+  final users = state.userStore.users;
+  final latestUsers = users.values.take(25);
+  return List.from(latestUsers);
 }
 
 Map<String, User> messageUsers({required AppState state, String? roomId}) {

@@ -26,11 +26,10 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
 
   // Generate the ThemeData to return if requested
   if (generateThemeData) {
-    final primaryColor = Color(appTheme.primaryColor);
+    final primaryColor = Color(appTheme.primaryColor).withOpacity(1);
     final accentColor = Color(appTheme.accentColor);
     final brightness = selectThemeBrightness(appTheme.themeType);
-    final invertedPrimaryColor =
-      brightness == Brightness.light ? primaryColor : accentColor;
+    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : accentColor;
 
     final appBarElevation = selectAppBarElevation(appTheme.themeType);
     final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
@@ -55,10 +54,10 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       accentColor: accentColor,
       brightness: brightness,
       colorScheme: ThemeData().colorScheme.copyWith(
-        primary: primaryColor,
-        secondary: accentColor,
-        brightness: brightness,
-      ),
+            primary: primaryColor,
+            secondary: accentColor,
+            brightness: brightness,
+          ),
 
       // Core UI
       dialogBackgroundColor: dialogBackgroundColor,
@@ -69,9 +68,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
         selectionHandleColor: primaryColor,
       ),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor: scaffoldBackgroundColor != null
-          ? Color(scaffoldBackgroundColor)
-          : null,
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
         brightness: Brightness.dark,

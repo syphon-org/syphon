@@ -1,20 +1,14 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -24,7 +18,6 @@ import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class SearchUserScreen extends StatefulWidget {
@@ -35,9 +28,10 @@ class SearchUserScreen extends StatefulWidget {
 }
 
 class SearchUserState extends State<SearchUserScreen> {
-  final searchInputFocusNode = FocusNode();
-
   SearchUserState();
+
+  final searchInputFocusNode = FocusNode();
+  final avatarScrollController = ScrollController();
 
   String searchable = '';
   String? creatingRoomDisplayName;
@@ -55,7 +49,7 @@ class SearchUserState extends State<SearchUserScreen> {
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
-    if (searchResults.isNotEmpty && !(searchResults[0] is User)) {
+    if (searchResults.isNotEmpty && searchResults[0] is! User) {
       store.dispatch(clearSearchResults());
     }
   }
@@ -67,10 +61,7 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  onShowUserDetails({
-    required BuildContext context,
-    User? user,
-  }) async {
+  onShowUserDetails({required BuildContext context, User? user}) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -83,8 +74,7 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  Future onMessageUser(
-      {required BuildContext context, _Props? props, User? user}) async {
+  onCreateChat({required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -114,19 +104,13 @@ class SearchUserState extends State<SearchUserScreen> {
     );
   }
 
-  /**
-   * 
-   * Attempt User Chat
-   * 
-   * attempt chating with a user 
-   * by the name searched
-   */
+  ///
+  /// Attempt User Chat
+  ///
+  /// attempt chating with a user by the name searched
+  ///
   @protected
-  Future onAttemptChat({
-    required User user,
-    required BuildContext context,
-    _Props? props,
-  }) async {
+  onAttemptChat({required User user, required BuildContext context, _Props? props}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -157,35 +141,84 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  Widget buildUserList(BuildContext context, _Props props) {
-    final searchText = searchable;
-
-    final attemptableUser = User(
-      displayName: searchText,
-      userId: searchable.isNotEmpty && searchable.contains(':')
-          ? searchable
-          : formatUserId(searchText),
-    );
+  Widget buildSearchList(BuildContext context, _Props props) {
+    final usersList = props.searchResults;
 
     final foundResult = props.searchResults.indexWhere(
-      (result) => result.userId.contains(searchText),
+      (result) => result.userId.contains(searchable),
     );
 
     final showManualUser = searchable.isNotEmpty && foundResult < 0;
 
-    final usersList =
-        searchable.isEmpty ? props.usersRecent : props.searchResults;
+    final attemptableUser = User(
+      displayName: searchable,
+      userId: searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
+    );
+
+    return ListView(
+      children: [
+        Container(
+          padding: EdgeInsets.only(left: 20, right: 20, top: 24),
+          child: Row(
+            children: [
+              Text(
+                Strings.labelSearchResults,
+                textAlign: TextAlign.start,
+                style: Theme.of(context).textTheme.subtitle2,
+              ),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: showManualUser,
+          child: GestureDetector(
+            onTap: () => onAttemptChat(props: props, context: context, user: attemptableUser),
+            child: ListItemUser(
+              user: attemptableUser,
+              enabled: creatingRoomDisplayName != searchable,
+              loading: props.loading,
+              real: false,
+            ),
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: usersList.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            final user = usersList[index] as User;
+
+            return GestureDetector(
+              onTap: () => onShowUserDetails(context: context, user: user),
+              child: ListItemUser(
+                user: user,
+                enabled: creatingRoomDisplayName != user.displayName,
+                loading: props.loading,
+                onPress: () => onCreateChat(
+                  context: context,
+                  props: props,
+                  user: user,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  @protected
+  Widget buildPreviewList(BuildContext context, _Props props) {
+    final usersList = props.usersRecent;
+    final knownList = props.usersKnown;
 
     return ListView(
       children: [
         Visibility(
-          visible: searchable.isEmpty,
+          visible: usersList.isNotEmpty,
           child: Container(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 16,
-            ),
+            padding: EdgeInsets.only(left: 20, right: 20, top: 24),
             child: Row(
               children: [
                 Text(
@@ -197,190 +230,110 @@ class SearchUserState extends State<SearchUserScreen> {
             ),
           ),
         ),
-        Visibility(
-          visible: searchable.isNotEmpty,
-          child: Container(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 16,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  Strings.labelSearchResults,
-                  textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Visibility(
-          visible: showManualUser,
-          child: GestureDetector(
-            onTap: () => onAttemptChat(
-              props: props,
-              context: context,
-              user: attemptableUser,
-            ),
-            child: CardSection(
-              padding: EdgeInsets.zero,
-              elevation: 0,
-              child: Container(
-                child: ListTile(
-                  enabled: creatingRoomDisplayName != searchable,
-                  leading: Avatar(
-                    uri: attemptableUser.avatarUri,
-                    alt: attemptableUser.displayName ?? attemptableUser.userId,
-                    size: Dimensions.avatarSizeMin,
-                  ),
-                  title: Text(
-                    formatUsername(attemptableUser),
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  subtitle: Text(
-                    attemptableUser.userId!,
-                    style: Theme.of(context).textTheme.caption!.merge(
-                          TextStyle(
-                            color: props.loading
-                                ? Color(Colours.greyDisabled)
-                                : null,
-                          ),
-                        ),
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: Dimensions.iconSizeLite,
-                        height: Dimensions.iconSizeLite,
-                        child: SvgPicture.asset(
-                          Assets.iconSendBeing,
-                          height: Dimensions.iconSize,
-                          width: Dimensions.iconSize,
-                          semanticsLabel: Strings.semanticsSendUnencrypted,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
           itemCount: usersList.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
-            final user = (usersList[index] as User);
+            final user = usersList[index];
 
             return GestureDetector(
-              onTap: () => this.onShowUserDetails(
-                context: context,
+              onTap: () => onShowUserDetails(context: context, user: user),
+              child: ListItemUser(
                 user: user,
-              ),
-              child: CardSection(
-                padding: EdgeInsets.zero,
-                elevation: 0,
-                child: Container(
-                  child: ListTile(
-                    enabled: creatingRoomDisplayName != user.displayName,
-                    leading: Avatar(
-                      uri: user.avatarUri,
-                      alt: user.displayName ?? user.userId,
-                      size: Dimensions.avatarSizeMin,
-                      background: Colours.hashedColor(formatUsername(user)),
-                    ),
-                    title: Text(
-                      formatUsername(user),
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
-                    subtitle: Text(
-                      user.userId!,
-                      style: Theme.of(context).textTheme.caption!.merge(
-                            TextStyle(
-                              color: props.loading
-                                  ? Color(Colours.greyDisabled)
-                                  : null,
-                            ),
-                          ),
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () => this.onMessageUser(
-                            context: context,
-                            props: props,
-                            user: user,
-                          ),
-                          child: Container(
-                            width: Dimensions.iconSizeLite,
-                            height: Dimensions.iconSizeLite,
-                            child: SvgPicture.asset(
-                              Assets.iconSendBeing,
-                              fit: BoxFit.contain,
-                              height: Dimensions.iconSize,
-                              width: Dimensions.iconSize,
-                              color: Theme.of(context).iconTheme.color,
-                              semanticsLabel: Strings.semanticsSendUnencrypted,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                enabled: creatingRoomDisplayName != user.displayName,
+                loading: props.loading,
+                onPress: () => onCreateChat(
+                  context: context,
+                  props: props,
+                  user: user,
                 ),
               ),
             );
           },
-        )
+        ),
+        Container(
+          padding: EdgeInsets.only(left: 20, right: 20, top: 24),
+          child: Row(
+            children: [
+              Text(
+                Strings.labelKnownUsers,
+                textAlign: TextAlign.start,
+                style: Theme.of(context).textTheme.subtitle2,
+              ),
+            ],
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: knownList.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            final user = knownList[index];
+
+            return GestureDetector(
+              onTap: () => onShowUserDetails(context: context, user: user),
+              child: ListItemUser(
+                user: user,
+                enabled: creatingRoomDisplayName != user.displayName,
+                loading: props.loading,
+                onPress: () => onCreateChat(
+                  context: context,
+                  props: props,
+                  user: user,
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-        distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-        builder: (context, props) {
-          return Scaffold(
-            appBar: AppBarSearch(
-              title: Strings.titleSearchUsers,
-              label: 'Search for a user...',
-              tooltip: 'Search users',
-              brightness: Brightness.dark,
-              forceFocus: true,
-              focusNode: searchInputFocusNode,
-              onChange: (text) => setState(() {
+      distinct: true,
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+      builder: (context, props) {
+        return Scaffold(
+          appBar: AppBarSearch(
+            title: Strings.titleSearchUsers,
+            label: 'Search for a user...',
+            tooltip: 'Search users',
+            brightness: Brightness.dark,
+            forceFocus: true,
+            focusNode: searchInputFocusNode,
+            onChange: (text) => setState(() {
+              searchable = text;
+            }),
+            onSearch: (text) {
+              setState(() {
                 searchable = text;
-              }),
-              onSearch: (text) {
-                setState(() {
-                  searchable = text;
-                });
-                props.onSearch(text);
-              },
-            ),
-            body: Stack(
-              children: [
-                buildUserList(context, props),
-                Positioned(
-                  child: Loader(
-                    loading: props.loading,
-                  ),
+              });
+              props.onSearch(text);
+            },
+          ),
+          body: Stack(
+            children: [
+              Visibility(
+                visible: searchable.isEmpty,
+                child: buildPreviewList(context, props),
+              ),
+              Visibility(
+                visible: searchable.isNotEmpty,
+                child: buildSearchList(context, props),
+              ),
+              Positioned(
+                child: Loader(
+                  loading: props.loading,
                 ),
-              ],
-            ),
-          );
-        },
-      );
+              ),
+            ],
+          ),
+        );
+      });
 }
 
 class _Props extends Equatable {
@@ -388,26 +341,37 @@ class _Props extends Equatable {
   final ThemeType themeType;
   final bool creatingRoom;
   final List<User> usersRecent;
+  final List<User> usersKnown;
   final List<dynamic> searchResults;
 
   final Function onSearch;
   final Function onCreateChatDirect;
 
-  _Props({
+  const _Props({
     required this.themeType,
     required this.loading,
     required this.creatingRoom,
     required this.searchResults,
     required this.usersRecent,
+    required this.usersKnown,
     required this.onSearch,
     required this.onCreateChatDirect,
   });
+
+  @override
+  List<Object> get props => [
+        loading,
+        themeType,
+        creatingRoom,
+        searchResults,
+      ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
-        usersRecent: friendlyUsers(store.state),
+        usersKnown: selectKnownUsers(store.state),
+        usersRecent: selectFriendlyUsers(store.state),
         searchResults: store.state.searchStore.searchResults,
         onSearch: (String text) {
           if (text.contains('@') && text.length == 1) {
@@ -427,12 +391,4 @@ class _Props extends Equatable {
           ));
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        themeType,
-        creatingRoom,
-        searchResults,
-      ];
 }

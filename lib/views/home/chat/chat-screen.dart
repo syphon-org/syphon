@@ -41,10 +41,7 @@ class ChatViewArguements {
   final String? title;
 
   // Improve loading times
-  ChatViewArguements({
-    this.roomId,
-    this.title,
-  });
+  ChatViewArguements({this.roomId, this.title});
 }
 
 class ChatScreen extends StatefulWidget {
@@ -164,7 +161,7 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  onSubmitMessage(_Props props) async {
+  onSendMessage(_Props props) async {
     setState(() {
       sending = true;
     });
@@ -311,7 +308,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                        semanticsLabel: Strings.semanticsSendArrow,
                       ),
                     ),
                   ),
@@ -344,7 +341,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendUnencrypted,
+                        semanticsLabel: Strings.semanticsSendArrow,
                       ),
                     ),
                   ),
@@ -368,14 +365,12 @@ class ChatScreenState extends State<ChatScreen> {
           (ModalRoute.of(context)!.settings.arguments as ChatViewArguements).roomId,
         ),
         builder: (context, props) {
-          final double height = MediaQuery.of(context).size.height;
-
+          final height = MediaQuery.of(context).size.height;
           final closedInputPadding =
               !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
-
           final isScrolling = messagesController.hasClients && messagesController.offset != 0;
 
-          Color inputContainerColor = Colors.white;
+          var inputContainerColor = Colors.white;
 
           if (Theme.of(context).brightness == Brightness.dark) {
             inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
@@ -471,12 +466,7 @@ class ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      top: 12,
-                      bottom: 12,
-                    ),
+                    padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling
@@ -498,7 +488,7 @@ class ChatScreenState extends State<ChatScreen> {
                         sending: sending,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
-                        onSubmitMessage: () => onSubmitMessage(props),
+                        onSubmitMessage: () => onSendMessage(props),
                       ),
                     ),
                   ),
