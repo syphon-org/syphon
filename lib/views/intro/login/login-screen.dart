@@ -128,6 +128,7 @@ class LoginScreenState extends State<LoginScreen> {
               maxLines: 1,
               label: props.usernameHint,
               disableSpacing: true,
+              disabled: props.loading,
               controller: usernameController,
               autofillHints: const [AutofillHints.username],
               formatters: [FilteringTextInputFormatter.deny(RegExp(r'@@'))],
@@ -163,6 +164,7 @@ class LoginScreenState extends State<LoginScreen> {
           ),
           child: TextFieldSecure(
             label: 'password',
+            disabled: props.loading,
             focusNode: passwordFocus,
             obscureText: !visibility,
             textAlign: TextAlign.left,
