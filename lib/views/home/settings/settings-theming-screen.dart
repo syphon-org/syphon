@@ -25,11 +25,7 @@ class ThemingSettingsScreen extends StatefulWidget {
 }
 
 class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
-  bool advancedColors = false;
-
-  onToggleAdvancedColors(
-    BuildContext context,
-  ) async {
+  onToggleAdvancedColors(BuildContext context, Function onAdvanced) async {
     await showDialog(
       context: context,
       barrierDismissible: true,
@@ -38,12 +34,36 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
         content: Strings.contentAdvancedColorDialog,
         confirm: 'enable',
         onConfirm: () async {
-          setState(() {
-            advancedColors = true;
-          });
           Navigator.pop(dialogContext);
+          onAdvanced();
         },
         onDismiss: () => Navigator.pop(dialogContext),
+      ),
+    );
+  }
+
+  onToggleColorType({
+    required String title,
+    required int currentColor,
+    required Function onSelectColor,
+    bool? advanced,
+  }) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => DialogColorPicker(
+        title: title,
+        resetColor: Colours.cyanSyphon,
+        currentColor: currentColor,
+        onSelectColor: onSelectColor,
+        advanced: advanced ?? false,
+        onToggleAdvanced: () => onToggleAdvancedColors(
+            dialogContext,
+            () => onToggleColorType(
+                  title: title,
+                  currentColor: currentColor,
+                  onSelectColor: onSelectColor,
+                  advanced: true,
+                )),
       ),
     );
   }
@@ -84,16 +104,10 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext dialogContext) => DialogColorPicker(
-                              title: 'Select Primary Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.primaryColor,
-                              onSelectColor: props.onSelectPrimaryColor,
-                              advanced: advancedColors,
-                              onToggleAdvanced: () => onToggleAdvancedColors(dialogContext),
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select Primary Color',
+                            currentColor: props.primaryColor,
+                            onSelectColor: props.onSelectPrimaryColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
@@ -106,16 +120,10 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext dialogContext) => DialogColorPicker(
-                              title: 'Select Accent Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.accentColor,
-                              onSelectColor: props.onSelectAccentColor,
-                              advanced: advancedColors,
-                              onToggleAdvanced: () => onToggleAdvancedColors(dialogContext),
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select Accent Color',
+                            currentColor: props.accentColor,
+                            onSelectColor: props.onSelectAccentColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
@@ -128,16 +136,10 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                           ),
                         ),
                         ListTile(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (BuildContext dialogContext) => DialogColorPicker(
-                              title: 'Select App Bar Color',
-                              resetColor: Colours.cyanSyphon,
-                              currentColor: props.appBarColor,
-                              onSelectColor: props.onSelectAppBarColor,
-                              advanced: advancedColors,
-                              onToggleAdvanced: () => onToggleAdvancedColors(dialogContext),
-                            ),
+                          onTap: () => onToggleColorType(
+                            title: 'Select App Bar Color',
+                            currentColor: props.appBarColor,
+                            onSelectColor: props.onSelectAppBarColor,
                           ),
                           contentPadding: Dimensions.listPadding,
                           title: Text(

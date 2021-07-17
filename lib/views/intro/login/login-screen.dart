@@ -76,8 +76,29 @@ class LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  buildSSOLogin(_Props props) {
-    return Container(
+  onToggleShowPassword() {
+    if (!passwordFocus.hasFocus) {
+      // Unfocus all focus nodes
+      passwordFocus.unfocus();
+
+      // Disable text field's focus node request
+      passwordFocus.canRequestFocus = false;
+    }
+
+    // Do your stuff
+    setState(() {
+      visibility = !visibility;
+    });
+
+    if (!passwordFocus.hasFocus) {
+      //Enable the text field's focus node request after some delay
+      Future.delayed(Duration(milliseconds: 100), () {
+        passwordFocus.canRequestFocus = true;
+      });
+    }
+  }
+
+  buildSSOLogin(_Props props) => Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: Avatar(
@@ -106,13 +127,9 @@ class LoginScreenState extends State<LoginScreen> {
             size: Dimensions.iconSizeLarge,
           ),
         ),
-      ),
-    );
-  }
+      ));
 
-  buildPasswordLogin(_Props props) {
-    return Column(
-      children: [
+  buildPasswordLogin(_Props props) => Column(children: [
         Container(
           height: Dimensions.inputHeight,
           margin: const EdgeInsets.only(
@@ -173,27 +190,7 @@ class LoginScreenState extends State<LoginScreen> {
               props.onChangePassword(password);
             },
             suffix: GestureDetector(
-              onTap: () {
-                if (!passwordFocus.hasFocus) {
-                  // Unfocus all focus nodes
-                  passwordFocus.unfocus();
-
-                  // Disable text field's focus node request
-                  passwordFocus.canRequestFocus = false;
-                }
-
-                // Do your stuff
-                setState(() {
-                  visibility = !visibility;
-                });
-
-                if (!passwordFocus.hasFocus) {
-                  //Enable the text field's focus node request after some delay
-                  Future.delayed(Duration(milliseconds: 100), () {
-                    passwordFocus.canRequestFocus = true;
-                  });
-                }
-              },
+              onTap: () => onToggleShowPassword(),
               child: Icon(
                 visibility ? Icons.visibility : Icons.visibility_off,
               ),
@@ -233,9 +230,7 @@ class LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-      ],
-    );
-  }
+      ]);
 
   @override
   Widget build(BuildContext context) {
@@ -246,6 +241,7 @@ class LoginScreenState extends State<LoginScreen> {
       distinct: true,
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           elevation: 0,
           brightness: Brightness.light,
@@ -278,7 +274,6 @@ class LoginScreenState extends State<LoginScreen> {
             },
           ),
         ),
-        extendBodyBehindAppBar: true,
         body: ScrollConfiguration(
           behavior: DefaultScrollBehavior(),
           child: SingleChildScrollView(

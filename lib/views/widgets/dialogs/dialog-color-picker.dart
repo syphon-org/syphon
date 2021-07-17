@@ -105,6 +105,8 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
       dialogHeight = height / 1.80;
     }
 
+    const optionsPadding = EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0);
+
     final options = [
       SimpleDialogOption(
         onPressed: () {
@@ -122,6 +124,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
       if (widget.onToggleAdvanced != null) {
         options.add(
           SimpleDialogOption(
+            padding: optionsPadding,
             onPressed: () {
               Navigator.pop(context);
               widget.onToggleAdvanced!();
@@ -136,6 +139,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
 
       options.add(
         SimpleDialogOption(
+          padding: optionsPadding,
           onPressed: () {
             if (widget.onCancel != null) {
               widget.onCancel!();
@@ -153,6 +157,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
     if (widget.advanced) {
       options.add(
         SimpleDialogOption(
+          padding: optionsPadding,
           onPressed: () {
             Navigator.pop(context);
           },
@@ -165,12 +170,8 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
     }
 
     return SimpleDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      contentPadding: EdgeInsets.symmetric(
-        vertical: 12,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      contentPadding: EdgeInsets.symmetric(vertical: 12),
       title: Text(widget.title),
       children: <Widget>[
         Container(
@@ -179,6 +180,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           ),
           width: width,
           height: dialogHeight,
+          constraints: !widget.advanced ? null : BoxConstraints(minHeight: 460),
           child: widget.advanced ? buildAdvancedPicker(context) : buildDefaultPicker(context),
         ),
         Container(

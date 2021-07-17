@@ -311,6 +311,7 @@ class ChatInputState extends State<ChatInput> {
                       maxLines: null,
                       autocorrect: props.autocorrectEnabled,
                       enableSuggestions: props.suggestionsEnabled,
+                      textCapitalization: props.textCapitalization,
                       keyboardType: TextInputType.multiline,
                       textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
                       cursorColor: props.inputCursorColor,
@@ -373,6 +374,7 @@ class _Props extends Equatable {
   final bool enterSendEnabled;
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
+  final TextCapitalization textCapitalization;
 
   final Function onSendTyping;
 
@@ -384,6 +386,7 @@ class _Props extends Equatable {
     required this.enterSendEnabled,
     required this.autocorrectEnabled,
     required this.suggestionsEnabled,
+    required this.textCapitalization,
     required this.onSendTyping,
   });
 
@@ -401,6 +404,7 @@ class _Props extends Equatable {
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
+        textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

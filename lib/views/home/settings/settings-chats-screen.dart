@@ -54,7 +54,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                               width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
-                                'Chats',
+                                'General',
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
