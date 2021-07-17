@@ -19,7 +19,7 @@ import 'package:syphon/store/sync/background/storage.dart';
 /// Saves store data to cold storage based
 /// on which redux actions are fired.
 ///
-dynamic storageMiddleware<State>(
+storageMiddleware<State>(
   Store<AppState> store,
   dynamic action,
   NextDispatcher next,
@@ -27,27 +27,24 @@ dynamic storageMiddleware<State>(
   next(action);
 
   switch (action.runtimeType) {
-    // auth store
     case SetUser:
-      // printInfo(
-      //   '[storageMiddleware] saving auth ${action.runtimeType.toString()}',
-      // );
       saveAuth(store.state.authStore, storage: Storage.main!);
       break;
-    // media store
     case UpdateMediaCache:
-      // printInfo(
-      //   '[storageMiddleware] saving media ${action.runtimeType.toString()}',
-      // );
       // saveMedia(action.mxcUri, action.data, storage: Storage.main);
       break;
     case UpdateRoom:
-      // TODO: create a mutation like SetSyncing to distinguish small but important room mutations
-      if (action.syncing == null) {
-        final room = store.state.roomStore.rooms[action.id];
-        if (room != null) {
-          saveRoom(room, storage: Storage.main);
-        }
+      final _action = action as UpdateRoom;
+      final rooms = store.state.roomStore.rooms;
+      final isSending = _action.sending != null;
+      final isDrafting = _action.draft != null;
+      final isLastRead = _action.lastRead != null;
+
+      // room information (or a room) should be small enought to update frequently
+      // TODO: extract room event keys to a helper class / object to remove large map copies
+      if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
+        final room = rooms[_action.id];
+        saveRoom(room!, storage: Storage.main);
       }
       break;
     case RemoveRoom:

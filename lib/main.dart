@@ -4,6 +4,7 @@ import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/syphon.dart';
 
 // ignore: avoid_void_async
@@ -24,5 +25,13 @@ void main() async {
   final store = await initStore(cache, storage);
 
   // init app
-  runApp(Syphon(store, cache, storage));
+  runApp(
+    Prelock(
+      child: Syphon(
+        store,
+        cache,
+        storage,
+      ),
+    ),
+  );
 }

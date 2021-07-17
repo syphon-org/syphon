@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/cache/index.dart';
@@ -31,17 +30,20 @@ class Storage {
   static Map<String, dynamic> storageData = {};
 
   // storage identifiers
-  static const mainLocation = '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
+  static const defaultLocation = '${Values.appNameLabel}-main-storage.db';
+
+  // cache key identifiers
+  static const keyLocation = '${Values.appNameLabel}@storageKey';
 }
 
 Future<Database?> initStorage() async {
   try {
     DatabaseFactory? storageFactory;
 
-    var version;
+    var version = 1;
+    final location = DEBUG_MODE ? 'debug-${Storage.defaultLocation}' : Storage.defaultLocation;
 
     if (Platform.isAndroid || Platform.isIOS) {
-      version = 1;
       // always open cold storage as sqflite
       storageFactory = getDatabaseFactorySqflite(
         sqflite.databaseFactory,
@@ -62,10 +64,12 @@ Future<Database?> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: Cache.cryptKey!);
+    final codec = getEncryptSembastCodec(
+      password: Cache.cryptKey!,
+    );
 
     Storage.main = await storageFactory.openDatabase(
-      Storage.mainLocation,
+      location,
       codec: codec,
       version: version,
     );
@@ -100,7 +104,7 @@ deleteStorage() async {
       );
     }
 
-    await storageFactory.deleteDatabase(Storage.mainLocation);
+    await storageFactory.deleteDatabase(Storage.defaultLocation);
 
     Storage.main = null;
   } catch (error) {

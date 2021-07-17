@@ -239,7 +239,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                           leading: Avatar(
                             alt: props.searchText,
                             size: Dimensions.avatarSizeMin,
-                            url: props.homeserver.photoUrl != null ? props.homeserver.photoUrl : null,
+                            url: props.homeserver.photoUrl,
                             background: props.searchText.isNotEmpty
                                 ? Colours.hashedColor(props.searchText)
                                 : Colors.grey,

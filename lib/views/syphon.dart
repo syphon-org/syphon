@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart' as localization;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -113,8 +112,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onMounted();
   }
 
-  @protected
-  void onMounted() {
+  onMounted() {
     // init auth listener
     store.state.authStore.onAuthStateChanged!.listen((user) {
       if (user == null && defaultHome.runtimeType == HomeScreen) {
@@ -165,6 +163,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       ));
     });
   }
+
+  onUpdateCache() {}
 
   @override
   void dispose() {

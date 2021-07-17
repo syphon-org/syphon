@@ -25,12 +25,14 @@ class AuthStore extends Equatable {
   @JsonKey()
   final String protocol;
 
+  @JsonKey()
+  final List<User> availableUsers;
+
   User get currentUser => user;
 
   final StreamController<User?>? authObserver;
 
-  Stream<User?>? get onAuthStateChanged =>
-      authObserver != null ? authObserver!.stream : null;
+  Stream<User?>? get onAuthStateChanged => authObserver != null ? authObserver!.stream : null;
 
   // Interactive Auth Data
   final Credential? credential;
@@ -63,6 +65,7 @@ class AuthStore extends Equatable {
 
   const AuthStore({
     this.user = const User(),
+    this.availableUsers = const [],
     this.session,
     this.clientSecret,
     this.authObserver,
@@ -99,6 +102,7 @@ class AuthStore extends Equatable {
   @override
   List<Object?> get props => [
         user,
+        availableUsers,
         session,
         clientSecret,
         authObserver,
@@ -125,7 +129,8 @@ class AuthStore extends Equatable {
       ];
 
   AuthStore copyWith({
-    user,
+    User? user,
+    List<User>? availableUsers,
     String? session,
     String? clientSecret,
     protocol,
@@ -155,6 +160,7 @@ class AuthStore extends Equatable {
   }) =>
       AuthStore(
         user: user ?? this.user,
+        availableUsers: availableUsers ?? this.availableUsers,
         session: session ?? this.session,
         clientSecret: clientSecret ?? this.clientSecret,
         protocol: protocol ?? this.protocol,
@@ -185,6 +191,5 @@ class AuthStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$AuthStoreToJson(this);
 
-  factory AuthStore.fromJson(Map<String, dynamic> json) =>
-      _$AuthStoreFromJson(json);
+  factory AuthStore.fromJson(Map<String, dynamic> json) => _$AuthStoreFromJson(json);
 }

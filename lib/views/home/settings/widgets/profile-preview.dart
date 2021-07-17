@@ -11,6 +11,71 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
+class ProfilePreview extends StatelessWidget {
+  const ProfilePreview({
+    Key? key,
+    this.hasMultiaccounts = false,
+    this.onModifyAccounts,
+  }) : super(key: key);
+
+  final bool hasMultiaccounts;
+  final Function? onModifyAccounts;
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+        distinct: true,
+        converter: (Store<AppState> store) => _Props(store),
+        builder: (context, props) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(children: [
+              Container(
+                width: Dimensions.avatarSize,
+                height: Dimensions.avatarSize,
+                margin: EdgeInsets.only(right: 16),
+                child: Avatar(
+                  uri: props.avatarUri,
+                  alt: props.user.displayName ?? props.user.userId,
+                  size: Dimensions.avatarSize,
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    props.username ?? '',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  Text(
+                    props.userId ?? '',
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                ],
+              ),
+            ]),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                    width: Dimensions.avatarSize,
+                    height: Dimensions.avatarSize,
+                    child: IconButton(
+                      onPressed: () => onModifyAccounts != null ? onModifyAccounts!() : null,
+                      icon: hasMultiaccounts
+                          ? Icon(Icons.arrow_drop_down_rounded, size: Dimensions.avatarSize * 0.6)
+                          : Icon(Icons.add, size: Dimensions.avatarSize * 0.6),
+                    )),
+              ],
+            )
+          ],
+        ),
+      );
+}
+
 ///
 /// TODO: Convert to cleaner ViewModel convention
 /// https://github.com/brianegan/flutter_redux/issues/214
@@ -40,45 +105,4 @@ class _Props extends Equatable {
         loading = _store.state.authStore.loading,
         username = formatUsername(_store.state.authStore.user),
         avatarUri = _store.state.authStore.user.avatarUri;
-}
-
-class ProfilePreview extends StatelessWidget {
-  ProfilePreview({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-        distinct: true,
-        converter: (Store<AppState> store) => _Props(store),
-        builder: (context, props) => Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: Dimensions.avatarSize,
-                height: Dimensions.avatarSize,
-                margin: EdgeInsets.only(right: 16),
-                child: Avatar(
-                  uri: props.avatarUri,
-                  alt: props.user.displayName ?? props.user.userId,
-                  size: Dimensions.avatarSize,
-                ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    props.username ?? '',
-                    style: TextStyle(fontSize: 20.0),
-                  ),
-                  Text(
-                    props.userId ?? '',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      );
 }

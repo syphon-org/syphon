@@ -23,11 +23,10 @@ import 'package:syphon/store/media/state.dart';
 import 'package:syphon/store/rooms/state.dart';
 import 'package:syphon/store/settings/state.dart';
 
-/**
- * Cache Serializer
- * 
- * Handles serialization, encryption, and storage for caching redux stores
- */
+///
+/// Cache Serializer
+///
+/// Handles serialization, encryption, and storage for caching redux stores
 class CacheSerializer implements StateSerializer<AppState> {
   final Database? cache;
   final Map<String, dynamic> preloaded;
@@ -45,7 +44,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     // TODO: clean this up, this is only needed because the CacheSerializer
     // is not reset when logging in and logging out
-    var localcache = Cache.cacheMain ?? cache;
+    final localcache = Cache.cacheMain ?? cache;
 
     // Queue up a cache saving will wait
     // if the previously schedule task has not finished
@@ -53,8 +52,7 @@ class CacheSerializer implements StateSerializer<AppState> {
       // run through all redux stores for encryption and encoding
       await Future.wait(stores.map((store) async {
         try {
-          String type = store.runtimeType.toString();
-
+          final type = store.runtimeType.toString();
           final json = jsonEncode(store);
 
           // encrypt the store contents
@@ -88,6 +86,7 @@ class CacheSerializer implements StateSerializer<AppState> {
     return null;
   }
 
+  @override
   AppState decode(Uint8List? data) {
     AuthStore? authStore;
     SyncStore? syncStore;
@@ -160,10 +159,10 @@ class CacheSerializer implements StateSerializer<AppState> {
           ),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages: preloaded['messages'] ?? Map<String, List<Message>>(),
-            reactions: preloaded['reactions'] ?? Map<String, List<Reaction>>(),
-            redactions: preloaded['redactions'] ?? Map<String, Redaction>(),
-            receipts: preloaded['receipts'] ?? Map<String, Map<String, ReadReceipt>>(),
+            messages: preloaded['messages'] ?? <String, List<Message>>{},
+            reactions: preloaded['reactions'] ?? <String, List<Reaction>>{},
+            redactions: preloaded['redactions'] ?? <String, Redaction>{},
+            receipts: preloaded['receipts'] ?? <String, Map<String, ReadReceipt>>{},
           ),
       syncStore: syncStore ?? SyncStore(),
       settingsStore: preloaded['settings'] ?? settingsStore ?? SettingsStore(),

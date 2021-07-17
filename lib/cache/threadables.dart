@@ -1,11 +1,11 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:syphon/cache/codec.dart';
 
 Future<String> encryptJsonBackground(Map params) async {
-  String json = params['json'];
-  String cryptKey = params['cryptKey'];
+  final String json = params['json'];
+  final String cryptKey = params['cryptKey'];
 
   final cacheEncrypter = initCacheEncrypter(password: cryptKey);
 
@@ -13,8 +13,8 @@ Future<String> encryptJsonBackground(Map params) async {
 }
 
 Future<dynamic> decryptJsonBackground(Map params) async {
-  String json = params['json'];
-  String cryptKey = params['cryptKey'];
+  final String json = params['json'];
+  final String cryptKey = params['cryptKey'];
 
   final cacheEncrypter = initCacheEncrypter(password: cryptKey);
 

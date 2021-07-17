@@ -129,5 +129,9 @@ Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
     ],
   );
 
-  return Future.value(store);
+  return store;
+}
+
+Future<Store<AppState>> updateStore(Store<AppState> store) async {
+  return store;
 }
