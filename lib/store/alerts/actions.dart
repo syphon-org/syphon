@@ -40,9 +40,15 @@ ThunkAction<AppState> startAlertsObserver() {
       throw 'Cannot call startAlertsObserver with an existing instance';
     }
 
-    store.dispatch(
-      SetAlertsObserver(alertsObserver: StreamController<Alert>.broadcast()),
-    );
+    store.dispatch(SetAlertsObserver(
+      alertsObserver: StreamController<Alert>.broadcast(),
+    ));
+  };
+}
+
+ThunkAction<AppState> stopAlertsObserver() {
+  return (Store<AppState> store) async {
+    store.state.alertsStore.alertsObserver!.close();
   };
 }
 
@@ -94,17 +100,9 @@ ThunkAction<AppState> addAlert({
     debugPrint('[$origin] ${error.toString()}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
-    final alert = Alert(
-        type: type,
-        message: message.isNotEmpty ? message : error.toString(),
-        error: error.toString());
+    final alert =
+        Alert(type: type, message: message.isNotEmpty ? message : error.toString(), error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
-  };
-}
-
-ThunkAction<AppState> stopAlertsObserver() {
-  return (Store<AppState> store) async {
-    store.state.alertsStore.alertsObserver!.close();
   };
 }

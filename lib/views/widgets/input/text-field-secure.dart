@@ -78,7 +78,7 @@ class TextFieldSecure extends StatelessWidget {
           onEditingComplete: onEditingComplete as void Function()?,
           autocorrect: autocorrect,
           enableSuggestions: enabledSuggestions,
-          autofillHints: autofillHints,
+          autofillHints: disabled ? null : autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
           inputFormatters: !disableSpacing
               ? [

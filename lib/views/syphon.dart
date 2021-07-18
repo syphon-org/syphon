@@ -46,10 +46,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final Database? cache;
   final Database? storage;
   final Store<AppState> store;
-  final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
+  final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
   Widget defaultHome = HomeScreen();
-  StreamSubscription? alertsListener;
 
   SyphonState(
     this.store,
@@ -126,7 +125,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     });
 
     // init alerts listener
-    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
+    store.state.alertsStore.onAlertsChanged.listen((alert) {
       Color? color;
 
       switch (alert.type) {
@@ -173,7 +172,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.dispatch(disposeDeepLinks());
     closeCache(cache);
     WidgetsBinding.instance?.removeObserver(this);
-    alertsListener?.cancel();
     super.dispose();
   }
 
@@ -192,6 +190,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
             distinct: true,
             converter: (store) => store.state.settingsStore.themeSettings,
             builder: (context, themeSettings) => MaterialApp(
+              scaffoldMessengerKey: globalScaffold,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
@@ -199,11 +198,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
-              builder: (context, child) => Scaffold(
-                body: child,
-                appBar: null,
-                key: globalScaffold,
-              ),
             ),
           ),
         ),
