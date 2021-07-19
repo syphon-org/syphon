@@ -61,4 +61,29 @@ class SecureStorage {
       }
     }
   }
+
+  Future delete({required String key}) async {
+    // mobile
+    if (Platform.isAndroid || Platform.isIOS) {
+      final storage = SecureStorage.instance!;
+
+      try {
+        return storage.delete(key: key);
+      } catch (error) {
+        printError('[SecureStorage.write] $error');
+        throw error;
+      }
+    }
+
+    // desktop
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      try {
+        final directory = await getApplicationSupportDirectory();
+        await File(join(directory.path, key)).delete();
+      } catch (error) {
+        printError('[SecureStorage.write] $key $error');
+        throw error;
+      }
+    }
+  }
 }

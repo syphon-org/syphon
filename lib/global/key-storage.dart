@@ -25,3 +25,12 @@ Future<String?> loadKey(String keyId) async {
 
   return key;
 }
+
+Future deleteKey(String keyId) async {
+  // try to read key
+  try {
+    await SecureStorage().delete(key: keyId);
+  } catch (error) {
+    printError('[loadKey] $error');
+  }
+}

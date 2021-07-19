@@ -42,8 +42,14 @@ class Cache {
 ///
 Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
   try {
-    final cacheKeyId = context! + Cache.keyLocation;
-    var cacheLocation = context + Cache.databaseLocation;
+    var cacheKeyId = Cache.keyLocation;
+    var cacheLocation = Cache.databaseLocation;
+
+    if (context!.isNotEmpty) {
+      cacheKeyId = '$context-${Cache.keyLocation}';
+      cacheLocation = '$context-${Cache.databaseLocation}';
+    }
+
     var cacheFactory;
 
     // Configure cache encryption/decryption instance
@@ -89,7 +95,13 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
 deleteCache({String? context = StoreContext.DEFAULT}) async {
   try {
     late var cacheFactory;
-    var cacheLocation = context! + Cache.databaseLocation;
+    var cacheKeyId = Cache.keyLocation;
+    var cacheLocation = Cache.databaseLocation;
+
+    if (context!.isNotEmpty) {
+      cacheKeyId = '$context-${Cache.keyLocation}';
+      cacheLocation = '$context-${Cache.databaseLocation}';
+    }
 
     if (Platform.isAndroid || Platform.isIOS) {
       final directory = await getApplicationSupportDirectory();
@@ -105,6 +117,7 @@ deleteCache({String? context = StoreContext.DEFAULT}) async {
     }
 
     await cacheFactory.deleteDatabase(cacheLocation);
+    await deleteKey(cacheKeyId);
   } catch (error) {
     printError('[initCache] $error');
   }

@@ -14,6 +14,7 @@ import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
@@ -109,20 +110,53 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
   }
 
+  ///
+  /// a.k.a. onMounted()
+  ///
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    onMounted();
+
+    // init auth listener
+    store.state.authStore.onAuthStateChanged!.listen(onAuthStateChanged);
+
+    // set auth state listener
+    store.state.authStore.onContextChanged!.listen(onContextChanged);
+
+    // init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
   }
 
   onContextChanged(User? user) async {
-    final context = user == null ? StoreContext.DEFAULT : generateContextId(id: user.userId!);
+    final contextCurrent = await loadCurrentContext();
 
-    await saveContext(context);
+    var contextNew = StoreContext.DEFAULT;
 
-    final cacheContext = await initCache(context: context);
-    final storageContext = await initStorage(context: context);
-    final storeContext = await initStore(cache, storage, existingState: store.state);
+    // save new user context
+    if (user != null) {
+      contextNew = generateContextId(id: user.userId!);
+      await saveContext(contextNew);
+    } else {
+      // Remove old context and check all remained
+      await deleteContext(contextCurrent.current);
+      final allContexts = await loadContexts();
+
+      // set to another if one exists
+      // otherwise, will be default
+      if (allContexts.isNotEmpty) {
+        contextNew = allContexts.first.current;
+      }
+    }
+
+    final cacheContext = await initCache(context: contextNew);
+    final storageContext = await initStorage(context: contextNew);
+    final storeContext = await initStore(
+      cache,
+      storage,
+      existingState: AppState(
+        authStore: store.state.authStore,
+      ),
+    );
 
     setState(() {
       cache = cacheContext;
@@ -130,73 +164,60 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       store = storeContext;
     });
 
-    // Delete default cache data if now authenticated (context is not default)
-    if (context != StoreContext.DEFAULT) {
-      store.dispatch(startSyncObserver());
-
-      deleteCache();
-      deleteStorage();
+    // delete cache data if now authenticated (context is not default)
+    if (user == null) {
+      deleteCache(context: contextCurrent.current);
+      deleteStorage(context: contextCurrent.current);
     }
 
-    store.state.authStore.authObserver?.add(
-      user,
-    );
+    store.state.authStore.authObserver?.add(user);
   }
 
-  onMounted() {
-    // init auth listener
-    store.state.authStore.onAuthStateChanged!.listen((user) async {
-      if (user == null && defaultHome.runtimeType == HomeScreen) {
-        defaultHome = IntroScreen();
-        NavigationService.clearTo(NavigationPaths.intro, context);
-      } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
-        defaultHome = HomeScreen();
-        NavigationService.clearTo(NavigationPaths.home, context);
-      }
-    });
+  onAuthStateChanged(User? user) async {
+    if (user == null && defaultHome.runtimeType == HomeScreen) {
+      defaultHome = IntroScreen();
+      NavigationService.clearTo(NavigationPaths.intro, context);
+    } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
+      defaultHome = HomeScreen();
+      NavigationService.clearTo(NavigationPaths.home, context);
+    }
+  }
 
-    // set auth state listener
-    store.state.authStore.onContextChanged!.listen(
-      onContextChanged,
-    );
+  onAlertsChanged(Alert alert) {
+    Color? color;
 
-    // init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen((alert) {
-      Color? color;
+    switch (alert.type) {
+      case 'error':
+        color = Colors.red;
+        break;
+      case 'warning':
+        color = Colors.red;
+        break;
+      case 'success':
+        color = Colors.green;
+        break;
+      case 'info':
+      default:
+        color = Colors.grey;
+    }
 
-      switch (alert.type) {
-        case 'error':
-          color = Colors.red;
-          break;
-        case 'warning':
-          color = Colors.red;
-          break;
-        case 'success':
-          color = Colors.green;
-          break;
-        case 'info':
-        default:
-          color = Colors.grey;
-      }
+    final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
 
-      final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
-
-      globalScaffold.currentState?.showSnackBar(SnackBar(
-        backgroundColor: color,
-        content: Text(
-          alertMessage,
-          style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
-        ),
-        duration: alert.duration,
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            globalScaffold.currentState?.removeCurrentSnackBar();
-          },
-        ),
-      ));
-    });
+    globalScaffold.currentState?.showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(
+        alertMessage,
+        style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
+      ),
+      duration: alert.duration,
+      action: SnackBarAction(
+        label: 'Dismiss',
+        textColor: Colors.white,
+        onPressed: () {
+          globalScaffold.currentState?.removeCurrentSnackBar();
+        },
+      ),
+    ));
   }
 
   @override

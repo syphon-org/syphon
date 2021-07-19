@@ -36,10 +36,15 @@ class Storage {
 
 Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
   try {
-    final storageKeyId = context!.isNotEmpty ? '$context-${Storage.keyLocation}' : Storage.keyLocation;
-    final storagePath =
-        context.isNotEmpty ? '$context-${Storage.databaseLocation}' : Storage.databaseLocation;
-    final storageLocation = DEBUG_MODE ? 'debug-$storagePath' : storagePath;
+    var storageKeyId = Storage.keyLocation;
+    var storageLocation = Storage.databaseLocation;
+
+    if (context!.isNotEmpty) {
+      storageKeyId = '$context-${Storage.keyLocation}';
+      storageLocation = '$context-${Storage.databaseLocation}';
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
     var version = 1;
     var storageFactory;
@@ -94,8 +99,18 @@ closeStorage(Database? database) async {
   }
 }
 
-deleteStorage() async {
+deleteStorage({String? context = StoreContext.DEFAULT}) async {
   try {
+    var storageKeyId = Storage.keyLocation;
+    var storageLocation = Storage.databaseLocation;
+
+    if (context!.isNotEmpty) {
+      storageKeyId = '$context-${Storage.keyLocation}';
+      storageLocation = '$context-${Storage.databaseLocation}';
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+
     late DatabaseFactory storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -110,7 +125,8 @@ deleteStorage() async {
       );
     }
 
-    await storageFactory.deleteDatabase(Storage.databaseLocation);
+    await storageFactory.deleteDatabase(storageLocation);
+    await deleteKey(storageKeyId);
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
   }

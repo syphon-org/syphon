@@ -451,7 +451,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
         user: User.fromMatrix(data),
       ));
 
-      store.state.authStore.authObserver?.add(
+      store.state.authStore.contextObserver?.add(
         store.state.authStore.user,
       );
 
@@ -482,7 +482,7 @@ ThunkAction<AppState> logoutUser() {
 
       // tell authObserver to wipe store user and other data
       final temp = store.state.authStore.user.accessToken;
-      store.state.authStore.authObserver?.add(null);
+      store.state.authStore.contextObserver?.add(null);
 
       final data = await MatrixApi.logoutUser(
         protocol: store.state.authStore.protocol,
@@ -840,7 +840,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       store.dispatch(SetUser(user: User.fromMatrix(data)));
 
-      store.state.authStore.authObserver?.add(
+      store.state.authStore.contextObserver?.add(
         store.state.authStore.user,
       );
 
@@ -1070,15 +1070,13 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
           return store.dispatch(setInteractiveAuths(auths: data));
         }
 
-        store.state.authStore.authObserver?.add(null);
+        store.state.authStore.contextObserver?.add(null);
 
         // wipe cache
         await deleteCache();
-        await initCache();
 
         // wipe cold storage
         await deleteStorage();
-        await initStorage();
 
         // reset client secret
         await store.dispatch(initClientSecret());

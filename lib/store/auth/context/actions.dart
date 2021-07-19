@@ -28,8 +28,9 @@ ThunkAction<AppState> startContextObserver() {
 
 ThunkAction<AppState> stopContextObserver() {
   return (Store<AppState> store) async {
-    if (store.state.authStore.contextObserver != null) {
-      store.state.authStore.contextObserver?.close();
+    final contextObserver = store.state.authStore.contextObserver;
+    if (contextObserver != null) {
+      contextObserver.close();
     }
   };
 }

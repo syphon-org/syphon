@@ -28,7 +28,7 @@ generateContextId({required String id}) {
   return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
-Future<StoreContext> loadContext() async {
+Future<StoreContext> loadCurrentContext() async {
   final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
   return StoreContext(current: allContexts.isNotEmpty ? allContexts[0] : StoreContext.DEFAULT);
