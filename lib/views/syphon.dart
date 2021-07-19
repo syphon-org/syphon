@@ -65,11 +65,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    store.dispatch(initDeepLinks());
-    store.dispatch(initClientSecret());
-    store.dispatch(startAuthObserver());
-    store.dispatch(startAlertsObserver());
-    store.dispatch(startContextObserver());
+    onInitListeners();
 
     // init current auth state with current user
     store.state.authStore.authObserver?.add(
@@ -116,18 +112,46 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    onMounted();
+    onStartListeners();
+  }
+
+  onInitListeners() {
+    store.dispatch(initDeepLinks());
+    store.dispatch(startAuthObserver());
+    store.dispatch(startAlertsObserver());
+    store.dispatch(startContextObserver());
+  }
+
+  onStartListeners() {
+    print('[onUpdateListeners] RUNNING ON LISTENER UPDATES ${store.hashCode.toString()}');
+    // init auth listener
+    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
+
+    // set auth state listener
+    store.state.authStore.onContextChanged.listen(onContextChanged);
+
+    // init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
+  }
+
+  onDestroyListeners() async {
+    store.dispatch(stopContextObserver());
+    store.dispatch(stopAlertsObserver());
+    store.dispatch(stopAuthObserver());
+    store.dispatch(disposeDeepLinks());
   }
 
   onContextChanged(User? user) async {
+    onDestroyListeners();
+
     print('[onContextChanged] *** RUNNING *** ');
     final contextOld = await loadCurrentContext();
 
     var contextNew = StoreContext.DEFAULT;
 
-    // Stop saving to existing context storage
-    closeCache(Cache.instance);
-    closeStorage(Storage.instance);
+    // Stop saving to existing context databases
+    // await closeCache(Cache.instance);
+    // await closeStorage(Storage.instance);
 
     print('[onContextChanged] contextOld ${contextOld.current}');
 
@@ -136,7 +160,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       contextNew = generateContextId(id: user.userId!);
       await saveContext(contextNew);
     } else {
-      store.teardown();
       // Remove old context and check all remained
       await deleteContext(contextOld.current);
       final allContexts = await loadContexts();
@@ -150,38 +173,47 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     print('[onContextChanged] contextNew $contextNew');
 
-    final cacheContext = await initCache(context: contextNew);
-    final storageContext = await initStorage(context: contextNew);
-    final storeContext = await initStore(
-      cache,
-      storage,
-      existingState: AppState(
-        authStore: store.state.authStore.copyWith(),
-      ),
-    );
+    final cacheNew = await initCache(context: contextNew);
+    final storageNew = await initStorage(context: contextNew);
 
+    final storeNew = await initStore(
+      cacheNew,
+      storageNew,
+      existingState: store.state,
+    );
+    print('[onContextChanged] UPDATING STORE - OLD - ${store.hashCode.toString()}');
+    print('[onContextChanged] UPDATING STORE - NEW - ${storeNew.hashCode.toString()}');
     setState(() {
-      cache = cacheContext;
-      storage = storageContext;
-      store = storeContext;
+      cache = cacheNew;
+      storage = storageNew;
+      store = storeNew;
     });
+    print('[onContextChanged] UPDATING STORE - DONE - ${store.hashCode.toString()}');
 
     // wipe unauthenticated storage
     if (user != null) {
       print('[onContextChanged] deleting unauthenticated storage');
-      deleteCache();
-      deleteStorage();
+      await deleteCache();
+      await deleteStorage();
       // delete cache data if now authenticated (context is not default)
     } else {
       print('[onContextChanged] deleting data ${contextOld.current}');
-      deleteCache(context: contextOld.current);
-      deleteStorage(context: contextOld.current);
+      await deleteCache(context: contextOld.current);
+      await deleteStorage(context: contextOld.current);
     }
 
-    store.state.authStore.authObserver?.add(user);
+    print('[onContextChanged] STORE HASH CODE AFTER OBSERVERS ${store.hashCode.toString()} ${user}');
+
+    onInitListeners();
+    onStartListeners();
+
+    storeNew.state.authStore.authObserver?.add(
+      user,
+    );
   }
 
   onAuthStateChanged(User? user) async {
+    print('[onAuthStateChanged] Widget ${user}');
     if (user == null && defaultHome.runtimeType == HomeScreen) {
       defaultHome = IntroScreen();
       NavigationService.clearTo(NavigationPaths.intro, context);
@@ -228,23 +260,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     ));
   }
 
-  onMounted() {
-    // init auth listener
-    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
-
-    // set auth state listener
-    store.state.authStore.onContextChanged.listen(onContextChanged);
-
-    // init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
-  }
-
   @override
   void dispose() {
-    store.dispatch(stopContextObserver());
-    store.dispatch(stopAuthObserver());
-    store.dispatch(stopAlertsObserver());
-    store.dispatch(disposeDeepLinks());
+    onDestroyListeners();
     closeCache(cache);
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
@@ -254,7 +272,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   // lifecycle widget functions
   @override
   Widget build(BuildContext context) => StoreProvider<AppState>(
-        key: Key(store.hashCode.toString()),
         store: store,
         child: localization.EasyLocalization(
           path: 'assets/translations',

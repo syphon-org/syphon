@@ -40,8 +40,8 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
     var storageLocation = Storage.databaseLocation;
 
     if (context!.isNotEmpty) {
-      storageKeyId = '$context-${Storage.keyLocation}';
-      storageLocation = '$context-${Storage.databaseLocation}';
+      storageKeyId = '$context-$storageKeyId';
+      storageLocation = '$context-$storageLocation';
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
@@ -105,8 +105,8 @@ deleteStorage({String? context = StoreContext.DEFAULT}) async {
     var storageLocation = Storage.databaseLocation;
 
     if (context!.isNotEmpty) {
-      storageKeyId = '$context-${Storage.keyLocation}';
-      storageLocation = '$context-${Storage.databaseLocation}';
+      storageKeyId = '$context-$storageKeyId';
+      storageLocation = '$context-$storageLocation';
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;

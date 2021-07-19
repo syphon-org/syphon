@@ -122,15 +122,16 @@ Future<Store<AppState>> initStore(
   );
 
   try {
+    print('[initStore] existingState ${existingState}');
     // Finally load persisted store
-    initialState = existingState ?? await persistor.load();
+    initialState = await persistor.load();
   } catch (error) {
     debugPrint('[Redux Persist] $error');
   }
 
   return Store<AppState>(
     appReducer,
-    initialState: initialState ?? AppState(),
+    initialState: existingState ?? initialState ?? AppState(),
     middleware: [
       thunkMiddleware,
       authMiddleware,
