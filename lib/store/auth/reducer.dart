@@ -1,3 +1,5 @@
+import 'package:syphon/store/auth/context/actions.dart';
+
 import '../user/model.dart';
 import './actions.dart';
 import './state.dart';
@@ -10,6 +12,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(creating: action.creating);
     case SetAuthObserver:
       return state.copyWith(authObserver: action.authObserver);
+    case SetContextObserver:
+      return state.copyWith(contextObserver: action.contextObserver);
     case SetUser:
       return state.copyWith(user: action.user);
     case SetSession:

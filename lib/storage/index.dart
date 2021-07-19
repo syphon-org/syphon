@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/cache/index.dart';
+import 'package:syphon/context/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -23,25 +24,28 @@ import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {
-  // cold storage references
-  static Database? main;
-
-  // preloaded cold storage data
-  static Map<String, dynamic> storageData = {};
+  // cache key identifiers
+  static const keyLocation = '${Values.appLabel}@storageKey';
 
   // storage identifiers
-  static const defaultLocation = '${Values.appNameLabel}-main-storage.db';
+  static const databaseLocation = '${Values.appLabel}-main-storage.db';
 
-  // cache key identifiers
-  static const keyLocation = '${Values.appNameLabel}@storageKey';
+  // cold storage references
+  static Database? instance;
 }
 
-Future<Database?> initStorage() async {
+Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
   try {
-    DatabaseFactory? storageFactory;
+    final storageKeyId = context!.isNotEmpty ? '$context-${Storage.keyLocation}' : Storage.keyLocation;
+    final storagePath =
+        context.isNotEmpty ? '$context-${Storage.databaseLocation}' : Storage.databaseLocation;
+    final storageLocation = DEBUG_MODE ? 'debug-$storagePath' : storagePath;
 
     var version = 1;
-    final location = DEBUG_MODE ? 'debug-${Storage.defaultLocation}' : Storage.defaultLocation;
+    var storageFactory;
+
+    // Configure cache encryption/decryption instance
+    final cryptKey = await loadKey(storageKeyId);
 
     if (Platform.isAndroid || Platform.isIOS) {
       // always open cold storage as sqflite
@@ -64,17 +68,19 @@ Future<Database?> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(
-      password: Cache.cryptKey!,
-    );
+    final codec = getEncryptSembastCodec(password: cryptKey!);
 
-    Storage.main = await storageFactory.openDatabase(
-      location,
+    print('initStorage');
+    print(storageLocation);
+    print(cryptKey);
+
+    Storage.instance = await storageFactory.openDatabase(
+      storageLocation,
       codec: codec,
       version: version,
     );
 
-    return Storage.main;
+    return Storage.instance;
   } catch (error) {
     printDebug('[initStorage] $error');
     return null;
@@ -82,9 +88,9 @@ Future<Database?> initStorage() async {
 }
 
 // Closes and saves storage
-closeStorage() async {
-  if (Storage.main != null) {
-    Storage.main!.close();
+closeStorage(Database? database) async {
+  if (database != null) {
+    database.close();
   }
 }
 
@@ -104,9 +110,7 @@ deleteStorage() async {
       );
     }
 
-    await storageFactory.deleteDatabase(Storage.defaultLocation);
-
-    Storage.main = null;
+    await storageFactory.deleteDatabase(Storage.databaseLocation);
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
   }

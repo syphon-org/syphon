@@ -82,8 +82,7 @@ ThunkAction<AppState> uploadMedia({
   };
 }
 
-ThunkAction<AppState> fetchThumbnail(
-    {String? mxcUri, double? size, bool force = false}) {
+ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
@@ -96,8 +95,7 @@ ThunkAction<AppState> fetchThumbnail(
 
       // Noop if currently checking or failed
       if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING ||
-              mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
+          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {
         return;
       }
@@ -108,10 +106,10 @@ ThunkAction<AppState> fetchThumbnail(
       ));
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.main!)) {
+      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.main!,
+          storage: Storage.instance!,
         );
 
         if (storedData != null) {
@@ -139,7 +137,7 @@ ThunkAction<AppState> fetchThumbnail(
       final bodyBytes = data['bodyBytes'];
 
       store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes));
-      saveMedia(mxcUri, bodyBytes, storage: Storage.main!);
+      saveMedia(mxcUri, bodyBytes, storage: Storage.instance!);
       store.dispatch(UpdateMediaChecks(
         mxcUri: mxcUri,
         status: MediaStatus.SUCCESS,

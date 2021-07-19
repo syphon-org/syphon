@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/context/index.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
@@ -15,11 +16,14 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
+  // pull current context / nullable
+  final context = await loadContext();
+
   // init hot cache
-  final cache = await initCache();
+  final cache = await initCache(context: context.current);
 
   // init cold storage
-  final storage = await initStorage();
+  final storage = await initStorage(context: context.current);
 
   // init redux store
   final store = await initStore(cache, storage);

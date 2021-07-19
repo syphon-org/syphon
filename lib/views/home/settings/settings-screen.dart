@@ -13,6 +13,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
                         child: ProfilePreview(
                           hasMultiaccounts: props.hasMultiaccounts,
                           onModifyAccounts: () {
-                            Navigator.pushNamed(context, '/login');
+                            Navigator.pushNamed(context, NavigationPaths.login);
                           },
                         ),
                       ),
@@ -129,7 +130,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, '/theming');
+                            Navigator.pushNamed(context, NavigationPaths.theming);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(

@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:syphon/global/values.dart';
 
 // @again_guy:matrix.org -> again_ereio
 String formatSender(String sender) {
@@ -12,13 +13,13 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
 String formatLanguageCode(String? language) {
   switch ((language ?? 'english').toLowerCase()) {
     case 'english':
-      return 'en';
+      return LangCodes.en;
     case 'russian':
-      return 'ru';
+      return LangCodes.ru;
     case 'polish':
-      return 'pl';
+      return LangCodes.pl;
     default:
-      return 'en';
+      return LangCodes.en;
   }
 }
 

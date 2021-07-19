@@ -11,7 +11,7 @@ import 'package:sqlite3/open.dart';
 import 'package:syphon/global/print.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider_linux/path_provider_linux.dart';
-import 'package:syphon/global/secure-keys.dart';
+import 'package:syphon/global/secure-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
@@ -68,13 +68,13 @@ Future<void> initPlatformDependencies() async {
     try {
       DynamicLibrary.open('libolm.3.dylib');
     } catch (error) {
-      print('[macos] ${error.toString()}');
+      printInfo('[macos] ${error.toString()}');
     }
   }
 
   // Init flutter secure storage
   if (Platform.isAndroid || Platform.isIOS) {
-    KeyStorage.keyStorage = FlutterSecureStorage();
+    SecureStorage.instance = FlutterSecureStorage();
   }
 
   // init background sync for Android only

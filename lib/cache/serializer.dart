@@ -27,6 +27,7 @@ import 'package:syphon/store/settings/state.dart';
 /// Cache Serializer
 ///
 /// Handles serialization, encryption, and storage for caching redux stores
+///
 class CacheSerializer implements StateSerializer<AppState> {
   final Database? cache;
   final Map<String, dynamic> preloaded;
@@ -44,7 +45,7 @@ class CacheSerializer implements StateSerializer<AppState> {
 
     // TODO: clean this up, this is only needed because the CacheSerializer
     // is not reset when logging in and logging out
-    final localcache = Cache.cacheMain ?? cache;
+    final localcache = Cache.instance ?? cache;
 
     // Queue up a cache saving will wait
     // if the previously schedule task has not finished

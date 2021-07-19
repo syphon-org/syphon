@@ -6,17 +6,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/context/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/secure-keys.dart';
+import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class Cache {
   // cache key identifiers
-  static const keyLocation = '${Values.appNameLabel}@cryptKey';
+  static const keyLocation = '${Values.appLabel}@cryptKey';
 
   // cache storage identifiers
-  static const defaultLocation = '${Values.appNameLabel}-main-cache.db';
+  static const databaseLocation = '${Values.appLabel}-main-cache.db';
 
   // background data identifiers
   static const userIdKey = 'userId';
@@ -30,7 +31,7 @@ class Cache {
   static String? cryptKey;
 
   // hot cache refrences
-  static Database? cacheMain;
+  static Database? instance;
 
   // inital store caches for reload
   static Map<String, Map?> cacheStores = {};
@@ -39,20 +40,21 @@ class Cache {
 ///
 /// Init Hot Cache
 ///
-Future<Database?> initCache() async {
+Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
   try {
-    var cachePath = Cache.defaultLocation;
+    final cacheKeyId = context! + Cache.keyLocation;
+    var cacheLocation = context + Cache.databaseLocation;
     var cacheFactory;
+
+    // Configure cache encryption/decryption instance
+    final cryptKey = await loadKey(cacheKeyId);
 
     if (Platform.isAndroid || Platform.isIOS) {
       final directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, Cache.defaultLocation);
+      cacheLocation = join(directory.path, cacheLocation);
       cacheFactory = databaseFactoryIo;
     }
-
-    // Configure cache encryption/decryption instance
-    Cache.cryptKey = await loadKey(Cache.keyLocation);
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -68,33 +70,31 @@ Future<Database?> initCache() async {
       );
     }
 
-    Cache.cacheMain = await cacheFactory.openDatabase(
-      cachePath,
+    print('initCache');
+    print(cacheLocation);
+    print(cryptKey);
+
+    Cache.cryptKey = cryptKey;
+    Cache.instance = await cacheFactory.openDatabase(
+      cacheLocation,
     );
 
-    return Cache.cacheMain;
+    return Cache.instance;
   } catch (error) {
     printError('[initCache] $error');
     return null;
   }
 }
 
-// Closes and saves storage
-closeCache(Database? cache) async {
-  if (cache != null) {
-    cache.close();
-  }
-}
-
-deleteCache({Database? cache}) async {
+deleteCache({String? context = StoreContext.DEFAULT}) async {
   try {
     late var cacheFactory;
-    var cachePath = Cache.defaultLocation;
+    var cacheLocation = context! + Cache.databaseLocation;
 
     if (Platform.isAndroid || Platform.isIOS) {
       final directory = await getApplicationSupportDirectory();
       await directory.create();
-      cachePath = join(directory.path, cachePath);
+      cacheLocation = join(directory.path, cacheLocation);
       cacheFactory = databaseFactoryIo;
     }
 
@@ -104,8 +104,15 @@ deleteCache({Database? cache}) async {
       );
     }
 
-    Cache.cacheMain = await cacheFactory.deleteDatabase(cachePath);
+    await cacheFactory.deleteDatabase(cacheLocation);
   } catch (error) {
     printError('[initCache] $error');
+  }
+}
+
+// Closes and saves storage
+closeCache(Database? cache) async {
+  if (cache != null) {
+    cache.close();
   }
 }

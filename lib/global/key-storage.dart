@@ -1,0 +1,27 @@
+import 'package:encrypt/encrypt.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/secure-storage.dart';
+
+String generateKey() {
+  return Key.fromSecureRandom(32).base64;
+}
+
+Future<String?> loadKey(String keyId) async {
+  var key;
+
+  // try to read key
+  try {
+    key = await SecureStorage().read(key: keyId);
+  } catch (error) {
+    printError('[loadKey] $error');
+  }
+
+  // generate a new one on failure
+  if (key == null) {
+    printInfo('[loadKey] generating new key for $keyId');
+    key = generateKey();
+    await SecureStorage().write(key: keyId, value: key);
+  }
+
+  return key;
+}

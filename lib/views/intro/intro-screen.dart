@@ -14,6 +14,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -196,13 +197,13 @@ class IntroScreenState extends State<IntroScreen> {
                     pageSnapping: true,
                     allowImplicitScrolling: true,
                     controller: pageController,
-                    children: sections,
                     onPageChanged: (index) {
                       setState(() {
                         currentStep = index;
                         onboarding = index != 0 && index != sections.length - 1;
                       });
                     },
+                    children: sections,
                   ),
                 ),
               ),
@@ -278,10 +279,7 @@ class IntroScreenState extends State<IntroScreen> {
                             )
                           : TouchableOpacity(
                               activeOpacity: 0.4,
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/login',
-                              ),
+                              onTap: () => Navigator.pushNamed(context, NavigationPaths.login),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[

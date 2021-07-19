@@ -92,35 +92,44 @@ AppState appReducer(AppState state, action) => AppState(
       cryptoStore: cryptoReducer(state.cryptoStore, action),
     );
 
+///
 /// Initialize Store
-/// - Hot redux state cache for top level data
-Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
-  Map<String, dynamic> data = {};
+///
+/// Hot cache for top level data
+/// Cold storage all missing and full state data
+///
+/// existingState copies the login state between multiaccount swaps
+///
+Future<Store<AppState>> initStore(
+  Database? cache,
+  Database? storage, {
+  AppState? existingState,
+}) async {
+  AppState? initialState;
+  Map<String, dynamic> preloaded = {};
 
   if (storage != null) {
     // partially load storage to memory to rehydrate cache
-    data = await loadStorage(storage);
+    preloaded = await loadStorage(storage);
   }
 
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: CacheStorage(cache: cache),
-    serializer: CacheSerializer(cache: cache, preloaded: data),
+    serializer: CacheSerializer(cache: cache, preloaded: preloaded),
     shouldSave: cacheMiddleware,
   );
 
-  // Finally load persisted store
-  AppState? initialState;
-
   try {
+    // Finally load persisted store
     initialState = await persistor.load();
   } catch (error) {
     debugPrint('[Redux Persist] $error');
   }
 
-  final Store<AppState> store = Store<AppState>(
+  return Store<AppState>(
     appReducer,
-    initialState: initialState ?? AppState(),
+    initialState: existingState ?? initialState ?? AppState(),
     middleware: [
       thunkMiddleware,
       persistor.createMiddleware(),
@@ -128,10 +137,4 @@ Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
       alertMiddleware,
     ],
   );
-
-  return store;
-}
-
-Future<Store<AppState>> updateStore(Store<AppState> store) async {
-  return store;
 }

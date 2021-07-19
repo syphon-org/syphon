@@ -31,8 +31,11 @@ class AuthStore extends Equatable {
   User get currentUser => user;
 
   final StreamController<User?>? authObserver;
+  final StreamController<User?>? contextObserver;
 
   Stream<User?>? get onAuthStateChanged => authObserver != null ? authObserver!.stream : null;
+
+  Stream<User?>? get onContextChanged => contextObserver != null ? contextObserver!.stream : null;
 
   // Interactive Auth Data
   final Credential? credential;
@@ -69,6 +72,7 @@ class AuthStore extends Equatable {
     this.session,
     this.clientSecret,
     this.authObserver,
+    this.contextObserver,
     this.protocol = 'https://',
     this.email = '',
     this.username = '',
@@ -106,6 +110,7 @@ class AuthStore extends Equatable {
         session,
         clientSecret,
         authObserver,
+        contextObserver,
         username,
         password,
         passwordConfirm,
@@ -157,6 +162,7 @@ class AuthStore extends Equatable {
     creating,
     verificationNeeded,
     authObserver,
+    contextObserver,
   }) =>
       AuthStore(
         user: user ?? this.user,
@@ -167,6 +173,7 @@ class AuthStore extends Equatable {
         email: email ?? this.email,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,
+        contextObserver: contextObserver ?? this.contextObserver,
         username: username ?? this.username,
         password: password ?? this.password,
         agreement: agreement ?? this.agreement,

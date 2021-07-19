@@ -211,7 +211,9 @@ ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
 
 ThunkAction<AppState> startAuthObserver() {
   return (Store<AppState> store) async {
-    if (store.state.authStore.authObserver != null) {
+    final authObserver = store.state.authStore.authObserver;
+
+    if (authObserver != null && !authObserver.isClosed) {
       throw 'Cannot call startAuthObserver with an existing instance';
     }
 
@@ -219,7 +221,7 @@ ThunkAction<AppState> startAuthObserver() {
       authObserver: StreamController<User?>.broadcast(),
     ));
 
-    final onAuthStateChanged = (User? user) async {
+    onAuthStateChanged(User? user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 
@@ -264,7 +266,7 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(ResetAuthStore());
         await store.dispatch(ResetSync());
       }
-    };
+    }
 
     // set auth state listener
     store.state.authStore.onAuthStateChanged!.listen(
@@ -275,9 +277,10 @@ ThunkAction<AppState> startAuthObserver() {
 
 ThunkAction<AppState> stopAuthObserver() {
   return (Store<AppState> store) async {
-    if (store.state.authStore.authObserver != null) {
-      store.state.authStore.authObserver?.close();
-      store.dispatch(SetAuthObserver(authObserver: null));
+    final authObserver = store.state.authStore.authObserver;
+
+    if (authObserver != null) {
+      authObserver.close();
     }
   };
 }
@@ -375,7 +378,7 @@ ThunkAction<AppState> loginUser() {
         user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
       ));
 
-      store.state.authStore.authObserver?.add(
+      store.state.authStore.contextObserver?.add(
         store.state.authStore.user,
       );
 
@@ -448,7 +451,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
         user: User.fromMatrix(data),
       ));
 
-      store.state.authStore.authObserver!.add(
+      store.state.authStore.authObserver?.add(
         store.state.authStore.user,
       );
 
@@ -479,7 +482,7 @@ ThunkAction<AppState> logoutUser() {
 
       // tell authObserver to wipe store user and other data
       final temp = store.state.authStore.user.accessToken;
-      store.state.authStore.authObserver!.add(null);
+      store.state.authStore.authObserver?.add(null);
 
       final data = await MatrixApi.logoutUser(
         protocol: store.state.authStore.protocol,
@@ -488,14 +491,14 @@ ThunkAction<AppState> logoutUser() {
       );
 
       if (data['errcode'] != null) {
-        if (data['errcode'] == MatrixErrors.unknown_token) {
-          store.state.authStore.authObserver!.add(null);
-        } else {
+        if (data['errcode'] != MatrixErrors.unknown_token) {
           throw Exception(data['error']);
         }
       }
 
-      store.state.authStore.authObserver!.add(null);
+      // close databases
+      closeCache(Cache.instance);
+      closeStorage(Storage.instance);
 
       // wipe cache
       await deleteCache();
@@ -837,7 +840,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       store.dispatch(SetUser(user: User.fromMatrix(data)));
 
-      store.state.authStore.authObserver!.add(
+      store.state.authStore.authObserver?.add(
         store.state.authStore.user,
       );
 
@@ -1067,7 +1070,7 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
           return store.dispatch(setInteractiveAuths(auths: data));
         }
 
-        store.state.authStore.authObserver!.add(null);
+        store.state.authStore.authObserver?.add(null);
 
         // wipe cache
         await deleteCache();

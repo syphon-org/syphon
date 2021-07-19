@@ -28,7 +28,7 @@ storageMiddleware<State>(
 
   switch (action.runtimeType) {
     case SetUser:
-      saveAuth(store.state.authStore, storage: Storage.main!);
+      saveAuth(store.state.authStore, storage: Storage.instance!);
       break;
     case UpdateMediaCache:
       // saveMedia(action.mxcUri, action.data, storage: Storage.main);
@@ -44,14 +44,14 @@ storageMiddleware<State>(
       // TODO: extract room event keys to a helper class / object to remove large map copies
       if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
         final room = rooms[_action.id];
-        saveRoom(room!, storage: Storage.main);
+        saveRoom(room!, storage: Storage.instance);
       }
       break;
     case RemoveRoom:
       final _action = action as RemoveRoom;
       final room = store.state.roomStore.rooms[_action.roomId];
       if (room != null) {
-        deleteRooms({room.id: room}, storage: Storage.main);
+        deleteRooms({room.id: room}, storage: Storage.instance);
       }
       break;
     case SetThemeType:
@@ -74,7 +74,7 @@ storageMiddleware<State>(
     case ToggleReadReceipts:
     case LogAppAgreement:
     case SetSyncInterval:
-      saveSettings(store.state.settingsStore, storage: Storage.main!);
+      saveSettings(store.state.settingsStore, storage: Storage.instance!);
       break;
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
@@ -88,14 +88,14 @@ storageMiddleware<State>(
     case AddOutboundMessageSession:
     case UpdateMessageSessionOutbound:
     case ResetCrypto:
-      saveCrypto(store.state.cryptoStore, storage: Storage.main!);
+      saveCrypto(store.state.cryptoStore, storage: Storage.instance!);
       break;
     case SetNotificationSettings:
       // handles updating the background sync thread with new chat settings
       saveNotificationSettings(
         settings: store.state.settingsStore.notificationSettings,
       );
-      saveSettings(store.state.settingsStore, storage: Storage.main!);
+      saveSettings(store.state.settingsStore, storage: Storage.instance!);
       break;
 
     default:
