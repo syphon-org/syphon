@@ -221,10 +221,7 @@ ThunkAction<AppState> startAuthObserver() {
       authObserver: StreamController<User?>.broadcast(),
     ));
 
-    print('[startAuthObserver] Action STORE ${store.hashCode.toString()}');
-
     onAuthStateChanged(User? user) async {
-      print('[onAuthStateChanged] Action STORE ${store.hashCode.toString()} ${user}');
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
 

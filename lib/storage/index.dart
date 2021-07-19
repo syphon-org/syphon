@@ -75,9 +75,7 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
 
     final codec = getEncryptSembastCodec(password: cryptKey!);
 
-    print('initStorage');
-    print(storageLocation);
-    print(cryptKey);
+    printInfo('initStorage $storageLocation $cryptKey');
 
     Storage.instance = await storageFactory.openDatabase(
       storageLocation,

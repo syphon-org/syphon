@@ -36,7 +36,9 @@ class RemoveAlert {
 
 ThunkAction<AppState> startAlertsObserver() {
   return (Store<AppState> store) async {
-    if (store.state.alertsStore.alertsObserver != null) {
+    final alertsObserver = store.state.alertsStore.alertsObserver;
+
+    if (alertsObserver != null && !alertsObserver.isClosed) {
       throw 'Cannot call startAlertsObserver with an existing instance';
     }
 

@@ -76,16 +76,13 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    print('initCache');
-    print(cacheLocation);
-    print(cryptKey);
+    printInfo('initCache $cacheLocation $cryptKey');
 
     Cache.cryptKey = cryptKey;
-    Cache.instance = await cacheFactory.openDatabase(
+
+    return await cacheFactory.openDatabase(
       cacheLocation,
     );
-
-    return Cache.instance;
   } catch (error) {
     printError('[initCache] $error');
     return null;

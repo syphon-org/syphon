@@ -60,60 +60,72 @@ class SetSyncObserver {
 
 class ResetSync {}
 
-/// Default Room Sync Observer
+///
+/// Default Sync Observer
 ///
 /// This will be run after the initial sync. Following login or signup, users
 /// will just have an observer that runs every second or so to sync with the server
 /// only while the app is _active_ otherwise, it will be up to a background service
 /// and a notification service to trigger syncs
+///
 ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
     final interval = store.state.settingsStore.syncInterval;
 
-    final Timer syncObserver = Timer.periodic(
-      Duration(milliseconds: interval),
-      (timer) async {
-        if (store.state.syncStore.lastSince == null) {
-          debugPrint('[startSyncObserver] skipping sync, needs full sync');
-          return;
-        }
+    onSync(timer) async {
+      final accessToken = store.state.authStore.user.accessToken;
+      final lastSince = store.state.syncStore.lastSince;
+      final syncing = store.state.syncStore.syncing;
 
-        final backoff = store.state.syncStore.backoff;
-        final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-          store.state.syncStore.lastAttempt!,
+      if (accessToken == null) {
+        debugPrint('[syncObserver] skipping sync, context not authenticated');
+        return;
+      }
+
+      if (lastSince == null) {
+        debugPrint('[syncObserver] skipping sync, needs full sync');
+        return;
+      }
+
+      if (syncing) {
+        debugPrint('[syncObserver] still syncing');
+        return;
+      }
+
+      final backoff = store.state.syncStore.backoff;
+      final lastAttemptMillis = store.state.syncStore.lastAttempt;
+      final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+        lastAttemptMillis!,
+      );
+
+      if (backoff != 0) {
+        final backoffs = fibonacci(backoff);
+        final backoffFactor = backoffs[backoffs.length - 1];
+        final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
+              Duration(milliseconds: 1000 * backoffFactor),
+            );
+
+        debugPrint(
+          '[syncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
         );
 
-        if (backoff != 0) {
-          final backoffs = fibonacci(backoff);
-          final backoffFactor = backoffs[backoffs.length - 1];
-          final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
-                Duration(milliseconds: 1000 * backoffFactor),
-              );
-
-          debugPrint(
-            '[startSyncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
-          );
-          if (backoffLimit != 1) {
-            return;
-          }
-
-          debugPrint('[Sync Observer] forced retry timeout');
-          return store.dispatch(fetchSync(
-            since: store.state.syncStore.lastSince,
-          ));
-        }
-
-        if (store.state.syncStore.syncing) {
-          debugPrint('[startSyncObserver] still syncing');
+        if (backoffLimit != 1) {
           return;
         }
 
-        debugPrint('[startSyncObserver] running sync');
-        store.dispatch(fetchSync(since: store.state.syncStore.lastSince));
-      },
-    );
+        debugPrint('[syncObserver] backoff timeout, trying again');
+      }
 
-    store.dispatch(SetSyncObserver(syncObserver: syncObserver));
+      debugPrint('[syncObserver] running sync');
+      store.dispatch(fetchSync(since: lastSince));
+    }
+
+    store.dispatch(SetSyncObserver(
+      syncObserver: Timer.periodic(
+        Duration(milliseconds: interval),
+        onSync,
+      ),
+    ));
   };
 }
 
@@ -236,16 +248,12 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         ));
       }
 
-      // WARN: may finish a sync poll after logging out
-      // TODO: cancel in progress sync polls?
-      if (store.state.authStore.user.accessToken != null) {
-        // Update synced to indicate init sync and next batch id (lastSince)
-        store.dispatch(SetSynced(
-          synced: true,
-          syncing: false,
-          lastSince: nextBatch,
-        ));
-      }
+      // Update synced to indicate init sync and next batch id (lastSince)
+      store.dispatch(SetSynced(
+        synced: true,
+        syncing: false,
+        lastSince: nextBatch,
+      ));
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync completed ***');
