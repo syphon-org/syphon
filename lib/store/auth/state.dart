@@ -33,9 +33,9 @@ class AuthStore extends Equatable {
   final StreamController<User?>? authObserver;
   final StreamController<User?>? contextObserver;
 
-  Stream<User?>? get onAuthStateChanged => authObserver != null ? authObserver!.stream : null;
+  Stream<User?> get onAuthStateChanged => authObserver!.stream;
 
-  Stream<User?>? get onContextChanged => contextObserver != null ? contextObserver!.stream : null;
+  Stream<User?> get onContextChanged => contextObserver!.stream;
 
   // Interactive Auth Data
   final Credential? credential;
@@ -161,8 +161,8 @@ class AuthStore extends Equatable {
     credential,
     creating,
     verificationNeeded,
-    authObserver,
-    contextObserver,
+    StreamController<User?>? authObserver,
+    StreamController<User?>? contextObserver,
   }) =>
       AuthStore(
         user: user ?? this.user,

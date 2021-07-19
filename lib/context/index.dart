@@ -23,7 +23,7 @@ class StoreContext {
   });
 }
 
-generateContextId({required String id}) {
+String generateContextId({required String id}) {
   final shaHash = sha256.convert(utf8.encode(id));
   return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
@@ -45,7 +45,10 @@ Future saveContext(String? current) async {
 
   final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
-  allContexts.add(current);
+
+  if (!allContexts.contains(current)) {
+    allContexts.add(current);
+  }
 
   return SecureStorage().write(key: StoreContext.STORAGE_KEY, value: json.encode(allContexts));
 }

@@ -116,29 +116,29 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // init auth listener
-    store.state.authStore.onAuthStateChanged!.listen(onAuthStateChanged);
-
-    // set auth state listener
-    store.state.authStore.onContextChanged!.listen(onContextChanged);
-
-    // init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
+    onMounted();
   }
 
   onContextChanged(User? user) async {
-    final contextCurrent = await loadCurrentContext();
+    print('[onContextChanged] *** RUNNING *** ');
+    final contextOld = await loadCurrentContext();
 
     var contextNew = StoreContext.DEFAULT;
+
+    // Stop saving to existing context storage
+    closeCache(Cache.instance);
+    closeStorage(Storage.instance);
+
+    print('[onContextChanged] contextOld ${contextOld.current}');
 
     // save new user context
     if (user != null) {
       contextNew = generateContextId(id: user.userId!);
       await saveContext(contextNew);
     } else {
+      store.teardown();
       // Remove old context and check all remained
-      await deleteContext(contextCurrent.current);
+      await deleteContext(contextOld.current);
       final allContexts = await loadContexts();
 
       // set to another if one exists
@@ -148,13 +148,15 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       }
     }
 
+    print('[onContextChanged] contextNew $contextNew');
+
     final cacheContext = await initCache(context: contextNew);
     final storageContext = await initStorage(context: contextNew);
     final storeContext = await initStore(
       cache,
       storage,
       existingState: AppState(
-        authStore: store.state.authStore,
+        authStore: store.state.authStore.copyWith(),
       ),
     );
 
@@ -164,10 +166,16 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       store = storeContext;
     });
 
-    // delete cache data if now authenticated (context is not default)
-    if (user == null) {
-      deleteCache(context: contextCurrent.current);
-      deleteStorage(context: contextCurrent.current);
+    // wipe unauthenticated storage
+    if (user != null) {
+      print('[onContextChanged] deleting unauthenticated storage');
+      deleteCache();
+      deleteStorage();
+      // delete cache data if now authenticated (context is not default)
+    } else {
+      print('[onContextChanged] deleting data ${contextOld.current}');
+      deleteCache(context: contextOld.current);
+      deleteStorage(context: contextOld.current);
     }
 
     store.state.authStore.authObserver?.add(user);
@@ -218,6 +226,17 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         },
       ),
     ));
+  }
+
+  onMounted() {
+    // init auth listener
+    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
+
+    // set auth state listener
+    store.state.authStore.onContextChanged.listen(onContextChanged);
+
+    // init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
   }
 
   @override

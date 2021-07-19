@@ -17,7 +17,7 @@ void main() async {
   await initPlatformDependencies();
 
   // pull current context / nullable
-  final context = await loadContext();
+  final context = await loadCurrentContext();
 
   // init hot cache
   final cache = await initCache(context: context.current);

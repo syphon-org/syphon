@@ -6,7 +6,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 
 class SetContextObserver {
-  final StreamController? contextObserver;
+  final StreamController<User?> contextObserver;
 
   SetContextObserver({
     required this.contextObserver,

@@ -80,6 +80,7 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       // retain the app sessions auth observer only
       return AuthStore(
         authObserver: state.authObserver,
+        contextObserver: state.contextObserver,
         clientSecret: state.clientSecret,
       );
     default:

@@ -266,10 +266,13 @@ ThunkAction<AppState> startAuthObserver() {
         await store.dispatch(ResetAuthStore());
         await store.dispatch(ResetSync());
       }
+
+      // reset client secret
+      store.dispatch(initClientSecret());
     }
 
     // set auth state listener
-    store.state.authStore.onAuthStateChanged!.listen(
+    store.state.authStore.onAuthStateChanged.listen(
       onAuthStateChanged,
     );
   };
@@ -378,7 +381,9 @@ ThunkAction<AppState> loginUser() {
         user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
       ));
 
-      store.state.authStore.contextObserver?.add(
+      final contextObserver = store.state.authStore.contextObserver;
+
+      contextObserver?.add(
         store.state.authStore.user,
       );
 
@@ -482,7 +487,6 @@ ThunkAction<AppState> logoutUser() {
 
       // tell authObserver to wipe store user and other data
       final temp = store.state.authStore.user.accessToken;
-      store.state.authStore.contextObserver?.add(null);
 
       final data = await MatrixApi.logoutUser(
         protocol: store.state.authStore.protocol,
@@ -496,20 +500,7 @@ ThunkAction<AppState> logoutUser() {
         }
       }
 
-      // close databases
-      closeCache(Cache.instance);
-      closeStorage(Storage.instance);
-
-      // wipe cache
-      await deleteCache();
-      await initCache();
-
-      // wipe cold storage
-      await deleteStorage();
-      await initStorage();
-
-      // reset client secret
-      await store.dispatch(initClientSecret());
+      store.state.authStore.contextObserver?.add(null);
     } catch (error) {
       store.dispatch(addAlert(
         origin: 'logoutUser',
@@ -1077,9 +1068,6 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
 
         // wipe cold storage
         await deleteStorage();
-
-        // reset client secret
-        await store.dispatch(initClientSecret());
       } catch (error) {
         store.dispatch(addAlert(
           error: error,

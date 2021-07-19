@@ -13,6 +13,7 @@ import 'package:syphon/storage/middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 
 import 'package:syphon/store/alerts/model.dart';
+import 'package:syphon/store/auth/middleware.dart';
 import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
@@ -122,16 +123,17 @@ Future<Store<AppState>> initStore(
 
   try {
     // Finally load persisted store
-    initialState = await persistor.load();
+    initialState = existingState ?? await persistor.load();
   } catch (error) {
     debugPrint('[Redux Persist] $error');
   }
 
   return Store<AppState>(
     appReducer,
-    initialState: existingState ?? initialState ?? AppState(),
+    initialState: initialState ?? AppState(),
     middleware: [
       thunkMiddleware,
+      authMiddleware,
       persistor.createMiddleware(),
       storageMiddleware,
       alertMiddleware,
