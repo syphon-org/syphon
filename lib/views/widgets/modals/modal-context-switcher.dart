@@ -12,7 +12,6 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/lists/list-item.dart';
 
 class ModalContextSwitcher extends StatelessWidget {

@@ -157,7 +157,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final contextOld = await loadCurrentContext();
 
     var contextNew = StoreContext.DEFAULT;
-    var contextsAll = await loadContexts();
 
     // Stop saving to existing context databases
     await closeCache(cache);
@@ -170,13 +169,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     } else {
       // Remove old context and check all remaining
       await deleteContext(contextOld.current);
-      contextsAll = await loadContexts();
-
-      // set to another if one exists
-      // otherwise, will be default
-      if (contextsAll.isNotEmpty) {
-        contextNew = contextsAll.first.current;
-      }
+      contextNew = (await loadCurrentContext()).current;
     }
 
     final cacheNew = await initCache(context: contextNew);
@@ -236,8 +229,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   onAuthStateChanged(User? user) async {
     final currentUser = store.state.authStore.currentUser;
+    final allContexts = await loadContexts();
 
-    if (user == null && defaultHome.runtimeType == HomeScreen) {
+    if (user == null && allContexts.isEmpty && defaultHome.runtimeType == HomeScreen) {
       defaultHome = IntroScreen();
       NavigationService.clearTo(NavigationPaths.intro, context);
     } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {

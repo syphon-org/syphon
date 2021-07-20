@@ -15,7 +15,20 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
     case SetContextObserver:
       return state.copyWith(contextObserver: action.contextObserver);
     case SetUser:
-      return state.copyWith(user: action.user);
+      final _action = action as SetUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+      final hasUser = availableUsers.indexWhere(
+        (user) => user.userId == _action.user.userId,
+      );
+
+      if (hasUser != -1) {
+        availableUsers.replaceRange(hasUser, hasUser + 1, [_action.user]);
+      }
+
+      return state.copyWith(
+        user: _action.user,
+        availableUsers: availableUsers,
+      );
     case SetSession:
       return state.copyWith(session: action.session);
     case SetClientSecret:

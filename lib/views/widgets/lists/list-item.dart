@@ -48,13 +48,13 @@ class ListItem extends StatelessWidget {
     switch (type) {
       case ListItemUserType.Pressable:
         return GestureDetector(
-          onTap: onPress != null ? () => onPress!() : null,
+          onTap: onPress != null && enabled ? () => onPress!() : null,
           child: child,
         );
       case ListItemUserType.Selectable:
         return InkWell(
           splashColor: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
-          onTap: onPress != null ? () => onPress!() : null,
+          onTap: onPress != null && enabled ? () => onPress!() : null,
           child: child,
         );
       default:
@@ -75,7 +75,6 @@ class ListItem extends StatelessWidget {
             child: ListTile(
               enabled: enabled,
               selected: selected,
-              onTap: onPress != null ? () => onPress!() : null,
               contentPadding: EdgeInsets.symmetric(vertical: 4),
               leading: Avatar(
                 uri: user.avatarUri,

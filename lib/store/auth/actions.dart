@@ -12,7 +12,6 @@ import 'package:device_info/device_info.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/libs/jack/index.dart';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -21,7 +20,6 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/libs/matrix/utils.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -56,8 +54,8 @@ class SetCreating {
 }
 
 class SetUser {
-  final User? user;
-  SetUser({this.user});
+  final User user;
+  SetUser({required this.user});
 }
 
 class SetClientSecret {
@@ -535,7 +533,7 @@ ThunkAction<AppState> fetchAuthUserProfile() {
         userId: store.state.authStore.currentUser.userId,
       );
 
-      store.dispatch(SetUser(
+      await store.dispatch(SetUser(
         user: store.state.authStore.currentUser.copyWith(
           displayName: data['displayname'],
           avatarUri: data['avatar_url'],

@@ -1,6 +1,5 @@
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
@@ -34,7 +33,6 @@ storageMiddleware(Database storage) {
       case AddAvailableUser:
       case RemoveAvailableUser:
       case SetUser:
-        printInfo('[storageMiddleware] ${action.runtimeType} saving auth');
         saveAuth(store.state.authStore, storage: storage);
         break;
       case UpdateMediaCache:
