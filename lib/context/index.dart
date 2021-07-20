@@ -45,9 +45,14 @@ Future saveContext(String? current) async {
 
   final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
+  final position = allContexts.indexOf(current);
 
-  if (!allContexts.contains(current)) {
+// TODO: remove the domain logic of setting "current user" from this function
+  if (position == -1) {
     allContexts.add(current);
+  } else {
+    allContexts.removeAt(position);
+    allContexts.insert(0, current);
   }
 
   return SecureStorage().write(key: StoreContext.STORAGE_KEY, value: json.encode(allContexts));

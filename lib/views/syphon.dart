@@ -147,6 +147,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   onContextChanged(User? user) async {
+    store.dispatch(SetGlobalLoading(loading: true));
     // stop old store listeners from running
     await onDestroyListeners();
 
@@ -181,7 +182,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final cacheNew = await initCache(context: contextNew);
     final storageNew = await initStorage(context: contextNew);
 
-    AppState? storeExisting = AppState(
+    final storeExisting = AppState(
       authStore: store.state.authStore.copyWith(user: user),
       settingsStore: store.state.settingsStore.copyWith(),
     );
@@ -189,9 +190,10 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // users previously authenticated will not
     // have an accessToken passed thus,
     // let the persistor load the auth user instead
+    var existingUser = false;
     if (user != null && user.accessToken != null) {
       if (user.accessToken!.isEmpty) {
-        storeExisting = null;
+        existingUser = true;
       }
     }
 
@@ -199,6 +201,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       cacheNew,
       storageNew,
       existingState: storeExisting,
+      existingUser: existingUser,
     );
 
     setState(() {
@@ -227,6 +230,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     storeNew.state.authStore.authObserver?.add(
       user,
     );
+
+    storeNew.dispatch(SetGlobalLoading(loading: false));
   }
 
   onAuthStateChanged(User? user) async {

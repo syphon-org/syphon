@@ -36,7 +36,7 @@ ThunkAction<AppState> startContextObserver() {
 ThunkAction<AppState> addAvailableUser(User user) {
   return (Store<AppState> store) async {
     // Remove all sensitive data about user (like accessToken)
-    store.dispatch(AddAvailableUser(
+    await store.dispatch(AddAvailableUser(
       availableUser: user.copyWith(
         accessToken: '',
       ),
@@ -47,7 +47,7 @@ ThunkAction<AppState> addAvailableUser(User user) {
 ThunkAction<AppState> removeAvailableUser(User user) {
   return (Store<AppState> store) async {
     // Remove all sensitive data about user (like accessToken)
-    store.dispatch(RemoveAvailableUser(
+    await store.dispatch(RemoveAvailableUser(
       availableUser: user.copyWith(
         accessToken: '',
       ),

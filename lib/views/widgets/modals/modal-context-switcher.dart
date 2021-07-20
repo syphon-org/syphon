@@ -7,11 +7,13 @@ import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/lists/list-item.dart';
 
 class ModalContextSwitcher extends StatelessWidget {
   const ModalContextSwitcher() : super();
@@ -26,6 +28,11 @@ class ModalContextSwitcher extends StatelessWidget {
     );
   }
 
+  onSwitchUser({required User user, required BuildContext context, required _Props props}) async {
+    props.onSwitchUser(user);
+    Navigator.pop(context);
+  }
+
   buildUserList(BuildContext context, _Props props) => ListView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
@@ -36,32 +43,12 @@ class ModalContextSwitcher extends StatelessWidget {
         final user = props.availableUsers[index];
         final selected = props.currentUser.userId == user.userId;
 
-        print('${user.userId} ${props.currentUser.userId} $selected');
-        return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: Dimensions.paddingContainer,
-          ),
-          color: selected ? Color(Colours.greyLight) : Colors.transparent,
-          child: Ink(
-            color: selected ? Color(Colours.greyDefault) : Colors.transparent,
-            child: ListTile(
-              enabled: !selected,
-              selected: selected,
-              onTap: () => props.onSwitchUser(user),
-              contentPadding: EdgeInsets.symmetric(vertical: 4),
-              leading: Avatar(
-                uri: user.avatarUri,
-                alt: user.displayName ?? user.userId,
-                size: Dimensions.avatarSizeMin,
-                background: Colours.hashedColorUser(user),
-              ),
-              title: Text(
-                user.userId!,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyText2,
-              ),
-            ),
-          ),
+        print('${user.userId} ${props.currentUser.userId} ${user.avatarUri} $selected');
+        return ListItem(
+          user: user,
+          selected: selected,
+          enabled: !props.loading && !selected,
+          onPress: () => onSwitchUser(user: user, context: context, props: props),
         );
       });
 
@@ -109,6 +96,7 @@ class ModalContextSwitcher extends StatelessWidget {
                       children: [
                         buildUserList(context, props),
                         ListTile(
+                          enabled: !props.loading,
                           onTap: () => onNavigateToMultiLogin(
                             context: context,
                             props: props,
@@ -144,12 +132,14 @@ class _Props extends Equatable {
 
   final User currentUser;
   final List<User> availableUsers;
+  final ThemeSettings themeSettings;
 
   final Function onSwitchUser;
 
   const _Props({
     required this.loading,
     required this.currentUser,
+    required this.themeSettings,
     required this.availableUsers,
     required this.onSwitchUser,
   });
@@ -158,11 +148,13 @@ class _Props extends Equatable {
   List<Object> get props => [
         currentUser,
         availableUsers,
+        themeSettings,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.authStore.loading,
+        loading: store.state.loading,
         currentUser: store.state.authStore.currentUser,
+        themeSettings: store.state.settingsStore.themeSettings,
         availableUsers: store.state.authStore.availableUsers,
         onSwitchUser: (User user) {
           print(user);

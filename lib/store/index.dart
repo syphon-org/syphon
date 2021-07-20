@@ -36,6 +36,20 @@ import './search/state.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
 
+class SetGlobalLoading {
+  bool loading;
+  SetGlobalLoading({required this.loading});
+}
+
+bool loadingReducer([bool state = false, dynamic action]) {
+  switch (action.runtimeType) {
+    case SetGlobalLoading:
+      return action.loading;
+    default:
+      return state;
+  }
+}
+
 class AppState extends Equatable {
   final bool loading;
   final AuthStore authStore;
@@ -50,7 +64,7 @@ class AppState extends Equatable {
   final CryptoStore cryptoStore;
 
   const AppState({
-    this.loading = true,
+    this.loading = false,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
@@ -79,6 +93,7 @@ class AppState extends Equatable {
       ];
 
   AppState copyWith({
+    bool? loading,
     AuthStore? authStore,
     AlertsStore? alertsStore,
     SearchStore? searchStore,
@@ -90,7 +105,7 @@ class AppState extends Equatable {
     CryptoStore? cryptoStore,
   }) =>
       AppState(
-        loading: false,
+        loading: loading ?? this.loading,
         authStore: authStore ?? this.authStore,
         alertsStore: alertsStore ?? this.alertsStore,
         searchStore: searchStore ?? this.searchStore,
@@ -104,7 +119,7 @@ class AppState extends Equatable {
 }
 
 AppState appReducer(AppState state, action) => AppState(
-      loading: state.loading,
+      loading: loadingReducer(state.loading, action),
       authStore: authReducer(state.authStore, action),
       alertsStore: alertsReducer(state.alertsStore, action),
       mediaStore: mediaReducer(state.mediaStore, action),
@@ -129,6 +144,7 @@ Future<Store<AppState>> initStore(
   Database? cache,
   Database? storage, {
   AppState? existingState,
+  bool existingUser = false,
 }) async {
   AppState? initialState;
   Map<String, dynamic> preloaded = {};
@@ -147,7 +163,16 @@ Future<Store<AppState>> initStore(
 
   try {
     // Finally load persisted store
-    initialState = existingState ?? await persistor.load();
+    if (existingUser) {
+      initialState = await persistor.load();
+      initialState = initialState?.copyWith(
+        authStore: initialState.authStore.copyWith(
+          availableUsers: existingState?.authStore.availableUsers,
+        ),
+      );
+    } else {
+      initialState = existingState ?? await persistor.load();
+    }
   } catch (error) {
     debugPrint('[persistor.load] error $error');
   }
