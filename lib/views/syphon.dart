@@ -66,12 +66,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.initState();
 
     // init all on state change listeners
-    onInitListeners();
-
-    // init current auth state with current user
-    store.state.authStore.authObserver?.add(
-      store.state.authStore.user,
-    );
+    onInitListenersFirst();
 
     // mutate messages
     store.dispatch(mutateMessagesAll());
@@ -116,6 +111,15 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onStartListeners();
   }
 
+  onInitListenersFirst() {
+    onInitListeners();
+
+    // init current auth state with current user
+    store.state.authStore.authObserver?.add(
+      store.state.authStore.user,
+    );
+  }
+
   onInitListeners() {
     store.dispatch(initDeepLinks());
     store.dispatch(startAuthObserver());
@@ -134,16 +138,19 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
   }
 
-  onDestroyListeners() {
-    store.dispatch(stopContextObserver());
-    store.dispatch(stopAlertsObserver());
-    store.dispatch(stopAuthObserver());
-    store.dispatch(disposeDeepLinks());
+  onDestroyListeners() async {
+    await store.dispatch(stopContextObserver());
+    await store.dispatch(stopAlertsObserver());
+    await store.dispatch(stopAuthObserver());
+    await store.dispatch(disposeDeepLinks());
   }
 
   onContextChanged(User? user) async {
     // stop old store listeners from running
-    onDestroyListeners();
+    await onDestroyListeners();
+
+    // stop old sync observer from running
+    await store.dispatch(stopSyncObserver());
 
     final contextOld = await loadCurrentContext();
 
@@ -175,7 +182,10 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final storeNew = await initStore(
       cacheNew,
       storageNew,
-      existingState: store.state,
+      existingState: AppState(
+        authStore: store.state.authStore.copyWith(),
+        settingsStore: store.state.settingsStore.copyWith(),
+      ),
     );
 
     setState(() {
@@ -186,10 +196,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
+      print('Deleting default cache');
       await deleteCache();
       await deleteStorage();
       // delete cache data if now authenticated (context is not default)
     } else {
+      print('Deleting context cache ${contextOld.current}');
       await deleteCache(context: contextOld.current);
       await deleteStorage(context: contextOld.current);
     }
@@ -198,17 +210,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onInitListeners();
     onStartListeners();
 
+    // reinitialize state of current context user
     storeNew.state.authStore.authObserver?.add(
       user,
     );
   }
 
   onAuthStateChanged(User? user) async {
+    final currentUser = store.state.authStore.currentUser;
+
     if (user == null && defaultHome.runtimeType == HomeScreen) {
       defaultHome = IntroScreen();
       NavigationService.clearTo(NavigationPaths.intro, context);
     } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
       defaultHome = HomeScreen();
+      NavigationService.clearTo(NavigationPaths.home, context);
+    } else if (user != null && user.userId != currentUser.userId && defaultHome.runtimeType == HomeScreen) {
       NavigationService.clearTo(NavigationPaths.home, context);
     }
   }

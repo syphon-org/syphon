@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 
 /// British localization because
 /// google monopolized the namespaces
@@ -34,6 +36,10 @@ class Colours {
     final hashable = string ?? '123';
     final int hash = hashable.codeUnits.reduce((value, element) => value + element);
     return Colours.chatColors[hash % Colours.chatColors.length];
+  }
+
+  static Color hashedColorUser(User user) {
+    return hashedColor(safeUserId(user));
   }
 
   static const chatColors = [

@@ -248,7 +248,6 @@ class LoginScreenState extends State<LoginScreen> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           elevation: 0,
-          brightness: Brightness.light,
           backgroundColor: Colors.transparent,
           actions: <Widget>[
             Visibility(

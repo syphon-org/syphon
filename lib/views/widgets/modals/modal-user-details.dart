@@ -131,7 +131,7 @@ class ModalUserDetails extends StatelessWidget {
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
                             background:
-                                props.user.avatarUri == null ? Colours.hashedColor(props.user.userId) : null,
+                                props.user.avatarUri == null ? Colours.hashedColorUser(props.user) : null,
                           ),
                         ),
                       ],

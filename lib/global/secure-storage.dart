@@ -11,7 +11,7 @@ class SecureStorage {
   Future<String?> read({required String key}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
-      final storage = SecureStorage.instance!;
+      final storage = instance!;
 
       // try to read key
       try {
@@ -40,7 +40,7 @@ class SecureStorage {
   Future write({required String key, required String? value}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
-      final storage = SecureStorage.instance!;
+      final storage = instance!;
 
       try {
         return storage.write(key: key, value: value);
@@ -65,7 +65,7 @@ class SecureStorage {
   Future delete({required String key}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
-      final storage = SecureStorage.instance!;
+      final storage = instance!;
 
       try {
         return storage.delete(key: key);

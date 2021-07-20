@@ -54,7 +54,7 @@ Future saveContext(String? current) async {
 }
 
 Future deleteContext(String? current) async {
-  if (current == null) return;
+  if (current == null || current.isEmpty) return;
 
   final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));

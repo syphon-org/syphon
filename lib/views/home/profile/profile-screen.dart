@@ -100,7 +100,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           uri: props.user.avatarUri,
           alt: formatUsername(props.user),
           size: imageSize,
-          background: Colours.hashedColor(formatUsername(props.user)),
+          background: Colours.hashedColorUser(props.user),
         );
 
         if (avatarFileNew != null) {
@@ -108,7 +108,7 @@ class ProfileScreenState extends State<ProfileScreen> {
             alt: formatUsername(props.user),
             size: imageSize,
             file: avatarFileNew,
-            background: Colours.hashedColor(formatUsername(props.user)),
+            background: Colours.hashedColorUser(props.user),
           );
         }
 

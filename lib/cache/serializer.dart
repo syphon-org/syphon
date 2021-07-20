@@ -67,7 +67,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache!, jsonEncrypted);
           } catch (error) {
-            printError('[CacheSerializer|storage] $error');
+            printError('[CacheSerializer|database] $error');
           }
         } catch (error) {
           printError(

@@ -71,6 +71,7 @@ class ResetSync {}
 ThunkAction<AppState> startSyncObserver() {
   return (Store<AppState> store) async {
     final interval = store.state.settingsStore.syncInterval;
+    final syncObserver = store.state.syncStore.syncObserver;
 
     onSync(timer) async {
       final accessToken = store.state.authStore.user.accessToken;
@@ -120,12 +121,11 @@ ThunkAction<AppState> startSyncObserver() {
       store.dispatch(fetchSync(since: lastSince));
     }
 
-    store.dispatch(SetSyncObserver(
-      syncObserver: Timer.periodic(
-        Duration(milliseconds: interval),
-        onSync,
-      ),
-    ));
+    if (syncObserver == null || !syncObserver.isActive) {
+      store.dispatch(SetSyncObserver(
+        syncObserver: Timer.periodic(Duration(milliseconds: interval), onSync),
+      ));
+    }
   };
 }
 
@@ -135,9 +135,9 @@ ThunkAction<AppState> startSyncObserver() {
 /// every few seconds
 ThunkAction<AppState> stopSyncObserver() {
   return (Store<AppState> store) {
-    if (store.state.syncStore.syncObserver != null) {
-      store.state.syncStore.syncObserver!.cancel();
-      store.dispatch(SetSyncObserver(syncObserver: null));
+    final syncObserver = store.state.syncStore.syncObserver;
+    if (syncObserver != null && syncObserver.isActive) {
+      syncObserver.cancel();
     }
   };
 }

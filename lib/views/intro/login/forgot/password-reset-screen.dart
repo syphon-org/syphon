@@ -50,7 +50,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             appBar: AppBar(

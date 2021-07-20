@@ -229,9 +229,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
                   uri: user.avatarUri,
                   alt: user.displayName ?? user.userId,
                   size: Dimensions.avatarSizeMessage,
-                  background: Colours.hashedColor(
-                    formatUsername(user),
-                  ),
+                  background: Colours.hashedColorUser(user),
                 ),
                 label: Text(
                   formatUsername(user),

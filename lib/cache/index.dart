@@ -79,7 +79,6 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
     printInfo('initCache $cacheLocation $cryptKey');
 
     Cache.cryptKey = cryptKey;
-
     return await cacheFactory.openDatabase(
       cacheLocation,
     );

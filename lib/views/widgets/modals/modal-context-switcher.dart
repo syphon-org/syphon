@@ -36,14 +36,12 @@ class ModalContextSwitcher extends StatelessWidget {
         return ListTile(
           selected: props.currentUser.userId == user.userId,
           onTap: () => props.onSwitchUser(user),
-          contentPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.symmetric(vertical: 4),
           leading: Avatar(
             uri: user.avatarUri,
             alt: user.displayName ?? user.userId,
             size: Dimensions.avatarSizeMin,
-            background: Colours.hashedColor(
-              user.displayName ?? user.userId,
-            ),
+            background: Colours.hashedColorUser(user),
           ),
           title: Text(
             user.userId!,

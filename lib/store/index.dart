@@ -123,7 +123,7 @@ Future<Store<AppState>> initStore(
 
   try {
     // Finally load persisted store
-    initialState = existingState ?? await persistor.load();
+    initialState = existingState ?? (await persistor.load());
   } catch (error) {
     debugPrint('[Redux Persist] $error');
   }
