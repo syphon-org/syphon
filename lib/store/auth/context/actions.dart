@@ -37,10 +37,8 @@ ThunkAction<AppState> addAvailableUser(User user) {
   return (Store<AppState> store) async {
     // Remove all sensitive data about user (like accessToken)
     store.dispatch(AddAvailableUser(
-      availableUser: User().copyWith(
-        userId: user.userId,
-        avatarUri: user.avatarUri,
-        displayName: user.displayName,
+      availableUser: user.copyWith(
+        accessToken: '',
       ),
     ));
   };
@@ -50,10 +48,8 @@ ThunkAction<AppState> removeAvailableUser(User user) {
   return (Store<AppState> store) async {
     // Remove all sensitive data about user (like accessToken)
     store.dispatch(RemoveAvailableUser(
-      availableUser: User().copyWith(
-        userId: user.userId,
-        avatarUri: user.avatarUri,
-        displayName: user.displayName,
+      availableUser: user.copyWith(
+        accessToken: '',
       ),
     ));
   };

@@ -8,6 +8,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -28,25 +29,38 @@ class ModalContextSwitcher extends StatelessWidget {
   buildUserList(BuildContext context, _Props props) => ListView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
       itemCount: props.availableUsers.length,
       itemBuilder: (BuildContext context, int index) {
         final user = props.availableUsers[index];
+        final selected = props.currentUser.userId == user.userId;
 
-        return ListTile(
-          selected: props.currentUser.userId == user.userId,
-          onTap: () => props.onSwitchUser(user),
-          contentPadding: EdgeInsets.symmetric(vertical: 4),
-          leading: Avatar(
-            uri: user.avatarUri,
-            alt: user.displayName ?? user.userId,
-            size: Dimensions.avatarSizeMin,
-            background: Colours.hashedColorUser(user),
+        print('${user.userId} ${props.currentUser.userId} $selected');
+        return Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimensions.paddingContainer,
           ),
-          title: Text(
-            user.userId!,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyText2,
+          color: selected ? Color(Colours.greyLight) : Colors.transparent,
+          child: Ink(
+            color: selected ? Color(Colours.greyDefault) : Colors.transparent,
+            child: ListTile(
+              enabled: !selected,
+              selected: selected,
+              onTap: () => props.onSwitchUser(user),
+              contentPadding: EdgeInsets.symmetric(vertical: 4),
+              leading: Avatar(
+                uri: user.avatarUri,
+                alt: user.displayName ?? user.userId,
+                size: Dimensions.avatarSizeMin,
+                background: Colours.hashedColorUser(user),
+              ),
+              title: Text(
+                user.userId!,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+            ),
           ),
         );
       });
@@ -59,7 +73,6 @@ class ModalContextSwitcher extends StatelessWidget {
             constraints: BoxConstraints(
               maxHeight: Dimensions.modalHeightMax,
             ),
-            padding: Dimensions.modalPadding,
             decoration: BoxDecoration(
               color: Theme.of(context).dialogBackgroundColor,
               borderRadius: BorderRadius.only(
@@ -71,7 +84,10 @@ class ModalContextSwitcher extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.only(bottom: 14),
+                  padding: EdgeInsets.symmetric(
+                    vertical: Dimensions.paddingContainer,
+                    horizontal: Dimensions.paddingLarge,
+                  ),
                   child: Text(
                     'Accounts',
                     textAlign: TextAlign.center,
@@ -83,24 +99,38 @@ class ModalContextSwitcher extends StatelessWidget {
                         ),
                   ),
                 ),
-                buildUserList(context, props),
-                ListTile(
-                  onTap: () => onNavigateToMultiLogin(
-                    context: context,
-                    props: props,
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    'Add account',
-                    style: Theme.of(context).textTheme.bodyText2,
-                  ),
-                  leading: Container(
-                    height: Dimensions.avatarSizeMin,
-                    width: Dimensions.avatarSizeMin,
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(
-                      Icons.add_circle_outline,
-                      size: Dimensions.iconSize,
+                ScrollConfiguration(
+                  behavior: DefaultScrollBehavior(),
+                  child: SingleChildScrollView(
+                    // Use a container of the same height and width
+                    // to flex dynamically but within a single child scroll
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildUserList(context, props),
+                        ListTile(
+                          onTap: () => onNavigateToMultiLogin(
+                            context: context,
+                            props: props,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: Dimensions.paddingContainer,
+                          ),
+                          title: Text(
+                            'Add account',
+                            style: Theme.of(context).textTheme.bodyText2,
+                          ),
+                          leading: Container(
+                            height: Dimensions.avatarSizeMin,
+                            width: Dimensions.avatarSizeMin,
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Icon(
+                              Icons.add_circle_outline,
+                              size: Dimensions.iconSize,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

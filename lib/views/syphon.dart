@@ -9,6 +9,7 @@ import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/index.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
@@ -155,6 +156,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final contextOld = await loadCurrentContext();
 
     var contextNew = StoreContext.DEFAULT;
+    var contextsAll = await loadContexts();
 
     // Stop saving to existing context databases
     await closeCache(cache);
@@ -165,27 +167,38 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       contextNew = generateContextId(id: user.userId!);
       await saveContext(contextNew);
     } else {
-      // Remove old context and check all remained
+      // Remove old context and check all remaining
       await deleteContext(contextOld.current);
-      final allContexts = await loadContexts();
+      contextsAll = await loadContexts();
 
       // set to another if one exists
       // otherwise, will be default
-      if (allContexts.isNotEmpty) {
-        contextNew = allContexts.first.current;
+      if (contextsAll.isNotEmpty) {
+        contextNew = contextsAll.first.current;
       }
     }
 
     final cacheNew = await initCache(context: contextNew);
     final storageNew = await initStorage(context: contextNew);
 
+    AppState? storeExisting = AppState(
+      authStore: store.state.authStore.copyWith(user: user),
+      settingsStore: store.state.settingsStore.copyWith(),
+    );
+
+    // users previously authenticated will not
+    // have an accessToken passed thus,
+    // let the persistor load the auth user instead
+    if (user != null && user.accessToken != null) {
+      if (user.accessToken!.isEmpty) {
+        storeExisting = null;
+      }
+    }
+
     final storeNew = await initStore(
       cacheNew,
       storageNew,
-      existingState: AppState(
-        authStore: store.state.authStore.copyWith(),
-        settingsStore: store.state.settingsStore.copyWith(),
-      ),
+      existingState: storeExisting,
     );
 
     setState(() {
@@ -196,12 +209,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
-      print('Deleting default cache');
+      printInfo('[onContextChanged] Deleting default cache');
       await deleteCache();
       await deleteStorage();
-      // delete cache data if now authenticated (context is not default)
     } else {
-      print('Deleting context cache ${contextOld.current}');
+      // delete cache data if removing context / account (context is not default)
+      printInfo('[onContextChanged] Deleting old cache ${contextOld.current}');
       await deleteCache(context: contextOld.current);
       await deleteStorage(context: contextOld.current);
     }

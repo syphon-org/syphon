@@ -77,6 +77,30 @@ class AppState extends Equatable {
         settingsStore,
         cryptoStore,
       ];
+
+  AppState copyWith({
+    AuthStore? authStore,
+    AlertsStore? alertsStore,
+    SearchStore? searchStore,
+    SettingsStore? settingsStore,
+    RoomStore? roomStore,
+    EventStore? eventStore,
+    UserStore? userStore,
+    SyncStore? syncStore,
+    CryptoStore? cryptoStore,
+  }) =>
+      AppState(
+        loading: false,
+        authStore: authStore ?? this.authStore,
+        alertsStore: alertsStore ?? this.alertsStore,
+        searchStore: searchStore ?? this.searchStore,
+        settingsStore: settingsStore ?? this.settingsStore,
+        roomStore: roomStore ?? this.roomStore,
+        eventStore: eventStore ?? this.eventStore,
+        userStore: userStore ?? this.userStore,
+        syncStore: syncStore ?? this.syncStore,
+        cryptoStore: cryptoStore ?? this.cryptoStore,
+      );
 }
 
 AppState appReducer(AppState state, action) => AppState(
@@ -123,9 +147,9 @@ Future<Store<AppState>> initStore(
 
   try {
     // Finally load persisted store
-    initialState = existingState ?? (await persistor.load());
+    initialState = existingState ?? await persistor.load();
   } catch (error) {
-    debugPrint('[Redux Persist] $error');
+    debugPrint('[persistor.load] error $error');
   }
 
   return Store<AppState>(

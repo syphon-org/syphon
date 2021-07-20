@@ -98,6 +98,7 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return AuthStore(
         loading: false,
         user: state.user,
+        availableUsers: state.availableUsers,
         clientSecret: state.clientSecret,
       );
     case ResetAuthStore:
@@ -105,6 +106,7 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return AuthStore(
         authObserver: state.authObserver,
         contextObserver: state.contextObserver,
+        availableUsers: state.availableUsers,
         clientSecret: state.clientSecret,
       );
     default:
