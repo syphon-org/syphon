@@ -27,6 +27,7 @@ import 'widgets/page-landing.dart';
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
 
+  @override
   IntroScreenState createState() => IntroScreenState();
 }
 

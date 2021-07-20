@@ -345,7 +345,7 @@ class HomeState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context,
                 '/home/chat',
-                arguments: ChatViewArguements(
+                arguments: ChatScreenArguments(
                   roomId: room.id,
                   title: roomName,
                 ),

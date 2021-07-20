@@ -8,16 +8,11 @@ import 'package:redux/redux.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-
-final Duration nextAnimationDuration = Duration(
-  milliseconds: Values.animationDurationDefault,
-);
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({Key? key}) : super(key: key);
@@ -95,7 +90,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                               width: width,
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
-                                maxHeight: Dimensions.widgetHeightMax * 0.5,
+                                maxHeight: Dimensions.heightMax * 0.5,
                               ),
                               child: PageView(
                                 pageSnapping: true,

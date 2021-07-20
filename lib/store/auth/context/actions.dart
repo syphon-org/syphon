@@ -7,10 +7,17 @@ import 'package:syphon/store/user/model.dart';
 
 class SetContextObserver {
   final StreamController<User?> contextObserver;
+  SetContextObserver({required this.contextObserver});
+}
 
-  SetContextObserver({
-    required this.contextObserver,
-  });
+class AddAvailableUser {
+  User availableUser;
+  AddAvailableUser({required this.availableUser});
+}
+
+class RemoveAvailableUser {
+  User availableUser;
+  RemoveAvailableUser({required this.availableUser});
 }
 
 ThunkAction<AppState> startContextObserver() {
@@ -22,6 +29,32 @@ ThunkAction<AppState> startContextObserver() {
 
     store.dispatch(SetContextObserver(
       contextObserver: StreamController<User?>.broadcast(),
+    ));
+  };
+}
+
+ThunkAction<AppState> addAvailableUser(User user) {
+  return (Store<AppState> store) async {
+    // Remove all sensitive data about user (like accessToken)
+    store.dispatch(AddAvailableUser(
+      availableUser: User().copyWith(
+        userId: user.userId,
+        avatarUri: user.avatarUri,
+        displayName: user.displayName,
+      ),
+    ));
+  };
+}
+
+ThunkAction<AppState> removeAvailableUser(User user) {
+  return (Store<AppState> store) async {
+    // Remove all sensitive data about user (like accessToken)
+    store.dispatch(RemoveAvailableUser(
+      availableUser: User().copyWith(
+        userId: user.userId,
+        avatarUri: user.avatarUri,
+        displayName: user.displayName,
+      ),
     ));
   };
 }

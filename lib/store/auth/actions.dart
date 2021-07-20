@@ -25,6 +25,7 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -377,9 +378,12 @@ ThunkAction<AppState> loginUser() {
         throw data['error'];
       }
 
-      await store.dispatch(SetUser(
-        user: User.fromMatrix(data).copyWith(homeserver: homeserver.baseUrl),
-      ));
+      final user = User.fromMatrix(data).copyWith(
+        homeserver: homeserver.baseUrl,
+      );
+
+      await store.dispatch(SetUser(user: user));
+      await store.dispatch(addAvailableUser(user));
 
       final contextObserver = store.state.authStore.contextObserver;
 
@@ -452,9 +456,12 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
         throw data['error'];
       }
 
-      await store.dispatch(SetUser(
-        user: User.fromMatrix(data),
-      ));
+      final user = User.fromMatrix(data).copyWith(
+        homeserver: homeserver.baseUrl,
+      );
+
+      await store.dispatch(SetUser(user: user));
+      await store.dispatch(addAvailableUser(user));
 
       store.state.authStore.contextObserver?.add(
         store.state.authStore.user,
@@ -486,6 +493,8 @@ ThunkAction<AppState> logoutUser() {
       }
 
       // tell authObserver to wipe store user and other data
+      final user = store.state.authStore.user;
+
       final temp = store.state.authStore.user.accessToken;
 
       final data = await MatrixApi.logoutUser(
@@ -500,6 +509,7 @@ ThunkAction<AppState> logoutUser() {
         }
       }
 
+      await store.dispatch(removeAvailableUser(user));
       store.state.authStore.contextObserver?.add(null);
     } catch (error) {
       store.dispatch(addAlert(
@@ -828,8 +838,10 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
         return completedAll;
       }
+      final user = User.fromMatrix(data);
 
-      store.dispatch(SetUser(user: User.fromMatrix(data)));
+      await store.dispatch(SetUser(user: user));
+      await store.dispatch(addAvailableUser(user));
 
       store.state.authStore.contextObserver?.add(
         store.state.authStore.user,
@@ -1039,16 +1051,17 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
 
         final currentCredential = store.state.authStore.credential ?? Credential();
 
-        final idServer = store.state.authStore.user.idserver;
-        final homeserver = store.state.authStore.user.homeserver;
+        final user = store.state.authStore.user;
+        final idServer = user.idserver;
+        final homeserver = user.homeserver;
 
         final data = await MatrixApi.deactivateUser(
           protocol: store.state.authStore.protocol,
           homeserver: homeserver,
-          accessToken: store.state.authStore.user.accessToken,
+          accessToken: user.accessToken,
           identityServer: idServer ?? homeserver,
           session: store.state.authStore.session,
-          userId: store.state.authStore.user.userId,
+          userId: user.userId,
           authType: MatrixAuthTypes.PASSWORD,
           authValue: currentCredential.value,
         );
@@ -1061,13 +1074,8 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
           return store.dispatch(setInteractiveAuths(auths: data));
         }
 
+        await store.dispatch(removeAvailableUser(user));
         store.state.authStore.contextObserver?.add(null);
-
-        // wipe cache
-        await deleteCache();
-
-        // wipe cold storage
-        await deleteStorage();
       } catch (error) {
         store.dispatch(addAlert(
           error: error,

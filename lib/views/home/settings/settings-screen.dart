@@ -14,10 +14,20 @@ import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/modals/modal-context-switcher.dart';
 import 'widgets/profile-preview.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
+
+  onToggleAccountBottomSheet(BuildContext context, _Props props) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (contextModal) => ModalContextSwitcher(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -54,10 +64,8 @@ class SettingsScreen extends StatelessWidget {
                       child: Container(
                         padding: Dimensions.heroPadding,
                         child: ProfilePreview(
-                          hasMultiaccounts: props.hasMultiaccounts,
-                          onModifyAccounts: () {
-                            Navigator.pushNamed(context, NavigationPaths.login);
-                          },
+                          hasMultiaccounts: false,
+                          onModifyAccounts: () => onToggleAccountBottomSheet(context, props),
                         ),
                       ),
                     ),
@@ -72,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
                               tr('list-item-settings-sms'),
                             ),
                             subtitle: Text(
-                              false ? Strings.labelOn : Strings.labelOff,
+                              Strings.labelOff, // TODO: add SMS feature
                               style: TextStyle(fontSize: 14.0),
                             ),
                             leading: Container(
@@ -225,7 +233,7 @@ class SettingsScreen extends StatelessWidget {
                               height: 28,
                               child: CircularProgressIndicator(
                                 strokeWidth: 1.5,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                valueColor: AlwaysStoppedAnimation<Color>(
                                   Theme.of(context).accentColor,
                                 ),
                                 value: null,

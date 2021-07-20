@@ -56,6 +56,30 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(captcha: action.completed);
     case SetAgreement:
       return state.copyWith(agreement: action.agreement);
+    case AddAvailableUser:
+      final _action = action as AddAvailableUser;
+      final availableUser = _action.availableUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+
+      if (existingIndex == -1) {
+        availableUsers.add(availableUser);
+      }
+
+      return state.copyWith(availableUsers: availableUsers);
+    case RemoveAvailableUser:
+      final _action = action as RemoveAvailableUser;
+      final availableUser = _action.availableUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+
+      if (existingIndex != -1) {
+        availableUsers.remove(availableUser);
+      }
+
+      return state.copyWith(availableUsers: availableUsers);
     case ResetUser:
       return state.copyWith(user: User());
     case ResetOnboarding:

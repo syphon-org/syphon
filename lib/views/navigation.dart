@@ -45,6 +45,7 @@ class NavigationService {
   }
 }
 
+// TODO: finish converting over to NavigationPaths for all routes
 class NavigationPaths {
   static const intro = '/intro';
   static const login = '/login';
@@ -52,6 +53,8 @@ class NavigationPaths {
   static const forgot = '/forgot';
   static const reset = '/reset';
   static const searchHomeservers = '/search/homeservers';
+  static const searchRooms = '/home/rooms/search';
+  static const userDetails = '/home/user/details';
   static const verification = '/verification';
   static const theming = '/theming';
   static const home = '/home';

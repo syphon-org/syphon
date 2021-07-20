@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
@@ -20,6 +21,7 @@ class ProfilePreview extends StatelessWidget {
 
   final bool hasMultiaccounts;
   final Function? onModifyAccounts;
+  static const double avatarSize = 32;
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -65,9 +67,21 @@ class ProfilePreview extends StatelessWidget {
                     height: Dimensions.avatarSize,
                     child: IconButton(
                       onPressed: () => onModifyAccounts != null ? onModifyAccounts!() : null,
-                      icon: hasMultiaccounts
-                          ? Icon(Icons.arrow_drop_down_rounded, size: Dimensions.avatarSize * 0.6)
-                          : Icon(Icons.add, size: Dimensions.avatarSize * 0.6),
+                      icon: Container(
+                        // decoration: ShapeDecoration(
+                        //   shape: CircleBorder(
+                        //     side: BorderSide(
+                        //       color: Color(Colours.greyDefault),
+                        //       width: Dimensions.borderWidthIcons,
+                        //     ),
+                        //   ),
+                        // ),
+                        child: Icon(
+                          Icons.more_horiz_rounded,
+                          color: Color(Colours.greyDefault),
+                          size: avatarSize,
+                        ),
+                      ),
                     )),
               ],
             )
