@@ -255,8 +255,6 @@ ThunkAction<AppState> startAuthObserver() {
         // start syncing for user
         await store.dispatch(startSyncObserver());
       } else {
-        await store.dispatch(stopSyncObserver());
-
         // wipe sensitive redux state
         await store.dispatch(ResetRooms());
         await store.dispatch(ResetEvents());
@@ -483,28 +481,33 @@ ThunkAction<AppState> logoutUser() {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      store.dispatch(stopSyncObserver());
-      // submit empty auth before logging out of matrix
+      await store.dispatch(stopSyncObserver());
 
-      if (store.state.authStore.user.homeserver == null) {
-        throw Exception('Unavailable user data');
-      }
-
+      // copy user data in case store updates occur
       final user = store.state.authStore.user.copyWith();
 
-      final data = await MatrixApi.logoutUser(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-      );
+      // attempt to logout of Matrix if even possible
+      if (user.homeserver != null && user.accessToken != null) {
+        final data = await MatrixApi.logoutUser(
+          protocol: store.state.authStore.protocol,
+          homeserver: user.homeserver,
+          accessToken: user.accessToken,
+        );
 
-      if (data['errcode'] != null) {
-        if (data['errcode'] != MatrixErrors.unknown_token) {
-          throw Exception(data['error']);
+        if (data['errcode'] != null) {
+          if (data['errcode'] != MatrixErrors.unknown_token) {
+            throw Exception(data['error']);
+          }
         }
       }
 
+      // Remove this user from available multiaccounts
       await store.dispatch(removeAvailableUser(user));
+
+      // Attempt to switch to another user if session is present
+      // final nextAvailableUser = store.state.authStore.availableUsers;
+      // final nextUser = nextAvailableUser.isNotEmpty ? nextAvailableUser.first : null;
+
       store.state.authStore.contextObserver?.add(null);
     } catch (error) {
       store.dispatch(addAlert(
@@ -1070,6 +1073,11 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
         }
 
         await store.dispatch(removeAvailableUser(user));
+
+        // Attempt to switch to another user if session is present
+        // final nextAvailableUser = store.state.authStore.availableUsers;
+        // final nextUser = nextAvailableUser.isNotEmpty ? nextAvailableUser.first : null;
+
         store.state.authStore.contextObserver?.add(null);
       } catch (error) {
         store.dispatch(addAlert(

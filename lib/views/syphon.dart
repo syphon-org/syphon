@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -113,12 +115,20 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onStartListeners();
   }
 
-  onInitListenersFirst() {
+  onInitListenersFirst() async {
     onInitListeners();
+
+    final currentContext = (await loadCurrentContext()).current;
+    final currentUser = store.state.authStore.user;
+
+    // Reset contexts if the current user has no accessToken (unrecoverable state)
+    if (currentUser.accessToken == null && currentContext != StoreContext.DEFAULT) {
+      return onResetContext();
+    }
 
     // init current auth state with current user
     store.state.authStore.authObserver?.add(
-      store.state.authStore.user,
+      currentUser,
     );
   }
 
@@ -156,24 +166,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // stop old sync observer from running
     await store.dispatch(stopSyncObserver());
 
-    // final context switches
-    final contextOld = await loadCurrentContext();
-    var contextNew;
-
     // Stop saving to existing context databases
     await closeCache(cache);
     await closeStorage(storage);
+
+    // final context switches
+    final contextOld = await loadCurrentContext();
+    String? contextNew;
 
     // save new user context
     if (user != null) {
       contextNew = generateContextId(id: user.userId!);
       await saveContext(contextNew);
     } else {
-      // Remove old context and check all remaining
-      print('[onContextChanged] DELETING ${contextOld.current}');
+      // revert to another user context or default
       await deleteContext(contextOld.current);
       contextNew = (await loadCurrentContext()).current;
-      print('[onContextChanged] SETTING TO PREVIOUS CONTEXT ${contextNew}');
     }
 
     final cacheNew = await initCache(context: contextNew);
@@ -184,23 +192,21 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       settingsStore: store.state.settingsStore.copyWith(),
     );
 
+    var existingUser = false;
+
     // users previously authenticated will not
     // have an accessToken passed thus,
     // let the persistor load the auth user instead
-    var existingUser = false;
     if (user != null && user.accessToken != null) {
-      printInfo(user.toString());
-
       if (user.accessToken!.isEmpty) {
         existingUser = true;
       }
-      // otherwise, do the same thing if logging out of a user
-      // but another exists (really switching users)
-    } else if (user == null && contextNew != StoreContext.DEFAULT) {
+    }
+
+    if (user == null) {
       existingUser = true;
     }
 
-    printInfo(existingUser.toString());
     final storeNew = await initStore(
       cacheNew,
       storageNew,
@@ -214,28 +220,56 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       store = storeNew;
     });
 
-    // wipe unauthenticated storage
-    if (user != null) {
-      printInfo('[onContextChanged] Deleting default cache');
-      await deleteCache();
-      await deleteStorage();
-    } else {
-      // delete cache data if removing context / account (context is not default)
-      printInfo('[onContextChanged] Deleting old cache ${contextOld.current}');
-      await deleteCache(context: contextOld.current);
-      await deleteStorage(context: contextOld.current);
-    }
-
     // reinitialize and start new store listeners
     onInitListeners();
     onStartListeners();
 
-    // reinitialize state of current context user
-    storeNew.state.authStore.authObserver?.add(
-      user,
-    );
+    final userNew = storeNew.state.authStore.user;
+    final authObserverNew = storeNew.state.authStore.authObserver;
+
+    // revert to another authed user if available and logging out
+    if (user == null && userNew.accessToken != null && contextNew.isNotEmpty) {
+      authObserverNew?.add(userNew);
+    } else {
+      authObserverNew?.add(user);
+    }
+
+    // wipe unauthenticated storage
+    if (user != null) {
+      onDeleteContext(StoreContext(current: StoreContext.DEFAULT));
+    } else {
+      // delete cache data if removing context / account (context is not default)
+      onDeleteContext(contextOld);
+    }
 
     storeNew.dispatch(SetGlobalLoading(loading: false));
+  }
+
+  onDeleteContext(StoreContext context) async {
+    if (context.current.isEmpty) {
+      printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
+    } else {
+      printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.current}');
+    }
+    await deleteCache(context: context.current);
+    await deleteStorage(context: context.current);
+  }
+
+  // Reset contexts if the current user has no accessToken (unrecoverable state)
+  onResetContext() async {
+    printError('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    final allContexts = await loadContexts();
+
+    await Future.forEach(
+      allContexts,
+      (StoreContext context) async {
+        await onDeleteContext(context);
+      },
+    );
+
+    store.state.authStore.contextObserver?.add(
+      null,
+    );
   }
 
   onAuthStateChanged(User? user) async {
@@ -250,7 +284,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // No user is present during auth state change, but other contexts exist
     if (user == null && allContexts.isNotEmpty && defaultScreen == HomeScreen) {
-      return NavigationService.clearTo(NavigationPaths.home, context);
+      return;
     }
 
     // New user is found and previously was in an unauthenticated state
@@ -265,7 +299,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         user.accessToken != null &&
         user.accessToken!.isNotEmpty &&
         defaultScreen == HomeScreen) {
-      return NavigationService.clearTo(NavigationPaths.settings, context);
+      return NavigationService.clearTo(NavigationPaths.home, context);
     }
   }
 

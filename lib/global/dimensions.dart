@@ -70,6 +70,7 @@ class Dimensions {
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
   // Padding values
+  static const double paddingMin = 4;
   static const double paddingSmall = 12;
   static const double paddingLarge = 24;
   static const double paddingContainer = 16;
@@ -165,6 +166,11 @@ class Dimensions {
   // Modals
   static const double defaultModalHeight = 256;
   static const double modalHeightMax = 456;
+
+  static const modalBorderRadius = BorderRadius.only(
+    topLeft: Radius.circular(16),
+    topRight: Radius.circular(16),
+  );
 
   static double modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;

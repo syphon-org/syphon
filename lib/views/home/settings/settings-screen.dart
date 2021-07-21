@@ -21,10 +21,18 @@ class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
   onToggleAccountBottomSheet(BuildContext context, _Props props) {
+    if (props.accountLoading) {
+      return props.onAddInfo('Wait for full sync to finish before switching accounts');
+    }
+
+    // NOTE: example of setting modal backgroound w/ inkwell working
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: Dimensions.modalBorderRadius,
+      ),
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
       builder: (contextModal) => ModalContextSwitcher(),
     );
   }
@@ -253,11 +261,13 @@ class SettingsScreen extends StatelessWidget {
 class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
+  final bool accountLoading;
   final bool hasMultiaccounts;
   final bool? notificationsEnabled;
   final String? fontName;
   final String themeTypeName;
 
+  final Function onAddInfo;
   final Function onDisabled;
   final Function onLogoutUser;
 
@@ -266,8 +276,10 @@ class _Props extends Equatable {
     required this.themeTypeName,
     required this.loading,
     required this.authLoading,
+    required this.accountLoading,
     required this.hasMultiaccounts,
     required this.notificationsEnabled,
+    required this.onAddInfo,
     required this.onDisabled,
     required this.onLogoutUser,
   });
@@ -278,9 +290,13 @@ class _Props extends Equatable {
         loading,
         authLoading,
         notificationsEnabled,
+        accountLoading,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        accountLoading: !store.state.cryptoStore.oneTimeKeysStable ||
+            !store.state.syncStore.synced ||
+            store.state.syncStore.lastSince == null,
         hasMultiaccounts: selectHasMultiaccount(store.state),
         fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
         themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
@@ -289,5 +305,8 @@ class _Props extends Equatable {
         notificationsEnabled: store.state.settingsStore.notificationSettings.enabled,
         onDisabled: () => store.dispatch(addInProgress()),
         onLogoutUser: () => store.dispatch(logoutUser()),
+        onAddInfo: (message) {
+          store.dispatch(addInfo(origin: 'ModalContextSwitcher', message: message));
+        },
       );
 }

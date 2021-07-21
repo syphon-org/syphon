@@ -10,11 +10,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
@@ -66,7 +69,19 @@ class LoginScreenState extends State<LoginScreen> {
       currentAuthType = AuthTypes.Password;
     });
 
-    await props.onLoginUser();
+    final userId = props.userIdHint;
+
+    final authExists = props.availableUsers.indexWhere(
+      (user) => user.userId == userId,
+    );
+
+    if (authExists != -1) {
+      props.onAddAlert(
+        'User already logged in under multiaccounts',
+      );
+    } else {
+      await props.onLoginUser();
+    }
 
     setState(() {
       currentAuthType = null;
@@ -149,7 +164,7 @@ class LoginScreenState extends State<LoginScreen> {
             },
             child: TextFieldSecure(
               maxLines: 1,
-              label: props.usernameHint,
+              label: props.userIdHint,
               disableSpacing: true,
               disabled: props.loading,
               controller: usernameController,
@@ -496,17 +511,20 @@ class LoginScreenState extends State<LoginScreen> {
 }
 
 class _Props extends Equatable {
-  final bool loading;
+  final String userIdHint;
   final String username;
   final String password;
+
+  final bool loading;
+  final bool isPasswordLoginAvailable;
   final bool isPasswordLoginAttemptable;
+  final bool isSSOLoginAvailable;
   final bool isSSOLoginAttemptable;
-  final String usernameHint;
-  final List<String> loginTypes;
+
   final Homeserver homeserver;
 
-  final bool isPasswordLoginAvailable;
-  final bool isSSOLoginAvailable;
+  final List<String> loginTypes;
+  final List<User> availableUsers;
 
   final Function onDebug;
   final Function onLoginUser;
@@ -515,20 +533,23 @@ class _Props extends Equatable {
   final Function onChangeUsername;
   final Function onChangePassword;
   final Function onChangeHomeserver;
+  final Function onAddAlert;
   final Function onResetSession;
 
   const _Props({
     required this.loading,
+    required this.userIdHint,
     required this.username,
     required this.password,
     required this.loginTypes,
+    required this.availableUsers,
     required this.isPasswordLoginAvailable,
     required this.isSSOLoginAvailable,
     required this.homeserver,
     required this.isPasswordLoginAttemptable,
     required this.isSSOLoginAttemptable,
-    required this.usernameHint,
     required this.onDebug,
+    required this.onAddAlert,
     required this.onLoginUser,
     required this.onLoginUserSSO,
     required this.onIncrementThemeType,
@@ -541,9 +562,10 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         loading,
+        userIdHint,
         username,
         password,
-        usernameHint,
+        availableUsers,
         onIncrementThemeType,
         isPasswordLoginAttemptable,
         isSSOLoginAttemptable,
@@ -556,11 +578,12 @@ class _Props extends Equatable {
         password: store.state.authStore.password,
         homeserver: store.state.authStore.homeserver,
         loginTypes: store.state.authStore.homeserver.loginTypes,
+        availableUsers: store.state.authStore.availableUsers,
         isSSOLoginAvailable: selectSSOEnabled(store.state),
         isPasswordLoginAvailable: selectPasswordEnabled(store.state),
         isSSOLoginAttemptable: selectSSOLoginAttemptable(store.state),
         isPasswordLoginAttemptable: selectPasswordLoginAttemptable(store.state),
-        usernameHint: Strings.formatUsernameHint(
+        userIdHint: formatUsernameHint(
           username: store.state.authStore.username,
           homeserver: store.state.authStore.hostname,
         ),
@@ -596,6 +619,12 @@ class _Props extends Equatable {
           }
 
           return await store.dispatch(loginUserSSO());
+        },
+        onAddAlert: (message) {
+          store.dispatch(addAlert(
+            origin: 'LoginScreen',
+            message: message,
+          ));
         },
         onLoginUser: () async {
           final hostname = store.state.authStore.hostname;

@@ -113,6 +113,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return AuthStore(
         loading: false,
         user: state.user,
+        authObserver: state.authObserver,
+        contextObserver: state.contextObserver,
         availableUsers: state.availableUsers,
         clientSecret: state.clientSecret,
       );

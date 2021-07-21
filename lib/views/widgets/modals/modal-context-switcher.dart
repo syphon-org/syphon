@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -58,13 +59,6 @@ class ModalContextSwitcher extends StatelessWidget {
             constraints: BoxConstraints(
               maxHeight: Dimensions.modalHeightMax,
             ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).dialogBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,26 +87,29 @@ class ModalContextSwitcher extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         buildUserList(context, props),
-                        ListTile(
-                          enabled: !props.loading,
-                          onTap: () => onNavigateToMultiLogin(
-                            context: context,
-                            props: props,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: Dimensions.paddingContainer,
-                          ),
-                          title: Text(
-                            'Add account',
-                            style: Theme.of(context).textTheme.bodyText2,
-                          ),
-                          leading: Container(
-                            height: Dimensions.avatarSizeMin,
-                            width: Dimensions.avatarSizeMin,
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Icon(
-                              Icons.add_circle_outline,
-                              size: Dimensions.iconSize,
+                        Opacity(
+                          opacity: !props.loading ? 1 : 0.7,
+                          child: ListTile(
+                            enabled: !props.loading,
+                            onTap: () => onNavigateToMultiLogin(
+                              context: context,
+                              props: props,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: Dimensions.paddingContainer,
+                            ),
+                            title: Text(
+                              'Add account',
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                            leading: Container(
+                              height: Dimensions.avatarSizeMin,
+                              width: Dimensions.avatarSizeMin,
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Icon(
+                                Icons.add_circle_outline,
+                                size: Dimensions.iconSize,
+                              ),
                             ),
                           ),
                         ),
@@ -151,13 +148,11 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading:
-            store.state.loading && store.state.syncStore.synced && store.state.syncStore.lastSince != null,
+        loading: !store.state.syncStore.synced || store.state.syncStore.lastSince == null,
         currentUser: store.state.authStore.currentUser,
         themeSettings: store.state.settingsStore.themeSettings,
         availableUsers: store.state.authStore.availableUsers,
         onSwitchUser: (User user) {
-          print(user);
           final contextObserver = store.state.authStore.contextObserver;
           contextObserver?.add(user);
         },

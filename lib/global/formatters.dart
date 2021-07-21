@@ -112,3 +112,10 @@ String formatTimestamp({
     return 'Now';
   }
 }
+
+formatUsernameHint({required String homeserver, String? username}) {
+  final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
+  final alias = homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
+
+  return alias.replaceFirst('@', '', 1);
+}

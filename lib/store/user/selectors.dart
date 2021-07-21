@@ -62,8 +62,8 @@ String formatUsername(User user) {
   return user.displayName ?? trimAlias(user.userId ?? '');
 }
 
-String safeUserId(User user) {
-  return user.userId ?? '';
+String safeUserId(User? user) {
+  return user != null ? user.userId ?? '' : '';
 }
 
 String formatUserInitials(User? user) {

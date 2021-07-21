@@ -65,8 +65,13 @@ class SetOlmAccountBackup {
 }
 
 class SetOneTimeKeysCounts {
-  var oneTimeKeysCounts;
+  Map<String, int>? oneTimeKeysCounts;
   SetOneTimeKeysCounts({this.oneTimeKeysCounts});
+}
+
+class SetOneTimeKeysStable {
+  bool stable;
+  SetOneTimeKeysStable({required this.stable});
 }
 
 class SetOneTimeKeysClaimed {
@@ -394,10 +399,17 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
   };
 }
 
-ThunkAction<AppState> updateOneTimeKeyCounts(
-  Map<String, int> oneTimeKeysCounts,
-) {
+///
+/// Update One Time Key Counts
+///
+/// Always run this function for every fetchSync or /sync call made
+/// Matrix will return the number of keyCounts available, and for every
+/// payload, this function will determine if updates are needed
+///
+ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeysCounts) {
   return (Store<AppState> store) async {
+    printDebug('[updateOneTimeKeyCounts] $oneTimeKeysCounts');
+
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
     if (accessToken == null) {
@@ -423,6 +435,8 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
       return;
     }
 
+    printInfo('[updateOneTimeKeyCounts] Updating $currentKeyCount, $oneTimeKeysCounts');
+
     store.dispatch(SetOneTimeKeysCounts(
       oneTimeKeysCounts: oneTimeKeysCounts,
     ));
@@ -434,6 +448,8 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
     // the last check is because im scared
     if ((signedCurveCount < maxKeyCount / 3) && signedCurveCount < 100) {
       store.dispatch(updateOneTimeKeys());
+    } else {
+      store.dispatch(SetOneTimeKeysStable(stable: true));
     }
   };
 }
@@ -441,6 +457,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(
 ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
   return (Store<AppState> store) async {
     try {
+      store.dispatch(SetOneTimeKeysStable(stable: false));
       final olmAccount = store.state.cryptoStore.olmAccount!;
 
       var newOneTimeKeys = await store.dispatch(

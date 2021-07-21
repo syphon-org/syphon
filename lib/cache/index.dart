@@ -115,7 +115,7 @@ deleteCache({String? context = StoreContext.DEFAULT}) async {
     await cacheFactory.deleteDatabase(cacheLocation);
     await deleteKey(cacheKeyId);
   } catch (error) {
-    printError('[initCache] $error');
+    printError('[deleteCache] $error');
   }
 }
 

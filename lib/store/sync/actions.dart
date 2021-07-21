@@ -241,12 +241,10 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         await store.dispatch(syncDevice(toDeviceJson));
       }
 
-      if (oneTimeKeyCount.isEmpty) {
-        // Update encryption one time key count
-        store.dispatch(updateOneTimeKeyCounts(
-          Map<String, int>.from(oneTimeKeyCount),
-        ));
-      }
+      // Update encryption one time key count
+      store.dispatch(updateOneTimeKeyCounts(
+        Map<String, int>.from(oneTimeKeyCount),
+      ));
 
       // Update synced to indicate init sync and next batch id (lastSince)
       store.dispatch(SetSynced(

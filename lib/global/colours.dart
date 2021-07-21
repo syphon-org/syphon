@@ -38,7 +38,7 @@ class Colours {
     return Colours.chatColors[hash % Colours.chatColors.length];
   }
 
-  static Color hashedColorUser(User user) {
+  static Color hashedColorUser(User? user) {
     return hashedColor(safeUserId(user));
   }
 

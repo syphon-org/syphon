@@ -39,6 +39,7 @@ class ProfilePreview extends StatelessWidget {
                   uri: props.avatarUri,
                   alt: props.user.displayName ?? props.user.userId,
                   size: Dimensions.avatarSize,
+                  background: Colours.hashedColorUser(props.user),
                 ),
               ),
               Column(
@@ -67,20 +68,10 @@ class ProfilePreview extends StatelessWidget {
                     height: Dimensions.avatarSize,
                     child: IconButton(
                       onPressed: () => onModifyAccounts != null ? onModifyAccounts!() : null,
-                      icon: Container(
-                        // decoration: ShapeDecoration(
-                        //   shape: CircleBorder(
-                        //     side: BorderSide(
-                        //       color: Color(Colours.greyDefault),
-                        //       width: Dimensions.borderWidthIcons,
-                        //     ),
-                        //   ),
-                        // ),
-                        child: Icon(
-                          Icons.more_horiz_rounded,
-                          color: Color(Colours.greyDefault),
-                          size: avatarSize,
-                        ),
+                      icon: Icon(
+                        Icons.more_horiz_rounded,
+                        color: Color(Colours.greyDefault),
+                        size: avatarSize,
                       ),
                     )),
               ],

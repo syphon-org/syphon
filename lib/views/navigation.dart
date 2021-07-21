@@ -41,7 +41,11 @@ class NavigationService {
   }
 
   static Future clearTo(String routeName, BuildContext context) {
-    return navigatorKey.currentState!.pushNamedAndRemoveUntil(routeName, (_) => false);
+    final navigator = navigatorKey.currentState;
+
+    if (navigator == null) return Future.value();
+
+    return navigator.pushNamedAndRemoveUntil(routeName, (_) => false);
   }
 }
 
