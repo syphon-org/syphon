@@ -18,6 +18,8 @@ class Values {
   static const defaultLanguage = 'en-US';
   static const EMPTY_CHAT = 'Empty Chat';
 
+  static const EMPTY = '';
+
   // Notifications and Background service
   static const channel_id = '${appLabel}_notifications';
   static const channel_id_background_service = '${appName}_background_notification';

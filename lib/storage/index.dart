@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/context/index.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/storage/codec.dart';
@@ -50,7 +51,7 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
     var storageFactory;
 
     // Configure cache encryption/decryption instance
-    final cryptKey = await loadKey(storageKeyId);
+    final storageKey = await loadKey(storageKeyId);
 
     if (Platform.isAndroid || Platform.isIOS) {
       // always open cold storage as sqflite
@@ -73,9 +74,9 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: cryptKey!);
+    final codec = getEncryptSembastCodec(password: storageKey!);
 
-    printInfo('initStorage $storageLocation $cryptKey');
+    printInfo('initStorage $storageLocation $storageKey');
 
     Storage.instance = await storageFactory.openDatabase(
       storageLocation,

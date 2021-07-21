@@ -36,11 +36,11 @@ import 'package:syphon/views/intro/signup/verification-screen.dart';
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  static Future<dynamic> navigateTo(String routeName) {
+  static Future navigateTo(String routeName) {
     return navigatorKey.currentState!.pushNamed(routeName);
   }
 
-  static Future<dynamic> clearTo(String routeName, BuildContext context) {
+  static Future clearTo(String routeName, BuildContext context) {
     return navigatorKey.currentState!.pushNamedAndRemoveUntil(routeName, (_) => false);
   }
 }
@@ -58,6 +58,10 @@ class NavigationPaths {
   static const verification = '/verification';
   static const theming = '/theming';
   static const home = '/home';
+  static const settings = '/settings';
+  static const devices = '/devices';
+  static const blocked = '/blocked';
+  static const loading = '/loading';
 }
 
 class NavigationProvider {
@@ -90,9 +94,9 @@ class NavigationProvider {
         '/privacy': (BuildContext context) => const PrivacySettingsScreen(),
         '/chat-preferences': (BuildContext context) => const ChatsSettingsScreen(),
         NavigationPaths.theming: (BuildContext context) => const ThemingSettingsScreen(),
-        '/devices': (BuildContext context) => DevicesScreen(),
-        '/settings': (BuildContext context) => const SettingsScreen(),
-        '/blocked': (BuildContext context) => const BlockedScreen(),
-        '/loading': (BuildContext context) => const LoadingScreen(),
+        NavigationPaths.devices: (BuildContext context) => DevicesScreen(),
+        NavigationPaths.settings: (BuildContext context) => const SettingsScreen(),
+        NavigationPaths.blocked: (BuildContext context) => const BlockedScreen(),
+        NavigationPaths.loading: (BuildContext context) => const LoadingScreen(),
       };
 }

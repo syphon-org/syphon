@@ -58,7 +58,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             {
               'type': type,
               'json': json,
-              'cryptKey': Cache.cryptKey,
+              'cacheKey': Cache.cacheKey,
             },
             debugLabel: 'encryptJsonBackground',
           );

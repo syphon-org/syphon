@@ -22,7 +22,9 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       );
 
       if (hasUser != -1) {
-        availableUsers.replaceRange(hasUser, hasUser + 1, [_action.user]);
+        availableUsers.replaceRange(hasUser, hasUser + 1, [
+          _action.user.copyWith(accessToken: ''),
+        ]);
       }
 
       return state.copyWith(

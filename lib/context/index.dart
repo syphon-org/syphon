@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/secure-storage.dart';
-import 'package:syphon/global/values.dart';
 
 ///
 /// Store Context
@@ -12,17 +12,6 @@ import 'package:syphon/global/values.dart';
 ///
 /// allows multiaccount feature to be domain logic independent
 ///
-class StoreContext {
-  static const DEFAULT = '';
-  static const STORAGE_KEY = '${Values.appLabel}@context';
-
-  final String current;
-
-  StoreContext({
-    this.current = DEFAULT,
-  });
-}
-
 String generateContextId({required String id}) {
   final shaHash = sha256.convert(utf8.encode(id));
   return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);

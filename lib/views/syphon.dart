@@ -7,6 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/index.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
@@ -148,15 +149,16 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   onContextChanged(User? user) async {
     store.dispatch(SetGlobalLoading(loading: true));
+
     // stop old store listeners from running
     await onDestroyListeners();
 
     // stop old sync observer from running
     await store.dispatch(stopSyncObserver());
 
+    // final context switches
     final contextOld = await loadCurrentContext();
-
-    var contextNew = StoreContext.DEFAULT;
+    var contextNew;
 
     // Stop saving to existing context databases
     await closeCache(cache);
@@ -168,8 +170,10 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       await saveContext(contextNew);
     } else {
       // Remove old context and check all remaining
+      print('[onContextChanged] DELETING ${contextOld.current}');
       await deleteContext(contextOld.current);
       contextNew = (await loadCurrentContext()).current;
+      print('[onContextChanged] SETTING TO PREVIOUS CONTEXT ${contextNew}');
     }
 
     final cacheNew = await initCache(context: contextNew);
@@ -185,16 +189,23 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // let the persistor load the auth user instead
     var existingUser = false;
     if (user != null && user.accessToken != null) {
+      printInfo(user.toString());
+
       if (user.accessToken!.isEmpty) {
         existingUser = true;
       }
+      // otherwise, do the same thing if logging out of a user
+      // but another exists (really switching users)
+    } else if (user == null && contextNew != StoreContext.DEFAULT) {
+      existingUser = true;
     }
 
+    printInfo(existingUser.toString());
     final storeNew = await initStore(
       cacheNew,
       storageNew,
-      existingState: storeExisting,
       existingUser: existingUser,
+      existingState: storeExisting,
     );
 
     setState(() {
@@ -228,17 +239,33 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   onAuthStateChanged(User? user) async {
-    final currentUser = store.state.authStore.currentUser;
     final allContexts = await loadContexts();
+    final defaultScreen = defaultHome.runtimeType;
 
-    if (user == null && allContexts.isEmpty && defaultHome.runtimeType == HomeScreen) {
+    // No user is present and no contexts are availble to jump to
+    if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
       defaultHome = IntroScreen();
-      NavigationService.clearTo(NavigationPaths.intro, context);
-    } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
+      return NavigationService.clearTo(NavigationPaths.intro, context);
+    }
+
+    // No user is present during auth state change, but other contexts exist
+    if (user == null && allContexts.isNotEmpty && defaultScreen == HomeScreen) {
+      return NavigationService.clearTo(NavigationPaths.home, context);
+    }
+
+    // New user is found and previously was in an unauthenticated state
+    if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
       defaultHome = HomeScreen();
-      NavigationService.clearTo(NavigationPaths.home, context);
-    } else if (user != null && user.userId != currentUser.userId && defaultHome.runtimeType == HomeScreen) {
-      NavigationService.clearTo(NavigationPaths.home, context);
+      return NavigationService.clearTo(NavigationPaths.home, context);
+    }
+
+    // New user has been authenticated during an existing authenticated session
+    // NOTE: skips users without accessTokens because that would mean its a multiaccount switch
+    if (user != null &&
+        user.accessToken != null &&
+        user.accessToken!.isNotEmpty &&
+        defaultScreen == HomeScreen) {
+      return NavigationService.clearTo(NavigationPaths.settings, context);
     }
   }
 

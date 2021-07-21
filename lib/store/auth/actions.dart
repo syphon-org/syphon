@@ -490,15 +490,12 @@ ThunkAction<AppState> logoutUser() {
         throw Exception('Unavailable user data');
       }
 
-      // tell authObserver to wipe store user and other data
-      final user = store.state.authStore.user;
-
-      final temp = store.state.authStore.user.accessToken;
+      final user = store.state.authStore.user.copyWith();
 
       final data = await MatrixApi.logoutUser(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
-        accessToken: temp,
+        accessToken: store.state.authStore.user.accessToken,
       );
 
       if (data['errcode'] != null) {

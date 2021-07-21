@@ -161,8 +161,9 @@ Future<Store<AppState>> initStore(
     shouldSave: cacheMiddleware,
   );
 
+  // Finally load persisted store
   try {
-    // Finally load persisted store
+    // TODO: this is pretty hacky - merges availableUsers across stores
     if (existingUser) {
       initialState = await persistor.load();
       initialState = initialState?.copyWith(

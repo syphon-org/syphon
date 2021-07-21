@@ -42,7 +42,6 @@ class ModalContextSwitcher extends StatelessWidget {
         final user = props.availableUsers[index];
         final selected = props.currentUser.userId == user.userId;
 
-        print('${user.userId} ${props.currentUser.userId} ${user.avatarUri} $selected');
         return ListItem(
           user: user,
           selected: selected,
@@ -145,13 +144,15 @@ class _Props extends Equatable {
 
   @override
   List<Object> get props => [
+        loading,
         currentUser,
         availableUsers,
         themeSettings,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.loading,
+        loading:
+            store.state.loading && store.state.syncStore.synced && store.state.syncStore.lastSince != null,
         currentUser: store.state.authStore.currentUser,
         themeSettings: store.state.settingsStore.themeSettings,
         availableUsers: store.state.authStore.availableUsers,

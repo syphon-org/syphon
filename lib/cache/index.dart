@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/global/values.dart';
@@ -28,7 +28,7 @@ class Cache {
   static const accessTokenKey = 'accessToken';
 
   // encryption references (in memory only)
-  static String? cryptKey;
+  static String? cacheKey;
 
   // hot cache refrences
   static Database? instance;
@@ -53,7 +53,7 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
     var cacheFactory;
 
     // Configure cache encryption/decryption instance
-    final cryptKey = await loadKey(cacheKeyId);
+    final cacheKey = await loadKey(cacheKeyId);
 
     if (Platform.isAndroid || Platform.isIOS) {
       final directory = await getApplicationSupportDirectory();
@@ -76,9 +76,9 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    printInfo('initCache $cacheLocation $cryptKey');
+    printInfo('initCache $cacheLocation $cacheKey');
 
-    Cache.cryptKey = cryptKey;
+    Cache.cacheKey = cacheKey;
     return await cacheFactory.openDatabase(
       cacheLocation,
     );
