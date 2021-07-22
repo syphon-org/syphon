@@ -8,7 +8,6 @@ import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/views/applock.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
 import 'package:syphon/views/syphon.dart';
 
@@ -94,6 +93,7 @@ class _PrelockState extends State<Prelock> {
               store,
               storage,
               cache,
+              enabled: widget.enabled,
             ),
           ),
         ),

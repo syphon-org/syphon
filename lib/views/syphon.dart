@@ -31,6 +31,7 @@ import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
 class Syphon extends StatefulWidget {
+  final bool enabled;
   final AppContext appContext;
   final Database? cache;
   final Database? storage;
@@ -40,8 +41,9 @@ class Syphon extends StatefulWidget {
     this.appContext,
     this.store,
     this.cache,
-    this.storage,
-  );
+    this.storage, {
+    required this.enabled,
+  });
 
   @override
   SyphonState createState() => SyphonState(
@@ -49,11 +51,13 @@ class Syphon extends StatefulWidget {
         store,
         cache,
         storage,
+        enabled: enabled,
       );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
+  final bool enabled;
 
   AppContext appContext;
   Database? cache;
@@ -66,8 +70,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     this.appContext,
     this.store,
     this.cache,
-    this.storage,
-  );
+    this.storage, {
+    required this.enabled,
+  });
 
   @override
   void initState() {
