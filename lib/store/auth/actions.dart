@@ -29,6 +29,7 @@ import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -254,6 +255,9 @@ ThunkAction<AppState> startAuthObserver() {
 
         // start syncing for user
         await store.dispatch(startSyncObserver());
+
+        // Run all necessary mutations on loaded / existing messages
+        await store.dispatch(mutateMessagesAll());
       } else {
         // wipe sensitive redux state
         await store.dispatch(ResetRooms());

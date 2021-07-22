@@ -2,19 +2,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screen_lock/configurations/input_button_config.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/handlers.dart';
+import 'package:syphon/context/types.dart';
+import 'package:syphon/views/applock.dart';
 
 import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
 
 class LockScreen extends StatefulWidget {
-  final String hash;
+  final AppContext appContext;
 
   const LockScreen({
     Key? key,
-    required this.hash,
+    required this.appContext,
   }) : super(key: key);
 
   @override
@@ -40,12 +42,13 @@ class _LockScreenState extends State<LockScreen> {
         onMaxRetries: onMaxRetries,
         maxRetries: maxRetries,
         onVerify: (String answer) async {
+          return Future.value(true);
           return Future.value(verifyPinHash(
             passcode: answer,
-            hash: widget.hash,
+            hash: widget.appContext.pinHash,
           ));
         },
-        onUnlocked: () {
+        onUnlocked: () async {
           Prelock.togglePermitted(context);
         });
   }
@@ -56,8 +59,6 @@ class _LockScreenState extends State<LockScreen> {
       SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     }
   }
-
-  onSuccess() {}
 
   @override
   Widget build(BuildContext context) {

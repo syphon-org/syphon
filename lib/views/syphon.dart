@@ -20,7 +20,6 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -33,24 +32,13 @@ import 'package:syphon/views/navigation.dart';
 
 class Syphon extends StatefulWidget {
   final AppContext appContext;
-  final Database? cache;
-  final Database? storage;
-  final Store<AppState> store;
 
   const Syphon(
     this.appContext,
-    this.store,
-    this.cache,
-    this.storage,
   );
 
   @override
-  SyphonState createState() => SyphonState(
-        appContext,
-        store,
-        cache,
-        storage,
-      );
+  SyphonState createState() => SyphonState(appContext);
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
@@ -59,23 +47,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   AppContext appContext;
   Database? cache;
   Database? storage;
-  Store<AppState> store;
+  Store<AppState> store = Store<AppState>(
+    appReducer,
+    initialState: AppState(),
+    middleware: [],
+  );
 
   Widget defaultHome = LoadingScreen(lite: true);
 
-  SyphonState(
-    this.appContext,
-    this.store,
-    this.cache,
-    this.storage,
-  );
+  SyphonState(this.appContext);
 
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    // init all on state change listeners
+    // async init state handler
     onInitState();
   }
 
@@ -102,16 +89,23 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
   }
 
-  ///
-  /// a.k.a. onMounted()
-  ///
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onStartListeners();
+  onInitStorage() async {
+    final cacheNew = await initCache(context: widget.appContext.current);
+
+    final storageNew = await initStorage(context: widget.appContext.current);
+
+    final storeNew = await initStore(cacheNew, storageNew);
+
+    setState(() {
+      cache = cacheNew;
+      storage = storageNew;
+      store = storeNew;
+    });
   }
 
   onInitState() async {
+    await onInitStorage();
+
     onInitListeners();
 
     final currentContext = (await loadCurrentContext()).current;
@@ -126,54 +120,15 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.state.authStore.authObserver?.add(
       currentUser,
     );
-
-    // mutate messages
-    store.dispatch(mutateMessagesAll());
   }
 
-  onInitListeners() {
+  onInitListeners() async {
     store.dispatch(initDeepLinks());
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
     store.dispatch(startContextObserver());
-  }
 
-  onInitStores(AppContext context, User? user) async {
-    final cacheNew = await initCache(context: context.current);
-    final storageNew = await initStorage(context: context.current);
-
-    final storeExisting = AppState(
-      authStore: store.state.authStore.copyWith(user: user),
-      settingsStore: store.state.settingsStore.copyWith(),
-    );
-
-    var existingUser = false;
-
-    // users previously authenticated will not
-    // have an accessToken passed thus,
-    // let the persistor load the auth user instead
-    if (user != null && user.accessToken != null) {
-      if (user.accessToken!.isEmpty) {
-        existingUser = true;
-      }
-    }
-
-    if (user == null) {
-      existingUser = true;
-    }
-
-    final storeNew = await initStore(
-      cacheNew,
-      storageNew,
-      existingUser: existingUser,
-      existingState: storeExisting,
-    );
-
-    setState(() {
-      cache = cacheNew;
-      storage = storageNew;
-      store = storeNew;
-    });
+    onStartListeners();
   }
 
   onStartListeners() {
@@ -221,7 +176,41 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       contextNew = (await loadCurrentContext()).current;
     }
 
-    onInitStores(AppContext(current: contextNew), user);
+    final cacheNew = await initCache(context: contextNew);
+    final storageNew = await initStorage(context: contextNew);
+
+    final storeExisting = AppState(
+      authStore: store.state.authStore.copyWith(user: user),
+      settingsStore: store.state.settingsStore.copyWith(),
+    );
+
+    var existingUser = false;
+
+    // users previously authenticated will not
+    // have an accessToken passed thus,
+    // let the persistor load the auth user instead
+    if (user != null && user.accessToken != null) {
+      if (user.accessToken!.isEmpty) {
+        existingUser = true;
+      }
+    }
+
+    if (user == null) {
+      existingUser = true;
+    }
+
+    final storeNew = await initStore(
+      cacheNew,
+      storageNew,
+      existingUser: existingUser,
+      existingState: storeExisting,
+    );
+
+    setState(() {
+      cache = cacheNew;
+      storage = storageNew;
+      store = storeNew;
+    });
 
     // reinitialize and start new store listeners
     onInitListeners();

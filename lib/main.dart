@@ -5,6 +5,7 @@ import 'package:syphon/context/storage.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/applock.dart';
 import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/syphon.dart';
 
@@ -19,25 +20,20 @@ void main() async {
   // pull current context / nullable
   final context = await loadCurrentContext();
 
-  // init hot cache
-  final cache = await initCache(context: context.current);
+  // // init hot cache
+  // final cache = await initCache(context: context.current);
 
-  // init cold storage
-  final storage = await initStorage(context: context.current);
+  // // init cold storage
+  // final storage = await initStorage(context: context.current);
 
-  // init redux store
-  final store = await initStore(cache, storage);
+  // // init redux store
+  // final store = await initStore(cache, storage);
 
   // init app
   runApp(
     Prelock(
-      hash: context.pinHash,
-      child: Syphon(
-        context,
-        store,
-        cache,
-        storage,
-      ),
+      appContext: context,
+      child: Syphon(context),
     ),
   );
 }

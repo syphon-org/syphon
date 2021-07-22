@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/views/applock.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
+import 'package:syphon/views/syphon.dart';
 
 class Prelock extends StatefulWidget {
   final Widget child;
-  final String hash;
+  final AppContext appContext;
 
   const Prelock({
     required this.child,
-    this.hash = AppContext.DEFAULT,
+    required this.appContext,
   });
 
   static restart(BuildContext context) {
@@ -32,7 +34,7 @@ class _PrelockState extends State<Prelock> {
   void initState() {
     super.initState();
 
-    permitted = widget.hash.isEmpty;
+    // permitted = widget.appContext.pinHash.isEmpty;
   }
 
   restart() {
@@ -42,20 +44,21 @@ class _PrelockState extends State<Prelock> {
   }
 
   togglePermitted() {
+    AppLock.of(context)?.didUnlock();
     setState(() {
-      permitted = !permitted;
+      permitted = true;
     });
   }
 
   @override
   Widget build(BuildContext context) => KeyedSubtree(
         key: key,
-        child: permitted
-            ? widget.child
-            : MaterialApp(
-                home: LockScreen(
-                  hash: widget.hash,
-                ),
-              ),
+        child: AppLock(
+          enabled: false,
+          builder: (args) => Syphon(widget.appContext),
+          lockScreen: LockScreen(
+            appContext: widget.appContext,
+          ),
+        ),
       );
 }
