@@ -164,7 +164,13 @@ class _AppLockState extends State<AppLock> with WidgetsBindingObserver {
 
   void _didUnlockOnAppLaunch(Object? args) {
     _didUnlockForAppLaunch = true;
-    _navigatorKey.currentState?.pushReplacementNamed('/unlocked', arguments: args);
+    _navigatorKey.currentState?.pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) =>
+            widget.builder(ModalRoute.of(context)!.settings.arguments),
+        transitionDuration: Duration(seconds: 0),
+      ),
+    );
   }
 
   void _didUnlockOnAppPaused() {

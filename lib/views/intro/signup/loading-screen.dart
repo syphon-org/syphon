@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,14 +11,14 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 
 class LoadingScreen extends StatelessWidget {
-  final bool lite;
+  final bool light;
 
   const LoadingScreen({
     Key? key,
-    this.lite = false,
+    this.light = false,
   }) : super(key: key);
 
-  buildLoadingDefault(BuildContext context) {
+  buildLoadingLight(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -48,7 +50,7 @@ class LoadingScreen extends StatelessWidget {
     );
   }
 
-  buildLoadingInverted(BuildContext context) {
+  buildLoadingDefault(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
@@ -82,10 +84,8 @@ class LoadingScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => lite
-      ? buildLoadingInverted(
-          context,
-        )
+  Widget build(BuildContext context) => light || Platform.isIOS
+      ? buildLoadingLight(context)
       : buildLoadingDefault(
           context,
         );

@@ -1,25 +1,32 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:redux/redux.dart';
+import 'package:sembast/sembast.dart';
+import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/views/applock.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
 import 'package:syphon/views/syphon.dart';
 
 class Prelock extends StatefulWidget {
-  final Widget child;
+  final bool enabled;
   final AppContext appContext;
 
   const Prelock({
-    required this.child,
     required this.appContext,
+    required this.enabled,
   });
 
   static restart(BuildContext context) {
     context.findAncestorStateOfType<_PrelockState>()!.restart();
   }
 
-  static togglePermitted(BuildContext context) {
-    context.findAncestorStateOfType<_PrelockState>()!.togglePermitted();
+  static Future? togglePermitted(BuildContext context) {
+    return context.findAncestorStateOfType<_PrelockState>()!.togglePermitted();
   }
 
   @override
@@ -28,13 +35,21 @@ class Prelock extends StatefulWidget {
 
 class _PrelockState extends State<Prelock> {
   Key key = UniqueKey();
-  bool permitted = false;
+
+  bool enabled = false;
+
+  Database? cache;
+  Database? storage;
+  Store<AppState> store = Store<AppState>(
+    appReducer,
+    initialState: AppState(),
+    middleware: [],
+  );
 
   @override
   void initState() {
     super.initState();
-
-    // permitted = widget.appContext.pinHash.isEmpty;
+    enabled = widget.enabled;
   }
 
   restart() {
@@ -43,21 +58,43 @@ class _PrelockState extends State<Prelock> {
     });
   }
 
-  togglePermitted() {
-    AppLock.of(context)?.didUnlock();
+  togglePermitted() async {
+    return await onLoadStores();
+  }
+
+  onLoadStores() async {
+    final appContext = widget.appContext;
+
+    // init hot cache
+    final cachePreload = await initCache(context: appContext.current);
+
+    // init cold storage
+    final storagePreload = await initStorage(context: appContext.current);
+
+    // init redux store
+    final storePreload = await initStore(cachePreload, storagePreload);
+
     setState(() {
-      permitted = true;
+      cache = cachePreload;
+      storage = storagePreload;
+      store = storePreload;
     });
   }
 
   @override
   Widget build(BuildContext context) => KeyedSubtree(
         key: key,
-        child: AppLock(
-          enabled: false,
-          builder: (args) => Syphon(widget.appContext),
-          lockScreen: LockScreen(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LockScreen(
             appContext: widget.appContext,
+            enabled: widget.enabled,
+            child: Syphon(
+              widget.appContext,
+              store,
+              storage,
+              cache,
+            ),
           ),
         ),
       );

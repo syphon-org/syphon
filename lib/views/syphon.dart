@@ -32,13 +32,24 @@ import 'package:syphon/views/navigation.dart';
 
 class Syphon extends StatefulWidget {
   final AppContext appContext;
+  final Database? cache;
+  final Database? storage;
+  final Store<AppState> store;
 
   const Syphon(
     this.appContext,
+    this.store,
+    this.cache,
+    this.storage,
   );
 
   @override
-  SyphonState createState() => SyphonState(appContext);
+  SyphonState createState() => SyphonState(
+        appContext,
+        store,
+        cache,
+        storage,
+      );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
@@ -47,22 +58,23 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   AppContext appContext;
   Database? cache;
   Database? storage;
-  Store<AppState> store = Store<AppState>(
-    appReducer,
-    initialState: AppState(),
-    middleware: [],
+  Store<AppState> store;
+
+  Widget defaultHome = LoadingScreen(light: true);
+
+  SyphonState(
+    this.appContext,
+    this.store,
+    this.cache,
+    this.storage,
   );
-
-  Widget defaultHome = LoadingScreen(lite: true);
-
-  SyphonState(this.appContext);
 
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    // async init state handler
+    // init all on state change listeners
     onInitState();
   }
 
@@ -89,24 +101,19 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
   }
 
-  onInitStorage() async {
-    final cacheNew = await initCache(context: widget.appContext.current);
+  ///
+  /// a.k.a. onMounted()
+  ///
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    final storageNew = await initStorage(context: widget.appContext.current);
-
-    final storeNew = await initStore(cacheNew, storageNew);
-
-    setState(() {
-      cache = cacheNew;
-      storage = storageNew;
-      store = storeNew;
-    });
+    // init all on state change listeners
+    onInitState();
   }
 
   onInitState() async {
-    await onInitStorage();
-
-    onInitListeners();
+    onInitObservers();
 
     final currentContext = (await loadCurrentContext()).current;
     final currentUser = store.state.authStore.user;
@@ -116,22 +123,20 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       return onResetContext();
     }
 
-    // init current auth state with current user
-    store.state.authStore.authObserver?.add(
-      currentUser,
-    );
-  }
-
-  onInitListeners() async {
-    store.dispatch(initDeepLinks());
-    store.dispatch(startAuthObserver());
-    store.dispatch(startAlertsObserver());
-    store.dispatch(startContextObserver());
-
     onStartListeners();
   }
 
+  onInitObservers() async {
+    await store.dispatch(startContextObserver());
+    await store.dispatch(startAlertsObserver());
+    await store.dispatch(startAuthObserver());
+    await store.dispatch(initDeepLinks());
+  }
+
   onStartListeners() {
+    if (store.state.authStore.authObserver == null) {
+      return;
+    }
     // init auth listener
     store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
 
@@ -140,13 +145,21 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // init alerts listener
     store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
+
+    final currentUser = store.state.authStore.user;
+
+    print("WHAT>");
+    // init current auth state with current user
+    store.state.authStore.authObserver?.add(
+      currentUser,
+    );
   }
 
   onDestroyListeners() async {
-    await store.dispatch(stopContextObserver());
-    await store.dispatch(stopAlertsObserver());
-    await store.dispatch(stopAuthObserver());
-    await store.dispatch(disposeDeepLinks());
+    store.dispatch(stopContextObserver());
+    store.dispatch(stopAlertsObserver());
+    store.dispatch(stopAuthObserver());
+    store.dispatch(disposeDeepLinks());
   }
 
   onContextChanged(User? user) async {
@@ -213,7 +226,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     });
 
     // reinitialize and start new store listeners
-    onInitListeners();
+    await onInitObservers();
     onStartListeners();
 
     final userNew = storeNew.state.authStore.user;
