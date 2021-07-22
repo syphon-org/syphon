@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
@@ -15,8 +15,6 @@ void main() async {
 
   // init platform specific code
   await initPlatformDependencies();
-
-  // SecureStorage.instance?.deleteAll();
 
   // pull current context / nullable
   final context = await loadCurrentContext();
@@ -33,7 +31,9 @@ void main() async {
   // init app
   runApp(
     Prelock(
+      hash: context.pinHash,
       child: Syphon(
+        context,
         store,
         cache,
         storage,

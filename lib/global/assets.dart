@@ -1,6 +1,7 @@
 class Assets {
   // App Icons
   static const appIcon = 'assets/icons/current/app_icon_cyan.svg';
+  static const appIconLite = 'assets/icons/current/app_icon_white.svg';
   static const appIconPng = 'assets/icons/current/app_icon_cyan.png';
 
   // Generic Icons

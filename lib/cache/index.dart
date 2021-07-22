@@ -40,7 +40,7 @@ class Cache {
 ///
 /// Init Hot Cache
 ///
-Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
+Future<Database?> initCache({String? context = AppContext.DEFAULT}) async {
   try {
     var cacheKeyId = Cache.keyLocation;
     var cacheLocation = Cache.databaseLocation;
@@ -88,7 +88,7 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
   }
 }
 
-deleteCache({String? context = StoreContext.DEFAULT}) async {
+deleteCache({String? context = AppContext.DEFAULT}) async {
   try {
     late var cacheFactory;
     var cacheKeyId = Cache.keyLocation;

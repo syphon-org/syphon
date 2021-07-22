@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
@@ -35,7 +35,7 @@ class Storage {
   static Database? instance;
 }
 
-Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
+Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
@@ -98,7 +98,7 @@ closeStorage(Database? database) async {
   }
 }
 
-deleteStorage({String? context = StoreContext.DEFAULT}) async {
+deleteStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;

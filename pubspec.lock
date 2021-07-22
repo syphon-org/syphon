@@ -363,6 +363,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.2"
+  flutter_screen_lock:
+    dependency: "direct main"
+    description:
+      name: flutter_screen_lock
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.4+1"
   flutter_secure_storage:
     dependency: "direct main"
     description:

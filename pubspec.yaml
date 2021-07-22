@@ -94,6 +94,7 @@ dependencies:
   flutter_secure_storage: ^4.1.0
   # checked_yaml: ^2.0.1
   # sqflite_sqlcipher: 1.1.2
+  flutter_screen_lock: ^4.0.4
 
   # services
   http: ^0.13.1
@@ -207,6 +208,7 @@ flutter:
     - assets/graphics/undraw_mention.svg
     - assets/graphics/undraw_not_found.svg
     - assets/icons/current/app_icon_cyan.svg
+    - assets/icons/current/app_icon_white.svg
     - assets/icons/current/app_icon_cyan.png
     - assets/icons/current/app_icon_white.png
     - assets/icons/global/being-check.svg

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -8,7 +6,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/handlers.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
@@ -29,14 +28,17 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
 class Syphon extends StatefulWidget {
+  final AppContext appContext;
   final Database? cache;
   final Database? storage;
   final Store<AppState> store;
 
   const Syphon(
+    this.appContext,
     this.store,
     this.cache,
     this.storage,
@@ -44,6 +46,7 @@ class Syphon extends StatefulWidget {
 
   @override
   SyphonState createState() => SyphonState(
+        appContext,
         store,
         cache,
         storage,
@@ -51,14 +54,17 @@ class Syphon extends StatefulWidget {
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
+  final globalScaffold = GlobalKey<ScaffoldMessengerState>();
+
+  AppContext appContext;
   Database? cache;
   Database? storage;
   Store<AppState> store;
-  final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
-  Widget defaultHome = HomeScreen();
+  Widget defaultHome = LoadingScreen(lite: true);
 
   SyphonState(
+    this.appContext,
     this.store,
     this.cache,
     this.storage,
@@ -70,17 +76,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.initState();
 
     // init all on state change listeners
-    onInitListenersFirst();
-
-    // mutate messages
-    store.dispatch(mutateMessagesAll());
-
-    final currentUser = store.state.authStore.user;
-    final authed = currentUser.accessToken != null;
-
-    if (!authed) {
-      defaultHome = IntroScreen();
-    }
+    onInitState();
   }
 
   @override
@@ -115,14 +111,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onStartListeners();
   }
 
-  onInitListenersFirst() async {
+  onInitState() async {
     onInitListeners();
 
     final currentContext = (await loadCurrentContext()).current;
     final currentUser = store.state.authStore.user;
 
     // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null && currentContext != StoreContext.DEFAULT) {
+    if (currentUser.accessToken == null && currentContext != AppContext.DEFAULT) {
       return onResetContext();
     }
 
@@ -130,6 +126,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.state.authStore.authObserver?.add(
       currentUser,
     );
+
+    // mutate messages
+    store.dispatch(mutateMessagesAll());
   }
 
   onInitListeners() {
@@ -137,6 +136,44 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.dispatch(startAuthObserver());
     store.dispatch(startAlertsObserver());
     store.dispatch(startContextObserver());
+  }
+
+  onInitStores(AppContext context, User? user) async {
+    final cacheNew = await initCache(context: context.current);
+    final storageNew = await initStorage(context: context.current);
+
+    final storeExisting = AppState(
+      authStore: store.state.authStore.copyWith(user: user),
+      settingsStore: store.state.settingsStore.copyWith(),
+    );
+
+    var existingUser = false;
+
+    // users previously authenticated will not
+    // have an accessToken passed thus,
+    // let the persistor load the auth user instead
+    if (user != null && user.accessToken != null) {
+      if (user.accessToken!.isEmpty) {
+        existingUser = true;
+      }
+    }
+
+    if (user == null) {
+      existingUser = true;
+    }
+
+    final storeNew = await initStore(
+      cacheNew,
+      storageNew,
+      existingUser: existingUser,
+      existingState: storeExisting,
+    );
+
+    setState(() {
+      cache = cacheNew;
+      storage = storageNew;
+      store = storeNew;
+    });
   }
 
   onStartListeners() {
@@ -184,41 +221,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       contextNew = (await loadCurrentContext()).current;
     }
 
-    final cacheNew = await initCache(context: contextNew);
-    final storageNew = await initStorage(context: contextNew);
-
-    final storeExisting = AppState(
-      authStore: store.state.authStore.copyWith(user: user),
-      settingsStore: store.state.settingsStore.copyWith(),
-    );
-
-    var existingUser = false;
-
-    // users previously authenticated will not
-    // have an accessToken passed thus,
-    // let the persistor load the auth user instead
-    if (user != null && user.accessToken != null) {
-      if (user.accessToken!.isEmpty) {
-        existingUser = true;
-      }
-    }
-
-    if (user == null) {
-      existingUser = true;
-    }
-
-    final storeNew = await initStore(
-      cacheNew,
-      storageNew,
-      existingUser: existingUser,
-      existingState: storeExisting,
-    );
-
-    setState(() {
-      cache = cacheNew;
-      storage = storageNew;
-      store = storeNew;
-    });
+    onInitStores(AppContext(current: contextNew), user);
 
     // reinitialize and start new store listeners
     onInitListeners();
@@ -236,7 +239,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
-      onDeleteContext(StoreContext(current: StoreContext.DEFAULT));
+      onDeleteContext(AppContext(current: AppContext.DEFAULT));
     } else {
       // delete cache data if removing context / account (context is not default)
       onDeleteContext(contextOld);
@@ -245,7 +248,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     storeNew.dispatch(SetGlobalLoading(loading: false));
   }
 
-  onDeleteContext(StoreContext context) async {
+  onDeleteContext(AppContext context) async {
     if (context.current.isEmpty) {
       printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
@@ -262,7 +265,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     await Future.forEach(
       allContexts,
-      (StoreContext context) async {
+      (AppContext context) async {
         await onDeleteContext(context);
       },
     );
@@ -275,6 +278,22 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   onAuthStateChanged(User? user) async {
     final allContexts = await loadContexts();
     final defaultScreen = defaultHome.runtimeType;
+
+    // User is not logged in and has no contexts (fresh state)
+    if (user != null && user.accessToken == null && defaultScreen == LoadingScreen) {
+      setState(() {
+        defaultHome = IntroScreen();
+      });
+      return NavigationService.clearTo(NavigationPaths.intro, context);
+    }
+
+    // User is logged in (fresh state)
+    if (user != null && user.accessToken != null && defaultScreen == LoadingScreen) {
+      setState(() {
+        defaultHome = IntroScreen();
+      });
+      return NavigationService.clearTo(NavigationPaths.home, context);
+    }
 
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
@@ -367,6 +386,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
             distinct: true,
             converter: (store) => store.state.settingsStore.themeSettings,
             builder: (context, themeSettings) => MaterialApp(
+              key: Key(defaultHome.runtimeType.toString()),
               scaffoldMessengerKey: globalScaffold,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
