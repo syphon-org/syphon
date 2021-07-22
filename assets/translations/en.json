@@ -73,7 +73,7 @@
   "content-intro-section-four": "By using {} and other Matrix clients\nwe can make private messaging \naccessible to everyone",
   "content-dialog-devices-delete": "You will have to sign in again on these devices if you remove them.",
   "content-dialog-devices-key-export": "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!",
-  "content-notification-background": "Backgound connection enabled",
+  "content-notification-background": "Background connection enabled",
   "content-signup-email-requirement": "This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information",
   "content-signup-email-verification": "This homeserver requires a verified email to complete registration, you'll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.",
   "content-signup-captcha-requirement": "This homeserver requires a captcha\n before you can create an account.",
