@@ -31,19 +31,18 @@ import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
 class Syphon extends StatefulWidget {
-  final bool enabled;
   final AppContext appContext;
   final Database? cache;
   final Database? storage;
   final Store<AppState> store;
 
   const Syphon(
+    Key? key,
     this.appContext,
     this.store,
     this.cache,
-    this.storage, {
-    required this.enabled,
-  });
+    this.storage,
+  ) : super(key: key);
 
   @override
   SyphonState createState() => SyphonState(
@@ -51,13 +50,11 @@ class Syphon extends StatefulWidget {
         store,
         cache,
         storage,
-        enabled: enabled,
       );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
-  final bool enabled;
 
   AppContext appContext;
   Database? cache;
@@ -70,14 +67,24 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     this.appContext,
     this.store,
     this.cache,
-    this.storage, {
-    required this.enabled,
-  });
+    this.storage,
+  );
 
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
+
+    // init all on state change listeners
+    onInitState();
+  }
+
+  ///
+  /// a.k.a. onMounted()
+  ///
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     // init all on state change listeners
     onInitState();
@@ -104,17 +111,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store.dispatch(setBackgrounded(true));
         break;
     }
-  }
-
-  ///
-  /// a.k.a. onMounted()
-  ///
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    // init all on state change listeners
-    onInitState();
   }
 
   onInitState() async {
@@ -153,7 +149,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     final currentUser = store.state.authStore.user;
 
-    print("WHAT>");
     // init current auth state with current user
     store.state.authStore.authObserver?.add(
       currentUser,

@@ -76,7 +76,6 @@ class _LockScreenState extends State<LockScreen> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      key: Key(widget.enabled.toString()),
       children: [
         widget.child,
         Visibility(

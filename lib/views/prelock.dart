@@ -34,8 +34,10 @@ class Prelock extends StatefulWidget {
 
 class _PrelockState extends State<Prelock> {
   Key key = UniqueKey();
+  Key storekey = UniqueKey();
 
   bool enabled = false;
+  bool permiteed = false;
 
   Database? cache;
   Database? storage;
@@ -89,11 +91,11 @@ class _PrelockState extends State<Prelock> {
             appContext: widget.appContext,
             enabled: widget.enabled,
             child: Syphon(
+              Key(storekey.toString()),
               widget.appContext,
               store,
               storage,
               cache,
-              enabled: widget.enabled,
             ),
           ),
         ),
