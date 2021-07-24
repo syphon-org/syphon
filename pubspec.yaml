@@ -185,6 +185,7 @@ flutter:
   # On release, change .env.debug to .env
   assets:
     - assets/translations/en.json
+    - assets/translations/nl.json
     - assets/translations/ru.json
     - assets/translations/pl.json
     - assets/graphics/undraw_sync_files.svg
