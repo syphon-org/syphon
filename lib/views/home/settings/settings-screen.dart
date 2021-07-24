@@ -14,6 +14,7 @@ import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/modals/modal-context-switcher.dart';
 import 'widgets/profile-preview.dart';
 
@@ -25,6 +26,10 @@ class SettingsScreen extends StatelessWidget {
       return props.onAddInfo('Wait for full sync to finish before switching accounts');
     }
 
+    if (props.accountsAvailable == 0) {
+      return props.onAddInfo('You must logout of your\ncurrent session to enable multiaccounts');
+    }
+
     // NOTE: example of setting modal backgroound w/ inkwell working
     showModalBottomSheet(
       context: context,
@@ -34,6 +39,28 @@ class SettingsScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Theme.of(context).dialogBackgroundColor,
       builder: (contextModal) => ModalContextSwitcher(),
+    );
+  }
+
+  onLogout(BuildContext context, _Props props) {
+    var content = 'Are you sure you want to log out?';
+
+    if (props.accountsAvailable > 1) {
+      content += '\n\nSince you have other accounts, logging out will switch you to another account session.';
+    }
+
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => DialogConfirm(
+        title: 'Logout',
+        content: content,
+        onConfirm: () async {
+          await props.onLogoutUser();
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
+        onDismiss: () => Navigator.pop(context),
+      ),
     );
   }
 
@@ -262,7 +289,7 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool accountLoading;
-  final bool hasMultiaccounts;
+  final int accountsAvailable;
   final bool? notificationsEnabled;
   final String? fontName;
   final String themeTypeName;
@@ -277,7 +304,7 @@ class _Props extends Equatable {
     required this.loading,
     required this.authLoading,
     required this.accountLoading,
-    required this.hasMultiaccounts,
+    required this.accountsAvailable,
     required this.notificationsEnabled,
     required this.onAddInfo,
     required this.onDisabled,
@@ -297,7 +324,7 @@ class _Props extends Equatable {
         accountLoading: !store.state.cryptoStore.oneTimeKeysStable ||
             !store.state.syncStore.synced ||
             store.state.syncStore.lastSince == null,
-        hasMultiaccounts: selectHasMultiaccount(store.state),
+        accountsAvailable: selectAvailableAccounts(store.state),
         fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
         themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         loading: store.state.roomStore.loading,

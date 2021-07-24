@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 
@@ -33,7 +34,7 @@ class Colours {
   static const chatBlue = 0xFF1976D2;
 
   static Color hashedColor(String? string) {
-    final hashable = string ?? '123';
+    final hashable = string ?? Values.defaultUserId;
     final int hash = hashable.codeUnits.reduce((value, element) => value + element);
     return Colours.chatColors[hash % Colours.chatColors.length];
   }

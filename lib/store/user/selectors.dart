@@ -1,4 +1,5 @@
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import './model.dart';
@@ -63,7 +64,7 @@ String formatUsername(User user) {
 }
 
 String safeUserId(User? user) {
-  return user != null ? user.userId ?? '' : '';
+  return user != null ? user.userId ?? Values.defaultUserId : Values.defaultUserId;
 }
 
 String formatUserInitials(User? user) {

@@ -16,8 +16,6 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
-  // SecureStorage.instance?.deleteAll();
-
   // pull current context / nullable
   final context = await loadCurrentContext();
 

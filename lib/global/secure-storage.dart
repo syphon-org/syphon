@@ -8,6 +8,36 @@ import 'package:syphon/global/print.dart';
 class SecureStorage {
   static FlutterSecureStorage? instance;
 
+  static Future<bool> check({required String key}) async {
+    // mobile
+    if (Platform.isAndroid || Platform.isIOS) {
+      final storage = instance!;
+
+      // try to read key
+      try {
+        printError('[SecureStorage.check] checking $key ${await storage.containsKey(key: key)}');
+        return storage.containsKey(key: key);
+      } catch (error) {
+        printError('[SecureStorage.check] $key $error');
+        throw error;
+      }
+    }
+
+    // desktop
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      // try to read key
+      try {
+        final directory = await getApplicationSupportDirectory();
+        return await File(join(directory.path, key)).exists();
+      } catch (error) {
+        printError('[SecureStorage.check] $key $error');
+        throw error;
+      }
+    }
+
+    return false;
+  }
+
   Future<String?> read({required String key}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
@@ -43,6 +42,10 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
     if (context!.isNotEmpty) {
       storageKeyId = '$context-$storageKeyId';
       storageLocation = '$context-$storageLocation';
+    }
+    // TODO: TEMP: remove after 0.1.11 release
+    if (!(await checkKey(Storage.keyLocation))) {
+      await deleteStorage();
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;

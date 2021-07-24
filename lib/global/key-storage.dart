@@ -6,6 +6,15 @@ String generateKey() {
   return Key.fromSecureRandom(32).base64;
 }
 
+Future<bool> checkKey(String keyId) async {
+  try {
+    return await SecureStorage.check(key: keyId);
+  } catch (error) {
+    printError('[checkKey] $error');
+    return false;
+  }
+}
+
 Future<String?> loadKey(String keyId) async {
   var key;
 

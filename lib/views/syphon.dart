@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';

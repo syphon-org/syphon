@@ -11,6 +11,10 @@ bool selectHasMultiaccount(AppState state) {
   return state.authStore.availableUsers.isNotEmpty;
 }
 
+int selectAvailableAccounts(AppState state) {
+  return state.authStore.availableUsers.length;
+}
+
 bool selectPasswordLoginAttemptable(AppState state) {
   return state.authStore.isPasswordValid &&
       state.authStore.isUsernameValid &&

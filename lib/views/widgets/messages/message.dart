@@ -200,7 +200,8 @@ class MessageWidget extends StatelessWidget {
     final isRead = message.timestamp < lastRead;
 
     var textColor = Colors.white;
-    var showSender = true;
+    var showSender = !messageOnly; // nearly always show the sender
+    final showAvatar = !isLastSender && !isUserSent && !messageOnly;
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     Color? bubbleColor = color ?? Colours.hashedColor(message.sender);
@@ -364,7 +365,7 @@ class MessageWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Visibility(
-                        visible: !isLastSender && !isUserSent && !messageOnly,
+                        visible: showAvatar,
                         maintainState: !messageOnly,
                         maintainAnimation: !messageOnly,
                         maintainSize: !messageOnly,

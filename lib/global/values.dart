@@ -64,6 +64,7 @@ class Values {
   static const serviceNotificationTimeoutDuration = 75000; // millis
 
   static const defaultHeaders = {'Content-Type': 'application/json'};
+  static const defaultUserId = '123'; // only for hashing default on colored avatars
 }
 
 // ignore: non_constant_identifier_names
