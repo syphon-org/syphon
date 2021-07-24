@@ -13,6 +13,8 @@ String formatLanguageCode(String? language) {
   switch ((language ?? 'english').toLowerCase()) {
     case 'english':
       return 'en';
+    case 'dutch':
+      return 'nl';
     case 'russian':
       return 'ru';
     case 'polish':
