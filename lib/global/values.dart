@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 class LangCodes {
   static const en = 'en';
+  static const de = 'de';
+  static const dl = 'dl';
   static const ru = 'ru';
   static const pl = 'pl';
 }
@@ -15,9 +17,7 @@ class Values {
   static const appNameLong = 'Syphon Messenger';
   static const appDisplayName = 'Syphon';
 
-  static const defaultLanguage = 'en-US';
   static const EMPTY_CHAT = 'Empty Chat';
-
   static const EMPTY = '';
 
   // Notifications and Background service

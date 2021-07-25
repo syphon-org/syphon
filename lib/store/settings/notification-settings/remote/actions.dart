@@ -118,7 +118,6 @@ ThunkAction<AppState> saveNotificationPusher({
         pushKey: pusherKey,
         appDisplayName: Values.appNameLong,
         appId: Values.appId,
-        lang: Values.defaultLanguage,
         deviceDisplayName: currentDevice.displayName,
       );
 
