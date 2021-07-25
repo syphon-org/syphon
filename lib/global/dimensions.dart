@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Dimensions {
-  // Generic
-  static const double widgetHeightMax = 1024;
+  // Containers
+  static const double heightMax = 1024;
+  static const double borderWidthIcons = 1.5;
+
+  // Container EdgeInsets
   static const scrollviewPadding = EdgeInsets.only(bottom: 32);
-
-  static const appPaddingVertical = EdgeInsets.symmetric(
-    vertical: 16,
-  );
-
-  static const appPaddingHorizontal = EdgeInsets.symmetric(
-    horizontal: 16,
-  );
+  static const appPaddingVertical = EdgeInsets.symmetric(vertical: 16);
+  static const appPaddingHorizontal = EdgeInsets.symmetric(horizontal: 16);
 
   // Avatars
   static const double avatarSize = 56; // was 52
@@ -72,42 +69,51 @@ class Dimensions {
   static const double inputWidthMin = inputSizeMin;
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
-  static const EdgeInsets inputContentPadding = EdgeInsets.symmetric(
+  // Padding values
+  static const double paddingMin = 4;
+  static const double paddingSmall = 12;
+  static const double paddingLarge = 24;
+  static const double paddingContainer = 16;
+
+  // Padding EdgeInsets
+  static const modalEdgeInsets = EdgeInsets.symmetric(vertical: 12, horizontal: 24);
+
+  static const inputContentPadding = EdgeInsets.symmetric(
     vertical: 4.0,
     horizontal: 20.0,
   );
 
-  static const EdgeInsets inputMargin = EdgeInsets.all(8);
+  static const inputMargin = EdgeInsets.all(8);
 
-  static const EdgeInsets inputPadding = EdgeInsets.only(
+  static const inputPadding = EdgeInsets.only(
     left: 20,
     bottom: 32,
   );
 
   // Lists
-  static const EdgeInsets heroPadding = EdgeInsets.symmetric(
+  static const heroPadding = EdgeInsets.symmetric(
     vertical: 24,
     horizontal: 12,
   );
 
-  static const EdgeInsets listPadding = EdgeInsets.symmetric(
+  static const listPadding = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 8,
   );
 
-  static const EdgeInsets listPaddingSettings = EdgeInsets.symmetric(
+  static const listPaddingSettings = EdgeInsets.symmetric(
     horizontal: 20,
     vertical: 4,
   );
 
-  static EdgeInsets listPaddingDynamic({double width = 500}) => EdgeInsets.only(
+  static listPaddingDynamic({double width = 500}) => EdgeInsets.only(
         left: width * 0.04,
         right: width * 0.04,
         top: 4,
         bottom: 8,
       );
 
-  static EdgeInsets listTitlePaddingDynamic({double width = 500}) => EdgeInsets.only(
+  static listTitlePaddingDynamic({double width = 500}) => EdgeInsets.only(
         left: width * 0.04,
         right: width * 0.04,
         top: 6,
@@ -115,12 +121,12 @@ class Dimensions {
       );
 
   // Dialogs
-  static const EdgeInsets dialogPadding = EdgeInsets.symmetric(
+  static const dialogPadding = EdgeInsets.symmetric(
     horizontal: 24,
     vertical: 16,
   );
 
-  static const EdgeInsets dialogContentPadding = EdgeInsets.symmetric(
+  static const dialogContentPadding = EdgeInsets.symmetric(
     horizontal: 8,
     vertical: 12,
   );
@@ -136,7 +142,7 @@ class Dimensions {
     return size.width * 0.8;
   }
 
-  static const EdgeInsets contentPadding = EdgeInsets.symmetric(
+  static const contentPadding = EdgeInsets.symmetric(
     horizontal: 32,
     vertical: 8,
   );
@@ -151,7 +157,7 @@ class Dimensions {
   // Page Viewer
   static const double pageViewerWidthMin = 326;
   static const double pageViewerHeightMin = 326;
-  static const double pageViewerHeightMax = widgetHeightMax / 2;
+  static const double pageViewerHeightMax = heightMax / 2;
 
   // Progress Indicator
   static const double defaultStrokeWidth = 2;
@@ -159,7 +165,12 @@ class Dimensions {
 
   // Modals
   static const double defaultModalHeight = 256;
-  static const double defaultModalHeightMax = 456;
+  static const double modalHeightMax = 456;
+
+  static const modalBorderRadius = BorderRadius.only(
+    topLeft: Radius.circular(16),
+    topRight: Radius.circular(16),
+  );
 
   static double modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;

@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:syphon/global/values.dart';
 
 // @again_guy:matrix.org -> again_ereio
 String formatSender(String sender) {
@@ -11,16 +12,16 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
 
 String formatLanguageCode(String? language) {
   switch ((language ?? 'english').toLowerCase()) {
-    case 'english':
-      return 'en';
-    case 'german':
-      return 'de';
+    case 'english': 
+      return LangCodes.en;  
+    case 'german': 
+      return LangCodes.de; 
     case 'russian':
-      return 'ru';
+      return LangCodes.ru;
     case 'polish':
-      return 'pl';
+      return LangCodes.pl;
     default:
-      return 'en';
+      return LangCodes.en;
   }
 }
 
@@ -112,4 +113,11 @@ String formatTimestamp({
   } else {
     return 'Now';
   }
+}
+
+formatUsernameHint({required String homeserver, String? username}) {
+  final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
+  final alias = homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
+
+  return alias.replaceFirst('@', '', 1);
 }

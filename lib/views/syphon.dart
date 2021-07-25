@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart' as localization;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -9,17 +6,25 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/context/index.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/navigation.dart';
@@ -44,13 +49,12 @@ class Syphon extends StatefulWidget {
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  final Database? cache;
-  final Database? storage;
-  final Store<AppState> store;
-  final GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
+  Database? cache;
+  Database? storage;
+  Store<AppState> store;
+  final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
   Widget defaultHome = HomeScreen();
-  StreamSubscription? alertsListener;
 
   SyphonState(
     this.store,
@@ -63,15 +67,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
 
-    store.dispatch(initDeepLinks());
-    store.dispatch(initClientSecret());
-    store.dispatch(startAuthObserver());
-    store.dispatch(startAlertsObserver());
-
-    // init current auth state with current user
-    store.state.authStore.authObserver!.add(
-      store.state.authStore.user,
-    );
+    // init all on state change listeners
+    onInitListenersFirst();
 
     // mutate messages
     store.dispatch(mutateMessagesAll());
@@ -107,73 +104,245 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
   }
 
+  ///
+  /// a.k.a. onMounted()
+  ///
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    onMounted();
+    onStartListeners();
   }
 
-  @protected
-  void onMounted() {
+  onInitListenersFirst() async {
+    onInitListeners();
+
+    final currentContext = (await loadCurrentContext()).current;
+    final currentUser = store.state.authStore.user;
+
+    // Reset contexts if the current user has no accessToken (unrecoverable state)
+    if (currentUser.accessToken == null && currentContext != StoreContext.DEFAULT) {
+      return onResetContext();
+    }
+
+    // init current auth state with current user
+    store.state.authStore.authObserver?.add(
+      currentUser,
+    );
+  }
+
+  onInitListeners() {
+    store.dispatch(initDeepLinks());
+    store.dispatch(startAuthObserver());
+    store.dispatch(startAlertsObserver());
+    store.dispatch(startContextObserver());
+  }
+
+  onStartListeners() {
     // init auth listener
-    store.state.authStore.onAuthStateChanged!.listen((user) {
-      if (user == null && defaultHome.runtimeType == HomeScreen) {
-        defaultHome = IntroScreen();
-        NavigationService.clearTo(NavigationPaths.intro, context);
-      } else if (user != null && user.accessToken != null && defaultHome.runtimeType == IntroScreen) {
-        // Default Authenticated App Home
-        defaultHome = HomeScreen();
-        NavigationService.clearTo('/home', context);
-      }
-    });
+    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
+
+    // set auth state listener
+    store.state.authStore.onContextChanged.listen(onContextChanged);
 
     // init alerts listener
-    alertsListener = store.state.alertsStore.onAlertsChanged.listen((alert) {
-      Color? color;
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
+  }
 
-      switch (alert.type) {
-        case 'error':
-          color = Colors.red;
-          break;
-        case 'warning':
-          color = Colors.red;
-          break;
-        case 'success':
-          color = Colors.green;
-          break;
-        case 'info':
-        default:
-          color = Colors.grey;
+  onDestroyListeners() async {
+    await store.dispatch(stopContextObserver());
+    await store.dispatch(stopAlertsObserver());
+    await store.dispatch(stopAuthObserver());
+    await store.dispatch(disposeDeepLinks());
+  }
+
+  onContextChanged(User? user) async {
+    store.dispatch(SetGlobalLoading(loading: true));
+
+    // stop old store listeners from running
+    await onDestroyListeners();
+
+    // stop old sync observer from running
+    await store.dispatch(stopSyncObserver());
+
+    // Stop saving to existing context databases
+    await closeCache(cache);
+    await closeStorage(storage);
+
+    // final context switches
+    final contextOld = await loadCurrentContext();
+    String? contextNew;
+
+    // save new user context
+    if (user != null) {
+      contextNew = generateContextId(id: user.userId!);
+      await saveContext(contextNew);
+    } else {
+      // revert to another user context or default
+      await deleteContext(contextOld.current);
+      contextNew = (await loadCurrentContext()).current;
+    }
+
+    final cacheNew = await initCache(context: contextNew);
+    final storageNew = await initStorage(context: contextNew);
+
+    final storeExisting = AppState(
+      authStore: store.state.authStore.copyWith(user: user),
+      settingsStore: store.state.settingsStore.copyWith(),
+    );
+
+    var existingUser = false;
+
+    // users previously authenticated will not
+    // have an accessToken passed thus,
+    // let the persistor load the auth user instead
+    if (user != null && user.accessToken != null) {
+      if (user.accessToken!.isEmpty) {
+        existingUser = true;
       }
+    }
 
-      final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
+    if (user == null) {
+      existingUser = true;
+    }
 
-      globalScaffold.currentState?.showSnackBar(SnackBar(
-        backgroundColor: color,
-        content: Text(
-          alertMessage,
-          style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
-        ),
-        duration: alert.duration,
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            globalScaffold.currentState?.removeCurrentSnackBar();
-          },
-        ),
-      ));
+    final storeNew = await initStore(
+      cacheNew,
+      storageNew,
+      existingUser: existingUser,
+      existingState: storeExisting,
+    );
+
+    setState(() {
+      cache = cacheNew;
+      storage = storageNew;
+      store = storeNew;
     });
+
+    // reinitialize and start new store listeners
+    onInitListeners();
+    onStartListeners();
+
+    final userNew = storeNew.state.authStore.user;
+    final authObserverNew = storeNew.state.authStore.authObserver;
+
+    // revert to another authed user if available and logging out
+    if (user == null && userNew.accessToken != null && contextNew.isNotEmpty) {
+      authObserverNew?.add(userNew);
+    } else {
+      authObserverNew?.add(user);
+    }
+
+    // wipe unauthenticated storage
+    if (user != null) {
+      onDeleteContext(StoreContext(current: StoreContext.DEFAULT));
+    } else {
+      // delete cache data if removing context / account (context is not default)
+      onDeleteContext(contextOld);
+    }
+
+    storeNew.dispatch(SetGlobalLoading(loading: false));
+  }
+
+  onDeleteContext(StoreContext context) async {
+    if (context.current.isEmpty) {
+      printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
+    } else {
+      printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.current}');
+    }
+    await deleteCache(context: context.current);
+    await deleteStorage(context: context.current);
+  }
+
+  // Reset contexts if the current user has no accessToken (unrecoverable state)
+  onResetContext() async {
+    printError('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    final allContexts = await loadContexts();
+
+    await Future.forEach(
+      allContexts,
+      (StoreContext context) async {
+        await onDeleteContext(context);
+      },
+    );
+
+    store.state.authStore.contextObserver?.add(
+      null,
+    );
+  }
+
+  onAuthStateChanged(User? user) async {
+    final allContexts = await loadContexts();
+    final defaultScreen = defaultHome.runtimeType;
+
+    // No user is present and no contexts are availble to jump to
+    if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
+      defaultHome = IntroScreen();
+      return NavigationService.clearTo(NavigationPaths.intro, context);
+    }
+
+    // No user is present during auth state change, but other contexts exist
+    if (user == null && allContexts.isNotEmpty && defaultScreen == HomeScreen) {
+      return;
+    }
+
+    // New user is found and previously was in an unauthenticated state
+    if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
+      defaultHome = HomeScreen();
+      return NavigationService.clearTo(NavigationPaths.home, context);
+    }
+
+    // New user has been authenticated during an existing authenticated session
+    // NOTE: skips users without accessTokens because that would mean its a multiaccount switch
+    if (user != null &&
+        user.accessToken != null &&
+        user.accessToken!.isNotEmpty &&
+        defaultScreen == HomeScreen) {
+      return NavigationService.clearTo(NavigationPaths.home, context);
+    }
+  }
+
+  onAlertsChanged(Alert alert) {
+    Color? color;
+
+    switch (alert.type) {
+      case 'error':
+        color = Colors.red;
+        break;
+      case 'warning':
+        color = Colors.red;
+        break;
+      case 'success':
+        color = Colors.green;
+        break;
+      case 'info':
+      default:
+        color = Colors.grey;
+    }
+
+    final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
+
+    globalScaffold.currentState?.showSnackBar(SnackBar(
+      backgroundColor: color,
+      content: Text(
+        alertMessage,
+        style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
+      ),
+      duration: alert.duration,
+      action: SnackBarAction(
+        label: 'Dismiss',
+        textColor: Colors.white,
+        onPressed: () {
+          globalScaffold.currentState?.removeCurrentSnackBar();
+        },
+      ),
+    ));
   }
 
   @override
   void dispose() {
-    store.dispatch(stopAuthObserver());
-    store.dispatch(stopAlertsObserver());
-    store.dispatch(disposeDeepLinks());
+    onDestroyListeners();
     closeCache(cache);
     WidgetsBinding.instance?.removeObserver(this);
-    alertsListener?.cancel();
     super.dispose();
   }
 
@@ -185,13 +354,19 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)),
-          fallbackLocale: Locale('en'),
-          supportedLocales: const [Locale('en'), Locale('de'), Locale('ru'), Locale('pl')],
+          startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)), 
+          fallbackLocale: Locale(LangCodes.en),
+          supportedLocales: const [
+            Locale(LangCodes.en),
+            Locale(LangCodes.de),
+            Locale(LangCodes.ru),
+            Locale(LangCodes.pl),
+          ], 
           child: StoreConnector<AppState, ThemeSettings>(
             distinct: true,
             converter: (store) => store.state.settingsStore.themeSettings,
             builder: (context, themeSettings) => MaterialApp(
+              scaffoldMessengerKey: globalScaffold,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               debugShowCheckedModeBanner: false,
@@ -199,11 +374,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               navigatorKey: NavigationService.navigatorKey,
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
-              builder: (context, child) => Scaffold(
-                body: child,
-                appBar: null,
-                key: globalScaffold,
-              ),
             ),
           ),
         ),

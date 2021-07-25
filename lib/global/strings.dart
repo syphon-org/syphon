@@ -194,14 +194,6 @@ class Strings {
   static const placeholderInputMatrixUnencrypted = 'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
 
-  static String formatUsernameHint({required String homeserver, String? username}) {
-    final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
-    final alias =
-        homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
-
-    return alias.replaceFirst('@', '', 1);
-  }
-
   // Tooltips
   static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 

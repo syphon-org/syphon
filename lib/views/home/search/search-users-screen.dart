@@ -93,7 +93,7 @@ class SearchUserState extends State<SearchUserScreen> {
             Navigator.popAndPushNamed(
               context,
               '/home/chat',
-              arguments: ChatViewArguements(
+              arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
               ),
@@ -129,7 +129,7 @@ class SearchUserState extends State<SearchUserScreen> {
             Navigator.popAndPushNamed(
               context,
               '/home/chat',
-              arguments: ChatViewArguements(
+              arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
               ),

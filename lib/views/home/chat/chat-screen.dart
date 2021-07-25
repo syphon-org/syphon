@@ -36,12 +36,12 @@ import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
-class ChatViewArguements {
+class ChatScreenArguments {
   final String? roomId;
   final String? title;
 
   // Improve loading times
-  ChatViewArguements({this.roomId, this.title});
+  ChatScreenArguments({this.roomId, this.title});
 }
 
 class ChatScreen extends StatefulWidget {
@@ -362,7 +362,7 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatViewArguements).roomId,
+          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;

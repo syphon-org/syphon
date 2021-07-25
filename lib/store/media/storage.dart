@@ -13,7 +13,7 @@ Future<bool> checkMedia(
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
-  return await store.record(mxcUri).exists(storage);
+  return store.record(mxcUri).exists(storage);
 }
 
 Future<void> saveMedia(
@@ -23,14 +23,14 @@ Future<void> saveMedia(
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.MEDIA);
 
-  return await storage.transaction((txn) async {
+  return storage.transaction((txn) async {
     final record = store.record(mxcUri);
     await record.put(txn, await compute(jsonEncode, data));
   });
 }
 
 /// Load Media (Cold Storage)
-/// 
+///
 /// load one set of media data based on mxc uri
 Future<Uint8List?> loadMedia({
   String? mxcUri,
@@ -58,7 +58,7 @@ Future<Uint8List?> loadMedia({
 }
 
 /// Load All Media (Cold Storage)
-///  
+///
 /// load all media found within media storage
 Future<Map<String, Uint8List>?> loadMediaAll({
   required Database storage,
@@ -69,7 +69,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     final mediaDataAll = await store.find(storage);
 
-    for (RecordSnapshot<String, String> record in mediaDataAll) {
+    for (final record in mediaDataAll) {
       final data = json.decode(record.value);
 
       // TODO: sometimes, a null gets saved to cold storage

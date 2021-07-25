@@ -129,12 +129,12 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // update cold storage
         await Future.wait([
-          saveUsers(room.usersNew, storage: Storage.main!),
-          saveRooms({room.id: room}, storage: Storage.main),
-          saveReactions(room.reactions, storage: Storage.main!),
-          saveMessages(room.messagesNew, storage: Storage.main!),
-          saveRedactions(room.redactions, storage: Storage.main!),
-          saveReceipts(room.readReceipts, storage: Storage.main, ready: synced),
+          saveUsers(room.usersNew, storage: Storage.instance!),
+          saveRooms({room.id: room}, storage: Storage.instance),
+          saveReactions(room.reactions, storage: Storage.instance!),
+          saveMessages(room.messagesNew, storage: Storage.instance!),
+          saveRedactions(room.redactions, storage: Storage.instance!),
+          saveReceipts(room.readReceipts, storage: Storage.instance, ready: synced),
         ]);
 
         // mutation filters - handles previously fetched messages
@@ -448,7 +448,7 @@ ThunkAction<AppState> createRoom({
 
       await store.dispatch(SetRoom(room: room));
 
-      saveRooms({room.id: room}, storage: Storage.main);
+      saveRooms({room.id: room}, storage: Storage.instance);
 
       return room.id;
     } catch (error) {

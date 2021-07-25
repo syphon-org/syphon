@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/print.dart';
 
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -15,7 +14,7 @@ class MessageTypingWidget extends StatefulWidget {
   final String? selectedMessageId;
   final Function? onPressAvatar;
 
-  MessageTypingWidget({
+  const MessageTypingWidget({
     Key? key,
     this.typing,
     this.usersTyping = const [],
@@ -28,24 +27,20 @@ class MessageTypingWidget extends StatefulWidget {
   MessageTypingState createState() => MessageTypingState();
 }
 
-/**
- * RoundedPopupMenu
- * Mostly an example for myself on how to override styling or other options on
- * existing components app wide
- */
-class MessageTypingState extends State<MessageTypingWidget>
-    with TickerProviderStateMixin {
+///
+/// RoundedPopupMenu
+///
+/// Mostly an example for myself on how to override styling or other options on
+/// existing components app wide
+class MessageTypingState extends State<MessageTypingWidget> with TickerProviderStateMixin {
   double fullSize = 1;
 
   @protected
-  wrapAnimation({Widget? animatedWidget, int? milliseconds}) =>
-      TweenAnimationBuilder(
+  wrapAnimation({Widget? animatedWidget, int? milliseconds}) => TweenAnimationBuilder(
         tween: Tween<double>(begin: 0, end: widget.typing! ? 1 : 0),
         duration: Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        child: animatedWidget,
-        builder: (BuildContext context, double size, Widget? child) =>
-            GestureDetector(
+        builder: (BuildContext context, double size, Widget? child) => GestureDetector(
           onTap: () => setState(() {
             fullSize = fullSize == 1 ? 0.0 : 1;
           }),
@@ -57,19 +52,20 @@ class MessageTypingState extends State<MessageTypingWidget>
             child: child,
           ),
         ),
+        child: animatedWidget,
       );
 
   @override
   Widget build(BuildContext context) {
-    var textColor = Colors.white;
-    var bubbleColor = Theme.of(context).primaryColor;
+    const textColor = Colors.white;
+    const messageAlignment = MainAxisAlignment.start;
+    const messageTextAlignment = CrossAxisAlignment.start;
+
+    final bubbleColor = Theme.of(context).primaryColor;
+    final bubbleSpacing = EdgeInsets.only(top: 4, bottom: 4);
 
     var bubbleBorder = BorderRadius.circular(16);
-    var messageAlignment = MainAxisAlignment.start;
-    var messageTextAlignment = CrossAxisAlignment.start;
     var opacity = 1.0;
-
-    var bubbleSpacing = EdgeInsets.only(top: 4, bottom: 4);
     var userTyping = User();
 
     bubbleBorder = BorderRadius.only(
@@ -83,7 +79,7 @@ class MessageTypingState extends State<MessageTypingWidget>
       opacity = widget.selectedMessageId != null ? 0.5 : 1.0;
     }
 
-    if (widget.usersTyping.length > 0) {
+    if (widget.usersTyping.isNotEmpty) {
       final usernamesTyping = widget.usersTyping;
       userTyping = widget.roomUsers[usernamesTyping[0]] ?? User();
     }
@@ -124,12 +120,9 @@ class MessageTypingState extends State<MessageTypingWidget>
                               ? null
                               : Avatar(
                                   uri: userTyping.avatarUri,
-                                  alt: userTyping.displayName ??
-                                      userTyping.userId,
+                                  alt: userTyping.displayName ?? userTyping.userId,
                                   size: Dimensions.avatarSizeMessage,
-                                  background: Colours.hashedColor(
-                                    userTyping.userId ?? '',
-                                  ),
+                                  background: Colours.hashedColorUser(userTyping),
                                 ),
                         ),
                       ),

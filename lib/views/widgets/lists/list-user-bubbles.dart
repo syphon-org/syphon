@@ -75,7 +75,7 @@ class ListUserBubbles extends StatelessWidget {
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSize,
-                      background: Colours.hashedColor(user.userId),
+                      background: Colours.hashedColorUser(user),
                     ),
                   ),
                 ),
