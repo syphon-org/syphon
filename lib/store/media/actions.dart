@@ -82,8 +82,7 @@ ThunkAction<AppState> uploadMedia({
   };
 }
 
-ThunkAction<AppState> fetchThumbnail(
-    {String? mxcUri, double? size, bool force = false}) {
+ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force = false}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
@@ -96,22 +95,20 @@ ThunkAction<AppState> fetchThumbnail(
 
       // Noop if currently checking or failed
       if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING ||
-              mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
+          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
           !force) {
         return;
       }
 
-      store.dispatch(UpdateMediaChecks(
-        mxcUri: mxcUri,
-        status: MediaStatus.CHECKING,
-      ));
+      store.dispatch(
+        UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.CHECKING),
+      );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.main!)) {
+      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.main!,
+          storage: Storage.instance!,
         );
 
         if (storedData != null) {
@@ -138,12 +135,12 @@ ThunkAction<AppState> fetchThumbnail(
 
       final bodyBytes = data['bodyBytes'];
 
-      store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes));
-      saveMedia(mxcUri, bodyBytes, storage: Storage.main!);
-      store.dispatch(UpdateMediaChecks(
-        mxcUri: mxcUri,
-        status: MediaStatus.SUCCESS,
-      ));
+      store.dispatch(
+        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes),
+      );
+      store.dispatch(
+        UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
+      );
     } catch (error) {
       debugPrint('[fetchThumbnail] $mxcUri $error');
       store.dispatch(UpdateMediaChecks(

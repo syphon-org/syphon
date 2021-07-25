@@ -8,15 +8,10 @@ import 'package:redux/redux.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'password-update-step.dart';
-
-final Duration nextAnimationDuration = Duration(
-  milliseconds: Values.animationDurationDefault,
-);
 
 class PasswordUpdateView extends StatefulWidget {
   const PasswordUpdateView({Key? key}) : super(key: key);
@@ -75,10 +70,8 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -95,7 +88,7 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
                               width: width,
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
-                                maxHeight: Dimensions.widgetHeightMax * 0.5,
+                                maxHeight: Dimensions.heightMax * 0.5,
                               ),
                               child: PageView(
                                 pageSnapping: true,
@@ -106,8 +99,7 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                               ),
@@ -131,8 +123,7 @@ class PasswordUpdateState extends State<PasswordUpdateView> {
                               child: ButtonSolid(
                                 text: Strings.buttonSaveGeneric,
                                 loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
+                                disabled: !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onSavePassword();
                                   if (result) {

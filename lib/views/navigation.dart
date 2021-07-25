@@ -36,53 +36,71 @@ import 'package:syphon/views/intro/signup/verification-screen.dart';
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  static Future<dynamic> navigateTo(String routeName) {
+  static Future navigateTo(String routeName) {
     return navigatorKey.currentState!.pushNamed(routeName);
   }
 
-  static Future<dynamic> clearTo(String routeName, BuildContext context) {
-    return navigatorKey.currentState!.pushNamedAndRemoveUntil(routeName, (_) => false);
+  static Future clearTo(String routeName, BuildContext context) {
+    final navigator = navigatorKey.currentState;
+
+    if (navigator == null) return Future.value();
+
+    return navigator.pushNamedAndRemoveUntil(routeName, (_) => false);
   }
 }
 
+// TODO: finish converting over to NavigationPaths for all routes
 class NavigationPaths {
   static const intro = '/intro';
+  static const login = '/login';
+  static const signup = '/signup';
+  static const forgot = '/forgot';
+  static const reset = '/reset';
+  static const searchHomeservers = '/search/homeservers';
+  static const searchRooms = '/home/rooms/search';
+  static const userDetails = '/home/user/details';
+  static const verification = '/verification';
   static const theming = '/theming';
+  static const home = '/home';
+  static const settings = '/settings';
+  static const devices = '/devices';
+  static const blocked = '/blocked';
+  static const loading = '/loading';
 }
 
 class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
         NavigationPaths.intro: (BuildContext context) => const IntroScreen(),
-        '/login': (BuildContext context) => const LoginScreen(),
-        '/signup': (BuildContext context) => const SignupScreen(),
-        '/forgot': (BuildContext context) => ForgotPasswordScreen(),
-        '/reset': (BuildContext context) => ResetPasswordScreen(),
-        '/search/homeservers': (BuildContext context) => SearchHomeserverScreen(),
-        '/verification': (BuildContext context) => VerificationScreen(),
-        '/home': (BuildContext context) => HomeScreen(),
-        '/home/chat': (BuildContext context) => ChatScreen(),
-        '/home/chat/settings': (BuildContext context) => ChatDetailsScreen(),
-        '/home/chat/details': (BuildContext context) => MessageDetailsScreen(),
-        '/home/chat/users': (BuildContext context) => ChatUsersDetailScreen(),
-        '/home/user/search': (BuildContext context) => SearchUserScreen(),
-        '/home/user/details': (BuildContext context) => UserProfileScreen(),
-        '/home/user/invite': (BuildContext context) => InviteUsersScreen(),
-        '/home/rooms/search': (BuildContext context) => RoomSearchScreen(),
-        '/home/groups/search': (BuildContext context) => GroupSearchScreen(),
-        '/home/groups/create': (BuildContext context) => CreateGroupScreen(),
-        '/home/groups/create/public': (BuildContext context) => CreatePublicGroupScreen(),
-        '/profile': (BuildContext context) => ProfileScreen(),
-        '/notifications': (BuildContext context) => NotificationSettingsScreen(),
-        '/advanced': (BuildContext context) => AdvancedSettingsScreen(),
-        '/storage': (BuildContext context) => StorageSettingsScreen(),
-        '/password': (BuildContext context) => PasswordUpdateView(),
-        '/licenses': (BuildContext context) => LicensePage(applicationName: Values.appName),
-        '/privacy': (BuildContext context) => PrivacySettingsScreen(),
-        '/chat-preferences': (BuildContext context) => ChatsSettingsScreen(),
-        NavigationPaths.theming: (BuildContext context) => ThemingSettingsScreen(),
-        '/devices': (BuildContext context) => DevicesScreen(),
-        '/settings': (BuildContext context) => SettingsScreen(),
-        '/blocked': (BuildContext context) => BlockedScreen(),
-        '/loading': (BuildContext context) => LoadingScreen(),
+        NavigationPaths.login: (BuildContext context) => const LoginScreen(),
+        NavigationPaths.signup: (BuildContext context) => const SignupScreen(),
+        NavigationPaths.forgot: (BuildContext context) => const ForgotPasswordScreen(),
+        NavigationPaths.reset: (BuildContext context) => const ResetPasswordScreen(),
+        NavigationPaths.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
+        NavigationPaths.verification: (BuildContext context) => const VerificationScreen(),
+        NavigationPaths.home: (BuildContext context) => const HomeScreen(),
+        '/home/chat': (BuildContext context) => const ChatScreen(),
+        '/home/chat/settings': (BuildContext context) => const ChatDetailsScreen(),
+        '/home/chat/details': (BuildContext context) => const MessageDetailsScreen(),
+        '/home/chat/users': (BuildContext context) => const ChatUsersDetailScreen(),
+        '/home/user/search': (BuildContext context) => const SearchUserScreen(),
+        '/home/user/details': (BuildContext context) => const UserProfileScreen(),
+        '/home/user/invite': (BuildContext context) => const InviteUsersScreen(),
+        '/home/rooms/search': (BuildContext context) => const RoomSearchScreen(),
+        '/home/groups/search': (BuildContext context) => const GroupSearchScreen(),
+        '/home/groups/create': (BuildContext context) => const CreateGroupScreen(),
+        '/home/groups/create/public': (BuildContext context) => const CreatePublicGroupScreen(),
+        '/profile': (BuildContext context) => const ProfileScreen(),
+        '/notifications': (BuildContext context) => const NotificationSettingsScreen(),
+        '/advanced': (BuildContext context) => const AdvancedSettingsScreen(),
+        '/storage': (BuildContext context) => const StorageSettingsScreen(),
+        '/password': (BuildContext context) => const PasswordUpdateView(),
+        '/licenses': (BuildContext context) => const LicensePage(applicationName: Values.appName),
+        '/privacy': (BuildContext context) => const PrivacySettingsScreen(),
+        '/chat-preferences': (BuildContext context) => const ChatsSettingsScreen(),
+        NavigationPaths.theming: (BuildContext context) => const ThemingSettingsScreen(),
+        NavigationPaths.devices: (BuildContext context) => DevicesScreen(),
+        NavigationPaths.settings: (BuildContext context) => const SettingsScreen(),
+        NavigationPaths.blocked: (BuildContext context) => const BlockedScreen(),
+        NavigationPaths.loading: (BuildContext context) => const LoadingScreen(),
       };
 }

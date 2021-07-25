@@ -184,6 +184,13 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  onNavigateNextPage(PageController? controller) {
+    controller!.nextPage(
+      duration: nextAnimationDuration,
+      curve: Curves.ease,
+    );
+  }
+
   onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
@@ -202,18 +209,12 @@ class SignupScreenState extends State<SignupScreen> {
           }
 
           if (valid!) {
-            controller!.nextPage(
-              duration: nextAnimationDuration,
-              curve: Curves.ease,
-            );
+            onNavigateNextPage(controller);
           }
         };
       case UsernameStep:
         return () {
-          controller!.nextPage(
-            duration: nextAnimationDuration,
-            curve: Curves.ease,
-          );
+          onNavigateNextPage(controller);
         };
       case PasswordStep:
         return () async {
@@ -226,10 +227,7 @@ class SignupScreenState extends State<SignupScreen> {
             }
           }
 
-          return controller!.nextPage(
-            duration: nextAnimationDuration,
-            curve: Curves.ease,
-          );
+          return onNavigateNextPage(controller);
         };
       case CaptchaStep:
         return () async {
@@ -238,10 +236,7 @@ class SignupScreenState extends State<SignupScreen> {
             result = await props.onCreateUser(enableErrors: lastStep);
           }
           if (!result!) {
-            controller!.nextPage(
-              duration: nextAnimationDuration,
-              curve: Curves.ease,
-            );
+            onNavigateNextPage(controller);
           }
         };
       case TermsStep:
@@ -251,10 +246,7 @@ class SignupScreenState extends State<SignupScreen> {
             result = await props.onCreateUser(enableErrors: lastStep);
           }
           if (!result!) {
-            return controller!.nextPage(
-              duration: nextAnimationDuration,
-              curve: Curves.ease,
-            );
+            return onNavigateNextPage(controller);
           }
 
           // If the user has a completed auth flow for matrix.org, reset to
@@ -287,10 +279,7 @@ class SignupScreenState extends State<SignupScreen> {
             }
 
             // or continue if not the last step
-            controller!.nextPage(
-              duration: nextAnimationDuration,
-              curve: Curves.ease,
-            );
+            onNavigateNextPage(controller);
           }
         };
       default:

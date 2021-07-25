@@ -10,12 +10,12 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 
 class LoadingScreen extends StatelessWidget {
-  LoadingScreen({Key? key}) : super(key: key);
+  const LoadingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: ScrollConfiguration(

@@ -280,7 +280,7 @@ class HomeState extends State<HomeScreen> {
 
         final messageLatest = latestMessage(messages);
         final preview = formatPreview(room: room, message: messageLatest);
-        final roomName = room.name ?? '';
+        final chatName = room.name ?? '';
         final newMessage = messageLatest != null &&
             room.lastRead < messageLatest.timestamp &&
             messageLatest.sender != props.currentUser.userId;
@@ -345,9 +345,9 @@ class HomeState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context,
                 '/home/chat',
-                arguments: ChatViewArguements(
+                arguments: ChatScreenArguments(
                   roomId: room.id,
-                  title: roomName,
+                  title: chatName,
                 ),
               );
             }
@@ -489,7 +489,7 @@ class HomeState extends State<HomeScreen> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              roomName,
+                              chatName,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),

@@ -39,7 +39,7 @@ class CacheStorage implements StorageEngine {
           {
             'type': type,
             'json': jsonEncrypted,
-            'cryptKey': Cache.cryptKey,
+            'cacheKey': Cache.cacheKey,
           },
           debugLabel: 'decryptJsonBackground',
         );

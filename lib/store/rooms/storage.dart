@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 Future saveRooms(
@@ -12,7 +11,6 @@ Future saveRooms(
   Database? storage,
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
-  storage = storage ?? Storage.main;
 
   return storage!.transaction((txn) async {
     for (final Room? room in rooms.values) {
@@ -28,7 +26,6 @@ Future saveRoom(
   Database? storage,
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
-  storage = storage ?? Storage.main;
 
   return storage!.transaction((txn) async {
     final record = store.record(room.id);
@@ -42,7 +39,6 @@ Future deleteRooms(
   Database? storage,
 }) async {
   final store = StoreRef<String?, String>(StorageKeys.ROOMS);
-  storage = storage ?? Storage.main;
 
   return storage!.transaction((txn) async {
     for (final Room? room in rooms.values) {

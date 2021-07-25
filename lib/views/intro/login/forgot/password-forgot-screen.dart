@@ -8,16 +8,11 @@ import 'package:redux/redux.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PageEmailVerify.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
-
-final Duration nextAnimationDuration = Duration(
-  milliseconds: Values.animationDurationDefault,
-);
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -73,8 +68,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             appBar: AppBar(
@@ -96,10 +91,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +109,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                               width: width,
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
-                                maxHeight: Dimensions.widgetHeightMax * 0.5,
+                                maxHeight: Dimensions.heightMax * 0.5,
                               ),
                               child: PageView(
                                 pageSnapping: true,
@@ -147,15 +140,13 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                     child: ButtonSolid(
                                       text: Strings.buttonSendVerification,
                                       loading: loading,
-                                      disabled: !props.isEmailValid ||
-                                          !props.isHomeserverValid,
+                                      disabled: !props.isEmailValid || !props.isHomeserverValid,
                                       onPressed: () async {
                                         setState(() {
                                           loading = true;
                                         });
 
-                                        final result = await props
-                                            .onSendVerification(sendAttempt);
+                                        final result = await props.onSendVerification(sendAttempt);
 
                                         if (result) {
                                           onShowConfirmDialog();
@@ -182,8 +173,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                           loading = true;
                                         });
 
-                                        final result =
-                                            await props.onConfirmVerification();
+                                        final result = await props.onConfirmVerification();
 
                                         if (result) {
                                           onVerificationConfirmed();

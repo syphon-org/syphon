@@ -10,15 +10,14 @@ var _random = Random.secure();
 
 /// Random bytes generator
 Uint8List _randBytes(int length) {
-  return Uint8List.fromList(
-      List<int>.generate(length, (i) => _random.nextInt(256)));
+  return Uint8List.fromList(List<int>.generate(length, (i) => _random.nextInt(256)));
 }
 
 /// Generate an encryption password based on a user input password
 ///
 /// It uses MD5 which generates a 16 bytes blob, size needed for Salsa20
 Uint8List _generateEncryptPassword(String password) {
-  var blob = Uint8List.fromList(md5.convert(utf8.encode(password)).bytes);
+  final blob = Uint8List.fromList(md5.convert(utf8.encode(password)).bytes);
   assert(blob.length == 16);
   return blob;
 }
@@ -37,8 +36,7 @@ class _EncryptEncoder extends Converter<dynamic, String> {
     assert(ivEncoded.length == 12);
 
     // Encode the input value
-    final encoded =
-        Encrypter(salsa20).encrypt(json.encode(input), iv: IV(iv)).base64;
+    final encoded = Encrypter(salsa20).encrypt(json.encode(input), iv: IV(iv)).base64;
 
     // Prepend the initial value
     return '$ivEncoded$encoded';
@@ -61,7 +59,7 @@ class _EncryptDecoder extends Converter<String, dynamic> {
     input = input.substring(12);
 
     // Decode the input
-    var decoded = json.decode(Encrypter(salsa20).decrypt64(input, iv: IV(iv)));
+    final decoded = json.decode(Encrypter(salsa20).decrypt64(input, iv: IV(iv)));
     if (decoded is Map) {
       return decoded.cast<String, dynamic>();
     }
@@ -75,7 +73,7 @@ class _EncryptCodec extends Codec<dynamic, String> {
   late _EncryptDecoder _decoder;
 
   _EncryptCodec(Uint8List passwordBytes) {
-    var salsa20 = Salsa20(Key(passwordBytes));
+    final salsa20 = Salsa20(Key(passwordBytes));
     _encoder = _EncryptEncoder(salsa20);
     _decoder = _EncryptDecoder(salsa20);
   }
@@ -112,5 +110,6 @@ const _encryptCodecSignature = 'encrypt';
 /// // ...your database is ready to use
 /// ```
 SembastCodec getEncryptSembastCodec({required String password}) => SembastCodec(
-    signature: _encryptCodecSignature,
-    codec: _EncryptCodec(_generateEncryptPassword(password)));
+      signature: _encryptCodecSignature,
+      codec: _EncryptCodec(_generateEncryptPassword(password)),
+    );
