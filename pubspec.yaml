@@ -184,10 +184,13 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
   assets:
-    - assets/translations/en.json
-    - assets/translations/nl.json
+    - assets/translations/en.json 
+    - assets/translations/nl.json 
+    - assets/translations/de.json 
     - assets/translations/ru.json
     - assets/translations/pl.json
+    - assets/graphics/undraw_avatar_male.svg
+    - assets/graphics/undraw_avatar_female.svg
     - assets/graphics/undraw_sync_files.svg
     - assets/graphics/undraw_accept_terms.svg
     - assets/graphics/undraw_mobile_user.svg

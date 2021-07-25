@@ -143,7 +143,7 @@ ThunkAction<AppState> loadMessagesCached({
 
       final messagesStored = await loadMessages(
         room.messageIds,
-        storage: Storage.main!,
+        storage: Storage.instance!,
         offset: offset, // offset from the most recent eventId found
         limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );

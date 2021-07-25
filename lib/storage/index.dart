@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/cache/index.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -24,24 +24,39 @@ import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {
-  // cold storage references
-  static Database? main;
-
-  // preloaded cold storage data
-  static Map<String, dynamic> storageData = {};
+  // cache key identifiers
+  static const keyLocation = '${Values.appLabel}@storageKey';
 
   // storage identifiers
-  static const mainLocation = '${Values.appNameLabel}-main-storage${kReleaseMode ? '' : '-debug'}.db';
+  static const databaseLocation = '${Values.appLabel}-main-storage.db';
+
+  // cold storage references
+  static Database? instance;
 }
 
-Future<Database?> initStorage() async {
+Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
   try {
-    DatabaseFactory? storageFactory;
+    var storageKeyId = Storage.keyLocation;
+    var storageLocation = Storage.databaseLocation;
 
-    var version;
+    if (context!.isNotEmpty) {
+      storageKeyId = '$context-$storageKeyId';
+      storageLocation = '$context-$storageLocation';
+    }
+    // TODO: TEMP: remove after 0.1.11 release
+    if (!(await checkKey(Storage.keyLocation))) {
+      await deleteStorage();
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+
+    var version = 1;
+    var storageFactory;
+
+    // Configure cache encryption/decryption instance
+    final storageKey = await loadKey(storageKeyId);
 
     if (Platform.isAndroid || Platform.isIOS) {
-      version = 1;
       // always open cold storage as sqflite
       storageFactory = getDatabaseFactorySqflite(
         sqflite.databaseFactory,
@@ -62,15 +77,17 @@ Future<Database?> initStorage() async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: Cache.cryptKey!);
+    final codec = getEncryptSembastCodec(password: storageKey!);
 
-    Storage.main = await storageFactory.openDatabase(
-      Storage.mainLocation,
+    printInfo('initStorage $storageLocation $storageKey');
+
+    Storage.instance = await storageFactory.openDatabase(
+      storageLocation,
       codec: codec,
       version: version,
     );
 
-    return Storage.main;
+    return Storage.instance;
   } catch (error) {
     printDebug('[initStorage] $error');
     return null;
@@ -78,14 +95,24 @@ Future<Database?> initStorage() async {
 }
 
 // Closes and saves storage
-closeStorage() async {
-  if (Storage.main != null) {
-    Storage.main!.close();
+closeStorage(Database? database) async {
+  if (database != null) {
+    database.close();
   }
 }
 
-deleteStorage() async {
+deleteStorage({String? context = StoreContext.DEFAULT}) async {
   try {
+    var storageKeyId = Storage.keyLocation;
+    var storageLocation = Storage.databaseLocation;
+
+    if (context!.isNotEmpty) {
+      storageKeyId = '$context-$storageKeyId';
+      storageLocation = '$context-$storageLocation';
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+
     late DatabaseFactory storageFactory;
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -100,9 +127,8 @@ deleteStorage() async {
       );
     }
 
-    await storageFactory.deleteDatabase(Storage.mainLocation);
-
-    Storage.main = null;
+    await storageFactory.deleteDatabase(storageLocation);
+    await deleteKey(storageKeyId);
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
   }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +9,6 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -38,11 +35,10 @@ class ChatUsersDetailScreen extends StatefulWidget {
 class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
   final searchInputFocusNode = FocusNode();
 
-  ChatUsersDetailState({Key? key});
-
   bool loading = false;
 
-  // componentDidMount(){}
+  ChatUsersDetailState();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -67,12 +63,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
     super.dispose();
   }
 
-  @protected
-  onShowUserDetails({
-    required BuildContext context,
-    String? roomId,
-    String? userId,
-  }) async {
+  onShowUserDetails({required BuildContext context, String? roomId, String? userId}) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -83,8 +74,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
     );
   }
 
-  @protected
-  Widget buildUserList(BuildContext context, _Props props) => ListView.builder(
+  buildUserList(BuildContext context, _Props props) => ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
         itemCount: props.usersFiltered.length,
@@ -92,7 +82,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
           final user = (props.usersFiltered[index] as User);
 
           return GestureDetector(
-            onTap: () => this.onShowUserDetails(
+            onTap: () => onShowUserDetails(
               context: context,
               userId: user.userId,
               roomId: props.room.id,
@@ -100,31 +90,27 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
             child: CardSection(
               padding: EdgeInsets.zero,
               elevation: 0,
-              child: Container(
-                child: ListTile(
-                  leading: Avatar(
-                    uri: user.avatarUri,
-                    alt: user.displayName ?? user.userId,
-                    size: Dimensions.avatarSizeMin,
-                    background: Colours.hashedColor(
-                      user.displayName ?? user.userId,
-                    ),
+              child: ListTile(
+                leading: Avatar(
+                  uri: user.avatarUri,
+                  alt: user.displayName ?? user.userId,
+                  size: Dimensions.avatarSizeMin,
+                  background: Colours.hashedColor(
+                    user.displayName ?? user.userId,
                   ),
-                  title: Text(
-                    formatUsername(user),
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  subtitle: Text(
-                    user.userId!,
-                    style: Theme.of(context).textTheme.caption!.merge(
-                          TextStyle(
-                            color: props.loading
-                                ? Color(Colours.greyDisabled)
-                                : null,
-                          ),
+                ),
+                title: Text(
+                  formatUsername(user),
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                subtitle: Text(
+                  user.userId!,
+                  style: Theme.of(context).textTheme.caption!.merge(
+                        TextStyle(
+                          color: props.loading ? Color(Colours.greyDisabled) : null,
                         ),
-                  ),
+                      ),
                 ),
               ),
             ),
@@ -139,8 +125,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) =>
-          _Props.mapStateToProps(store, arguments!.roomId),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store, arguments!.roomId),
       builder: (context, props) => Scaffold(
         appBar: AppBarSearch(
           title: Strings.titleRoomUsers,
@@ -160,7 +145,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
             buildUserList(context, props),
             Positioned(
               child: Loader(
-                loading: this.loading,
+                loading: loading,
               ),
             ),
           ],
@@ -178,7 +163,7 @@ class _Props extends Equatable {
 
   final Function onSearch;
 
-  _Props({
+  const _Props({
     required this.room,
     required this.loading,
     required this.searchText,
@@ -193,8 +178,7 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         loading: store.state.roomStore.loading,
         searchText: store.state.searchStore.searchText,
         room: store.state.roomStore.rooms[roomId!] ?? Room(id: roomId),

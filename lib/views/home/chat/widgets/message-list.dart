@@ -145,6 +145,7 @@ class MessageListState extends State<MessageList> {
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,
+                      messageOnly: !isUserSent && props.users.length <= 2,
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,

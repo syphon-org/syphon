@@ -1,6 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -13,6 +14,8 @@ import 'package:syphon/store/rooms/actions.dart';
 ///
 bool cacheMiddleware(Store<AppState> store, dynamic action) {
   switch (action.runtimeType) {
+    case AddAvailableUser:
+    case RemoveAvailableUser:
     case SetRoom:
     case RemoveRoom:
     case SetOlmAccount:

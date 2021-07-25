@@ -17,11 +17,12 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/search/search-rooms-screen.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
 class ModalUserDetails extends StatelessWidget {
-  ModalUserDetails({
+  const ModalUserDetails({
     Key? key,
     this.user,
     this.userId,
@@ -35,7 +36,7 @@ class ModalUserDetails extends StatelessWidget {
   onNavigateToProfile({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      '/home/user/details',
+      NavigationPaths.userDetails,
       arguments: UserProfileArguments(
         user: props.user,
       ),
@@ -45,7 +46,7 @@ class ModalUserDetails extends StatelessWidget {
   onNavigateToInvite({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      '/home/rooms/search',
+      NavigationPaths.searchRooms,
       arguments: RoomSearchArguments(
         user: props.user,
       ),
@@ -74,7 +75,7 @@ class ModalUserDetails extends StatelessWidget {
             Navigator.popAndPushNamed(
               context,
               '/home/chat',
-              arguments: ChatViewArguements(
+              arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
               ),
@@ -98,7 +99,7 @@ class ModalUserDetails extends StatelessWidget {
         ),
         builder: (context, props) => Container(
           constraints: BoxConstraints(
-            maxHeight: Dimensions.defaultModalHeightMax,
+            maxHeight: Dimensions.modalHeightMax,
           ),
           padding: EdgeInsets.symmetric(
             vertical: 12,
@@ -130,7 +131,7 @@ class ModalUserDetails extends StatelessWidget {
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
                             background:
-                                props.user.avatarUri == null ? Colours.hashedColor(props.user.userId) : null,
+                                props.user.avatarUri == null ? Colours.hashedColorUser(props.user) : null,
                           ),
                         ),
                       ],

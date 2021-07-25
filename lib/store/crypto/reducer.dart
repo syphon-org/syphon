@@ -1,10 +1,7 @@
-import 'package:syphon/global/print.dart';
-
 import './actions.dart';
 import './state.dart';
 
-CryptoStore cryptoReducer(
-    [CryptoStore state = const CryptoStore(), dynamic action]) {
+CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetOlmAccount:
       return state.copyWith(
@@ -25,6 +22,11 @@ CryptoStore cryptoReducer(
     case SetOneTimeKeysCounts:
       return state.copyWith(
         oneTimeKeysCounts: action.oneTimeKeysCounts,
+      );
+    case SetOneTimeKeysStable:
+      final _action = action as SetOneTimeKeysStable;
+      return state.copyWith(
+        oneTimeKeysStable: _action.stable,
       );
     case SetOneTimeKeysClaimed:
       return state.copyWith(
@@ -81,16 +83,12 @@ CryptoStore cryptoReducer(
       );
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String> messageSessionInboundNew = {
-        action.identityKey: action.session
-      };
+      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.session};
 
       messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
 
       // add or update inbound message index by roomId + identity
-      final Map<String, int> messageSessionIndexUpdated = {
-        action.identityKey: action.messageIndex
-      };
+      final Map<String, int> messageSessionIndexUpdated = {action.identityKey: action.messageIndex};
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 

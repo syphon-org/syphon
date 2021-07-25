@@ -13,6 +13,7 @@ import 'package:syphon/storage/middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 
 import 'package:syphon/store/alerts/model.dart';
+import 'package:syphon/store/auth/middleware.dart';
 import 'package:syphon/store/auth/reducer.dart';
 import 'package:syphon/store/crypto/reducer.dart';
 import 'package:syphon/store/crypto/state.dart';
@@ -35,6 +36,20 @@ import './search/state.dart';
 import './settings/reducer.dart';
 import './settings/state.dart';
 
+class SetGlobalLoading {
+  bool loading;
+  SetGlobalLoading({required this.loading});
+}
+
+bool loadingReducer([bool state = false, dynamic action]) {
+  switch (action.runtimeType) {
+    case SetGlobalLoading:
+      return action.loading;
+    default:
+      return state;
+  }
+}
+
 class AppState extends Equatable {
   final bool loading;
   final AuthStore authStore;
@@ -49,7 +64,7 @@ class AppState extends Equatable {
   final CryptoStore cryptoStore;
 
   const AppState({
-    this.loading = true,
+    this.loading = false,
     this.authStore = const AuthStore(),
     this.alertsStore = const AlertsStore(),
     this.syncStore = const SyncStore(),
@@ -76,10 +91,35 @@ class AppState extends Equatable {
         settingsStore,
         cryptoStore,
       ];
+
+  AppState copyWith({
+    bool? loading,
+    AuthStore? authStore,
+    AlertsStore? alertsStore,
+    SearchStore? searchStore,
+    SettingsStore? settingsStore,
+    RoomStore? roomStore,
+    EventStore? eventStore,
+    UserStore? userStore,
+    SyncStore? syncStore,
+    CryptoStore? cryptoStore,
+  }) =>
+      AppState(
+        loading: loading ?? this.loading,
+        authStore: authStore ?? this.authStore,
+        alertsStore: alertsStore ?? this.alertsStore,
+        searchStore: searchStore ?? this.searchStore,
+        settingsStore: settingsStore ?? this.settingsStore,
+        roomStore: roomStore ?? this.roomStore,
+        eventStore: eventStore ?? this.eventStore,
+        userStore: userStore ?? this.userStore,
+        syncStore: syncStore ?? this.syncStore,
+        cryptoStore: cryptoStore ?? this.cryptoStore,
+      );
 }
 
 AppState appReducer(AppState state, action) => AppState(
-      loading: state.loading,
+      loading: loadingReducer(state.loading, action),
       authStore: authReducer(state.authStore, action),
       alertsStore: alertsReducer(state.alertsStore, action),
       mediaStore: mediaReducer(state.mediaStore, action),
@@ -92,42 +132,61 @@ AppState appReducer(AppState state, action) => AppState(
       cryptoStore: cryptoReducer(state.cryptoStore, action),
     );
 
+///
 /// Initialize Store
-/// - Hot redux state cache for top level data
-Future<Store<AppState>> initStore(Database? cache, Database? storage) async {
-  Map<String, dynamic> data = {};
+///
+/// Hot cache for top level data
+/// Cold storage all missing and full state data
+///
+/// existingState copies the login state between multiaccount swaps
+///
+Future<Store<AppState>> initStore(
+  Database? cache,
+  Database? storage, {
+  AppState? existingState,
+  bool existingUser = false,
+}) async {
+  AppState? initialState;
+  Map<String, dynamic> preloaded = {};
 
   if (storage != null) {
     // partially load storage to memory to rehydrate cache
-    data = await loadStorage(storage);
+    preloaded = await loadStorage(storage);
   }
 
   // Configure redux persist instance
   final persistor = Persistor<AppState>(
     storage: CacheStorage(cache: cache),
-    serializer: CacheSerializer(cache: cache, preloaded: data),
+    serializer: CacheSerializer(cache: cache, preloaded: preloaded),
     shouldSave: cacheMiddleware,
   );
 
   // Finally load persisted store
-  AppState? initialState;
-
   try {
-    initialState = await persistor.load();
+    // TODO: this is pretty hacky - merges availableUsers across stores
+    if (existingUser) {
+      initialState = await persistor.load();
+      initialState = initialState?.copyWith(
+        authStore: initialState.authStore.copyWith(
+          availableUsers: existingState?.authStore.availableUsers,
+        ),
+      );
+    } else {
+      initialState = existingState ?? await persistor.load();
+    }
   } catch (error) {
-    debugPrint('[Redux Persist] $error');
+    debugPrint('[persistor.load] error $error');
   }
 
-  final Store<AppState> store = Store<AppState>(
+  return Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
     middleware: [
       thunkMiddleware,
+      authMiddleware,
       persistor.createMiddleware(),
-      storageMiddleware,
+      storageMiddleware(storage!),
       alertMiddleware,
     ],
   );
-
-  return Future.value(store);
 }

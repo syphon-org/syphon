@@ -59,38 +59,32 @@ class BlockedScreenState extends State<BlockedScreen> {
           final user = props.usersBlocked[index]!;
 
           return GestureDetector(
-            onTap: () => this.onShowUserDetails(
+            onTap: () => onShowUserDetails(
               context: context,
               userId: user.userId,
             ),
             child: CardSection(
               padding: EdgeInsets.zero,
               elevation: 0,
-              child: Container(
-                child: ListTile(
-                  leading: Avatar(
-                    uri: user.avatarUri,
-                    alt: user.displayName ?? user.userId,
-                    size: Dimensions.avatarSizeMin,
-                    background: Colours.hashedColor(
-                      user.displayName ?? user.userId,
-                    ),
-                  ),
-                  title: Text(
-                    formatUsername(user),
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  subtitle: Text(
-                    user.userId!,
-                    style: Theme.of(context).textTheme.caption!.merge(
-                          TextStyle(
-                            color: props.loading
-                                ? Color(Colours.greyDisabled)
-                                : null,
-                          ),
+              child: ListTile(
+                leading: Avatar(
+                  uri: user.avatarUri,
+                  alt: user.displayName ?? user.userId,
+                  size: Dimensions.avatarSizeMin,
+                  background: Colours.hashedColorUser(user),
+                ),
+                title: Text(
+                  formatUsername(user),
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                subtitle: Text(
+                  user.userId!,
+                  style: Theme.of(context).textTheme.caption!.merge(
+                        TextStyle(
+                          color: props.loading ? Color(Colours.greyDisabled) : null,
                         ),
-                  ),
+                      ),
                 ),
               ),
             ),
@@ -143,8 +137,6 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.roomStore.loading,
-        usersBlocked: store.state.userStore.blocked
-            .map((id) => store.state.userStore.users[id])
-            .toList(),
+        usersBlocked: store.state.userStore.blocked.map((id) => store.state.userStore.users[id]).toList(),
       );
 }

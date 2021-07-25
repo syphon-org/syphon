@@ -25,12 +25,17 @@ class AuthStore extends Equatable {
   @JsonKey()
   final String protocol;
 
+  @JsonKey()
+  final List<User> availableUsers;
+
   User get currentUser => user;
 
   final StreamController<User?>? authObserver;
+  final StreamController<User?>? contextObserver;
 
-  Stream<User?>? get onAuthStateChanged =>
-      authObserver != null ? authObserver!.stream : null;
+  Stream<User?> get onAuthStateChanged => authObserver!.stream;
+
+  Stream<User?> get onContextChanged => contextObserver!.stream;
 
   // Interactive Auth Data
   final Credential? credential;
@@ -63,9 +68,11 @@ class AuthStore extends Equatable {
 
   const AuthStore({
     this.user = const User(),
+    this.availableUsers = const [],
     this.session,
     this.clientSecret,
     this.authObserver,
+    this.contextObserver,
     this.protocol = 'https://',
     this.email = '',
     this.username = '',
@@ -99,9 +106,11 @@ class AuthStore extends Equatable {
   @override
   List<Object?> get props => [
         user,
+        availableUsers,
         session,
         clientSecret,
         authObserver,
+        contextObserver,
         username,
         password,
         passwordConfirm,
@@ -125,7 +134,8 @@ class AuthStore extends Equatable {
       ];
 
   AuthStore copyWith({
-    user,
+    User? user,
+    List<User>? availableUsers,
     String? session,
     String? clientSecret,
     protocol,
@@ -151,16 +161,19 @@ class AuthStore extends Equatable {
     credential,
     creating,
     verificationNeeded,
-    authObserver,
+    StreamController<User?>? authObserver,
+    StreamController<User?>? contextObserver,
   }) =>
       AuthStore(
         user: user ?? this.user,
+        availableUsers: availableUsers ?? this.availableUsers,
         session: session ?? this.session,
         clientSecret: clientSecret ?? this.clientSecret,
         protocol: protocol ?? this.protocol,
         email: email ?? this.email,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,
+        contextObserver: contextObserver ?? this.contextObserver,
         username: username ?? this.username,
         password: password ?? this.password,
         agreement: agreement ?? this.agreement,
@@ -185,6 +198,5 @@ class AuthStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$AuthStoreToJson(this);
 
-  factory AuthStore.fromJson(Map<String, dynamic> json) =>
-      _$AuthStoreFromJson(json);
+  factory AuthStore.fromJson(Map<String, dynamic> json) => _$AuthStoreFromJson(json);
 }

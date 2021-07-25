@@ -1,3 +1,5 @@
+import 'package:syphon/store/auth/context/actions.dart';
+
 import '../user/model.dart';
 import './actions.dart';
 import './state.dart';
@@ -10,8 +12,25 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(creating: action.creating);
     case SetAuthObserver:
       return state.copyWith(authObserver: action.authObserver);
+    case SetContextObserver:
+      return state.copyWith(contextObserver: action.contextObserver);
     case SetUser:
-      return state.copyWith(user: action.user);
+      final _action = action as SetUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+      final hasUser = availableUsers.indexWhere(
+        (user) => user.userId == _action.user.userId,
+      );
+
+      if (hasUser != -1) {
+        availableUsers.replaceRange(hasUser, hasUser + 1, [
+          _action.user.copyWith(accessToken: ''),
+        ]);
+      }
+
+      return state.copyWith(
+        user: _action.user,
+        availableUsers: availableUsers,
+      );
     case SetSession:
       return state.copyWith(session: action.session);
     case SetClientSecret:
@@ -52,6 +71,30 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return state.copyWith(captcha: action.completed);
     case SetAgreement:
       return state.copyWith(agreement: action.agreement);
+    case AddAvailableUser:
+      final _action = action as AddAvailableUser;
+      final availableUser = _action.availableUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+
+      if (existingIndex == -1) {
+        availableUsers.add(availableUser);
+      }
+
+      return state.copyWith(availableUsers: availableUsers);
+    case RemoveAvailableUser:
+      final _action = action as RemoveAvailableUser;
+      final availableUser = _action.availableUser;
+      final availableUsers = List<User>.from(state.availableUsers);
+
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+
+      if (existingIndex != -1) {
+        availableUsers.remove(availableUser);
+      }
+
+      return state.copyWith(availableUsers: availableUsers);
     case ResetUser:
       return state.copyWith(user: User());
     case ResetOnboarding:
@@ -70,12 +113,17 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       return AuthStore(
         loading: false,
         user: state.user,
+        authObserver: state.authObserver,
+        contextObserver: state.contextObserver,
+        availableUsers: state.availableUsers,
         clientSecret: state.clientSecret,
       );
     case ResetAuthStore:
       // retain the app sessions auth observer only
       return AuthStore(
         authObserver: state.authObserver,
+        contextObserver: state.contextObserver,
+        availableUsers: state.availableUsers,
         clientSecret: state.clientSecret,
       );
     default:

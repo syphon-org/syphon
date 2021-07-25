@@ -8,15 +8,11 @@ import 'package:redux/redux.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
-
-final Duration nextAnimationDuration = Duration(
-  milliseconds: Values.animationDurationDefault,
-);
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({Key? key}) : super(key: key);
@@ -54,7 +50,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             appBar: AppBar(
@@ -76,10 +72,8 @@ class PasswordResetState extends State<ResetPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +90,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                               width: width,
                               constraints: BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
-                                maxHeight: Dimensions.widgetHeightMax * 0.5,
+                                maxHeight: Dimensions.heightMax * 0.5,
                               ),
                               child: PageView(
                                 pageSnapping: true,
@@ -106,8 +100,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -132,15 +125,14 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                               child: ButtonSolid(
                                 text: Strings.buttonResetPassword,
                                 loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
+                                disabled: !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onResetPassword();
 
                                   if (result) {
                                     Navigator.popUntil(
                                       context,
-                                      ModalRoute.withName('/login'),
+                                      ModalRoute.withName(NavigationPaths.login),
                                     );
                                   }
                                 },

@@ -11,7 +11,9 @@ List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
   return roomList
     ..removeWhere((room) =>
         room.userIds.length == 2 &&
-        room.userIds.any((userId) => blocked.contains(userId)))
+        room.userIds.any(
+          (userId) => blocked.contains(userId),
+        ))
     ..toList();
 }
 
