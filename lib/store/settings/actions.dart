@@ -7,6 +7,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -348,8 +349,8 @@ ThunkAction<AppState> incrementAvatarShape() {
   };
 }
 
-ThunkAction<AppState> incrementLanguage(context) { 
-  final languages = ['English', 'Dutch', 'German', 'Russian', 'Polish']; 
+ThunkAction<AppState> incrementLanguage(context) {
+  final languages = Languages.displayList;
 
   return (Store<AppState> store) async {
     final languageIndex = languages.indexWhere(

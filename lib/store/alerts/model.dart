@@ -7,12 +7,17 @@ class Alert {
   final String? message;
   final Duration duration;
   final String? error;
+  final String? action;
+
+  final Function? onAction;
 
   const Alert({
     this.type = 'warning',
     this.message = '',
     this.duration = const Duration(milliseconds: 3000),
     this.error,
+    this.action,
+    this.onAction,
   });
 }
 

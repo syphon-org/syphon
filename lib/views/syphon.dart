@@ -329,9 +329,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       ),
       duration: alert.duration,
       action: SnackBarAction(
-        label: 'Dismiss',
+        label: alert.action ?? 'Dismiss',
         textColor: Colors.white,
         onPressed: () {
+          if (alert.onAction != null) {
+            alert.onAction!();
+          }
           globalScaffold.currentState?.removeCurrentSnackBar();
         },
       ),
@@ -353,16 +356,10 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store: store,
         child: localization.EasyLocalization(
           path: 'assets/translations',
-          useOnlyLangCode: true, 
-          startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)), 
+          useOnlyLangCode: true,
+          startLocale: Locale(formatLanguageCode(store.state.settingsStore.language)),
           fallbackLocale: Locale(LangCodes.en),
-          supportedLocales: const [
-            Locale(LangCodes.en),
-            Locale(LangCodes.de),
-            Locale(LangCodes.nl),
-            Locale(LangCodes.ru),
-            Locale(LangCodes.pl),
-          ],
+          supportedLocales: LangCodes.localeList,
           child: StoreConnector<AppState, ThemeSettings>(
             distinct: true,
             converter: (store) => store.state.settingsStore.themeSettings,

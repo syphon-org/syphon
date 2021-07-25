@@ -1,11 +1,35 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
+
+extension StringExtension on String {
+  String capitalize() {
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
 
 class LangCodes {
   static const en = 'en';
   static const de = 'de';
-  static const dl = 'dl';
-  static const ru = 'ru';
   static const pl = 'pl';
+  static const ru = 'ru';
+  static const nl = 'nl';
+
+  static const all = [en, de, pl, ru, nl];
+
+  static final localeList = all.map((locale) => Locale(locale)).toList();
+}
+
+class Languages {
+  static const english = 'english';
+  static const german = 'german';
+  static const polish = 'polish';
+  static const russian = 'russian';
+  static const dutch = 'dutch';
+
+  static final all = [english, german, polish, russian, dutch];
+
+  static final displayList = all.map((l) => l.capitalize()).toList();
 }
 
 /// Constants that cannot be localized
@@ -65,6 +89,7 @@ class Values {
 
   static const defaultHeaders = {'Content-Type': 'application/json'};
   static const defaultUserId = '123'; // only for hashing default on colored avatars
+
 }
 
 // ignore: non_constant_identifier_names

@@ -277,7 +277,6 @@ class Props extends Equatable {
   final bool? enterSend;
   final bool? timeFormat24;
   final bool? dismissKeyboard;
-  final String chatFontSize;
 
   final Function onDisabled;
   final Function onIncrementLanguage;
@@ -288,7 +287,6 @@ class Props extends Equatable {
   const Props({
     required this.language,
     required this.enterSend,
-    required this.chatFontSize,
     required this.timeFormat24,
     required this.dismissKeyboard,
     required this.onDisabled,
@@ -302,18 +300,20 @@ class Props extends Equatable {
   List<Object?> get props => [
         language,
         enterSend,
-        chatFontSize,
         timeFormat24,
+        dismissKeyboard,
       ];
 
   static Props mapStateToProps(Store<AppState> store, BuildContext context) => Props(
-        chatFontSize: 'Default',
         language: store.state.settingsStore.language,
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {
-          store.dispatch(addInfo(message: tr('alert-restart-app-effect')));
+          store.dispatch(addInfo(
+            message: tr('alert-restart-app-effect'),
+            action: 'Dismiss',
+          ));
           store.dispatch(incrementLanguage(context));
         },
         onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),

@@ -65,12 +65,20 @@ ThunkAction<AppState> addInfo({
   origin = 'Unknown',
   message,
   error,
+  String? action,
+  Function? onAction,
 }) {
   return (Store<AppState> store) async {
     debugPrint('[$origin] $type : $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
-    final alert = Alert(type: type, message: message, error: error);
+    final alert = Alert(
+      type: type,
+      message: message,
+      error: error,
+      action: action,
+      onAction: onAction,
+    );
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };
