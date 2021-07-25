@@ -349,7 +349,7 @@ ThunkAction<AppState> incrementAvatarShape() {
 }
 
 ThunkAction<AppState> incrementLanguage(context) {
-  final languages = ['English', 'Russian', 'Polish'];
+  final languages = ['English', 'German', 'Russian', 'Polish'];
 
   return (Store<AppState> store) async {
     final languageIndex = languages.indexWhere(

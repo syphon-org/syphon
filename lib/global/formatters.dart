@@ -12,8 +12,10 @@ String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
 
 String formatLanguageCode(String? language) {
   switch ((language ?? 'english').toLowerCase()) {
-    case 'english':
-      return LangCodes.en;
+    case 'english': 
+      return LangCodes.en;  
+    case 'german': 
+      return LangCodes.de; 
     case 'russian':
       return LangCodes.ru;
     case 'polish':
