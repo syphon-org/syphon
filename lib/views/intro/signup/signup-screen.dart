@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -21,6 +22,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';
 import 'package:syphon/views/intro/signup/widgets/StepTerms.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'widgets/StepHomeserver.dart';
@@ -275,7 +277,7 @@ class SignupScreenState extends State<SignupScreen> {
           // otherwise, send to the verification holding page
           if (!result!) {
             if (lastStep) {
-              return Navigator.pushNamed(context, '/verification');
+              return Navigator.pushNamed(context, NavigationPaths.verification);
             }
 
             // or continue if not the last step
@@ -289,10 +291,10 @@ class SignupScreenState extends State<SignupScreen> {
 
   String buildButtonString(_Props props) {
     if (currentStep == sections.length - 1) {
-      return Strings.buttonSignupFinish;
+      return tr(StringKeys.buttonFinish);
     }
 
-    return Strings.buttonSignupNext;
+    return tr(StringKeys.buttonNext);
   }
 
   @override
@@ -388,7 +390,7 @@ class SignupScreenState extends State<SignupScreen> {
                               child: Container(
                                 padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonOutline(
-                                  text: Strings.buttonLoginSSO,
+                                  text: tr(StringKeys.buttonLoginSSO),
                                   disabled: props.loading,
                                   onPressed: onCompleteStep(
                                     props,

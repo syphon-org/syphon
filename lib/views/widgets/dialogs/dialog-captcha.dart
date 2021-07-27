@@ -8,6 +8,8 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
@@ -62,8 +64,7 @@ class DialogCaptcha extends StatelessWidget {
                   ),
                   child: Captcha(
                     publicKey: props.publicKey,
-                    onVerified: (token) =>
-                        props.onCompleteCaptcha(token, context: context),
+                    onVerified: (token) => props.onCompleteCaptcha(token, context: context),
                   ),
                 ),
               ),
@@ -108,11 +109,9 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-              [MatrixAuthTypes.RECAPTCHA]['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token,
-            {required BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

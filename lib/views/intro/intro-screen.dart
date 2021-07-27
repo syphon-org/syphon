@@ -11,6 +11,8 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -231,10 +233,7 @@ class IntroScreenState extends State<IntroScreen> {
                         }
 
                         if (currentStep == sections.length - 1) {
-                          Navigator.pushNamed(
-                            context,
-                            '/signup',
-                          );
+                          Navigator.pushNamed(context, NavigationPaths.signup);
                         }
 
                         pageController!.nextPage(

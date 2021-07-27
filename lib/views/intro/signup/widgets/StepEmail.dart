@@ -12,6 +12,8 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
@@ -134,8 +136,7 @@ class EmailStepState extends State<EmailStep> {
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) =>
-                                    DialogExplaination(
+                                builder: (BuildContext context) => DialogExplaination(
                                   title: Strings.titleDialogEmailRequirement,
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {

@@ -9,7 +9,10 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -23,8 +26,6 @@ class DevicesScreen extends StatefulWidget {
 }
 
 class DeviceViewState extends State<DevicesScreen> {
-  DeviceViewState() : super();
-
   List<Device?>? selectedDevices;
 
   @override
@@ -78,7 +79,7 @@ class DeviceViewState extends State<DevicesScreen> {
   }
 
   @protected
-  Widget buildDeviceOptionsBar({BuildContext? context, Props? props}) {
+  Widget buildDeviceOptionsBar({BuildContext? context, _Props? props}) {
     var selfSelectedDevice;
 
     if (selectedDevices != null) {
@@ -138,14 +139,14 @@ class DeviceViewState extends State<DevicesScreen> {
   }
 
   @protected
-  Widget buildAppBar({BuildContext? context, Props? props}) {
+  Widget buildAppBar({BuildContext? context, _Props? props}) {
     return AppBar(
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context!, false),
       ),
       title: Text(
-        tr('title-view-devices'),
+        tr(StringKeys.titleDevices),
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,
@@ -155,9 +156,9 @@ class DeviceViewState extends State<DevicesScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
+  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
               ? const Color(Colours.blackDefault)
@@ -275,7 +276,7 @@ class DeviceViewState extends State<DevicesScreen> {
       );
 }
 
-class Props extends Equatable {
+class _Props extends Equatable {
   final bool loading;
   final String? session;
   final List<Device> devices;
@@ -284,7 +285,7 @@ class Props extends Equatable {
   final Function onFetchDevices;
   final Function onDeleteDevices;
 
-  const Props({
+  const _Props({
     required this.loading,
     required this.devices,
     required this.session,
@@ -299,7 +300,7 @@ class Props extends Equatable {
         devices,
       ];
 
-  static Props mapStateToProps(Store<AppState> store) => Props(
+  static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices,
         session: store.state.authStore.session,
@@ -321,7 +322,7 @@ class Props extends Equatable {
               context: context,
               builder: (dialogContext) => DialogConfirmPassword(
                 key: Key(authSession),
-                title: tr(StringIds.titleConfirmPassword),
+                title: tr(StringKeys.titleConfirmPassword),
                 content: Strings.contentDeleteDevices,
                 onConfirm: () async {
                   final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();

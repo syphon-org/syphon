@@ -7,7 +7,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/selectors.dart';
@@ -75,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
                 onPressed: props.authLoading ? null : () => Navigator.pop(context, false),
               ),
               title: Text(
-                Strings.titleSettings,
+                tr(StringKeys.titleSettings),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -94,7 +97,7 @@ class SettingsScreen extends StatelessWidget {
                       onTap: props.authLoading
                           ? null
                           : () {
-                              Navigator.pushNamed(context, '/profile');
+                              Navigator.pushNamed(context, NavigationPaths.settingsProfile);
                             },
                       child: Container(
                         padding: Dimensions.heroPadding,
@@ -112,7 +115,7 @@ class SettingsScreen extends StatelessWidget {
                             contentPadding: Dimensions.listPaddingSettings,
                             enabled: false,
                             title: Text(
-                              tr('list-item-settings-sms'),
+                              tr(StringKeys.listItemSettingsSms),
                             ),
                             subtitle: Text(
                               Strings.labelOff, // TODO: add SMS feature
@@ -129,10 +132,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/notifications',
-                            );
+                            Navigator.pushNamed(context, NavigationPaths.settingsNotifications);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -142,7 +142,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('list-item-settings-notification'),
+                            tr(StringKeys.listItemSettingsNotification),
                           ),
                           subtitle: Text(
                             props.notificationsEnabled! ? Strings.labelOn : Strings.labelOff,
@@ -152,7 +152,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, '/privacy');
+                            Navigator.pushNamed(context, NavigationPaths.settingsPrivacy);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -162,7 +162,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('list-item-settings-privacy'),
+                            tr(StringKeys.listItemSettingsPrivacy),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
@@ -183,7 +183,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('title-view-theming'),
+                            tr(StringKeys.titleTheming),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
@@ -194,7 +194,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, '/chat-preferences');
+                            Navigator.pushNamed(context, NavigationPaths.settingsChat);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -209,14 +209,14 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('list-item-settings-chat'),
+                            tr(StringKeys.listItemSettingsChat),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, '/devices');
+                            Navigator.pushNamed(context, NavigationPaths.settingsDevices);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -226,14 +226,14 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('title-view-devices'),
+                            tr(StringKeys.titleDevices),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, '/advanced');
+                            Navigator.pushNamed(context, NavigationPaths.settingsAdvanced);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -243,7 +243,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('title-view-advanced'),
+                            tr(StringKeys.titleAdvanced),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
@@ -258,7 +258,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr('list-item-settings-logout'),
+                            tr(StringKeys.listItemSettingsLogout),
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Visibility(

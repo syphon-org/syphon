@@ -12,6 +12,8 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -146,12 +148,9 @@ class EmailStepState extends State<EmailVerifyStep> {
                               onTap: () {
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) =>
-                                      DialogExplaination(
-                                    title: Strings
-                                        .titleDialogUserVerifyRequirement,
-                                    content:
-                                        Strings.contentExplainPasswordReset,
+                                  builder: (BuildContext context) => DialogExplaination(
+                                    title: Strings.titleDialogUserVerifyRequirement,
+                                    content: Strings.contentExplainPasswordReset,
                                     onConfirm: () {
                                       Navigator.pop(context);
                                     },
@@ -323,8 +322,7 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.session != null &&
-            store.state.authStore.session!.length > 0,
+        session: store.state.authStore.session != null && store.state.authStore.session!.length > 0,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

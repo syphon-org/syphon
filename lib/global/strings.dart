@@ -1,28 +1,9 @@
 import 'package:syphon/global/values.dart';
 
-// Use this to reference JSON defined
-// string IDs for i18n library reference
-class StringIds {
-  static const titleConfirmPassword = 'title-confirm-password';
-  static const promptConfirmDeactivation = 'prompt-confirm-deactivate';
-}
-
 /// Will be converted to
 /// i18n json soon, but a "String"
 /// class below is just a stub for now
 class Strings {
-  // View Titles
-  static const titleProfile = 'Set up Your Profile';
-  static const titleSettings = 'Settings';
-  static const titleAdvanced = 'Advanced';
-  static const titleInvite = 'Invite';
-  static const titleSearchGroups = 'Explore Groups';
-  static const titleSearchUsers = 'Search Users';
-  static const titleInviteusers = 'Invite Users';
-  static const titleRoomUsers = 'All Room Users';
-  static const titleCreateGroup = 'Create A Group Chat';
-  static const titleCreateGroupPublic = 'Create A Public Group';
-
   // Dialog Titles
   static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
   static const titleDialogEncryption = 'Encrypt Chat?';
@@ -34,16 +15,9 @@ class Strings {
   static const titleDialogUserVerifyRequirement = 'User verification';
   static const titleDialogVerifyEmailRequirement = 'Confirm email';
 
-  // Placeholders
-  static const placeholderHomeserverSearch = 'Search for homeservers...';
-
   // Labels
-  static const labelSyncing = 'syncing chats...';
-  static const labelSearching = 'Searching...';
-  static const labelSearchForHomeservers = 'Search for homeservers...';
   static const labelSearchForUsers = 'Search for a user...';
   static const labelSearchedUsers = 'Matched Users';
-  static const labelUsersSection = 'Users';
   static const labelRecentUsers = 'Recent Users';
   static const labelKnownUsers = 'Known Users';
   static const labelSearchResults = 'Search Results';
@@ -55,13 +29,9 @@ class Strings {
   static const labelOff = 'Off';
 
   // Buttons
-  static const buttonLogin = 'log in';
-  static const buttonLoginSSO = 'single sign on';
   static const buttonSaveGeneric = 'save';
   static const buttonSendVerification = 'send verification email';
   static const buttonConfirmVerification = 'confirm verification';
-  static const buttonSignupNext = 'continue';
-  static const buttonSignupFinish = 'finish';
   static const buttonLetsChat = 'let\'s chat';
   static const buttonCreate = 'create';
   static const buttonCancel = 'cancel';
@@ -79,8 +49,6 @@ class Strings {
   static const buttonTextSeeAllUsers = 'See All Users';
   static const buttonIntroExistQuestion = 'Already have a username?';
   static const buttonIntroExistAction = 'Login';
-  static const buttonLoginCreateQuestion = 'Don\'t have a username?';
-  static const buttonLoginCreateAction = 'Create One';
   static const buttonTextLogin = 'Login';
 
   // Prompts
@@ -193,9 +161,6 @@ class Strings {
   // Placeholders
   static const placeholderInputMatrixUnencrypted = 'Matrix message (unencrypted)';
   static const placeholderInputMatrixEncrypted = 'Matrix message';
-
-  // Tooltips
-  static const tooltipSelectHomeserver = 'Select your usernames homeserver';
 
   // Accessibility
   static const semanticsPrivateMessage = 'A person holding up a private message';

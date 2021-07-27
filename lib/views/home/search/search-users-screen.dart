@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -11,6 +13,8 @@ import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -299,7 +303,7 @@ class SearchUserState extends State<SearchUserScreen> {
       builder: (context, props) {
         return Scaffold(
           appBar: AppBarSearch(
-            title: Strings.titleSearchUsers,
+            title: tr(StringKeys.titleSearchUsers),
             label: 'Search for a user...',
             tooltip: 'Search users',
             brightness: Brightness.dark,

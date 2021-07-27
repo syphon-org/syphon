@@ -8,6 +8,8 @@ import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
@@ -123,9 +125,7 @@ class DialogConfirmPassword extends StatelessWidget {
                   child: !props.loading
                       ? Text(Strings.buttonConfirmOfficial,
                           style: TextStyle(
-                            color: props.valid
-                                ? Theme.of(context).primaryColor
-                                : Color(Colours.greyDisabled),
+                            color: props.valid ? Theme.of(context).primaryColor : Color(Colours.greyDisabled),
                           ))
                       : LoadingIndicator(),
                 ),

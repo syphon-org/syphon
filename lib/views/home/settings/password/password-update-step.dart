@@ -9,6 +9,8 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
@@ -59,8 +61,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                     ),
                     child: SvgPicture.asset(
                       Assets.heroSignupPassword,
-                      semanticsLabel:
-                          'User thinking up a password in a swirl of wind',
+                      semanticsLabel: 'User thinking up a password in a swirl of wind',
                     ),
                   ),
                 ),

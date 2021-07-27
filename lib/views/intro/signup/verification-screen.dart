@@ -10,6 +10,8 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -23,8 +25,7 @@ class VerificationScreen extends StatefulWidget {
   VerificationScreenState createState() => VerificationScreenState();
 }
 
-class VerificationScreenState extends State<VerificationScreen>
-    with WidgetsBindingObserver {
+class VerificationScreenState extends State<VerificationScreen> with WidgetsBindingObserver {
   late bool sending;
   bool? success;
 
@@ -100,8 +101,7 @@ class VerificationScreenState extends State<VerificationScreen>
                             ),
                             child: SvgPicture.asset(
                               Assets.heroSignupVerificationView,
-                              semanticsLabel:
-                                  'Letter in envelop floating upward with attached balloons',
+                              semanticsLabel: 'Letter in envelop floating upward with attached balloons',
                             ),
                           ),
                         ),
@@ -129,9 +129,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                       child: Text(
                                         'Verify your email address',
                                         textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5,
+                                        style: Theme.of(context).textTheme.headline5,
                                       ),
                                     ),
                                     Positioned(
@@ -141,12 +139,9 @@ class VerificationScreenState extends State<VerificationScreen>
                                         onTap: () {
                                           showDialog(
                                             context: context,
-                                            builder: (BuildContext context) =>
-                                                DialogExplaination(
-                                              title: Strings
-                                                  .titleDialogEmailVerifiedRequirement,
-                                              content: Strings
-                                                  .contentEmailVerifiedRequirement,
+                                            builder: (BuildContext context) => DialogExplaination(
+                                              title: Strings.titleDialogEmailVerifiedRequirement,
+                                              content: Strings.contentEmailVerifiedRequirement,
                                               onConfirm: () {
                                                 Navigator.pop(context);
                                               },
@@ -158,8 +153,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                           width: 20,
                                           child: Icon(
                                             Icons.info_outline,
-                                            color:
-                                                Theme.of(context).accentColor,
+                                            color: Theme.of(context).accentColor,
                                             size: 20,
                                           ),
                                         ),
@@ -210,8 +204,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                   text: 'check verification',
                                   disabled: sending || props.loading,
                                   onPressed: () async {
-                                    final result = await props.onCreateUser(
-                                        enableErrors: true);
+                                    final result = await props.onCreateUser(enableErrors: true);
                                     setState(() {
                                       success = result;
                                     });

@@ -69,7 +69,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
         builder: (context, props) {
           return Scaffold(
             appBar: AppBarSearch(
-              title: tr(StringKeys.titleViewHomeserverSearch),
+              title: tr(StringKeys.titleHomeserverSearch),
               label: tr(StringKeys.labelSearchHomeservers),
               tooltip: 'Search Homeservers',
               brightness: Brightness.dark,

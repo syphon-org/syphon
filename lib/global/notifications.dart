@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 
@@ -29,8 +31,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   Function? onMessage,
   Function? onSaveToken,
   Future<dynamic> Function(String?)? onSelectNotification,
-  Future<dynamic> Function(int, String?, String?, String?)?
-      onDidReceiveLocalNotification,
+  Future<dynamic> Function(int, String?, String?, String?)? onDidReceiveLocalNotification,
 }) async {
   // Currently mobile only
   if (!(Platform.isIOS || Platform.isAndroid)) {
@@ -54,8 +55,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
     iOS: initializationSettingsIOS,
   );
 
-  final FlutterLocalNotificationsPlugin pluginInstance =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin pluginInstance = FlutterLocalNotificationsPlugin();
 
   await pluginInstance.initialize(
     initializationSettings,
@@ -101,8 +101,7 @@ Future<bool> promptNativeNotificationsRequest({
     //
 
     result = await pluginInstance
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -304,24 +303,15 @@ Future showMessageNotificationTest({
   // /
   // / Recommended to create this regardless as the behaviour may vary as
   // / mentioned in https://developer.android.com/training/notify-user/group
-  const List<String> lines = <String>[
-    'ABC 123 Check this out',
-    'XYZ URI    Launch Party'
-  ];
-  const InboxStyleInformation inboxStyleInformation = InboxStyleInformation(
-      lines,
-      contentTitle: '2 messages',
-      summaryText: 'janedoe@example.com');
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          styleInformation: inboxStyleInformation,
-          groupKey: groupKey,
-          setAsGroupSummary: true);
+  const List<String> lines = <String>['ABC 123 Check this out', 'XYZ URI    Launch Party'];
+  const InboxStyleInformation inboxStyleInformation =
+      InboxStyleInformation(lines, contentTitle: '2 messages', summaryText: 'janedoe@example.com');
+  const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      groupChannelId, groupChannelName, groupChannelDescription,
+      styleInformation: inboxStyleInformation, groupKey: groupKey, setAsGroupSummary: true);
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
-  await pluginInstance.show(
-      3, 'Attention', 'Two messages', platformChannelSpecifics);
+  await pluginInstance.show(3, 'Attention', 'Two messages', platformChannelSpecifics);
 }
 
 Future showDebugNotification({

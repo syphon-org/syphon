@@ -35,7 +35,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleViewPreferencesChat),
+                tr(StringKeys.titleChatSettings),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -311,7 +311,7 @@ class Props extends Equatable {
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {
           store.dispatch(addInfo(
-            message: tr('alert-restart-app-effect'),
+            message: tr(StringKeys.alertAppRestartEffect),
             action: 'Dismiss',
           ));
           store.dispatch(incrementLanguage(context));

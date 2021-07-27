@@ -17,6 +17,7 @@ import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
@@ -237,11 +238,8 @@ class AppBarChatState extends State<AppBarChat> {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    '/home/chat/settings',
-                    arguments: ChatDetailArguments(
-                      roomId: widget.room!.id,
-                      title: widget.room!.name,
-                    ),
+                    NavigationPaths.chatDetails,
+                    arguments: ChatDetailsArguments(roomId: widget.room!.id, title: widget.room!.name),
                   );
                 },
                 child: Container(
@@ -352,7 +350,7 @@ class AppBarChatState extends State<AppBarChat> {
                     case ChatOptions.inviteFriends:
                       Navigator.pushNamed(
                         context,
-                        '/home/user/invite',
+                        NavigationPaths.userInvite,
                         arguments: InviteUsersArguments(
                           roomId: widget.room!.id,
                         ),
@@ -361,8 +359,8 @@ class AppBarChatState extends State<AppBarChat> {
                     case ChatOptions.chatSettings:
                       Navigator.pushNamed(
                         context,
-                        '/home/chat/settings',
-                        arguments: ChatDetailArguments(
+                        NavigationPaths.chatDetails,
+                        arguments: ChatDetailsArguments(
                           roomId: widget.room!.id,
                           title: widget.room!.name,
                         ),

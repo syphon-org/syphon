@@ -6,13 +6,15 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogStartChat extends StatelessWidget {
-  DialogStartChat({
+  const DialogStartChat({
     Key? key,
     this.user,
     this.title = 'Try chatting',
@@ -35,7 +37,7 @@ class DialogStartChat extends StatelessWidget {
 
     return StatefulBuilder(
       builder: (context, setState) {
-        double width = MediaQuery.of(context).size.width;
+        final double width = MediaQuery.of(context).size.width;
 
         return SimpleDialog(
           shape: RoundedRectangleBorder(
@@ -104,11 +106,9 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-              [MatrixAuthTypes.RECAPTCHA]['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token,
-            {required BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

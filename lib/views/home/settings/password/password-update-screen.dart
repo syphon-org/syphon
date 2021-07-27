@@ -8,29 +8,30 @@ import 'package:redux/redux.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'password-update-step.dart';
 
-class PasswordUpdateView extends StatefulWidget {
-  const PasswordUpdateView({Key? key}) : super(key: key);
+class PasswordUpdateScreen extends StatefulWidget {
+  const PasswordUpdateScreen({Key? key}) : super(key: key);
 
+  @override
   PasswordUpdateState createState() => PasswordUpdateState();
 }
 
-class PasswordUpdateState extends State<PasswordUpdateView> {
+class PasswordUpdateState extends State<PasswordUpdateScreen> {
   int currentStep = 0;
   bool naving = false;
   bool validStep = false;
   bool onboarding = false;
   PageController? pageController;
 
-  var sections = [
-    PasswordUpdateStep(),
-  ];
+  var sections = [PasswordUpdateStep()];
 
-  PasswordUpdateState({Key? key});
+  PasswordUpdateState();
 
   @override
   void initState() {
@@ -151,18 +152,24 @@ class _Props extends Equatable {
   final Map interactiveAuths;
   final Function onSavePassword;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.isPasswordValid,
     required this.interactiveAuths,
     required this.onSavePassword,
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        isPasswordValid,
+        interactiveAuths,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid: store.state.authStore.isPasswordValid &&
-            store.state.authStore.passwordCurrent != null &&
-            store.state.authStore.passwordCurrent.length > 0,
+        isPasswordValid:
+            store.state.authStore.isPasswordValid && store.state.authStore.passwordCurrent.isNotEmpty,
         interactiveAuths: store.state.authStore.interactiveAuths,
         onSavePassword: () async {
           final valid = store.state.authStore.isPasswordValid;
@@ -174,11 +181,4 @@ class _Props extends Equatable {
           );
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        isPasswordValid,
-        interactiveAuths,
-      ];
 }

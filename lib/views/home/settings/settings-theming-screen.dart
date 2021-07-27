@@ -10,6 +10,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
@@ -82,7 +84,7 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleViewTheming),
+                tr(StringKeys.titleTheming),
                 style: Theme.of(context).textTheme.headline6!.copyWith(
                       color: Colors.white,
                     ),

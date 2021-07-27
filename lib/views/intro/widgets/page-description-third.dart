@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 
 class ThirdDescriptionPage extends StatelessWidget {
   const ThirdDescriptionPage({Key? key, this.title}) : super(key: key);

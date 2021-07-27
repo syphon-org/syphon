@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,8 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -274,10 +277,7 @@ class LoginScreenState extends State<LoginScreen> {
                 tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    NavigationPaths.theming,
-                  );
+                  Navigator.pushNamed(context, NavigationPaths.theming);
                   props.onDebug();
                 },
               ),
@@ -426,7 +426,7 @@ class LoginScreenState extends State<LoginScreen> {
                                 Visibility(
                                   visible: props.isPasswordLoginAvailable,
                                   child: ButtonSolid(
-                                    text: Strings.buttonLogin,
+                                    text: tr(StringKeys.buttonLogin),
                                     loading: props.loading && currentAuthType == AuthTypes.Password,
                                     disabled: !props.isPasswordLoginAttemptable || currentAuthType != null,
                                     onPressed: () => onLoginPassword(props),
@@ -437,7 +437,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonSolid(
-                                      text: Strings.buttonLoginSSO,
+                                      text: tr(StringKeys.buttonLoginSSO),
                                       loading: props.loading && currentAuthType == AuthTypes.SSO,
                                       disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
                                       onPressed: () => onLoginSSO(props),
@@ -449,7 +449,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonText(
-                                      text: Strings.buttonLoginSSO,
+                                      text: tr(StringKeys.buttonLoginSSO),
                                       loading: props.loading && currentAuthType == AuthTypes.SSO,
                                       disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
                                       onPressed: () => onLoginSSO(props),
@@ -476,7 +476,7 @@ class LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                Strings.buttonLoginCreateQuestion,
+                                tr(StringKeys.buttonTextSignupQuestion),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 18,
@@ -486,7 +486,7 @@ class LoginScreenState extends State<LoginScreen> {
                               Container(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: Text(
-                                  Strings.buttonLoginCreateAction,
+                                  tr(StringKeys.buttonTextSignupAction),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                         color: Theme.of(context).primaryColor,

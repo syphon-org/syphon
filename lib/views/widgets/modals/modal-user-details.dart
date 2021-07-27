@@ -10,13 +10,15 @@ import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
-import 'package:syphon/views/home/search/search-rooms-screen.dart';
+import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
@@ -46,8 +48,8 @@ class ModalUserDetails extends StatelessWidget {
   onNavigateToInvite({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.searchRooms,
-      arguments: RoomSearchArguments(
+      NavigationPaths.searchChats,
+      arguments: ChatSearchArguments(
         user: props.user,
       ),
     );
@@ -74,7 +76,7 @@ class ModalUserDetails extends StatelessWidget {
           if (newRoomId != null) {
             Navigator.popAndPushNamed(
               context,
-              '/home/chat',
+              NavigationPaths.chat,
               arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
@@ -172,7 +174,7 @@ class ModalUserDetails extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                      onTap: () => this.onMessageUser(
+                      onTap: () => onMessageUser(
                         context: context,
                         props: props,
                       ),
@@ -194,7 +196,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                     ),
                     ListTile(
-                      onTap: () => this.onNavigateToInvite(
+                      onTap: () => onNavigateToInvite(
                         context: context,
                         props: props,
                       ),
@@ -211,7 +213,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                     ),
                     ListTile(
-                      onTap: () => this.onNavigateToProfile(
+                      onTap: () => onNavigateToProfile(
                         context: context,
                         props: props,
                       ),
