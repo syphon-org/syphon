@@ -38,6 +38,7 @@ class IntroScreenState extends State<IntroScreen> {
 
   int currentStep = 0;
   bool onboarding = false;
+  bool showingTerms = false;
   String loginText = Strings.buttonIntroExistQuestion;
   PageController? pageController;
 
@@ -76,13 +77,13 @@ class IntroScreenState extends State<IntroScreen> {
     final double width = MediaQuery.of(context).size.width;
 
     // TODO: decide on alway showing alpha aggrement on intro
-    if (alphaAgreement == null || true) {
+    if (alphaAgreement == null || true && !showingTerms) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Container(
+        builder: (dialogContext) => Container(
           constraints: BoxConstraints(
             minWidth: width * 0.9,
           ),
@@ -148,7 +149,7 @@ class IntroScreenState extends State<IntroScreen> {
                     child: TextButton(
                       onPressed: () async {
                         await store.dispatch(acceptAgreement());
-                        Navigator.of(context).pop();
+                        Navigator.of(dialogContext).pop();
                       },
                       child: Text(
                         Strings.buttonAgree,
@@ -162,6 +163,10 @@ class IntroScreenState extends State<IntroScreen> {
           ),
         ),
       );
+
+      setState(() {
+        showingTerms = true;
+      });
     }
   }
 
