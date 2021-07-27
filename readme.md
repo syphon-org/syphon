@@ -35,6 +35,9 @@ a privacy centric matrix client - now in open alpha*
     <a href="https://matrix.to/#/#syphon:matrix.org">
         <img src="https://img.shields.io/matrix/syphon:matrix.org?color=teal"/>
     </a>
+    <a href="https://hosted.weblate.org/engage/syphon/">
+      <img src="https://hosted.weblate.org/widgets/syphon/-/svg-badge.svg" alt="Translation status" />
+    </a>
 </p>
 
 <p align='center'> 
