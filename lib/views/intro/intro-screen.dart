@@ -39,7 +39,7 @@ class IntroScreenState extends State<IntroScreen> {
   int currentStep = 0;
   bool onboarding = false;
   bool showingTerms = false;
-  String loginText = Strings.buttonIntroExistQuestion;
+  String loginText = Strings.buttonTextExistingUser;
   PageController? pageController;
 
   final List<Widget> sections = [
@@ -78,7 +78,8 @@ class IntroScreenState extends State<IntroScreen> {
 
     // TODO: decide on alway showing alpha aggrement on intro
     if (alphaAgreement == null || true && !showingTerms) {
-      final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
+      final termsTitle =
+          Platform.isIOS ? tr(StringKeys.titleDialogTerms) : tr(StringKeys.titleDialogTermsAlpha);
 
       showDialog(
         context: context,
@@ -138,7 +139,7 @@ class IntroScreenState extends State<IntroScreen> {
                 textAlign: TextAlign.center,
               ),
               Text(
-                Strings.confirmationAppTermsOfService,
+                Strings.confirmAppTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),
               Row(
@@ -152,7 +153,7 @@ class IntroScreenState extends State<IntroScreen> {
                         Navigator.of(dialogContext).pop();
                       },
                       child: Text(
-                        Strings.buttonAgree,
+                        Strings.buttonTextAgreement,
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -232,7 +233,7 @@ class IntroScreenState extends State<IntroScreen> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = Strings.buttonIntroExistQuestion;
+                            loginText = Strings.buttonTextExistingUser;
                             onboarding = false;
                           });
                         }
@@ -299,7 +300,7 @@ class IntroScreenState extends State<IntroScreen> {
                                   Container(
                                     padding: const EdgeInsets.only(left: 4),
                                     child: Text(
-                                      Strings.buttonIntroExistAction,
+                                      Strings.buttonTextExistingAction,
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                             color: Theme.of(context).primaryColor,

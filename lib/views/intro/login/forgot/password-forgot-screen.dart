@@ -50,8 +50,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogExplaination(
-        title: Strings.titleDialogVerifyEmailRequirement,
-        content: Strings.contentConfirmPasswordReset,
+        title: tr(StringKeys.titleConfirmEmail),
+        content: tr(StringKeys.titleConfirmEmail),
         onConfirm: () {
           Navigator.pop(context);
         },

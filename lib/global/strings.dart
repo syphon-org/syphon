@@ -1,172 +1,115 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 
-/// Will be converted to
-/// i18n json soon, but a "String"
-/// class below is just a stub for now
+///
+/// Strings
+///
+/// Hides library used for i18n / localization and
+/// gives static references to all strings used in the app
+///
 class Strings {
-  // Dialog Titles
-  static const titleDialogDeleteKeys = 'Confirm Deleting Keys';
-  static const titleDialogEncryption = 'Encrypt Chat?';
-  static const titleDialogCaptcha = 'Complete Captcha';
-  static const titleDialogTerms = 'Confirm Terms Of Service';
-  static const titleDialogTermsAlpha = 'Confirm Open Alpha Terms Of Service';
-  static const titleDialogEmailRequirement = 'Email requirement';
-  static const titleDialogEmailVerifiedRequirement = 'Email verification';
-  static const titleDialogUserVerifyRequirement = 'User verification';
-  static const titleDialogVerifyEmailRequirement = 'Confirm email';
+  // Titles
+  static final titleIntro = tr('title-intro', args: [Values.appName]);
+  static final titleEmailRequirement = tr('title-dialog-email-requirement');
+
+  // Headers
+  static final headerIntro = tr('header-intro');
+  static final headerLogin = tr('header-login');
 
   // Labels
-  static const labelSearchForUsers = 'Search for a user...';
-  static const labelSearchedUsers = 'Matched Users';
-  static const labelRecentUsers = 'Recent Users';
-  static const labelKnownUsers = 'Known Users';
-  static const labelSearchResults = 'Search Results';
-  static const labelRoomNameDefault = 'New Chat';
-  static const labelNoMessages = 'no messages found';
-  static const labelNoGroups = 'no groups found';
-  static const labelDeletedMessage = 'This message was deleted';
-  static const labelOn = 'On';
-  static const labelOff = 'Off';
+  static final labelSearchResults = tr('label-search-results'); // 'Search Results'
+  static final labelRoomNameDefault = tr('label-chat-default'); // 'New Chat'
+  static final labelNoMessages = tr('label-messages-empty'); // 'no messages found';
+  static final labelNoGroups = tr('label-groups-empty'); // 'no groups found';
+  static final labelEncryptedMessage = tr('label-message-encrypted'); //  'Encrypted Message';
+  static final labelDeletedMessage = tr('label-message-deleted'); // 'This message was deleted';
+  static final labelOn = tr('label-on'); // 'On';
+  static final labelOff = tr('label-off'); // 'Off';
 
   // Buttons
-  static const buttonSaveGeneric = 'save';
-  static const buttonSendVerification = 'send verification email';
-  static const buttonConfirmVerification = 'confirm verification';
-  static const buttonLetsChat = 'let\'s chat';
-  static const buttonCreate = 'create';
-  static const buttonCancel = 'cancel';
-  static const buttonDeactivate = 'deactivate';
-  static const buttonQuit = 'quit';
-  static const buttonConfirm = 'got it';
-  static const buttonConfirmOfficial = 'confirm';
-  static const buttonConfirmAlt = 'ok';
-  static const buttonBlocKUser = 'block user';
-  static const buttonDeleteKeys = 'delete keys';
-  static const buttonResetPassword = 'reset password';
-  static const buttonAgree = 'I Agree';
+  static final buttonSaveGeneric = tr('button-save-generic'); // 'save';
+  static final buttonSendVerification = tr('button-send-verification'); // 'send verification email';
+  static final buttonConfirmVerification = tr('button-confirm-verification'); //  'confirm verification';
+  static final buttonStartChat = tr('button-start-chat'); // 'let\'s chat';
+  static final buttonCreate = tr('button-create'); // 'create';
+  static final buttonCancel = tr('button-cancel'); //'cancel';
+  static final buttonDeactivate = tr('button-deactivate'); //  'deactivate';
+  static final buttonQuit = tr('button-quit'); //  'quit';
+  static final buttonConfirm = tr('button-confirm'); //  'got it';
+  static final buttonConfirmFormal = tr('button-confirm-formal'); // 'confirm';
+  static final buttonConfirmAlt = tr('button-confirm-alt'); //  'ok';
+  static final buttonBlocKUser = tr('button-block-user'); //  'block user';
+  static final buttonDeleteKeys = tr('button-delete-key'); //  'delete keys';
+  static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
-  // Text Buttons
-  static const buttonTextSeeAllUsers = 'See All Users';
-  static const buttonIntroExistQuestion = 'Already have a username?';
-  static const buttonIntroExistAction = 'Login';
-  static const buttonTextLogin = 'Login';
-
-  // Prompts
-  static const passwordRecommendationDefault =
-      'Try thinking up 3 or more random\nwords you\'ll easily remember';
-
-  // Errors
-  static const alertInviteUnknownUser =
-      'This user doesn\'t appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.';
-  static const errorMessageSendingFailed = 'Message Failed To Send';
-  static const errorCheckHomeserver =
-      'This server failed the \'well-known\' check, make sure the server is configured correctly';
-
-  // intro
-  static const contentIntroFirstPartOne =
-      '${Values.appName} works by using an encrypted \nand decentralized protocol \ncalled ';
-
-  static const contentIntroSecondPartOne = 'Matrix enables you to message others \nwith';
-  static const contentIntroSecondPartBold = 'privacy and control ';
-  static const contentIntroSecondPartTwo = 'where the\nmessages are stored';
-
-  static const contentAdvancedColorDialog =
-      'Are you sure you want to use advanced color selection?\n\nSelecting the same color\nas the background may prevent you from seeing parts of the app!';
-
-  static const contentIntroThird =
-      'Both Matrix and ${Values.appName} are developed\nopenly by organizations and people,\nnot corporations';
-
-  static const contentIntroFinal =
-      'By using ${Values.appName} and other Matrix clients\nwe can make private messaging \naccessible to everyone';
-
-  static const contentNotificationBackgroundService = 'Background connection enabled';
-
-  // Content
-  static const contentTopicEmpty = 'No Topic Description';
-  static const contentDeleteDevices = 'You will have to sign in again on these devices if you remove them.';
-
-  static const contentDeleteDeviceKeyWarning =
-      "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!";
-
-  static const contentDeactivateAccount =
-      'THIS WILL PERMANENTLY DELETE YOUR ACCOUNT\n\nYou will be unable to recover any data or access for this account after deactivation.\nPlease take careful consideration before doing this!';
-
-  static const contentDeactivateAccountFinal =
-      'There is no way to recover this account after it\'s deleted. You will immediately be logged out of your account and it will become unavailable.\n\nThis is your final warning regarding deactivation. If you are sure you\'re sure, press deactivate below.';
-
-  static const contentEncryptedMessage = 'Encrypted Message';
-  static const contentDeletedMessage = 'This message was deleted';
-
-  static const contentEmailRequirement =
-      'This homeserver requires an email for registration, your email will be visible to whoever or whatever is in control of the homeserver. Make sure you trust this homeserver before submitting this information';
-
-  static const contentExplainPasswordReset =
-      'A verification email will be sent to your inbox before resetting your password. After verification, you\'ll be able to set and confirm a new password.';
-
-  static const contentConfirmPasswordReset =
-      'Click on the link sent to your email. After clicking the link, press the continue button below to change your password.';
-
-  static const contentPasswordRequirements =
-      'Each homeserver may have different requirements for passwords.\n\nIf you\'re having trouble, try creating a password including a lower-case letter, an upper-case letter, a number and a symbol and with at least 8 characters';
-
-  static const contentEmailVerifiedRequirement =
-      'This homeserver requires a verified email to complete registration, you\'ll need to click the link in the email address to continue. Make sure you trust this homeserver before clicking the verification link.';
-
-  // Confirmations
-  static const confirmationDeleteKeys =
-      'Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.';
-
-  static const confirmationInvite =
-      'Are you sure you want to invite the following user to the following room?';
-
-  static const confirmationInvites =
-      'Are you sure you want to invite the selected users to the following room?';
-
-  static const confirmationStartChat =
-      'Even if you don\'t send a message, ' + 'the user will still see your invite to chat.';
-  static const confirmationAttemptChat = 'Even if you don\'t send a message, ' +
-      'the user will still see your invite to chat if they exist.\n\nDo you want to try chatting with this username?';
-  static const confirmationAppTermsOfService =
-      'THIS SOFTWARE (${Values.appName}) IS PROVIDED BY THE AUTHOR \'\'AS IS\'\' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.';
-  static const confirmationNotifications =
-      'Your device will prompt you to turn on notifications for ${Values.appName}.\n\nDo you want to turn on message notifications?';
-  static const confirmationInteractiveAuth =
-      'In order to perform this action, you\'ll need to enter your password again';
-
-  static const confirmationThanks = 'Thanks for trying out ${Values.appName}!\n\n';
-
-  static const confirmationAlphaVersion = 'Please be aware this app is still very much in Alpha.\n';
-
-  static const confirmationAlphaWarning =
-      'Do not use, nor do I recommend using, Syphon where proven and independently verified security is required.\n';
-
-  static const confirmationAlphaWarningAlt =
-      'You may lose data using this application as features and bugs are worked out.\n';
-
-  static const confirmationConclusion =
-      'Please read the below terms and conditions for this application and if you agree tap "I Agree" to continue:\n\n';
-
-  static const confirmationAcceptInvite =
-      'If you accept this room invite, the users in the room will be made aware you\'ve accepted. Are you sure you want to accept now?';
-
-  static const confirmationEncryption =
-      'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this chat?';
-
-  static const confirmationGroupEncryption =
-      'After you encrypt a chat, you cannot go back to sending messages unencrypted. Are you sure you want to encrypt this group chat?\n\nPlease be aware Group E2EE is still a work in progress. You may lose message data!';
-
-  static const confirmationModifySyncInterval =
-      'Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.';
+  // Buttons (Text)
+  static final buttonTextAgreement = tr('button-text-agreement'); // 'I Agree';
+  static final buttonTextSeeAllUsers = tr('button-text-see-all-users'); // ; 'See All Users';
+  static final buttonTextExistingUser = tr('button-text-existing-user'); // 'Already have a username?';
+  static final buttonTextExistingAction = tr('button-text-login'); // 'Login';
+  static final buttonTextLogin = tr('button-text-login'); // 'Login';
 
   // Placeholders
-  static const placeholderInputMatrixUnencrypted = 'Matrix message (unencrypted)';
-  static const placeholderInputMatrixEncrypted = 'Matrix message';
+  static final placeholderTopic = tr('placeholder-topic');
+  static final placeholderMatrixUnencrypted = tr('label-message-matrix-unencrypted');
+  static final placeholderMatrixEncrypted = tr('label-message-matrix');
+
+  // Warnings
+  static final warningDeactivateAccount = tr('warning-deactivate-account');
+  static final warrningDeactivateAccountFinal = tr('warning-deactivate-account-final');
+
+  // Alerts
+  static final alertInviteUnknownUser = tr('alert-invite-user-unknown');
+  static final alertMessageSendingFailed = tr('alert-message-failed'); // 'Message Failed To Send';
+  static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
+  static final alertFeatureInProgress = tr(StringKeys.alertFeatureInProgress);
+
+  // Alert (Non-Flutter / Background Thread)
+  static const alertBackgroundService = 'Background connection enabled';
+
+  // Content
+  static final contentPasswordRecommendation = tr('content-password-recommendation');
+  static final contentDeleteDevices = tr('content-dialog-devices-delete');
+  static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
+  static final contentEmailRequirement = tr('content-signup-email-requirement');
+  static final contentForgotEmailVerification = tr('content-forgot-email-verification');
+  static final contentConfirmPasswordReset = tr('content-confirm-password-reset');
+  static final contentPasswordRequirements = tr('content-password-requirements');
+  static final contentEmailVerifiedRequirement = tr('content-signup-email-verification');
+
+  static final contentIntroFirstPartOne = tr('content-intro-section-one', args: [Values.appName]);
+  static final contentIntroSecondPartOne = tr('content-intro-section-two');
+  static final contentIntroSecondPartBold = tr('content-intro-section-two-part-two');
+  static final contentIntroSecondPartTwo = tr('content-intro-section-two-part-three');
+  static final contentIntroThird = tr('content-intro-section-three', args: [Values.appName]);
+  static final contentIntroFinal = tr('content-intro-section-four', args: [Values.appName]);
+
+  // Confirmations
+  static final confirmationInvite = tr('confirm-invite');
+  static final confirmationInvites = tr('confirm-invit-multiple');
+  static final confirmStartChat = tr('confirm-start-chat');
+  static final confirmAttemptChat = tr('confirm-attempt-chat');
+  static final confirmAdvancedColors = tr('confirm-advanced-colors');
+  static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);
+  static final confirmnEnableNotifications = tr('confirm-enable-notifications', args: [Values.appName]);
+  static final confirmationThanks = tr('content-thanks', args: [Values.appName]);
+  static final confirmAuthVerification = tr('confirm-auth-verification');
+  static final confirmAcceptInvite = tr('confirm-chat-invite');
+  static final confirmEncryption = tr('confirm-encryption');
+  static final confirmGroupEncryption = tr('confirm-encryption-group');
+  static final confirmModifySyncInterval = tr('content-sync-interval');
+
+  static final confirmationAlphaVersion = tr('confirm-alpha-version');
+  static final confirmationAlphaWarning = tr('confirm-alpha-warning');
+  static final confirmationAlphaWarningAlt = tr('confirm-alpha-warning-alt');
+  static final confirmationConclusion = tr('confirm-terms-of-service-alt');
 
   // Accessibility
-  static const semanticsPrivateMessage = 'A person holding up a private message';
-  static const semanticsSendArrow = 'Right arrow prompt to send a message';
-  static const semanticsIntroFinal = 'Two different people feeling confident and lookin\' good';
-  static const semanticsIntroThird = 'People lounging around and messaging';
-  static const semanticsLabelImageIntro = 'Relaxed, Lounging User';
-  static const semanticsLabelHomeEmpty = 'Tiny cute monsters hidding behind foliage';
+  static final semanticsImageIntro = tr('semnatics-image-intro');
+  static final semanticsPrivateMessage = tr('semnatics-image-private-message');
+  static final semanticsSendArrow = tr('semnatics-image-send-arrow');
+  static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
+  static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
+  static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
 }

@@ -84,7 +84,7 @@ class SearchUserState extends State<SearchUserScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Chat with ${formatUsername(user!)}',
-        content: Strings.confirmationStartChat,
+        content: Strings.confirmStartChat,
         onStartChat: () async {
           setState(() {
             creatingRoomDisplayName = user.displayName;
@@ -120,7 +120,7 @@ class SearchUserState extends State<SearchUserScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Try chatting with ${formatUsername(user)}',
-        content: Strings.confirmationAttemptChat,
+        content: Strings.confirmAttemptChat,
         onStartChat: () async {
           setState(() {
             creatingRoomDisplayName = user.displayName;
@@ -226,7 +226,7 @@ class SearchUserState extends State<SearchUserScreen> {
             child: Row(
               children: [
                 Text(
-                  Strings.labelRecentUsers,
+                  tr(StringKeys.labelUsersRecent),
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.subtitle2,
                 ),
@@ -262,7 +262,7 @@ class SearchUserState extends State<SearchUserScreen> {
           child: Row(
             children: [
               Text(
-                Strings.labelKnownUsers,
+                tr(StringKeys.labelKnownUsers),
                 textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.subtitle2,
               ),

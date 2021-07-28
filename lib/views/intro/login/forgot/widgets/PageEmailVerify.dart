@@ -12,8 +12,6 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -27,15 +25,16 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class EmailVerifyStep extends StatefulWidget {
   const EmailVerifyStep({Key? key}) : super(key: key);
 
+  @override
   EmailStepState createState() => EmailStepState();
 }
 
 class EmailStepState extends State<EmailVerifyStep> {
-  EmailStepState({Key? key});
-
   Timer? typingTimeout;
   final emailController = TextEditingController();
   final homeserverController = TextEditingController();
+
+  EmailStepState();
 
   @override
   void didChangeDependencies() {
@@ -55,7 +54,7 @@ class EmailStepState extends State<EmailVerifyStep> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        double height = MediaQuery.of(context).size.height;
+        final double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidgetHomeserver = CircularProgressIndicator(
@@ -149,8 +148,8 @@ class EmailStepState extends State<EmailVerifyStep> {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) => DialogExplaination(
-                                    title: Strings.titleDialogUserVerifyRequirement,
-                                    content: Strings.contentExplainPasswordReset,
+                                    title: Strings.titleEmailRequirement,
+                                    content: Strings.contentForgotEmailVerification,
                                     onConfirm: () {
                                       Navigator.pop(context);
                                     },
@@ -185,7 +184,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: "Homeserver",
+                    label: 'Homeserver',
                     hint: 'matrix.org',
                     disableSpacing: true,
                     disabled: props.session,
@@ -252,7 +251,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: "Email",
+                    label: 'Email',
                     disableSpacing: true,
                     disabled: props.session,
                     valid: props.isEmailValid,
@@ -304,7 +303,7 @@ class _Props extends Equatable {
   final Function onSetHomeserver;
   final Function onSelectHomeserver;
 
-  _Props({
+  const _Props({
     required this.email,
     required this.hostname,
     required this.session,
@@ -316,13 +315,21 @@ class _Props extends Equatable {
     required this.onSelectHomeserver,
   });
 
+  @override
+  List<Object> get props => [
+        email,
+        loading,
+        isEmailValid,
+        isHomeserverValid,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         email: store.state.authStore.email,
         hostname: store.state.authStore.hostname,
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.session != null && store.state.authStore.session!.length > 0,
+        session: store.state.authStore.session != null && store.state.authStore.session!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },
@@ -338,12 +345,4 @@ class _Props extends Equatable {
           }
         },
       );
-
-  @override
-  List<Object> get props => [
-        email,
-        loading,
-        isEmailValid,
-        isHomeserverValid,
-      ];
 }

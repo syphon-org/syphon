@@ -274,7 +274,8 @@ class InviteUsersState extends State<InviteUsersScreen> {
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel = searchable.isEmpty ? Strings.labelRecentUsers : Strings.labelSearchedUsers;
+        final usersListLabel =
+            searchable.isEmpty ? tr(StringKeys.labelUsersRecent) : tr(StringKeys.labelUsersResults);
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -302,7 +303,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
                 child: SvgPicture.asset(
                   Assets.iconChevronsRightBeing,
                   color: Colors.white,
-                  semanticsLabel: Strings.semanticsLabelHomeEmpty,
+                  semanticsLabel: Strings.semanticsHomeDefault,
                 ),
               ),
             ),

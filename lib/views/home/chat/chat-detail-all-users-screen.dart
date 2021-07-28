@@ -133,7 +133,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
       builder: (context, props) => Scaffold(
         appBar: AppBarSearch(
           title: tr(StringKeys.titleChatUsers),
-          label: Strings.labelSearchForUsers,
+          label: tr(StringKeys.labelSearchUser),
           tooltip: 'Search users',
           brightness: Brightness.dark,
           focusNode: searchInputFocusNode,

@@ -137,7 +137,7 @@ class EmailStepState extends State<EmailStep> {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) => DialogExplaination(
-                                  title: Strings.titleDialogEmailRequirement,
+                                  title: tr(StringKeys.titleDialogEmailRequirement),
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {
                                     Navigator.pop(context);
@@ -184,7 +184,7 @@ class EmailStepState extends State<EmailStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: "Email",
+                    label: tr(StringKeys.labelEmail),
                     disableSpacing: true,
                     valid: props.isEmailValid,
                     controller: emailController,

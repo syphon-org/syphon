@@ -63,7 +63,7 @@ class ChatInputState extends State<ChatInput> {
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
 
-  String hintText = Strings.placeholderInputMatrixUnencrypted;
+  String hintText = Strings.placeholderMatrixUnencrypted;
 
   @protected
   onMounted(_Props props) {
@@ -173,12 +173,12 @@ class ChatInputState extends State<ChatInput> {
           Color sendButtonColor = const Color(Colours.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
-            hintText = Strings.placeholderInputMatrixUnencrypted;
+            hintText = Strings.placeholderMatrixUnencrypted;
             sendButtonColor = Color(Colours.greyDark);
           }
 
           if (widget.mediumType == MediumType.encryption) {
-            hintText = Strings.placeholderInputMatrixEncrypted;
+            hintText = Strings.placeholderMatrixEncrypted;
             sendButtonColor = Theme.of(context).primaryColor;
           }
 

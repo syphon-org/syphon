@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 
 class DialogInvite extends StatelessWidget {
   const DialogInvite({
@@ -28,7 +26,7 @@ class DialogInvite extends StatelessWidget {
           Container(
             padding: Dimensions.dialogContentPadding,
             child: Text(
-              Strings.confirmationAcceptInvite,
+              Strings.confirmAcceptInvite,
               textAlign: TextAlign.left,
             ),
           ),

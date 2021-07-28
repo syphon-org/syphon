@@ -48,9 +48,7 @@ class DialogCaptcha extends StatelessWidget {
             right: 8,
             bottom: 16,
           ),
-          title: Text(
-            Strings.titleDialogCaptcha,
-          ),
+          title: Text(tr(StringKeys.titleDialogCaptcha)),
           children: <Widget>[
             Container(
               width: width,

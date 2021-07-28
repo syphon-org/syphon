@@ -84,7 +84,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsLabelHomeEmpty,
+              semanticsLabel: Strings.semanticsHomeDefault,
             ),
           ),
           GestureDetector(
@@ -261,7 +261,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                 Container(
                   padding: Dimensions.listPadding,
                   child: Text(
-                    room.topic ?? Strings.contentTopicEmpty,
+                    room.topic ?? Strings.placeholderTopic,
                     style: Theme.of(context).textTheme.caption,
                   ),
                 ),

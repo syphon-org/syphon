@@ -292,7 +292,7 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (message.failed) {
-      status = Strings.errorMessageSendingFailed;
+      status = Strings.alertMessageSendingFailed;
     }
 
     if (message.edited) {
@@ -302,11 +302,11 @@ class MessageWidget extends StatelessWidget {
     String body = message.body ?? '';
     if (message.type == EventTypes.encrypted) {
       if (message.body!.isEmpty) {
-        body = Strings.contentEncryptedMessage;
+        body = Strings.labelEncryptedMessage;
       }
     } else {
       if (message.body!.isEmpty) {
-        body = Strings.contentDeletedMessage;
+        body = Strings.labelDeletedMessage;
         fontStyle = FontStyle.italic;
       }
     }

@@ -6,8 +6,6 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
@@ -18,16 +16,16 @@ class DialogStartChat extends StatelessWidget {
     Key? key,
     this.user,
     this.title = 'Try chatting',
-    this.content = Strings.confirmationAttemptChat,
-    this.action = Strings.buttonLetsChat,
+    this.content,
+    this.action,
     this.onCancel,
     this.onStartChat,
   }) : super(key: key);
 
   final User? user;
   final String title;
-  final String content;
-  final String action;
+  final String? content;
+  final String? action;
   final Function? onCancel;
   final Function? onStartChat;
 
@@ -49,7 +47,9 @@ class DialogStartChat extends StatelessWidget {
             vertical: 12,
           ),
           children: <Widget>[
-            Text(content),
+            Text(
+              content ?? Strings.confirmAttemptChat,
+            ),
             Container(
               padding: EdgeInsets.only(top: 8),
               child: Row(
@@ -67,7 +67,7 @@ class DialogStartChat extends StatelessWidget {
                   ),
                   ButtonText(
                     textWidget: Text(
-                      action,
+                      action ?? Strings.buttonStartChat,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     loading: creating,

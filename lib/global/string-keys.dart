@@ -8,11 +8,6 @@
 /// Glossary is based on en.json
 ///
 class StringKeys {
-  // titles
-  static const titleIntro = 'title-intro';
-  static const titleLogin = 'title-login';
-  static const subtitleIntro = 'subtitle-intro';
-
   // titles (screens / views)
   static const titleProfile = 'title-view-profile';
   static const titleSearchGroups = 'title-view-search-groups';
@@ -29,6 +24,7 @@ class StringKeys {
   static const titleChatSettings = 'title-view-preferences-chat';
   static const titlePrivacy = 'title-view-privacy';
   static const titleHomeserverSearch = 'title-view-homeserver-search';
+  static const titleEmailVerification = 'title-user-verification';
 
   // titles (dialogs)
   static const titleDialogEncryption = 'title-dialog-encryption';
@@ -36,25 +32,31 @@ class StringKeys {
   static const titleDialogTerms = 'title-dialog-terms';
   static const titleDialogTermsAlpha = 'title-dialog-terms-alpha';
   static const titleDialogEmailRequirement = 'title-dialog-email-requirement';
-  static const titleDialogEmailRequirementVerified = 'title-dialog-email-requirement-verified';
+  static const titleDialogSignupEmailVerification = 'title-dialog-email-requirement-verified';
   static const titleConfirmPassword = 'title-confirm-password';
   static const titleConfirmDeleteDevices = 'title-view-delete-devices';
   static const titleConfirmDeleteKeys = 'title-dialog-delete-keys';
+  static const titleConfirmEmail = 'title-confirm-email';
 
   // Labels
   static const labelUsers = 'label-users';
+  static const labelUsersRecent = 'label-users-recent';
+  static const labelUsersResults = 'label-users-results';
+  static const labelKnownUsers = 'label-users-known';
   static const labelSyncing = 'label-syncing';
   static const labelSearching = 'label-searching';
   static const labelChatDefault = 'label-chat-default';
   static const labelSearchHomeservers = 'label-search-homeservers';
+  static const labelSearchUser = 'label-search-user';
   static const labelSearchUsers = 'label-search-users';
-  static const labelSearchUsersResults = 'label-search-users-results';
-  static const labelSectionUsersRecent = 'label-section-users-recent';
   static const labelMessagesEmpty = 'label-messages-empty';
   static const labelMessageEncrypted = 'label-message-encrypted';
   static const labelMessageMatrix = 'label-message-matrix';
   static const labelMessageMatrixUnencrypted = 'label-message-matrix-unencrypted';
   static const labelGroupsEmpty = 'label-groups-empty';
+
+  // Labels (inputs)
+  static const labelEmail = 'label-email';
 
   // Buttons
   static const buttonLogin = 'button-login';
@@ -62,7 +64,7 @@ class StringKeys {
   static const buttonSaveGeneric = 'button-save-generic';
   static const buttonNext = 'button-next';
   static const buttonFinish = 'button-finish';
-  static const buttonLetsChat = 'button-lets-chat';
+  static const buttonLetsChat = 'button-start-chat';
   static const buttonCreate = 'button-create';
   static const buttonCancel = 'button-cancel';
   static const buttonQuit = 'button-quit';
@@ -103,12 +105,13 @@ class StringKeys {
   static const contentDialogDevicesDelete = 'content-dialog-devices-delete';
   static const contentDialogDevicesKeyExport = 'content-dialog-devices-key-export';
   static const contentNotificationBackground = 'content-notification-background';
-  static const contentSignupEmailRequirement = 'content-signup-email-requirement';
-  static const contentSignupEmailVerification = 'content-signup-email-verification';
   static const contentSignupCaptchaRequirement = 'content-signup-captcha-requirement';
 
   // Context (Dialogs)
   static const contentConfirmDeleteKeys = 'confirmation-delete-keys';
+  static const contentSignupEmailVerification = 'content-signup-email-verification';
+  static const contentForgotEmailVerification = 'content-forgot-email-verification';
+  static const contentConfirmPasswordReset = 'content-confirm-password-reset';
 
   // Dialogs
   static const confirmationInvite = 'confirmation-invite';
@@ -132,8 +135,8 @@ class StringKeys {
 
   // Accessibility
   static const semanticsImageSendUnencrypted = 'semantics-image-send-unencrypted';
-  static const semnaticsImageIntroSectionOne = 'semnatics-image-intro-section-one';
-  static const semnaticsImageIntroSectionTwo = 'semnatics-image-intro-section-two';
+  static const semnaticsImageIntroSectionOne = 'semnatics-image-intro';
+  static const semnaticsImageIntroSectionTwo = 'semnatics-image-private-message';
   static const semnaticsImageIntroSectionThird = 'semnatics-image-intro-section-third';
   static const semnaticsImageIntroSectionFour = 'semnatics-image-intro-section-four';
   static const semanticsImageEmptyChatList = 'semantics-image-empty-chat-list';

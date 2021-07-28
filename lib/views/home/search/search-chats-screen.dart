@@ -123,7 +123,7 @@ class ChatSearchState extends State<ChatSearchScreen> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsLabelHomeEmpty,
+              semanticsLabel: Strings.semanticsHomeDefault,
             ),
           ),
           GestureDetector(

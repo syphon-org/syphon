@@ -33,7 +33,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.contentDeactivateAccount),
+        content: Text(Strings.warningDeactivateAccount),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -69,7 +69,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.contentDeactivateAccountFinal),
+        content: Text(Strings.warrningDeactivateAccountFinal),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -415,7 +415,7 @@ class _Props extends Equatable {
             context: context,
             builder: (dialogContext) => AlertDialog(
               title: Text('Confirm Exporting Keys'),
-              content: Text(Strings.contentDeleteDeviceKeyWarning),
+              content: Text(Strings.contentKeyExportWarning),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {

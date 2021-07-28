@@ -14,8 +14,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -314,7 +312,7 @@ class _Props extends Equatable {
             barrierDismissible: true,
             builder: (context) => DialogTextInput(
               title: 'Modify Sync Interval',
-              content: Strings.confirmationModifySyncInterval,
+              content: Strings.confirmModifySyncInterval,
               editingController: TextEditingController(
                 text: Duration(
                   milliseconds: store.state.settingsStore.syncInterval,

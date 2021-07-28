@@ -10,8 +10,6 @@ import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -63,7 +61,7 @@ class ModalUserDetails extends StatelessWidget {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Chat with ${user.displayName}',
-        content: Strings.confirmationStartChat,
+        content: Strings.confirmStartChat,
         onStartChat: () async {
           final newRoomId = await props.onCreateChatDirect(user: user);
 

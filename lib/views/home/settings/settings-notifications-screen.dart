@@ -12,8 +12,6 @@ import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
@@ -298,7 +296,7 @@ class _Props extends Equatable {
                 builder: (context) => AlertDialog(
                   title: Text('Confirm Notifications'),
                   content: Text(
-                    Strings.confirmationNotifications,
+                    Strings.confirmnEnableNotifications,
                   ),
                   actions: <Widget>[
                     TextButton(

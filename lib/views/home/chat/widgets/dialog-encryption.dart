@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:syphon/global/string-keys.dart';
 
 class DialogEncryption extends StatelessWidget {
   const DialogEncryption({
     Key? key,
-    this.content = Strings.confirmationEncryption,
+    this.content,
     this.onAccept,
   }) : super(key: key);
 
-  final String content;
+  final String? content;
   final Function? onAccept;
 
   @override
@@ -21,17 +20,12 @@ class DialogEncryption extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: Text(
-        Strings.titleDialogEncryption,
-      ),
+      title: Text(tr(StringKeys.titleDialogEncryption)),
       contentPadding: Dimensions.dialogPadding,
       children: <Widget>[
-        Container(
-          child: Text(
-            content,
-            textAlign: TextAlign.left,
-          ),
-          padding: Dimensions.dialogContentPadding,
+        Text(
+          content ?? tr(StringKeys.confirmationEncryption),
+          textAlign: TextAlign.left,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,

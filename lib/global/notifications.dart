@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 
@@ -150,7 +148,7 @@ Future showBackgroundServiceNotification({
   await pluginInstance.show(
     notificationId,
     Values.default_channel_title,
-    Strings.contentNotificationBackgroundService,
+    Strings.alertBackgroundService,
     platformChannelSpecifics,
   );
 }
