@@ -36,7 +36,8 @@ class IntroScreenState extends State<IntroScreen> {
 
   int currentStep = 0;
   bool onboarding = false;
-  String loginText = Strings.buttonIntroExistQuestion;
+  bool showingTerms = false;
+  String loginText = Strings.buttonTextLoginQuestion;
   PageController? pageController;
 
   final List<Widget> sections = [
@@ -74,13 +75,13 @@ class IntroScreenState extends State<IntroScreen> {
     final double width = MediaQuery.of(context).size.width;
 
     // TODO: decide on alway showing alpha aggrement on intro
-    if (alphaAgreement == null || true) {
+    if (alphaAgreement == null || true && !showingTerms) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Container(
+        builder: (dialogContext) => Container(
           constraints: BoxConstraints(
             minWidth: width * 0.9,
           ),
@@ -107,35 +108,35 @@ class IntroScreenState extends State<IntroScreen> {
                 ),
               ),
               Text(
-                Strings.confirmationThanks,
+                Strings.confirmThanks,
                 textAlign: TextAlign.center,
               ),
               Visibility(
                 visible: !Platform.isIOS,
                 child: Text(
-                  Strings.confirmationAlphaVersion,
+                  Strings.confirmAlphaVersion,
                   textAlign: TextAlign.center,
                 ),
               ),
               Visibility(
                 visible: !Platform.isIOS,
                 child: Text(
-                  Strings.confirmationAlphaWarning,
+                  Strings.confirmAlphaWarning,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.w100),
                 ),
               ),
               Text(
-                Strings.confirmationAlphaWarningAlt,
+                Strings.confirmAlphaWarningAlt,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.w300),
               ),
               Text(
-                Strings.confirmationConclusion,
+                Strings.confirmTermsOfServiceConclusion,
                 textAlign: TextAlign.center,
               ),
               Text(
-                Strings.confirmationAppTermsOfService,
+                Strings.confirmAppTermsOfService,
                 style: TextStyle(fontSize: 12),
               ),
               Row(
@@ -146,10 +147,10 @@ class IntroScreenState extends State<IntroScreen> {
                     child: TextButton(
                       onPressed: () async {
                         await store.dispatch(acceptAgreement());
-                        Navigator.of(context).pop();
+                        Navigator.of(dialogContext).pop();
                       },
                       child: Text(
-                        Strings.buttonAgree,
+                        Strings.buttonTextAgreement,
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -160,6 +161,10 @@ class IntroScreenState extends State<IntroScreen> {
           ),
         ),
       );
+
+      setState(() {
+        showingTerms = true;
+      });
     }
   }
 
@@ -225,16 +230,13 @@ class IntroScreenState extends State<IntroScreen> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = Strings.buttonIntroExistQuestion;
+                            loginText = Strings.buttonTextLoginQuestion;
                             onboarding = false;
                           });
                         }
 
                         if (currentStep == sections.length - 1) {
-                          Navigator.pushNamed(
-                            context,
-                            '/signup',
-                          );
+                          Navigator.pushNamed(context, NavigationPaths.signup);
                         }
 
                         pageController!.nextPage(
@@ -295,7 +297,7 @@ class IntroScreenState extends State<IntroScreen> {
                                   Container(
                                     padding: const EdgeInsets.only(left: 4),
                                     child: Text(
-                                      Strings.buttonIntroExistAction,
+                                      Strings.buttonTextLogin,
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                             color: Theme.of(context).primaryColor,

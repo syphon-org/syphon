@@ -14,6 +14,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -21,6 +22,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 class HomeserverStep extends StatefulWidget {
   const HomeserverStep({Key? key}) : super(key: key);
 
+  @override
   HomeserverStepState createState() => HomeserverStepState();
 }
 
@@ -65,10 +67,7 @@ class HomeserverStepState extends State<HomeserverStep> {
           ),
           trailing: TouchableOpacity(
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/search/homeservers',
-              );
+              Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
             },
             child: Icon(
               Icons.search_rounded,
@@ -100,10 +99,7 @@ class HomeserverStepState extends State<HomeserverStep> {
               icon: Icon(Icons.search),
               tooltip: 'Find your homeserver',
               onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  '/search/homeservers',
-                );
+                Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
               }),
         ),
       );

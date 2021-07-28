@@ -9,11 +9,13 @@ import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -65,6 +67,8 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
   @protected
   Widget buildSearchList(BuildContext context, _Props props) {
+    final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
+
     if (props.searchResults.isEmpty) {
       return Center(
           child: Column(
@@ -78,7 +82,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsLabelHomeEmpty,
+              semanticsLabel: Strings.semanticsHomeDefault,
             ),
           ),
           GestureDetector(
@@ -86,7 +90,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                props.loading ? Strings.labelSearching : Strings.labelNoGroups,
+                label,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
@@ -255,7 +259,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                 Container(
                   padding: Dimensions.listPadding,
                   child: Text(
-                    room.topic ?? Strings.contentTopicEmpty,
+                    room.topic ?? Strings.placeholderTopic,
                     style: Theme.of(context).textTheme.caption,
                   ),
                 ),

@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
+
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -19,6 +20,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
@@ -144,7 +146,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 ListTile(
                   dense: true,
                   onTap: () {
-                    Navigator.pushNamed(context, '/licenses');
+                    Navigator.pushNamed(context, NavigationPaths.licenses);
                   },
                   contentPadding: Dimensions.listPadding,
                   title: Text(
@@ -309,7 +311,7 @@ class _Props extends Equatable {
             barrierDismissible: true,
             builder: (context) => DialogTextInput(
               title: 'Modify Sync Interval',
-              content: Strings.confirmationModifySyncInterval,
+              content: Strings.confirmModifySyncInterval,
               editingController: TextEditingController(
                 text: Duration(
                   milliseconds: store.state.settingsStore.syncInterval,

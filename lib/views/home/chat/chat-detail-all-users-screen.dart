@@ -128,8 +128,8 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store, arguments!.roomId),
       builder: (context, props) => Scaffold(
         appBar: AppBarSearch(
-          title: Strings.titleRoomUsers,
-          label: Strings.labelSearchForUsers,
+          title: Strings.titleChatUsers,
+          label: Strings.labelSearchUser,
           tooltip: 'Search users',
           brightness: Brightness.dark,
           focusNode: searchInputFocusNode,

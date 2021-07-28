@@ -59,8 +59,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                     ),
                     child: SvgPicture.asset(
                       Assets.heroSignupPassword,
-                      semanticsLabel:
-                          'User thinking up a password in a swirl of wind',
+                      semanticsLabel: 'User thinking up a password in a swirl of wind',
                     ),
                   ),
                 ),
@@ -73,7 +72,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       Container(
                         padding: EdgeInsets.only(bottom: 8, top: 8),
                         child: Text(
-                          Strings.passwordRecommendationDefault,
+                          Strings.contentPasswordRecommendation,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.caption,
                         ),

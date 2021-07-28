@@ -12,6 +12,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 
 class ActionRing extends StatelessWidget {
   const ActionRing({
@@ -25,28 +26,28 @@ class ActionRing extends StatelessWidget {
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, '/home/groups/search');
+    Navigator.pushNamed(context, NavigationPaths.searchGroups);
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, '/home/user/search');
+    Navigator.pushNamed(context, NavigationPaths.searchUsers);
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, '/home/groups/create');
+    Navigator.pushNamed(context, NavigationPaths.groupCreate);
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, '/home/groups/create/public');
+    Navigator.pushNamed(context, NavigationPaths.groupCreatePublic);
   }
 
   @override

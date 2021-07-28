@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -11,6 +10,7 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -92,10 +92,8 @@ class UsernameStepState extends State<UsernameStep> {
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
-                  child: SvgPicture.asset(
-                    Assets.heroSignupUsername,
-                    semanticsLabel: 'Person resting on I.D. card',
-                  ),
+                  child: SvgPicture.asset(Assets.heroSignupUsername,
+                      semanticsLabel: Strings.semanticsImageSignupUsername),
                 ),
               ),
               Flexible(
@@ -105,7 +103,7 @@ class UsernameStepState extends State<UsernameStep> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      'Create a username',
+                      Strings.headerSignupUsername,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headline5,
                     ),
@@ -122,7 +120,7 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: props.isUsernameValid ? props.fullUserId : "Username",
+                    label: props.isUsernameValid ? props.fullUserId : 'Username',
                     disableSpacing: true,
                     valid: props.isUsernameValid,
                     controller: usernameController,
@@ -192,7 +190,7 @@ class _Props extends Equatable {
   final Function onSetUsername;
   final Function onCheckUsernameAvailability;
 
-  _Props({
+  const _Props({
     required this.username,
     required this.fullUserId,
     required this.isUsernameValid,

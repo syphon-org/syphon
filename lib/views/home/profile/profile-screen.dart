@@ -33,10 +33,10 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   ProfileScreenState() : super();
 
+  final String title = Strings.titleProfile;
+
   final userIdController = TextEditingController();
   final displayNameController = TextEditingController();
-
-  final String title = Strings.titleProfile;
 
   String? userIdNew;
   String? displayNameNew;
@@ -238,7 +238,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 Container(
                                   margin: const EdgeInsets.all(8.0),
                                   child: ButtonSolid(
-                                    text: Strings.buttonSaveGeneric,
+                                    text: Strings.buttonSave,
                                     loading: props.loading,
                                     disabled: props.loading || !hasNewInfo,
                                     onPressed: () async {
@@ -265,7 +265,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       activeOpacity: 0.4,
                                       onTap: () => Navigator.pop(context),
                                       child: Text(
-                                        'cancel',
+                                        Strings.buttonCancel,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 18,

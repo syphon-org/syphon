@@ -3,8 +3,7 @@ import 'package:syphon/store/settings/notification-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
-SettingsStore settingsReducer(
-    [SettingsStore state = const SettingsStore(), dynamic action]) {
+SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(
@@ -113,8 +112,8 @@ SettingsStore settingsReducer(
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationSettings: state.notificationSettings
-            .copyWith(enabled: !state.notificationSettings.enabled),
+        notificationSettings:
+            state.notificationSettings.copyWith(enabled: !state.notificationSettings.enabled),
       );
     case SetNotificationSettings:
       return state.copyWith(notificationSettings: action.settings);

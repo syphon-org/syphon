@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/strings.dart';
 
 import 'package:syphon/store/index.dart';
 import './model.dart';
@@ -56,7 +56,7 @@ ThunkAction<AppState> stopAlertsObserver() {
 
 ThunkAction<AppState> addInProgress() {
   return (Store<AppState> store) async {
-    store.dispatch(addInfo(message: tr('alert-feature-in-progress')));
+    store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
   };
 }
 

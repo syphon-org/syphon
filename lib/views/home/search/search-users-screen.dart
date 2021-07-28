@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -11,6 +12,7 @@ import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -80,7 +82,7 @@ class SearchUserState extends State<SearchUserScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Chat with ${formatUsername(user!)}',
-        content: Strings.confirmationStartChat,
+        content: Strings.confirmStartChat,
         onStartChat: () async {
           setState(() {
             creatingRoomDisplayName = user.displayName;
@@ -116,7 +118,7 @@ class SearchUserState extends State<SearchUserScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Try chatting with ${formatUsername(user)}',
-        content: Strings.confirmationAttemptChat,
+        content: Strings.confirmAttemptChat,
         onStartChat: () async {
           setState(() {
             creatingRoomDisplayName = user.displayName;
@@ -222,7 +224,7 @@ class SearchUserState extends State<SearchUserScreen> {
             child: Row(
               children: [
                 Text(
-                  Strings.labelRecentUsers,
+                  Strings.labelUsersRecent,
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.subtitle2,
                 ),

@@ -11,6 +11,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PageEmailVerify.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
@@ -47,7 +48,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogExplaination(
-        title: Strings.titleDialogVerifyEmailRequirement,
+        title: Strings.titleConfirmEmail,
         content: Strings.contentConfirmPasswordReset,
         onConfirm: () {
           Navigator.pop(context);
@@ -57,10 +58,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
   }
 
   onVerificationConfirmed() {
-    Navigator.pushNamed(
-      context,
-      '/reset',
-    );
+    Navigator.pushNamed(context, NavigationPaths.reset);
   }
 
   @override
@@ -166,7 +164,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                     visible: showConfirmation,
                                     child: ButtonSolid(
                                       text: Strings.buttonConfirmVerification,
-                                      loading: props.loading || this.loading,
+                                      loading: props.loading || loading,
                                       disabled: !props.isEmailValid,
                                       onPressed: () async {
                                         setState(() {

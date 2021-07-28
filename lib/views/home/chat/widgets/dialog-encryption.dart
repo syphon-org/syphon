@@ -6,11 +6,11 @@ import 'package:syphon/global/strings.dart';
 class DialogEncryption extends StatelessWidget {
   const DialogEncryption({
     Key? key,
-    this.content = Strings.confirmationEncryption,
+    this.content,
     this.onAccept,
   }) : super(key: key);
 
-  final String content;
+  final String? content;
   final Function? onAccept;
 
   @override
@@ -19,17 +19,12 @@ class DialogEncryption extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: Text(
-        Strings.titleDialogEncryption,
-      ),
+      title: Text(Strings.titleDialogEncryption),
       contentPadding: Dimensions.dialogPadding,
       children: <Widget>[
-        Container(
-          child: Text(
-            content,
-            textAlign: TextAlign.left,
-          ),
-          padding: Dimensions.dialogContentPadding,
+        Text(
+          content ?? Strings.confirmEncryption,
+          textAlign: TextAlign.left,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -43,7 +38,7 @@ class DialogEncryption extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Text(
-                'cancel',
+                Strings.buttonCancel,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
@@ -13,6 +14,7 @@ import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
@@ -30,11 +32,11 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
-class ChatDetailArguments {
+class ChatDetailsArguments {
   final String? roomId;
   final String? title;
 
-  ChatDetailArguments({
+  ChatDetailsArguments({
     this.roomId,
     this.title,
   });
@@ -146,7 +148,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
     final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
-    final ChatDetailArguments? arguments = ModalRoute.of(context)!.settings.arguments as ChatDetailArguments?;
+    final ChatDetailsArguments? arguments =
+        ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
 
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
         ? Color(Colours.greyLightest)
@@ -241,7 +244,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        Strings.labelUsersSection,
+                                        Strings.labelUsers,
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context).textTheme.subtitle2,
                                       ),
@@ -251,7 +254,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,
-                                        '/home/chat/users',
+                                        NavigationPaths.chatUsers,
                                         arguments: ChatUsersDetailArguments(
                                           roomId: props.room.id,
                                         ),

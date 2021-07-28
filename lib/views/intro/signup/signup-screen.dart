@@ -7,12 +7,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/selectors.dart';
 
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -21,6 +22,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';
 import 'package:syphon/views/intro/signup/widgets/StepTerms.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'widgets/StepHomeserver.dart';
@@ -275,7 +277,7 @@ class SignupScreenState extends State<SignupScreen> {
           // otherwise, send to the verification holding page
           if (!result!) {
             if (lastStep) {
-              return Navigator.pushNamed(context, '/verification');
+              return Navigator.pushNamed(context, NavigationPaths.verification);
             }
 
             // or continue if not the last step
@@ -289,10 +291,10 @@ class SignupScreenState extends State<SignupScreen> {
 
   String buildButtonString(_Props props) {
     if (currentStep == sections.length - 1) {
-      return Strings.buttonSignupFinish;
+      return Strings.buttonFinish;
     }
 
-    return Strings.buttonSignupNext;
+    return Strings.buttonNext;
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,14 +6,15 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
@@ -30,7 +30,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.contentDeactivateAccount),
+        content: Text(Strings.warningDeactivateAccount),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -66,7 +66,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.contentDeactivateAccountFinal),
+        content: Text(Strings.warrningDeactivateAccountFinal),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -111,7 +111,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleViewPrivacy),
+                Strings.titlePrivacy,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -177,7 +177,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, '/password');
+                              Navigator.pushNamed(context, NavigationPaths.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -190,7 +190,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, '/blocked');
+                              Navigator.pushNamed(context, NavigationPaths.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -228,8 +228,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.readReceipts!,
-                              onChanged: (enterSend) =>
-                                  props.onToggleReadReceipts(),
+                              onChanged: (enterSend) => props.onToggleReadReceipts(),
                             ),
                           ),
                           ListTile(
@@ -244,8 +243,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) =>
-                                  props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -267,8 +265,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap:
-                                  props.onImportDeviceKey as void Function()?,
+                              onTap: props.onImportDeviceKey as void Function()?,
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Import Keys',
@@ -388,8 +385,8 @@ class _Props extends Equatable {
               context: context,
               builder: (dialogContext) => DialogConfirmPassword(
                 key: Key(authSession),
-                title: tr(StringIds.titleConfirmPassword),
-                content: tr(StringIds.promptConfirmDeactivation),
+                title: Strings.titleConfirmPassword,
+                content: Strings.confirmDeactivate,
                 onConfirm: () async {
                   await store.dispatch(deactivateAccount());
                   Navigator.of(dialogContext).pop();
@@ -415,7 +412,7 @@ class _Props extends Equatable {
             context: context,
             builder: (dialogContext) => AlertDialog(
               title: Text('Confirm Exporting Keys'),
-              content: Text(Strings.contentDeleteDeviceKeyWarning),
+              content: Text(Strings.contentKeyExportWarning),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -443,8 +440,8 @@ class _Props extends Equatable {
           await showDialog(
             context: context,
             builder: (dialogContext) => AlertDialog(
-              title: Text(Strings.titleDialogDeleteKeys),
-              content: Text(Strings.confirmationDeleteKeys),
+              title: Text(Strings.titleConfirmDeleteKeys),
+              content: Text(Strings.confirmDeleteKeys),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -461,7 +458,7 @@ class _Props extends Equatable {
                     Navigator.of(dialogContext).pop();
                   },
                   child: Text(
-                    Strings.buttonDeleteKeys,
+                    Strings.buttonTextDeleteKeys,
                     style: Theme.of(context).textTheme.subtitle1!.copyWith(
                           color: Colors.redAccent,
                         ),

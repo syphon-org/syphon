@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -274,10 +276,7 @@ class LoginScreenState extends State<LoginScreen> {
                 tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    NavigationPaths.theming,
-                  );
+                  Navigator.pushNamed(context, NavigationPaths.theming);
                   props.onDebug();
                 },
               ),
@@ -476,7 +475,7 @@ class LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                Strings.buttonLoginCreateQuestion,
+                                Strings.buttonTextSignupQuestion,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 18,
@@ -486,7 +485,7 @@ class LoginScreenState extends State<LoginScreen> {
                               Container(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: Text(
-                                  Strings.buttonLoginCreateAction,
+                                  Strings.buttonTextSignupAction,
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                         color: Theme.of(context).primaryColor,

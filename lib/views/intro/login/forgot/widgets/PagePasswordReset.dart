@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -88,7 +87,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                     Container(
                       padding: EdgeInsets.only(bottom: 8, top: 8),
                       child: Text(
-                        Strings.passwordRecommendationDefault,
+                        Strings.contentPasswordRecommendation,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.caption,
                       ),

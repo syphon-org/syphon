@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/print.dart';
 
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';

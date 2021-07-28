@@ -8,6 +8,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/formatters.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -21,6 +22,7 @@ import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -362,7 +364,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  Strings.labelUsersSection,
+                                                  Strings.labelUsers,
                                                   textAlign: TextAlign.start,
                                                   style: Theme.of(context).textTheme.subtitle2,
                                                 ),

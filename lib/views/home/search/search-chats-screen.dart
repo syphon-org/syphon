@@ -14,6 +14,7 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -24,22 +25,22 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
-class RoomSearchArguments {
+class ChatSearchArguments {
   User? user;
-  RoomSearchArguments({this.user});
+  ChatSearchArguments({this.user});
 }
 
-class RoomSearchScreen extends StatefulWidget {
-  const RoomSearchScreen({Key? key}) : super(key: key);
+class ChatSearchScreen extends StatefulWidget {
+  const ChatSearchScreen({Key? key}) : super(key: key);
 
   @override
-  RoomSearchState createState() => RoomSearchState();
+  ChatSearchState createState() => ChatSearchState();
 }
 
-class RoomSearchState extends State<RoomSearchScreen> {
+class ChatSearchState extends State<ChatSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
-  RoomSearchState();
+  ChatSearchState();
 
   late Map<String, Color> roomColorDefaults;
 
@@ -76,7 +77,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final RoomSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
+    final ChatSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
     final user = arguments.user!;
     final username = formatUsername(user);
 
@@ -85,7 +86,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Invite $username',
-        content: '${Strings.confirmationInvite}\n\nUser: $username\nRoom: ${room.name}',
+        content: '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
         action: 'send invite',
         onStartChat: () async {
           props.onSendInvite(room: room, user: user);
@@ -119,7 +120,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsLabelHomeEmpty,
+              semanticsLabel: Strings.semanticsHomeDefault,
             ),
           ),
           GestureDetector(
@@ -127,7 +128,7 @@ class RoomSearchState extends State<RoomSearchScreen> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                Strings.labelNoMessages,
+                Strings.labelMessagesEmpty,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
@@ -312,11 +313,11 @@ class RoomSearchState extends State<RoomSearchScreen> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final RoomSearchArguments arguments =
-            ModalRoute.of(context)!.settings.arguments as RoomSearchArguments;
+        final ChatSearchArguments arguments =
+            ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
         return Scaffold(
           appBar: AppBarSearch(
-            title: Strings.titleInvite + formatUsername(arguments.user!),
+            title: '${Strings.titleInvite} ${formatUsername(arguments.user!)}',
             label: 'Search any room info...',
             tooltip: 'Search Joined Rooms',
             brightness: Brightness.dark,

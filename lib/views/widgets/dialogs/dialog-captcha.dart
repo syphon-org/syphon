@@ -46,9 +46,7 @@ class DialogCaptcha extends StatelessWidget {
             right: 8,
             bottom: 16,
           ),
-          title: Text(
-            Strings.titleDialogCaptcha,
-          ),
+          title: Text(Strings.titleDialogCaptcha),
           children: <Widget>[
             Container(
               width: width,
@@ -62,8 +60,7 @@ class DialogCaptcha extends StatelessWidget {
                   ),
                   child: Captcha(
                     publicKey: props.publicKey,
-                    onVerified: (token) =>
-                        props.onCompleteCaptcha(token, context: context),
+                    onVerified: (token) => props.onCompleteCaptcha(token, context: context),
                   ),
                 ),
               ),
@@ -72,7 +69,7 @@ class DialogCaptcha extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 ButtonText(
-                  text: 'Cancel',
+                  text: Strings.buttonCancel,
                   onPressed: () {
                     if (onCancel != null) {
                       onCancel!();
@@ -108,11 +105,9 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-              [MatrixAuthTypes.RECAPTCHA]['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token,
-            {required BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

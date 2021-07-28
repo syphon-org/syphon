@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
@@ -25,15 +24,16 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class EmailVerifyStep extends StatefulWidget {
   const EmailVerifyStep({Key? key}) : super(key: key);
 
+  @override
   EmailStepState createState() => EmailStepState();
 }
 
 class EmailStepState extends State<EmailVerifyStep> {
-  EmailStepState({Key? key});
-
   Timer? typingTimeout;
   final emailController = TextEditingController();
   final homeserverController = TextEditingController();
+
+  EmailStepState();
 
   @override
   void didChangeDependencies() {
@@ -53,7 +53,7 @@ class EmailStepState extends State<EmailVerifyStep> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        double height = MediaQuery.of(context).size.height;
+        final double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidgetHomeserver = CircularProgressIndicator(
@@ -78,7 +78,7 @@ class EmailStepState extends State<EmailVerifyStep> {
           suffixBackgroundColor = Theme.of(context).primaryColor;
         }
 
-        if (!props.loading && this.typingTimeout == null) {
+        if (!props.loading && typingTimeout == null) {
           if (props.isHomeserverValid) {
             suffixWidgetHomeserver = Icon(
               Icons.check,
@@ -113,7 +113,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroResetPasswordEmail,
-                    semanticsLabel: 'Person resting on checked letter',
+                    semanticsLabel: Strings.semanticsImagePasswordReset,
                   ),
                 ),
               ),
@@ -146,12 +146,9 @@ class EmailStepState extends State<EmailVerifyStep> {
                               onTap: () {
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) =>
-                                      DialogExplaination(
-                                    title: Strings
-                                        .titleDialogUserVerifyRequirement,
-                                    content:
-                                        Strings.contentExplainPasswordReset,
+                                  builder: (BuildContext context) => DialogExplaination(
+                                    title: Strings.titleEmailRequirement,
+                                    content: Strings.contentForgotEmailVerification,
                                     onConfirm: () {
                                       Navigator.pop(context);
                                     },
@@ -186,7 +183,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: "Homeserver",
+                    label: 'Homeserver',
                     hint: Values.homeserverDefault,
                     disableSpacing: true,
                     disabled: props.session,
@@ -253,7 +250,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: "Email",
+                    label: 'Email',
                     disableSpacing: true,
                     disabled: props.session,
                     valid: props.isEmailValid,
@@ -305,7 +302,7 @@ class _Props extends Equatable {
   final Function onSetHomeserver;
   final Function onSelectHomeserver;
 
-  _Props({
+  const _Props({
     required this.email,
     required this.hostname,
     required this.session,
@@ -317,14 +314,21 @@ class _Props extends Equatable {
     required this.onSelectHomeserver,
   });
 
+  @override
+  List<Object> get props => [
+        email,
+        loading,
+        isEmailValid,
+        isHomeserverValid,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         email: store.state.authStore.email,
         hostname: store.state.authStore.hostname,
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.session != null &&
-            store.state.authStore.session!.length > 0,
+        session: store.state.authStore.session != null && store.state.authStore.session!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },
@@ -340,12 +344,4 @@ class _Props extends Equatable {
           }
         },
       );
-
-  @override
-  List<Object> get props => [
-        email,
-        loading,
-        isEmailValid,
-        isHomeserverValid,
-      ];
 }
