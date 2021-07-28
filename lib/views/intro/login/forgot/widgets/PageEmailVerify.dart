@@ -114,7 +114,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroResetPasswordEmail,
-                    semanticsLabel: 'Person resting on checked letter',
+                    semanticsLabel: Strings.semanticsImagePasswordReset,
                   ),
                 ),
               ),
@@ -185,7 +185,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   ),
                   child: TextFieldSecure(
                     label: 'Homeserver',
-                    hint: 'matrix.org',
+                    hint: Values.homeserverDefault,
                     disableSpacing: true,
                     disabled: props.session,
                     valid: props.isHomeserverValid,

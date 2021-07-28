@@ -40,6 +40,7 @@ class Strings {
   // Headers
   static final headerIntro = tr('header-intro');
   static final headerLogin = tr('header-login');
+  static final headerSignupUsername = tr('header-signup-username');
 
   // Labels
   static final labelUsers = tr('label-users');
@@ -164,4 +165,6 @@ class Strings {
   static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
   static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
+  static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
+  static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
 }

@@ -2,6 +2,7 @@
   "title-intro": "Welcome to {}",
   "header-login": "take back the chat",
   "header-intro": "Privacy and freedom\nwithout the hassle.",
+  "header-signup-username": "Create a username",
   "title-view-delete-devices": "Confirm Device Removal",
   "title-view-search-groups": "Explore Groups",
   "title-view-search-users": "Search Users",
@@ -131,5 +132,7 @@
   "semnatics-image-intro-section-third": "People lounging around and messaging each other",
   "semnatics-image-intro-section-four": "Two different people feeling confident and lookin' good",
   "semantics-image-empty-chat-list": "Several tiny, cute monsters peering out behind foliage",
-  "semantics-image-terms-of-service": "Hand holding a phone with a terms of service checkbox checked"
+  "semantics-image-terms-of-service": "Hand holding a phone with a terms of service checkbox checked",
+  "semantics-image-signup-username": "Person resting elbow on I.D. card",
+  "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside"
 }
