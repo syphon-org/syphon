@@ -17,7 +17,7 @@ abstract class Users {
   /// to clients in the top-level account_data.
   static Future<dynamic> fetchAccountData({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     String type = AccountDataTypes.direct,
@@ -48,7 +48,7 @@ abstract class Users {
   /// to clients in the top-level account_data.
   static Future<dynamic> saveAccountData({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     String type = AccountDataTypes.direct,
@@ -81,7 +81,7 @@ abstract class Users {
   /// to clients in the top-level account_data.
   static Future<dynamic> updateBlockedUsers({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     Map<String, dynamic> blockUserList = const {},
@@ -117,7 +117,7 @@ abstract class Users {
   /// to clients in the top-level account_data.
   static Future<dynamic> inviteUser({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? userId,
@@ -152,7 +152,7 @@ abstract class Users {
   /// e.g. you need to have their access_token.
   static Future<dynamic> fetchUserProfile({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
   }) async {
@@ -181,7 +181,7 @@ abstract class Users {
   /// e.g. you need to have their access_token.
   static Future<dynamic> updateDisplayName({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     String? displayName,
@@ -218,7 +218,7 @@ abstract class Users {
   /// you need to have their access_token.
   static Future<dynamic> updateAvatarUri({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     String? avatarUri,
@@ -254,7 +254,7 @@ abstract class Users {
   /// you need to have their access_token.
   static Future<dynamic> deactivateUser({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     String? identityServer,
@@ -300,7 +300,7 @@ abstract class Users {
 /// If you have left the room then this will be the members of the room when you left.
 dynamic buildRoomMembersRequest({
   String protocol = 'https://',
-  String homeserver = 'matrix.org',
+  String homeserver = Values.homeserverDefault,
   String? accessToken,
   String? roomId,
 }) {

@@ -6,7 +6,7 @@ String formatSender(String sender) {
   return sender.replaceAll('@', '').split(':')[0];
 }
 
-String formatUserId(String displayName, {String homeserver = 'matrix.org'}) {
+String formatUserId(String displayName, {String homeserver = Values.homeserverDefault}) {
   return '@$displayName:$homeserver';
 }
 

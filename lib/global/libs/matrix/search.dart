@@ -19,7 +19,7 @@ import 'package:syphon/global/values.dart';
 class Search {
   static Future<dynamic> searchUsers({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? searchText,
     String? since,
@@ -47,7 +47,7 @@ class Search {
 
   static Future<dynamic> searchRooms({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? searchText,
     String? server,

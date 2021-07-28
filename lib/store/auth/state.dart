@@ -85,8 +85,8 @@ class AuthStore extends Equatable {
     this.hostname = Values.homeserverDefault,
     this.homeserver = const Homeserver(
       valid: true,
-      hostname: 'matrix.org',
-      baseUrl: 'matrix.org',
+      hostname: Values.homeserverDefault,
+      baseUrl: Values.homeserverDefault,
       loginType: MatrixAuthTypes.DUMMY,
     ),
     this.interactiveAuths = const {},
