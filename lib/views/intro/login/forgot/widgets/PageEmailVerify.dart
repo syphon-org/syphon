@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
@@ -79,7 +78,7 @@ class EmailStepState extends State<EmailVerifyStep> {
           suffixBackgroundColor = Theme.of(context).primaryColor;
         }
 
-        if (!props.loading && this.typingTimeout == null) {
+        if (!props.loading && typingTimeout == null) {
           if (props.isHomeserverValid) {
             suffixWidgetHomeserver = Icon(
               Icons.check,
