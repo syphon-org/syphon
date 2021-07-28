@@ -1245,7 +1245,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
     } else {
       if (!hostname.contains('.')) {
         store.dispatch(setHostname(
-          hostname: homeserver.hostname ?? 'matrix.org',
+          hostname: homeserver.hostname ?? Values.homeserverDefault,
         ));
       }
     }

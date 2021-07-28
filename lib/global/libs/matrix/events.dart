@@ -15,7 +15,7 @@ abstract class Events {
   /// Get the state events for the current state of a room.
   static Future<dynamic> fetchStateEvents({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
   }) async {
@@ -39,7 +39,7 @@ abstract class Events {
   /// https://matrix.org/docs/spec/client_server/latest#id261
   static Future<dynamic> fetchMessageEvents({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? from,
@@ -97,7 +97,7 @@ abstract class Events {
 
   static Future<dynamic> sendMessageEncrypted({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     Map? unencryptedData,
     String? accessToken,
     String? trxId,
@@ -147,7 +147,7 @@ abstract class Events {
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendEvent({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? eventType,
@@ -184,7 +184,7 @@ abstract class Events {
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendMessage({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? trxId,
@@ -235,7 +235,7 @@ abstract class Events {
   /// it will be used by the server to ensure idempotency of requests. <- really a requestId
   static Future<dynamic> sendReaction({
     String protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? reaction,
     String? roomId,
@@ -274,7 +274,7 @@ abstract class Events {
   ///
   static Future<dynamic> redactEvent({
     String protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? eventId,
@@ -310,7 +310,7 @@ abstract class Events {
   /// The device ID may also be *, meaning all known devices for the user.
   static Future<dynamic> sendEventToDevice({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String trxId = '0', // just a random string to denote uniqueness
     String? eventType,
@@ -343,7 +343,7 @@ abstract class Events {
   /// Send Typing Event
   static Future<dynamic> sendTyping({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? userId,
@@ -376,7 +376,7 @@ abstract class Events {
   /// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-receipt-receipttype-eventid
   static Future<dynamic> sendReadMarkers({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? messageId,

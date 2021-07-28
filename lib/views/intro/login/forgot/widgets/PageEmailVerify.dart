@@ -187,7 +187,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                   ),
                   child: TextFieldSecure(
                     label: "Homeserver",
-                    hint: 'matrix.org',
+                    hint: Values.homeserverDefault,
                     disableSpacing: true,
                     disabled: props.session,
                     valid: props.isHomeserverValid,
