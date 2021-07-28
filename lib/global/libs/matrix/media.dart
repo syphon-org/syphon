@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/values.dart';
 
 /// Media queries for matrix
 ///
@@ -29,7 +30,7 @@ class Media {
 
   static Future<dynamic> fetchThumbnailUnmapped({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? serverName,
     required String mediaUri,
@@ -68,7 +69,7 @@ class Media {
 
   static Future<dynamic> uploadMedia({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? fileName,
     String fileType = 'application/jpeg', // Content-Type: application/pdf
@@ -107,7 +108,7 @@ class Media {
 
 dynamic buildMediaDownloadRequest({
   String protocol = 'https://',
-  String homeserver = 'matrix.org',
+  String homeserver = Values.homeserverDefault,
   String? accessToken,
   String? serverName,
   required String mediaUri,
@@ -133,7 +134,7 @@ dynamic buildMediaDownloadRequest({
 /// Upload some content to the content repository.
 dynamic buildMediaUploadRequest({
   String protocol = 'https://',
-  String homeserver = 'matrix.org',
+  String homeserver = Values.homeserverDefault,
   String? accessToken,
   String? fileName,
   String fileType = 'application/jpeg', // Content-Type: application/pdf

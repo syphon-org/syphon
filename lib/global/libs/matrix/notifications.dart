@@ -12,7 +12,7 @@ abstract class Notifications {
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotifications({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? from,
     int limit = 10,
@@ -44,7 +44,7 @@ abstract class Notifications {
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchNotificationPushers({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/pushers';
@@ -87,7 +87,7 @@ abstract class Notifications {
   /// in the JSON body.
   static Future<dynamic> saveNotificationPusher({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? pushKey, // required
     String? kind = 'http', // required

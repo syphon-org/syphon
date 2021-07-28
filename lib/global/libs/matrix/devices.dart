@@ -11,7 +11,7 @@ abstract class Devices {
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> fetchDevices({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/devices';
@@ -31,7 +31,7 @@ abstract class Devices {
   /// Gets all currently active pushers for the authenticated user.
   static Future<dynamic> updateDevice({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? deviceId,
     String? displayName,
@@ -63,7 +63,7 @@ abstract class Devices {
  */
   static Future<dynamic> deleteDevice({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? deviceId,
     String? session,
@@ -118,7 +118,7 @@ abstract class Devices {
  */
   static Future<dynamic> deleteDevices({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     List<String?>? deviceIds,
     String? session,
