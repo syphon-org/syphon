@@ -6,7 +6,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';

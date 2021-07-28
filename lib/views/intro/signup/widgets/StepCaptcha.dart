@@ -9,7 +9,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';

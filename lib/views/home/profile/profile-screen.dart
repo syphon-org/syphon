@@ -238,7 +238,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 Container(
                                   margin: const EdgeInsets.all(8.0),
                                   child: ButtonSolid(
-                                    text: Strings.buttonSaveGeneric,
+                                    text: Strings.buttonSave,
                                     loading: props.loading,
                                     disabled: props.loading || !hasNewInfo,
                                     onPressed: () async {

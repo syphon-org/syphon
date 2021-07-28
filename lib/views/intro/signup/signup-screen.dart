@@ -13,7 +13,7 @@ import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';

@@ -37,7 +37,7 @@ class IntroScreenState extends State<IntroScreen> {
   int currentStep = 0;
   bool onboarding = false;
   bool showingTerms = false;
-  String loginText = Strings.buttonTextExistingUser;
+  String loginText = Strings.buttonTextLoginQuestion;
   PageController? pageController;
 
   final List<Widget> sections = [
@@ -108,31 +108,31 @@ class IntroScreenState extends State<IntroScreen> {
                 ),
               ),
               Text(
-                Strings.confirmationThanks,
+                Strings.confirmThanks,
                 textAlign: TextAlign.center,
               ),
               Visibility(
                 visible: !Platform.isIOS,
                 child: Text(
-                  Strings.confirmationAlphaVersion,
+                  Strings.confirmAlphaVersion,
                   textAlign: TextAlign.center,
                 ),
               ),
               Visibility(
                 visible: !Platform.isIOS,
                 child: Text(
-                  Strings.confirmationAlphaWarning,
+                  Strings.confirmAlphaWarning,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.w100),
                 ),
               ),
               Text(
-                Strings.confirmationAlphaWarningAlt,
+                Strings.confirmAlphaWarningAlt,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.w300),
               ),
               Text(
-                Strings.confirmationConclusion,
+                Strings.confirmTermsOfServiceConclusion,
                 textAlign: TextAlign.center,
               ),
               Text(
@@ -230,7 +230,7 @@ class IntroScreenState extends State<IntroScreen> {
 
                         if (currentStep == sections.length - 2) {
                           setState(() {
-                            loginText = Strings.buttonTextExistingUser;
+                            loginText = Strings.buttonTextLoginQuestion;
                             onboarding = false;
                           });
                         }
@@ -297,7 +297,7 @@ class IntroScreenState extends State<IntroScreen> {
                                   Container(
                                     padding: const EdgeInsets.only(left: 4),
                                     child: Text(
-                                      Strings.buttonTextExistingAction,
+                                      Strings.buttonTextLogin,
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context).textTheme.bodyText2!.copyWith(
                                             color: Theme.of(context).primaryColor,

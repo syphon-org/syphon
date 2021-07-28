@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -129,7 +128,7 @@ class ChatSearchState extends State<ChatSearchScreen> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                Strings.labelNoMessages,
+                Strings.labelMessagesEmpty,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),

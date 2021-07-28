@@ -143,7 +143,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
                       }
                       Navigator.of(context).pop();
                     },
-              child: !widget.loading ? Text(Strings.buttonSaveGeneric) : LoadingIndicator(size: 16),
+              child: !widget.loading ? Text(Strings.buttonSave) : LoadingIndicator(size: 16),
             ),
           ],
         )

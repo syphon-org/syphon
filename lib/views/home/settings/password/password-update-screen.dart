@@ -121,7 +121,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),
                               child: ButtonSolid(
-                                text: Strings.buttonSaveGeneric,
+                                text: Strings.buttonSave,
                                 loading: props.loading,
                                 disabled: !props.isPasswordValid || props.loading,
                                 onPressed: () async {

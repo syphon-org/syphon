@@ -46,8 +46,6 @@ class NotificationSettingsScreen extends StatelessWidget {
               break;
             case StyleType.Latest:
               styleTypeDescription = 'Notifications will only show one for the most recent notification';
-              // styleTypeDescription =
-              //     'Notifications will stack overtop of each other until all are dismissed';
               break;
             case StyleType.Itemized:
             default:
@@ -296,7 +294,7 @@ class _Props extends Equatable {
                 builder: (context) => AlertDialog(
                   title: Text('Confirm Notifications'),
                   content: Text(
-                    Strings.confirmnEnableNotifications,
+                    Strings.confirmEnableNotifications,
                   ),
                   actions: <Widget>[
                     TextButton(

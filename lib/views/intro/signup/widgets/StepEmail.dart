@@ -136,7 +136,7 @@ class EmailStepState extends State<EmailStep> {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) => DialogExplaination(
-                                  title: Strings.titleDialogEmailRequirement,
+                                  title: Strings.titleEmailRequirement,
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {
                                     Navigator.pop(context);

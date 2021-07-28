@@ -205,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            Strings.listItemSettingsChat,
+                            Strings.titleChatSettings,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),

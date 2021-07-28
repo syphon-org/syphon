@@ -441,7 +441,7 @@ class _Props extends Equatable {
             context: context,
             builder: (dialogContext) => AlertDialog(
               title: Text(Strings.titleConfirmDeleteKeys),
-              content: Text(Strings.contentConfirmDeleteKeys),
+              content: Text(Strings.confirmDeleteKeys),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -458,7 +458,7 @@ class _Props extends Equatable {
                     Navigator.of(dialogContext).pop();
                   },
                   child: Text(
-                    Strings.buttonDeleteKeys,
+                    Strings.buttonTextDeleteKeys,
                     style: Theme.of(context).textTheme.subtitle1!.copyWith(
                           color: Colors.redAccent,
                         ),

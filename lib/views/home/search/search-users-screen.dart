@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';

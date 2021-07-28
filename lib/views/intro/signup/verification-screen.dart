@@ -138,7 +138,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                           context: context,
                                           builder: (BuildContext context) => DialogExplaination(
                                             title: Strings.titleDialogSignupEmailVerification,
-                                            content: Strings.contentSignupEmailVerification,
+                                            content: Strings.contentEmailVerification,
                                             onConfirm: () {
                                               Navigator.pop(context);
                                             },

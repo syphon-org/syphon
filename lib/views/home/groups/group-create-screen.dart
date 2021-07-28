@@ -8,7 +8,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/alerts/actions.dart';
