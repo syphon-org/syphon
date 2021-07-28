@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +7,7 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
@@ -33,8 +29,8 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
       barrierDismissible: true,
       builder: (dialogContext) => DialogConfirm(
         title: 'Confirm Advanced Colors',
-        content: Strings.contentAdvancedColorDialog,
-        confirm: 'enable',
+        content: Strings.confirmAdvancedColors,
+        confirm: Strings.buttonEnable,
         onConfirm: () async {
           Navigator.pop(dialogContext);
           onAdvanced();
@@ -84,7 +80,7 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleTheming),
+                Strings.titleTheming,
                 style: Theme.of(context).textTheme.headline6!.copyWith(
                       color: Colors.white,
                     ),

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +8,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -20,8 +18,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
@@ -187,7 +184,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
       builder: (BuildContext context) => DialogInviteUsers(
         users: invites,
         title: 'Invite To ${room!.name}',
-        content: Strings.confirmationInvites +
+        content: Strings.confirmInvites +
             '\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?',
         action: 'send ${invitePlurialized.toLowerCase()}',
         onInviteUsers: () async {
@@ -274,12 +271,11 @@ class InviteUsersState extends State<InviteUsersScreen> {
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel =
-            searchable.isEmpty ? tr(StringKeys.labelUsersRecent) : tr(StringKeys.labelUsersResults);
+        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
-            title: tr(StringKeys.titleInviteUsers),
+            title: Strings.titleInviteUsers,
             label: 'Search for a user...',
             tooltip: 'Search Users',
             elevation: 0,

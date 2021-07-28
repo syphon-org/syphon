@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+import 'package:syphon/global/strings.dart';
 
 class DialogEncryption extends StatelessWidget {
   const DialogEncryption({
@@ -20,11 +19,11 @@ class DialogEncryption extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: Text(tr(StringKeys.titleDialogEncryption)),
+      title: Text(Strings.titleDialogEncryption),
       contentPadding: Dimensions.dialogPadding,
       children: <Widget>[
         Text(
-          content ?? tr(StringKeys.confirmationEncryption),
+          content ?? Strings.confirmEncryption,
           textAlign: TextAlign.left,
         ),
         Row(
@@ -39,7 +38,7 @@ class DialogEncryption extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Text(
-                'cancel',
+                Strings.buttonCancel,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),

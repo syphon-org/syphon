@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +6,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -114,7 +111,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titlePrivacy),
+                Strings.titlePrivacy,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -388,8 +385,8 @@ class _Props extends Equatable {
               context: context,
               builder: (dialogContext) => DialogConfirmPassword(
                 key: Key(authSession),
-                title: tr(StringKeys.titleConfirmPassword),
-                content: tr(StringKeys.promptConfirmDeactivate),
+                title: Strings.titleConfirmPassword,
+                content: Strings.confirmDeactivate,
                 onConfirm: () async {
                   await store.dispatch(deactivateAccount());
                   Navigator.of(dialogContext).pop();
@@ -443,8 +440,8 @@ class _Props extends Equatable {
           await showDialog(
             context: context,
             builder: (dialogContext) => AlertDialog(
-              title: Text(tr(StringKeys.titleConfirmDeleteKeys)),
-              content: Text(tr(StringKeys.contentConfirmDeleteKeys)),
+              title: Text(Strings.titleConfirmDeleteKeys),
+              content: Text(Strings.contentConfirmDeleteKeys),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {

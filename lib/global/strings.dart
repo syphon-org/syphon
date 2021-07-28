@@ -11,13 +11,50 @@ import 'package:syphon/global/values.dart';
 class Strings {
   // Titles
   static final titleIntro = tr('title-intro', args: [Values.appName]);
+  static final titleProfile = tr('title-view-profile');
+  static final titleTheming = tr('title-view-theming');
+  static final titleDevices = tr(StringKeys.titleDevices);
+  static final titlePrivacy = tr(StringKeys.titlePrivacy);
+  static final titleSettings = tr('title-view-settings');
+  static final titleAdvanced = tr('title-view-advanced');
+  static final titleInvite = tr('title-view-invite');
+  static final titleChatUsers = tr('title-view-chat-users');
+  static final titleConfirmEmail = tr('title-confirm-email');
+  static final titleChatSettings = tr(StringKeys.titleChatSettings);
+  static final titleSearchGroups = tr('title-view-search-groups');
+  static final titleSearchUsers = tr('title-view-search-users');
+  static final titleInviteUsers = tr('title-view-invite');
+  static final titleCreateGroup = tr('title-view-create-group');
+  static final titleCreateGroupPublic = tr('title-view-create-group-public');
   static final titleEmailRequirement = tr('title-dialog-email-requirement');
+  static final titleConfirmPassword = tr(StringKeys.titleConfirmPassword);
+  static final titleConfirmDeleteKeys = tr(StringKeys.titleConfirmDeleteKeys);
+  static final titleHomeserverSearch = tr(StringKeys.titleHomeserverSearch);
+
+  // Titles (Dialogs)
+  static final titleDialogEncryption = tr(StringKeys.titleDialogEncryption);
+  static final titleDialogTerms = tr(StringKeys.titleDialogTerms);
+  static final titleDialogTermsAlpha = tr(StringKeys.titleDialogTermsAlpha);
+  static final titleDialogCaptcha = tr(StringKeys.titleDialogCaptcha);
+  static final titleDialogSignupEmailVerification = tr(StringKeys.titleDialogSignupEmailVerification);
+  static final titleDialogEmailRequirement = tr('title-dialog-email-requirement');
 
   // Headers
   static final headerIntro = tr('header-intro');
   static final headerLogin = tr('header-login');
 
   // Labels
+  static final labelUsers = tr(StringKeys.labelUsers);
+  static final labelEmail = tr(StringKeys.labelEmail);
+  static final labelSyncing = tr(StringKeys.labelSyncing);
+  static final labelSearchUser = tr(StringKeys.labelSearchUser);
+  static final labelUsersRecent = tr(StringKeys.labelUsersRecent);
+  static final labelSearching = tr(StringKeys.labelSearching);
+  static final labelKnownUsers = tr(StringKeys.labelKnownUsers);
+  static final labelGroupsEmpty = tr(StringKeys.labelGroupsEmpty);
+  static final labelUsersResults = tr(StringKeys.labelUsersResults);
+  static final labelMessagesEmpty = tr(StringKeys.labelMessagesEmpty);
+  static final labelSearchHomeservers = tr(StringKeys.labelSearchHomeservers);
   static final labelSearchResults = tr('label-search-results'); // 'Search Results'
   static final labelRoomNameDefault = tr('label-chat-default'); // 'New Chat'
   static final labelNoMessages = tr('label-messages-empty'); // 'no messages found';
@@ -26,14 +63,27 @@ class Strings {
   static final labelDeletedMessage = tr('label-message-deleted'); // 'This message was deleted';
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
+  static final labelTermsOfService = tr('label-terms-of-service');
+
+  // List Items
+  static final listItemSettingsSms = tr(StringKeys.listItemSettingsSms);
+  static final listItemSettingsChat = tr(StringKeys.listItemSettingsChat);
+  static final listItemSettingsNotification = tr(StringKeys.listItemSettingsNotification);
+  static final listItemSettingsPrivacy = tr(StringKeys.listItemSettingsPrivacy);
+  static final listItemSettingsLogout = tr(StringKeys.listItemSettingsLogout);
 
   // Buttons
+  static final buttonLogin = tr(StringKeys.buttonLogin);
+  static final buttonNext = tr(StringKeys.buttonNext);
+  static final buttonFinish = tr(StringKeys.buttonFinish);
+  static final buttonLoginSSO = tr(StringKeys.buttonLoginSSO);
   static final buttonSaveGeneric = tr('button-save-generic'); // 'save';
   static final buttonSendVerification = tr('button-send-verification'); // 'send verification email';
   static final buttonConfirmVerification = tr('button-confirm-verification'); //  'confirm verification';
   static final buttonStartChat = tr('button-start-chat'); // 'let\'s chat';
   static final buttonCreate = tr('button-create'); // 'create';
   static final buttonCancel = tr('button-cancel'); //'cancel';
+  static final buttonEnable = tr('button-enable'); //'enable';
   static final buttonDeactivate = tr('button-deactivate'); //  'deactivate';
   static final buttonQuit = tr('button-quit'); //  'quit';
   static final buttonConfirm = tr('button-confirm'); //  'got it';
@@ -44,11 +94,15 @@ class Strings {
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
   // Buttons (Text)
+  static final buttonTextSignupQuestion = tr(StringKeys.buttonTextSignupQuestion);
+  static final buttonTextSignupAction = tr(StringKeys.buttonTextSignupAction);
   static final buttonTextAgreement = tr('button-text-agreement'); // 'I Agree';
   static final buttonTextSeeAllUsers = tr('button-text-see-all-users'); // ; 'See All Users';
   static final buttonTextExistingUser = tr('button-text-existing-user'); // 'Already have a username?';
   static final buttonTextExistingAction = tr('button-text-login'); // 'Login';
   static final buttonTextLogin = tr('button-text-login'); // 'Login';
+  static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
+  static final buttonTextConfirmed = tr('button-text-confirmed');
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
@@ -60,6 +114,7 @@ class Strings {
   static final warrningDeactivateAccountFinal = tr('warning-deactivate-account-final');
 
   // Alerts
+  static final alertAppRestartEffect = tr(StringKeys.alertAppRestartEffect);
   static final alertInviteUnknownUser = tr('alert-invite-user-unknown');
   static final alertMessageSendingFailed = tr('alert-message-failed'); // 'Message Failed To Send';
   static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
@@ -71,12 +126,15 @@ class Strings {
   // Content
   static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
+  static final contentConfirmDeleteKeys = tr(StringKeys.contentConfirmDeleteKeys);
   static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
   static final contentEmailRequirement = tr('content-signup-email-requirement');
   static final contentForgotEmailVerification = tr('content-forgot-email-verification');
   static final contentConfirmPasswordReset = tr('content-confirm-password-reset');
   static final contentPasswordRequirements = tr('content-password-requirements');
   static final contentEmailVerifiedRequirement = tr('content-signup-email-verification');
+  static final contentSignupEmailVerification = tr(StringKeys.contentSignupEmailVerification);
+  static final contentCaptchaRequirement = tr('content-signup-captcha-requirement');
 
   static final contentIntroFirstPartOne = tr('content-intro-section-one', args: [Values.appName]);
   static final contentIntroSecondPartOne = tr('content-intro-section-two');
@@ -86,9 +144,10 @@ class Strings {
   static final contentIntroFinal = tr('content-intro-section-four', args: [Values.appName]);
 
   // Confirmations
-  static final confirmationInvite = tr('confirm-invite');
-  static final confirmationInvites = tr('confirm-invit-multiple');
+  static final confirmInvite = tr('confirm-invite');
+  static final confirmInvites = tr('confirm-invite-multiple');
   static final confirmStartChat = tr('confirm-start-chat');
+  static final confirmDeactivate = tr('prompt-confirm-deactivate');
   static final confirmAttemptChat = tr('confirm-attempt-chat');
   static final confirmAdvancedColors = tr('confirm-advanced-colors');
   static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);

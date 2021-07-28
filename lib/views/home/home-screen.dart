@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,8 +18,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -245,7 +243,7 @@ class HomeState extends State<HomeScreen> {
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
 
-    final label = props.syncing ? tr(StringKeys.labelSyncing) : tr(StringKeys.labelMessagesEmpty);
+    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
 
     if (rooms.isEmpty) {
       return Center(

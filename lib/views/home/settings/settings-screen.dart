@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/selectors.dart';
@@ -78,7 +74,7 @@ class SettingsScreen extends StatelessWidget {
                 onPressed: props.authLoading ? null : () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleSettings),
+                Strings.titleSettings,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -115,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
                             contentPadding: Dimensions.listPaddingSettings,
                             enabled: false,
                             title: Text(
-                              tr(StringKeys.listItemSettingsSms),
+                              Strings.listItemSettingsSms,
                             ),
                             subtitle: Text(
                               Strings.labelOff, // TODO: add SMS feature
@@ -142,7 +138,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.listItemSettingsNotification),
+                            Strings.listItemSettingsNotification,
                           ),
                           subtitle: Text(
                             props.notificationsEnabled! ? Strings.labelOn : Strings.labelOff,
@@ -162,7 +158,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.listItemSettingsPrivacy),
+                            Strings.listItemSettingsPrivacy,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
@@ -183,7 +179,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.titleTheming),
+                            Strings.titleTheming,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
@@ -209,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.listItemSettingsChat),
+                            Strings.listItemSettingsChat,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
@@ -226,7 +222,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.titleDevices),
+                            Strings.titleDevices,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
@@ -243,7 +239,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.titleAdvanced),
+                            Strings.titleAdvanced,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
@@ -258,7 +254,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            tr(StringKeys.listItemSettingsLogout),
+                            Strings.listItemSettingsLogout,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Visibility(

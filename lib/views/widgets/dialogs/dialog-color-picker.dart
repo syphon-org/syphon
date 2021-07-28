@@ -1,13 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 
 class DialogColorPicker extends StatefulWidget {
   const DialogColorPicker({
@@ -134,7 +130,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
               widget.onToggleAdvanced!();
             },
             child: Text(
-              tr(StringKeys.titleAdvanced).toLowerCase(),
+              Strings.titleAdvanced.toLowerCase(),
               style: Theme.of(context).textTheme.subtitle1,
             ),
           ),
@@ -151,7 +147,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
             Navigator.pop(context);
           },
           child: Text(
-            'cancel',
+            Strings.buttonCancel,
             style: Theme.of(context).textTheme.subtitle1,
           ),
         ),
@@ -166,7 +162,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
             Navigator.pop(context);
           },
           child: Text(
-            'confirm',
+            Strings.buttonConfirmFormal,
             style: Theme.of(context).textTheme.subtitle1,
           ),
         ),

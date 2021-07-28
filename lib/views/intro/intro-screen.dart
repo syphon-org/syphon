@@ -11,8 +11,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -78,8 +76,7 @@ class IntroScreenState extends State<IntroScreen> {
 
     // TODO: decide on alway showing alpha aggrement on intro
     if (alphaAgreement == null || true && !showingTerms) {
-      final termsTitle =
-          Platform.isIOS ? tr(StringKeys.titleDialogTerms) : tr(StringKeys.titleDialogTermsAlpha);
+      final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,

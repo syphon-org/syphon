@@ -4,8 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogTextInput extends StatefulWidget {

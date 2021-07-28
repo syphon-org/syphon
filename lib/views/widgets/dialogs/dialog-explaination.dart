@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 

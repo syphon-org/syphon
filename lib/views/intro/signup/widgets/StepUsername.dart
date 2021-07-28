@@ -94,7 +94,7 @@ class UsernameStepState extends State<UsernameStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupUsername,
-                    semanticsLabel: 'Person resting on I.D. card',
+                    semanticsLabel: 'Person resting on .D. card',
                   ),
                 ),
               ),

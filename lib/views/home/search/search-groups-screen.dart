@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +15,7 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -69,7 +67,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
   @protected
   Widget buildSearchList(BuildContext context, _Props props) {
-    final label = props.loading ? tr(StringKeys.labelSearching) : tr(StringKeys.labelGroupsEmpty);
+    final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
 
     if (props.searchResults.isEmpty) {
       return Center(
@@ -348,7 +346,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) => Scaffold(
           appBar: AppBarSearch(
-            title: tr(StringKeys.titleSearchGroups),
+            title: Strings.titleSearchGroups,
             label: 'Search a topic...',
             tooltip: 'Search topics',
             brightness: Brightness.dark,

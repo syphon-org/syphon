@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -23,8 +22,7 @@ import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -143,7 +141,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                     Navigator.pop(context, false);
                   }),
               title: Text(
-                tr(StringKeys.titleCreateGroupPublic),
+                Strings.titleCreateGroupPublic,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -366,7 +364,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  tr(StringKeys.labelUsers),
+                                                  Strings.labelUsers,
                                                   textAlign: TextAlign.start,
                                                   style: Theme.of(context).textTheme.subtitle2,
                                                 ),

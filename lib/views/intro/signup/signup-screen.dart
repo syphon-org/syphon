@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/selectors.dart';
 
 import 'package:syphon/views/behaviors.dart';
@@ -291,10 +291,10 @@ class SignupScreenState extends State<SignupScreen> {
 
   String buildButtonString(_Props props) {
     if (currentStep == sections.length - 1) {
-      return tr(StringKeys.buttonFinish);
+      return Strings.buttonFinish;
     }
 
-    return tr(StringKeys.buttonNext);
+    return Strings.buttonNext;
   }
 
   @override
@@ -390,7 +390,7 @@ class SignupScreenState extends State<SignupScreen> {
                               child: Container(
                                 padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonOutline(
-                                  text: tr(StringKeys.buttonLoginSSO),
+                                  text: Strings.buttonLoginSSO,
                                   disabled: props.loading,
                                   onPressed: onCompleteStep(
                                     props,

@@ -12,8 +12,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
@@ -137,7 +136,7 @@ class EmailStepState extends State<EmailStep> {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) => DialogExplaination(
-                                  title: tr(StringKeys.titleDialogEmailRequirement),
+                                  title: Strings.titleDialogEmailRequirement,
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {
                                     Navigator.pop(context);
@@ -184,7 +183,7 @@ class EmailStepState extends State<EmailStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: tr(StringKeys.labelEmail),
+                    label: Strings.labelEmail,
                     disableSpacing: true,
                     valid: props.isEmailValid,
                     controller: emailController,

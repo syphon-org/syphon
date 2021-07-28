@@ -21,7 +21,7 @@ class StringKeys {
   static const titleTheming = 'title-view-theming';
   static const titleAdvanced = 'title-view-advanced';
   static const titleInvite = 'title-view-invite';
-  static const titleChatSettings = 'title-view-preferences-chat';
+  static const titleChatSettings = 'title-view-settings-chat';
   static const titlePrivacy = 'title-view-privacy';
   static const titleHomeserverSearch = 'title-view-homeserver-search';
   static const titleEmailVerification = 'title-user-verification';

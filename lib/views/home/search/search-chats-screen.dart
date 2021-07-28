@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +15,7 @@ import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -89,7 +87,7 @@ class ChatSearchState extends State<ChatSearchScreen> {
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Invite $username',
-        content: '${Strings.confirmationInvite}\n\nUser: $username\nRoom: ${room.name}',
+        content: '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
         action: 'send invite',
         onStartChat: () async {
           props.onSendInvite(room: room, user: user);
@@ -320,7 +318,7 @@ class ChatSearchState extends State<ChatSearchScreen> {
             ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
         return Scaffold(
           appBar: AppBarSearch(
-            title: '${tr(StringKeys.titleInvite)} ${formatUsername(arguments.user!)}',
+            title: '${Strings.titleInvite} ${formatUsername(arguments.user!)}',
             label: 'Search any room info...',
             tooltip: 'Search Joined Rooms',
             brightness: Brightness.dark,

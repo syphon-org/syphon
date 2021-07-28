@@ -6,8 +6,7 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
@@ -17,16 +16,16 @@ class DialogInviteUsers extends StatelessWidget {
   const DialogInviteUsers({
     Key? key,
     this.users,
-    this.title = 'Invite Users',
-    this.content = Strings.confirmationAttemptChat,
-    this.action = 'invite users',
+    this.title,
+    this.content,
+    this.action,
     this.onCancel,
     this.onInviteUsers,
   }) : super(key: key);
 
-  final String title;
-  final String content;
-  final String action;
+  final String? title;
+  final String? content;
+  final String? action;
   final List<User?>? users;
   final Function? onCancel;
   final Function? onInviteUsers;
@@ -37,19 +36,19 @@ class DialogInviteUsers extends StatelessWidget {
 
     return StatefulBuilder(
       builder: (context, setState) {
-        double width = MediaQuery.of(context).size.width;
+        final double width = MediaQuery.of(context).size.width;
 
         return SimpleDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text(title),
+          title: Text(title ?? Strings.titleInviteUsers),
           contentPadding: EdgeInsets.symmetric(
             horizontal: width * 0.05,
             vertical: 12,
           ),
           children: <Widget>[
-            Text(content),
+            Text(content ?? Strings.confirmAttemptChat),
             Container(
               padding: EdgeInsets.only(top: 8),
               child: Row(
@@ -67,7 +66,7 @@ class DialogInviteUsers extends StatelessWidget {
                   ),
                   ButtonText(
                     textWidget: Text(
-                      action,
+                      action ?? Strings.titleInviteUsers.toLowerCase(),
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     loading: creating,
@@ -97,11 +96,17 @@ class Props extends Equatable {
 
   final Function onCompleteCaptcha;
 
-  Props({
+  const Props({
     required this.completed,
     required this.publicKey,
     required this.onCompleteCaptcha,
   });
+
+  @override
+  List<Object?> get props => [
+        completed,
+        publicKey,
+      ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
@@ -117,10 +122,4 @@ class Props extends Equatable {
           Navigator.of(context).pop();
         },
       );
-
-  @override
-  List<Object?> get props => [
-        completed,
-        publicKey,
-      ];
 }

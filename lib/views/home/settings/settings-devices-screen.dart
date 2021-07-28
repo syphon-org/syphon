@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +10,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
+
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -146,7 +144,7 @@ class DeviceViewState extends State<DevicesScreen> {
         onPressed: () => Navigator.pop(context!, false),
       ),
       title: Text(
-        tr(StringKeys.titleDevices),
+        Strings.titleDevices,
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,
@@ -322,7 +320,7 @@ class _Props extends Equatable {
               context: context,
               builder: (dialogContext) => DialogConfirmPassword(
                 key: Key(authSession),
-                title: tr(StringKeys.titleConfirmPassword),
+                title: Strings.titleConfirmPassword,
                 content: Strings.contentDeleteDevices,
                 onConfirm: () async {
                   final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();

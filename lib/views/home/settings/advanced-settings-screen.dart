@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -64,7 +63,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleAdvanced),
+                Strings.titleAdvanced,
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
               ),
             ),

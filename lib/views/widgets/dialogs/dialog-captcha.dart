@@ -8,8 +8,6 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/string-keys.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
@@ -48,7 +46,7 @@ class DialogCaptcha extends StatelessWidget {
             right: 8,
             bottom: 16,
           ),
-          title: Text(tr(StringKeys.titleDialogCaptcha)),
+          title: Text(Strings.titleDialogCaptcha),
           children: <Widget>[
             Container(
               width: width,
@@ -71,7 +69,7 @@ class DialogCaptcha extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 ButtonText(
-                  text: 'Cancel',
+                  text: Strings.buttonCancel,
                   onPressed: () {
                     if (onCancel != null) {
                       onCancel!();
