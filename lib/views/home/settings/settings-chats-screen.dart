@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +7,8 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/string-keys.dart';
+
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -35,7 +35,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                tr(StringKeys.titleViewPreferencesChat),
+                Strings.titleChatSettings,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -311,7 +311,7 @@ class Props extends Equatable {
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         onIncrementLanguage: () {
           store.dispatch(addInfo(
-            message: tr('alert-restart-app-effect'),
+            message: Strings.alertAppRestartEffect,
             action: 'Dismiss',
           ));
           store.dispatch(incrementLanguage(context));

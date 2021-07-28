@@ -26,7 +26,7 @@ class DialogInvite extends StatelessWidget {
           Container(
             padding: Dimensions.dialogContentPadding,
             child: Text(
-              Strings.confirmationAcceptInvite,
+              Strings.confirmAcceptInvite,
               textAlign: TextAlign.left,
             ),
           ),

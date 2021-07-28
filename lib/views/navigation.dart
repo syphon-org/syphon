@@ -12,7 +12,7 @@ import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/profile/profile-screen.dart';
 import 'package:syphon/views/home/search/search-groups-screen.dart';
-import 'package:syphon/views/home/search/search-rooms-screen.dart';
+import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/home/search/search-users-screen.dart';
 import 'package:syphon/views/home/settings/advanced-settings-screen.dart';
 import 'package:syphon/views/home/settings/blocked-screen.dart';
@@ -49,23 +49,57 @@ class NavigationService {
   }
 }
 
-// TODO: finish converting over to NavigationPaths for all routes
 class NavigationPaths {
+  // Onboarding
+  static const loading = '/loading';
   static const intro = '/intro';
   static const login = '/login';
   static const signup = '/signup';
   static const forgot = '/forgot';
   static const reset = '/reset';
-  static const searchHomeservers = '/search/homeservers';
-  static const searchRooms = '/home/rooms/search';
-  static const userDetails = '/home/user/details';
   static const verification = '/verification';
-  static const theming = '/theming';
+  static const searchHomeservers = '/search/homeservers';
+
+  // Main (Authed)
   static const home = '/home';
-  static const settings = '/settings';
-  static const devices = '/devices';
-  static const blocked = '/blocked';
-  static const loading = '/loading';
+
+  // Search
+  static const searchAll = '/home/search';
+  static const searchChats = '/home/search/chats';
+  static const searchUsers = '/home/search/users';
+  static const searchGroups = '/home/search/groups';
+
+  // Users
+  static const userInvite = '/home/user/invite';
+  static const userDetails = '/home/user/details';
+
+  // Groups
+  static const groupCreate = '/home/groups/create';
+  static const groupCreatePublic = '/home/groups/create/public';
+
+  // Chats and Messages
+  static const chat = '/home/chat';
+  static const chatUsers = '/home/chat/users';
+  static const chatDetails = '/home/chat/details';
+  static const messageDetails = '/home/message/details';
+
+  // Settings
+  static const settings = '/home/settings';
+  static const settingsChat = '/home/settings/chat';
+  static const settingsProfile = '/home/settings/profile';
+  static const settingsStorage = '/home/settings/storage';
+  static const settingsPrivacy = '/home/settings/privacy';
+  static const settingsDevices = '/home/settings/devices';
+  static const settingsBlocked = '/home/settings/blocked';
+  static const settingsPassword = '/home/settings/password';
+  static const settingsAdvanced = '/home/settings/advanced';
+  static const settingsNotifications = '/home/settings/notifications';
+
+  // Settings (Global)
+  static const theming = '/settings/theming';
+
+  // Misc
+  static const licenses = '/licenses';
 }
 
 class NavigationProvider {
@@ -78,29 +112,30 @@ class NavigationProvider {
         NavigationPaths.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
         NavigationPaths.verification: (BuildContext context) => const VerificationScreen(),
         NavigationPaths.home: (BuildContext context) => const HomeScreen(),
-        '/home/chat': (BuildContext context) => const ChatScreen(),
-        '/home/chat/settings': (BuildContext context) => const ChatDetailsScreen(),
-        '/home/chat/details': (BuildContext context) => const MessageDetailsScreen(),
-        '/home/chat/users': (BuildContext context) => const ChatUsersDetailScreen(),
-        '/home/user/search': (BuildContext context) => const SearchUserScreen(),
-        '/home/user/details': (BuildContext context) => const UserProfileScreen(),
-        '/home/user/invite': (BuildContext context) => const InviteUsersScreen(),
-        '/home/rooms/search': (BuildContext context) => const RoomSearchScreen(),
-        '/home/groups/search': (BuildContext context) => const GroupSearchScreen(),
-        '/home/groups/create': (BuildContext context) => const CreateGroupScreen(),
-        '/home/groups/create/public': (BuildContext context) => const CreatePublicGroupScreen(),
-        '/profile': (BuildContext context) => const ProfileScreen(),
-        '/notifications': (BuildContext context) => const NotificationSettingsScreen(),
-        '/advanced': (BuildContext context) => const AdvancedSettingsScreen(),
-        '/storage': (BuildContext context) => const StorageSettingsScreen(),
-        '/password': (BuildContext context) => const PasswordUpdateView(),
-        '/licenses': (BuildContext context) => const LicensePage(applicationName: Values.appName),
-        '/privacy': (BuildContext context) => const PrivacySettingsScreen(),
-        '/chat-preferences': (BuildContext context) => const ChatsSettingsScreen(),
+        NavigationPaths.chat: (BuildContext context) => const ChatScreen(),
+        NavigationPaths.chatDetails: (BuildContext context) => const ChatDetailsScreen(),
+        NavigationPaths.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
+        NavigationPaths.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
+        NavigationPaths.searchUsers: (BuildContext context) => const SearchUserScreen(),
+        NavigationPaths.userDetails: (BuildContext context) => const UserProfileScreen(),
+        NavigationPaths.userInvite: (BuildContext context) => const InviteUsersScreen(),
+        NavigationPaths.searchChats: (BuildContext context) => const ChatSearchScreen(),
+        NavigationPaths.searchGroups: (BuildContext context) => const GroupSearchScreen(),
+        NavigationPaths.groupCreate: (BuildContext context) => const CreateGroupScreen(),
+        NavigationPaths.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
+        NavigationPaths.settingsProfile: (BuildContext context) => const ProfileScreen(),
+        NavigationPaths.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
+        NavigationPaths.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
+        NavigationPaths.settingsStorage: (BuildContext context) => const StorageSettingsScreen(),
+        NavigationPaths.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
+        NavigationPaths.licenses: (BuildContext context) =>
+            const LicensePage(applicationName: Values.appName),
+        NavigationPaths.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
+        NavigationPaths.settingsChat: (BuildContext context) => const ChatsSettingsScreen(),
         NavigationPaths.theming: (BuildContext context) => const ThemingSettingsScreen(),
-        NavigationPaths.devices: (BuildContext context) => DevicesScreen(),
+        NavigationPaths.settingsDevices: (BuildContext context) => DevicesScreen(),
         NavigationPaths.settings: (BuildContext context) => const SettingsScreen(),
-        NavigationPaths.blocked: (BuildContext context) => const BlockedScreen(),
+        NavigationPaths.settingsBlocked: (BuildContext context) => const BlockedScreen(),
         NavigationPaths.loading: (BuildContext context) => const LoadingScreen(),
       };
 }

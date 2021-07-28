@@ -8,6 +8,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/formatters.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -72,7 +73,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => DialogEncryption(
-        content: Strings.confirmationGroupEncryption,
+        content: Strings.confirmGroupEncryption,
         onAccept: () {
           setState(() {
             encryption = !encryption;
@@ -342,7 +343,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  Strings.labelUsersSection,
+                                                  Strings.labelUsers,
                                                   textAlign: TextAlign.start,
                                                   style: Theme.of(context).textTheme.subtitle2,
                                                 ),

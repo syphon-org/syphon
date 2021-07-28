@@ -27,7 +27,7 @@ abstract class Encryption {
   /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchKeys({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
     String? lastSince,
@@ -62,7 +62,7 @@ abstract class Encryption {
   /// Returns the current devices and identity keys for the given users.
   static Future<dynamic> fetchRoomKeys({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     int timeout = 10 * 1000, // 10 seconds
     String? lastSince,
@@ -96,7 +96,7 @@ abstract class Encryption {
   ///
   static Future<dynamic> fetchKeyChanges({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? from,
     String? to,
@@ -123,7 +123,7 @@ abstract class Encryption {
   ///
   static Future<Map<String, dynamic>> claimKeys({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     Map? oneTimeKeys,
   }) async {
@@ -150,7 +150,7 @@ abstract class Encryption {
 
   static Future<dynamic> uploadKeys({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     Map? data,
   }) async {
@@ -179,7 +179,7 @@ abstract class Encryption {
   ///
   static Future<dynamic> requestKeys({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? requestId,
     String? roomId,

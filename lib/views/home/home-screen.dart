@@ -8,14 +8,17 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -93,8 +96,8 @@ class HomeState extends State<HomeScreen> {
             onPressed: () {
               Navigator.pushNamed(
                 context!,
-                '/home/chat/settings',
-                arguments: ChatDetailArguments(
+                NavigationPaths.chatDetails,
+                arguments: ChatDetailsArguments(
                   roomId: selectedRoom!.id,
                   title: selectedRoom!.name,
                 ),
@@ -168,7 +171,7 @@ class HomeState extends State<HomeScreen> {
               unauthed: props.unauthed,
               tooltip: 'Profile and Settings',
               onPressed: () {
-                Navigator.pushNamed(context, '/profile');
+                Navigator.pushNamed(context, NavigationPaths.settingsProfile);
               },
             ),
             Text(
@@ -186,7 +189,7 @@ class HomeState extends State<HomeScreen> {
             icon: Icon(Icons.search),
             tooltip: 'Search Chats',
             onPressed: () {
-              Navigator.pushNamed(context, '/search');
+              Navigator.pushNamed(context, NavigationPaths.searchAll);
             },
           ),
           RoundedPopupMenu<Options>(
@@ -194,13 +197,13 @@ class HomeState extends State<HomeScreen> {
             onSelected: (Options result) {
               switch (result) {
                 case Options.newGroup:
-                  Navigator.pushNamed(context, '/home/groups/create');
+                  Navigator.pushNamed(context, NavigationPaths.groupCreate);
                   break;
                 case Options.markAllRead:
                   props.onMarkAllRead();
                   break;
                 case Options.settings:
-                  Navigator.pushNamed(context, '/settings');
+                  Navigator.pushNamed(context, NavigationPaths.settings);
                   break;
                 case Options.help:
                   props.onSelectHelp();
@@ -240,6 +243,8 @@ class HomeState extends State<HomeScreen> {
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
 
+    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+
     if (rooms.isEmpty) {
       return Center(
           child: Column(
@@ -253,7 +258,7 @@ class HomeState extends State<HomeScreen> {
             ),
             child: SvgPicture.asset(
               Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsLabelHomeEmpty,
+              semanticsLabel: Strings.semanticsHomeDefault,
             ),
           ),
           GestureDetector(
@@ -261,7 +266,7 @@ class HomeState extends State<HomeScreen> {
               margin: EdgeInsets.only(bottom: 48),
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                props.syncing ? Strings.labelSyncing : Strings.labelNoMessages,
+                label,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
@@ -344,11 +349,8 @@ class HomeState extends State<HomeScreen> {
             } else {
               Navigator.pushNamed(
                 context,
-                '/home/chat',
-                arguments: ChatScreenArguments(
-                  roomId: room.id,
-                  title: chatName,
-                ),
+                NavigationPaths.chat,
+                arguments: ChatScreenArguments(roomId: room.id, title: chatName),
               );
             }
           },

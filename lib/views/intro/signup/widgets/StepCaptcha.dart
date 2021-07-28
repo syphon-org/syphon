@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +9,8 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
@@ -51,7 +52,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                 ),
                 child: SvgPicture.asset(
                   Assets.heroAcceptTerms,
-                  semanticsLabel: tr('semantics-image-terms-of-service'),
+                  semanticsLabel: Strings.labelTermsOfService,
                 ),
               ),
             ),
@@ -64,7 +65,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                   Container(
                     padding: EdgeInsets.only(bottom: 8, top: 8),
                     child: Text(
-                      tr('content-signup-captcha-requirement'),
+                      Strings.contentCaptchaRequirement,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.caption,
                     ),
@@ -113,12 +114,8 @@ class CaptchaStepState extends State<CaptchaStep> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonText(
-                    text: !props.completed
-                        ? tr('button-text-load-captcha')
-                        : tr('button-text-confirmed'),
-                    color: !props.completed
-                        ? Color(Colours.cyanSyphon)
-                        : Color(Colours.cyanSyphonAlpha),
+                    text: !props.completed ? Strings.buttonTextLoadCaptcha : Strings.buttonTextConfirmed,
+                    color: !props.completed ? Color(Colours.cyanSyphon) : Color(Colours.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => props.onShowCaptcha(

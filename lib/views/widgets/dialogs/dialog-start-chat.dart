@@ -12,20 +12,20 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogStartChat extends StatelessWidget {
-  DialogStartChat({
+  const DialogStartChat({
     Key? key,
     this.user,
     this.title = 'Try chatting',
-    this.content = Strings.confirmationAttemptChat,
-    this.action = Strings.buttonLetsChat,
+    this.content,
+    this.action,
     this.onCancel,
     this.onStartChat,
   }) : super(key: key);
 
   final User? user;
   final String title;
-  final String content;
-  final String action;
+  final String? content;
+  final String? action;
   final Function? onCancel;
   final Function? onStartChat;
 
@@ -35,7 +35,7 @@ class DialogStartChat extends StatelessWidget {
 
     return StatefulBuilder(
       builder: (context, setState) {
-        double width = MediaQuery.of(context).size.width;
+        final double width = MediaQuery.of(context).size.width;
 
         return SimpleDialog(
           shape: RoundedRectangleBorder(
@@ -47,7 +47,9 @@ class DialogStartChat extends StatelessWidget {
             vertical: 12,
           ),
           children: <Widget>[
-            Text(content),
+            Text(
+              content ?? Strings.confirmAttemptChat,
+            ),
             Container(
               padding: EdgeInsets.only(top: 8),
               child: Row(
@@ -65,7 +67,7 @@ class DialogStartChat extends StatelessWidget {
                   ),
                   ButtonText(
                     textWidget: Text(
-                      action,
+                      action ?? Strings.buttonStartChat,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     loading: creating,
@@ -104,11 +106,9 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-              [MatrixAuthTypes.RECAPTCHA]['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
-        onCompleteCaptcha: (String token,
-            {required BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

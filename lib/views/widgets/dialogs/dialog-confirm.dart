@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogConfirm extends StatelessWidget {
@@ -10,14 +11,14 @@ class DialogConfirm extends StatelessWidget {
     Key? key,
     this.title = '',
     this.content = '',
-    this.confirm = Strings.buttonConfirm,
+    this.confirm,
     this.onConfirm,
     this.onDismiss,
   }) : super(key: key);
 
   final String title;
   final String content;
-  final String confirm;
+  final String? confirm;
   final Function? onConfirm;
   final Function? onDismiss;
 
@@ -46,7 +47,7 @@ class DialogConfirm extends StatelessWidget {
                 ButtonText(
                   onPressed: () => onConfirm!(),
                   textWidget: Text(
-                    confirm,
+                    confirm ?? Strings.buttonConfirm,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),

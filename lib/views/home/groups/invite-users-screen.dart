@@ -18,6 +18,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
@@ -183,7 +184,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
       builder: (BuildContext context) => DialogInviteUsers(
         users: invites,
         title: 'Invite To ${room!.name}',
-        content: Strings.confirmationInvites +
+        content: Strings.confirmInvites +
             '\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?',
         action: 'send ${invitePlurialized.toLowerCase()}',
         onInviteUsers: () async {
@@ -270,11 +271,11 @@ class InviteUsersState extends State<InviteUsersScreen> {
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel = searchable.isEmpty ? Strings.labelRecentUsers : Strings.labelSearchedUsers;
+        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
-            title: Strings.titleInviteusers,
+            title: Strings.titleInviteUsers,
             label: 'Search for a user...',
             tooltip: 'Search Users',
             elevation: 0,
@@ -298,7 +299,7 @@ class InviteUsersState extends State<InviteUsersScreen> {
                 child: SvgPicture.asset(
                   Assets.iconChevronsRightBeing,
                   color: Colors.white,
-                  semanticsLabel: Strings.semanticsLabelHomeEmpty,
+                  semanticsLabel: Strings.semanticsHomeDefault,
                 ),
               ),
             ),

@@ -60,7 +60,7 @@ class SecureStorage {
         return await File(join(directory.path, key)).readAsString();
       } catch (error) {
         printError('[SecureStorage.read] $key $error');
-        throw error;
+        return null;
       }
     }
 

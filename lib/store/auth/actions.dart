@@ -1158,7 +1158,7 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
     try {
       homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
       if (!homeserver.valid) {
-        throw Exception(Strings.errorCheckHomeserver);
+        throw Exception(Strings.alertCheckHomeserver);
       }
     } catch (error) {
       printError('[selectHomserver] $error');
@@ -1245,7 +1245,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
     } else {
       if (!hostname.contains('.')) {
         store.dispatch(setHostname(
-          hostname: homeserver.hostname ?? 'matrix.org',
+          hostname: homeserver.hostname ?? Values.homeserverDefault,
         ));
       }
     }

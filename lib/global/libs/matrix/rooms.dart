@@ -15,7 +15,7 @@ abstract class Rooms {
   /// for new events
   static Future<dynamic> sync({
     String? protocol = 'https://', // http or https ( or libp2p :D )
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? since,
     bool? fullState = false,
@@ -73,7 +73,7 @@ abstract class Rooms {
   /// Sync (filter by roomId)
   static Future<dynamic> syncRoom({
     String protocol = 'https://', // http or https ( or libp2p :D )
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? since,
     String? roomId,
@@ -97,7 +97,7 @@ abstract class Rooms {
 
   static Future<dynamic> fetchRoomIds({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
   }) async {
@@ -117,7 +117,7 @@ abstract class Rooms {
 
   static Future<dynamic> fetchDirectRoomIds({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
   }) async {
@@ -144,7 +144,7 @@ abstract class Rooms {
   */
   static Future<dynamic> joinRoom({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
   }) async {
@@ -180,7 +180,7 @@ abstract class Rooms {
   /// to the room, but had not joined, this call serves to reject the invite.
   static Future<dynamic> createRoom({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? name,
     String? alias,
@@ -238,7 +238,7 @@ abstract class Rooms {
   /// before calling this API.
   static Future<dynamic> leaveRoom({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
   }) async {
@@ -275,7 +275,7 @@ abstract class Rooms {
   /// Must leave room before you can forget (The Way)
   static Future<dynamic> forgetRoom({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
   }) async {
@@ -309,7 +309,7 @@ abstract class Rooms {
   ///
   static Future<dynamic> deleteRoomAlias({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomAlias,
   }) async {
@@ -339,7 +339,7 @@ abstract class Rooms {
   ///
   static Future<dynamic> createFilter({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? userId,
     bool lazyLoading = false,
@@ -379,7 +379,7 @@ abstract class Rooms {
   /// Create a filter to use when fetching room state, messages, or /sync'ing
   static Future<dynamic> fetchFilter({
     String protocol = 'https://',
-    String homeserver = 'matrix.org',
+    String homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomAlias,
     String? filterId,
@@ -411,7 +411,7 @@ abstract class Rooms {
   ///
   static Future<dynamic> fetchRoomName({
     String? protocol = 'https://',
-    String? homeserver = 'matrix.org',
+    String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
   }) async {

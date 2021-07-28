@@ -7,9 +7,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -23,8 +23,7 @@ class VerificationScreen extends StatefulWidget {
   VerificationScreenState createState() => VerificationScreenState();
 }
 
-class VerificationScreenState extends State<VerificationScreen>
-    with WidgetsBindingObserver {
+class VerificationScreenState extends State<VerificationScreen> with WidgetsBindingObserver {
   late bool sending;
   bool? success;
 
@@ -100,8 +99,7 @@ class VerificationScreenState extends State<VerificationScreen>
                             ),
                             child: SvgPicture.asset(
                               Assets.heroSignupVerificationView,
-                              semanticsLabel:
-                                  'Letter in envelop floating upward with attached balloons',
+                              semanticsLabel: 'Letter in envelop floating upward with attached balloons',
                             ),
                           ),
                         ),
@@ -117,56 +115,48 @@ class VerificationScreenState extends State<VerificationScreen>
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
-                              Container(
-                                child: Stack(
-                                  overflow: Overflow.visible,
-                                  children: <Widget>[
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 8,
-                                        horizontal: 24,
-                                      ),
-                                      child: Text(
-                                        'Verify your email address',
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
+                              Stack(
+                                overflow: Overflow.visible,
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 24,
                                     ),
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) =>
-                                                DialogExplaination(
-                                              title: Strings
-                                                  .titleDialogEmailVerifiedRequirement,
-                                              content: Strings
-                                                  .contentEmailVerifiedRequirement,
-                                              onConfirm: () {
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
-                                          height: 20,
-                                          width: 20,
-                                          child: Icon(
-                                            Icons.info_outline,
-                                            color:
-                                                Theme.of(context).accentColor,
-                                            size: 20,
+                                    child: Text(
+                                      'Verify your email address',
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.headline5,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) => DialogExplaination(
+                                            title: Strings.titleDialogSignupEmailVerification,
+                                            content: Strings.contentEmailVerification,
+                                            onConfirm: () {
+                                              Navigator.pop(context);
+                                            },
                                           ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 20,
+                                        width: 20,
+                                        child: Icon(
+                                          Icons.info_outline,
+                                          color: Theme.of(context).accentColor,
+                                          size: 20,
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -210,8 +200,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                   text: 'check verification',
                                   disabled: sending || props.loading,
                                   onPressed: () async {
-                                    final result = await props.onCreateUser(
-                                        enableErrors: true);
+                                    final result = await props.onCreateUser(enableErrors: true);
                                     setState(() {
                                       success = result;
                                     });

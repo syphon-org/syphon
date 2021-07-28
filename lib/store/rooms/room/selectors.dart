@@ -21,7 +21,7 @@ String formatRoomInitials({required Room room}) {
 }
 
 String formatPreviewTopic(String? fullTopic) {
-  final topic = fullTopic ?? Strings.contentTopicEmpty;
+  final topic = fullTopic ?? Strings.placeholderTopic;
   final topicTruncated = topic.length > 100 ? topic.substring(0, 100) : topic;
   return topicTruncated.replaceAll('\n', ' ');
 }
@@ -63,7 +63,7 @@ String formatPreview({required Room room, Message? message}) {
 
   // message hasn't been decrypted
   if (message.type == EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
-    return Strings.contentEncryptedMessage;
+    return Strings.labelEncryptedMessage;
   }
 
   return formatPreviewMessage(message.body);

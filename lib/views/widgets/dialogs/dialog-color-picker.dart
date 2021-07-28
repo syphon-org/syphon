@@ -147,7 +147,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
             Navigator.pop(context);
           },
           child: Text(
-            'cancel',
+            Strings.buttonCancel,
             style: Theme.of(context).textTheme.subtitle1,
           ),
         ),
@@ -162,7 +162,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
             Navigator.pop(context);
           },
           child: Text(
-            'confirm',
+            Strings.buttonConfirmFormal,
             style: Theme.of(context).textTheme.subtitle1,
           ),
         ),

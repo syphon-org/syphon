@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogTextInput extends StatefulWidget {
@@ -45,8 +46,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
     final double width = MediaQuery.of(context).size.width;
     final double defaultWidgetScaling = width * 0.725;
 
-    final editingController =
-        widget.editingController ?? editingControllerDefault;
+    final editingController = widget.editingController ?? editingControllerDefault;
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -138,15 +138,12 @@ class _DialogTextInputState extends State<DialogTextInput> {
               onPressed: !editingController.value.text.isNotEmpty
                   ? null
                   : () {
-                      if (widget.onConfirm != null &&
-                          editingController.value.text.isNotEmpty) {
+                      if (widget.onConfirm != null && editingController.value.text.isNotEmpty) {
                         widget.onConfirm!(editingController.value.text);
                       }
                       Navigator.of(context).pop();
                     },
-              child: !widget.loading
-                  ? Text(Strings.buttonSaveGeneric)
-                  : LoadingIndicator(size: 16),
+              child: !widget.loading ? Text(Strings.buttonSave) : LoadingIndicator(size: 16),
             ),
           ],
         )

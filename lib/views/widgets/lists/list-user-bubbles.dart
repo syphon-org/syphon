@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -95,13 +95,13 @@ class ListUserBubbles extends StatelessWidget {
                       if (invite) {
                         Navigator.pushNamed(
                           context,
-                          '/home/user/invite',
+                          NavigationPaths.userInvite,
                           arguments: InviteUsersArguments(roomId: null),
                         );
                       } else {
                         Navigator.pushNamed(
                           context,
-                          '/home/chat/users',
+                          NavigationPaths.chatUsers,
                           arguments: ChatUsersDetailArguments(roomId: roomId),
                         );
                       }
