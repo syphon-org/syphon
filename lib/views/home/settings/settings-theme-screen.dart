@@ -15,14 +15,14 @@ import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
-class ThemingSettingsScreen extends StatefulWidget {
-  const ThemingSettingsScreen({Key? key}) : super(key: key);
+class ThemeSettingsScreen extends StatefulWidget {
+  const ThemeSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  _ThemingSettingsScreenState createState() => _ThemingSettingsScreenState();
+  _ThemeSettingsScreenState createState() => _ThemeSettingsScreenState();
 }
 
-class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
+class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
   onToggleAdvancedColors(BuildContext context, Function onAdvanced) async {
     await showDialog(
       context: context,
@@ -64,6 +64,20 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                 )),
       ),
     );
+  }
+
+  // NOTE: example of calling actions without mapping dispatch
+  // NOTE: example of calling actions using Store.of(context)
+  onIncrementFabType() {
+    final store = StoreProvider.of<AppState>(context);
+
+    store.dispatch(incrementFabType());
+  }
+
+  onIncrementFabLocation() {
+    final store = StoreProvider.of<AppState>(context);
+
+    store.dispatch(incrementFabLocation());
   }
 
   @override
@@ -247,6 +261,26 @@ class _ThemingSettingsScreenState extends State<ThemingSettingsScreen> {
                             props.avatarShape,
                           ),
                         ),
+                        ListTile(
+                          onTap: () => onIncrementFabType(),
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Main FAB Type',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(props.mainFabType),
+                        ),
+                        ListTile(
+                          onTap: () => onIncrementFabLocation(),
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Main FAB Location',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.mainFabLocation,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -268,6 +302,8 @@ class _Props extends Equatable {
   final String fontSize;
   final String messageSize;
   final String avatarShape;
+  final String mainFabType;
+  final String mainFabLocation;
 
   final bool roomTypeBadgesEnabled;
 
@@ -291,6 +327,8 @@ class _Props extends Equatable {
     required this.fontSize,
     required this.messageSize,
     required this.avatarShape,
+    required this.mainFabType,
+    required this.mainFabLocation,
     required this.roomTypeBadgesEnabled,
     required this.onSelectPrimaryColor,
     required this.onSelectAccentColor,
@@ -314,6 +352,8 @@ class _Props extends Equatable {
         fontSize,
         avatarShape,
         roomTypeBadgesEnabled,
+        mainFabType,
+        mainFabLocation,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -327,6 +367,8 @@ class _Props extends Equatable {
         messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
         avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
+        mainFabType: selectMainFabType(store.state.settingsStore.themeSettings),
+        mainFabLocation: selectMainFabLocation(store.state.settingsStore.themeSettings),
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
         ),

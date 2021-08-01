@@ -521,6 +521,24 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
+  buildActionFab(_Props props) {
+    final fabType = props.fabType;
+
+    if (fabType == MainFabType.Bar) {
+      return ActionRing(fabKey: fabKey);
+    }
+
+    return ActionRing(fabKey: fabKey);
+  }
+
+  selectActionLocation(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return FloatingActionButtonLocation.startFloat;
+    }
+
+    return FloatingActionButtonLocation.endFloat;
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -540,7 +558,8 @@ class HomeState extends State<HomeScreen> {
 
           return Scaffold(
             appBar: currentAppBar as PreferredSizeWidget?,
-            floatingActionButton: ActionRing(fabKey: fabKey),
+            floatingActionButton: buildActionFab(props),
+            floatingActionButtonLocation: selectActionLocation(props),
             body: Align(
               alignment: Alignment.topCenter,
               child: Column(
@@ -580,6 +599,8 @@ class _Props extends Equatable {
   final bool roomTypeBadgesEnabled;
   final User currentUser;
   final ThemeType themeType;
+  final MainFabType fabType;
+  final MainFabLocation fabLocation;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
 
@@ -600,6 +621,8 @@ class _Props extends Equatable {
     required this.messages,
     required this.currentUser,
     required this.chatSettings,
+    required this.fabType,
+    required this.fabLocation,
     required this.roomTypeBadgesEnabled,
     required this.onDebug,
     required this.onLeaveChat,
@@ -621,6 +644,8 @@ class _Props extends Equatable {
         currentUser,
         chatSettings,
         roomTypeBadgesEnabled,
+        fabType,
+        fabLocation,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -632,6 +657,8 @@ class _Props extends Equatable {
         messages: store.state.eventStore.messages,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
+        fabType: store.state.settingsStore.themeSettings.mainFabType,
+        fabLocation: store.state.settingsStore.themeSettings.mainFabLocation,
         syncing: () {
           final synced = store.state.syncStore.synced;
           final syncing = store.state.syncStore.syncing;

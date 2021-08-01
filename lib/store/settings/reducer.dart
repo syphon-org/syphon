@@ -37,6 +37,16 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return state.copyWith(
         themeSettings: state.themeSettings.copyWith(avatarShape: action.avatarShape),
       );
+    case SetMainFabType:
+      final _action = action as SetMainFabType;
+      return state.copyWith(
+        themeSettings: state.themeSettings.copyWith(mainFabType: _action.fabType),
+      );
+    case SetMainFabLocation:
+      final _action = action as SetMainFabLocation;
+      return state.copyWith(
+        themeSettings: state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
+      );
     case SetDevices:
       return state.copyWith(
         devices: action.devices,

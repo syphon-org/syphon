@@ -4,6 +4,14 @@ import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/colours.dart';
 import 'model.dart';
 
+String selectMainFabType(ThemeSettings themeSettings) {
+  return enumToString(themeSettings.mainFabType);
+}
+
+String selectMainFabLocation(ThemeSettings themeSettings) {
+  return enumToString(themeSettings.mainFabLocation);
+}
+
 String selectThemeTypeString(ThemeType themeType) {
   return enumToString(themeType);
 }
