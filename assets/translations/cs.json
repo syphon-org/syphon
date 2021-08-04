@@ -1,1 +1,9 @@
-{}
+{
+    "title-view-search-users": "Vyhledat Uživatele",
+    "title-view-search-groups": "Prozkoumej Skupiny",
+    "title-view-delete-devices": "Potvrďte odstranění zařízení",
+    "header-signup-username": "Vytvořit uživatele",
+    "header-intro": "Soukromí a svoboda\nbez problémú.",
+    "header-login": "vrátit se k chatu",
+    "title-intro": "Vítejte v {}"
+}
