@@ -110,5 +110,7 @@
     "label-email": "E-Mail",
     "label-off": "Aus",
     "label-on": "An",
-    "label-searching": "Suchen…"
+    "label-searching": "Suchen…",
+    "button-text-agreement": "Ich stimme zu",
+    "content-password-recommendation": "Versuche dir 3 oder mehr zufällige Wörter zu überlegen, an die du dich leicht erinnern kannst"
 }
